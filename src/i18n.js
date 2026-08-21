@@ -79,8 +79,9 @@ export function detectLocale(text) {
   return bestScore >= 2 || bestScore > second ? getLocale(bestCode) : null;
 }
 
+// Query language has priority over settings/device language. The request value is
+// used only when the query is empty or its language cannot be detected.
 export function localeFromRequest(value, queryText = "") {
   const requested = String(value || "").split(",")[0].trim().toLowerCase();
-  if (requested && byCode.has(requested)) return getLocale(requested);
   return detectLocale(queryText) || getLocale(requested) || getLocale(DEFAULT_LOCALE);
 }
