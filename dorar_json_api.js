@@ -12,6 +12,7 @@ import { calculateInheritance, supportedMadhahib } from "./src/inheritance-calcu
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
+const API_VERSION = "0.8.3";
 const MAX_QUERY_LENGTH = Number(process.env.MAX_QUERY_LENGTH || 300);
 const PUBLIC_WINDOW_MS = 60_000;
 const PUBLIC_MAX_PER_WINDOW = Number(process.env.PUBLIC_MAX_PER_MINUTE || 30);
@@ -49,7 +50,7 @@ const server = http.createServer(async (req, res) => {
     ? localeFromRequest(requestedLanguage)
     : (detectLocale(queryText) || localeFromRequest(req.headers["accept-language"] || DEFAULT_LOCALE));
 
-  if (url.pathname === "/health") return sendJson(res, 200, { ok: true, service: "deen-allah-encyclopedia-api", name: "موسوعة دين الله", version: "0.8.1", locale, timestamp: new Date().toISOString() });
+  if (url.pathname === "/health") return sendJson(res, 200, { ok: true, service: "deen-allah-encyclopedia-api", name: "موسوعة دين الله", version: API_VERSION, locale, timestamp: new Date().toISOString() });
 
   const rawKey = String(req.headers["x-api-key"] || "").trim();
   const keyHash = rawKey ? hashKey(rawKey) : null;
@@ -57,7 +58,7 @@ const server = http.createServer(async (req, res) => {
   if (rawKey && (!app || !app.enabled)) return sendJson(res, 401, { error: "Invalid or disabled API key" });
   if (!consume(app ? `app:${keyHash}` : `ip:${clientIp(req)}`, app ? APP_MAX_PER_WINDOW : PUBLIC_MAX_PER_WINDOW, PUBLIC_WINDOW_MS)) return sendJson(res, 429, { error: "Rate limit exceeded", retryAfterSeconds: 60 });
 
-  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة دين الله", nameEn: "Deen Allah Encyclopedia", service: "Deen Allah API", version: "0.8.1", locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid", tajweed: "/tajweed", tajweedLesson: "/tajweed/lesson?id=letters", inheritance: "/inheritance?estate=100000&sons=1&daughters=1&madhhab=hanbali", inheritanceMadhahib: "/inheritance/madhahib" } });
+  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة دين الله", nameEn: "Deen Allah Encyclopedia", service: "Deen Allah API", version: API_VERSION, locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid", tajweed: "/tajweed", tajweedLesson: "/tajweed/lesson?id=letters", inheritance: "/inheritance?estate=100000&sons=1&daughters=1&madhhab=hanbali", inheritanceMadhahib: "/inheritance/madhahib" } });
   if (url.pathname === "/locales") return sendJson(res, 200, { default: DEFAULT_LOCALE, count: listLocales().length, locales: listLocales() });
   if (url.pathname === "/categories") return sendJson(res, 200, { locale, direction: locale.dir, categories: listCategories() });
   if (url.pathname === "/sources") return sendJson(res, 200, { locale, sources: listSources({ category: requireString(url.searchParams.get("category")), role: requireString(url.searchParams.get("role")) }) });
@@ -78,7 +79,7 @@ const server = http.createServer(async (req, res) => {
         debts: Number(url.searchParams.get("debts") || 0),
         bequest: Number(url.searchParams.get("bequest") || 0),
         heirs: {
-          husband: intParam(url, "husband"), wives: intParam(url, "wives"), father: intParam(url, "father"), mother: intParam(url, "mother"),
+          husband: intParam(url, "husband"), wives: intParam(url, "wives"), father: intParam(url, "father"), mother: intParam(url, "mother"), grandfather: intParam(url, "grandfather"), grandmothers: intParam(url, "grandmothers"),
           sons: intParam(url, "sons"), daughters: intParam(url, "daughters"), grandsons: intParam(url, "grandsons"), granddaughters: intParam(url, "granddaughters"),
           fullBrothers: intParam(url, "fullBrothers"), fullSisters: intParam(url, "fullSisters"), paternalBrothers: intParam(url, "paternalBrothers"), paternalSisters: intParam(url, "paternalSisters"),
           maternalBrothers: intParam(url, "maternalBrothers"), maternalSisters: intParam(url, "maternalSisters"),
@@ -123,4 +124,4 @@ const server = http.createServer(async (req, res) => {
   }
   return sendJson(res, 404, { error: "Not found" });
 });
-server.listen(PORT, HOST, () => console.log(`Deen Allah API listening on ${HOST}:${PORT}`));
+server.listen(PORT, HOST, () => console.log(`Deen Allah API ${API_VERSION} listening on ${HOST}:${PORT}`));
