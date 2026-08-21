@@ -1,0 +1,29 @@
+{
+  "id": "sunni-fiqh-fatawa",
+  "titleAr": "مصادر الفقه والفتاوى السنية",
+  "descriptionAr": "سجل مصادر فقه وفتاوى سنية موثوقة، مع فصل المصدر عن الحكم الداخلي للموسوعة وعدم اعتبار مجرد الإدراج تصحيحاً لكل محتوى المصدر.",
+  "policy": {
+    "corpus": "sunni",
+    "sourceVerificationRequired": true,
+    "contentRightsMustBeVerifiedBeforeRehosting": true,
+    "originalSourcePreferred": true,
+    "scholarlyAttributionRequired": true,
+    "fatwaIsAttributedToItsIssuer": true,
+    "differencesOfOpinionPreserved": true
+  },
+  "sources": [
+    {"id":"islamweb-fatwa","nameAr":"إسلام ويب - مركز الفتوى","url":"https://islamweb.net/ar/fatwa/","type":"fatwa-center","status":"verified-web-source","rights":"source-dependent"},
+    {"id":"binbaz-fatwa","nameAr":"الموقع الرسمي للشيخ عبد العزيز بن باز","url":"https://binbaz.org.sa/fatwas","type":"scholar-fatwa","status":"verified-official-site","rights":"source-dependent"},
+    {"id":"binothaimeen-fatwa","nameAr":"الموقع الرسمي للشيخ محمد بن صالح العثيمين","url":"https://binothaimeen.net/","type":"scholar-fatwa","status":"verified-official-site","rights":"source-dependent"},
+    {"id":"islamqa","nameAr":"الإسلام سؤال وجواب","url":"https://islamqa.info/ar/","type":"fatwa-reference","status":"verified-web-source","rights":"source-dependent"}
+  ],
+  "topics": [
+    "fiqh-ibadat","fiqh-muamalat","family-fiqh","inheritance","criminal-law","food","judiciary","oaths-vows","usul-al-fiqh","contemporary-issues"
+  ],
+  "inheritance": {
+    "enabled": true,
+    "topics": ["faraid","estate-inventory","debts-and-wills","fixed-shares","residuaries","blocking","awl","radd","inheritance-disputes","valuation-and-partition"],
+    "requiresCaseSpecificReview": true,
+    "legalDisclaimerRequired": true
+  }
+}
