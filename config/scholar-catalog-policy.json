@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "scope": {
+    "tradition": "Sunni",
+    "includeFourMadhhabs": true,
+    "excludeSectarianMaterialFromCoreCorpus": true
+  },
+  "classification": {
+    "requiredBeforeCoreIndex": true,
+    "fields": ["madhhab", "methodology", "era", "sources"],
+    "unknownStatus": "pending_review"
+  },
+  "automaticUpdates": {
+    "enabled": true,
+    "discoverNewBooks": true,
+    "deduplicate": true,
+    "verifyAuthorAndSource": true,
+    "verifyRightsBeforeFullText": true,
+    "neverAutoPromoteUnverified": true
+  },
+  "display": {
+    "showAuthorMethodology": true,
+    "showSourceAndEdition": true,
+    "showRightsStatus": true,
+    "separateCandidateFromVerified": true
+  },
+  "importantNote": "The catalog must not infer a scholar's creed or sectarian affiliation from keywords alone. Classification requires explicit reliable bibliographic evidence and remains reviewable."
+}
