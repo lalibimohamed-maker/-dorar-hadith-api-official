@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { detectLocale, listLocales, localeFromRequest } from "../src/i18n.js";
 
 const AGREED = ["ar","en","zh","ko","bn","pl","fr","es","it","de","ru","ja","hi","fi","ber","tr","id","ms","ur","fa"];
@@ -8,6 +9,13 @@ test("exactly 20 launch locales are configured and extensible", () => {
   const codes = listLocales().map((locale) => locale.code);
   assert.equal(codes.length, 20);
   assert.deepEqual(codes, AGREED);
+});
+
+test("central locale config stays synchronized with runtime locales", () => {
+  const config = JSON.parse(fs.readFileSync(new URL("../config/i18n.json", import.meta.url), "utf8"));
+  assert.equal(config.launchLocaleCount, 20);
+  assert.equal(config.allowFutureExpansion, true);
+  assert.deepEqual(config.languages.map((locale) => locale.code), AGREED);
 });
 
 test("explicit locale selection has priority", () => {
