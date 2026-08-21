@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Dorar Encyclopedia API
-  version: 0.3.0
-  description: Public search contract for Quran, hadith, seerah, tafsir and related sources. Source attribution is mandatory.
+  title: موسوعة الدرر - Official Research API
+  version: 0.4.0
+  description: Public research gateway for official Dorar.net hadith retrieval and a curated Sunni Islamic source registry. Source attribution is mandatory.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
 paths:
@@ -12,14 +12,42 @@ paths:
       summary: Check API health
       responses:
         '200': {description: Healthy}
+  /categories:
+    get:
+      operationId: listCategories
+      summary: List encyclopedia research categories
+      responses:
+        '200': {description: Categories}
+  /sources:
+    get:
+      operationId: listSources
+      summary: List configured sources
+      parameters:
+        - {name: category, in: query, schema: {type: string}}
+        - {name: role, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Source registry}
+  /sources/one:
+    get:
+      operationId: getSource
+      summary: Get one source by id
+      parameters:
+        - {name: id, in: query, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Source}
+        '404': {description: Source not found}
+  /maqasid:
+    get:
+      operationId: getMaqasid
+      summary: Get maqasid taxonomy and the five daruriyyat
+      responses:
+        '200': {description: Maqasid taxonomy}
   /search:
     get:
       operationId: search
-      summary: Smart and advanced search
+      summary: Search official Dorar.net hadith data
       parameters:
-        - {name: q, in: query, required: true, schema: {type: string, minLength: 1}}
-        - {name: category, in: query, schema: {type: string, enum: [quran, tafsir, tadabbur, hidayat, hadith, seerah, musnads, fiqh, books]}}
-        - {name: source, in: query, schema: {type: string}}
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
       responses:
         '200':
           description: Search results with source attribution
@@ -27,34 +55,27 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/SearchResponse'}
         '400': {description: Missing query}
+        '429': {description: Rate limit exceeded}
         '502': {description: Upstream source failure}
-  /sources:
-    get:
-      operationId: listSources
-      summary: List configured sources
-      responses:
-        '200': {description: Source registry}
 components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
   schemas:
     SearchResponse:
       type: object
-      required: [query, results]
+      required: [query, source, data]
       properties:
         query: {type: string}
-        results:
-          type: array
-          items:
-            type: object
-            required: [title, category, source]
-            properties:
-              title: {type: string}
-              text: {type: string}
-              category: {type: string}
-              source:
-                type: object
-                required: [name, url]
-                properties:
-                  name: {type: string}
-                  url: {type: string, format: uri}
-              reliability: {type: string}
-              attribution: {type: string}
+        source:
+          type: object
+          required: [id, nameAr, role]
+          properties:
+            id: {type: string}
+            nameAr: {type: string}
+            role: {type: string}
+            url: {type: string, format: uri}
+        data: {type: object}
+        researchPolicy: {type: string}
