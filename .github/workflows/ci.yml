@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'feat/**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Syntax check
+        run: npm run health
+      - name: Smoke test client configuration
+        run: node --input-type=module -e "import fs from 'node:fs'; const s=fs.readFileSync('src/dorar-client.js','utf8'); if(!s.includes('dorar.net/dorar_api.json')) process.exit(1); console.log('Dorar client configuration OK')"

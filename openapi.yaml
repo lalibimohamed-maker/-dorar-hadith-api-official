@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Dorar Hadith API Official
-  version: 0.2.0
-  description: Integration API that retrieves hadith search results through the official Dorar.net JSON API.
+  title: موسوعة الدرر - Official Research API
+  version: 0.5.0
+  description: Public research gateway for official Dorar.net hadith retrieval and a curated Sunni Islamic source registry. Search results use a concise verified summary with expandable source and takhrij details. Source attribution is mandatory.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
 paths:
@@ -11,43 +11,120 @@ paths:
       operationId: healthCheck
       summary: Check API health
       responses:
-        '200':
-          description: Healthy
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [ok, service, source]
-                properties:
-                  ok: { type: boolean }
-                  service: { type: string }
-                  source: { type: string }
-                  timestamp: { type: string, format: date-time }
+        '200': {description: Healthy}
+  /categories:
+    get:
+      operationId: listCategories
+      summary: List encyclopedia research categories
+      responses:
+        '200': {description: Categories}
+  /sources:
+    get:
+      operationId: listSources
+      summary: List configured sources
+      parameters:
+        - {name: category, in: query, schema: {type: string}}
+        - {name: role, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Source registry}
+  /sources/one:
+    get:
+      operationId: getSource
+      summary: Get one source by id
+      parameters:
+        - {name: id, in: query, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Source}
+        '404': {description: Source not found}
+  /maqasid:
+    get:
+      operationId: getMaqasid
+      summary: Get maqasid taxonomy and the five daruriyyat
+      responses:
+        '200': {description: Maqasid taxonomy}
   /search:
     get:
-      operationId: searchHadith
-      summary: Search hadith in Dorar.net
+      operationId: search
+      summary: Search with a concise verified summary and expandable source details
+      description: Returns a concise, source-attributed result first. Clients should expose a "المصادر والتخريج" action to reveal full provenance, book/location details, grading when available, related evidence, scholarly disagreement, and original source links.
       parameters:
-        - name: q
-          in: query
-          required: true
-          description: Arabic or other search text.
-          schema:
-            type: string
-            minLength: 1
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+        - {name: category, in: query, required: false, schema: {type: string}}
+        - {name: sourceId, in: query, required: false, schema: {type: string}}
+        - {name: detail, in: query, required: false, description: 'summary returns the default concise verified view; full returns source/takhrij details when available.', schema: {type: string, enum: [summary, full], default: summary}}
       responses:
         '200':
-          description: Search results returned from Dorar.net
+          description: Search results with concise verified summary and optional detailed provenance
           content:
             application/json:
-              schema:
-                type: object
-                required: [query, source, data]
-                properties:
-                  query: { type: string }
-                  source: { type: string }
-                  data: {}
-        '400':
-          description: Missing query
-        '502':
-          description: Dorar.net retrieval failed
+              schema: {$ref: '#/components/schemas/SearchResponse'}
+        '400': {description: Missing or invalid query}
+        '429': {description: Rate limit exceeded}
+        '502': {description: Upstream source failure}
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+  schemas:
+    SourceAttribution:
+      type: object
+      required: [id, nameAr, role]
+      properties:
+        id: {type: string}
+        nameAr: {type: string}
+        role: {type: string}
+        author: {type: string}
+        book: {type: string}
+        edition: {type: string}
+        location: {type: string}
+        url: {type: string, format: uri}
+    Takhrij:
+      type: object
+      properties:
+        hadithNumber: {type: string}
+        book: {type: string}
+        chapter: {type: string}
+        location: {type: string}
+        grading: {type: string}
+        grader: {type: string}
+        isnad: {type: string}
+        narrators: {type: array, items: {type: string}}
+        notes: {type: string}
+    ScholarlyView:
+      type: object
+      properties:
+        position: {type: string}
+        scholar: {type: string}
+        source: {$ref: '#/components/schemas/SourceAttribution'}
+        evidence: {type: string}
+    SearchResult:
+      type: object
+      required: [summary, source]
+      properties:
+        type: {type: string}
+        summary: {type: string}
+        text: {type: string}
+        source: {$ref: '#/components/schemas/SourceAttribution'}
+        takhrij: {$ref: '#/components/schemas/Takhrij'}
+        scholarlyViews: {type: array, items: {$ref: '#/components/schemas/ScholarlyView'}}
+        relatedSources: {type: array, items: {$ref: '#/components/schemas/SourceAttribution'}}
+        verificationNote: {type: string}
+    SearchResponse:
+      type: object
+      required: [query, mode, source, results]
+      properties:
+        query: {type: string}
+        mode: {type: string, enum: [summary, full]}
+        source:
+          type: object
+          required: [id, nameAr, role]
+          properties:
+            id: {type: string}
+            nameAr: {type: string}
+            role: {type: string}
+            url: {type: string, format: uri}
+        results: {type: array, items: {$ref: '#/components/schemas/SearchResult'}}
+        researchPolicy: {type: string}
+        limitations: {type: array, items: {type: string}}
