@@ -1,0 +1,43 @@
+{
+  "policy": {
+    "corpus": "sunni",
+    "autoAdd": "discover_then_verify",
+    "rights": "Do not redistribute copyrighted files unless the source permits it.",
+    "classification": "Store methodology and attribution as metadata; do not infer doctrine from keywords."
+  },
+  "books": [
+    {"id":"bukhari","title":"صحيح البخاري","authorId":"al-bukhari","subject":"hadith","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"muslim","title":"صحيح مسلم","authorId":"muslim-ibn-al-hajjaj","subject":"hadith","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"musnad-ahmad","title":"مسند الإمام أحمد بن حنبل","authorId":"ahmad-ibn-hanbal","subject":"hadith","madhhab":"hanbali","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"musnad-abu-yala","title":"مسند أبي يعلى الموصلي","authorId":"abu-yala-al-mawsili","subject":"hadith","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"musnad-ibn-rahwayh","title":"مسند إسحاق بن راهويه","authorId":"ishaq-ibn-rahwayh","subject":"hadith","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"abu-dawud","title":"سنن أبي داود","authorId":"abu-dawud","subject":"hadith","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"ibn-majah","title":"سنن ابن ماجه","authorId":"ibn-majah","subject":"hadith","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"tirmidhi","title":"سنن الترمذي","authorId":"al-tirmidhi","subject":"hadith","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"nasai","title":"سنن النسائي","authorId":"al-nasai","subject":"hadith","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"darimi","title":"سنن الدارمي","authorId":"al-darimi","subject":"hadith","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"bayhaqi-kubra","title":"السنن الكبرى للبيهقي","authorId":"al-bayhaqi","subject":"hadith","madhhab":"shafii","status":"verified","rights":"source-dependent","sources":["dorar"]},
+    {"id":"ibn-hisham","title":"السيرة النبوية - ابن هشام","authorId":"ibn-hisham","subject":"sirah","madhhab":"sunni","status":"verified","rights":"public-domain-text-source-dependent","sources":["shamela"]},
+    {"id":"imta-al-asma","title":"إمتاع الأسماع","authorId":"al-maqrizi","subject":"sirah","madhhab":"sunni","status":"verified","rights":"public-domain-text-source-dependent","sources":["shamela"]},
+    {"id":"raheeq-makhtum","title":"الرحيق المختوم","authorId":"safiur-rahman-mubarakpuri","subject":"sirah","madhhab":"sunni","status":"verified","rights":"copyright-check-required","sources":["shamela"]},
+    {"id":"al-shifa","title":"الشفا بتعريف حقوق المصطفى","authorId":"qadi-iyad","subject":"sirah","madhhab":"maliki","status":"verified","rights":"public-domain-text-source-dependent","sources":["shamela"]},
+    {"id":"shamail","title":"الشمائل المحمدية","authorId":"al-tirmidhi","subject":"sirah","madhhab":"sunni","status":"verified","rights":"source-dependent","sources":["dorar"]}
+  ],
+  "authors": [
+    {"id":"al-bukhari","name":"محمد بن إسماعيل البخاري","era":"early","deathYear":256,"madhhab":"sunni","methodology":"hadith","status":"verified"},
+    {"id":"muslim-ibn-al-hajjaj","name":"مسلم بن الحجاج","era":"early","deathYear":261,"madhhab":"sunni","methodology":"hadith","status":"verified"},
+    {"id":"ahmad-ibn-hanbal","name":"أحمد بن حنبل","era":"early","deathYear":241,"madhhab":"hanbali","methodology":"hadith-athari","status":"verified"},
+    {"id":"abu-yala-al-mawsili","name":"أحمد بن علي أبو يعلى الموصلي","era":"early","deathYear":307,"madhhab":"sunni","methodology":"hadith","status":"verified"},
+    {"id":"ishaq-ibn-rahwayh","name":"إسحاق بن راهويه","era":"early","deathYear":238,"madhhab":"sunni","methodology":"hadith","status":"verified"},
+    {"id":"abu-dawud","name":"أبو داود السجستاني","era":"early","deathYear":275,"madhhab":"sunni","methodology":"hadith","status":"verified"},
+    {"id":"ibn-majah","name":"ابن ماجه القزويني","era":"early","deathYear":273,"madhhab":"sunni","methodology":"hadith","status":"verified"},
+    {"id":"al-tirmidhi","name":"محمد بن عيسى الترمذي","era":"early","deathYear":279,"madhhab":"sunni","methodology":"hadith","status":"verified"},
+    {"id":"al-nasai","name":"أحمد بن شعيب النسائي","era":"early","deathYear":303,"madhhab":"sunni","methodology":"hadith","status":"verified"},
+    {"id":"al-darimi","name":"عبد الله بن عبد الرحمن الدارمي","era":"early","deathYear":255,"madhhab":"sunni","methodology":"hadith","status":"verified"},
+    {"id":"al-bayhaqi","name":"أحمد بن الحسين البيهقي","era":"middle","deathYear":458,"madhhab":"shafii","methodology":"hadith-fiqh","status":"verified"},
+    {"id":"ibn-hisham","name":"ابن هشام","era":"early","deathYear":218,"madhhab":"sunni","methodology":"sirah","status":"verified"},
+    {"id":"al-maqrizi","name":"تقي الدين المقريزي","era":"middle","deathYear":845,"madhhab":"sunni","methodology":"history-sirah","status":"verified"},
+    {"id":"safiur-rahman-mubarakpuri","name":"صفي الرحمن المباركفوري","era":"modern","deathYear":1427,"madhhab":"sunni","methodology":"sirah","status":"verified"},
+    {"id":"qadi-iyad","name":"القاضي عياض","era":"middle","deathYear":544,"madhhab":"maliki","methodology":"hadith-sirah","status":"verified"}
+  ]
+}
