@@ -1,165 +1,216 @@
-const SUPPORTED_MADHAHIB = ["hanafi", "maliki", "shafii", "hanbali"];
+import { FARAID_SOURCES, MADHHAB_NOTES } from "./faraid-rules.js";
 
-function n(value) {
-  const x = Number(value);
-  if (!Number.isInteger(x) || x < 0) throw new Error("Heir counts must be non-negative integers");
-  return x;
+export const SUPPORTED_MADHAHIB = ["hanafi", "maliki", "shafii", "hanbali"];
+
+const f = (num, den = 1) => ({ num, den });
+const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a || 1; };
+const lcm = (a, b) => Math.abs(a * b) / gcd(a, b);
+const norm = a => { const g = gcd(a.num, a.den); return f(a.num / g, a.den / g); };
+const add = (a, b) => norm(f(a.num * b.den + b.num * a.den, a.den * b.den));
+const sub = (a, b) => norm(f(a.num * b.den - b.num * a.den, a.den * b.den));
+const mul = (a, b) => norm(f(a.num * b.num, a.den * b.den));
+const gt = (a, b) => a.num * b.den > b.num * a.den;
+const eq = (a, b) => a.num * b.den === b.num * a.den;
+const zero = () => f(0, 1);
+
+function count(value, name) {
+  const n = Number(value ?? 0);
+  if (!Number.isInteger(n) || n < 0) throw new Error(`${name} must be a non-negative integer`);
+  return n;
 }
-
-function frac(num, den) { return { num, den }; }
-function add(a, b) { return frac(a.num * b.den + b.num * a.den, a.den * b.den); }
-function sub(a, b) { return frac(a.num * b.den - b.num * a.den, a.den * b.den); }
-function mul(a, b) { return frac(a.num * b.num, a.den * b.den); }
-function norm(a) { const g = gcd(Math.abs(a.num), a.den); return frac(a.num / g, a.den / g); }
-function gcd(a, b) { while (b) [a, b] = [b, a % b]; return a || 1; }
-function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
-function sumShares(items) { return items.reduce((s, x) => add(s, x.share), frac(0, 1)); }
 
 function normalizeInput(input = {}) {
   return {
     madhhab: input.madhhab || "hanbali",
-    estate: Number(input.estate || 0),
-    debts: Number(input.debts || 0),
-    bequest: Number(input.bequest || 0),
-    heirs: {
-      husband: n(input.heirs?.husband || 0),
-      wives: n(input.heirs?.wives || 0),
-      father: n(input.heirs?.father || 0),
-      mother: n(input.heirs?.mother || 0),
-      sons: n(input.heirs?.sons || 0),
-      daughters: n(input.heirs?.daughters || 0),
-      grandsons: n(input.heirs?.grandsons || 0),
-      granddaughters: n(input.heirs?.granddaughters || 0),
-      fullBrothers: n(input.heirs?.fullBrothers || 0),
-      fullSisters: n(input.heirs?.fullSisters || 0),
-      paternalBrothers: n(input.heirs?.paternalBrothers || 0),
-      paternalSisters: n(input.heirs?.paternalSisters || 0),
-      maternalBrothers: n(input.heirs?.maternalBrothers || 0),
-      maternalSisters: n(input.heirs?.maternalSisters || 0),
-    },
+    estate: Number(input.estate ?? 0),
+    debts: Number(input.debts ?? 0),
+    bequest: Number(input.bequest ?? 0),
+    heirs: Object.fromEntries([
+      "husband","wives","father","mother","sons","daughters","grandfather","grandmothers",
+      "grandsons","granddaughters","fullBrothers","fullSisters","paternalBrothers","paternalSisters",
+      "maternalBrothers","maternalSisters"
+    ].map(k => [k, count(input.heirs?.[k], `heirs.${k}`)]))
   };
 }
 
-function validate(input) {
-  if (!SUPPORTED_MADHAHIB.includes(input.madhhab)) throw new Error(`Unsupported madhhab: ${input.madhhab}`);
-  if (!Number.isFinite(input.estate) || input.estate < 0) throw new Error("estate must be a non-negative number");
-  if (!Number.isFinite(input.debts) || input.debts < 0) throw new Error("debts must be a non-negative number");
-  if (!Number.isFinite(input.bequest) || input.bequest < 0) throw new Error("bequest must be a non-negative number");
-  if (input.heirs.husband && input.heirs.wives) throw new Error("A case cannot contain both a husband and wives");
-  if (input.heirs.husband > 1) throw new Error("husband must be 0 or 1");
-  if (input.heirs.father > 1 || input.heirs.mother > 1) throw new Error("father and mother must be 0 or 1");
-  if (input.heirs.wives > 4) throw new Error("wives cannot exceed four");
-  const payable = input.estate - input.debts - input.bequest;
-  if (payable < 0) throw new Error("debts and bequest exceed the estate");
-  return payable;
+function validate(x) {
+  if (!SUPPORTED_MADHAHIB.includes(x.madhhab)) throw new Error(`Unsupported madhhab: ${x.madhhab}`);
+  for (const [k, v] of Object.entries({ estate:x.estate, debts:x.debts, bequest:x.bequest })) {
+    if (!Number.isFinite(v) || v < 0) throw new Error(`${k} must be a non-negative number`);
+  }
+  const h = x.heirs;
+  if (h.husband && h.wives) throw new Error("A case cannot contain both husband and wives");
+  if (h.husband > 1 || h.father > 1 || h.mother > 1 || h.grandfather > 1) throw new Error("single-person heirs must be 0 or 1");
+  if (h.wives > 4) throw new Error("wives cannot exceed four");
+  const distributable = x.estate - x.debts - x.bequest;
+  if (distributable < 0) throw new Error("debts and bequest exceed the estate");
+  return distributable;
 }
 
-function push(items, id, labelAr, count, share, basis, notes = []) {
-  if (!count || share.num <= 0) return;
-  items.push({ id, labelAr, count, share: norm(share), basis, notes });
+function item(id, labelAr, countValue, share, basis, notes = [], role = "fixed") {
+  return { id, labelAr, count: countValue, share: norm(share), basis, notes, role };
+}
+
+function sum(items) { return items.reduce((s, x) => add(s, x.share), zero()); }
+
+function hasDirectDesc(h) { return h.sons + h.daughters > 0; }
+function hasAnyDesc(h) { return hasDirectDesc(h) || h.grandsons + h.granddaughters > 0; }
+function siblingCount(h) { return h.fullBrothers+h.fullSisters+h.paternalBrothers+h.paternalSisters+h.maternalBrothers+h.maternalSisters; }
+
+function pushFixed(items, id, label, c, share, basis, notes=[]) {
+  if (c) items.push(item(id,label,c,share,basis,notes,"fixed"));
 }
 
 /**
- * Core Sunni faraid calculator.
- * It deliberately flags cases where a full madhhab-specific adjudication is required
- * instead of inventing a result. This is a calculation aid, not a fatwa or legal opinion.
+ * Faraid engine for the common Sunni cases, with explicit awl, radd and correction.
+ * Complex edge cases are never guessed: they are returned as warnings for scholarly review.
  */
 export function calculateInheritance(raw = {}) {
   const input = normalizeInput(raw);
   const distributable = validate(input);
   const h = input.heirs;
-  const hasDescendants = h.sons + h.daughters + h.grandsons + h.granddaughters > 0;
-  const hasMaleDescendant = h.sons + h.grandsons > 0;
-  const siblingCount = h.fullBrothers + h.fullSisters + h.paternalBrothers + h.paternalSisters + h.maternalBrothers + h.maternalSisters;
+  const descendants = hasAnyDesc(h);
+  const directDesc = hasDirectDesc(h);
+  const warnings = [];
   const blockers = [];
-  const results = [];
+  const fixed = [];
+  const residuaryCandidates = [];
 
-  if (h.husband) push(results, "husband", "الزوج", 1, hasDescendants ? frac(1,4) : frac(1,2), "Quran 4:12");
-  if (h.wives) push(results, "wives", "الزوجات", h.wives, hasDescendants ? frac(1,8) : frac(1,4), "Quran 4:12");
+  if (h.husband) pushFixed(fixed,"husband","الزوج",1, descendants ? f(1,4) : f(1,2),"Qur'an 4:12");
+  if (h.wives) pushFixed(fixed,"wives","الزوجات",h.wives, descendants ? f(1,8) : f(1,4),"Qur'an 4:12");
 
+  const maternalMultiple = h.maternalBrothers + h.maternalSisters >= 2;
+  const umariyya = h.mother && h.father && !descendants && (h.husband || h.wives);
   if (h.mother) {
-    let share;
-    if (hasDescendants || siblingCount >= 2) share = frac(1,6);
-    else if ((h.husband || h.wives) && h.father && !hasDescendants) share = frac(1,3);
-    else share = frac(1,3);
-    push(results, "mother", "الأم", 1, share, "Quran 4:11", share.num === 1 && share.den === 3 ? ["في بعض مسائل الزوجين والأبوين يراعى ثلث الباقي وفق المسألة المعروفة بالعمريتين."] : []);
+    const share = descendants || siblingCount(h) >= 2 ? f(1,6) : (umariyya ? f(1,3) : f(1,3));
+    pushFixed(fixed,"mother","الأم",1,share,"Qur'an 4:11",umariyya ? ["العمريتان: ثلث الباقي بعد فرض الزوج/الزوجة في الصورة المعروفة."] : []);
   }
 
-  if (h.father && hasDescendants) push(results, "father", "الأب", 1, frac(1,6), "Quran 4:11");
+  if (h.father && directDesc) {
+    pushFixed(fixed,"father","الأب",1,f(1,6),"Qur'an 4:11");
+    if (h.daughters && !h.sons) residuaryCandidates.push({ id:"father", count:1, labelAr:"الأب", role:"father-after-female-descendants" });
+  } else if (h.father && !descendants) {
+    residuaryCandidates.push({ id:"father", count:1, labelAr:"الأب", role:"residuary" });
+  }
 
   if (h.sons) {
-    push(results, "sons", "الأبناء", h.sons, frac(0,1), "تعصيب بالنفس", ["يأخذون الباقي مع البنات للذكر مثل حظ الأنثيين."]);
-  }
-  if (h.daughters && h.sons) {
-    push(results, "daughters", "البنات", h.daughters, frac(0,1), "تعصيب بالغير", ["مع الأبناء: للذكر مثل حظ الأنثيين."]);
+    residuaryCandidates.push({ id:"sons", count:h.sons*2, labelAr:"الأبناء", role:"descendant-male" });
+    if (h.daughters) residuaryCandidates.push({ id:"daughters", count:h.daughters, labelAr:"البنات", role:"descendant-female" });
   } else if (h.daughters) {
-    push(results, "daughters", "البنات", h.daughters, h.daughters === 1 ? frac(1,2) : frac(2,3), "Quran 4:11");
+    pushFixed(fixed,"daughters","البنات",h.daughters,h.daughters===1?f(1,2):f(2,3),"Qur'an 4:11");
   }
 
+  // Maternal siblings: simple Qur'anic cases only.
   if (h.maternalBrothers + h.maternalSisters) {
-    if (hasDescendants || h.father) {
-      blockers.push("الإخوة لأم محجوبون بالفرع الوارث أو الأب");
+    if (descendants || h.father || h.grandfather) blockers.push("الإخوة لأم محجوبون بوجود الفرع الوارث أو الأب/الجد في هذه الصورة.");
+    else pushFixed(fixed,"maternal-siblings","الإخوة والأخوات لأم",h.maternalBrothers+h.maternalSisters,
+      maternalMultiple?f(1,3):f(1,6),"Qur'an 4:12",maternalMultiple?["عند التعدد يكون الثلث بينهم بالسوية."]:[]);
+  }
+
+  // Full/paternal siblings in the common kalalah cases.
+  if (!h.father && !descendants && (h.fullBrothers || h.fullSisters)) {
+    if (h.fullBrothers) {
+      residuaryCandidates.push({ id:"fullBrothers", count:h.fullBrothers*2, labelAr:"الإخوة الأشقاء", role:"sibling-male" });
+      if (h.fullSisters) residuaryCandidates.push({ id:"fullSisters", count:h.fullSisters, labelAr:"الأخوات الشقيقات", role:"sibling-female" });
     } else {
-      const count = h.maternalBrothers + h.maternalSisters;
-      push(results, "maternal-siblings", "الإخوة والأخوات لأم", count, count === 1 ? frac(1,6) : frac(1,3), "Quran 4:12", ["الإخوة لأم يشتركون في الثلث بالتساوي عند تعددهم."]);
+      pushFixed(fixed,"fullSisters","الأخوات الشقيقات",h.fullSisters,h.fullSisters===1?f(1,2):f(2,3),"Qur'an 4:176");
+    }
+  } else if (h.fullBrothers || h.fullSisters) {
+    warnings.push("وجود الإخوة الأشقاء مع الأب أو الفرع الوارث يحتاج تفصيلاً للحجب والتعصيب.");
+  }
+
+  if (!h.father && !h.grandfather && !descendants && !h.fullBrothers && !h.fullSisters && (h.paternalBrothers || h.paternalSisters)) {
+    if (h.paternalBrothers) {
+      residuaryCandidates.push({ id:"paternalBrothers", count:h.paternalBrothers*2, labelAr:"الإخوة لأب", role:"sibling-male" });
+      if (h.paternalSisters) residuaryCandidates.push({ id:"paternalSisters", count:h.paternalSisters, labelAr:"الأخوات لأب", role:"sibling-female" });
+    } else {
+      pushFixed(fixed,"paternalSisters","الأخوات لأب",h.paternalSisters,h.paternalSisters===1?f(1,2):f(2,3),"أحكام الفرائض",["هذه الصورة مبنية على عدم وجود الشقيقات/الإخوة الأشقاء والحجب المؤثر."]);
+    }
+  } else if (h.paternalBrothers || h.paternalSisters) {
+    warnings.push("وجود الإخوة لأب مع الورثة الآخرين يحتاج تفصيلاً للحجب.");
+  }
+
+  if (h.grandsons || h.granddaughters) warnings.push("أولاد الابن تحتاج أحكام الحجب والتعصيب التفصيلية؛ لا تُستنتج من مجرد وجود الأبناء.");
+  if (h.grandfather || h.grandmothers) warnings.push("مسائل الجد/الجدات تحتاج تفصيلاً مذهبياً ولا تُحسم هنا آلياً.");
+
+  // Umariyyatan: replace mother's ordinary 1/3 with one-third of residue after spouse.
+  if (umariyya) {
+    const spouse = fixed.find(x => x.id === "husband" || x.id === "wives");
+    const spouseShare = spouse?.share || zero();
+    const mother = fixed.find(x => x.id === "mother");
+    if (mother) mother.share = norm(mul(sub(f(1,1), spouseShare), f(1,3)));
+  }
+
+  let totalFixed = sum(fixed);
+  let awl = false;
+  let awlFactor = f(1,1);
+  if (gt(totalFixed,f(1,1))) {
+    awl = true;
+    awlFactor = norm(f(totalFixed.den,totalFixed.num));
+    for (const x of fixed) x.share = norm(mul(x.share, awlFactor));
+    totalFixed = sum(fixed);
+  }
+
+  let remaining = sub(f(1,1), totalFixed);
+  const allocations = [...fixed];
+  let correction = null;
+
+  if (residuaryCandidates.length && gt(remaining,zero())) {
+    const units = residuaryCandidates.reduce((s,x)=>s+x.count,0);
+    for (const r of residuaryCandidates) {
+      allocations.push(item(r.id,r.labelAr,r.count, mul(remaining,f(r.count,units)), "تعصيب", ["يأخذ من الباقي بعد أصحاب الفروض."], "residuary"));
+    }
+    remaining = zero();
+  }
+
+  // Radd: apply to non-spouse fixed heirs when there is no residuary. We deliberately
+  // expose the spouse treatment as a madhhab-sensitive warning instead of guessing.
+  if (gt(remaining,zero()) && fixed.length) {
+    const eligible = allocations.filter(x => x.role === "fixed" && x.id !== "husband" && x.id !== "wives");
+    const eligibleTotal = sum(eligible);
+    if (gt(eligibleTotal,zero())) {
+      for (const x of eligible) x.share = norm(mul(x.share, f(remaining.num + eligibleTotal.num*remaining.den, remaining.den*eligibleTotal.den)));
+      // The multiplier above is (eligible + remaining) / eligible.
+      remaining = zero();
+      warnings.push("طُبِّق الرد على أصحاب الفروض غير الزوجين/الزوجة في الصورة البسيطة؛ مسائل الرد على الزوجين قد تختلف باختلاف المذهب والتفصيل.");
+    } else {
+      warnings.push("بقي فاضل لا عاصب له؛ يلزم تفصيل حكم الرد وبيت المال بحسب المذهب والاختصاص القضائي.");
     }
   }
 
-  const unsupportedComplexity = [];
-  if (h.grandsons || h.granddaughters) unsupportedComplexity.push("أولاد الابن مع وجود/عدم وجود أبناء مباشرين تحتاج معالجة تفصيلية للحجب والتعصيب");
-  if (h.fullBrothers || h.fullSisters || h.paternalBrothers || h.paternalSisters) unsupportedComplexity.push("تفاصيل الإخوة الأشقاء/لأب مع البنات والجد تحتاج معالجة مذهبية تفصيلية");
-  if (h.father && !hasDescendants) unsupportedComplexity.push("الأب في حالة عدم وجود فرع وارث يأخذ الباقي تعصيباً");
-  if (h.mother && h.father && (h.husband || h.wives) && !hasDescendants) unsupportedComplexity.push("العمريتان تحتاجان تطبيق قاعدة ثلث الباقي");
-
-  // Allocate zero-share residuaries using the standard common-case ordering.
-  let assigned = sumShares(results);
-  let remaining = sub(frac(1,1), assigned);
-  const residuary = [];
-  if (h.sons) residuary.push({ id: "sons", count: h.sons * 2, labelAr: "الأبناء" });
-  if (h.daughters && h.sons) residuary.push({ id: "daughters", count: h.daughters, labelAr: "البنات" });
-  if (h.father && !hasDescendants) residuary.push({ id: "father", count: 1, labelAr: "الأب" });
-
-  if (residuary.length && remaining.num > 0) {
-    const units = residuary.reduce((s, x) => s + x.count, 0);
-    for (const r of residuary) {
-      const share = mul(remaining, frac(r.count, units));
-      const existing = results.find((x) => x.id === r.id);
-      if (existing) existing.share = norm(add(existing.share, share));
-      else push(results, r.id, r.labelAr, r.count, share, "تعصيب");
-    }
-    assigned = sumShares(results);
-    remaining = sub(frac(1,1), assigned);
+  // Convert fractions to a common denominator and detect correction need.
+  let denominator = 1;
+  for (const x of allocations) denominator = lcm(denominator,x.share.den);
+  const unitTotals = allocations.map(x => x.share.num * (denominator/x.share.den));
+  const integerCounts = allocations.map((x,i) => x.count ? unitTotals[i] % x.count === 0 : true);
+  if (integerCounts.some(v=>!v)) {
+    let correctionFactor = 1;
+    for (const x of allocations) correctionFactor = lcm(correctionFactor, x.count ? x.count / gcd(unitTotals[allocations.indexOf(x)],x.count) : 1);
+    denominator *= correctionFactor;
+    correction = { originalDenominator: denominator / correctionFactor, factor: correctionFactor, correctedDenominator: denominator };
   }
 
-  // Radd is deliberately not applied when a spouse is present; exact madhhab handling is flagged.
-  if (remaining.num > 0 && !residuary.length) {
-    if (h.husband || h.wives) unsupportedComplexity.push("الرد مع وجود الزوج/الزوجات يحتاج اختيار الرأي المذهبي وتفصيله");
-    else unsupportedComplexity.push("بقاء جزء من التركة دون عاصب يحتاج تطبيق أحكام الرد/بيت المال بحسب المذهب والحالة");
-  }
-
-  const denominator = results.reduce((d, r) => lcm(d, r.share.den), 1);
-  const allocations = results.map((r) => {
-    const units = r.share.num * (denominator / r.share.den);
-    return { ...r, fraction: `${r.share.num}/${r.share.den}`, denominator, units, amount: distributable * r.share.num / r.share.den };
-  });
+  const finalTotal = sum(allocations);
+  if (!eq(finalTotal,f(1,1))) warnings.push(`مجموع الأنصبة النهائي ${finalTotal.num}/${finalTotal.den} وليس 1؛ يلزم مراجعة علمية قبل الاعتماد.`);
+  if (awl) warnings.unshift("هذه مسألة عَول: خُفِّضت الأنصبة بنسبة مشتركة لأن مجموع الفروض تجاوز أصل المسألة.");
 
   return {
-    calculator: "deen-allah-faraid",
-    madhhab: input.madhhab,
-    estate: input.estate,
-    deductions: { debts: input.debts, bequest: input.bequest, distributable },
-    heirs: h,
-    allocations,
-    remainingFraction: `${remaining.num}/${remaining.den}`,
+    calculator:"deen-allah-faraid",
+    madhhab:input.madhhab,
+    madhhabNote:MADHHAB_NOTES[input.madhhab],
+    estate:input.estate,
+    deductions:{debts:input.debts,bequest:input.bequest,distributable},
+    heirs:h,
+    method:{awl,awlFactor,remainingFraction:`${remaining.num}/${remaining.den}`,correction},
+    allocations:allocations.map(x=>({
+      id:x.id,labelAr:x.labelAr,count:x.count,role:x.role,fraction:`${x.share.num}/${x.share.den}`,
+      denominator,units:x.share.num*(denominator/x.share.den),amount:distributable*x.share.num/x.share.den,basis:x.basis,notes:x.notes
+    })),
     blockers,
-    warnings: [...new Set(unsupportedComplexity)],
-    sources: [
-      { reference: "Quran 4:11", titleAr: "آية المواريث", type: "primary" },
-      { reference: "Quran 4:12", titleAr: "آية المواريث والزوجين والإخوة لأم", type: "primary" },
-      { reference: "Quran 4:176", titleAr: "آية الكلالة", type: "primary" }
-    ],
-    disclaimerAr: "هذه حاسبة تعليمية للفرائض وليست فتوى ولا بديلاً عن مراجعة عالم أو جهة إفتاء، ولا سيما في المسائل المركبة أو المتنازع فيها أو المتعلقة بالقانون المحلي.",
+    warnings:[...new Set(warnings)],
+    sources:FARAID_SOURCES,
+    disclaimerAr:"هذه حاسبة تعليمية للفرائض وليست فتوى ولا بديلاً عن مراجعة عالم أو جهة إفتاء، ولا سيما في المسائل المركبة أو المختلف فيها أو المرتبطة بالقانون المحلي."
   };
 }
 
-export function supportedMadhahib() { return [...SUPPORTED_MADHAHIB]; }
+export function supportedMadhahib(){return [...SUPPORTED_MADHAHIB];}
