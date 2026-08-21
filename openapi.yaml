@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Dorar Hadith API Official
-  version: 0.2.0
-  description: Integration API that retrieves hadith search results through the official Dorar.net JSON API.
+  title: Dorar Encyclopedia API
+  version: 0.3.0
+  description: Public search contract for Quran, hadith, seerah, tafsir and related sources. Source attribution is mandatory.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
 paths:
@@ -11,38 +11,50 @@ paths:
       operationId: healthCheck
       summary: Check API health
       responses:
-        '200':
-          description: Healthy
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [ok, service, source]
-                properties:
-                  ok: { type: boolean }
-                  service: { type: string }
-                  source: { type: string }
-                  timestamp: { type: string, format: date-time }
+        '200': {description: Healthy}
   /search:
     get:
-      operationId: searchHadith
-      summary: Search hadith in Dorar.net
+      operationId: search
+      summary: Smart and advanced search
       parameters:
-        - name: q
-          in: query
-          required: true
-          schema: { type: string, minLength: 1 }
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 1}}
+        - {name: category, in: query, schema: {type: string, enum: [quran, tafsir, tadabbur, hidayat, hadith, seerah, musnads, fiqh, books]}}
+        - {name: source, in: query, schema: {type: string}}
       responses:
         '200':
-          description: Search results returned from Dorar.net
+          description: Search results with source attribution
           content:
             application/json:
-              schema:
+              schema: {$ref: '#/components/schemas/SearchResponse'}
+        '400': {description: Missing query}
+        '502': {description: Upstream source failure}
+  /sources:
+    get:
+      operationId: listSources
+      summary: List configured sources
+      responses:
+        '200': {description: Source registry}
+components:
+  schemas:
+    SearchResponse:
+      type: object
+      required: [query, results]
+      properties:
+        query: {type: string}
+        results:
+          type: array
+          items:
+            type: object
+            required: [title, category, source]
+            properties:
+              title: {type: string}
+              text: {type: string}
+              category: {type: string}
+              source:
                 type: object
-                required: [query, source, data]
+                required: [name, url]
                 properties:
-                  query: { type: string }
-                  source: { type: string }
-                  data: {}
-        '400': { description: Missing query }
-        '502': { description: Dorar.net retrieval failed }
+                  name: {type: string}
+                  url: {type: string, format: uri}
+              reliability: {type: string}
+              attribution: {type: string}
