@@ -1,0 +1,27 @@
+{
+  "scope": "sunny-fatwa-sources",
+  "policy": "discover-and-index verified official sources; do not imply endorsement; preserve attribution; do not republish copyrighted full text without permission",
+  "sources": [
+    {"id":"binbaz-official","scholar":"عبد العزيز بن باز","type":"official-scholar-site","url":"https://binbaz.org.sa/","content":["fatwas","books","answers"],"reuse":"source-permission-dependent"},
+    {"id":"binothaimeen-official","scholar":"محمد بن صالح العثيمين","type":"official-foundation-site","url":"https://binothaimeen.net/","content":["fatwas","books","lessons","answers"],"reuse":"source-permission-dependent"},
+    {"id":"alfawzan-official","scholar":"صالح بن فوزان الفوزان","type":"official-scholar-site","url":"https://www.alfawzan.af.org.sa/","content":["fatwas","lessons","answers"],"reuse":"source-permission-dependent"},
+    {"id":"ibn-jibreen-official","scholar":"عبد الله بن عبد الرحمن بن جبرين","type":"official-foundation-site","url":"https://cms.ibn-jebreen.com/","content":["fatwas","answers","books"],"reuse":"source-permission-dependent"},
+    {"id":"ferkous-official","scholar":"محمد علي فركوس","type":"official-scholar-site","url":"https://ferkous.app/","content":["fatwas","books","answers"],"reuse":"source-permission-dependent"},
+    {"id":"islamweb-fatwa","organization":"إسلام ويب - مركز الفتوى","type":"fatwa-center","url":"https://www.islamweb.net/ar/fatwa/","content":["fatwas"],"reuse":"source-permission-dependent"},
+    {"id":"islamqa-ar","organization":"الإسلام سؤال وجواب","type":"fatwa-site","url":"https://islamqa.info/ar/","content":["fatwas","research"],"reuse":"source-permission-dependent"},
+    {"id":"shamela","organization":"المكتبة الشاملة","type":"digital-library","url":"https://shamela.ws/","content":["fatwa-books","fiqh-books","usul","faraid"],"reuse":"book-rights-dependent"},
+    {"id":"alshathri","scholar":"سعد بن ناصر الشثري","type":"scholar-site","url":"https://www.alshathri.net/","content":["fiqh","usul","fatwas","lessons"],"reuse":"source-permission-dependent"},
+    {"id":"al-badr","scholar":"عبد الرزاق بن عبد المحسن البدر","type":"scholar-site","url":"https://al-badr.net/","content":["lessons","books","answers"],"reuse":"source-permission-dependent"}
+  ],
+  "taxonomy": [
+    "aqidah","ibadat","purification","prayer","zakat","fasting","hajj","family","marriage","divorce","transactions","finance","food","medicine","ethics","inheritance","wills","faraid","judiciary","contemporary-issues","quran","hadith","usul-al-fiqh"
+  ],
+  "searchBehavior": {
+    "officialSourcePriority": true,
+    "preserveScholarAttribution": true,
+    "preserveDifferentOpinions": true,
+    "distinguishFatwaFromBookIndex": true,
+    "showOriginalSourceLink": true,
+    "languageFollowsUserQuery": true
+  }
+}
