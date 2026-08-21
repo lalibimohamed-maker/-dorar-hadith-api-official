@@ -24,17 +24,19 @@ const LANGUAGE_RULES = [
   ["zh", /[\u3400-\u4DBF\u4E00-\u9FFF]/g]
 ];
 
+// Avoid generic religious terms such as "hadith" that occur across languages.
+// Distinctive function words carry the Latin-script language signal instead.
 const LATIN_HINTS = {
-  en: /\b(the|and|is|are|what|who|how|why|hadith|prophet|allah|about)\b/i,
-  fr: /\b(le|la|les|des|et|est|que|qui|comment|pourquoi|hadith|prophète)\b/i,
+  en: /\b(the|and|is|are|what|who|how|why|prophet|allah|about)\b/i,
+  fr: /\b(le|la|les|des|et|est|que|qui|comment|pourquoi|prophète)\b/i,
   es: /\b(el|la|los|las|y|es|qué|quién|cómo|por qué|hadiz|profeta)\b/i,
-  de: /\b(der|die|das|und|ist|was|wer|wie|warum|hadith|prophet)\b/i,
+  de: /\b(der|die|das|und|ist|was|wer|wie|warum|prophet)\b/i,
   tr: /\b(ve|bir|bu|nedir|kim|nasıl|neden|hadis|peygamber)\b/i,
   id: /\b(dan|yang|apa|siapa|bagaimana|mengapa|hadis|nabi)\b/i,
   ms: /\b(dan|yang|apa|siapa|bagaimana|mengapa|hadis|nabi)\b/i,
   pt: /\b(o|a|os|as|e|é|que|quem|como|por que|hadith|profeta)\b/i,
   it: /\b(il|la|gli|e|è|che|chi|come|perché|hadith|profeta)\b/i,
-  nl: /\b(de|het|en|is|wat|wie|hoe|waarom|hadith|profeet)\b/i
+  nl: /\b(de|het|en|is|wat|wie|hoe|waarom|profeet)\b/i
 };
 
 export function detectLanguage(text) {
