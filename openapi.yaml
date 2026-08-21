@@ -2,7 +2,9 @@ openapi: 3.1.0
 info:
   title: Dorar Hadith API Official
   version: 0.2.0
-  description: Integration API that retrieves hadith search results through the official Dorar.net JSON API.
+  description: >-
+    Multilingual integration API that retrieves hadith search results through
+    the official Dorar.net JSON API and exposes detected input-language metadata.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
 paths:
@@ -17,21 +19,46 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [ok, service, source]
+                required: [ok, service, source, integration]
                 properties:
                   ok: { type: boolean }
                   service: { type: string }
                   source: { type: string }
+                  integration: { type: string }
                   timestamp: { type: string, format: date-time }
+  /language:
+    get:
+      operationId: detectLanguage
+      summary: Detect the language of user input
+      parameters:
+        - name: text
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          description: Detected language
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, confidence]
+                properties:
+                  code: { type: string }
+                  confidence: { type: number }
+        '400':
+          description: Missing text
   /search:
     get:
       operationId: searchHadith
-      summary: Search hadith in Dorar.net
+      summary: Search hadith through the official Dorar.net JSON API
       parameters:
         - name: q
           in: query
           required: true
-          description: Arabic or other search text.
+          description: Search text. The API also returns the detected input language.
           schema:
             type: string
             minLength: 1
@@ -42,12 +69,19 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [query, source, data]
+                required: [ok, query, language, source, sourceApi, data]
                 properties:
+                  ok: { type: boolean }
                   query: { type: string }
+                  language:
+                    type: object
+                    properties:
+                      code: { type: string }
+                      confidence: { type: number }
                   source: { type: string }
+                  sourceApi: { type: string, format: uri }
                   data: {}
         '400':
           description: Missing query
         '502':
-          description: Dorar.net retrieval failed
+          description: Dorar.net retrieval failed or timed out

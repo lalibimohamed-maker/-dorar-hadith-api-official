@@ -1,13 +1,14 @@
 {
   "name": "dorar-hadith-api-official",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "API service for integrating official Dorar.net hadith retrieval with external applications.",
+  "description": "Multilingual integration API for the official Dorar.net hadith JSON service.",
   "main": "dorar_json_api.js",
   "scripts": {
     "start": "node dorar_json_api.js",
-    "health": "node --check dorar_json_api.js"
+    "health": "node --check dorar_json_api.js && node --check src/language.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"
