@@ -49,7 +49,7 @@ const server = http.createServer(async (req, res) => {
   if (rawKey && (!app || !app.enabled)) return sendJson(res, 401, { error: "Invalid or disabled API key" });
   if (!consume(app ? `app:${keyHash}` : `ip:${clientIp(req)}`, app ? APP_MAX_PER_WINDOW : PUBLIC_MAX_PER_WINDOW, PUBLIC_WINDOW_MS)) return sendJson(res, 429, { error: "Rate limit exceeded", retryAfterSeconds: 60 });
 
-  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة الدرر", service: "Dorar Hadith API Official", version: "0.5.0", locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", categories: "/categories", maqasid: "/maqasid" }, source: "Dorar.net" });
+  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة الدرر", service: "Dorar Hadith API Official", version: "0.5.0", locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", categories: "/categories", maqasid: "/maqasid" }, source: "Dorar.net" });
   if (url.pathname === "/locales") return sendJson(res, 200, { default: DEFAULT_LOCALE, locales: listLocales() });
   if (url.pathname === "/categories") return sendJson(res, 200, { locale, direction: locale.dir, categories: listCategories() });
   if (url.pathname === "/sources") return sendJson(res, 200, { locale, sources: listSources({ category: requireString(url.searchParams.get("category")), role: requireString(url.searchParams.get("role")) }) });
@@ -65,8 +65,9 @@ const server = http.createServer(async (req, res) => {
     const verse = requireString(url.searchParams.get("verse"));
     if (!verse) return sendJson(res, 400, { error: "Missing required query parameter: verse (e.g. 1:1)" });
     const translationIds = (url.searchParams.get("translationIds") || "").split(",").map(Number).filter(Number.isInteger).filter((n) => n > 0);
+    const tafsirIds = (url.searchParams.get("tafsirIds") || "").split(",").map(Number).filter(Number.isInteger).filter((n) => n > 0);
     try {
-      const data = await getQuranAyah({ verseKey: verse, translationIds, language: locale.code, words: url.searchParams.get("words") === "true" });
+      const data = await getQuranAyah({ verseKey: verse, translationIds, tafsirIds, language: locale.code, words: url.searchParams.get("words") === "true" });
       return data ? sendJson(res, 200, { locale, direction: locale.dir, data }) : sendJson(res, 404, { error: "Ayah not found" });
     } catch (error) {
       const status = error.code === "QF_NOT_CONFIGURED" ? 503 : 502;
