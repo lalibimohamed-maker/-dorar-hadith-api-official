@@ -1,0 +1,39 @@
+{
+  "id": "tajweed-academy",
+  "titleAr": "أكاديمية القرآن والتجويد",
+  "descriptionAr": "منهج تعليمي مستقل داخل التطبيق لتعلم القراءة والتجويد تدريجياً، مع الاستفادة من المصادر التعليمية الموثوقة دون نسخ محتواها المحمي.",
+  "sourceReferences": [
+    {
+      "titleAr": "دروس تعليم تلاوة القرآن الكريم",
+      "organizationAr": "وزارة الأوقاف والشؤون الإسلامية - دولة قطر",
+      "url": "https://alquran.islam.gov.qa/droos/Sections.html",
+      "usage": "reference-and-link",
+      "rights": "external-source-dependent"
+    }
+  ],
+  "lessons": [
+    {"id":"letters","order":1,"titleAr":"الحروف الهجائية","skills":["letter-recognition","pronunciation"]},
+    {"id":"vowels","order":2,"titleAr":"الحركات","skills":["fatha","damma","kasra"]},
+    {"id":"tanwin","order":3,"titleAr":"التنوين","skills":["tanwin"]},
+    {"id":"sukun-shadda","order":4,"titleAr":"السكون والشدة","skills":["sukun","shadda"]},
+    {"id":"madd","order":5,"titleAr":"المدود","skills":["madd"]},
+    {"id":"noon-tanwin","order":6,"titleAr":"أحكام النون الساكنة والتنوين","skills":["izhar","idgham","iqlab","ikhfa"]},
+    {"id":"meem-sukun","order":7,"titleAr":"أحكام الميم الساكنة","skills":["ikhfa-shafawi","idgham-shafawi","izhar-shafawi"]},
+    {"id":"ghunna","order":8,"titleAr":"الغنة","skills":["ghunna"]},
+    {"id":"qalqalah","order":9,"titleAr":"القلقلة","skills":["qalqalah"]},
+    {"id":"heavy-light","order":10,"titleAr":"التفخيم والترقيق","skills":["tafkhim","tarqiq"]},
+    {"id":"waqf","order":11,"titleAr":"الوقف والابتداء","skills":["waqf","ibtida"]},
+    {"id":"practice","order":12,"titleAr":"تطبيقات عملية","skills":["guided-reading","self-assessment"]}
+  ],
+  "contentPolicy": {
+    "originalQuranTextUnchanged": true,
+    "externalSourceNotReproducedByDefault": true,
+    "attributionRequired": true,
+    "sourceLinkPreferred": true,
+    "futureLicensedContentMayBeEmbedded": true
+  },
+  "expansion": {
+    "languages": "all-supported-locales",
+    "futureLessonsAllowed": true
+  }
+}
