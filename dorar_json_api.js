@@ -2,6 +2,7 @@ import http from "node:http";
 import { URL } from "node:url";
 import crypto from "node:crypto";
 import { searchDorar } from "./src/dorar-client.js";
+import { getMaqasid, getSource, listCategories, listSources } from "./src/source-registry.js";
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
@@ -11,8 +12,6 @@ const PUBLIC_MAX_PER_WINDOW = Number(process.env.PUBLIC_MAX_PER_MINUTE || 30);
 const APP_MAX_PER_WINDOW = Number(process.env.APP_MAX_PER_MINUTE || 120);
 const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 10_000);
 
-// Optional named application keys. Store only SHA-256 hashes in APP_KEYS_JSON.
-// Example value: [{"name":"My App","keyHash":"<sha256>","dailyLimit":100000,"enabled":true}]
 const appKeys = new Map();
 try {
   const configured = JSON.parse(process.env.APP_KEYS_JSON || "[]");
@@ -61,18 +60,27 @@ function sendJson(res, status, data, extraHeaders = {}) {
   res.end(body);
 }
 
+function requireString(value) {
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+}
+
 const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") return sendJson(res, 204, {});
   const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
 
   if (url.pathname === "/health") {
-    return sendJson(res, 200, { ok: true, service: "dorar-hadith-api-official", source: "Dorar.net", timestamp: new Date().toISOString() });
+    return sendJson(res, 200, {
+      ok: true,
+      service: "dorar-hadith-api-official",
+      source: "Dorar.net",
+      registry: "sunny-islamic-research-sources",
+      timestamp: new Date().toISOString()
+    });
   }
 
   const rawKey = String(req.headers["x-api-key"] || "").trim();
   const keyHash = rawKey ? hashKey(rawKey) : null;
   const app = keyHash ? appKeys.get(keyHash) : null;
-
   if (rawKey && (!app || !app.enabled)) {
     return sendJson(res, 401, { error: "Invalid or disabled API key" });
   }
@@ -83,12 +91,41 @@ const server = http.createServer(async (req, res) => {
 
   if (url.pathname === "/") {
     return sendJson(res, 200, {
-      name: "Dorar Hadith API Official",
-      version: "0.3.0",
+      name: "موسوعة الدرر",
+      service: "Dorar Hadith API Official",
+      version: "0.4.0",
       access: app ? { type: "application", name: app.name, dailyLimit: app.dailyLimit } : { type: "public" },
-      endpoints: { health: "/health", search: "/search?q=..." },
+      endpoints: {
+        health: "/health",
+        search: "/search?q=...",
+        sources: "/sources",
+        categories: "/categories",
+        maqasid: "/maqasid"
+      },
       source: "Dorar.net"
     });
+  }
+
+  if (url.pathname === "/categories") {
+    return sendJson(res, 200, { categories: listCategories() });
+  }
+
+  if (url.pathname === "/sources") {
+    const category = requireString(url.searchParams.get("category"));
+    const role = requireString(url.searchParams.get("role"));
+    return sendJson(res, 200, { sources: listSources({ category, role }) });
+  }
+
+  if (url.pathname === "/sources/one") {
+    const id = requireString(url.searchParams.get("id"));
+    if (!id) return sendJson(res, 400, { error: "Missing required query parameter: id" });
+    const source = getSource(id);
+    if (!source) return sendJson(res, 404, { error: "Source not found" });
+    return sendJson(res, 200, { source });
+  }
+
+  if (url.pathname === "/maqasid") {
+    return sendJson(res, 200, { maqasid: getMaqasid() });
   }
 
   if (url.pathname === "/search") {
@@ -100,7 +137,12 @@ const server = http.createServer(async (req, res) => {
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
       const data = await searchDorar(q, { signal: controller.signal });
-      return sendJson(res, 200, { query: q, source: "Dorar.net", data });
+      return sendJson(res, 200, {
+        query: q,
+        source: getSource("dorar"),
+        data,
+        researchPolicy: "Source attribution is preserved; presence in a book is not itself a grading of authenticity."
+      });
     } catch (error) {
       const message = error?.name === "AbortError" ? "Dorar.net request timed out" : "Unable to retrieve results from Dorar.net";
       return sendJson(res, 502, { error: message, source: "Dorar.net" });
