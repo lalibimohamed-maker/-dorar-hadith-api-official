@@ -1,0 +1,63 @@
+{
+  "policy": {
+    "scope": "Sunni Islamic research sources",
+    "principle": "Every result must retain its original source and must not be presented as authoritative merely because it exists in a book or website.",
+    "copyright": "Only redistribute files/content when the source permits it; otherwise provide source navigation.",
+    "hadith": "Presence in a musnad or sunan is not itself a declaration of authenticity. Preserve grading and attribution separately."
+  },
+  "categories": [
+    { "id": "quran", "nameAr": "القرآن وعلومه" },
+    { "id": "tafsir", "nameAr": "التفسير" },
+    { "id": "tadabbur", "nameAr": "التدبر والهدايات" },
+    { "id": "hadith", "nameAr": "الحديث وعلومه" },
+    { "id": "musnads-sunan", "nameAr": "المسانيد والسنن" },
+    { "id": "sirah", "nameAr": "السيرة والمغازي والشمائل" },
+    { "id": "fiqh", "nameAr": "الفقه والمعاملات" },
+    { "id": "usul-fiqh", "nameAr": "أصول الفقه والقواعد" },
+    { "id": "maqasid", "nameAr": "مقاصد الشريعة" },
+    { "id": "aqidah", "nameAr": "العقيدة" },
+    { "id": "biographies", "nameAr": "التراجم والرواة والعلماء" },
+    { "id": "library", "nameAr": "المكتبة الإسلامية" }
+  ],
+  "sources": [
+    { "id": "dorar", "nameAr": "الدرر السنية", "category": "hadith", "url": "https://dorar.net", "role": "primary" },
+    { "id": "quranflash", "nameAr": "QuranFlash", "category": "quran", "url": "https://www.quranflash.com/v2/", "role": "supporting" },
+    { "id": "tafsir-app", "nameAr": "Tafsir.app", "category": "tafsir", "url": "https://tafsir.app", "role": "supporting" },
+    { "id": "altadabbur", "nameAr": "التدبر", "category": "tadabbur", "url": "https://altadabbur.com", "role": "supporting" },
+    { "id": "tadabur-app", "nameAr": "Tadabur.app", "category": "tadabbur", "url": "https://www.tadabur.app", "role": "supporting" },
+    { "id": "muslim-library", "nameAr": "المكتبة الإسلامية - هدايات القرآن", "category": "tadabbur", "url": "https://www.muslim-library.com/arabic/هدايات-القرآن-الكريم/", "role": "supporting" },
+    { "id": "shamela", "nameAr": "المكتبة الشاملة", "category": "library", "url": "https://shamela.ws", "role": "supporting" },
+    { "id": "bukhari", "nameAr": "صحيح البخاري", "category": "hadith", "role": "primary-book" },
+    { "id": "muslim", "nameAr": "صحيح مسلم", "category": "hadith", "role": "primary-book" },
+    { "id": "ahmad", "nameAr": "مسند الإمام أحمد بن حنبل", "category": "musnads-sunan", "role": "primary-book" },
+    { "id": "abu-yala", "nameAr": "مسند أبي يعلى الموصلي", "category": "musnads-sunan", "role": "primary-book" },
+    { "id": "ibn-rahwayh", "nameAr": "مسند إسحاق بن راهويه", "category": "musnads-sunan", "role": "primary-book" },
+    { "id": "abu-dawud", "nameAr": "سنن أبي داود", "category": "musnads-sunan", "role": "primary-book" },
+    { "id": "ibn-majah", "nameAr": "سنن ابن ماجه", "category": "musnads-sunan", "role": "primary-book" },
+    { "id": "tirmidhi", "nameAr": "سنن الترمذي", "category": "musnads-sunan", "role": "primary-book" },
+    { "id": "nasai", "nameAr": "سنن النسائي", "category": "musnads-sunan", "role": "primary-book" },
+    { "id": "darimi", "nameAr": "سنن الدارمي", "category": "musnads-sunan", "role": "primary-book" },
+    { "id": "bayhaqi", "nameAr": "البيهقي - السنن الكبرى ودلائل النبوة", "category": "hadith", "role": "primary-book" },
+    { "id": "ibn-hisham", "nameAr": "السيرة النبوية - ابن هشام", "category": "sirah", "role": "primary-book" },
+    { "id": "ibn-sad", "nameAr": "الطبقات الكبرى - ابن سعد", "category": "sirah", "role": "primary-book" },
+    { "id": "ibn-kathir", "nameAr": "البداية والنهاية - قسم السيرة", "category": "sirah", "role": "supporting" },
+    { "id": "zad-al-maad", "nameAr": "زاد المعاد", "category": "sirah", "role": "supporting" },
+    { "id": "imta-al-asma", "nameAr": "إمتاع الأسماع", "category": "sirah", "role": "supporting" },
+    { "id": "raheeq-makhtum", "nameAr": "الرحيق المختوم", "category": "sirah", "role": "supporting" },
+    { "id": "rawdhat-anwar", "nameAr": "روضة الأنوار في سيرة النبي المختار", "category": "sirah", "role": "supporting" },
+    { "id": "al-shifa", "nameAr": "الشفا بتعريف حقوق المصطفى", "category": "sirah", "role": "supporting" },
+    { "id": "shamail", "nameAr": "الشمائل المحمدية", "category": "sirah", "role": "primary-book" },
+    { "id": "madhhab-hanafi", "nameAr": "المذهب الحنفي", "category": "fiqh", "role": "school" },
+    { "id": "madhhab-maliki", "nameAr": "المذهب المالكي", "category": "fiqh", "role": "school" },
+    { "id": "madhhab-shafii", "nameAr": "المذهب الشافعي", "category": "fiqh", "role": "school" },
+    { "id": "madhhab-hanbali", "nameAr": "المذهب الحنبلي", "category": "fiqh", "role": "school" },
+    { "id": "usul-thalatha", "nameAr": "الأصول الثلاثة", "category": "aqidah", "role": "text" },
+    { "id": "usul-sitta", "nameAr": "الأصول الستة", "category": "aqidah", "role": "text" },
+    { "id": "qawaid-arbaa", "nameAr": "القواعد الأربع", "category": "aqidah", "role": "text" }
+  ],
+  "maqasid": {
+    "titleAr": "مقاصد الشريعة",
+    "subsections": ["الضروريات الخمس", "الحاجيات", "التحسينيات", "المقاصد العامة", "المقاصد الخاصة", "المقاصد الجزئية", "القواعد والضوابط", "التطبيقات في العبادات والمعاملات والأسرة"] ,
+    "daruriyyat": ["حفظ الدين", "حفظ النفس", "حفظ العقل", "حفظ النسل", "حفظ المال"]
+  }
+}
