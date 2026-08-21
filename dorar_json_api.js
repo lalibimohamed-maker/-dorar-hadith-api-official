@@ -1,5 +1,6 @@
 import http from "node:http";
 import { URL } from "node:url";
+import { searchDorar } from "./src/dorar-client.js";
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
@@ -17,7 +18,6 @@ function sendJson(res, status, data) {
 
 const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") return sendJson(res, 204, {});
-
   const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
 
   if (url.pathname === "/health") {
@@ -32,12 +32,9 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === "/") {
     return sendJson(res, 200, {
       name: "Dorar Hadith API Official",
-      version: "0.1.0",
-      endpoints: {
-        health: "/health",
-        search: "/search?q=..."
-      },
-      note: "The search integration is intentionally isolated so the official Dorar.net retrieval method can be implemented and tested without inventing undocumented endpoints."
+      version: "0.2.0",
+      endpoints: { health: "/health", search: "/search?q=..." },
+      source: "https://dorar.net/dorar_api.json"
     });
   }
 
@@ -45,11 +42,16 @@ const server = http.createServer(async (req, res) => {
     const q = (url.searchParams.get("q") || "").trim();
     if (!q) return sendJson(res, 400, { error: "Missing required query parameter: q" });
 
-    return sendJson(res, 501, {
-      error: "Search provider integration is not configured yet",
-      query: q,
-      source: "Dorar.net"
-    });
+    try {
+      const data = await searchDorar(q);
+      return sendJson(res, 200, { query: q, source: "Dorar.net", data });
+    } catch (error) {
+      return sendJson(res, 502, {
+        error: "Unable to retrieve results from Dorar.net",
+        message: error instanceof Error ? error.message : String(error),
+        source: "Dorar.net"
+      });
+    }
   }
 
   return sendJson(res, 404, { error: "Not found" });
