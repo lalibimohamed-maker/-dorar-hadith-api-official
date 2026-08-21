@@ -28,7 +28,35 @@ async function accessToken() {
   return token;
 }
 
-export async function getQuranAyah({ verseKey, translationIds = [], language = "en", words = false }) {
+async function qfGet(path, params) {
+  const response = await fetch(`${BASE}${path}?${params}`, {
+    headers: { "x-auth-token": await accessToken(), "x-client-id": process.env.QF_CLIENT_ID }
+  });
+  if (!response.ok) throw new Error(`Quran Foundation request failed: ${response.status}`);
+  return response.json();
+}
+
+async function getTafsirs(verseKey, tafsirIds) {
+  if (!tafsirIds.length) return [];
+  const results = await Promise.all(tafsirIds.map(async (resourceId) => {
+    const params = new URLSearchParams({ fields: "verse_key,resource_name,language_name,language_id,id" });
+    const data = await qfGet(`/tafsirs/${resourceId}/by_ayah/${encodeURIComponent(verseKey)}`, params);
+    const item = data?.tafsir;
+    if (!item) return null;
+    return {
+      resourceId: item.resource_id,
+      resourceName: item.resource_name,
+      languageId: item.language_id,
+      languageName: item.translated_name?.language_name || item.language_name,
+      slug: item.slug,
+      text: item.text,
+      type: "tafsir"
+    };
+  }));
+  return results.filter(Boolean);
+}
+
+export async function getQuranAyah({ verseKey, translationIds = [], tafsirIds = [], language = "en", words = false }) {
   if (!/^\d{1,3}:\d{1,3}$/.test(String(verseKey || ""))) {
     throw new Error("verseKey must be in surah:ayah form, e.g. 1:1");
   }
@@ -39,21 +67,15 @@ export async function getQuranAyah({ verseKey, translationIds = [], language = "
   });
   if (translationIds.length) params.set("translations", translationIds.join(","));
 
-  const response = await fetch(`${BASE}/verses/by_key/${encodeURIComponent(verseKey)}?${params}`, {
-    headers: { "x-auth-token": await accessToken(), "x-client-id": process.env.QF_CLIENT_ID }
-  });
-  if (!response.ok) throw new Error(`Quran Foundation verse request failed: ${response.status}`);
-  const data = await response.json();
+  const data = await qfGet(`/verses/by_key/${encodeURIComponent(verseKey)}`, params);
   const verse = data?.verses?.[0];
   if (!verse) return null;
 
+  const tafsirs = await getTafsirs(verseKey, tafsirIds);
+
   return {
     verseKey: verse.verse_key,
-    original: {
-      script: "uthmani",
-      text: verse.text_uthmani,
-      simpleText: verse.text_uthmani_simple
-    },
+    original: { script: "uthmani", text: verse.text_uthmani, simpleText: verse.text_uthmani_simple },
     translations: (verse.translations || []).map((item) => ({
       resourceId: item.resource_id,
       resourceName: item.resource_name,
@@ -61,13 +83,15 @@ export async function getQuranAyah({ verseKey, translationIds = [], language = "
       footnotes: item.foot_notes || null,
       type: "meaning-translation"
     })),
-    words: words ? verse.words || [] : undefined,
-    metadata: {
-      page: verse.page_number,
-      juz: verse.juz_number,
-      hizb: verse.hizb_number,
-      ruku: verse.ruku_number
+    tafsirs,
+    context: {
+      revelationContext: null,
+      asbabAlNuzul: null,
+      note: "Context and causes of revelation are populated only from separately verified sources; absence here does not mean that no source exists."
     },
-    policy: "The Arabic Quran text is original source text. Translations convey meanings and are displayed with their attribution."
+    related: { hadith: [], sirahEvents: [] },
+    words: words ? verse.words || [] : undefined,
+    metadata: { page: verse.page_number, juz: verse.juz_number, hizb: verse.hizb_number, ruku: verse.ruku_number },
+    policy: "The Arabic Quran text is original source text. Translations convey meanings and are displayed with attribution. Tafsir, revelation context, hadith and sirah are separate evidence types."
   };
 }
