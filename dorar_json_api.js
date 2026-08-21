@@ -8,6 +8,7 @@ import { DEFAULT_LOCALE, detectLocale, listLocales, localeFromRequest } from "./
 import { getQuranAyah } from "./src/quran-ayah.js";
 import { listQuranTranslations } from "./src/quran-translations.js";
 import { getTajweedCurriculum, getTajweedLesson } from "./src/tajweed-curriculum.js";
+import { calculateInheritance, supportedMadhahib } from "./src/inheritance-calculator.js";
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
@@ -37,6 +38,7 @@ function sendJson(res, status, data, extraHeaders = {}) {
   res.end(JSON.stringify(data));
 }
 function requireString(value) { return typeof value === "string" && value.trim() ? value.trim() : null; }
+function intParam(url, name) { const raw = url.searchParams.get(name); return raw === null ? 0 : Number(raw); }
 
 const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") return sendJson(res, 204, {});
@@ -55,7 +57,7 @@ const server = http.createServer(async (req, res) => {
   if (rawKey && (!app || !app.enabled)) return sendJson(res, 401, { error: "Invalid or disabled API key" });
   if (!consume(app ? `app:${keyHash}` : `ip:${clientIp(req)}`, app ? APP_MAX_PER_WINDOW : PUBLIC_MAX_PER_WINDOW, PUBLIC_WINDOW_MS)) return sendJson(res, 429, { error: "Rate limit exceeded", retryAfterSeconds: 60 });
 
-  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة دين الله", nameEn: "Deen Allah Encyclopedia", service: "Deen Allah API", version: "0.8.1", locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid", tajweed: "/tajweed", tajweedLesson: "/tajweed/lesson?id=letters" } });
+  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة دين الله", nameEn: "Deen Allah Encyclopedia", service: "Deen Allah API", version: "0.8.1", locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid", tajweed: "/tajweed", tajweedLesson: "/tajweed/lesson?id=letters", inheritance: "/inheritance?estate=100000&sons=1&daughters=1&madhhab=hanbali", inheritanceMadhahib: "/inheritance/madhahib" } });
   if (url.pathname === "/locales") return sendJson(res, 200, { default: DEFAULT_LOCALE, count: listLocales().length, locales: listLocales() });
   if (url.pathname === "/categories") return sendJson(res, 200, { locale, direction: locale.dir, categories: listCategories() });
   if (url.pathname === "/sources") return sendJson(res, 200, { locale, sources: listSources({ category: requireString(url.searchParams.get("category")), role: requireString(url.searchParams.get("role")) }) });
@@ -65,6 +67,28 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === "/maqasid") return sendJson(res, 200, { locale, maqasid: getMaqasid() });
   if (url.pathname === "/tajweed") return sendJson(res, 200, { locale, curriculum: getTajweedCurriculum() });
   if (url.pathname === "/tajweed/lesson") { const id = requireString(url.searchParams.get("id")); if (!id) return sendJson(res, 400, { error: "Missing required query parameter: id" }); const lesson = getTajweedLesson(id); return lesson ? sendJson(res, 200, { locale, lesson }) : sendJson(res, 404, { error: "Tajweed lesson not found" }); }
+
+  if (url.pathname === "/inheritance/madhahib") return sendJson(res, 200, { locale, madhahib: supportedMadhahib(), noteAr: "المذاهب الأربعة هنا هي خيارات لإطار الحساب؛ المسائل التفصيلية قد تختلف باختلاف المذهب والحالة." });
+
+  if (url.pathname === "/inheritance") {
+    try {
+      const data = calculateInheritance({
+        madhhab: requireString(url.searchParams.get("madhhab")) || "hanbali",
+        estate: Number(url.searchParams.get("estate") || 0),
+        debts: Number(url.searchParams.get("debts") || 0),
+        bequest: Number(url.searchParams.get("bequest") || 0),
+        heirs: {
+          husband: intParam(url, "husband"), wives: intParam(url, "wives"), father: intParam(url, "father"), mother: intParam(url, "mother"),
+          sons: intParam(url, "sons"), daughters: intParam(url, "daughters"), grandsons: intParam(url, "grandsons"), granddaughters: intParam(url, "granddaughters"),
+          fullBrothers: intParam(url, "fullBrothers"), fullSisters: intParam(url, "fullSisters"), paternalBrothers: intParam(url, "paternalBrothers"), paternalSisters: intParam(url, "paternalSisters"),
+          maternalBrothers: intParam(url, "maternalBrothers"), maternalSisters: intParam(url, "maternalSisters"),
+        },
+      });
+      return sendJson(res, 200, { locale, direction: locale.dir, data });
+    } catch (error) {
+      return sendJson(res, 400, { error: error.message, locale });
+    }
+  }
 
   if (url.pathname === "/quran/translations") {
     try { return sendJson(res, 200, { locale, translations: await listQuranTranslations(requireString(url.searchParams.get("lang")) || locale.code) }); }
