@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: موسوعة الدرر - Official Research API
-  version: 0.5.0
-  description: Public research gateway for official Dorar.net hadith retrieval and a curated Sunni Islamic source registry. Search results use a concise verified summary with expandable source and takhrij details. Source attribution is mandatory.
+  title: Deen Allah Encyclopedia API
+  version: 0.8.1
+  description: Multilingual research API for the Deen Allah Encyclopedia. It provides source-attributed access to Quran, hadith, tafsir, sirah, creed, fiqh, scholars, books, maqasid and Quran learning resources. Original texts remain distinct from translations and source attribution is mandatory.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
 paths:
@@ -12,19 +12,22 @@ paths:
       summary: Check API health
       responses:
         '200': {description: Healthy}
+  /locales:
+    get:
+      operationId: listLocales
+      summary: List supported languages
+      responses:
+        '200': {description: Supported locales}
   /categories:
     get:
       operationId: listCategories
-      summary: List encyclopedia research categories
+      summary: List encyclopedia categories
       responses:
         '200': {description: Categories}
   /sources:
     get:
       operationId: listSources
       summary: List configured sources
-      parameters:
-        - {name: category, in: query, schema: {type: string}}
-        - {name: role, in: query, schema: {type: string}}
       responses:
         '200': {description: Source registry}
   /sources/one:
@@ -39,92 +42,67 @@ paths:
   /maqasid:
     get:
       operationId: getMaqasid
-      summary: Get maqasid taxonomy and the five daruriyyat
+      summary: Get maqasid taxonomy and the five necessities
       responses:
         '200': {description: Maqasid taxonomy}
   /search:
     get:
       operationId: search
-      summary: Search with a concise verified summary and expandable source details
-      description: Returns a concise, source-attributed result first. Clients should expose a "المصادر والتخريج" action to reveal full provenance, book/location details, grading when available, related evidence, scholarly disagreement, and original source links.
+      summary: Multilingual source-attributed encyclopedia search
+      description: The language detected from the user's query has priority over the configured locale. Original Arabic Quran text is never replaced by translation. Results retain provenance and hadith grading separately from book presence.
       parameters:
         - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+        - {name: locale, in: query, required: false, schema: {type: string}}
         - {name: category, in: query, required: false, schema: {type: string}}
         - {name: sourceId, in: query, required: false, schema: {type: string}}
-        - {name: detail, in: query, required: false, description: 'summary returns the default concise verified view; full returns source/takhrij details when available.', schema: {type: string, enum: [summary, full], default: summary}}
+        - {name: detail, in: query, required: false, schema: {type: string, enum: [summary, full], default: summary}}
       responses:
-        '200':
-          description: Search results with concise verified summary and optional detailed provenance
-          content:
-            application/json:
-              schema: {$ref: '#/components/schemas/SearchResponse'}
+        '200': {description: Multilingual search response}
         '400': {description: Missing or invalid query}
         '429': {description: Rate limit exceeded}
         '502': {description: Upstream source failure}
+  /books:
+    get:
+      operationId: listBooks
+      summary: List indexed books
+      responses:
+        '200': {description: Book catalog}
+  /authors:
+    get:
+      operationId: listAuthors
+      summary: List indexed scholars and authors
+      responses:
+        '200': {description: Author catalog}
+  /quran/ayah:
+    get:
+      operationId: getQuranAyah
+      summary: Get an ayah with original text, translations and linked evidence
+      parameters:
+        - {name: surah, in: query, required: true, schema: {type: integer}}
+        - {name: ayah, in: query, required: true, schema: {type: integer}}
+        - {name: locale, in: query, required: false, schema: {type: string}}
+      responses:
+        '200': {description: Quran ayah context}
+        '400': {description: Invalid ayah}
+        '404': {description: Ayah not found}
+  /tajweed:
+    get:
+      operationId: getTajweedCurriculum
+      summary: Get the in-app Quran and Tajweed learning curriculum
+      responses:
+        '200': {description: Tajweed curriculum}
+  /tajweed/lesson:
+    get:
+      operationId: getTajweedLesson
+      summary: Get one Tajweed lesson
+      parameters:
+        - {name: id, in: query, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Tajweed lesson}
+        '404': {description: Lesson not found}
 components:
   securitySchemes:
     ApiKey:
       type: apiKey
       in: header
       name: x-api-key
-  schemas:
-    SourceAttribution:
-      type: object
-      required: [id, nameAr, role]
-      properties:
-        id: {type: string}
-        nameAr: {type: string}
-        role: {type: string}
-        author: {type: string}
-        book: {type: string}
-        edition: {type: string}
-        location: {type: string}
-        url: {type: string, format: uri}
-    Takhrij:
-      type: object
-      properties:
-        hadithNumber: {type: string}
-        book: {type: string}
-        chapter: {type: string}
-        location: {type: string}
-        grading: {type: string}
-        grader: {type: string}
-        isnad: {type: string}
-        narrators: {type: array, items: {type: string}}
-        notes: {type: string}
-    ScholarlyView:
-      type: object
-      properties:
-        position: {type: string}
-        scholar: {type: string}
-        source: {$ref: '#/components/schemas/SourceAttribution'}
-        evidence: {type: string}
-    SearchResult:
-      type: object
-      required: [summary, source]
-      properties:
-        type: {type: string}
-        summary: {type: string}
-        text: {type: string}
-        source: {$ref: '#/components/schemas/SourceAttribution'}
-        takhrij: {$ref: '#/components/schemas/Takhrij'}
-        scholarlyViews: {type: array, items: {$ref: '#/components/schemas/ScholarlyView'}}
-        relatedSources: {type: array, items: {$ref: '#/components/schemas/SourceAttribution'}}
-        verificationNote: {type: string}
-    SearchResponse:
-      type: object
-      required: [query, mode, source, results]
-      properties:
-        query: {type: string}
-        mode: {type: string, enum: [summary, full]}
-        source:
-          type: object
-          required: [id, nameAr, role]
-          properties:
-            id: {type: string}
-            nameAr: {type: string}
-            role: {type: string}
-            url: {type: string, format: uri}
-        results: {type: array, items: {$ref: '#/components/schemas/SearchResult'}}
-        researchPolicy: {type: string}
-        limitations: {type: array, items: {type: string}}
