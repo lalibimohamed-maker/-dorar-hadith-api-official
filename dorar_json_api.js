@@ -3,6 +3,7 @@ import { URL } from "node:url";
 import crypto from "node:crypto";
 import { searchDorar } from "./src/dorar-client.js";
 import { getMaqasid, getSource, listCategories, listSources } from "./src/source-registry.js";
+import { DEFAULT_LOCALE, getLocale, listLocales, localeFromRequest } from "./src/i18n.js";
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
@@ -54,7 +55,7 @@ function sendJson(res, status, data, extraHeaders = {}) {
     "referrer-policy": "no-referrer",
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET,OPTIONS",
-    "access-control-allow-headers": "content-type,x-api-key",
+    "access-control-allow-headers": "content-type,x-api-key,accept-language",
     ...extraHeaders
   });
   res.end(body);
@@ -67,6 +68,8 @@ function requireString(value) {
 const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") return sendJson(res, 204, {});
   const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
+  const requestedLocale = url.searchParams.get("lang") || req.headers["accept-language"] || DEFAULT_LOCALE;
+  const locale = localeFromRequest(requestedLocale);
 
   if (url.pathname === "/health") {
     return sendJson(res, 200, {
@@ -74,6 +77,7 @@ const server = http.createServer(async (req, res) => {
       service: "dorar-hadith-api-official",
       source: "Dorar.net",
       registry: "sunny-islamic-research-sources",
+      locale,
       timestamp: new Date().toISOString()
     });
   }
@@ -93,11 +97,14 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, 200, {
       name: "موسوعة الدرر",
       service: "Dorar Hadith API Official",
-      version: "0.4.0",
+      version: "0.5.0",
+      locale,
+      direction: locale.dir,
       access: app ? { type: "application", name: app.name, dailyLimit: app.dailyLimit } : { type: "public" },
       endpoints: {
         health: "/health",
-        search: "/search?q=...",
+        locales: "/locales",
+        search: "/search?q=...&lang=ar",
         sources: "/sources",
         categories: "/categories",
         maqasid: "/maqasid"
@@ -106,14 +113,18 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+  if (url.pathname === "/locales") {
+    return sendJson(res, 200, { default: DEFAULT_LOCALE, locales: listLocales() });
+  }
+
   if (url.pathname === "/categories") {
-    return sendJson(res, 200, { categories: listCategories() });
+    return sendJson(res, 200, { locale, direction: locale.dir, categories: listCategories() });
   }
 
   if (url.pathname === "/sources") {
     const category = requireString(url.searchParams.get("category"));
     const role = requireString(url.searchParams.get("role"));
-    return sendJson(res, 200, { sources: listSources({ category, role }) });
+    return sendJson(res, 200, { locale, sources: listSources({ category, role }) });
   }
 
   if (url.pathname === "/sources/one") {
@@ -121,11 +132,11 @@ const server = http.createServer(async (req, res) => {
     if (!id) return sendJson(res, 400, { error: "Missing required query parameter: id" });
     const source = getSource(id);
     if (!source) return sendJson(res, 404, { error: "Source not found" });
-    return sendJson(res, 200, { source });
+    return sendJson(res, 200, { locale, source });
   }
 
   if (url.pathname === "/maqasid") {
-    return sendJson(res, 200, { maqasid: getMaqasid() });
+    return sendJson(res, 200, { locale, maqasid: getMaqasid() });
   }
 
   if (url.pathname === "/search") {
@@ -139,13 +150,15 @@ const server = http.createServer(async (req, res) => {
       const data = await searchDorar(q, { signal: controller.signal });
       return sendJson(res, 200, {
         query: q,
+        locale,
+        direction: locale.dir,
         source: getSource("dorar"),
         data,
-        researchPolicy: "Source attribution is preserved; presence in a book is not itself a grading of authenticity."
+        researchPolicy: "Source attribution is preserved; presence in a book is not itself a grading of authenticity. Original Arabic source text remains distinct from translations."
       });
     } catch (error) {
       const message = error?.name === "AbortError" ? "Dorar.net request timed out" : "Unable to retrieve results from Dorar.net";
-      return sendJson(res, 502, { error: message, source: "Dorar.net" });
+      return sendJson(res, 502, { error: message, source: "Dorar.net", locale });
     } finally {
       clearTimeout(timeout);
     }
