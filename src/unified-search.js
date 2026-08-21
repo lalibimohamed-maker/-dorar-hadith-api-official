@@ -18,7 +18,7 @@ function sourceRecords() {
   }));
 }
 
-export async function unifiedSearch(query, { signal, includePotentialMatches = false } = {}) {
+export async function unifiedSearch(query, { signal, includePotentialMatches = false, responseLocale = "ar" } = {}) {
   const [hadithData, sourceMatches] = await Promise.all([
     searchDorar(query, { signal }),
     Promise.resolve(searchUnified(query, sourceRecords(), {
@@ -31,11 +31,13 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
 
   return {
     query,
+    responseLanguage: responseLocale,
     hadith: hadithData,
     sourceMatches: sourceMatches.map((item) => ({ ...item, evidence: buildEvidence(item) })),
     knowledge,
     policy: {
       corpus: "sunni",
+      responseLanguageMustMatchSelectedLocale: true,
       originalArabicDistinctFromTranslation: true,
       potentialMatchesSeparated: !includePotentialMatches,
       sourceAttributionRequired: true,
