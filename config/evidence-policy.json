@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "principles": [
+    "Search similarity is never proof of a religious relationship.",
+    "Cause of revelation requires an identifiable supporting source and explicit verification.",
+    "Candidate and inference links must remain separate from verified evidence.",
+    "Every promoted relation should retain source metadata and citation details."
+  ],
+  "relationshipTypes": {
+    "revelation-cause": "verified-only",
+    "revelation-context": "source-required",
+    "tafsir-evidence": "source-required",
+    "hadith-linked": "source-required",
+    "sirah-event-linked": "source-required",
+    "scholar-testimony": "source-required",
+    "candidate": "discovery-only",
+    "inference": "discovery-only"
+  },
+  "confidence": ["verified", "supported", "unverified"]
+}
