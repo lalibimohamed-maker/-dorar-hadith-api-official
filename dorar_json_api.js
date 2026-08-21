@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { unifiedSearch } from "./src/unified-search.js";
 import { getMaqasid, getSource, listCategories, listSources } from "./src/source-registry.js";
 import { listAuthors, listBooks } from "./src/book-catalog.js";
-import { DEFAULT_LOCALE, listLocales, localeFromRequest } from "./src/i18n.js";
+import { DEFAULT_LOCALE, detectLocale, listLocales, localeFromRequest } from "./src/i18n.js";
 import { getQuranAyah } from "./src/quran-ayah.js";
 import { listQuranTranslations } from "./src/quran-translations.js";
 
@@ -40,7 +40,11 @@ function requireString(value) { return typeof value === "string" && value.trim()
 const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") return sendJson(res, 204, {});
   const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
-  const locale = localeFromRequest(url.searchParams.get("lang") || req.headers["accept-language"] || DEFAULT_LOCALE);
+  const requestedLanguage = requireString(url.searchParams.get("lang"));
+  const queryText = String(url.searchParams.get("q") || "").trim();
+  const locale = requestedLanguage
+    ? localeFromRequest(requestedLanguage)
+    : (detectLocale(queryText) || localeFromRequest(req.headers["accept-language"] || DEFAULT_LOCALE));
 
   if (url.pathname === "/health") return sendJson(res, 200, { ok: true, service: "dorar-hadith-api-official", source: "Dorar.net", locale, timestamp: new Date().toISOString() });
 
@@ -50,8 +54,8 @@ const server = http.createServer(async (req, res) => {
   if (rawKey && (!app || !app.enabled)) return sendJson(res, 401, { error: "Invalid or disabled API key" });
   if (!consume(app ? `app:${keyHash}` : `ip:${clientIp(req)}`, app ? APP_MAX_PER_WINDOW : PUBLIC_MAX_PER_WINDOW, PUBLIC_WINDOW_MS)) return sendJson(res, 429, { error: "Rate limit exceeded", retryAfterSeconds: 60 });
 
-  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة الدرر", service: "Dorar Hadith API Official", version: "0.7.0", locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid" }, source: "Dorar.net" });
-  if (url.pathname === "/locales") return sendJson(res, 200, { default: DEFAULT_LOCALE, locales: listLocales() });
+  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة الدرر", service: "Dorar Hadith API Official", version: "0.8.0", locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid" }, source: "Dorar.net" });
+  if (url.pathname === "/locales") return sendJson(res, 200, { default: DEFAULT_LOCALE, count: listLocales().length, locales: listLocales() });
   if (url.pathname === "/categories") return sendJson(res, 200, { locale, direction: locale.dir, categories: listCategories() });
   if (url.pathname === "/sources") return sendJson(res, 200, { locale, sources: listSources({ category: requireString(url.searchParams.get("category")), role: requireString(url.searchParams.get("role")) }) });
   if (url.pathname === "/sources/one") { const id = requireString(url.searchParams.get("id")); if (!id) return sendJson(res, 400, { error: "Missing required query parameter: id" }); const source = getSource(id); return source ? sendJson(res, 200, { locale, source }) : sendJson(res, 404, { error: "Source not found" }); }
@@ -79,13 +83,13 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (url.pathname === "/search") {
-    const q = (url.searchParams.get("q") || "").trim();
+    const q = queryText;
     if (!q) return sendJson(res, 400, { error: "Missing required query parameter: q" });
     if (q.length > MAX_QUERY_LENGTH) return sendJson(res, 413, { error: `Query exceeds maximum length of ${MAX_QUERY_LENGTH} characters` });
     const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
       const data = await unifiedSearch(q, { signal: controller.signal, includePotentialMatches: url.searchParams.get("includePotentialMatches") === "true" });
-      return sendJson(res, 200, { ...data, locale, direction: locale.dir });
+      return sendJson(res, 200, { ...data, locale, direction: locale.dir, languageDetection: { explicit: Boolean(requestedLanguage), detectedFromQuery: !requestedLanguage && Boolean(detectLocale(q)), selected: locale.code } });
     } catch (error) {
       return sendJson(res, 502, { error: error?.name === "AbortError" ? "Search request timed out" : "Unable to retrieve unified search results", source: "Dorar.net", locale });
     } finally { clearTimeout(timeout); }
