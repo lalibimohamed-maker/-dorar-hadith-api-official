@@ -1,7 +1,7 @@
 {
   "id": "sunni-fiqh-fatawa",
   "titleAr": "مصادر الفقه والفتاوى السنية",
-  "descriptionAr": "سجل مصادر فقه وفتاوى سنية موثوقة، مع فصل المصدر عن الحكم الداخلي للموسوعة وعدم اعتبار مجرد الإدراج تصحيحاً لكل محتوى المصدر.",
+  "descriptionAr": "سجل قابل للتوسع لمصادر الفقه والفتاوى وعلماء أهل السنة، مع فصل نسبة القول عن تقييمه العلمي، وعدم اعتبار مجرد الإدراج تصحيحاً لكل محتوى المصدر.",
   "policy": {
     "corpus": "sunni",
     "sourceVerificationRequired": true,
@@ -9,13 +9,29 @@
     "originalSourcePreferred": true,
     "scholarlyAttributionRequired": true,
     "fatwaIsAttributedToItsIssuer": true,
-    "differencesOfOpinionPreserved": true
+    "differencesOfOpinionPreserved": true,
+    "no_claim_of_comprehensiveness": "The registry is expandable and is not claimed to contain every Sunni scholar until each source is independently verified.",
+    "newScholarWorkflow": ["identify-scholar", "verify-official-source", "verify-attribution", "record-books-and-fatwas", "record-rights", "index-for-search"]
   },
   "sources": [
     {"id":"islamweb-fatwa","nameAr":"إسلام ويب - مركز الفتوى","url":"https://islamweb.net/ar/fatwa/","type":"fatwa-center","status":"verified-web-source","rights":"source-dependent"},
     {"id":"binbaz-fatwa","nameAr":"الموقع الرسمي للشيخ عبد العزيز بن باز","url":"https://binbaz.org.sa/fatwas","type":"scholar-fatwa","status":"verified-official-site","rights":"source-dependent"},
     {"id":"binothaimeen-fatwa","nameAr":"الموقع الرسمي للشيخ محمد بن صالح العثيمين","url":"https://binothaimeen.net/","type":"scholar-fatwa","status":"verified-official-site","rights":"source-dependent"},
+    {"id":"fawzan-fatwa","nameAr":"الموقع الرسمي للشيخ صالح بن فوزان الفوزان","url":"https://alfawzan.af.org.sa/ar/ftawa/all","type":"scholar-fatwa","status":"verified-official-site","rights":"source-dependent"},
+    {"id":"ibn-jibreen-fatwa","nameAr":"فتاوى الشيخ عبد الله بن عبد الرحمن بن جبرين","url":"https://cms.ibn-jebreen.com/fatwa/home","type":"scholar-fatwa","status":"verified-official-source","rights":"source-dependent"},
+    {"id":"ibn-jibreen-foundation","nameAr":"مؤسسة الشيخ عبد الله بن جبرين الخيرية","url":"https://www.ibn-jebreen.org/","type":"scholar-foundation","status":"verified-official-source","rights":"source-dependent"},
+    {"id":"farkous-fatwa","nameAr":"الموقع الرسمي للشيخ أبي عبد المعز محمد علي فركوس","url":"https://www.ferkous.app/","type":"scholar-fatwa","status":"verified-official-site","rights":"source-dependent"},
+    {"id":"ruhaily-official","nameAr":"الموقع الرسمي للشيخ أ.د. سليمان بن سليم الله الرحيلي","url":"https://www.sualruhaily.com/","type":"scholar-lessons-fatwa","status":"official-site-identified","rights":"source-dependent"},
+    {"id":"haramain-ruhaily","nameAr":"رئاسة الشؤون الدينية بالمسجد النبوي والمسجد الحرام - مواد الشيخ سليمان الرحيلي","url":"https://haramain.prh.gov.sa/","type":"official-institution-scholar-content","status":"verified-official-institution-source","rights":"source-dependent"},
     {"id":"islamqa","nameAr":"الإسلام سؤال وجواب","url":"https://islamqa.info/ar/","type":"fatwa-reference","status":"verified-web-source","rights":"source-dependent"}
+  ],
+  "scholars": [
+    {"id":"abdulaziz-bin-baz","nameAr":"عبد العزيز بن عبد الله بن باز","sourceIds":["binbaz-fatwa"]},
+    {"id":"muhammad-bin-saleh-uthaymeen","nameAr":"محمد بن صالح العثيمين","sourceIds":["binothaimeen-fatwa"]},
+    {"id":"saleh-bin-fawzan-al-fawzan","nameAr":"صالح بن فوزان الفوزان","sourceIds":["fawzan-fatwa"]},
+    {"id":"abdullah-bin-jibreen","nameAr":"عبد الله بن عبد الرحمن بن جبرين","sourceIds":["ibn-jibreen-fatwa","ibn-jibreen-foundation"]},
+    {"id":"muhammad-ali-ferkous","nameAr":"محمد علي فركوس","sourceIds":["farkous-fatwa"]},
+    {"id":"sulayman-al-ruhaily","nameAr":"سليمان بن سليم الله الرحيلي","sourceIds":["ruhaily-official","haramain-ruhaily"]}
   ],
   "topics": [
     "fiqh-ibadat","fiqh-muamalat","family-fiqh","inheritance","criminal-law","food","judiciary","oaths-vows","usul-al-fiqh","contemporary-issues"
@@ -25,5 +41,10 @@
     "topics": ["faraid","estate-inventory","debts-and-wills","fixed-shares","residuaries","blocking","awl","radd","inheritance-disputes","valuation-and-partition"],
     "requiresCaseSpecificReview": true,
     "legalDisclaimerRequired": true
+  },
+  "expansion": {
+    "enabled": true,
+    "policy": "Add every newly identified Sunni scholar after independent source and attribution verification; do not silently exclude scholars merely because they are not yet indexed.",
+    "candidateStatusAllowed": true
   }
 }
