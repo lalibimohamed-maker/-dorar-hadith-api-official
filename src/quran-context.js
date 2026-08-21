@@ -1,6 +1,7 @@
 import { listSirahEvents } from "./sirah-catalog.js";
+import { findHadithLinksForAyah } from "./quran-hadith-links.js";
 
-export function getQuranContext(verseKey) {
+export async function getQuranContext({ verseKey, verseText, signal } = {}) {
   const events = listSirahEvents({ quranKey: verseKey }).map((event) => ({
     id: event.id,
     name: event.name,
@@ -9,14 +10,21 @@ export function getQuranContext(verseKey) {
     sourceCitations: event.sources,
   }));
 
+  let hadith = [];
+  if (verseText) {
+    try { hadith = await findHadithLinksForAyah(verseText, { signal }); }
+    catch { hadith = []; }
+  }
+
   return {
     revelationCause: [],
     revelationContext: [],
-    hadith: [],
+    hadith,
     sirahEvents: events,
     policy: {
       revelationCauseRequiresSource: true,
       aiInferenceMustBeLabeled: true,
+      hadithRelationsAreCandidatesUntilVerified: true,
     },
   };
 }
