@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dorar Hadith API</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--green:#176b4b;--deep:#0f4d38;--paper:#f8fbf7;--ink:#17352a;--muted:#62736b;--line:#dce9e1}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Naskh Arabic",serif;font-size:18px}header{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;padding:28px 20px 54px;text-align:center}main{max-width:900px;margin:-28px auto 50px;padding:0 18px}.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:0 10px 30px #17352a12;margin-bottom:18px}.mark{font-size:42px;margin-bottom:2px}h1{font-size:34px;margin:0 0 8px}h2{color:var(--deep);margin-top:0}p{line-height:1.9}.badge{display:inline-block;background:#e7f3ec;color:var(--deep);padding:4px 12px;border-radius:999px;margin:4px}.endpoint{direction:ltr;text-align:left;background:#f3f7f4;border:1px solid var(--line);padding:12px;border-radius:10px;font-family:monospace}.links{display:flex;gap:10px;flex-wrap:wrap}.links a{color:var(--deep);text-decoration:none;border:1px solid var(--line);padding:8px 14px;border-radius:10px;background:#fff}footer{text-align:center;color:var(--muted);font-size:15px;padding:20px}
+</style></head>
+<body><header><div class="mark">۞</div><h1>Dorar Hadith API</h1><div>واجهة هادئة للوصول البرمجي إلى بيانات الدرر السنية الرسمية</div></header>
+<main><section class="card"><h2>مرحباً بك</h2><p>خدمة API عامة للبحث في الموسوعة الحديثية، مع تصميم قابل للتوسع وحماية من إساءة الاستخدام. لا نحتفظ بنسخة محلية من الأحاديث؛ تُطلب نتائج البحث من المصدر الرسمي عند الحاجة.</p><span class="badge">Public API</span><span class="badge">HTTPS</span><span class="badge">OpenAPI</span></section>
+<section class="card"><h2>نقطة البحث</h2><div class="endpoint">GET /search?q=الصلاة</div><p>يمكن للتطبيقات استخدام واجهة البحث مباشرة، بينما تتوفر مفاتيح اختيارية للتطبيقات ذات الاستخدام المرتفع.</p></section>
+<section class="card"><h2>للمطورين</h2><p>توثيق OpenAPI متاح داخل المشروع، وستُضاف واجهة إدارة المفاتيح بعد اكتمال طبقة الحسابات والتخزين الدائم.</p><div class="links"><a href="/openapi.yaml">OpenAPI</a><a href="/health">حالة الخدمة</a></div></section></main><footer>المصدر: الدرر السنية — واجهة تقنية مستقلة للوصول إلى المصدر الرسمي</footer></body></html>
