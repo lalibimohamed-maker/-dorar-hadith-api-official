@@ -7,6 +7,7 @@ import { listAuthors, listBooks } from "./src/book-catalog.js";
 import { DEFAULT_LOCALE, detectLocale, listLocales, localeFromRequest } from "./src/i18n.js";
 import { getQuranAyah } from "./src/quran-ayah.js";
 import { listQuranTranslations } from "./src/quran-translations.js";
+import { getTajweedCurriculum, getTajweedLesson } from "./src/tajweed-curriculum.js";
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
@@ -46,7 +47,7 @@ const server = http.createServer(async (req, res) => {
     ? localeFromRequest(requestedLanguage)
     : (detectLocale(queryText) || localeFromRequest(req.headers["accept-language"] || DEFAULT_LOCALE));
 
-  if (url.pathname === "/health") return sendJson(res, 200, { ok: true, service: "dorar-hadith-api-official", source: "Dorar.net", locale, timestamp: new Date().toISOString() });
+  if (url.pathname === "/health") return sendJson(res, 200, { ok: true, service: "deen-allah-encyclopedia-api", name: "موسوعة دين الله", version: "0.8.1", locale, timestamp: new Date().toISOString() });
 
   const rawKey = String(req.headers["x-api-key"] || "").trim();
   const keyHash = rawKey ? hashKey(rawKey) : null;
@@ -54,7 +55,7 @@ const server = http.createServer(async (req, res) => {
   if (rawKey && (!app || !app.enabled)) return sendJson(res, 401, { error: "Invalid or disabled API key" });
   if (!consume(app ? `app:${keyHash}` : `ip:${clientIp(req)}`, app ? APP_MAX_PER_WINDOW : PUBLIC_MAX_PER_WINDOW, PUBLIC_WINDOW_MS)) return sendJson(res, 429, { error: "Rate limit exceeded", retryAfterSeconds: 60 });
 
-  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة الدرر", service: "Dorar Hadith API Official", version: "0.8.0", locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid" }, source: "Dorar.net" });
+  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة دين الله", nameEn: "Deen Allah Encyclopedia", service: "Deen Allah API", version: "0.8.1", locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid", tajweed: "/tajweed", tajweedLesson: "/tajweed/lesson?id=letters" } });
   if (url.pathname === "/locales") return sendJson(res, 200, { default: DEFAULT_LOCALE, count: listLocales().length, locales: listLocales() });
   if (url.pathname === "/categories") return sendJson(res, 200, { locale, direction: locale.dir, categories: listCategories() });
   if (url.pathname === "/sources") return sendJson(res, 200, { locale, sources: listSources({ category: requireString(url.searchParams.get("category")), role: requireString(url.searchParams.get("role")) }) });
@@ -62,6 +63,8 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === "/books") return sendJson(res, 200, { locale, books: listBooks({ subject: requireString(url.searchParams.get("subject")), madhhab: requireString(url.searchParams.get("madhhab")), authorId: requireString(url.searchParams.get("authorId")) }) });
   if (url.pathname === "/authors") return sendJson(res, 200, { locale, authors: listAuthors({ madhhab: requireString(url.searchParams.get("madhhab")) }) });
   if (url.pathname === "/maqasid") return sendJson(res, 200, { locale, maqasid: getMaqasid() });
+  if (url.pathname === "/tajweed") return sendJson(res, 200, { locale, curriculum: getTajweedCurriculum() });
+  if (url.pathname === "/tajweed/lesson") { const id = requireString(url.searchParams.get("id")); if (!id) return sendJson(res, 400, { error: "Missing required query parameter: id" }); const lesson = getTajweedLesson(id); return lesson ? sendJson(res, 200, { locale, lesson }) : sendJson(res, 404, { error: "Tajweed lesson not found" }); }
 
   if (url.pathname === "/quran/translations") {
     try { return sendJson(res, 200, { locale, translations: await listQuranTranslations(requireString(url.searchParams.get("lang")) || locale.code) }); }
@@ -96,4 +99,4 @@ const server = http.createServer(async (req, res) => {
   }
   return sendJson(res, 404, { error: "Not found" });
 });
-server.listen(PORT, HOST, () => console.log(`Dorar API listening on ${HOST}:${PORT}`));
+server.listen(PORT, HOST, () => console.log(`Deen Allah API listening on ${HOST}:${PORT}`));
