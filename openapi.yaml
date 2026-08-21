@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Deen Allah Encyclopedia API
-  version: 0.8.1
+  version: 0.8.3
   description: Multilingual research API for the Deen Allah Encyclopedia. It provides source-attributed access to Quran, hadith, tafsir, sirah, creed, fiqh, scholars, books, maqasid, inheritance and Quran learning resources. Original texts remain distinct from translations and source attribution is mandatory.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
@@ -90,8 +90,8 @@ paths:
   /inheritance:
     get:
       operationId: calculateInheritance
-      summary: Calculate a core Sunni faraid case
-      description: Educational inheritance calculator. It deducts debts and a supplied bequest before distribution, calculates common fixed shares and residuary shares, and explicitly flags complex cases requiring detailed madhhab-specific adjudication. It is not a fatwa or legal opinion.
+      summary: Calculate a Sunni faraid case with explicit awl, radd and correction reporting
+      description: Educational faraid calculator. It deducts debts and a supplied bequest before distribution, handles common fixed shares and residuary cases, explicitly reports awl and simple radd, and exposes the common denominator/correction information. The four madhhabs are selectable contexts, but complex cases are flagged instead of silently guessed. It is not a fatwa or legal opinion.
       parameters:
         - {name: estate, in: query, required: true, schema: {type: number, minimum: 0}}
         - {name: debts, in: query, required: false, schema: {type: number, minimum: 0, default: 0}}
@@ -101,6 +101,8 @@ paths:
         - {name: wives, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 4, default: 0}}
         - {name: father, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
         - {name: mother, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
+        - {name: grandfather, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
+        - {name: grandmothers, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
         - {name: sons, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
         - {name: daughters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
         - {name: grandsons, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
@@ -112,7 +114,7 @@ paths:
         - {name: maternalBrothers, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
         - {name: maternalSisters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
       responses:
-        '200': {description: Inheritance calculation}
+        '200': {description: Inheritance calculation including allocations, warnings, awl/radd method and sources}
         '400': {description: Invalid inheritance case}
   /quran/translations:
     get:
