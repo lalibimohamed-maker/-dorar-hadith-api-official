@@ -88,7 +88,7 @@ const server = http.createServer(async (req, res) => {
     if (q.length > MAX_QUERY_LENGTH) return sendJson(res, 413, { error: `Query exceeds maximum length of ${MAX_QUERY_LENGTH} characters` });
     const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
-      const data = await unifiedSearch(q, { signal: controller.signal, includePotentialMatches: url.searchParams.get("includePotentialMatches") === "true" });
+      const data = await unifiedSearch(q, { signal: controller.signal, responseLocale: locale.code, includePotentialMatches: url.searchParams.get("includePotentialMatches") === "true" });
       return sendJson(res, 200, { ...data, locale, direction: locale.dir, languageDetection: { explicit: Boolean(requestedLanguage), detectedFromQuery: !requestedLanguage && Boolean(detectLocale(q)), selected: locale.code } });
     } catch (error) {
       return sendJson(res, 502, { error: error?.name === "AbortError" ? "Search request timed out" : "Unable to retrieve unified search results", source: "Dorar.net", locale });
