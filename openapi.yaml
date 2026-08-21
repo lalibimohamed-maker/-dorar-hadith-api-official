@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Deen Allah Encyclopedia API
   version: 0.8.1
-  description: Multilingual research API for the Deen Allah Encyclopedia. It provides source-attributed access to Quran, hadith, tafsir, sirah, creed, fiqh, scholars, books, maqasid and Quran learning resources. Original texts remain distinct from translations and source attribution is mandatory.
+  description: Multilingual research API for the Deen Allah Encyclopedia. It provides source-attributed access to Quran, hadith, tafsir, sirah, creed, fiqh, scholars, books, maqasid, inheritance and Quran learning resources. Original texts remain distinct from translations and source attribution is mandatory.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
 paths:
@@ -81,6 +81,39 @@ paths:
         - {name: madhhab, in: query, required: false, schema: {type: string}}
       responses:
         '200': {description: Author catalog}
+  /inheritance/madhahib:
+    get:
+      operationId: listInheritanceMadhahib
+      summary: List supported Sunni fiqh contexts for the inheritance calculator
+      responses:
+        '200': {description: Four Sunni madhhabs}
+  /inheritance:
+    get:
+      operationId: calculateInheritance
+      summary: Calculate a core Sunni faraid case
+      description: Educational inheritance calculator. It deducts debts and a supplied bequest before distribution, calculates common fixed shares and residuary shares, and explicitly flags complex cases requiring detailed madhhab-specific adjudication. It is not a fatwa or legal opinion.
+      parameters:
+        - {name: estate, in: query, required: true, schema: {type: number, minimum: 0}}
+        - {name: debts, in: query, required: false, schema: {type: number, minimum: 0, default: 0}}
+        - {name: bequest, in: query, required: false, schema: {type: number, minimum: 0, default: 0}}
+        - {name: madhhab, in: query, required: false, schema: {type: string, enum: [hanafi, maliki, shafii, hanbali], default: hanbali}}
+        - {name: husband, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
+        - {name: wives, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 4, default: 0}}
+        - {name: father, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
+        - {name: mother, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
+        - {name: sons, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: daughters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: grandsons, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: granddaughters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: fullBrothers, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: fullSisters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: paternalBrothers, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: paternalSisters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: maternalBrothers, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: maternalSisters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
+      responses:
+        '200': {description: Inheritance calculation}
+        '400': {description: Invalid inheritance case}
   /quran/translations:
     get:
       operationId: listQuranTranslations
