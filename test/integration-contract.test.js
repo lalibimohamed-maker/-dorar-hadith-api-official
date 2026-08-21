@@ -5,11 +5,10 @@ import { listSources } from "../src/source-registry.js";
 import { getKnowledgeContext } from "../src/knowledge-context.js";
 import { listSirahBooks } from "../src/sirah-catalog.js";
 
-test("configured multilingual surface includes the agreed languages", () => {
-  const codes = new Set(listLocales().map((locale) => locale.code));
-  for (const code of ["ar", "en", "fr", "es", "it", "de", "ru", "ja", "hi", "fi", "ber"]) {
-    assert.ok(codes.has(code), `missing locale ${code}`);
-  }
+const AGREED_LOCALES = ["ar","en","zh","ko","bn","pl","fr","es","it","de","ru","ja","hi","fi","ber","tr","id","ms","ur","fa"];
+
+test("configured multilingual surface contains exactly the agreed 20 launch languages", () => {
+  assert.deepEqual(listLocales().map((locale) => locale.code), AGREED_LOCALES);
 });
 
 test("configured source registry includes the agreed external sources", () => {
