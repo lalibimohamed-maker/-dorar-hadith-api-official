@@ -7,7 +7,8 @@
   "main": "dorar_json_api.js",
   "scripts": {
     "start": "node dorar_json_api.js",
-    "health": "node --check dorar_json_api.js && node --check src/language.js"
+    "health": "node --check dorar_json_api.js && node --check src/language.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"
