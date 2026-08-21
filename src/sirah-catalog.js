@@ -1,3 +1,11 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = path.dirname(fileURLToPath(import.meta.url));
+const supplementPath = path.join(root, "..", "config", "sirah-supplement.json");
+const supplement = JSON.parse(fs.readFileSync(supplementPath, "utf8"));
+
 const EVENTS = [
   { id: "badr", name: "غزوة بدر", aliases: ["بدر", "يوم الفرقان"], sources: ["السيرة النبوية - ابن هشام", "المغازي", "زاد المعاد"], quran: ["3:123", "8:5", "8:41", "3:13"] },
   { id: "uhud", name: "غزوة أحد", aliases: ["أحد"], sources: ["السيرة النبوية - ابن هشام", "زاد المعاد", "الطبقات الكبرى"], quran: ["3:121", "3:152", "3:165"] },
@@ -12,11 +20,24 @@ export function listSirahEvents({ quranKey, query } = {}) {
   return EVENTS.filter((event) => {
     const byQuran = !key || event.quran.includes(key);
     const haystack = [event.name, ...event.aliases].join(" ").toLowerCase();
-    const byQuery = !q || haystack.includes(q);
-    return byQuran && byQuery;
+    return byQuran && (!q || haystack.includes(q));
   });
 }
 
 export function getSirahEvent(id) {
   return EVENTS.find((event) => event.id === id) || null;
+}
+
+export function listSirahBooks({ subject, method } = {}) {
+  return supplement.books.filter((book) =>
+    (!subject || book.subject === subject) && (!method || book.method === method)
+  );
+}
+
+export function getSirahBook(id) {
+  return supplement.books.find((book) => book.id === id) || null;
+}
+
+export function getSirahPolicy() {
+  return supplement.policy;
 }
