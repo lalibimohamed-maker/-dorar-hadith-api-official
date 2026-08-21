@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "description": "Evidence-aware links between Quran ayahs, hadith, and sirah events.",
+  "relationshipTypes": {
+    "revelation-cause": "سبب نزول مثبت بمصدر",
+    "revelation-context": "سياق نزول أو حدث مرتبط بالنزول",
+    "tafsir-evidence": "دليل أو نقل في التفسير",
+    "hadith-related": "حديث مرتبط بالآية موضوعياً أو تفسيرياً",
+    "sirah-event-related": "حدث من السيرة مرتبط بالآية",
+    "scholarly-inference": "استنباط أو ربط علمي وليس سبب نزول"
+  },
+  "evidencePolicy": {
+    "requiredForRevelationCause": true,
+    "allowUnverifiedCauseAsFact": false,
+    "preserveSourceAttribution": true,
+    "preserveOriginalArabic": true,
+    "aiInferenceMustBeLabeled": true
+  },
+  "bidirectional": {
+    "ayahToHadith": true,
+    "hadithToAyah": true,
+    "ayahToSirah": true,
+    "sirahToAyah": true
+  },
+  "recordShape": {
+    "sourceType": "quran|hadith|sirah",
+    "sourceId": "string",
+    "targetType": "quran|hadith|sirah",
+    "targetId": "string",
+    "relationshipType": "string",
+    "evidence": "string|null",
+    "sourceCitation": "string|null",
+    "confidence": "verified|supported|related|inference"
+  }
+}
