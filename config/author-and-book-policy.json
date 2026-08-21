@@ -1,0 +1,66 @@
+{
+  "version": "1.0.0",
+  "scope": {
+    "period": "from the Companions and early generations through contemporary scholars",
+    "goal": "Maintain a continuously extensible Sunni-oriented scholarly corpus without treating the label alone as sufficient evidence."
+  },
+  "importantTerminology": {
+    "projectProfile": "The requested primary corpus is Athari/Salafi-oriented Sunni scholarship plus the four Sunni schools of jurisprudence.",
+    "classificationNote": "The term Ahl al-Sunnah has historically been used differently by Sunni authorities; the project must not present a sectarian classification as an uncontested universal fact."
+  },
+  "inclusion": {
+    "primary": [
+      "Quran and recognized Quran sciences",
+      "Hadith and hadith sciences",
+      "Athari/Salafi creed and its scholarly works",
+      "recognized Sunni jurists of Hanafi, Maliki, Shafi'i and Hanbali schools",
+      "classical and contemporary Sunni scholarship whose methodology matches the project's stated corpus policy"
+    ],
+    "authors": {
+      "requiredMetadata": [
+        "name",
+        "deathOrBirthYearWhenKnown",
+        "era",
+        "jurisprudentialSchoolWhenKnown",
+        "creed/methodology classification",
+        "country/region when useful",
+        "sourceEvidence"
+      ],
+      "verification": "Do not classify an author solely by a website tag; use bibliographic records and authoritative biographical sources."
+    }
+  },
+  "exclusion": {
+    "defaultCorpus": [
+      "Shi'a doctrinal works",
+      "Rafidah doctrinal works",
+      "Ibadhi doctrinal works",
+      "Khawarij doctrinal works",
+      "Ahmadiyya/Qadiani doctrinal works",
+      "explicitly sectarian works outside the project's stated Sunni corpus"
+    ],
+    "doNotSilentlyRewrite": true,
+    "comparativeResearch": "If comparative material is ever added, it must live in a separate clearly labelled research corpus and must never be presented as part of the primary Sunni corpus."
+  },
+  "continuousUpdates": {
+    "enabled": true,
+    "schedule": "periodic",
+    "workflow": [
+      "discover new books from approved sources",
+      "verify author identity and methodology",
+      "verify publication/licensing status",
+      "deduplicate editions",
+      "index searchable metadata and permitted text",
+      "record source URL and retrieval date",
+      "flag uncertain classifications for review"
+    ],
+    "never": [
+      "auto-publish an unverified author classification",
+      "auto-copy copyrighted full books without permission",
+      "silently change an author's classification"
+    ]
+  },
+  "downloadPolicy": {
+    "formats": ["pdf", "docx", "epub", "txt"],
+    "rule": "Only expose direct downloads when the source or rights holder permits redistribution; otherwise provide a source link and bibliographic metadata."
+  }
+}
