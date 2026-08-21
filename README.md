@@ -1,20 +1,40 @@
-# Dorar Hadith API Official
+# موسوعة دين الله API — Deen Allah Encyclopedia API
 
-A Node.js API service intended to provide a clean integration layer for official Dorar.net hadith search and retrieval.
+منصة API متعددة اللغات للبحث المنظم في القرآن والحديث والتفسير والسيرة والفقه والعقيدة وكتب العلماء ومصادر تعليم القرآن، مع إسناد كل معلومة إلى مصدرها وعدم خلط صحة الرواية بوجودها في كتاب.
 
-## Status
+## الهوية
 
-The repository now contains the initial service scaffold and health endpoint. The official Dorar.net search integration is deliberately not fabricated: it must be implemented against a verified, permitted source/interface before returning hadith search data.
+- الاسم العربي: **موسوعة دين الله**
+- الاسم الإنجليزي: **Deen Allah Encyclopedia**
+- اسم واجهة البرمجة: **Deen Allah API**
+- الدرر السنية: مصدر رسمي للحديث داخل الموسوعة، وليست اسم الموسوعة.
 
-## Run locally
+## مبادئ أساسية
+
+- النص القرآني الأصلي لا يُستبدل بالترجمة.
+- الترجمة تُعرض منفصلة مع نسبة مصدرها.
+- صحة الحديث أو الرواية تُقيّم مستقلة عن مجرد وجودها في كتاب.
+- كتب السيرة والتاريخ لا تُعامل تلقائياً على أن كل ما فيها صحيح.
+- كل مصدر خارجي يُنسب إلى صاحبه، ولا يُعاد نشر محتواه المحمي دون ترخيص.
+- لغة السؤال لها الأولوية، ثم لغة الإعدادات، ثم العربية كافتراضي.
+- قائمة اللغات قابلة للتوسع مستقبلاً.
+
+## المجالات
+
+القرآن، التفسير، الحديث والتخريج، السيرة النبوية، الشمائل، العقيدة، أركان الإسلام، أركان الإيمان، الفقه وأصول الفقه، مقاصد الشريعة والكليات الخمس، كتب العلماء، والمواد التعليمية مثل أكاديمية القرآن والتجويد.
+
+## التشغيل محلياً
 
 ```bash
 npm start
 ```
 
-Endpoints:
+## الاختبارات
 
-- `/health`
-- `/search?q=الصلاة`
+```bash
+npm test
+```
 
-The `/search` endpoint currently returns HTTP 501 until the verified Dorar.net retrieval integration is added.
+## التوثيق
+
+تتوفر مواصفة OpenAPI في `openapi.yaml`، وتوجد وثائق المعمارية والبحث الموحد في `docs/`.
