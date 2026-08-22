@@ -1,0 +1,39 @@
+{
+  "version": "2026.17",
+  "catalog": "ghayb-knowledge-domains",
+  "purpose": "Route questions about unseen matters to evidence-first research layers without treating unverified reports as facts.",
+  "evidencePolicy": {
+    "priority": ["quran", "authenticated-sunnah", "sound-early-reports", "verified-scholarly-works"],
+    "reportStates": ["quranic", "hadith-authenticated", "hadith-hasan", "early-report", "scholar-opinion", "disputed", "weak", "fabricated", "unknown"],
+    "neverPromoteWeakToFact": true,
+    "neverPromoteScholarOpinionToRevelation": true,
+    "showAttributionAndLocator": true,
+    "separateCreedPrimaryFromComparative": true
+  },
+  "domains": [
+    {"id":"allah","title_ar":"الله تعالى","aliases":["الله","الرب","رب العالمين","أسماء الله","صفات الله"],"creedSensitive":true},
+    {"id":"angels","title_ar":"الملائكة","aliases":["ملائكته","الملائكة","الملك","جبريل","ميكائيل","إسرافيل","ملك الموت"],"creedSensitive":true},
+    {"id":"ruh","title_ar":"الروح","aliases":["الروح","أمر الروح","ماهي الروح","ما هي الروح"],"creedSensitive":true},
+    {"id":"barzakh","title_ar":"البرزخ","aliases":["البرزخ","الحياة البرزخية","حياة البرزخ","ما بعد الموت"],"creedSensitive":true},
+    {"id":"grave","title_ar":"القبر وما فيه","aliases":["عذاب القبر","نعيم القبر","فتنة القبر","سؤال القبر","القبر"],"creedSensitive":true},
+    {"id":"resurrection","title_ar":"البعث والنشور","aliases":["البعث","يوم البعث","النشور","إحياء الموتى"],"creedSensitive":true},
+    {"id":"gathering","title_ar":"الحشر","aliases":["الحشر","يوم الحشر","المحشر","أرض المحشر"],"creedSensitive":true},
+    {"id":"judgment","title_ar":"الحساب والجزاء","aliases":["الحساب","يوم الحساب","الجزاء","الميزان","الصراط","الحوض","الشفاعة"],"creedSensitive":true},
+    {"id":"paradise","title_ar":"الجنة","aliases":["الجنة","أهل الجنة","درجات الجنة","أبواب الجنة","أنهار الجنة","نعيم الجنة","الفردوس"],"creedSensitive":true},
+    {"id":"hellfire","title_ar":"النار","aliases":["النار","أهل النار","دركات النار","أبواب النار","عذاب النار","جهنم","سقر","لظى","الحطمة","الهاوية"],"creedSensitive":true},
+    {"id":"devil","title_ar":"الشيطان وإبليس","aliases":["الشيطان","إبليس","وسوسة الشيطان","الشياطين","عدو الإنسان"],"creedSensitive":true},
+    {"id":"jinn","title_ar":"الجن","aliases":["الجن","الجنّي","الشياطين من الجن","سورة الجن"],"creedSensitive":true},
+    {"id":"humankind","title_ar":"الإنسان","aliases":["الإنسان","بنو آدم","بني آدم","خلق الإنسان","مصير الإنسان"]},
+    {"id":"death","title_ar":"الموت","aliases":["الموت","الموتى","سكرات الموت","الاحتضار","ملك الموت"],"creedSensitive":true},
+    {"id":"hour","title_ar":"الساعة وأشراطها","aliases":["الساعة","يوم القيامة","أشراط الساعة","علامات الساعة","القيامة"],"creedSensitive":true},
+    {"id":"messianic-events","title_ar":"أشراط الساعة الكبرى","aliases":["الدجال","المسيح الدجال","نزول عيسى","يأجوج ومأجوج","الدابة","طلوع الشمس من مغربها"],"creedSensitive":true},
+    {"id":"keys-of-unseen","title_ar":"مفاتيح الغيب","aliases":["مفاتيح الغيب","مفاتح الغيب","الغيب","علم الغيب","عالم الغيب"],"creedSensitive":true}
+  ],
+  "researchFamilies": {
+    "paradise": ["quran", "authenticated-sunnah", "hadith-commentary", "classical-scholarly-works"],
+    "hellfire": ["quran", "authenticated-sunnah", "hadith-commentary", "classical-scholarly-works"],
+    "barzakh": ["quran", "authenticated-sunnah", "aqeedah", "classical-scholarly-works"],
+    "ruh": ["quran", "authenticated-sunnah", "tafsir", "language", "aqeedah"],
+    "general": ["quran", "authenticated-sunnah", "aqeedah", "tafsir", "classical-scholarly-works"]
+  }
+}
