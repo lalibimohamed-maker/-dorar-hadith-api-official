@@ -79,6 +79,57 @@ export function analyzeAmbiguousSex({ madhhab = "hanbali", knownHeirs = {}, esta
   };
 }
 
+/**
+ * Grandfather with full/paternal siblings.
+ * Hanafi: the true paternal grandfather is treated as a father for this conflict
+ * and therefore blocks the siblings. The other three schools commonly use the
+ * Zayd ibn Thabit method: compare muqasama, one-third of the residue/estate as
+ * applicable, and the minimum-sixth safeguard. The engine returns the candidate
+ * amounts rather than hiding the madhhab disagreement.
+ */
+export function analyzeGrandfatherWithSiblings({ madhhab = "hanbali", estate = 0, fixedShare = 0, fullBrothers = 0, fullSisters = 0, paternalBrothers = 0, paternalSisters = 0 } = {}) {
+  requireMadhhab(madhhab);
+  const numeric = { estate: Number(estate), fixedShare: Number(fixedShare) };
+  for (const [name, value] of Object.entries(numeric)) {
+    if (!Number.isFinite(value) || value < 0) throw new Error(`${name} must be a non-negative number`);
+  }
+  const siblings = Number(fullBrothers) * 2 + Number(fullSisters) + Number(paternalBrothers) * 2 + Number(paternalSisters);
+  if (![fullBrothers, fullSisters, paternalBrothers, paternalSisters].every(v => Number.isInteger(Number(v)) && Number(v) >= 0)) throw new Error("sibling counts must be non-negative integers");
+  const residue = Math.max(0, numeric.estate - numeric.fixedShare);
+  if (madhhab === "hanafi") {
+    return {
+      case: "grandfather_with_siblings",
+      madhhab,
+      status: "rule_applied",
+      rule: "في المذهب الحنفي المشهور يُعامل الجد الصحيح مع الإخوة معاملة الأب في الحجب في هذه الصورة.",
+      grandfather: { share: residue, fractionOfEstate: numeric.estate ? residue / numeric.estate : 0 },
+      siblings: { blocked: true, count: siblings },
+      sources: ["shamela-faraid", "ibn-qudamah-mughni"],
+      warning: "هذه نتيجة سياق مذهبي؛ لا تُعرض بوصفها محل اتفاق بين المذاهب."
+    };
+  }
+  const siblingUnits = siblings || 1;
+  const muqasama = residue * 1 / (siblingUnits + 1);
+  const oneThirdResidue = residue / 3;
+  const oneSixthEstate = numeric.estate / 6;
+  const best = Math.max(muqasama, oneThirdResidue, oneSixthEstate);
+  return {
+    case: "grandfather_with_siblings",
+    madhhab,
+    status: "candidate_comparison",
+    rule: "يُقارن للجد في الصورة العامة بين المقاسمة، وثلث الباقي، والسدس من جميع المال، ويؤخذ الأحظ وفق التفصيل الفقهي، مع مسائل خاصة تحتاج قواعد إضافية.",
+    inputs: { estate: numeric.estate, fixedShare: numeric.fixedShare, residue, fullBrothers: Number(fullBrothers), fullSisters: Number(fullSisters), paternalBrothers: Number(paternalBrothers), paternalSisters: Number(paternalSisters) },
+    candidates: {
+      muqasama,
+      oneThirdResidue,
+      oneSixthEstate,
+      best
+    },
+    sources: ["shamela-faraid", "ibn-qudamah-mughni"],
+    warning: "هذه مقارنة مرشحين وليست حلاً نهائياً لكل صور الجد مع الإخوة؛ الأكدرية وصور الإخوة لأب/أشقاء وبعض الفروض تحتاج قاعدة متخصصة وتصحيحاً مستقلاً."
+  };
+}
+
 export function analyzeMunasakhat({ madhhab = "hanbali", firstEstate = 0, firstHeirs = {}, secondDeceased = null } = {}) {
   requireMadhhab(madhhab);
   if (!Number.isFinite(Number(firstEstate)) || Number(firstEstate) < 0) throw new Error("firstEstate must be a non-negative number");
@@ -112,6 +163,7 @@ export function analyzeAdvancedFaraid(input = {}) {
     case "pregnancy": return analyzePregnancy(input);
     case "missing_person": return analyzeMissingPerson(input);
     case "ambiguous_sex": return analyzeAmbiguousSex(input);
+    case "grandfather_with_siblings": return analyzeGrandfatherWithSiblings(input);
     case "munasakhat": return analyzeMunasakhat(input);
     default: throw new Error(`Unsupported advanced faraid case: ${input.case}`);
   }
@@ -121,5 +173,6 @@ export const ADVANCED_FARAID_CASES = [
   "pregnancy",
   "missing_person",
   "ambiguous_sex",
+  "grandfather_with_siblings",
   "munasakhat"
 ];
