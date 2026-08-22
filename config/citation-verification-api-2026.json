@@ -1,0 +1,18 @@
+{
+  "version":"2026.8",
+  "endpoints": {
+    "search":"search across canonical corpus and verified secondary sources",
+    "sources":"return complete provenance for a source",
+    "verify":"verify a citation anchor against the stored canonical record",
+    "compare":"compare independent sources without merging their rulings",
+    "translations":"return original plus translation metadata",
+    "research":"return a structured research packet with claim-level citations"
+  },
+  "researchPacket": {
+    "fields":["query","language","claims","sources","conflicts","translations","verificationSummary"],
+    "claim":{"citationRequired":true,"sourceLocatorRequired":true},
+    "source":{"idRequired":true,"authorityRequired":true,"statusRequired":true},
+    "verificationSummary":{"verifiedCount":true,"unverifiedCount":true,"conflictCount":true}
+  },
+  "never": ["invent-citation","invent-page-number","present-machine-translation-as-official","merge-conflicting-fatwas","hide-source-status"]
+}
