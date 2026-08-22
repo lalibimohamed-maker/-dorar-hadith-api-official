@@ -1,0 +1,19 @@
+{
+  "version":"2026.11",
+  "policy":{"metadataFirst":true,"fullTextRequiresRightsReview":true,"officialEvidenceRequiredForOfficialTier":true,"lastVerified":"2026-08-22"},
+  "sources":[
+    {"id":"saudi-ifta","country":"SA","name":"الرئاسة العامة للبحوث العلمية والإفتاء","type":"institutional-fatwa","tier":"primary","url":"https://alifta.gov.sa/","evidence":"https://alifta.gov.sa/fatwa-committee","status":"official-verified","scope":["fatwa","fiqh","aqidah"]},
+    {"id":"saudi-quran-complex","country":"SA","name":"مجمع الملك فهد لطباعة المصحف الشريف","type":"quran-institution","tier":"primary","url":"https://qurancomplex.gov.sa/","evidence":"https://qurancomplex.gov.sa/en/kfgqpc/kfq-structure/","status":"official-verified","scope":["quran","quran-sciences","tafsir","translations"]},
+    {"id":"binbaz-official","country":"SA","name":"موقع الشيخ عبد العزيز بن باز","type":"scholar-archive","tier":"primary-reference","url":"https://binbaz.org.sa/","evidence":"https://binbaz.org.sa/majmou-fatawa","status":"official-verified","scope":["fatwa","fiqh","aqidah","books"]},
+    {"id":"binothaimeen-official","country":"SA","name":"مؤسسة الشيخ محمد بن صالح العثيمين الخيرية","type":"scholar-archive","tier":"primary-reference","url":"https://binothaimeen.net/","evidence":"https://binothaimeen.net/s/LIN61baD","status":"official-verified","scope":["fatwa","fiqh","aqidah","books","lessons"]},
+    {"id":"algeria-marw","country":"DZ","name":"وزارة الشؤون الدينية والأوقاف الجزائرية","type":"government-religious-institution","tier":"primary","url":"https://marw.gov.dz/","evidence":"https://marw.gov.dz/","status":"official-verified","scope":["fatwa","quran","religious-guidance","publications"]},
+    {"id":"algeria-fatwa-platform","country":"DZ","name":"المنصة الوطنية للفتوى","type":"institutional-fatwa","tier":"primary","url":"https://fatwa.adelsgn.net/","evidence":"https://fatwa.adelsgn.net/muftis","status":"official-verified","scope":["fatwa"]},
+    {"id":"egypt-dar-alifta","country":"EG","name":"دار الإفتاء المصرية","type":"government-fatwa-institution","tier":"primary","url":"https://www.dar-alifta.org/","evidence":"https://dar-alifta.org/ar/index/","status":"official-verified","scope":["fatwa","fiqh","research"]},
+    {"id":"azhar-fatwa","country":"EG","name":"منظومة الفتاوى الإلكترونية بالأزهر الشريف","type":"institutional-fatwa","tier":"primary-reference","url":"https://service.azhar.eg/fatwa/","evidence":"https://service.azhar.eg/fatwa/SOFatwa.aspx","status":"official-verified","scope":["fatwa"]}
+  ],
+  "verificationNotes":[
+    "Official tier means the institutional identity and official web presence were independently verified; it does not mean every individual document has been checked.",
+    "Each imported document must receive its own provenance, edition/revision, locator, rights status and review status.",
+    "Secondary sources remain separate and cannot overwrite primary institutional or original-source records."
+  ]
+}
