@@ -1,0 +1,13 @@
+{
+  "version":"2026.15",
+  "pipeline":"concept-card",
+  "scope":"all-islamic-encyclopedia-domains",
+  "stages":["detect-term","resolve-context","retrieve-canonical-sources","rank-evidence","build-card","localize","verify","display"],
+  "contextKeys":["domain","documentType","surahOrBook","passage","userQuery","selectedLanguage"],
+  "evidenceOrder":["quran","authenticated-sunnah","companion-report","follower-and-early-salaf-report","scholarly-source","official-fatwa-or-institution","secondary-study"],
+  "card":{"mediumOverlay":true,"preserveParentView":true,"summaryFirst":true,"expandableEvidence":true,"sourceOnDemand":true},
+  "translation":{"useVerifiedMeaningTranslationWhenAvailable":true,"machineTranslationNeverLabeledVerified":true,"fallbackToOriginal":true},
+  "ambiguity":{"requireContextResolution":true,"allowMultipleSenses":true,"neverGuessSilently":true},
+  "domains":["quran","tafsir","aqidah","tawhid","hadith","fiqh","fatwa","seerah","biography","usul-al-fiqh","ethics","history","islamic-terms","books","maqasid"],
+  "compatibility":"shares source IDs, provenance, translation IDs, and verification states with bilingual search and Quran word cards"
+}
