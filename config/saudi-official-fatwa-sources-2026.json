@@ -1,0 +1,24 @@
+{
+  "titleAr": "المصادر السعودية الرسمية للفتوى والبحوث الشرعية",
+  "version": "2026.1",
+  "policy": {
+    "provenance": "official-government",
+    "priority": "highest-for-saudi-institutional-fatwa",
+    "attributionRequired": true,
+    "noEndorsementByInclusion": true,
+    "copyright": "catalog-and-link-unless-licensed",
+    "distinguishInstitutionalOutputs": true
+  },
+  "sources": [
+    {"id":"saudi-ifta","nameAr":"الرئاسة العامة للبحوث العلمية والإفتاء","country":"السعودية","category":"fatwa","url":"https://alifta.gov.sa/","role":"official-government-fatwa","sourceKind":"government-religious-authority","coverage":["fatwa","fiqh","research","publications","senior-scholars"],"priority":100},
+    {"id":"saudi-senior-scholars","nameAr":"هيئة كبار العلماء السعودية - الأمانة العامة","country":"السعودية","category":"fatwa","url":"https://alifta.gov.sa/senior-scholars-council","role":"official-government-council","sourceKind":"senior-scholars-council","coverage":["decisions","research","statements","scholarly-opinions"],"priority":100},
+    {"id":"saudi-permanent-fatwa-committee","nameAr":"اللجنة الدائمة للفتوى","country":"السعودية","category":"fatwa","url":"https://alifta.gov.sa/fatwa-committee","role":"official-government-fatwa","sourceKind":"permanent-fatwa-committee","coverage":["aqidah","worship","transactions","personal-affairs","fatwa"],"priority":100},
+    {"id":"saudi-islamic-research-journal","nameAr":"مجلة البحوث الإسلامية","country":"السعودية","category":"research","url":"https://alifta.gov.sa/JournalslamicResearch","role":"official-peer-reviewed-journal","sourceKind":"islamic-research-journal","coverage":["sharia-research","fiqh","hadith","aqidah","usul","research"],"priority":90}
+  ],
+  "institutionalOutputRules": {
+    "seniorScholarsCouncil": "label as council decision/opinion and preserve session/document metadata when available",
+    "permanentCommittee": "label as committee fatwa and preserve question-answer attribution",
+    "presidency": "label as presidency publication or institutional fatwa according to the original record",
+    "journal": "label as peer-reviewed research; do not convert an article into an institutional fatwa"
+  }
+}
