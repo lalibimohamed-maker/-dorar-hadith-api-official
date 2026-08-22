@@ -1,0 +1,66 @@
+{
+  "version": "2026.08.22.1",
+  "titleAr": "توجيه مصادر العقيدة في موسوعة دين الله",
+  "purpose": "فصل طبقة عقيدة أهل السنة والجماعة عن مجرد فهرسة العلماء أو الاستفادة من كتبهم في غير العقيدة، مع إبقاء الخلافات المذهبية موثقة عند الحاجة.",
+  "primaryAqeedahLayer": {
+    "identity": "Ahl al-Sunnah wa al-Jama'ah",
+    "foundations": [
+      "القرآن الكريم",
+      "السنة الصحيحة الثابتة",
+      "فهم الصحابة رضي الله عنهم",
+      "فهم التابعين وأئمة القرون المفضلة",
+      "نقول أئمة أهل السنة الموثقة في مسائل الاعتقاد"
+    ],
+    "fourMadhhabScholarsAreEligible": true,
+    "fourMadhhabRule": "الانتساب إلى أحد المذاهب الفقهية الأربعة لا يكفي وحده لإدخال قول في طبقة العقيدة؛ العبرة بالمادة العقدية نفسها وبالدليل والتوثيق.",
+    "requires": [
+      "نسبة دقيقة إلى المصدر",
+      "توثيق النص أو القول",
+      "اجتياز فلتر منهجي للعقيدة",
+      "عدم تحويل الاستفادة الفقهية أو الأصولية إلى تزكية عقدية"
+    ]
+  },
+  "scholarRoles": {
+    "primaryAqeedah": "يظهر في مصادر العقيدة الأساسية إذا اجتاز التحقق المنهجي للمادة نفسها.",
+    "domainScholar": "يظهر في مجاله المتخصص مثل الفقه أو أصول الفقه أو اللغة أو المقاصد، ولا يُفهم من ذلك اعتماد آرائه العقدية.",
+    "comparativeTheology": "يظهر فقط عند الحاجة لشرح الخلاف العقدي أو تاريخ المدارس، مع وسم واضح بأنه ليس مصدراً أساسياً لعقيدة أهل السنة.",
+    "candidate": "يُفهرس دون توليد حكم أو فتوى حتى تكتمل مادة التحقق."
+  },
+  "knownComparativeExamples": [
+    {
+      "id": "al-baqillani",
+      "nameAr": "الباقلاني",
+      "classification": "Ashari theologian",
+      "allowedDomains": ["usul-al-fiqh", "comparative-theology"],
+      "aqeedahRole": "comparative-only"
+    },
+    {
+      "id": "al-juwayni",
+      "nameAr": "الجويني",
+      "classification": "Ashari theologian",
+      "allowedDomains": ["usul-al-fiqh", "fiqh", "comparative-theology"],
+      "aqeedahRole": "comparative-only"
+    },
+    {
+      "id": "al-ghazali",
+      "nameAr": "الغزالي",
+      "classification": "Ashari theologian",
+      "allowedDomains": ["usul-al-fiqh", "fiqh", "maqasid", "comparative-theology"],
+      "aqeedahRole": "comparative-only"
+    }
+  ],
+  "displayRules": {
+    "aqeedahPrimary": "لا تعرض في جواب العقيدة إلا المواد التي اجتازت الفلتر العقدي والتوثيق.",
+    "comparative": "إذا ظهرت مادة مقارنة، يجب أن تحمل نسبة صاحبها ومدرسته ووسم المقارنة بوضوح.",
+    "scholarIndex": "وجود العالم في الموسوعة لا يعني الموافقة على جميع أقواله.",
+    "translation": "الترجمة تابعة للمعنى الموثق ولا تنشئ دليلاً عقدياً جديداً.",
+    "verification": "يمكن فتح المصدر الأصلي أو موضع التوثيق عند طلب التحقق."
+  },
+  "safetyGates": {
+    "neverInferAqeedahFromFiqhMadhhab": true,
+    "neverPromoteComparativeTheologyToPrimaryAqeedah": true,
+    "neverGenerateUnsourcedCreedClaims": true,
+    "preserveAttribution": true,
+    "preserveDocumentedDisagreement": true
+  }
+}
