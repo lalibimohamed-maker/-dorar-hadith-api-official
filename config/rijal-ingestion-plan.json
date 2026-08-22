@@ -1,29 +1,12 @@
 {
-  "version": 1,
-  "purpose": "دفعات فهرسة علم الرجال والجرح والتعديل من المصادر الأصلية ثم المقارنة بالمصادر اللاحقة",
-  "order": [
-    "bukhari-tarikh-kabir",
-    "ibn-abi-hatim-jarh",
-    "yahya-ibn-main-tarikh",
-    "uquili-duafa",
-    "ibn-adi-kamil",
-    "ibn-hibban-thiqat",
-    "ibn-hibban-majruhin",
-    "nasai-duafa",
-    "darqutni-duafa",
-    "juzjani-ahwal-al-rijal",
-    "ajurri-sualat-abu-dawud",
-    "ibn-sad-tabaqat",
-    "dhahabi-mizan",
-    "dhahabi-mughni",
-    "dhahabi-siyar",
-    "mizzy-tahdhib-kamal",
-    "ibn-hajar-tahdhib",
-    "ibn-hajar-lisan",
-    "ibn-hajar-taqrib",
-    "dhahabi-kashif",
-    "ibn-hajar-tajil"
-  ],
+  "schemaVersion": "1.1",
+  "purpose": "فهرسة تراجم الرواة وأقوال الجرح والتعديل على دفعات، مع حفظ النص ونسبته وموضعه وسياقه والخلاف بين النقاد.",
+  "order": {
+    "batch1_core_early": ["bukhari-tarikh-kabir", "ibn-abi-hatim-jarh", "yahya-ibn-main-tarikh", "ibn-sad-tabaqat"],
+    "batch2_early_jarh": ["uquili-duafa", "ibn-adi-kamil", "ibn-hibban-thiqat", "ibn-hibban-majruhin", "nasai-duafa", "darqutni-duafa", "juzjani-ahwal-al-rijal", "ajurri-sualat-abu-dawud"],
+    "batch3_comparative": ["dhahabi-mizan", "dhahabi-mughni", "dhahabi-siyar", "mizzy-tahdhib-kamal", "ibn-hajar-tahdhib", "ibn-hajar-lisan"],
+    "batch4_summaries": ["dhahabi-kashif", "ibn-hajar-taqrib", "ibn-hajar-tajil", "ibn-al-jawzi-duafa"]
+  },
   "recordPolicy": {
     "oneRecordPerNarratorJudgment": true,
     "preserveOriginalWording": true,
@@ -32,18 +15,10 @@
     "preserveDisagreement": true,
     "neverInferSilenceAsApproval": true,
     "neverAutoGradeNarrator": true,
-    "neverAutoPromoteVerified": true
+    "neverAutoPromoteVerified": true,
+    "secondarySourcesCannotReplacePrimaryJudgment": true
   },
-  "requiredFields": [
-    "narratorId",
-    "narratorNameAr",
-    "criticNameAr",
-    "judgmentText",
-    "judgmentType",
-    "sourceId",
-    "sourceLocator",
-    "context",
-    "verification"
-  ],
-  "verificationStates": ["unverified", "supported", "verified", "disputed"]
+  "requiredFields": ["narratorId", "narratorNameAr", "criticNameAr", "judgmentText", "judgmentType", "sourceId", "sourceLocator", "context", "verification"],
+  "verificationStates": ["unverified", "source-located", "text-checked", "cross-checked", "verified", "disputed"],
+  "importantRule": "لا يُستنتج حكم من مجرد السكوت، ولا تُدمج أقوال النقاد المختلفة في حكم واحد، ولا يُنسب قول إلى ناقد دون موضع مصدر يمكن الرجوع إليه."
 }
