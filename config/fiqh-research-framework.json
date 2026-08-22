@@ -1,0 +1,53 @@
+{
+  "id": "sunni-fiqh-research-framework",
+  "titleAr": "منهج البحث الفقهي المقارن في موسوعة دين الله",
+  "scope": "sunni",
+  "purpose": "عرض المسألة الفقهية من مصادرها، ثم أقوال المذاهب وأدلتها، ثم مناقشة الأدلة والترجيح عند توفر مادة موثقة، مع إبقاء نسبة كل قول إلى قائله ومصدره.",
+  "madhahib": [
+    {"id":"hanafi","nameAr":"الحنفي","founderAr":"أبو حنيفة النعمان","role":"school"},
+    {"id":"maliki","nameAr":"المالكي","founderAr":"مالك بن أنس","role":"school"},
+    {"id":"shafii","nameAr":"الشافعي","founderAr":"محمد بن إدريس الشافعي","role":"school"},
+    {"id":"hanbali","nameAr":"الحنبلي","founderAr":"أحمد بن حنبل","role":"school"}
+  ],
+  "classicalMethodologists": [
+    {"id":"ibn-taymiyyah","nameAr":"أحمد بن عبد الحليم ابن تيمية","roles":["fiqh","usul","fatwa","comparative-reasoning"],"sourcePolicy":"attribute-each-view-to-a-verified-work"},
+    {"id":"ibn-al-qayyim","nameAr":"محمد بن أبي بكر ابن قيم الجوزية","roles":["fiqh","usul","fatwa","legal-maxims"],"sourcePolicy":"attribute-each-view-to-a-verified-work"},
+    {"id":"ibn-abd-al-barr","nameAr":"يوسف بن عبد الله ابن عبد البر","roles":["maliki-fiqh","hadith","comparative-fiqh","ijma"],"sourcePolicy":"attribute-each-view-to-a-verified-work"},
+    {"id":"al-khatib-al-baghdadi","nameAr":"أحمد بن علي الخطيب البغدادي","roles":["hadith","usul","scholarly-method"],"sourcePolicy":"use-for-method-and-hadith-evidence-when-relevant"},
+    {"id":"ibn-hazm","nameAr":"علي بن أحمد ابن حزم","roles":["fiqh","usul","comparative-fiqh"],"sourcePolicy":"preserve-dhahiri-position-separately"},
+    {"id":"ibn-ashur","nameAr":"محمد الطاهر ابن عاشور","roles":["maliki-fiqh","usul","maqasid","tafsir"],"sourcePolicy":"use-for-usul-and-maqasid-when-relevant"}
+  ],
+  "analysisSchema": {
+    "requiredSections": [
+      "question-definition",
+      "case-facts-and-assumptions",
+      "relevant-quran",
+      "relevant-hadith-with-grading",
+      "early-scholar-and-companion-reports-when-relevant",
+      "madhhab-hanafi",
+      "madhhab-maliki",
+      "madhhab-shafii",
+      "madhhab-hanbali",
+      "other-sunni-views",
+      "classical-discussion",
+      "evidence-comparison",
+      "causes-of-disagreement",
+      "preferred-view",
+      "confidence-and-limitations",
+      "source-list"
+    ],
+    "madhhabSectionFields": ["ruling", "conditions", "exceptions", "evidence", "references", "strengthStatus"],
+    "preferredViewRule": "Never generate a preferred ruling merely because a scholar is included. Prefer only when the cited evidence and scholarly analysis explicitly support it; otherwise return unresolved_or_requires_scholar_review.",
+    "disagreementRule": "Preserve genuine disagreement and distinguish majority, minority, school position, later revision, and individual scholar preference.",
+    "attributionRule": "Every substantive quoted or paraphrased position must carry author, work, edition or stable reference when available, and source URL.",
+    "hadithRule": "A hadith appearing in a fiqh book is not automatically authentic; display its grading independently.",
+    "sirahRule": "A sirah source is not by itself proof of hadith authenticity.",
+    "legalRule": "Answers are research presentations and do not replace a qualified mufti or court judgment in case-specific matters."
+  },
+  "outputModes": ["summary","comparative-table","detailed-research","evidence-first"],
+  "automaticExpansion": {
+    "enabled": true,
+    "newScholarWorkflow": ["discover","verify-identity","verify-methodology","verify-source","catalog-works","index-search","enable-for-analysis"],
+    "unverifiedScholarsMayAppearOnlyAsCandidates": true
+  }
+}
