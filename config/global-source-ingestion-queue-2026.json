@@ -1,0 +1,16 @@
+{
+  "version":"2026.16",
+  "strategy":"parallel-country-and-domain-expansion",
+  "queues":[
+    {"domain":"official-fatwa","priority":1,"countries":["Saudi Arabia","Qatar","Kuwait","Egypt","Jordan","Algeria","Morocco","Tunisia","United Arab Emirates","Oman","Bahrain","Palestine","Iraq" ]},
+    {"domain":"quran-and-tafsir","priority":1,"sources":["official Quran complexes","verified tafsir repositories","public-domain classical works"]},
+    {"domain":"hadith","priority":1,"sources":["verified canonical collections","official scholarly repositories","authenticated metadata"]},
+    {"domain":"fiqh-and-usul","priority":1,"sources":["classical works","official research councils","scholarly institutions"]},
+    {"domain":"scholars-and-salaf","priority":1,"sources":["verified biographies","primary books","critical editions","authenticated quotations"]},
+    {"domain":"translations","priority":2,"languages":["Arabic","English","Russian","French","Turkish","Urdu","Persian","Indonesian","Malay","German","Spanish","Portuguese","Italian","Chinese","Japanese","Korean","Bengali","Swahili","Hausa","Tamil"]}
+  ],
+  "ingestionGate":"no_full_text_without_rights_or_explicit_permission",
+  "qualityGate":"source-provenance-verification-before-indexing",
+  "languageRule":"canonical-source-record-is-language-independent; translations reference canonical record",
+  "conflictRule":"preserve disagreement and attribution rather than collapsing opinions"
+}
