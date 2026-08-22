@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { getBook, getSource, listCategories, listBooks, listSources } from "../src/source-registry.js";
+import { getBook, getClassicalFatwaWork, getSource, listCategories, listBooks, listSources } from "../src/source-registry.js";
 
 test("source registry exposes fatwa category", () => {
   const category = listCategories().find((item) => item.id === "fatwa");
@@ -26,6 +26,24 @@ test("Saudi official fatwa layer is present and institutionally separated", () =
   assert.ok(sources.some((source) => source.id === "saudi-senior-scholars"));
   assert.ok(sources.some((source) => source.id === "saudi-permanent-fatwa-committee"));
   assert.equal(getSource("saudi-permanent-fatwa-committee").sourceKind, "permanent-fatwa-committee");
+});
+
+test("secondary national fatwa layer covers multiple countries", () => {
+  const secondary = listSources({ category: "fatwa", secondary: true });
+  for (const id of ["algeria-religious-affairs-fatwa", "egypt-dar-al-ifta", "jordan-general-ifta", "palestine-dar-ifta", "libya-dar-ifta"]) {
+    assert.ok(secondary.some((source) => source.id === id));
+  }
+});
+
+test("classical fatwa layer preserves Ibn Taymiyyah collections and early heritage", () => {
+  const major = getClassicalFatwaWork("majmu-fatawa-ibn-taymiyyah");
+  const supplement = getClassicalFatwaWork("mustadrak-majmu-fatawa-ibn-taymiyyah");
+  assert.ok(major);
+  assert.ok(supplement);
+  assert.equal(major.authorAr, "أحمد بن عبد الحليم ابن تيمية");
+  assert.equal(supplement.compilerAr, "عبد الرحمن بن محمد بن قاسم ومحمد بن عبد الرحمن بن محمد بن قاسم");
+  assert.ok(getClassicalFatwaWork("mussannaf-abd-al-razzaq-fatwas"));
+  assert.ok(getClassicalFatwaWork("mussannaf-ibn-abi-shaybah-fatwas"));
 });
 
 test("Saudi Islamic Research Journal is research, not institutional fatwa", () => {
