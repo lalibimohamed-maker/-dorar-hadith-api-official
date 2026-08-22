@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "purpose": "دفعات فهرسة علم الرجال والجرح والتعديل من المصادر الأصلية ثم المقارنة بالمصادر اللاحقة",
+  "order": [
+    "bukhari-tarikh-kabir",
+    "ibn-abi-hatim-jarh",
+    "yahya-ibn-main-tarikh",
+    "uquili-duafa",
+    "ibn-adi-kamil",
+    "ibn-hibban-thiqat",
+    "ibn-hibban-majruhin",
+    "nasai-duafa",
+    "darqutni-duafa",
+    "juzjani-ahwal-al-rijal",
+    "ajurri-sualat-abu-dawud",
+    "ibn-sad-tabaqat",
+    "dhahabi-mizan",
+    "dhahabi-mughni",
+    "dhahabi-siyar",
+    "mizzy-tahdhib-kamal",
+    "ibn-hajar-tahdhib",
+    "ibn-hajar-lisan",
+    "ibn-hajar-taqrib",
+    "dhahabi-kashif",
+    "ibn-hajar-tajil"
+  ],
+  "recordPolicy": {
+    "oneRecordPerNarratorJudgment": true,
+    "preserveOriginalWording": true,
+    "requireCriticAttribution": true,
+    "requireSourceLocator": true,
+    "preserveDisagreement": true,
+    "neverInferSilenceAsApproval": true,
+    "neverAutoGradeNarrator": true,
+    "neverAutoPromoteVerified": true
+  },
+  "requiredFields": [
+    "narratorId",
+    "narratorNameAr",
+    "criticNameAr",
+    "judgmentText",
+    "judgmentType",
+    "sourceId",
+    "sourceLocator",
+    "context",
+    "verification"
+  ],
+  "verificationStates": ["unverified", "supported", "verified", "disputed"]
+}
