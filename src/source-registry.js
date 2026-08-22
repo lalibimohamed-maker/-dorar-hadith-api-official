@@ -18,6 +18,7 @@ const knowledgeExpansion = readJson("knowledge-source-expansion-2026.json", { so
 const officialExpansion = readJson("official-islamic-sources-2026.json", { sources: [], policy: {}, researchRule: "" });
 const academicExpansion = readJson("academic-islamic-sources-2026.json", { sources: [], policy: {} });
 const bookCatalog = readJson("book-catalog-2026.json", { books: [], policy: {}, normalizationRules: {} });
+const fiqhBookExpansion = readJson("fiqh-book-expansion-2026.json", { books: [], policy: {} });
 
 const fatwaSources = (fatwaExpansion.sources || []).map((source) => ({
   ...source,
@@ -99,15 +100,31 @@ const mergedSources = [
   ...academicSources.filter((source) => !sourceIds.has(source.id)),
 ];
 
+const mergedBookCatalog = [
+  ...(bookCatalog.books || []),
+  ...(fiqhBookExpansion.books || []),
+];
+
+const bookIds = new Set();
+const normalizedBooks = mergedBookCatalog.filter((book) => {
+  if (bookIds.has(book.id)) return false;
+  bookIds.add(book.id);
+  return true;
+});
+
 const mergedRegistry = {
   ...registry,
   categories,
   sources: mergedSources,
-  books: bookCatalog.books || [],
+  books: normalizedBooks,
   bookCatalog: {
     policy: bookCatalog.policy || {},
-    normalizationRules: bookCatalog.normalizationRules || {},
-    bookCount: (bookCatalog.books || []).length,
+    normalizationRules: {
+      ...(bookCatalog.normalizationRules || {}),
+      ...(fiqhBookExpansion.policy || {}),
+    },
+    bookCount: normalizedBooks.length,
+    fiqhExpansionCount: (fiqhBookExpansion.books || []).length,
   },
   fatwa: {
     taxonomy: fatwaExpansion.taxonomy || [],
@@ -141,7 +158,7 @@ export function listSources({ category, role, country } = {}) {
 export function getSource(id) { return mergedRegistry.sources.find((source) => source.id === id) || null; }
 export function listCategories() { return mergedRegistry.categories; }
 export function getMaqasid() { return mergedRegistry.maqasid; }
-export function listBooks({ category, authorAr } = {}) {
-  return mergedRegistry.books.filter((book) => (!category || book.category === category) && (!authorAr || book.authorAr === authorAr));
+export function listBooks({ category, authorAr, madhhab } = {}) {
+  return mergedRegistry.books.filter((book) => (!category || book.category === category) && (!authorAr || book.authorAr === authorAr) && (!madhhab || book.madhhab === madhhab));
 }
 export function getBook(id) { return mergedRegistry.books.find((book) => book.id === id) || null; }
