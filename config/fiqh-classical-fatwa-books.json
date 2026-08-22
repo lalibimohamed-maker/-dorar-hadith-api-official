@@ -1,10 +1,11 @@
 {
-  "titleAr": "كتب الفتاوى والفقه لأئمة أهل السنة",
+  "titleAr": "كتب الفتاوى والفقه لأئمة وعلماء أهل السنة",
   "policy": {
-    "scope": "sunni-classical",
+    "scope": "sunni-classical-and-contemporary",
     "includeOnlyVerifiedAttribution": true,
     "doNotTreatEveryBookNarrationAsAuthentic": true,
-    "copyright": "catalog-and-link-unless-licensed-for-republication"
+    "copyright": "catalog-and-link-unless-licensed-for-republication",
+    "scholarSelection": "include-qualified-sunni-scholars with identifiable works and source provenance; never infer a ruling from inclusion alone"
   },
   "authors": [
     {
@@ -30,6 +31,60 @@
         {"titleAr":"أحكام أهل الذمة","kind":"fiqh","status":"bibliographically-verified","source":"bibliographic sources"},
         {"titleAr":"تحفة المودود بأحكام المولود","kind":"family-fiqh","status":"bibliographically-verified","source":"bibliographic sources"},
         {"titleAr":"أعلام الموقعين - الفتاوى والأحكام المنقولة","kind":"fatwa-material","status":"catalogued-not-republished","source":"Shamela / Ibn al-Qayyim research index"}
+      ]
+    },
+    {
+      "id": "al-saadi",
+      "nameAr": "عبد الرحمن بن ناصر السعدي",
+      "roles": ["tafsir","fiqh","usul","fatwa","maqasid"],
+      "works": [
+        {"titleAr":"تيسير الكريم الرحمن في تفسير كلام المنان","kind":"tafsir-fiqh","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},
+        {"titleAr":"تيسير اللطيف المنان في خلاصة مقاصد القرآن","kind":"tafsir-education","status":"bibliographically-verified","source":"published editions"},
+        {"titleAr":"القواعد الحسان المتعلقة بتفسير القرآن","kind":"tafsir-usul","status":"bibliographically-verified","source":"published editions"},
+        {"titleAr":"الفتاوى السعدية","kind":"fatwa","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},
+        {"titleAr":"منظومة القواعد الفقهية","kind":"fiqh-maxims","status":"bibliographically-verified","source":"published editions"}
+      ]
+    },
+    {
+      "id": "abd-al-salam-al-shuwayir",
+      "nameAr": "عبد السلام بن محمد الشويعر",
+      "roles": ["fiqh","usul","comparative-fiqh","teaching"],
+      "works": [],
+      "status": "scholar-indexed-source-requires-work-level-verification"
+    },
+    {
+      "id": "ibn-abd-al-barr",
+      "nameAr": "يوسف بن عبد الله ابن عبد البر",
+      "roles": ["maliki-fiqh","hadith","comparative-fiqh","ijma"],
+      "works": [
+        {"titleAr":"الاستذكار","kind":"hadith-fiqh","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},
+        {"titleAr":"التمهيد","kind":"hadith-fiqh","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},
+        {"titleAr":"الكافي في فقه أهل المدينة","kind":"maliki-fiqh","status":"bibliographically-verified","source":"published editions"}
+      ]
+    },
+    {
+      "id": "al-khatib-al-baghdadi",
+      "nameAr": "أحمد بن علي الخطيب البغدادي",
+      "roles": ["hadith","usul","scholarly-method"],
+      "works": [
+        {"titleAr":"الفقيه والمتفقه","kind":"fiqh-usul-method","status":"bibliographically-verified","source":"published editions"}
+      ]
+    },
+    {
+      "id": "ibn-hazm",
+      "nameAr": "علي بن أحمد ابن حزم",
+      "roles": ["fiqh","usul","comparative-fiqh"],
+      "works": [
+        {"titleAr":"المحلى بالآثار","kind":"comparative-fiqh","status":"bibliographically-verified","source":"published editions"}
+      ]
+    },
+    {
+      "id": "ibn-ashur",
+      "nameAr": "محمد الطاهر ابن عاشور",
+      "roles": ["maliki-fiqh","usul","maqasid","tafsir"],
+      "works": [
+        {"titleAr":"مقاصد الشريعة الإسلامية","kind":"maqasid-usul","status":"bibliographically-verified","source":"published editions"},
+        {"titleAr":"التحرير والتنوير","kind":"tafsir","status":"bibliographically-verified","source":"published editions"}
       ]
     }
   ],
