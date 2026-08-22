@@ -1,7 +1,6 @@
 name: CI
 
 on:
-  # Keep CI active for every repository push; this also provides a simple push trigger to verify the workflow itself.
   push:
   pull_request:
     branches: [main]
@@ -31,8 +30,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      # This repository intentionally has no committed lockfile yet.
+      # Do not use npm ci or cache-dependency-path until package-lock.json exists.
       - name: Install dependencies
-        run: npm install --ignore-scripts --no-package-lock
+        run: npm install --ignore-scripts --no-package-lock --no-audit --no-fund
 
       - name: Syntax check
         run: npm run health
@@ -47,13 +48,17 @@ jobs:
           test -f src/dorar-client.js
           test -f src/unified-search.js
           test -f src/fiqh-research.js
+          test -f src/knowledge-context.js
+          test -f src/fiqh-research.js
           test -f config/fiqh-research-framework.json
           test -f config/fiqh-fatawa-sources.json
           test -f config/fiqh-classical-fatwa-books.json
+          test -f config/prophets-companions-genealogy-v2.json
           test -f src/inheritance-calculator.js
           test -f src/faraid-complex-cases.js
           test -f src/faraid-advanced.js
           test -f src/tajweed-curriculum.js
+          test -f src/prophets-companions-genealogy.js
 
       - name: Smoke test client configuration
         run: node --input-type=module -e "import fs from 'node:fs'; const s=fs.readFileSync('src/dorar-client.js','utf8'); if(!s.includes('https://dorar.net/dorar_api.json')) process.exit(1); console.log('Dorar client configuration OK')"
