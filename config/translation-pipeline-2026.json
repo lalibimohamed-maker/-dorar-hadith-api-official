@@ -1,0 +1,13 @@
+{
+  "titleAr":"خط ترجمة الكتب والفتاوى متعدد اللغات",
+  "version":"2026.2",
+  "sourceLanguage":"ar",
+  "priorityLanguages":["ar","en","fr","es","de","tr","ur","id","ms","bn","hi","ru","fa","zh","sw","ha","pt","it","ja","ko"],
+  "globalExpansion":true,
+  "pipeline":["source-lock","edition-identification","text-segmentation","arabic-lexical-analysis","fiqh-term-resolution","context-resolution","draft-translation","terminology-consistency","human-review","scholarly-review-when-required","quality-check","publish-with-provenance"],
+  "contentTypes":["book","chapter","hadith","athar","fatwa","fatwa-answer","fiqh-ruling","research-paper","institutional-resolution"],
+  "translationRecord":{"sourceId":"","sourceEdition":"","sourceLocation":"","arabicText":"","targetLanguage":"","translation":"","translator":"","reviewer":"","status":"machine-draft","terminologyRefs":[],"jurisdiction":"","methodology":"","license":"","createdAt":"","updatedAt":""},
+  "statuses":["machine-draft","machine-reviewed","human-translated","human-reviewed","scholar-reviewed","officially-published"],
+  "safetyRules":{"arabicOriginalAlwaysVisible":true,"neverOverwriteSource":true,"fatwaJurisdictionMustRemainVisible":true,"disagreementMustRemainVisible":true,"uncertaintyMustRemainVisible":true,"copyrightMustBeChecked":true},
+  "batchStrategy":{"translateHighValueTerminologyFirst":true,"thenBooksAndFatwas":true,"parallelizeAcrossLanguages":true,"neverPublishUnreviewedMachineDraftAsAuthoritative":true}
+}
