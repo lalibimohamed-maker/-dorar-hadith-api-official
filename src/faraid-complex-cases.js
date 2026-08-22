@@ -1,3 +1,10 @@
+import {
+  analyzePregnancy,
+  analyzeMissingPerson,
+  analyzeAmbiguousSex,
+  analyzeMunasakhat
+} from "./faraid-advanced.js";
+
 export const COMPLEX_FARAID_CASES = [
   {
     id: "grandfather-with-siblings",
@@ -87,4 +94,14 @@ export function listComplexFaraidCases({ status, topic } = {}) {
 
 export function getComplexFaraidCase(id) {
   return COMPLEX_FARAID_CASES.find((item) => item.id === id) || null;
+}
+
+export function analyzeComplexFaraidCase(id, input = {}) {
+  switch (id) {
+    case "pregnancy": return analyzePregnancy(input);
+    case "missing-person": return analyzeMissingPerson(input);
+    case "khuntha": return analyzeAmbiguousSex(input);
+    case "munasakhat": return analyzeMunasakhat(input);
+    default: return null;
+  }
 }
