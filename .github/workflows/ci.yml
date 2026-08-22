@@ -46,6 +46,10 @@ jobs:
           test -f openapi.yaml
           test -f src/dorar-client.js
           test -f src/unified-search.js
+          test -f src/fiqh-research.js
+          test -f config/fiqh-research-framework.json
+          test -f config/fiqh-fatawa-sources.json
+          test -f config/fiqh-classical-fatwa-books.json
           test -f src/inheritance-calculator.js
           test -f src/faraid-complex-cases.js
           test -f src/faraid-advanced.js
