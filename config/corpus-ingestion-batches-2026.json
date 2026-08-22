@@ -1,0 +1,11 @@
+{
+  "version":"2026.6",
+  "batches":[
+    {"id":"primary-hadith-core-001","priority":"primary","records":["book-bukhari","book-muslim","book-ahmad","book-abu-dawud","book-tirmidhi","book-nasai","book-ibn-majah"],"unit":"hadith","status":"metadata-seeded"},
+    {"id":"primary-fatwa-saudi-001","priority":"primary","records":["fatwa-ibn-baz","fatwa-ibn-uthaymeen","fatwa-saudi-ifta","fatwa-saudi-permanent"],"unit":"question-answer","status":"metadata-seeded"},
+    {"id":"classical-fatwa-001","priority":"secondary-classical-reference","records":["fatwa-ibn-taymiyyah-kubra","fatwa-ibn-taymiyyah-mustadrak"],"unit":"volume-section","status":"metadata-seeded"},
+    {"id":"translation-20-001","priority":"translation","dependsOn":["primary-hadith-core-001","primary-fatwa-saudi-001","classical-fatwa-001"],"languages":["ar","en","fr","es","de","tr","ur","id","ms","bn","hi","ru","fa","zh","sw","ha","pt","it","ja","ko"],"status":"queued"}
+  ],
+  "gates":["rights-check","edition-check","source-verification","stable-citation","lexical-linking","fiqh-term-resolution","translation-review"],
+  "failurePolicy":"stop-publication-for-record-and-retain-audit-state"
+}
