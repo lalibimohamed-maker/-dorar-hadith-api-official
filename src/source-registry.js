@@ -21,6 +21,7 @@ const academicExpansion = readJson("academic-islamic-sources-2026.json", { sourc
 const bookCatalog = readJson("book-catalog-2026.json", { books: [], policy: {}, normalizationRules: {} });
 const fiqhBookExpansion = readJson("fiqh-book-expansion-2026.json", { books: [], policy: {} });
 const classicalFatwaCatalog = readJson("classical-fatwa-catalog-2026.json", { works: [], policy: {} });
+const languageCoverage = readJson("language-coverage-2026.json", { agreed20: [], worldExpansion: {}, policy: {}, translationTiers: {} });
 
 const fatwaSources = (fatwaExpansion.sources || []).map((source) => ({ ...source, category: "fatwa", role: source.type === "official-scholar-site" || source.type === "official-foundation-site" ? "official-fatwa-source" : "fatwa-source", sourceKind: source.type || "fatwa-source", reusePolicy: source.reuse || "source-permission-dependent" }));
 const saudiFatwaSources = (saudiFatwaExpansion.sources || []).map((source) => ({ ...source, sourceKind: source.sourceKind || "saudi-official-fatwa-source", attributionRequired: true, noEndorsementByInclusion: true, reusePolicy: saudiFatwaExpansion.policy?.copyright || "catalog-and-link-unless-licensed", jurisdiction: "السعودية" }));
@@ -43,6 +44,7 @@ const mergedRegistry = {
   sources: mergedSources,
   books: normalizedBooks,
   classicalFatwaWorks: classicalFatwaCatalog.works || [],
+  languages: languageCoverage,
   bookCatalog: { policy: bookCatalog.policy || {}, normalizationRules: { ...(bookCatalog.normalizationRules || {}), ...(fiqhBookExpansion.policy || {}) }, bookCount: normalizedBooks.length, fiqhExpansionCount: (fiqhBookExpansion.books || []).length },
   fatwa: { taxonomy: fatwaExpansion.taxonomy || [], sourceCount: mergedSources.filter((source) => source.category === "fatwa").length, scholarCount: new Set(scholarSources.map((source) => source.scholar).filter(Boolean)).size, officialSaudiSourceCount: saudiFatwaSources.filter((source) => source.category === "fatwa").length, secondaryReferenceSourceCount: secondaryFatwaSources.filter((source) => source.category === "fatwa").length, classicalWorkCount: (classicalFatwaCatalog.works || []).length, policy: fatwaExpansion.policy || null, saudiPolicy: saudiFatwaExpansion.policy || null, secondaryPolicy: secondaryFatwaExpansion.policy || null, institutionalOutputRules: saudiFatwaExpansion.institutionalOutputRules || {} },
   knowledgeExpansion: { policy: knowledgeExpansion.policy || {}, rules: knowledgeExpansion.rules || {}, sourceCount: expandedSources.length },
@@ -59,3 +61,4 @@ export function listBooks({ category, authorAr, madhhab } = {}) { return mergedR
 export function getBook(id) { return mergedRegistry.books.find((book) => book.id === id) || null; }
 export function listClassicalFatwaWorks({ authorAr } = {}) { return mergedRegistry.classicalFatwaWorks.filter((work) => !authorAr || work.authorAr === authorAr); }
 export function getClassicalFatwaWork(id) { return mergedRegistry.classicalFatwaWorks.find((work) => work.id === id) || null; }
+export function listLanguages({ agreed20 = false } = {}) { return agreed20 ? (mergedRegistry.languages.agreed20 || []) : [...(mergedRegistry.languages.agreed20 || []), { code: "*", name: "worldwide-language-expansion" }]; }
