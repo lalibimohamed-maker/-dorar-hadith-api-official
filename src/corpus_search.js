@@ -1,6 +1,7 @@
 import { searchResponse, conceptCard, bilingualResult } from './corpus_api_contract.js';
 import { routeConcept } from './methodology-router.js';
 import { loadConceptIndex } from './corpus_repository.js';
+import { resolveGhaybDomain } from './ghayb-router.js';
 
 function resolveIndexedConcept(term) {
   const normalized = String(term || '').trim();
@@ -22,24 +23,13 @@ function resolveIndexedConcept(term) {
       return value === normalized || value.includes(normalized) || normalized.includes(value);
     });
     if (!matched) continue;
-
     for (const [group, terms] of Object.entries(groups)) {
       if ((terms || []).includes(canonical)) {
         const domain = group === 'aqidah' ? 'aqidah' : group === 'quran' || group === 'language' ? 'quran-tafsir' : group === 'hadith' ? 'hadith-takhrij' : group === 'fiqh' || group === 'usul' ? 'fiqh' : group === 'seerah' ? 'seerah' : 'general';
-        return {
-          id: `concept-index:${group}:${canonical}`,
-          type: 'concept',
-          domain,
-          title_ar: canonical,
-          index_group: group,
-          index_match: true,
-          alias_match: normalized !== canonical,
-          matched_term: normalized,
-        };
+        return { id:`concept-index:${group}:${canonical}`, type:'concept', domain, title_ar:canonical, index_group:group, index_match:true, alias_match:normalized!==canonical, matched_term:normalized };
       }
     }
   }
-
   return null;
 }
 
@@ -52,7 +42,7 @@ export function searchCorpus(query, options = {}, records = []) {
 }
 
 export function resolveConcept(term, contextId, language = 'ar', records = [], options = {}) {
-  const record = records.find(r => r.id === contextId) || records.find(r => r.title_ar === term || r.title === term) || records.find(r => String(r.title_ar || '').includes(term)) || resolveIndexedConcept(term);
+  const record = records.find(r => r.id === contextId) || records.find(r => r.title_ar === term || r.title === term) || records.find(r => String(r.title_ar || '').includes(term)) || resolveIndexedConcept(term) || resolveGhaybDomain(term);
   return conceptCard({ term, contextId: contextId || record?.id || null, language, record, routing: routeConcept(record, options) });
 }
 
