@@ -1,0 +1,11 @@
+{
+  "version":"2026.08",
+  "purpose":"Prevent unverified or malformed knowledge records from entering the canonical corpus",
+  "workflow":["validate-schema","validate-source","validate-provenance","validate-attribution","validate-rights","validate-translation","deduplicate","run-integrity-tests","review","merge"],
+  "requiredFields":["id","type","source_id","provenance","verification_state"],
+  "verificationStates":["pending","verified","rejected","needs_review"],
+  "canonicalRules":{"quranArabicTextImmutable":true,"translationIsMeaningNotOriginal":true,"tafsirSeparatedFromQuran":true,"fatwaAttributedToIssuer":true,"scholarlyDisagreementPreserved":true},
+  "mergePolicy":"Only verified records may enter the canonical corpus; pending records remain isolated until review",
+  "branchPolicy":"feature branches first; pull request review before main",
+  "writePolicy":"Sequential writes per path; verify returned commit SHA after every mutation"
+}
