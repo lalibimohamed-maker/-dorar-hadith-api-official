@@ -1,0 +1,11 @@
+{
+  "version":"2026.11",
+  "strategy":"collect-metadata-first-then-authorized-text",
+  "priorityWaves":[
+    {"wave":1,"scope":["Quran and official translations","Saudi official fatwa institutions","Bin Baz","Ibn Uthaymeen","Algerian Ministry and national fatwa platform","Egypt Dar al-Ifta","Azhar fatwa system"],"status":"verified-source-registry"},
+    {"wave":2,"scope":["major hadith collections","major tafsir collections","fiqh manuals across madhahib","classical biographies and rijal","Ibn Taymiyyah major fatwas and collected fatwas"],"status":"queued-for-edition-and-rights-audit"},
+    {"wave":3,"scope":["global official fatwa authorities","Arabic lexicons and grammar","Islamic history and civilization","research journals and bibliographies"],"status":"queued-for-global-audit"}
+  ],
+  "recordWorkflow":["discover","verify-authority","identify-edition","check-rights","capture-metadata","extract-or-link-text","segment","anchor-citation","quality-review","index","translate","translation-review","publish"],
+  "noShortcuts":["do-not-scrape-unknown-rights-as-republishable","do-not-copy-full-books-by-default","do-not-mark-a-document-verified-because-its-host-is-official","do-not-merge-editions","do-not-invent-missing-locators"]
+}
