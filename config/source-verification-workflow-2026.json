@@ -1,0 +1,8 @@
+{
+  "version":"2026.16",
+  "workflow":["discover","verify-official-domain","identify-institution","identify-content-owner","classify-content","check-rights","capture-metadata","store-canonical-reference","quality-check","publish-to-index"],
+  "requiredMetadata":["country","institution","officialUrl","contentType","issuerOrAuthor","title","locator","rightsStatus","verificationStatus","lastChecked"],
+  "rules":{"officialDomainMustBeVerified":true,"noAssumedAffiliation":true,"noUnverifiedFullTextMirroring":true,"preserveOriginalLanguage":true,"preserveCanonicalSourceIdentity":true,"translationsLinkedToSource":true},
+  "fatwaRules":{"distinguishInstitutionalFatwaFromIndividualScholarOpinion":true,"retainQuestionAndAnswerWhenRightsPermit":true,"retainIssuerAndDateWhenAvailable":true},
+  "continuousReview":{"enabled":true,"recheckOfficialLinks":true,"recheckRights":true,"recordChanges":true}
+}
