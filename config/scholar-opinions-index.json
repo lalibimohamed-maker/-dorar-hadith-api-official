@@ -1,0 +1,42 @@
+{
+  "titleAr": "فهرس أقوال العلماء في العلماء",
+  "version": "1.0.0",
+  "policy": {
+    "purpose": "إظهار ما قاله العلماء في عالم أو طالب علم أو راوٍ مع حفظ نسبة القول ومصدره وسياقه.",
+    "sourceFirst": true,
+    "quoteVerificationRequired": true,
+    "preserveDisagreement": true,
+    "separatePersonAndStatement": true,
+    "noEndorsementByInclusion": true,
+    "candidateEvidenceNeverPromotedAutomatically": true,
+    "copyright": "catalog-and-link-unless-licensed"
+  },
+  "requiredEvidenceFields": [
+    "subjectScholarId",
+    "criticScholarId",
+    "relationshipType",
+    "wording",
+    "sourceTitle",
+    "sourceUrl",
+    "citation",
+    "dateOrEra",
+    "context",
+    "verification"
+  ],
+  "relationshipTypes": [
+    "praise",
+    "criticism",
+    "qualification",
+    "defense",
+    "agreement",
+    "disagreement",
+    "biographical-testimony",
+    "methodological-assessment",
+    "hadith-assessment",
+    "fiqh-assessment",
+    "aqeedah-assessment",
+    "tafsir-assessment"
+  ],
+  "verificationLevels": ["verified", "supported", "unverified", "disputed"],
+  "records": []
+}
