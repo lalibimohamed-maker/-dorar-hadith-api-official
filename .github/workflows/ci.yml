@@ -37,22 +37,25 @@ jobs:
         run: |
           npm run health
           node --check web/app.js
+          node --check src/hadith-narrator-methodology.js
 
       - name: Validate required project files
         run: |
           required_files=(
             dorar_json_api.js openapi.yaml web/index.html web/app.js
             src/dorar-client.js src/unified-search.js src/fiqh-research.js src/knowledge-context.js
+            src/hadith-narrator-methodology.js
             config/fiqh-research-framework.json config/fiqh-fatawa-sources.json config/fiqh-classical-fatwa-books.json
-            config/prophets-companions-genealogy-v2.json src/inheritance-calculator.js src/faraid-complex-cases.js
-            src/faraid-advanced.js src/tajweed-curriculum.js src/prophets-companions-genealogy.js
-            config/knowledge-source-expansion-2026.json
+            config/prophets-companions-genealogy-v2.json config/hadith-narrator-methodology-2026.json
+            src/inheritance-calculator.js src/faraid-complex-cases.js src/faraid-advanced.js src/tajweed-curriculum.js
+            src/prophets-companions-genealogy.js config/knowledge-source-expansion-2026.json
           )
           for file in "${required_files[@]}"; do
             if [ ! -f "$file" ]; then echo "MISSING REQUIRED FILE: $file"; exit 1; fi
           done
           grep -q './app.js' web/index.html
-          node --input-type=module -e "import fs from 'node:fs'; JSON.parse(fs.readFileSync('config/knowledge-source-expansion-2026.json','utf8')); console.log('Expanded source catalog JSON OK')"
+          node --input-type=module -e "import fs from 'node:fs'; JSON.parse(fs.readFileSync('config/knowledge-source-expansion-2026.json','utf8')); JSON.parse(fs.readFileSync('config/hadith-narrator-methodology-2026.json','utf8')); console.log('Expanded source and hadith methodology JSON OK')"
+          node --input-type=module -e "import { listNarratorGrades, listCoreRijalBooks, listChainPhenomena } from './src/hadith-narrator-methodology.js'; if(listNarratorGrades().length < 10 || listCoreRijalBooks().length < 10 || listChainPhenomena().length < 5) process.exit(1); console.log('Hadith methodology registry OK')"
 
       - name: Smoke test client configuration
         run: node --input-type=module -e "import fs from 'node:fs'; const s=fs.readFileSync('src/dorar-client.js','utf8'); if(!s.includes('https://dorar.net/dorar_api.json')) process.exit(1); console.log('Dorar client configuration OK')"
