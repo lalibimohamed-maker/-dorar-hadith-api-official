@@ -1,0 +1,26 @@
+{
+  "version":"2026.13",
+  "framework":"Ahl al-Sunnah wa al-Jama'ah",
+  "principles":[
+    "Quran is the highest textual authority",
+    "Authentic Sunnah is foundational and must be authenticated before attribution",
+    "Companion and early-generation reports are preserved with exact attribution",
+    "Later scholarly positions are identified as scholarly positions and are not presented as revelation",
+    "Documented disagreements remain visible",
+    "Methodological classification does not replace evidence"
+  ],
+  "evidenceLevels":["quranic-text","authentic-hadith","hadith-with-documented-grading","companion-report","early-generation-report","scholarly-opinion","institutional-fatwa","secondary-research","unverified"],
+  "attributionRules":{
+    "propheticAttributionRequiresEvidence":true,
+    "quranCitationRequiresSurahAndVerse":true,
+    "hadithCitationRequiresSourceAndIdentifier":true,
+    "scholarlyCitationRequiresAuthorAndWork":true,
+    "fatwaCitationRequiresIssuerAndOfficialRecordWhenAvailable":true
+  },
+  "conflictHandling":{
+    "preserveMultipleViews":true,
+    "labelEvidenceLevel":true,
+    "neverSynthesizeUnsupportedConsensus":true,
+    "allowQualifiedScholarlyAssessment":true
+  }
+}
