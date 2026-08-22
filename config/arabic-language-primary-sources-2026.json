@@ -1,0 +1,21 @@
+{
+  "titleAr":"مصادر اللغة العربية الأساسية وربطها بالفقه والترجمة",
+  "version":"2026.1",
+  "policy":{"role":"primary-language-reference","arabicOriginalPreserved":true,"translationCannotReplaceOriginal":true,"classicalAndModernSeparated":true,"terminologyMustCarryProvenance":true},
+  "sources":[
+    {"id":"cairo-arabic-academy","nameAr":"مجمع اللغة العربية بالقاهرة","url":"https://www.arabicacademy.gov.eg/ar","kind":"arabic-academy","priority":"primary","coverage":["lexicography","terminology","grammar","heritage","quranic-lexicon"]},
+    {"id":"cairo-arabic-academy-great-dictionary","nameAr":"المعجم الكبير - مجمع اللغة العربية بالقاهرة","url":"https://www.arabicacademy.gov.eg/ar","kind":"dictionary","priority":"primary","coverage":["lexicography","classical-arabic"]},
+    {"id":"cairo-arabic-academy-wasit-dictionary","nameAr":"المعجم الوسيط - مجمع اللغة العربية بالقاهرة","url":"https://www.arabicacademy.gov.eg/ar","kind":"dictionary","priority":"primary","coverage":["lexicography","modern-standard-arabic"]},
+    {"id":"cairo-quran-lexicon","nameAr":"معجم ألفاظ القرآن الكريم - مجمع اللغة العربية بالقاهرة","url":"https://www.arabicacademy.gov.eg/ar","kind":"quranic-lexicon","priority":"primary","coverage":["quran","lexicography","semantics"]},
+    {"id":"king-salman-arabic-academy","nameAr":"مجمع الملك سلمان العالمي للغة العربية","url":"https://ksaa.gov.sa/en/","kind":"arabic-academy","priority":"primary","coverage":["language-policy","computational-linguistics","terminology","lexicography"]},
+    {"id":"riyadh-lexicon","nameAr":"معجم الرياض","url":"https://ksaa.gov.sa/en/","kind":"modern-dictionary","priority":"primary","coverage":["modern-arabic","lexicography","search"]},
+    {"id":"siwar-dictionaries","nameAr":"منصة سوار للمعاجم اللغوية","url":"https://ksaa.gov.sa/en/","kind":"digital-lexicography","priority":"primary","coverage":["dictionaries","computational-linguistics"]},
+    {"id":"quranic-arabic-corpus","nameAr":"Quranic Arabic Corpus - مورد لغوي بحثي","url":"https://corpus.quran.com/","kind":"linguistic-corpus","priority":"primary-linguistic-support","coverage":["morphology","syntax","i3rab","ontology","quranic-arabic"],"licenseNote":"Use subject to the corpus license and attribution terms; do not treat its English translation as the Arabic source."}
+  ],
+  "classicalReferenceFamilies":[
+    {"id":"classical-lexicons","examples":["لسان العرب","تاج العروس","مقاييس اللغة","الصحاح","مفردات ألفاظ القرآن"],"role":"primary-classical-language-reference"},
+    {"id":"grammar","examples":["الكتاب لسيبويه","مغني اللبيب","ألفية ابن مالك وشروحها"],"role":"primary-classical-language-reference"},
+    {"id":"rhetoric","examples":["دلائل الإعجاز","أسرار البلاغة"],"role":"primary-classical-language-reference"}
+  ],
+  "fiqhTerminology":{"sourcePriority":["classical-lexicons","quranic-lexicon","arabic-academies","fiqh-books","contextual-source"],"neverInferLegalMeaningFromModernDictionaryAlone":true,"preserveOriginalTerm":true}
+}
