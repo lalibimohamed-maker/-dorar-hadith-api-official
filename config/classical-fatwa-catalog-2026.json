@@ -1,15 +1,18 @@
 {
   "titleAr": "كتالوج التراث الإفتائي للسلف وأئمة الإسلام",
-  "version": "2026.1",
+  "version": "2026.2",
   "policy": {
     "secondaryReference": true,
     "preserveAttribution": true,
     "distinguishNarratedFatwaFromAuthoredFatwa": true,
-    "doNotInferConsensusFromPresence": true
+    "distinguishMajorCollections": true,
+    "doNotInferConsensusFromPresence": true,
+    "doNotTreatAtharCorpusAsSingleFatwaSource": true
   },
   "works": [
-    {"id":"majmu-fatawa-ibn-taymiyyah","nameAr":"مجموع فتاوى شيخ الإسلام ابن تيمية","authorAr":"أحمد بن عبد الحليم ابن تيمية","category":"fatwa","workType":"fatwa-collection","sourceIds":["ibn-taymiyyah-major-fatwas"]},
-    {"id":"mustadrak-majmu-fatawa-ibn-taymiyyah","nameAr":"المستدرك على مجموع فتاوى شيخ الإسلام ابن تيمية","authorAr":"أحمد بن عبد الحليم ابن تيمية","compilerAr":"عبد الرحمن بن محمد بن قاسم ومحمد بن عبد الرحمن بن محمد بن قاسم","category":"fatwa","workType":"fatwa-supplement","sourceIds":["ibn-taymiyyah-mustadrak-fatwas"]},
+    {"id":"majmu-fatawa-ibn-taymiyyah","nameAr":"مجموع فتاوى شيخ الإسلام ابن تيمية","authorAr":"أحمد بن عبد الحليم ابن تيمية","category":"fatwa","workType":"fatwa-collection","volumes":37,"sourceIds":["ibn-taymiyyah-major-fatwas"]},
+    {"id":"fatawa-kubra-ibn-taymiyyah","nameAr":"الفتاوى الكبرى لشيخ الإسلام ابن تيمية","authorAr":"أحمد بن عبد الحليم ابن تيمية","category":"fatwa","workType":"selected-fatwa-collection","volumes":6,"sourceIds":["ibn-taymiyyah-major-fatwas"]},
+    {"id":"mustadrak-majmu-fatawa-ibn-taymiyyah","nameAr":"المستدرك على مجموع فتاوى شيخ الإسلام ابن تيمية","authorAr":"أحمد بن عبد الحليم ابن تيمية","compilerAr":"محمد بن عبد الرحمن بن محمد بن قاسم","category":"fatwa","workType":"fatwa-supplement","volumes":5,"sourceIds":["ibn-taymiyyah-mustadrak-fatwas"]},
     {"id":"mussannaf-abd-al-razzaq-fatwas","nameAr":"مصنف عبد الرزاق - أبواب الآثار والفتاوى","authorAr":"عبد الرزاق بن همام الصنعاني","category":"fatwa","workType":"athar-and-fiqh-corpus","sourceIds":["fatwa-heritage-salaf-companions"]},
     {"id":"mussannaf-ibn-abi-shaybah-fatwas","nameAr":"مصنف ابن أبي شيبة - أبواب الآثار والفقه","authorAr":"عبد الله بن محمد ابن أبي شيبة","category":"fatwa","workType":"athar-and-fiqh-corpus","sourceIds":["fatwa-heritage-salaf-companions"]},
     {"id":"muwatta-malik-fatwas","nameAr":"الموطأ - آثار الصحابة وأقوال أهل العلم","authorAr":"مالك بن أنس","category":"fatwa","workType":"hadith-athar-fiqh-corpus","sourceIds":["fatwa-heritage-salaf-companions"]},
