@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { getSource, listCategories, listSources } from "../src/source-registry.js";
+import { getBook, getSource, listCategories, listBooks, listSources } from "../src/source-registry.js";
 
 test("source registry exposes fatwa category", () => {
   const category = listCategories().find((item) => item.id === "fatwa");
@@ -18,6 +18,21 @@ test("expanded fatwa sources are queryable with attribution metadata", () => {
     assert.ok(source.url);
     assert.ok(source.role);
   }
+});
+
+test("Saudi official fatwa layer is present and institutionally separated", () => {
+  const sources = listSources({ category: "fatwa", country: "السعودية" });
+  assert.ok(sources.some((source) => source.id === "saudi-ifta"));
+  assert.ok(sources.some((source) => source.id === "saudi-senior-scholars"));
+  assert.ok(sources.some((source) => source.id === "saudi-permanent-fatwa-committee"));
+  assert.equal(getSource("saudi-permanent-fatwa-committee").sourceKind, "permanent-fatwa-committee");
+});
+
+test("Saudi Islamic Research Journal is research, not institutional fatwa", () => {
+  const source = getSource("saudi-islamic-research-journal");
+  assert.ok(source);
+  assert.equal(source.category, "research");
+  assert.equal(source.sourceKind, "islamic-research-journal");
 });
 
 test("source IDs are unique after all registry expansions are merged", () => {
@@ -39,6 +54,17 @@ test("individual expanded source retains original attribution", () => {
   assert.equal(source.scholar, "عبد العزيز بن باز");
   assert.equal(source.url, "https://binbaz.org.sa/");
   assert.equal(source.category, "fatwa");
+});
+
+test("normalized book catalog separates compound works", () => {
+  assert.ok(getBook("sunan-kubra-bayhaqi"));
+  assert.ok(getBook("dalail-nubuwwa-bayhaqi"));
+  assert.notEqual(getBook("sunan-kubra-bayhaqi").id, getBook("dalail-nubuwwa-bayhaqi").id);
+  assert.equal(getBook("sunan-kubra-bayhaqi").authorAr, "أحمد بن الحسين البيهقي");
+});
+
+test("normalized catalog does not treat madhhabs as books", () => {
+  assert.equal(listBooks({ category: "fiqh" }).some((book) => book.id === "madhhab-hanafi"), false);
 });
 
 test("core hadith book sources retain distinct catalog identities", () => {
