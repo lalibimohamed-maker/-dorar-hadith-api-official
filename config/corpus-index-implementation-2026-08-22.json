@@ -1,0 +1,16 @@
+{
+  "version":"2026.16",
+  "purpose":"Turn verified source records into searchable knowledge units without replacing canonical sources.",
+  "unitTypes":["quran_ayah","quran_word","hadith","athar","tafsir_entry","fatwa","scholarly_statement","book","book_section","fiqh_issue","biography","translation"],
+  "identity":{"stableIds":true,"sourceProvenanceRequired":true,"canonicalTextPreserved":true},
+  "indexFields":["title","normalizedText","arabicOriginal","language","domain","author","institution","work","volume","page","section","date","sourceUrl","sourceType","evidenceGrade","verificationState","rightsState","translationId","conceptIds","relatedUnitIds"],
+  "verificationGates":["source_exists","source_identity_verified","attribution_verified","location_verified","text_integrity_checked","rights_checked","translation_provenance_checked","duplicate_checked"],
+  "search":{"indexCanonicalAndLocalizedFields":true,"rankCanonicalEvidenceAboveSecondaryMaterial":true,"preserveDisagreement":true,"contextAwareConceptResolution":true},
+  "longPress":{"enabled":true,"thresholdMs":5000,"opensMediumOverlay":true,"keepsParentSearchVisible":true,"usesConceptOrQuranWordCard":true},
+  "language":{"targetFromUserPreferenceOrQuery":true,"arabicCanonicalPreserved":true,"verifiedMeaningTranslationPreferred":true,"machineTranslationNeverMarkedVerified":true},
+  "rights":{"fullTextStorageOnlyWhenPermitted":true,"otherwiseStoreMetadataAndPermittedLinkage":true},
+  "revalidation":{"sourceHealthCheck":true,"periodicReverification":true,"staleRecordsFlagged":true},
+  "initialPriority":["quran","quran_translations","tafsir","authenticated_hadith","fiqh","fatwa","aqidah","seerah","scholars_and_books"],
+  "officialReferenceAnchors":["KingFahdGloriousQuranPrintingComplex","SaudiGeneralPresidencyForScholarlyResearchAndIfta"],
+  "designPrinciple":"The encyclopedia is comprehensive in Islamic subject matter while keeping every claim attributable and every source class distinguishable."
+}
