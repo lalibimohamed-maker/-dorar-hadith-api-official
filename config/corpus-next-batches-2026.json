@@ -1,0 +1,10 @@
+{
+  "version":"2026.7",
+  "batches":[
+    {"id":"fiqh-classics-002","domain":"fiqh","units":["madhhab-manual","chapter","issue","evidence"],"priority":"secondary-reference","requires":["edition-check","rights-check","source-verification"]},
+    {"id":"arabic-lexicons-002","domain":"arabic-language","units":["root","entry","sense","example","grammatical-note"],"priority":"primary-language-reference","requires":["source-verification","lexical-review"]},
+    {"id":"fatwa-global-audit-002","domain":"fatwa","units":["country","institution","collection","fatwa"],"priority":"secondary-reference","requires":["official-domain","jurisdiction-check","current-status","rights-check"]},
+    {"id":"translation-20-002","domain":"translation","dependsOn":["fiqh-classics-002","arabic-lexicons-002","fatwa-global-audit-002"],"languages":["ar","en","fr","es","de","tr","ur","id","ms","bn","hi","ru","fa","zh","sw","ha","pt","it","ja","ko"],"priority":"translation","requires":["source-anchor","terminology-resolution","human-review-when-required"]}
+  ],
+  "worldExpansion":{"enabled":true,"afterPriority20":true,"neverReplacePriority20":true}
+}
