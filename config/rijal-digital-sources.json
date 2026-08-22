@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0",
+  "policy": {
+    "role": "digital-source-registry",
+    "sourceTextMustBeLicensedOrPublicDomain": true,
+    "metadataOnlyUntilTextIsLegallyAndTechnicallyAvailable": true,
+    "noInferenceFromSilence": true,
+    "preserveExactEdition": true,
+    "everyExtractRequiresLocation": true,
+    "autoVerified": false
+  },
+  "sources": [
+    {
+      "id": "bukhari-tarikh-kabir",
+      "title": "التاريخ الكبير",
+      "author": "البخاري",
+      "priority": 1,
+      "role": "primary",
+      "catalogUrls": ["https://waqfeya.net/books/التاريخ-الكبير-وفي-آخره-كتاب-الكنى-af98c9ed002041e58286a5f674d4b67b"],
+      "availability": "metadata-and-index-reference",
+      "textIngestion": "local-or-authorized-copy"
+    },
+    {
+      "id": "ibn-abi-hatim-jarh",
+      "title": "الجرح والتعديل",
+      "author": "ابن أبي حاتم",
+      "priority": 1,
+      "role": "primary",
+      "catalogUrls": ["https://thahabi.org/book/2771", "https://sunna.alifta.gov.sa/Book/Details?bookId=61"],
+      "availability": "digital-reference",
+      "textIngestion": "local-or-authorized-copy"
+    },
+    {
+      "id": "yahya-ibn-main-marifat-al-rijal",
+      "title": "معرفة الرجال عن يحيى بن معين رواية ابن محرز",
+      "author": "يحيى بن معين",
+      "priority": 1,
+      "role": "early-primary",
+      "catalogUrls": ["https://waqfeya.net/books/معرفة-الرجال-عن-يحيى-بن-معين-رواية-ابن-محرز-ط-مجمع-اللغة/9853a909ba9345c8b9d935048cfd9654"],
+      "availability": "digital-reference",
+      "textIngestion": "local-or-authorized-copy"
+    },
+    {
+      "id": "ibn-sad-tabaqat",
+      "title": "الطبقات الكبرى",
+      "author": "ابن سعد",
+      "priority": 1,
+      "role": "early-biographical",
+      "catalogUrls": ["https://www.waqfeya.net/books/الطبقات-الكبير-الطبقات-الكبرى-طبقات-ابن-سعد-ط-الخانجي-ff34852d019f4bd9b743baabc33d0520"],
+      "availability": "digital-reference",
+      "textIngestion": "local-or-authorized-copy"
+    }
+  ]
+}
