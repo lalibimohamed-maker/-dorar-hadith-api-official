@@ -1,0 +1,11 @@
+{
+  "version":"2026.5",
+  "sourceLanguage":"ar",
+  "priorityLanguages":["ar","en","fr","es","de","tr","ur","id","ms","bn","hi","ru","fa","zh","sw","ha","pt","it","ja","ko"],
+  "worldExpansion":true,
+  "corpusUnits":["book","chapter","section","hadith","athar","fatwa","question","answer","biography","definition","fiqh-term"],
+  "translationMemory":{"preserveArabicSource":true,"storeTerminologyDecisions":true,"storeReviewerDecision":true,"reuseOnlyWhenSourceAndContextMatch":true},
+  "qa":{"requiredChecks":["source-anchor-preserved","scholar-attribution-preserved","institution-preserved","fiqh-term-consistency","negation-preserved","modality-preserved","uncertainty-preserved","madhhab-context-preserved","citation-preserved","numbers-and-references-preserved"],"automaticDraftNeverEqualsApproved":true},
+  "terminology":{"sourceOfTruth":"fiqh-terminology-lexical-map-2026.json","fallback":"arabic-language-primary-sources-2026.json","unresolvedTermAction":"human-review"},
+  "releasePolicy":{"officialHuman":"publish","reviewedHuman":"publish","machineReviewed":"publish-with-status","machineDraft":"internal-or-clearly-labeled-draft","missingRights":"metadata-and-link-only"}
+}
