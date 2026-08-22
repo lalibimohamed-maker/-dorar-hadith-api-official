@@ -1,0 +1,12 @@
+{
+  "version":"2026-08-22",
+  "verifiedOn":"2026-08-22",
+  "authorities":[
+    {"country":"Algeria","name":"Ministry of Religious Affairs and Endowments","type":"government_ministry","domains":["fatwa","quranic_education","religious_guidance","islamic_culture"],"officialDomain":"marw.gov.dz","evidence":"official ministry history states responsibility for religious guidance, fatwa, Quranic education and authentic Islamic culture; ministry also states responsibility for organizing and modernizing fatwa activity."},
+    {"country":"United Arab Emirates","name":"UAE Council for Fatwa","type":"federal_fatwa_council","domains":["fatwa","research","fatwa_policies"],"officialDomain":"uaelegislation.gov.ae","evidence":"Federal Law of 2024 specifies the Council's composition and competencies, including issuing public, contemporary and proactive fatwas and reviewing fatwa content from official entities."},
+    {"country":"Indonesia","name":"Majelis Ulama Indonesia (MUI)","type":"national_ulama_body","domains":["fatwa","sharia_consultation","scholar_directory"],"officialDomain":"mui.or.id","evidence":"official MUI site provides a Fatwa collection and identifies MUI Fatwa and DSN MUI channels; fatwa index is maintained on the official domain."},
+    {"scope":"International","name":"International Islamic Fiqh Academy (IIFA)","type":"international_fiqh_academy","domains":["fiqh_resolutions","research","international_fiqh"],"officialDomain":"iifa-aifi.org","evidence":"international fiqh academy registry entry; classify as international scholarly body, not a state fatwa authority."}
+  ],
+  "classificationRules":{"officialStatus":"Only establish official/institutional status from the authority's own official domain or governing legal instrument.","attribution":"Every fatwa remains attributed to its issuing body or named scholar; institutional status does not make a statement infallible.","sourceLayers":["quran","authenticated_sunnah","early_reports","scholarly_books","official_fatwa","international_fiqh","secondary_research"],"conflictHandling":"Preserve attributable differences rather than silently merging divergent rulings."},
+  "ingestion":"catalog-first; verify authority, provenance, rights, canonical URL, author/body, date and document identity before corpus ingestion."
+}
