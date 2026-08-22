@@ -7,14 +7,18 @@ on:
       - 'config/ghaib-source-framework-2026.json'
       - 'data/ghaib/**'
       - 'src/ghaib-evidence-router.js'
+      - 'src/hadith-evidence-registry.js'
       - 'test/ghaib-evidence-router.test.js'
+      - 'test/hadith-evidence-registry.test.js'
       - '.github/workflows/ghaib-evidence-ci.yml'
   pull_request:
     paths:
       - 'config/ghaib-source-framework-2026.json'
       - 'data/ghaib/**'
       - 'src/ghaib-evidence-router.js'
+      - 'src/hadith-evidence-registry.js'
       - 'test/ghaib-evidence-router.test.js'
+      - 'test/hadith-evidence-registry.test.js'
       - '.github/workflows/ghaib-evidence-ci.yml'
   workflow_dispatch:
 
@@ -34,6 +38,10 @@ jobs:
         with:
           node-version: '22'
       - name: Validate evidence JSON
-        run: node -e "for (const f of ['config/ghaib-source-framework-2026.json','data/ghaib/evidence-seed-2026.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('Evidence JSON OK')"
+        run: node -e "for (const f of ['config/ghaib-source-framework-2026.json','data/ghaib/evidence-seed-2026.json','data/ghaib/hadith-evidence-registry-2026.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('Evidence JSON OK')"
+      - name: Syntax check evidence modules
+        run: node --check src/ghaib-evidence-router.js && node --check src/hadith-evidence-registry.js
       - name: Run evidence router tests
         run: node test/ghaib-evidence-router.test.js
+      - name: Run hadith evidence registry tests
+        run: node --test test/hadith-evidence-registry.test.js
