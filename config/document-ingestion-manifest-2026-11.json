@@ -1,0 +1,19 @@
+{
+  "version":"2026.11",
+  "purpose":"تفكيك وجمع وفهرسة الوثائق الإسلامية من المصادر المتحققة دون افتراض صلاحية إعادة النشر",
+  "sourceFamilies":[
+    {"id":"saudi-ifta","country":"SA","priority":"primary","institution":"الرئاسة العامة للبحوث العلمية والإفتاء","collections":["اللجنة الدائمة للفتوى","هيئة كبار العلماء","مجلة البحوث الإسلامية","المطبوعات"]},
+    {"id":"egypt-dar-alifta","country":"EG","priority":"primary-institutional","institution":"دار الإفتاء المصرية","collections":["الفتاوى المعتمدة","الفتاوى البحثية","الموسوعات","الإصدارات"]},
+    {"id":"algeria-religious-affairs","country":"DZ","priority":"primary-institutional","institution":"وزارة الشؤون الدينية والأوقاف","collections":["الفتاوى","الإرشاد القرآني","البحوث والمطبوعات"]},
+    {"id":"qatar-awqaf","country":"QA","priority":"primary-institutional","institution":"وزارة الأوقاف والشؤون الإسلامية","collections":["الفتاوى","القرآن","البحوث والدراسات"]},
+    {"id":"jordan-iftaa","country":"JO","priority":"primary-institutional","institution":"دائرة الإفتاء العام","collections":["الفتاوى","قرارات مجلس الإفتاء","البحوث"]},
+    {"id":"kuwait-awqaf","country":"KW","priority":"primary-institutional","institution":"وزارة الأوقاف والشؤون الإسلامية","collections":["الفتاوى","الموسوعات الفقهية","البحوث"]},
+    {"id":"oman-awqaf","country":"OM","priority":"primary-institutional","institution":"وزارة الأوقاف والشؤون الدينية","collections":["الإفتاء","المطبوعات","المصادر الدينية"]},
+    {"id":"malaysia-fatwa","country":"MY","priority":"primary-institutional","institution":"إدارة المفتي للولايات الاتحادية","collections":["e-Fatwa","البحوث","التراث والمخطوطات"]},
+    {"id":"turkey-diyanet","country":"TR","priority":"primary-institutional","institution":"رئاسة الشؤون الدينية","collections":["الفتاوى","المجلس الأعلى للشؤون الدينية","البحوث"]}
+  ],
+  "documentUnit":{"atomic":true,"types":["fatwa","ruling","resolution","hadith","athar","ayah","tafsir-section","fiqh-issue","book","chapter","biography","research","dictionary-entry","manuscript-record"]},
+  "pipeline":["discover","institution-verify","document-verify","edition-verify","rights-check","capture-provenance","extract","normalize-copy-only","segment","anchor","review","index","translate","translation-review","publish"],
+  "rightsPolicy":{"unknown":"metadata-link-only","licensed":"follow-license","publicDomain":"allow-with-provenance","restricted":"do-not-republish-fulltext"},
+  "publicationPolicy":{"noSourceNoPublish":true,"noLocatorNoVerifiedClaim":true,"preserveConflicts":true,"preserveOriginal":true}
+}
