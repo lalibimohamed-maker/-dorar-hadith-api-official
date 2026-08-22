@@ -15,7 +15,7 @@ on:
     paths:
       - 'config/rijal-*.json'
       - 'src/rijal-*.js'
-      - 'scripts/validate-rijal-dataset.js'
+      - 'scripts/validate-rijal-*.js'
       - 'data/rijal/**'
 
 jobs:
@@ -28,5 +28,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Validate complete Rijal corpus configuration
+        run: npm run rijal:validate
       - name: Validate source-backed dataset
         run: node scripts/validate-rijal-dataset.js
