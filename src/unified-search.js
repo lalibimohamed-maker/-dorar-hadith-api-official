@@ -6,6 +6,7 @@ import { listShamelaSections } from "./shamela-source.js";
 import { searchFiqhResearch } from "./fiqh-research.js";
 import { buildHistoricalResearchContext } from "./prophets-companions-genealogy-search.js";
 import { searchOfficialInstitutions, officialInstitutionPolicy } from "./official-institution-search.js";
+import { searchRijalResearch } from "./rijal-search.js";
 
 function sourceRecords() {
   const registryRecords = listSources().map((source) => ({ id: source.id, title: source.nameAr || source.id, topic: source.category, source: source.url || source.id, verification: "verified", corpus: "sunni", work: source.nameAr || source.id, author: null, methodology: null, rights: "source-dependent" }));
@@ -29,6 +30,7 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
   const historical = buildHistoricalResearchContext(query);
   const historicalRecords = historical.records.map((item) => ({ ...item, relevance: historical.classification.confidence, verification: item.verification || "catalog-record", corpus: "sunni", rights: "catalog-and-link-unless-licensed" }));
   const officialInstitutions = searchOfficialInstitutions(query);
+  const rijalResearch = searchRijalResearch(query);
   const mergedSourceMatches = [...sourceMatches, ...fiqh, ...historicalRecords, ...officialInstitutions].sort((a, b) => (b.relevance || 0) - (a.relevance || 0));
 
   return {
@@ -39,6 +41,7 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
     fiqhResearch: { matched: fiqh.length > 0, records: fiqh, rule: "يُعرض الخلاف ونسبة القول ومصدره، ولا يُنشأ ترجيح بلا دليل موثق." },
     historicalResearch: historical,
     officialInstitutionResearch: { matched: officialInstitutions.length > 0, records: officialInstitutions, policy: officialInstitutionPolicy() },
+    rijalResearch,
     knowledge,
     policy: {
       corpus: "sunni",
@@ -57,6 +60,7 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
       prophetsSeparateQuranAndAuthenticSunnahFromUnverifiedStoryDetails: true,
       officialInstitutionsAreSecondaryReferences: true,
       officialInstitutionsNeverOverridePrimaryRijalEvidence: true,
+      rijalResearchRequiresPrimaryCriticEvidence: true,
     },
   };
 }
