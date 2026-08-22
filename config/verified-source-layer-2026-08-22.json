@@ -1,0 +1,14 @@
+{
+  "version":"2026.16",
+  "purpose":"Connect verified institutional sources to the knowledge and contextual-card layers",
+  "verifiedSources":[
+    {"id":"sa-alifta","jurisdiction":"Saudi Arabia","institution":"General Presidency for Scholarly Research and Ifta","type":"official-fatwa-institution","url":"https://alifta.gov.sa/","verification":"official-government-domain"},
+    {"id":"sa-kfgqpc","jurisdiction":"Saudi Arabia","institution":"King Fahd Glorious Quran Printing Complex","type":"official-quran-and-translation-institution","url":"https://qurancomplex.gov.sa/","verification":"official-government/institutional-source"},
+    {"id":"eg-dar-alifta","jurisdiction":"Egypt","institution":"Egypt's Dar Al-Ifta","type":"official-fatwa-institution","url":"https://www.dar-alifta.org/","verification":"official institutional source"},
+    {"id":"iifa","jurisdiction":"international","institution":"International Islamic Fiqh Academy","type":"international-fiqh-academy","url":"https://iifa-aifi.org/","verification":"official institutional source"}
+  ],
+  "sourceHierarchy":{"canonical":"Quranic Arabic text","primary":"authenticated Sunnah and verified early reports","scholarly":"recognized scholarly works and attributed opinions","institutional":"official fatwa bodies and fiqh academies","secondary":"research and explanatory material"},
+  "translationRules":{"quran":"translations are translations of meanings, not replacements for the Arabic Quran","verifiedOnly":"only reviewed/officially sourced translations receive verified status","machine":"machine translation must remain separately labeled and never inherit verified status","provenance":"every translation record keeps language, translator/reviewer when available, source institution, edition/version and verification state"},
+  "contextualCards":{"sourceResolution":true,"provenanceVisibleOnDemand":true,"preserveCanonicalText":true,"preserveAttribution":true,"preserveDisagreement":true},
+  "refresh":{"recheckOfficialSource":"periodic","recordLastVerifiedAt":true,"doNotAssumeStability":true}
+}
