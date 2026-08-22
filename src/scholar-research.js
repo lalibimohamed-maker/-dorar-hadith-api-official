@@ -1,0 +1,150 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import domainFramework from "../config/domain-scholar-framework.json" with { type: "json" };
+import contemporary from "../config/contemporary-sunni-scholars.json" with { type: "json" };
+import fiqhSources from "../config/fiqh-fatawa-sources.json" with { type: "json" };
+import { listBooks } from "./book-catalog.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const opinions = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "config", "scholar-opinions-index.json"), "utf8"));
+
+function normalize(value) {
+  return String(value || "")
+    .toLocaleLowerCase("ar")
+    .replace(/[إأآ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function allScholars() {
+  const map = new Map();
+  for (const [domainId, domain] of Object.entries(domainFramework.domains || {})) {
+    for (const scholar of domain.scholars || []) {
+      const current = map.get(scholar.id) || { id: scholar.id, nameAr: scholar.nameAr, domains: [], records: [] };
+      if (!current.domains.includes(domainId)) current.domains.push(domainId);
+      map.set(scholar.id, current);
+    }
+  }
+  for (const scholar of contemporary.scholars || []) {
+    const current = map.get(scholar.id) || { id: scholar.id, nameAr: scholar.nameAr, domains: [], records: [] };
+    current.role = scholar.role;
+    current.sources = scholar.sources || [];
+    current.contentTypes = scholar.contentTypes || [];
+    map.set(scholar.id, current);
+  }
+  for (const scholar of fiqhSources.scholars || []) {
+    const current = map.get(scholar.id) || { id: scholar.id, nameAr: scholar.nameAr, domains: [], records: [] };
+    current.fatwaSourceIds = scholar.sourceIds || [];
+    map.set(scholar.id, current);
+  }
+  return [...map.values()];
+}
+
+function findScholar(nameOrId) {
+  const needle = normalize(nameOrId);
+  return allScholars().find((item) => item.id === nameOrId || normalize(item.nameAr) === needle || normalize(item.nameAr).includes(needle)) || null;
+}
+
+function sourceBooksForScholar(scholar) {
+  if (!scholar) return [];
+  return listBooks({ status: "verified" }).filter((book) => book.authorId === scholar.id || book.authorId === scholar.nameAr).slice(0, 100);
+}
+
+function normalizeOpinion(record) {
+  const item = { ...record };
+  item.verification = item.verification || "unverified";
+  item.relationshipType = item.relationshipType || "biographical-testimony";
+  item.wording = item.wording || null;
+  item.sourceTitle = item.sourceTitle || null;
+  item.sourceUrl = item.sourceUrl || null;
+  item.citation = item.citation || null;
+  item.context = item.context || null;
+  item.dateOrEra = item.dateOrEra || null;
+  return item;
+}
+
+export function getScholarResearchPolicy() {
+  return {
+    ...opinions.policy,
+    requiredEvidenceFields: [...opinions.requiredEvidenceFields],
+    relationshipTypes: [...opinions.relationshipTypes],
+    verificationLevels: [...opinions.verificationLevels],
+  };
+}
+
+export function searchScholarOpinions(query, { relationshipType, verification } = {}) {
+  const q = normalize(query);
+  if (!q) return [];
+  return (opinions.records || []).map(normalizeOpinion).filter((item) => {
+    const haystack = normalize([item.subjectScholarId, item.criticScholarId, item.wording, item.sourceTitle, item.context].join(" "));
+    return haystack.includes(q) && (!relationshipType || item.relationshipType === relationshipType) && (!verification || item.verification === verification);
+  });
+}
+
+export function buildScholarResearchProfile(nameOrId) {
+  const scholar = findScholar(nameOrId);
+  if (!scholar) return null;
+  const subjectRecords = (opinions.records || []).map(normalizeOpinion).filter((item) => item.subjectScholarId === scholar.id);
+  const critics = subjectRecords.map((item) => item.criticScholarId).filter(Boolean);
+  const criticProfiles = critics.map((id) => findScholar(id)).filter(Boolean);
+  const evidence = subjectRecords.filter((item) => ["verified", "supported"].includes(item.verification));
+  const disputed = subjectRecords.filter((item) => item.verification === "disputed" || item.disputed === true);
+
+  return {
+    scholar,
+    identity: {
+      id: scholar.id,
+      nameAr: scholar.nameAr,
+      role: scholar.role || null,
+      domains: scholar.domains || [],
+      contentTypes: scholar.contentTypes || [],
+    },
+    primarySources: scholar.sources || [],
+    fatwaSourceIds: scholar.fatwaSourceIds || [],
+    authoredWorks: sourceBooksForScholar(scholar),
+    opinions: {
+      totalIndexed: subjectRecords.length,
+      verifiedOrSupported: evidence.length,
+      disputed: disputed.length,
+      records: subjectRecords,
+      criticsAndAssessors: criticProfiles,
+    },
+    synthesis: {
+      status: subjectRecords.length ? "evidence-available" : "needs-indexed-evidence",
+      rule: "لا يصدر ملخص ترجيحي إلا بعد جمع الأقوال الموثقة وحفظ الخلاف والسياق.",
+      distinction: [
+        "الحكم على العالم أو الراوي",
+        "الحكم على قوله أو كتابه",
+        "الحكم على حديث رواه",
+        "تقييم منهجه في مجال محدد"
+      ],
+    },
+  };
+}
+
+export function compareScholarOpinions(nameOrId) {
+  const profile = buildScholarResearchProfile(nameOrId);
+  if (!profile) return null;
+  const records = profile.opinions.records;
+  return {
+    scholar: profile.identity,
+    praise: records.filter((item) => item.relationshipType === "praise"),
+    criticism: records.filter((item) => item.relationshipType === "criticism"),
+    qualification: records.filter((item) => item.relationshipType === "qualification"),
+    defense: records.filter((item) => item.relationshipType === "defense"),
+    methodological: records.filter((item) => item.relationshipType.endsWith("-assessment")),
+    disputed: records.filter((item) => item.verification === "disputed" || item.disputed === true),
+    note: "المقارنة لا تعني ترجيح قول بمجرد كثرة القائلين؛ يلزم النظر في رتبة الناقد، وتاريخ قوله، وسياقه، ونص المصدر.",
+  };
+}
+
+export function listScholarResearchCandidates({ query } = {}) {
+  const q = normalize(query);
+  return allScholars().filter((item) => !q || normalize(item.nameAr).includes(q)).map((item) => ({
+    ...item,
+    evidenceCount: (opinions.records || []).filter((record) => record.subjectScholarId === item.id).length,
+  }));
+}
