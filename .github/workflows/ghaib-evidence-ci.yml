@@ -1,0 +1,39 @@
+name: Ghaib Evidence CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'config/ghaib-source-framework-2026.json'
+      - 'data/ghaib/**'
+      - 'src/ghaib-evidence-router.js'
+      - 'test/ghaib-evidence-router.test.js'
+      - '.github/workflows/ghaib-evidence-ci.yml'
+  pull_request:
+    paths:
+      - 'config/ghaib-source-framework-2026.json'
+      - 'data/ghaib/**'
+      - 'src/ghaib-evidence-router.js'
+      - 'test/ghaib-evidence-router.test.js'
+      - '.github/workflows/ghaib-evidence-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ghaib-evidence-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Validate evidence JSON
+        run: node -e "for (const f of ['config/ghaib-source-framework-2026.json','data/ghaib/evidence-seed-2026.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('Evidence JSON OK')"
+      - name: Run evidence router tests
+        run: node test/ghaib-evidence-router.test.js
