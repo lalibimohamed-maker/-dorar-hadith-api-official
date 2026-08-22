@@ -1,6 +1,6 @@
 {
   "titleAr":"مصادر اللغة العربية الأساسية وربطها بالفقه والترجمة",
-  "version":"2026.2",
+  "version":"2026.3",
   "policy":{"role":"primary-language-reference","arabicOriginalPreserved":true,"translationCannotReplaceOriginal":true,"classicalAndModernSeparated":true,"terminologyMustCarryProvenance":true,"lexiconCannotOverrideFiqhContext":true},
   "sources":[
     {"id":"cairo-arabic-academy","nameAr":"مجمع اللغة العربية بالقاهرة","url":"https://www.arabicacademy.gov.eg/ar","kind":"arabic-academy","priority":"primary","coverage":["lexicography","terminology","grammar","heritage","quranic-lexicon"]},
@@ -11,7 +11,8 @@
     {"id":"riyadh-lexicon","nameAr":"معجم الرياض","url":"https://siwar.ksaa.gov.sa/public-dict-information/Riyadh","kind":"modern-dictionary","priority":"primary","coverage":["modern-arabic","lexicography","search"]},
     {"id":"siwar-dictionaries","nameAr":"منصة سوار للمعاجم اللغوية","url":"https://siwar.ksaa.gov.sa/home","kind":"digital-lexicography","priority":"primary","coverage":["dictionaries","computational-linguistics","terminology","semantic-relations","apis"]},
     {"id":"falak-corpora","nameAr":"منصة فلك للمدونات اللغوية","url":"https://arai.ksaa.gov.sa/","kind":"linguistic-corpus","priority":"primary-linguistic-support","coverage":["corpora","usage","computational-linguistics"]},
-    {"id":"quranic-arabic-corpus","nameAr":"Quranic Arabic Corpus - مورد لغوي بحثي","url":"https://corpus.quran.com/","kind":"linguistic-corpus","priority":"primary-linguistic-support","coverage":["morphology","syntax","i3rab","ontology","quranic-arabic"],"licenseNote":"Use subject to the corpus license and attribution terms; do not treat its English translation as the Arabic source."}
+    {"id":"quranic-arabic-corpus","nameAr":"Quranic Arabic Corpus - مورد لغوي بحثي","url":"https://corpus.quran.com/","kind":"linguistic-corpus","priority":"primary-linguistic-support","coverage":["morphology","syntax","i3rab","ontology","quranic-arabic"],"licenseNote":"Use subject to the corpus license and attribution terms; do not treat its English translation as the Arabic source."},
+    {"id":"lisan-al-arab-reference","nameAr":"لسان العرب - ابن منظور","url":"https://archive.org/search?query=%D9%84%D8%B3%D8%A7%D9%86%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8","kind":"classical-lexicon-reference","priority":"primary-classical-reference","coverage":["classical-arabic","lexicography","semantics"],"licenseNote":"Catalog/reference record only unless a lawful full-text source is confirmed."}
   ],
   "classicalReferenceFamilies":[
     {"id":"classical-lexicons","examples":["لسان العرب","تاج العروس","مقاييس اللغة","الصحاح","مفردات ألفاظ القرآن"],"role":"primary-classical-language-reference"},
