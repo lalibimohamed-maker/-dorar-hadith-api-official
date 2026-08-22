@@ -13,6 +13,7 @@ function readJson(name, fallback) {
 
 const fatwaExpansion = readJson("fatwa-source-expansion-2026.json", { sources: [], taxonomy: [] });
 const contemporaryScholars = readJson("contemporary-sunni-scholars.json", { scholars: [] });
+const knowledgeExpansion = readJson("knowledge-source-expansion-2026.json", { sources: [], policy: {}, rules: {} });
 
 const fatwaSources = (fatwaExpansion.sources || []).map((source) => ({
   ...source,
@@ -37,16 +38,30 @@ const scholarSources = (contemporaryScholars.scholars || []).flatMap((scholar) =
   }))
 );
 
+const expandedSources = (knowledgeExpansion.sources || []).map((source) => ({
+  ...source,
+  sourceKind: source.role || "knowledge-source",
+  attributionRequired: true,
+  noEndorsementByInclusion: true,
+  reusePolicy: source.reuse || "catalog-and-link-unless-licensed",
+}));
+
 const categories = [
   ...registry.categories,
   { id: "fatwa", nameAr: "الفتاوى ومصادر العلماء" },
-];
+  { id: "history", nameAr: "التاريخ والأخبار" },
+  { id: "companions", nameAr: "أخبار الصحابة وتراجمهم" },
+  { id: "genealogy", nameAr: "الأنساب والقبائل" },
+  { id: "hadith-sciences", nameAr: "علوم الحديث ونقد الرواية" },
+  { id: "scholars", nameAr: "مصادر العلماء" },
+].filter((category, index, all) => all.findIndex((item) => item.id === category.id) === index);
 
 const sourceIds = new Set(registry.sources.map((source) => source.id));
 const mergedSources = [
   ...registry.sources,
   ...fatwaSources.filter((source) => !sourceIds.has(source.id)),
   ...scholarSources.filter((source) => !sourceIds.has(source.id)),
+  ...expandedSources.filter((source) => !sourceIds.has(source.id)),
 ];
 
 const mergedRegistry = {
@@ -58,6 +73,11 @@ const mergedRegistry = {
     sourceCount: mergedSources.filter((source) => source.category === "fatwa").length,
     scholarCount: new Set(scholarSources.map((source) => source.scholar).filter(Boolean)).size,
     policy: fatwaExpansion.policy || null,
+  },
+  knowledgeExpansion: {
+    policy: knowledgeExpansion.policy || {},
+    rules: knowledgeExpansion.rules || {},
+    sourceCount: expandedSources.length,
   },
 };
 
