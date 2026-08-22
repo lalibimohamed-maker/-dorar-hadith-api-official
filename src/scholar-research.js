@@ -1,6 +1,6 @@
-import fs from "node:fs";
+import "node:fs" from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath } from "url";
 import domainFramework from "../config/domain-scholar-framework.json" with { type: "json" };
 import contemporary from "../config/contemporary-sunni-scholars.json" with { type: "json" };
 import fiqhSources from "../config/fiqh-fatawa-sources.json" with { type: "json" };
@@ -10,6 +10,10 @@ import { listBooks } from "./book-catalog.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const opinions = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "config", "scholar-opinions-index.json"), "utf8"));
 
+const SCHOLAR_ALIASES = {
+  ibn_taymiyyah: ["ابن تيمية", "أحمد بن تيمية", "تقي الدين ابن تيمية", "شيخ الإسلام ابن تيمية"],
+};
+
 function normalize(value) {
   return String(value || "")
     .toLocaleLowerCase("ar")
@@ -18,6 +22,10 @@ function normalize(value) {
     .replace(/ة/g, "ه")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function aliasesForScholar(scholar) {
+  return [scholar?.nameAr, scholar?.id, ...(SCHOLAR_ALIASES[scholar?.id] || [])].filter(Boolean);
 }
 
 function allScholars() {
@@ -58,7 +66,10 @@ function allScholars() {
 
 function findScholar(nameOrId) {
   const needle = normalize(nameOrId);
-  return allScholars().find((item) => item.id === nameOrId || normalize(item.nameAr) === needle || normalize(item.nameAr).includes(needle)) || null;
+  return allScholars().find((item) => aliasesForScholar(item).some((alias) => {
+    const normalizedAlias = normalize(alias);
+    return item.id === nameOrId || normalizedAlias === needle || normalizedAlias.includes(needle) || needle.includes(normalizedAlias);
+  })) || null;
 }
 
 function sourceBooksForScholar(scholar) {
@@ -104,8 +115,13 @@ export function searchScholars(query, { limit = 20, era, verifiedOnly = false } 
     .filter((item) => !era || item.era === era)
     .filter((item) => !verifiedOnly || ["verified", "supported"].includes(item.verification))
     .map((item) => {
-      const haystack = normalize([item.nameAr, item.id, ...(item.domains || [])].join(" "));
-      const score = haystack === q ? 100 : haystack.includes(q) ? 90 : q.split(" ").filter((token) => haystack.includes(token)).length * 20;
+      const haystack = aliasesForScholar(item).map(normalize).join(" ");
+      const exactAlias = aliasesForScholar(item).some((alias) => normalize(alias) === q);
+      const partialAlias = aliasesForScholar(item).some((alias) => {
+        const normalizedAlias = normalize(alias);
+        return normalizedAlias.includes(q) || q.includes(normalizedAlias);
+      });
+      const score = exactAlias ? 100 : partialAlias ? 90 : q.split(" ").filter((token) => haystack.includes(token)).length * 20;
       return { ...item, score };
     })
     .filter((item) => item.score > 0)
@@ -176,7 +192,7 @@ export function compareScholarOpinions(nameOrId) {
 
 export function listScholarResearchCandidates({ query } = {}) {
   const q = normalize(query);
-  return allScholars().filter((item) => !q || normalize(item.nameAr).includes(q)).map((item) => ({
+  return allScholars().filter((item) => !q || aliasesForScholar(item).some((alias) => normalize(alias).includes(q))).map((item) => ({
     ...item,
     evidenceCount: (opinions.records || []).filter((record) => record.subjectScholarId === item.id).length,
   }));
