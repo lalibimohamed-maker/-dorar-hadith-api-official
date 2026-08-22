@@ -1,0 +1,15 @@
+{
+  "version":"2026.11",
+  "parallelTracks":[
+    {"id":"A","name":"official-fatwa","priority":1,"targets":["SA","EG","DZ","QA","JO","KW","OM","BH","AE","MA","TN","MR","SD","MY","TR"]},
+    {"id":"B","name":"hadith-and-athar","priority":1,"targets":["canonical-six-books","musnad-ahmad","major-hadith-collections","rijal-and-takhrij"]},
+    {"id":"C","name":"quran-and-tafsir","priority":1,"targets":["quran","quran-sciences","canonical-tafsir","tafsir-methodology","qiraat"]},
+    {"id":"D","name":"fiqh-and-usul","priority":1,"targets":["madhhab-primary-texts","comparative-fiqh","usul","legal-maxims"]},
+    {"id":"E","name":"sirah-biography-history","priority":2,"targets":["sirah","maghazi","companions","followers","scholars","history"]},
+    {"id":"F","name":"arabic-language","priority":2,"targets":["lexicons","grammar","morphology","rhetoric","terminology"]},
+    {"id":"G","name":"research-and-institutions","priority":2,"targets":["official-research","journals","resolutions","fatwa-councils","bibliography"]},
+    {"id":"H","name":"translation","priority":3,"targets":["20-priority-languages","world-language-expansion"]}
+  ],
+  "deduplication":{"by":"sourceId+edition+locator+contentHash","neverMergeConflictingEditions":true},
+  "audit":{"everyBatchHasManifest":true,"everyPublishedUnitHasProvenance":true,"failedUnitsRetained":true}
+}
