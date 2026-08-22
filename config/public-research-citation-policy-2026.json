@@ -1,0 +1,38 @@
+{
+  "version":"2026.8",
+  "objective":"إجابة المتصفح ببحث موثق قابل لإعادة التحقق في الفقه والفتوى والحديث والتفسير والسيرة وسائر المجالات",
+  "answerContract": {
+    "required": ["answerLanguage","claim","sourceType","sourceTitle","sourceLocator","sourceAuthority","originalTextOrExcerpt","translationStatus","verificationStatus"],
+    "citationMustBeTraceable":true,
+    "originalSourceRemainsCanonical":true
+  },
+  "sourceTypes":["quran","hadith","athar","tafsir","fiqh","fatwa","usul-al-fiqh","aqidah","sirah","biography","history","arabic-language","research","dictionary"],
+  "verification": {
+    "levels":["source-verified","edition-verified","institution-verified","scholar-reviewed","translation-reviewed"],
+    "noVerifiedClaimWithoutLocator":true,
+    "conflictingSourcesMustRemainSeparate":true,
+    "secondarySourceCannotOverwritePrimary":true
+  },
+  "multilingual": {
+    "twentyPriorityLanguages":["ar","en","fr","es","de","tr","ur","id","ms","bn","hi","ru","fa","zh","sw","ha","pt","it","ja","ko"],
+    "worldLanguages":true,
+    "displayOriginalAlongsideTranslation":true,
+    "translationNeverReplacesArabic":true
+  },
+  "researchMode": {
+    "supportsSourceLists":true,
+    "supportsClaimByClaimCitations":true,
+    "supportsCompareSources":true,
+    "supportsCitationExport":true,
+    "supportsVerificationView":true
+  },
+  "verificationView": {
+    "show": ["originalText","translation","book","author","institution","edition","volume","pageOrNumber","officialUrl","retrievedAt","rightsStatus","reviewStatus"],
+    "tamperEvidence":"textHashWhenAvailable"
+  },
+  "publication": {
+    "unknownRights":"metadata-and-link-only",
+    "machineTranslation":"clearly-labeled-unless-reviewed",
+    "sensitiveFatwa":"human-review-required-before-published-translation"
+  }
+}
