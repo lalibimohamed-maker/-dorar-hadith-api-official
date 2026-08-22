@@ -1,0 +1,19 @@
+{
+  "version":"2026.16",
+  "status":"seed-catalog-only",
+  "purpose":"Initial machine-readable records for real corpus ingestion; records point to authoritative sources and do not reproduce copyrighted corpora.",
+  "records":[
+    {"id":"quran:3:85","type":"quran_ayah","domain":"quran","surah":3,"ayah":85,"canonicalLanguage":"ar","canonicalTextStatus":"external-authoritative-source","source":{"authority":"King Fahd Quran Complex","role":"official-quran-source"}},
+    {"id":"quran:word:3:85:islam","type":"quran_word","domain":"quran","ayahId":"quran:3:85","lemma":"الإسلام","interaction":"long-press-context-card"},
+    {"id":"aqidah:iman:allah","type":"concept","domain":"aqidah","labelAr":"الإيمان بالله","relatedConcepts":["aqidah:iman","aqidah:tawhid"]},
+    {"id":"aqidah:arkan-al-iman","type":"concept","domain":"aqidah","labelAr":"أركان الإيمان","relatedConcepts":["aqidah:iman:allah"]},
+    {"id":"fiqh:salah","type":"concept","domain":"fiqh","labelAr":"الصلاة","interaction":"long-press-context-card"},
+    {"id":"hadith:methodology","type":"concept","domain":"hadith","labelAr":"تخريج الحديث وحكمه","source":{"authority":"Saudi General Presidency scholarly hadith program","role":"official-digital-hadith-resource"}},
+    {"id":"fatwa:saudi:authority","type":"authority","domain":"fatwa","authority":"General Presidency of Scholarly Research and Ifta","country":"Saudi Arabia","source":"official-site"},
+    {"id":"fatwa:egypt:authority","type":"authority","domain":"fatwa","authority":"Egyptian Dar al-Ifta","country":"Egypt","source":"official-site"},
+    {"id":"fiqh:iifa:resolutions","type":"authority","domain":"fiqh","authority":"International Islamic Fiqh Academy","scope":"international","source":"official-site"}
+  ],
+  "translationPolicy":{"canonicalArabicPreserved":true,"verifiedMeaningTranslationLinkedById":true,"machineTranslationNeverCanonical":true},
+  "verification":{"recordState":"pending-content-ingestion","requiresSourceCheck":true,"requiresRightsCheck":true,"requiresAttributionCheck":true},
+  "nextStage":"populate records from permitted/official source exports and indexed references"
+}
