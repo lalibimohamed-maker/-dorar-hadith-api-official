@@ -1,0 +1,30 @@
+{
+  "version":"2026.14",
+  "feature":"optional-bilingual-search",
+  "defaultMode":"single-language",
+  "uiLanguage":"auto-from-user-selection",
+  "secondLanguage":"auto-from-search-language",
+  "behavior":{
+    "off":"Search and display results in the user's selected language, with access to the Arabic original when available.",
+    "on":"Show the verified Arabic original together with an available verified meaning translation in the selected/search language.",
+    "neverRequireBilingualForEverySearch":true
+  },
+  "translationPolicy":{
+    "preferred":"verified-human-or-official-meaning-translation",
+    "neverPresentMachineTranslationAsVerified":true,
+    "machineTranslation":"optional-separate-assistance-only",
+    "missingVerifiedTranslation":"show-original-and-do-not-invent-a-verified-translation"
+  },
+  "languageRouting":{
+    "sourceLanguage":"Arabic when the canonical source is Arabic",
+    "targetLanguage":"user-selected-or-search-language",
+    "supportedPairs":"Arabic plus any supported interface/search language",
+    "manualOverride":true
+  },
+  "display":{
+    "single":"localized-result + optional Arabic original",
+    "bilingual":"Arabic original + verified meaning translation",
+    "verification":"source and provenance available on demand"
+  },
+  "persistence":"store preference per user/browser settings without changing the canonical source record"
+}
