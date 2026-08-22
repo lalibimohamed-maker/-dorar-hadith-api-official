@@ -23,12 +23,33 @@ jobs:
           RUN_ID: ${{ github.event.workflow_run.id }}
         run: gh run rerun "$RUN_ID" --failed --repo "$GITHUB_REPOSITORY"
 
-      - name: Open/update automatic failure report
+      - name: Diagnose failed run after retry
         if: ${{ github.event.workflow_run.run_attempt > 1 }}
         uses: actions/github-script@v7
         with:
           script: |
             const run = context.payload.workflow_run;
+            const jobs = await github.paginate(
+              github.rest.actions.listJobsForWorkflowRun,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: run.id,
+                per_page: 100
+              }
+            );
+
+            const failedJobs = jobs.filter(j => j.conclusion !== 'success');
+            const lines = failedJobs.length
+              ? failedJobs.map(job => {
+                  const failedSteps = (job.steps || [])
+                    .filter(step => step.conclusion !== 'success' && step.conclusion !== 'skipped')
+                    .map(step => `  - ${step.name}: ${step.conclusion}`)
+                    .join('\n');
+                  return `- **${job.name}** — ${job.conclusion}\n${failedSteps || '  - No failed step summary returned.'}`;
+                }).join('\n')
+              : '- No failed job details were returned by the Actions API.';
+
             const title = `CI failure requires repair: run #${run.run_number}`;
             const body = [
               '## Automatic CI recovery report',
@@ -39,24 +60,59 @@ jobs:
               `Attempt: ${run.run_attempt}`,
               `URL: ${run.html_url}`,
               '',
-              'The first automatic retry did not pass. This issue is intentionally opened instead of deleting or replacing source files blindly.',
-              'A repair must be based on the failing job logs and the smallest deterministic code change.'
-            ].join('\\n');
+              '### Failed jobs / steps',
+              lines,
+              '',
+              'The first retry did not pass. Source files are not deleted or replaced blindly.',
+              'The next repair should target the smallest deterministic cause, then CI must pass again.'
+            ].join('\n');
 
-            const existing = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: 'ci-auto-recovery',
-              per_page: 100
-            });
-            const sameRun = existing.data.find(i => i.title === title);
-            if (!sameRun) {
+            const labelName = 'ci-auto-recovery';
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: labelName
+              });
+            } catch (error) {
+              if (error.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: labelName,
+                  description: 'Automatic CI failure and recovery tracking',
+                  color: 'B60205'
+                });
+              } else {
+                throw error;
+              }
+            }
+
+            const existing = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: labelName,
+                per_page: 100
+              }
+            );
+
+            const sameRun = existing.find(i => i.title === title);
+            if (sameRun) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: sameRun.number,
+                body
+              });
+            } else {
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title,
                 body,
-                labels: ['ci-auto-recovery']
+                labels: [labelName]
               });
             }
