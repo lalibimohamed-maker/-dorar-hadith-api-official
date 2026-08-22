@@ -11,7 +11,8 @@
     "test": "node --test",
     "scholar:batch": "node scripts/run-scholar-opinions-batch.js",
     "scholar:probe": "node scripts/probe-official-scholar-sources.js",
-    "rijal:official": "node -e \"import('./src/official-source-verifier.js').then(m=>console.log(JSON.stringify(m.listOfficialSources(),null,2)))\""
+    "rijal:official": "node -e \"import('./src/official-source-verifier.js').then(m=>console.log(JSON.stringify(m.listOfficialSources(),null,2)))\"",
+    "rijal:batch": "node scripts/run-rijal-ingestion-batch.js"
   },
   "engines": {
     "node": ">=20"
