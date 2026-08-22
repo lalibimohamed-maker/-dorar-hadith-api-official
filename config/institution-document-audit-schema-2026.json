@@ -1,0 +1,10 @@
+{
+  "version":"2026.8",
+  "required":["institutionId","country","institution","documentId","documentTitle","documentType","officialUrl","retrievedAt","institutionStatus","documentStatus","rightsStatus","editionOrRevision","locator","contentIntegrity"],
+  "institutionStatusValues":["verified","pending","unverified"],
+  "documentStatusValues":["discovered","source-verified","edition-verified","rights-verified","indexed","reviewed","published"],
+  "rightsStatusValues":["licensed","public-domain","link-only","unknown"],
+  "contentIntegrity":{"originalPreserved":true,"hashRecommended":true,"noSilentEdits":true},
+  "locator":{"oneOf":["fatwaId","page","volumePage","chapterSection","hadithNumber","officialAnchor"]},
+  "publicationRule":"Institution verification alone cannot promote a document to published full-text status."
+}
