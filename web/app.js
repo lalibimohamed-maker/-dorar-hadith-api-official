@@ -2,6 +2,9 @@ const params = new URLSearchParams(location.search);
 const savedBase = localStorage.getItem("deenAllahApiBase") || "";
 const apiBase = (params.get("api") || savedBase).replace(/\/$/, "");
 const $ = (id) => document.getElementById(id);
+const browserLanguage = (navigator.language || "ar").split("-")[0].toLowerCase();
+let longPressTimer = null;
+let longPressTarget = null;
 
 function show(id, value) { const el = $(id); if (el) el.innerHTML = value; }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>\"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
@@ -14,55 +17,101 @@ async function api(path, options = {}) {
   return data;
 }
 
-async function checkApi() {
-  if (!apiBase) {
-    show("api-status", "⚠️ الواجهة جاهزة، لكن عنوان API لم يُضبط بعد. ضع عنوان الخدمة في إعدادات الربط أدناه.");
-    return false;
-  }
+function ensureConceptModal() {
+  if ($("concept-modal")) return;
+  const modal = document.createElement("div");
+  modal.id = "concept-modal";
+  modal.hidden = true;
+  modal.innerHTML = `<div class="concept-backdrop" data-close-concept></div><section class="concept-dialog" role="dialog" aria-modal="true" aria-labelledby="concept-title"><button class="concept-close" data-close-concept aria-label="إغلاق">×</button><div id="concept-body"><p>جارٍ التحميل…</p></div></section>`;
+  document.body.appendChild(modal);
+  modal.addEventListener("click", e => { if (e.target.matches("[data-close-concept]")) closeConcept(); });
+}
+
+function closeConcept() { const modal = $("concept-modal"); if (modal) modal.hidden = true; }
+
+function renderConcept(data) {
+  ensureConceptModal();
+  const r = data.record || {};
+  const m = data.methodology || {};
+  const routing = data.routing || {};
+  const primary = Array.isArray(m.primaryBasis) ? m.primaryBasis : [];
+  const sourcePriority = Array.isArray(m.sourcePriority) ? m.sourcePriority : [];
+  const sections = data.knowledge || {};
+  const text = sections.definition || sections.contextual_meaning || "لا توجد مادة تفسيرية موثقة مرتبطة بهذه الوحدة حتى الآن؛ هذه البطاقة تعرض نطاق التوجيه ومصادر التحقق المتاحة دون توليد نسبة غير موثقة.";
+  $("concept-body").innerHTML = `<h2 id="concept-title">${escapeHtml(data.term || r.title_ar || "المفهوم")}</h2><div class="concept-meta"><span>ضغط مطوّل 5 ثوانٍ</span><span>${escapeHtml(data.language || browserLanguage)}</span>${r.domain ? `<span>${escapeHtml(r.domain)}</span>` : ""}</div><p class="concept-text">${escapeHtml(text)}</p>${m.mode ? `<div class="concept-policy"><b>منهج العرض:</b> ${escapeHtml(m.display?.primaryLabel || m.mode)}<br><b>الأصول الأساسية:</b> ${escapeHtml(primary.join("، ") || "القرآن والسنة الصحيحة")}</div>` : ""}${routing.source_classes ? `<div class="concept-policy"><b>توجيه المجال:</b> ${escapeHtml(routing.source_classes.join("، "))}</div>` : ""}<div class="concept-sources"><b>المصادر والتوثيق</b><p>يُفتح الأصل عند الطلب، ولا تُعرض نسبة قول أو حكم على أنه موثق ما لم يجتز بوابة التحقق.</p>${sourcePriority.length ? `<details><summary>ترتيب طبقة المصادر</summary><ol>${sourcePriority.map(s => `<li>${escapeHtml(s.source || s.label || "مصدر")}</li>`).join("")}</ol></details>` : ""}</div>${r.links?.length ? `<div class="concept-links"><b>روابط المفهوم:</b> ${r.links.map(x => `<span>${escapeHtml(x)}</span>`).join(" · ")}</div>` : ""}`;
+  $("concept-modal").hidden = false;
+}
+
+async function openConcept(term, contextId, comparative = false) {
+  ensureConceptModal();
+  $("concept-body").innerHTML = `<p>جارٍ بناء بطاقة <b>${escapeHtml(term)}</b> وفق طبقة المصادر…</p>`;
+  $("concept-modal").hidden = false;
   try {
-    const data = await api("/health");
-    show("api-status", `🟢 API متصل — ${escapeHtml(data.name || "موسوعة دين الله")} — الإصدار ${escapeHtml(data.version || "")}`);
-    return true;
+    const data = await api(`/api/v1/concept?term=${encodeURIComponent(term)}&context=${encodeURIComponent(contextId || "")}&lang=${encodeURIComponent(browserLanguage)}&comparative=${comparative ? "true" : "false"}`);
+    renderConcept(data);
   } catch (error) {
-    show("api-status", `🔴 تعذر الاتصال بالـAPI: ${escapeHtml(error.message)}`);
-    return false;
+    $("concept-body").innerHTML = `<p class="error">تعذر فتح بطاقة المفهوم: ${escapeHtml(error.message)}</p>`;
   }
+}
+
+function selectedTerm(fallback) {
+  const selection = window.getSelection?.();
+  const text = selection ? String(selection.toString() || "").trim() : "";
+  return text.replace(/\s+/g, " ").slice(0, 120) || fallback;
+}
+
+function attachLongPressHandlers() {
+  document.querySelectorAll("[data-concept-id]").forEach(el => {
+    const start = (event) => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      clearTimeout(longPressTimer);
+      longPressTarget = el;
+      el.classList.add("long-press-pending");
+      longPressTimer = setTimeout(() => {
+        el.classList.remove("long-press-pending");
+        const term = selectedTerm(el.dataset.term || "المفهوم");
+        openConcept(term, el.dataset.conceptId);
+      }, 5000);
+    };
+    const cancel = () => { clearTimeout(longPressTimer); longPressTimer = null; if (longPressTarget) longPressTarget.classList.remove("long-press-pending"); longPressTarget = null; };
+    el.addEventListener("pointerdown", start, { passive: true });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(type => el.addEventListener(type, cancel));
+    el.addEventListener("contextmenu", e => e.preventDefault());
+  });
+}
+
+async function checkApi() {
+  if (!apiBase) { show("api-status", "⚠️ الواجهة جاهزة، لكن عنوان API لم يُضبط بعد. ضع عنوان الخدمة في إعدادات الربط أدناه."); return false; }
+  try { const data = await api("/health"); show("api-status", `🟢 API متصل — ${escapeHtml(data.name || "موسوعة دين الله")} — الإصدار ${escapeHtml(data.version || "")}`); return true; }
+  catch (error) { show("api-status", `🔴 تعذر الاتصال بالـAPI: ${escapeHtml(error.message)}`); return false; }
 }
 
 async function search() {
   const q = $("query").value.trim();
   if (!q) return;
-  show("results", "<p>جارٍ البحث مع حفظ نسبة كل نتيجة إلى مصدرها…</p>");
+  show("results", "<p>جارٍ البحث… والنتائج قابلة لفتح بطاقة المفهوم بالضغط المطوّل 5 ثوانٍ.</p>");
   try {
-    const data = await api(`/search?q=${encodeURIComponent(q)}&lang=ar&includePotentialMatches=true`);
+    const data = await api(`/api/v1/search?q=${encodeURIComponent(q)}&lang=${encodeURIComponent(browserLanguage)}&bilingual=false`);
     const results = data.results || data.items || data.hits || [];
     if (!results.length) { show("results", "<p>لم تظهر نتائج مطابقة في المصدر الموصول.</p>"); return; }
-    show("results", `<h3>نتائج البحث</h3><div class="result-grid">${results.slice(0, 40).map((r) => `<article class="result"><b>${escapeHtml(r.title || r.name || r.text || "نتيجة")}</b><p>${escapeHtml(r.snippet || r.text || r.description || "")}</p><small>المصدر: ${escapeHtml(r.source || r.sourceName || r.provider || "غير محدد")}</small></article>`).join("")}</div>`);
-  } catch (error) {
-    show("results", `<p class="error">تعذر تنفيذ البحث: ${escapeHtml(error.message)}</p>`);
-  }
+    show("results", `<h3>نتائج البحث</h3><p class="muted">اضغط مطولاً على أي كلمة/نتيجة لمدة 5 ثوانٍ لفتح بطاقة متوسطة فوق البحث.</p><div class="result-grid">${results.slice(0, 40).map((r) => `<article class="result concept-target" data-concept-id="${escapeHtml(r.id || r.recordId || "")}" data-term="${escapeHtml(r.title_ar || r.title || r.name || "نتيجة")}"><b>${escapeHtml(r.title_ar || r.title || r.name || "نتيجة")}</b><p>${escapeHtml(r.snippet || r.text || r.description || "اضغط مطولاً لعرض بطاقة المفهوم والتوجيه المنهجي.")}</p><small>المجال: ${escapeHtml(r.domain || "عام")} — ${escapeHtml(r.methodology?.mode || "domain_sources")}</small></article>`).join("")}</div>`);
+    attachLongPressHandlers();
+  } catch (error) { show("results", `<p class="error">تعذر تنفيذ البحث: ${escapeHtml(error.message)}</p>`); }
 }
 
 async function loadSources(category) {
   show("results", "<p>جارٍ تحميل المصادر…</p>");
-  try {
-    const data = await api(`/sources?category=${encodeURIComponent(category)}`);
-    const sources = data.sources || [];
-    show("results", `<h3>مصادر ${escapeHtml(category)}</h3><div class="result-grid">${sources.map(s => `<article class="result"><b>${escapeHtml(s.nameAr || s.name || s.id)}</b><p>${escapeHtml(s.role || "مصدر")}</p>${s.url ? `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener">فتح المصدر</a>` : ""}</article>`).join("")}</div>`);
-  } catch (error) { show("results", `<p class="error">${escapeHtml(error.message)}</p>`); }
+  try { const data = await api(`/sources?category=${encodeURIComponent(category)}`); const sources = data.sources || []; show("results", `<h3>مصادر ${escapeHtml(category)}</h3><div class="result-grid">${sources.map(s => `<article class="result"><b>${escapeHtml(s.nameAr || s.name || s.id)}</b><p>${escapeHtml(s.role || "مصدر")}</p>${s.url ? `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener">فتح المصدر</a>` : ""}</article>`).join("")}</div>`); }
+  catch (error) { show("results", `<p class="error">${escapeHtml(error.message)}</p>`); }
 }
 
-function saveApi() {
-  const value = $("api-base").value.trim().replace(/\/$/, "");
-  localStorage.setItem("deenAllahApiBase", value);
-  location.search = value ? `?api=${encodeURIComponent(value)}` : "";
-}
+function saveApi() { const value = $("api-base").value.trim().replace(/\/$/, ""); localStorage.setItem("deenAllahApiBase", value); location.search = value ? `?api=${encodeURIComponent(value)}` : ""; }
 
+ensureConceptModal();
 $("api-base").value = apiBase;
 $("search-btn").addEventListener("click", search);
 $("query").addEventListener("keydown", e => { if (e.key === "Enter") search(); });
 $("save-api").addEventListener("click", saveApi);
 $("api-check").addEventListener("click", checkApi);
-
 document.querySelectorAll("[data-category]").forEach(el => el.addEventListener("click", () => loadSources(el.dataset.category)));
 checkApi();
