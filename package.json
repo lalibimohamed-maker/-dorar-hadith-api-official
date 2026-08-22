@@ -9,7 +9,8 @@
     "start": "node dorar_json_api.js",
     "health": "find . -type f -name '*.js' -not -path './node_modules/*' -print0 | xargs -0 -n1 node --check",
     "test": "node --test",
-    "scholar:batch": "node scripts/run-scholar-opinions-batch.js"
+    "scholar:batch": "node scripts/run-scholar-opinions-batch.js",
+    "scholar:probe": "node scripts/probe-official-scholar-sources.js"
   },
   "engines": {
     "node": ">=20"
