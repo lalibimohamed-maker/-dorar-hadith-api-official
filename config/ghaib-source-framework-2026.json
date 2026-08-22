@@ -1,0 +1,42 @@
+{
+  "version":"2026.08.22",
+  "status":"framework",
+  "purpose":"Evidence-first routing for unseen-world, afterlife, prophets, angels, jinn, ruh, divine attributes and related questions.",
+  "domains":[
+    {"id":"allah","title_ar":"الله وأسماؤه وصفاته","requires_aqidah_review":true},
+    {"id":"angels","title_ar":"الملائكة","requires_aqidah_review":true},
+    {"id":"ruh","title_ar":"الروح","requires_aqidah_review":true},
+    {"id":"jinn","title_ar":"الجن","requires_aqidah_review":true},
+    {"id":"shaytan","title_ar":"الشيطان وإبليس","requires_aqidah_review":true},
+    {"id":"death","title_ar":"الموت والاحتضار"},
+    {"id":"barzakh","title_ar":"البرزخ"},
+    {"id":"grave","title_ar":"القبر ونعيمه وعذابه"},
+    {"id":"resurrection","title_ar":"البعث والنشور"},
+    {"id":"gathering","title_ar":"الحشر"},
+    {"id":"judgement","title_ar":"الحساب والميزان والصراط"},
+    {"id":"hawd","title_ar":"الحوض"},
+    {"id":"intercession","title_ar":"الشفاعة"},
+    {"id":"paradise","title_ar":"الجنة ودرجاتها وأبوابها ونعيمها"},
+    {"id":"hellfire","title_ar":"النار ودركاتها وأبوابها وعذابها"},
+    {"id":"eschatology","title_ar":"أشراط الساعة وأحداث آخر الزمان"},
+    {"id":"unseen_keys","title_ar":"مفاتيح الغيب","requires_aqidah_review":true},
+    {"id":"prophetic_stories","title_ar":"قصص الأنبياء من الوحي والآثار"}
+  ],
+  "evidenceOrder":["quran","sahih_hadith","hasan_hadith","verified_companion_report","verified_early_scholar_report","scholarly_work_with_citation","unverified_report"],
+  "disallowedAsVerifiedEvidence":["fabricated_hadith","unattributed_story","unknown_source","generated_text"],
+  "displayRules":{
+    "originalArabicPreserved":true,
+    "translationIsMeaningOnly":true,
+    "sourceAndGradeRequiredForHadith":true,
+    "bookPresenceDoesNotProveAuthenticity":true,
+    "disagreementPreserved":true,
+    "unverifiedHiddenFromTrustedAnswer":true,
+    "claimMustCarryEvidenceClass":true
+  },
+  "scholarWorksPolicy":{
+    "useWorksForScholarAttribution":true,
+    "neverPromoteBookPresenceToPropheticAuthenticity":true,
+    "quoteOnlyWhenSourceRecordExists":true,
+    "contextAndEditionRequiredWhenAvailable":true
+  }
+}
