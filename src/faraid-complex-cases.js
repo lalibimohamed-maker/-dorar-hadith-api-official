@@ -2,6 +2,7 @@ import {
   analyzePregnancy,
   analyzeMissingPerson,
   analyzeAmbiguousSex,
+  analyzeGrandfatherWithSiblings,
   analyzeMunasakhat
 } from "./faraid-advanced.js";
 
@@ -98,6 +99,7 @@ export function getComplexFaraidCase(id) {
 
 export function analyzeComplexFaraidCase(id, input = {}) {
   switch (id) {
+    case "grandfather-with-siblings": return analyzeGrandfatherWithSiblings(input);
     case "pregnancy": return analyzePregnancy(input);
     case "missing-person": return analyzeMissingPerson(input);
     case "khuntha": return analyzeAmbiguousSex(input);
