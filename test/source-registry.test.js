@@ -28,20 +28,26 @@ test("Saudi official fatwa layer is present and institutionally separated", () =
   assert.equal(getSource("saudi-permanent-fatwa-committee").sourceKind, "permanent-fatwa-committee");
 });
 
-test("secondary national fatwa layer covers multiple countries", () => {
+test("secondary national fatwa layer covers verified countries", () => {
   const secondary = listSources({ category: "fatwa", secondary: true });
-  for (const id of ["algeria-religious-affairs-fatwa", "egypt-dar-al-ifta", "jordan-general-ifta", "palestine-dar-ifta", "libya-dar-ifta"]) {
+  for (const id of ["algeria-religious-affairs-fatwa", "egypt-dar-al-ifta", "jordan-general-ifta", "palestine-dar-ifta", "libya-dar-ifta", "malaysia-mufti-federal-territories"]) {
     assert.ok(secondary.some((source) => source.id === id));
   }
+  assert.equal(getSource("malaysia-mufti-federal-territories").sourceKind, "mufti-department");
 });
 
-test("classical fatwa layer preserves Ibn Taymiyyah collections and early heritage", () => {
-  const major = getClassicalFatwaWork("majmu-fatawa-ibn-taymiyyah");
+test("classical fatwa layer preserves distinct Ibn Taymiyyah collections and early heritage", () => {
+  const majmu = getClassicalFatwaWork("majmu-fatawa-ibn-taymiyyah");
+  const kubra = getClassicalFatwaWork("fatawa-kubra-ibn-taymiyyah");
   const supplement = getClassicalFatwaWork("mustadrak-majmu-fatawa-ibn-taymiyyah");
-  assert.ok(major);
+  assert.ok(majmu);
+  assert.ok(kubra);
   assert.ok(supplement);
-  assert.equal(major.authorAr, "أحمد بن عبد الحليم ابن تيمية");
-  assert.equal(supplement.compilerAr, "عبد الرحمن بن محمد بن قاسم ومحمد بن عبد الرحمن بن محمد بن قاسم");
+  assert.notEqual(majmu.id, kubra.id);
+  assert.equal(majmu.volumes, 37);
+  assert.equal(kubra.volumes, 6);
+  assert.equal(supplement.volumes, 5);
+  assert.equal(supplement.compilerAr, "محمد بن عبد الرحمن بن محمد بن قاسم");
   assert.ok(getClassicalFatwaWork("mussannaf-abd-al-razzaq-fatwas"));
   assert.ok(getClassicalFatwaWork("mussannaf-ibn-abi-shaybah-fatwas"));
 });
