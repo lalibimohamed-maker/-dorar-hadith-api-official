@@ -1,0 +1,63 @@
+{
+  "titleAr": "خطة شاملة لفهرسة أقوال العلماء في العلماء",
+  "version": "1.0.0",
+  "scope": "جميع العلماء المسجلين في الموسوعة، مع قابلية إضافة أي عالم جديد",
+  "policy": {
+    "sourceFirst": true,
+    "originalSourcesPreferred": true,
+    "officialAcademicSourcesAsSupport": true,
+    "preservePraiseAndCriticism": true,
+    "preserveDisagreement": true,
+    "neverInferMissingOpinions": true,
+    "neverTreatInclusionAsEndorsement": true,
+    "separatePersonStatementMethodologyHadith": true,
+    "copyright": "catalog-and-link-unless-licensed"
+  },
+  "collectionOrder": [
+    "علماء الحديث والرجال",
+    "المفسرون وأهل علوم القرآن",
+    "الفقهاء وأصول الفقه والمقاصد",
+    "علماء العقيدة والمنهج",
+    "أهل السيرة والتاريخ والتراجم والأنساب",
+    "العلماء المعاصرون",
+    "كل عالم جديد يضاف إلى سجل الموسوعة"
+  ],
+  "evidenceFields": [
+    "subjectScholarId",
+    "criticScholarId",
+    "relationshipType",
+    "wording",
+    "sourceTitle",
+    "sourceUrl",
+    "citation",
+    "dateOrEra",
+    "context",
+    "verification",
+    "sourceType",
+    "institution",
+    "notes"
+  ],
+  "sourceLayers": [
+    "نص العالم أو كتابه الأصلي",
+    "كتب التراجم والطبقات الأصلية",
+    "كتب الجرح والتعديل والعلل",
+    "المصادر الرسمية الحكومية",
+    "الجامعات الشرعية والمستودعات المؤسسية",
+    "مراكز البحوث والمكتبات الوطنية",
+    "الدراسات المحكمة والمصادر الثانوية عند الحاجة"
+  ],
+  "qualityRules": [
+    "لا يُرفع النقل من unverified إلى verified إلا بعد التحقق من المصدر",
+    "النقل الثانوي يُوسم بوضوح ولا يُعامل كأصل",
+    "الخلاف بين النقاد يحفظ ولا يختزل في حكم واحد",
+    "يُسجل سياق القول وتاريخه متى توفر",
+    "يُفصل الحكم على الشخص عن الحكم على قوله أو كتابه أو حديثه",
+    "لا يُستنتج موقف منهجي من قول منفرد دون قرائن كافية"
+  ],
+  "automation": {
+    "candidateDiscovery": true,
+    "humanOrSourceVerificationRequired": true,
+    "autoPromotionToVerified": false,
+    "periodicSourceMonitoring": true
+  }
+}
