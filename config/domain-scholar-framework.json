@@ -4,18 +4,25 @@
   "domains": {
     "aqeedah": {
       "method": ["القرآن والسنة", "فهم الصحابة والسلف", "تمييز النقل الصحيح", "عرض الخلاف العقدي عند الحاجة مع نسبته"],
+      "sourcePolicy": "لا يُستدل في طبقة عقيدة أهل السنة بمجرد كون العالم من أهل العلم أو منسوبًا إلى أحد المذاهب الفقهية الأربعة؛ يُشترط توافق المصدر مع منهج الباب وتوثيق القول.",
+      "primaryScholarFilter": "athari_or_source_verified",
+      "excludedFromPrimaryAqeedah": [
+        {"id":"al-baqillani","nameAr":"الباقلاني","classification":"Ashari theologian","allowedDomains":["usul-al-fiqh","comparative-theology"],"aqeedahRole":"comparative-only"},
+        {"id":"al-juwayni","nameAr":"الجويني","classification":"Ashari theologian","allowedDomains":["usul-al-fiqh","fiqh","comparative-theology"],"aqeedahRole":"comparative-only"},
+        {"id":"al-ghazali","nameAr":"الغزالي","classification":"Ashari theologian","allowedDomains":["usul-al-fiqh","fiqh","maqasid","comparative-theology"],"aqeedahRole":"comparative-only"}
+      ],
       "scholars": [
-        {"id":"ibn-taymiyyah","nameAr":"ابن تيمية","status":"verified-scholar-record"},
-        {"id":"ibn-al-qayyim","nameAr":"ابن القيم","status":"verified-scholar-record"},
-        {"id":"al-ajurri","nameAr":"الآجري","status":"verified-scholar-record"},
-        {"id":"al-lalikaei","nameAr":"اللالكائي","status":"verified-scholar-record"},
-        {"id":"al-barbahari","nameAr":"البربهاري","status":"verified-scholar-record"},
-        {"id":"ibn-battah","nameAr":"ابن بطة العكبري","status":"verified-scholar-record"},
-        {"id":"al-tahawi","nameAr":"الطحاوي","status":"verified-scholar-record"},
-        {"id":"al-sabuni","nameAr":"الصابوني","status":"verified-scholar-record"},
-        {"id":"al-sadi","nameAr":"السعدي","status":"verified-scholar-record"},
-        {"id":"ibn-baz","nameAr":"ابن باز","status":"verified-scholar-record"},
-        {"id":"ibn-uthaymin","nameAr":"ابن عثيمين","status":"verified-scholar-record"}
+        {"id":"ibn-taymiyyah","nameAr":"ابن تيمية","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"ibn-al-qayyim","nameAr":"ابن القيم","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"al-ajurri","nameAr":"الآجري","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"al-lalikaei","nameAr":"اللالكائي","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"al-barbahari","nameAr":"البربهاري","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"ibn-battah","nameAr":"ابن بطة العكبري","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"al-tahawi","nameAr":"الطحاوي","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"al-sabuni","nameAr":"الصابوني","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"al-sadi","nameAr":"السعدي","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"ibn-baz","nameAr":"ابن باز","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"ibn-uthaymin","nameAr":"ابن عثيمين","status":"verified-scholar-record","aqeedahRole":"primary"}
       ]
     },
     "tafsir": {
@@ -49,6 +56,7 @@
         {"id":"al-shafii","nameAr":"الشافعي","status":"verified-scholar-record"},
         {"id":"al-juwayni","nameAr":"الجويني","status":"verified-scholar-record"},
         {"id":"al-ghazali","nameAr":"الغزالي","status":"verified-scholar-record"},
+        {"id":"al-baqillani","nameAr":"الباقلاني","status":"verified-scholar-record"},
         {"id":"al-shatibi","nameAr":"الشاطبي","status":"verified-scholar-record"},
         {"id":"ibn-taymiyyah","nameAr":"ابن تيمية","status":"verified-scholar-record"},
         {"id":"ibn-al-qayyim","nameAr":"ابن القيم","status":"verified-scholar-record"},
@@ -90,6 +98,8 @@
     "preferredViewRequiresEvidence": true,
     "doNotInferAgreementFromScholarInclusion": true,
     "preserveScholarlyDisagreement": true,
+    "aqeedahPrimarySourceMustPassMethodologyFilter": true,
+    "fiqhAndUsulBenefitDoesNotImplyAqeedahEndorsement": true,
     "contemporaryScholarWorksNeedWorkLevelVerification": true,
     "copyright": "catalog-and-link-unless-licensed"
   }
