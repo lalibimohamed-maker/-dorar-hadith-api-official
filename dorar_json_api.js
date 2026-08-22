@@ -10,10 +10,11 @@ import { listQuranTranslations } from "./src/quran-translations.js";
 import { getTajweedCurriculum, getTajweedLesson } from "./src/tajweed-curriculum.js";
 import { calculateInheritance, supportedMadhahib } from "./src/inheritance-calculator.js";
 import { getComplexFaraidCase, listComplexFaraidCases } from "./src/faraid-complex-cases.js";
+import { buildFiqhResearchTemplate, getFiqhResearchFramework, listFiqhMadhahib, listFiqhResearchScholars, searchFiqhResearch } from "./src/fiqh-research.js";
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
-const API_VERSION = "0.8.5";
+const API_VERSION = "0.9.0";
 const MAX_QUERY_LENGTH = Number(process.env.MAX_QUERY_LENGTH || 300);
 const PUBLIC_WINDOW_MS = 60_000;
 const PUBLIC_MAX_PER_WINDOW = Number(process.env.PUBLIC_MAX_PER_MINUTE || 30);
@@ -59,7 +60,7 @@ const server = http.createServer(async (req, res) => {
   if (rawKey && (!app || !app.enabled)) return sendJson(res, 401, { error: "Invalid or disabled API key" });
   if (!consume(app ? `app:${keyHash}` : `ip:${clientIp(req)}`, app ? APP_MAX_PER_WINDOW : PUBLIC_MAX_PER_WINDOW, PUBLIC_WINDOW_MS)) return sendJson(res, 429, { error: "Rate limit exceeded", retryAfterSeconds: 60 });
 
-  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة دين الله", nameEn: "Deen Allah Encyclopedia", service: "Deen Allah API", version: API_VERSION, locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid", tajweed: "/tajweed", tajweedLesson: "/tajweed/lesson?id=letters", inheritance: "/inheritance?estate=100000&sons=1&daughters=1&madhhab=hanbali", inheritanceMadhahib: "/inheritance/madhahib", inheritanceComplexCases: "/inheritance/complex-cases" } });
+  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة دين الله", nameEn: "Deen Allah Encyclopedia", service: "Deen Allah API", version: API_VERSION, locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid", tajweed: "/tajweed", tajweedLesson: "/tajweed/lesson?id=letters", fiqh: "/fiqh", fiqhResearch: "/fiqh/research?q=...", fiqhTemplate: "/fiqh/template?q=...", inheritance: "/inheritance?estate=100000&sons=1&daughters=1&madhhab=hanbali", inheritanceMadhahib: "/inheritance/madhahib", inheritanceComplexCases: "/inheritance/complex-cases" } });
   if (url.pathname === "/locales") return sendJson(res, 200, { default: DEFAULT_LOCALE, count: listLocales().length, locales: listLocales() });
   if (url.pathname === "/categories") return sendJson(res, 200, { locale, direction: locale.dir, categories: listCategories() });
   if (url.pathname === "/sources") return sendJson(res, 200, { locale, sources: listSources({ category: requireString(url.searchParams.get("category")), role: requireString(url.searchParams.get("role")) }) });
@@ -69,6 +70,18 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === "/maqasid") return sendJson(res, 200, { locale, maqasid: getMaqasid() });
   if (url.pathname === "/tajweed") return sendJson(res, 200, { locale, curriculum: getTajweedCurriculum() });
   if (url.pathname === "/tajweed/lesson") { const id = requireString(url.searchParams.get("id")); if (!id) return sendJson(res, 400, { error: "Missing required query parameter: id" }); const lesson = getTajweedLesson(id); return lesson ? sendJson(res, 200, { locale, lesson }) : sendJson(res, 404, { error: "Tajweed lesson not found" }); }
+
+  if (url.pathname === "/fiqh") return sendJson(res, 200, { locale, framework: getFiqhResearchFramework(), madhahib: listFiqhMadhahib(), scholars: listFiqhResearchScholars({ query: requireString(url.searchParams.get("scholar")) }) });
+  if (url.pathname === "/fiqh/research") {
+    const q = requireString(url.searchParams.get("q"));
+    if (!q) return sendJson(res, 400, { error: "Missing required query parameter: q" });
+    return sendJson(res, 200, { locale, query: q, results: searchFiqhResearch(q), method: getFiqhResearchFramework().analysisSchema });
+  }
+  if (url.pathname === "/fiqh/template") {
+    const q = requireString(url.searchParams.get("q"));
+    if (!q) return sendJson(res, 400, { error: "Missing required query parameter: q" });
+    return sendJson(res, 200, { locale, template: buildFiqhResearchTemplate(q, { madhhab: requireString(url.searchParams.get("madhhab")) }) });
+  }
 
   if (url.pathname === "/inheritance/madhahib") return sendJson(res, 200, { locale, madhahib: supportedMadhahib(), noteAr: "المذاهب الأربعة هنا هي خيارات لإطار الحساب؛ المسائل التفصيلية قد تختلف باختلاف المذهب والحالة." });
   if (url.pathname === "/inheritance/complex-cases") {
