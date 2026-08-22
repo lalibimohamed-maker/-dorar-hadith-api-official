@@ -1,14 +1,12 @@
 {
-  "schemaVersion":"1.0",
+  "schemaVersion":"1.1",
   "mode":"source-first-evidence-ingestion",
-  "policy":{"extractOnlyFromRegisteredEdition":true,"preserveOriginalAttribution":true,"preserveTextLocator":true,"preserveReaderLink":true,"neverInferGradeFromSilence":true,"neverCollapseDisagreement":true,"autoVerify":false},
-  "initialBatch":[
-    {"sourceId":"bukhari-tarikh-kabir","role":"primary-early","readerRequired":true},
-    {"sourceId":"ibn-abi-hatim-jarh","role":"primary-early","readerRequired":true},
-    {"sourceId":"yahia-ibn-main-ibn-mahraz","role":"primary-early","readerRequired":true},
-    {"sourceId":"ibn-sad-tabaqat","role":"early-biographical-context","readerRequired":true}
-  ],
+  "purpose":"تشغيل فهرسة corpus الرجال مع حفظ النص الأصلي والموضع والرابط والعلاقات، دون اختلاق أحكام أو تحويل الاكتشاف الآلي إلى توثيق.",
+  "pipeline":["source-reader","biography-segmentation","critic-statement-extraction","teacher-student-relation-extraction","exact-locator","book-access-link","cross-source-linking","verification-queue"],
+  "policy":{"extractOnlyFromRegisteredEdition":true,"preserveOriginalAttribution":true,"preserveOriginalArabic":true,"preserveTextLocator":true,"preserveReaderLink":true,"neverInferGradeFromSilence":true,"neverCollapseDisagreement":true,"secondaryCompilationKeepsOriginalAttribution":true,"officialInstitutionsAreSecondary":true,"autoVerify":false},
+  "initialBatch":[{"sourceId":"bukhari-tarikh-kabir","role":"primary-early","readerRequired":true},{"sourceId":"ibn-abi-hatim-jarh","role":"primary-early","readerRequired":true},{"sourceId":"yahia-ibn-main-ibn-mahraz","role":"primary-early","readerRequired":true},{"sourceId":"ibn-sad-tabaqat","role":"early-biographical-context","readerRequired":true}],
   "expansionOrder":["uquili-duafa","ibn-adi-kamil","ibn-hibban-thiqat","ibn-hibban-majruhin","nasai-duafa","darqutni-duafa","juzjani-ahwal-al-rijal","ajurri-sualat-abu-dawud","ibn-al-jawzi-duafa","dhahabi-mizan","dhahabi-mughni","dhahabi-siyar","mizzy-tahdhib-kamal","ibn-hajar-tahdhib","ibn-hajar-lisan","dhahabi-kashif","ibn-hajar-taqrib","ibn-hajar-tajil"],
   "recordOutput":{"entity":"narrator","fields":["narratorId","nameAr","aliases","critic","judgmentText","judgmentType","sourceId","edition","volume","page","entry","readerLink","verificationState"],"defaultVerificationState":"unverified"},
-  "relationshipOutput":{"fields":["narratorId","relationType","relatedNarratorId","sourceId","volume","page","entry","readerLink","verificationState"],"relationTypes":["teacher","student","narratedFrom","narratedBy","contemporary","mentionedWith"]}
+  "relationshipOutput":{"fields":["narratorId","relationType","relatedNarratorId","sourceId","volume","page","entry","readerLink","verificationState"],"relationTypes":["teacher","student","narratedFrom","narratedBy","contemporary","mentionedWith"]},
+  "qualityGates":["sourceExists","editionIdentified","locatorPresent","readerLinkVerifiedWhenAvailable","originalAttributionPresent","disagreementPreserved","noAutomaticGrade"]
 }
