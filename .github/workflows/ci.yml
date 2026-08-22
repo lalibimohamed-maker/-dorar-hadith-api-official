@@ -36,6 +36,7 @@ jobs:
           node --check web/app.js
           node --check src/hadith-narrator-methodology.js
           node --check src/query-intent-router.js
+          node --check src/ghayb-router.js
       - name: Validate required project files
         run: |
           required_files=(
@@ -48,15 +49,15 @@ jobs:
             src/inheritance-calculator.js src/faraid-complex-cases.js src/faraid-advanced.js src/tajweed-curriculum.js
             src/prophets-companions-genealogy.js config/knowledge-source-expansion-2026.json
             config/corpus-source-routing-2026.json config/corpus-seed-content-batch-05-2026-08-22.json
-            config/concept-knowledge-schema-2026.json config/ghaib-source-framework-2026.json
-            src/corpus_repository.js src/corpus_search.js src/corpus_api.js src/http_server.js src/index.js
+            config/concept-knowledge-schema-2026.json config/ghaib-source-framework-2026.json config/ghaib-evidence-catalog-2026.json config/ghayb-knowledge-domains-2026.json
+            src/corpus_repository.js src/corpus_search.js src/corpus_api.js src/ghayb-router.js src/http_server.js src/index.js
             test/ghaib-source-framework.test.js
           )
           for file in "${required_files[@]}"; do
             if [ ! -f "$file" ]; then echo "MISSING REQUIRED FILE: $file"; exit 1; fi
           done
           grep -q './app.js' web/index.html
-          node --input-type=module -e "import fs from 'node:fs'; for (const f of ['config/knowledge-source-expansion-2026.json','config/hadith-narrator-methodology-2026.json','config/corpus-source-routing-2026.json','config/corpus-seed-content-batch-05-2026-08-22.json','config/concept-knowledge-schema-2026.json','config/ghaib-source-framework-2026.json','data/concept-index-seed-2026.json','data/scholars/registry.json']) JSON.parse(fs.readFileSync(f,'utf8')); console.log('Corpus/source/scholar/ghaib JSON OK')"
+          node --input-type=module -e "import fs from 'node:fs'; for (const f of ['config/knowledge-source-expansion-2026.json','config/hadith-narrator-methodology-2026.json','config/corpus-source-routing-2026.json','config/corpus-seed-content-batch-05-2026-08-22.json','config/concept-knowledge-schema-2026.json','config/ghaib-source-framework-2026.json','config/ghaib-evidence-catalog-2026.json','config/ghayb-knowledge-domains-2026.json','data/concept-index-seed-2026.json','data/scholars/registry.json']) JSON.parse(fs.readFileSync(f,'utf8')); console.log('Corpus/source/scholar/ghaib JSON OK')"
           node --input-type=module -e "import { listNarratorGrades, listCoreRijalBooks, listChainPhenomena } from './src/hadith-narrator-methodology.js'; if(listNarratorGrades().length < 10 || listCoreRijalBooks().length < 10 || listChainPhenomena().length < 5) process.exit(1); console.log('Hadith methodology registry OK')"
           node --input-type=module -e "import registry from './data/scholars/registry.json' with { type: 'json' }; if(registry.records.length < 100 || !registry.records.some(x => x.name_ar === 'أبو بكر الجزائري') || !registry.records.some(x => x.name_ar === 'القاضي عياض')) process.exit(1); console.log('Scholar registry OK:', registry.records.length)"
       - name: Smoke test client configuration
