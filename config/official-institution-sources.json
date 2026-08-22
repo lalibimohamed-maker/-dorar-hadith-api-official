@@ -1,0 +1,59 @@
+{
+  "policy": {
+    "role": "secondary-supporting-reference",
+    "neverOverridesPrimaryRijalEvidence": true,
+    "neverAutoPromotesToVerified": true,
+    "useCases": ["biography", "institution", "manuscript", "catalog", "modern-context", "identity-cross-check"],
+    "verificationLevels": ["unverified", "accessible", "supported", "verified", "disputed"]
+  },
+  "sources": [
+    {
+      "id": "algeria-national-library",
+      "country": "DZ",
+      "nameAr": "المكتبة الوطنية الجزائرية",
+      "institutionType": "national-library",
+      "url": "https://digitallibrary.biblionat.dz/ar",
+      "capabilities": ["manuscripts", "rare-books", "bibliography", "catalog"]
+    },
+    {
+      "id": "algeria-ministry-religious-affairs-manuscripts",
+      "country": "DZ",
+      "nameAr": "وزارة الشؤون الدينية والأوقاف - المخطوطات",
+      "institutionType": "government-ministry",
+      "url": "https://marw.gov.dz/المخطوطات",
+      "capabilities": ["hadith-manuscripts", "sira-manuscripts", "fiqh-manuscripts", "catalog"]
+    },
+    {
+      "id": "algeria-national-manuscripts-center",
+      "country": "DZ",
+      "nameAr": "المركز الوطني للمخطوطات",
+      "institutionType": "government-research-center",
+      "url": "https://cnmanuscrits.dz/",
+      "capabilities": ["manuscripts", "collections", "catalog", "institution"]
+    },
+    {
+      "id": "saudi-libraries-commission",
+      "country": "SA",
+      "nameAr": "هيئة المكتبات السعودية",
+      "institutionType": "government-authority",
+      "url": "https://libraries.moc.gov.sa/",
+      "capabilities": ["digital-library", "manuscripts", "books", "catalog"]
+    },
+    {
+      "id": "qatar-ministry-islamic-affairs-quran",
+      "country": "QA",
+      "nameAr": "وزارة الأوقاف والشؤون الإسلامية - دولة قطر",
+      "institutionType": "government-ministry",
+      "url": "https://alquran.islam.gov.qa/",
+      "capabilities": ["quran", "religious-education", "institution"]
+    },
+    {
+      "id": "us-library-of-congress",
+      "country": "US",
+      "nameAr": "مكتبة الكونغرس",
+      "institutionType": "national-library",
+      "url": "https://www.loc.gov/",
+      "capabilities": ["manuscripts", "bibliography", "digitized-books", "catalog"]
+    }
+  ]
+}
