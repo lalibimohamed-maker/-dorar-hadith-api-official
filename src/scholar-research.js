@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import domainFramework from "../config/domain-scholar-framework.json" with { type: "json" };
 import contemporary from "../config/contemporary-sunni-scholars.json" with { type: "json" };
 import fiqhSources from "../config/fiqh-fatawa-sources.json" with { type: "json" };
+import scholarRegistry from "../data/scholars/registry.json" with { type: "json" };
 import { listBooks } from "./book-catalog.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -21,15 +22,26 @@ function normalize(value) {
 
 function allScholars() {
   const map = new Map();
+  for (const record of scholarRegistry.records || []) {
+    const current = map.get(record.id) || { id: record.id, nameAr: record.name_ar, domains: [], records: [] };
+    current.catalogStatus = record.status || "candidate";
+    current.era = record.era || null;
+    current.verification = record.verification || "pending";
+    current.inclusionBasis = record.inclusion_basis || "scholar-catalog-discovery";
+    current.sourceRequired = record.source_required !== false;
+    map.set(record.id, current);
+  }
   for (const [domainId, domain] of Object.entries(domainFramework.domains || {})) {
     for (const scholar of domain.scholars || []) {
       const current = map.get(scholar.id) || { id: scholar.id, nameAr: scholar.nameAr, domains: [], records: [] };
       if (!current.domains.includes(domainId)) current.domains.push(domainId);
+      current.nameAr = current.nameAr || scholar.nameAr;
       map.set(scholar.id, current);
     }
   }
   for (const scholar of contemporary.scholars || []) {
     const current = map.get(scholar.id) || { id: scholar.id, nameAr: scholar.nameAr, domains: [], records: [] };
+    current.nameAr = current.nameAr || scholar.nameAr;
     current.role = scholar.role;
     current.sources = scholar.sources || [];
     current.contentTypes = scholar.contentTypes || [];
@@ -37,6 +49,7 @@ function allScholars() {
   }
   for (const scholar of fiqhSources.scholars || []) {
     const current = map.get(scholar.id) || { id: scholar.id, nameAr: scholar.nameAr, domains: [], records: [] };
+    current.nameAr = current.nameAr || scholar.nameAr;
     current.fatwaSourceIds = scholar.sourceIds || [];
     map.set(scholar.id, current);
   }
@@ -84,6 +97,22 @@ export function searchScholarOpinions(query, { relationshipType, verification } 
   });
 }
 
+export function searchScholars(query, { limit = 20, era, verifiedOnly = false } = {}) {
+  const q = normalize(query);
+  if (!q) return [];
+  return allScholars()
+    .filter((item) => !era || item.era === era)
+    .filter((item) => !verifiedOnly || ["verified", "supported"].includes(item.verification))
+    .map((item) => {
+      const haystack = normalize([item.nameAr, item.id, ...(item.domains || [])].join(" "));
+      const score = haystack === q ? 100 : haystack.includes(q) ? 90 : q.split(" ").filter((token) => haystack.includes(token)).length * 20;
+      return { ...item, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || a.nameAr.localeCompare(b.nameAr, "ar"))
+    .slice(0, Math.min(Math.max(Number(limit) || 20, 1), 100));
+}
+
 export function buildScholarResearchProfile(nameOrId) {
   const scholar = findScholar(nameOrId);
   if (!scholar) return null;
@@ -101,6 +130,10 @@ export function buildScholarResearchProfile(nameOrId) {
       role: scholar.role || null,
       domains: scholar.domains || [],
       contentTypes: scholar.contentTypes || [],
+      era: scholar.era || null,
+      catalogStatus: scholar.catalogStatus || "candidate",
+      verification: scholar.verification || "pending",
+      inclusionBasis: scholar.inclusionBasis || null,
     },
     primarySources: scholar.sources || [],
     fatwaSourceIds: scholar.fatwaSourceIds || [],
