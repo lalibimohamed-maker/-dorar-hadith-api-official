@@ -1,0 +1,23 @@
+{
+  "version":"2026.16",
+  "purpose":"route authoritative Islamic source records into the corpus and contextual knowledge cards",
+  "verifiedExamples":[
+    {"authority":"General Presidency for Scholarly Research and Ifta","country":"Saudi Arabia","class":"official_fatwa_authority","evidence":"turn0search0"},
+    {"authority":"International Islamic Fiqh Academy","scope":"international","class":"international_fiqh_academy","evidence":"turn0search10"},
+    {"authority":"General Iftaa Department","country":"Jordan","class":"official_fatwa_authority","evidence":"turn0search5"}
+  ],
+  "routing":{
+    "canonicalText":"preserve_original_source",
+    "fatwa":"attribute_to_actual_issuer_and_date",
+    "institutionalResolution":"store_as_collective_fiqh_output",
+    "scholarlyOpinion":"attribute_to_named_author",
+    "secondaryMaterial":"never_promote_to_primary_evidence"
+  },
+  "evidenceLayers":["quran","authenticated_sunnah","companion_reports","early_salaf_reports","classical_scholarly_sources","collective_fiqh_resolutions","official_fatwa","secondary_research"],
+  "conflictPolicy":"preserve_attributed_disagreement; never silently merge conflicting rulings",
+  "translationPolicy":"use_verified_meaning_translation_when_available; machine translation remains separately labeled",
+  "conceptCardIntegration":true,
+  "bilingualSearchIntegration":true,
+  "longPressIntegration":true,
+  "refresh":{"recheckOfficialSources":true,"retainLastVerifiedAt":true}
+}
