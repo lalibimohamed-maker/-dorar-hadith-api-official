@@ -14,14 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         node-version: [20, 22]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: Syntax check
         run: npm run health
-      - name: Test catalog and sources
-        run: npm test
+      - name: Test catalog and source contracts
+        run: node --test test/catalog.test.js test/sirah-catalog.test.js test/tajweed-curriculum.test.js test/integration-contract.test.js
