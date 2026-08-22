@@ -1,0 +1,10 @@
+{
+  "schemaVersion":"1.0",
+  "recordType":"narrator-judgment-evidence",
+  "required":["narratorId","narratorNameAr","criticNameAr","judgmentText","judgmentType","sourceId","locator","verification"],
+  "locator":{"required":["bookTitleAr"],"recommended":["edition","volume","page","entry","url"]},
+  "verificationStates":["unverified","source-located","text-checked","cross-checked","verified","disputed"],
+  "sourceRules":{"primaryJudgmentPreferred":true,"secondaryCompilationsMustPreserveOriginalAttribution":true,"readerCanOpenSource":true},
+  "disagreement":{"preserveEachJudgment":true,"noForcedConsensus":true},
+  "provenance":{"retainOriginalText":true,"retainSourceLocator":true,"retainAccessLink":true}
+}
