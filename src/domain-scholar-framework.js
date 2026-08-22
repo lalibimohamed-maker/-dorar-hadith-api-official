@@ -1,4 +1,5 @@
 import framework from "../config/domain-scholar-framework.json" with { type: "json" };
+import { buildScholarResearchProfile, compareScholarOpinions, getScholarResearchPolicy } from "./scholar-research.js";
 
 export function listKnowledgeDomains() {
   return Object.entries(framework.domains).map(([id, domain]) => ({
@@ -26,10 +27,15 @@ export function searchDomainScholars(query, domainId) {
     if (!domain) return [];
     return domain.scholars
       .filter((scholar) => !q || scholar.nameAr.toLocaleLowerCase("ar").includes(q))
-      .map((scholar) => ({ ...scholar, domain: id }));
+      .map((scholar) => ({
+        ...scholar,
+        domain: id,
+        researchProfile: buildScholarResearchProfile(scholar.id),
+        opinionComparison: compareScholarOpinions(scholar.id),
+      }));
   });
 }
 
 export function getDomainResearchPolicy() {
-  return { ...framework.researchRules };
+  return { ...framework.researchRules, scholarOpinionResearch: getScholarResearchPolicy() };
 }
