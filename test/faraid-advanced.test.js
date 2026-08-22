@@ -7,6 +7,7 @@ import {
   analyzeAmbiguousSex,
   analyzeMunasakhat
 } from "../src/faraid-advanced.js";
+import { analyzeComplexFaraidCase } from "../src/faraid-complex-cases.js";
 
 test("pregnancy is scenario-only and never silently finalizes", () => {
   const result = analyzePregnancy({ estate: 100000, madhhab: "hanbali", knownHeirs: { mother: 1 } });
@@ -39,4 +40,12 @@ test("advanced dispatcher routes supported cases", () => {
   assert.equal(analyzeAdvancedFaraid({ case: "missing_person" }).case, "missing_person");
   assert.equal(analyzeAdvancedFaraid({ case: "ambiguous_sex" }).case, "ambiguous_sex");
   assert.equal(analyzeAdvancedFaraid({ case: "munasakhat" }).case, "munasakhat");
+});
+
+test("complex-case catalog routes its advanced cases to algorithms", () => {
+  assert.equal(analyzeComplexFaraidCase("pregnancy", {}).case, "pregnancy");
+  assert.equal(analyzeComplexFaraidCase("missing-person", {}).case, "missing_person");
+  assert.equal(analyzeComplexFaraidCase("khuntha", {}).case, "ambiguous_sex");
+  assert.equal(analyzeComplexFaraidCase("munasakhat", {}).case, "munasakhat");
+  assert.equal(analyzeComplexFaraidCase("grandfather-with-siblings", {}), null);
 });
