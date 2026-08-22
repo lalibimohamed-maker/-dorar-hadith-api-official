@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Deen Allah Encyclopedia API
-  version: 0.8.3
+  version: 0.9.0
   description: Multilingual research API for the Deen Allah Encyclopedia. It provides source-attributed access to Quran, hadith, tafsir, sirah, creed, fiqh, scholars, books, maqasid, inheritance and Quran learning resources. Original texts remain distinct from translations and source attribution is mandatory.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
@@ -52,7 +52,7 @@ paths:
     get:
       operationId: search
       summary: Multilingual source-attributed encyclopedia search
-      description: The language detected from the user's query has priority over the configured locale. Original Arabic Quran text is never replaced by translation. Results retain provenance and hadith grading separately from book presence.
+      description: The language detected from the user's query has priority over the configured locale. Original Arabic Quran text is never replaced by translation. Results retain provenance and hadith grading separately from book presence. Fiqh matches preserve madhhab differences and source attribution.
       parameters:
         - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
         - {name: lang, in: query, required: false, schema: {type: string}}
@@ -81,6 +81,34 @@ paths:
         - {name: madhhab, in: query, required: false, schema: {type: string}}
       responses:
         '200': {description: Author catalog}
+  /fiqh:
+    get:
+      operationId: getFiqhFramework
+      summary: Get comparative Sunni fiqh research framework, madhhabs and scholars
+      parameters:
+        - {name: scholar, in: query, required: false, schema: {type: string}}
+      responses:
+        '200': {description: Fiqh research framework}
+  /fiqh/research:
+    get:
+      operationId: searchFiqhResearch
+      summary: Search fiqh scholars and classical fatwa books
+      parameters:
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+      responses:
+        '200': {description: Fiqh research records with provenance}
+        '400': {description: Missing query}
+  /fiqh/template:
+    get:
+      operationId: buildFiqhResearchTemplate
+      summary: Build an evidence-first comparative fiqh analysis template
+      description: The template separates the four Sunni madhhabs, other Sunni views, evidence, causes of disagreement and a preferred view. A preferred view must be supported by cited evidence and is never invented from the presence of a scholar in the index.
+      parameters:
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+        - {name: madhhab, in: query, required: false, schema: {type: string, enum: [hanafi, maliki, shafii, hanbali]}}
+      responses:
+        '200': {description: Comparative fiqh research template}
+        '400': {description: Missing query}
   /inheritance/madhahib:
     get:
       operationId: listInheritanceMadhahib
