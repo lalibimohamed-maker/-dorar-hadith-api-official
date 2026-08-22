@@ -5,6 +5,7 @@ import {
   analyzePregnancy,
   analyzeMissingPerson,
   analyzeAmbiguousSex,
+  analyzeGrandfatherWithSiblings,
   analyzeMunasakhat
 } from "../src/faraid-advanced.js";
 import { analyzeComplexFaraidCase } from "../src/faraid-complex-cases.js";
@@ -29,6 +30,21 @@ test("ambiguous sex exposes both recognized scenarios", () => {
   assert.deepEqual(result.scenarios.map(x => x.name), ["male", "female"]);
 });
 
+test("grandfather with siblings blocks siblings in the Hanafi context", () => {
+  const result = analyzeGrandfatherWithSiblings({ madhhab: "hanafi", estate: 120000, fullBrothers: 1, fullSisters: 1 });
+  assert.equal(result.status, "rule_applied");
+  assert.equal(result.siblings.blocked, true);
+  assert.equal(result.grandfather.share, 120000);
+});
+
+test("grandfather with siblings compares candidate methods in the other contexts", () => {
+  for (const madhhab of ["maliki", "shafii", "hanbali"]) {
+    const result = analyzeGrandfatherWithSiblings({ madhhab, estate: 120000, fullBrothers: 1, fullSisters: 1 });
+    assert.equal(result.status, "candidate_comparison");
+    assert.ok(result.candidates.best >= result.candidates.muqasama);
+  }
+});
+
 test("munasakhat requires the second death data before finalization", () => {
   const result = analyzeMunasakhat({ firstEstate: 100000, firstHeirs: { sons: 1, daughters: 1 } });
   assert.equal(result.status, "input_required");
@@ -39,6 +55,7 @@ test("advanced dispatcher routes supported cases", () => {
   assert.equal(analyzeAdvancedFaraid({ case: "pregnancy" }).case, "pregnancy");
   assert.equal(analyzeAdvancedFaraid({ case: "missing_person" }).case, "missing_person");
   assert.equal(analyzeAdvancedFaraid({ case: "ambiguous_sex" }).case, "ambiguous_sex");
+  assert.equal(analyzeAdvancedFaraid({ case: "grandfather_with_siblings" }).case, "grandfather_with_siblings");
   assert.equal(analyzeAdvancedFaraid({ case: "munasakhat" }).case, "munasakhat");
 });
 
@@ -47,5 +64,5 @@ test("complex-case catalog routes its advanced cases to algorithms", () => {
   assert.equal(analyzeComplexFaraidCase("missing-person", {}).case, "missing_person");
   assert.equal(analyzeComplexFaraidCase("khuntha", {}).case, "ambiguous_sex");
   assert.equal(analyzeComplexFaraidCase("munasakhat", {}).case, "munasakhat");
-  assert.equal(analyzeComplexFaraidCase("grandfather-with-siblings", {}), null);
+  assert.equal(analyzeComplexFaraidCase("grandfather-with-siblings", { madhhab: "hanafi", estate: 100000, fullBrothers: 1 }).case, "grandfather_with_siblings");
 });
