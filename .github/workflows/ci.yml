@@ -29,10 +29,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
 
       - name: Install dependencies
-        run: npm install --ignore-scripts
+        run: npm install --ignore-scripts --no-package-lock
 
       - name: Syntax check
         run: npm run health
@@ -47,7 +46,8 @@ jobs:
           test -f src/dorar-client.js
           test -f src/unified-search.js
           test -f src/inheritance-calculator.js
-          test -f src/faraid-complex.js
+          test -f src/faraid-complex-cases.js
+          test -f src/faraid-advanced.js
           test -f src/tajweed-curriculum.js
 
       - name: Smoke test client configuration
