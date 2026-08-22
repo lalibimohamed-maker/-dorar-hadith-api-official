@@ -1,0 +1,18 @@
+{
+  "version":"2026.16",
+  "purpose":"Ingest real Islamic corpus with provenance, verification, rights, and source hierarchy",
+  "ingestionStages":["discover","verify-official-origin","check-rights","acquire-or-reference","normalize","segment","metadata","link-citations","quality-check","publish-index"],
+  "sourceRegistry":{
+    "saudiOfficial":[
+      {"name":"General Presidency for Scholarly Research and Ifta","url":"https://alifta.gov.sa/","priority":"official-primary-reference","scope":["fatwa","senior-scholars","research","publications"]},
+      {"name":"Permanent Committee for Fatwa","url":"https://alifta.gov.sa/fatwa-committee","priority":"official-primary-reference","scope":["aqidah","worship","personal-transactions"]}
+    ],
+    "otherOfficialInstitutions":"To be added only after direct official-domain verification",
+    "scholarlySources":"To be added with author/work/edition provenance",
+    "hadithSources":"To be added with collection/book/chapter/hadith identifiers and authentication metadata",
+    "quranSources":"To be added with canonical Arabic text and verified meaning-translation provenance"
+  },
+  "recordRequirements":["sourceId","canonicalTitle","authorOrInstitution","sourceType","officialUrlOrBibliographicRecord","edition","locator","language","rightsStatus","verificationStatus","ingestedAt"],
+  "rightsPolicy":{"doNotAssumePublicDomain":true,"preferOfficialOpenDataOrLicensedText":true,"retainReferenceMetadataWhenFullTextCannotBeStored":true},
+  "qualityGates":{"noUnverifiedCanonicalText":true,"noUnattributedFatwa":true,"noMachineTranslationAsVerified":true,"noSilentSourceSubstitution":true}
+}
