@@ -1,0 +1,78 @@
+{
+  "titleAr": "علم الرجال والجرح والتعديل ومنهج المحدثين في نقد الرواية",
+  "policy": {
+    "principle": "لا يُنسب حكم على راوٍ أو حديث إلى الموسوعة من غير نسبة واضحة إلى ناقد ومصدر يمكن التحقق منه.",
+    "authorityOrder": [
+      "النصوص الشرعية والسنة الثابتة",
+      "منهج الصحابة والسلف في نقل الأخبار",
+      "أئمة الحديث والنقد المتقدمون",
+      "كتب الجرح والتعديل والعلل الأصلية",
+      "كتب العلماء المتأخرين والشروح المحققة",
+      "الأبحاث الجامعية والمراكز الرسمية للتحقيق والفهرسة والمقارنة",
+      "التحليل الآلي مع وسمه بوضوح بأنه تحليل وليس حكمًا شرعيًا"
+    ],
+    "noBlanketJudgment": true,
+    "distinguishNarratorAndHadith": true,
+    "preserveDisagreement": true,
+    "reuse": "فهرسة وربط بالمصدر الأصلي ما لم توجد رخصة لإعادة نشر النص"
+  },
+  "narratorGrades": [
+    {"id":"thiqah","nameAr":"ثقة","class":"accepted"},
+    {"id":"thabt","nameAr":"ثبت","class":"accepted"},
+    {"id":"hafiz","nameAr":"حافظ","class":"accepted"},
+    {"id":"saduq","nameAr":"صدوق","class":"accepted-with-caveat"},
+    {"id":"salih-hadith","nameAr":"صالح الحديث","class":"accepted-with-caveat"},
+    {"id":"layyin","nameAr":"لين الحديث","class":"weak"},
+    {"id":"daif","nameAr":"ضعيف","class":"weak"},
+    {"id":"sayyi-al-hifz","nameAr":"سيئ الحفظ","class":"weak"},
+    {"id":"majhul","nameAr":"مجهول","class":"unknown"},
+    {"id":"mastur","nameAr":"مستور","class":"unknown"},
+    {"id":"mukhtalit","nameAr":"مختلط","class":"conditional"},
+    {"id":"mudallis","nameAr":"مدلس","class":"conditional"},
+    {"id":"matruk","nameAr":"متروك","class":"rejected"},
+    {"id":"accused-fabricator","nameAr":"متهم بالوضع","class":"rejected"},
+    {"id":"kadhdhab","nameAr":"كذاب","class":"rejected"},
+    {"id":"waddaa","nameAr":"وضاع","class":"rejected"},
+    {"id":"innovator","nameAr":"صاحب بدعة","class":"context-required"},
+    {"id":"ghali","nameAr":"غالي","class":"context-required"},
+    {"id":"zindiq","nameAr":"منسوب إلى الزندقة","class":"context-required"},
+    {"id":"nifaq","nameAr":"منسوب إلى النفاق","class":"context-required"},
+    {"id":"disputed","nameAr":"مختلف فيه","class":"disputed"}
+  ],
+  "chainPhenomena": [
+    {"id":"connected","nameAr":"متصل"},
+    {"id":"mursal","nameAr":"مرسل"},
+    {"id":"munqati","nameAr":"منقطع"},
+    {"id":"muadal","nameAr":"معضل"},
+    {"id":"muallaq","nameAr":"معلق"},
+    {"id":"mudallas","nameAr":"مدلس"},
+    {"id":"mukhtalit","nameAr":"اختلاط الراوي"},
+    {"id":"taalluq-liqaa","nameAr":"المعاصرة واللقاء"},
+    {"id":"tafarrud","nameAr":"التفرد"},
+    {"id":"mukhalafa","nameAr":"مخالفة الثقات"},
+    {"id":"hidden-illah","nameAr":"العلة الخفية"},
+    {"id":"shawahid","nameAr":"الشواهد والمتابعات"}
+  ],
+  "coreBooks": [
+    {"id":"ibn-abi-hatim-jarh","titleAr":"الجرح والتعديل","authorAr":"ابن أبي حاتم الرازي","type":"jarh-wa-tadil","priority":"primary"},
+    {"id":"bukhari-tarikh-kabir","titleAr":"التاريخ الكبير","authorAr":"البخاري","type":"rijal","priority":"primary"},
+    {"id":"uqaילי-duafa","titleAr":"الضعفاء الكبير","authorAr":"العقيلي","type":"jarh","priority":"primary"},
+    {"id":"ibn-adi-kamil","titleAr":"الكامل في ضعفاء الرجال","authorAr":"ابن عدي","type":"jarh","priority":"primary"},
+    {"id":"ibn-hibban-thiqat","titleAr":"الثقات","authorAr":"ابن حبان","type":"tawthiq","priority":"primary"},
+    {"id":"nasai-duafa","titleAr":"الضعفاء والمتروكون","authorAr":"النسائي","type":"jarh","priority":"primary"},
+    {"id":"daraqutni-duafa","titleAr":"الضعفاء والمتروكون","authorAr":"الدارقطني","type":"jarh","priority":"primary"},
+    {"id":"dhahabi-mizan","titleAr":"ميزان الاعتدال","authorAr":"الذهبي","type":"comparative-rijal","priority":"major"},
+    {"id":"dhahabi-mughni","titleAr":"المغني في الضعفاء","authorAr":"الذهبي","type":"jarh","priority":"major"},
+    {"id":"dhahabi-siyar","titleAr":"سير أعلام النبلاء","authorAr":"الذهبي","type":"biography-and-criticism","priority":"major"},
+    {"id":"mizzi-tahdhib-kamal","titleAr":"تهذيب الكمال","authorAr":"المزي","type":"rijal","priority":"major"},
+    {"id":"ibn-hajar-tahdhib","titleAr":"تهذيب التهذيب","authorAr":"ابن حجر العسقلاني","type":"rijal","priority":"major"},
+    {"id":"ibn-hajar-taqrib","titleAr":"تقريب التهذيب","authorAr":"ابن حجر العسقلاني","type":"rijal-summary","priority":"major"},
+    {"id":"ibn-hajar-lisan","titleAr":"لسان الميزان","authorAr":"ابن حجر العسقلاني","type":"jarh","priority":"major"},
+    {"id":"dhahabi-kashif","titleAr":"الكاشف","authorAr":"الذهبي","type":"rijal-summary","priority":"major"},
+    {"id":"ibn-hajar-tajil","titleAr":"تعجيل المنفعة","authorAr":"ابن حجر العسقلاني","type":"rijal","priority":"major"}
+  ],
+  "officialResearchUse": {
+    "rule": "الجامعات والمراكز الرسمية تستخدم للتحقيق والفهرسة والرسائل والأبحاث المحكمة، ولا تُعامل تلقائيًا كناقد حديث متقدم.",
+    "examples": ["الجامعة الإسلامية بالمدينة المنورة","جامعة الإمام محمد بن سعود الإسلامية","جامعة أم القرى","جامعة القصيم","جامعة الأزهر","مركز الملك فيصل للبحوث والدراسات الإسلامية","مكتبة الملك فهد الوطنية","مكتبة الملك عبدالعزيز العامة","كلية الشريعة بجامعة الكويت","كلية الشريعة بجامعة قطر"]
+  }
+}
