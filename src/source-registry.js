@@ -12,10 +12,12 @@ function readJson(name, fallback) {
 }
 
 const fatwaExpansion = readJson("fatwa-source-expansion-2026.json", { sources: [], taxonomy: [] });
+const saudiFatwaExpansion = readJson("saudi-official-fatwa-sources-2026.json", { sources: [], policy: {}, institutionalOutputRules: {} });
 const contemporaryScholars = readJson("contemporary-sunni-scholars.json", { scholars: [] });
 const knowledgeExpansion = readJson("knowledge-source-expansion-2026.json", { sources: [], policy: {}, rules: {} });
 const officialExpansion = readJson("official-islamic-sources-2026.json", { sources: [], policy: {}, researchRule: "" });
 const academicExpansion = readJson("academic-islamic-sources-2026.json", { sources: [], policy: {} });
+const bookCatalog = readJson("book-catalog-2026.json", { books: [], policy: {}, normalizationRules: {} });
 
 const fatwaSources = (fatwaExpansion.sources || []).map((source) => ({
   ...source,
@@ -23,6 +25,15 @@ const fatwaSources = (fatwaExpansion.sources || []).map((source) => ({
   role: source.type === "official-scholar-site" || source.type === "official-foundation-site" ? "official-fatwa-source" : "fatwa-source",
   sourceKind: source.type || "fatwa-source",
   reusePolicy: source.reuse || "source-permission-dependent",
+}));
+
+const saudiFatwaSources = (saudiFatwaExpansion.sources || []).map((source) => ({
+  ...source,
+  sourceKind: source.sourceKind || "saudi-official-fatwa-source",
+  attributionRequired: true,
+  noEndorsementByInclusion: true,
+  reusePolicy: saudiFatwaExpansion.policy?.copyright || "catalog-and-link-unless-licensed",
+  jurisdiction: "السعودية",
 }));
 
 const scholarSources = (contemporaryScholars.scholars || []).flatMap((scholar) =>
@@ -81,6 +92,7 @@ const sourceIds = new Set(registry.sources.map((source) => source.id));
 const mergedSources = [
   ...registry.sources,
   ...fatwaSources.filter((source) => !sourceIds.has(source.id)),
+  ...saudiFatwaSources.filter((source) => !sourceIds.has(source.id)),
   ...scholarSources.filter((source) => !sourceIds.has(source.id)),
   ...expandedSources.filter((source) => !sourceIds.has(source.id)),
   ...officialSources.filter((source) => !sourceIds.has(source.id)),
@@ -91,11 +103,20 @@ const mergedRegistry = {
   ...registry,
   categories,
   sources: mergedSources,
+  books: bookCatalog.books || [],
+  bookCatalog: {
+    policy: bookCatalog.policy || {},
+    normalizationRules: bookCatalog.normalizationRules || {},
+    bookCount: (bookCatalog.books || []).length,
+  },
   fatwa: {
     taxonomy: fatwaExpansion.taxonomy || [],
     sourceCount: mergedSources.filter((source) => source.category === "fatwa").length,
     scholarCount: new Set(scholarSources.map((source) => source.scholar).filter(Boolean)).size,
+    officialSaudiSourceCount: saudiFatwaSources.filter((source) => source.category === "fatwa").length,
     policy: fatwaExpansion.policy || null,
+    saudiPolicy: saudiFatwaExpansion.policy || null,
+    institutionalOutputRules: saudiFatwaExpansion.institutionalOutputRules || {},
   },
   knowledgeExpansion: {
     policy: knowledgeExpansion.policy || {},
@@ -120,3 +141,7 @@ export function listSources({ category, role, country } = {}) {
 export function getSource(id) { return mergedRegistry.sources.find((source) => source.id === id) || null; }
 export function listCategories() { return mergedRegistry.categories; }
 export function getMaqasid() { return mergedRegistry.maqasid; }
+export function listBooks({ category, authorAr } = {}) {
+  return mergedRegistry.books.filter((book) => (!category || book.category === category) && (!authorAr || book.authorAr === authorAr));
+}
+export function getBook(id) { return mergedRegistry.books.find((book) => book.id === id) || null; }
