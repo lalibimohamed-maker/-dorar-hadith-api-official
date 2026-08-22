@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: deen-allah-encyclopedia-api
+    runtime: node
+    plan: free
+    buildCommand: npm install --ignore-scripts --no-package-lock --no-audit --no-fund
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PUBLIC_MAX_PER_MINUTE
+        value: 30
+      - key: APP_MAX_PER_MINUTE
+        value: 120
+      - key: REQUEST_TIMEOUT_MS
+        value: 10000
