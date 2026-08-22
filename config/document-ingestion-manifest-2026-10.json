@@ -1,0 +1,15 @@
+{
+  "version":"2026.10",
+  "purpose":"تفكيك المصادر إلى وثائق قابلة للتدقيق قبل إدخال النصوص الكاملة",
+  "workflow":["institution-verify","document-discover","official-url-verify","edition-identify","rights-check","content-acquire","integrity-check","segment","citation-anchor","review","index","publish"],
+  "sourceClasses":[
+    {"class":"official-fatwa","examples":["Saudi General Presidency for Scholarly Research and Ifta","Egyptian Dar al-Ifta","Jordan General Iftaa Department","Qatar Ministry of Awqaf and Islamic Affairs","Oman Ministry of Endowments and Religious Affairs","other national institutions"],"priority":"primary-institutional"},
+    {"class":"official-scholar","examples":["Ibn Baz official site","Ibn Uthaymeen official site"],"priority":"primary-verified-publication"},
+    {"class":"classical-reference","examples":["Ibn Taymiyyah al-Fatawa al-Kubra","Ibn Taymiyyah collections","hadith and tafsir classics"],"priority":"secondary-classical-reference"},
+    {"class":"research-and-language","examples":["Arabic lexicons","hadith sciences","tafsir sciences","fiqh usul","bibliographic catalogs"],"priority":"reference"}
+  ],
+  "recordMinimum":["institutionId","documentId","title","authorOrIssuer","documentType","sourceUrl","retrievedAt","editionOrRevision","rightsStatus","integrityStatus","citationAnchor","reviewStatus"],
+  "rightsPolicy":{"unknown":"link-only","restricted":"metadata-and-link-only","licensed":"use-within-license","public-domain":"verify-jurisdiction-before-republication"},
+  "integrityPolicy":{"preserveOriginal":true,"hashWhenAcquired":true,"noSilentCorrection":true,"correctionsCreateRevision":true},
+  "publicationGate":"all-record-minimum-fields-and-required-review-complete"
+}
