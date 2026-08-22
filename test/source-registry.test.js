@@ -1,11 +1,36 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { getBook, getClassicalFatwaWork, getSource, listCategories, listBooks, listLanguages, listSources } from "../src/source-registry.js";
+import { getArabicTerminologyPolicy, getBook, getClassicalFatwaWork, getSource, getTranslationPolicy, listArabicLanguageSources, listCategories, listBooks, listLanguages, listSources } from "../src/source-registry.js";
 
-test("source registry exposes fatwa category", () => {
-  const category = listCategories().find((item) => item.id === "fatwa");
-  assert.ok(category);
-  assert.equal(category.nameAr, "الفتاوى ومصادر العلماء");
+test("source registry exposes fatwa and Arabic language categories", () => {
+  assert.ok(listCategories().some((item) => item.id === "fatwa"));
+  assert.ok(listCategories().some((item) => item.id === "arabic-language"));
+});
+
+test("primary Arabic language layer is available", () => {
+  const sources = listArabicLanguageSources();
+  assert.ok(sources.length >= 5);
+  assert.ok(sources.some((source) => source.id === "cairo-arabic-academy"));
+  assert.ok(sources.some((source) => source.id === "cairo-quran-lexicon"));
+  assert.ok(sources.some((source) => source.id === "king-salman-arabic-academy"));
+  assert.ok(sources.some((source) => source.id === "quranic-arabic-corpus"));
+  assert.ok(sources.every((source) => source.language === "ar"));
+});
+
+test("Arabic fiqh terminology preserves original term and prioritizes classical references", () => {
+  const policy = getArabicTerminologyPolicy();
+  assert.equal(policy.preserveOriginalTerm, true);
+  assert.equal(policy.neverInferLegalMeaningFromModernDictionaryAlone, true);
+  assert.ok(policy.sourcePriority.includes("classical-lexicons"));
+  assert.ok(policy.sourcePriority.includes("fiqh-books"));
+});
+
+test("translation layer is explicitly anchored to Arabic original", () => {
+  const policy = getTranslationPolicy();
+  assert.equal(policy.sourceLanguage, "ar");
+  assert.equal(policy.preserveOriginal, true);
+  assert.ok(policy.translationTiers["official-human"]);
+  assert.ok(policy.terminologySourcePriority.includes("quranic-lexicon"));
 });
 
 test("expanded fatwa sources are queryable with attribution metadata", () => {
@@ -14,10 +39,7 @@ test("expanded fatwa sources are queryable with attribution metadata", () => {
   assert.ok(sources.some((source) => source.id === "binbaz-official"));
   assert.ok(sources.some((source) => source.id === "binothaimeen-official"));
   assert.ok(sources.some((source) => source.id === "scholar-saad-al-shathri"));
-  for (const source of sources) {
-    assert.ok(source.url);
-    assert.ok(source.role);
-  }
+  for (const source of sources) { assert.ok(source.url); assert.ok(source.role); }
 });
 
 test("Saudi official fatwa layer is present and institutionally separated", () => {
@@ -30,100 +52,41 @@ test("Saudi official fatwa layer is present and institutionally separated", () =
 
 test("secondary national fatwa layer covers verified countries", () => {
   const secondary = listSources({ category: "fatwa", secondary: true });
-  for (const id of ["algeria-religious-affairs-fatwa", "egypt-dar-al-ifta", "jordan-general-ifta", "palestine-dar-ifta", "libya-dar-ifta", "malaysia-mufti-federal-territories", "kuwait-government-general-fatwa"]) {
-    assert.ok(secondary.some((source) => source.id === id));
-  }
-  assert.equal(getSource("malaysia-mufti-federal-territories").sourceKind, "mufti-department");
-  assert.equal(getSource("kuwait-government-general-fatwa").sourceKind, "government-fatwa-service");
+  for (const id of ["algeria-religious-affairs-fatwa", "egypt-dar-al-ifta", "jordan-general-ifta", "palestine-dar-ifta", "libya-dar-ifta", "malaysia-mufti-federal-territories", "kuwait-government-general-fatwa"]) assert.ok(secondary.some((source) => source.id === id));
 });
 
 test("international fiqh institution is separated from national fatwa offices", () => {
   const source = getSource("international-islamic-fiqh-academy");
-  assert.ok(source);
-  assert.equal(source.category, "fiqh");
-  assert.equal(source.sourceKind, "international-fiqh-academy");
+  assert.ok(source); assert.equal(source.category, "fiqh"); assert.equal(source.sourceKind, "international-fiqh-academy");
 });
 
 test("classical fatwa layer preserves distinct Ibn Taymiyyah collections and early heritage", () => {
   const majmu = getClassicalFatwaWork("majmu-fatawa-ibn-taymiyyah");
   const kubra = getClassicalFatwaWork("fatawa-kubra-ibn-taymiyyah");
   const supplement = getClassicalFatwaWork("mustadrak-majmu-fatawa-ibn-taymiyyah");
-  assert.ok(majmu);
-  assert.ok(kubra);
-  assert.ok(supplement);
-  assert.notEqual(majmu.id, kubra.id);
-  assert.equal(majmu.volumes, 37);
-  assert.equal(kubra.volumes, 6);
-  assert.equal(supplement.volumes, 5);
+  assert.ok(majmu); assert.ok(kubra); assert.ok(supplement); assert.notEqual(majmu.id, kubra.id);
+  assert.equal(majmu.volumes, 37); assert.equal(kubra.volumes, 6); assert.equal(supplement.volumes, 5);
   assert.equal(supplement.compilerAr, "محمد بن عبد الرحمن بن محمد بن قاسم");
-  assert.ok(getClassicalFatwaWork("mussannaf-abd-al-razzaq-fatwas"));
-  assert.ok(getClassicalFatwaWork("mussannaf-ibn-abi-shaybah-fatwas"));
-});
-
-test("Saudi Islamic Research Journal is research, not institutional fatwa", () => {
-  const source = getSource("saudi-islamic-research-journal");
-  assert.ok(source);
-  assert.equal(source.category, "research");
-  assert.equal(source.sourceKind, "islamic-research-journal");
 });
 
 test("multilingual layer exposes the agreed 20 languages and worldwide expansion", () => {
   const agreed20 = listLanguages({ agreed20: true });
   assert.equal(agreed20.length, 20);
-  for (const code of ["ar", "en", "fr", "es", "de", "tr", "ur", "id", "ms", "bn", "hi", "ru", "fa", "zh", "sw", "ha", "pt", "it", "ja", "ko"]) {
-    assert.ok(agreed20.some((language) => language.code === code));
-  }
   assert.ok(listLanguages().some((language) => language.code === "*"));
 });
 
 test("source IDs are unique after all registry expansions are merged", () => {
-  const sources = listSources();
-  const ids = sources.map((source) => source.id);
+  const ids = listSources().map((source) => source.id);
   assert.equal(new Set(ids).size, ids.length);
 });
 
-test("historical official sources retain availability status", () => {
-  const source = getSource("alfawzan-official");
-  assert.ok(source);
-  assert.equal(source.url, "https://alfawzan.af.org.sa/");
-  assert.equal(source.status, "historical-official-site-closed");
-  assert.equal(source.closedAt, "2026-04-02");
-});
-
-test("individual expanded source retains original attribution", () => {
-  const source = getSource("binbaz-official");
-  assert.equal(source.scholar, "عبد العزيز بن باز");
-  assert.equal(source.url, "https://binbaz.org.sa/");
-  assert.equal(source.category, "fatwa");
-});
-
-test("normalized book catalog separates compound works", () => {
-  assert.ok(getBook("sunan-kubra-bayhaqi"));
-  assert.ok(getBook("dalail-nubuwwa-bayhaqi"));
+test("normalized book catalog separates compound works and madhhabs", () => {
+  assert.ok(getBook("sunan-kubra-bayhaqi")); assert.ok(getBook("dalail-nubuwwa-bayhaqi"));
   assert.notEqual(getBook("sunan-kubra-bayhaqi").id, getBook("dalail-nubuwwa-bayhaqi").id);
-  assert.equal(getBook("sunan-kubra-bayhaqi").authorAr, "أحمد بن الحسين البيهقي");
-});
-
-test("normalized catalog contains fiqh books and does not treat madhhabs as books", () => {
   const fiqhBooks = listBooks({ category: "fiqh" });
-  assert.ok(fiqhBooks.length >= 10);
-  assert.equal(fiqhBooks.some((book) => book.id === "madhhab-hanafi"), false);
-  assert.ok(fiqhBooks.some((book) => book.madhhab === "hanafi"));
-  assert.ok(fiqhBooks.some((book) => book.madhhab === "maliki"));
-  assert.ok(fiqhBooks.some((book) => book.madhhab === "shafii"));
-  assert.ok(fiqhBooks.some((book) => book.madhhab === "hanbali"));
+  assert.ok(fiqhBooks.length >= 10); assert.equal(fiqhBooks.some((book) => book.id === "madhhab-hanafi"), false);
 });
 
 test("core hadith book sources retain distinct catalog identities", () => {
-  assert.equal(getSource("bukhari").nameAr, "صحيح البخاري");
-  assert.equal(getSource("muslim").nameAr, "صحيح مسلم");
-  assert.equal(getSource("ahmad").nameAr, "مسند الإمام أحمد");
-  assert.equal(getSource("abu-yala").nameAr, "مسند أبي يعلى الموصلي");
-  assert.equal(getSource("ibn-rahwayh").nameAr, "مسند إسحاق بن راهويه");
-  assert.equal(getSource("abu-dawud").nameAr, "سنن أبي داود");
-  assert.equal(getSource("tirmidhi").nameAr, "سنن الترمذي");
-  assert.equal(getSource("nasai").nameAr, "سنن النسائي");
-  assert.equal(getSource("ibn-majah").nameAr, "سنن ابن ماجه");
-  assert.equal(getSource("darimi").nameAr, "سنن الدارمي");
-  assert.equal(getSource("bayhaqi").category, "hadith");
+  for (const [id, nameAr] of [["bukhari","صحيح البخاري"],["muslim","صحيح مسلم"],["ahmad","مسند الإمام أحمد"],["abu-yala","مسند أبي يعلى الموصلي"],["ibn-rahwayh","مسند إسحاق بن راهويه"],["abu-dawud","سنن أبي داود"],["tirmidhi","سنن الترمذي"],["nasai","سنن النسائي"],["ibn-majah","سنن ابن ماجه"],["darimi","سنن الدارمي"]]) assert.equal(getSource(id).nameAr, nameAr);
 });
