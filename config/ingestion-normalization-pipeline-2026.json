@@ -1,0 +1,27 @@
+{
+  "version":"2026.5",
+  "purpose":"تفكيك الكتب والفتاوى إلى سجلات قابلة للتوثيق والبحث والترجمة دون فقد الأصل",
+  "pipeline":["source-discovery","authority-verification","edition-identification","copyright-license-check","document-ingestion","ocr-or-text-extraction","text-normalization","book-structure-detection","chunking","citation-anchor","scholar-and-institution-attribution","fiqh-context-linking","lexical-linking","translation-queue","quality-assurance","publication"],
+  "canonicalRecord": {
+    "required":["recordId","sourceId","sourceType","titleOriginal","textOriginal","language","location","attribution","provenance","rights","reviewStatus"],
+    "preserveOriginal":true,
+    "immutableSourceText":true,
+    "stableCitationAnchor":true
+  },
+  "sourceTypes":["book","fatwa","hadith","athar","institutional-fatwa","research","dictionary","grammar","fiqh-manual","biography"],
+  "normalization": {
+    "neverRewriteMeaning":true,
+    "neverMergeDifferentEditionsSilently":true,
+    "retainPageVolumeHadithNumberOrSection":true,
+    "retainArabicDiacriticsWhenAvailable":true,
+    "retainVariantReadingsAndEditionNotes":true
+  },
+  "rights": {
+    "licensed": "eligible-for-authorized-reuse",
+    "public-domain": "eligible-subject-to-edition-and-host-rights-check",
+    "link-only": "store-metadata-and-link",
+    "unknown": "do-not-republish-source-text"
+  },
+  "reviewStatuses":["ingested","normalized","source-verified","scholar-reviewed","translation-reviewed","published"],
+  "deduplication":{"key":["sourceId","editionId","location","textHash"],"neverDeduplicateAcrossSourcesWithoutHumanReview":true}
+}
