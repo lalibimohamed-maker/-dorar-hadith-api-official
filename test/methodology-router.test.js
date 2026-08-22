@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { routeConcept, filterConceptKnowledge } from '../src/methodology-router.js';
+import { resolveConcept } from '../src/corpus_search.js';
 
 test('aqidah concept defaults to Sunni primary source layer', () => {
   const result = routeConcept({ id: 'concept:iman-billah', domain: 'aqidah' });
@@ -26,4 +27,11 @@ test('aqidah knowledge separates comparative sources', () => {
   assert.equal(primary.sources[0].title, 'Quran');
   const withComparison = filterConceptKnowledge(knowledge, 'aqidah', true);
   assert.equal(withComparison.comparative_sources.length, 2);
+});
+
+test('selected fragment resolves to canonical concept index', () => {
+  const card = resolveConcept('ملائكته', '', 'ar', [], {});
+  assert.equal(card.record.title_ar, 'الإيمان بالملائكة');
+  assert.equal(card.record.domain, 'aqidah');
+  assert.equal(card.methodology.mode, 'sunni_primary');
 });
