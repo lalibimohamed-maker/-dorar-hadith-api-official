@@ -4,7 +4,9 @@ import { loadConceptIndex } from './corpus_repository.js';
 
 function resolveIndexedConcept(term) {
   const normalized = String(term || '').trim();
-  const groups = loadConceptIndex().groups || {};
+  const index = loadConceptIndex();
+  const groups = index.groups || {};
+
   for (const [group, terms] of Object.entries(groups)) {
     const hit = (terms || []).find(item => item === normalized || item.includes(normalized) || normalized.includes(item));
     if (hit) {
@@ -12,6 +14,32 @@ function resolveIndexedConcept(term) {
       return { id: `concept-index:${group}:${hit}`, type: 'concept', domain, title_ar: hit, index_group: group, index_match: true };
     }
   }
+
+  const aliases = index.aliases || {};
+  for (const [canonical, aliasList] of Object.entries(aliases)) {
+    const matched = [canonical, ...(aliasList || [])].some(alias => {
+      const value = String(alias || '').trim();
+      return value === normalized || value.includes(normalized) || normalized.includes(value);
+    });
+    if (!matched) continue;
+
+    for (const [group, terms] of Object.entries(groups)) {
+      if ((terms || []).includes(canonical)) {
+        const domain = group === 'aqidah' ? 'aqidah' : group === 'quran' || group === 'language' ? 'quran-tafsir' : group === 'hadith' ? 'hadith-takhrij' : group === 'fiqh' || group === 'usul' ? 'fiqh' : group === 'seerah' ? 'seerah' : 'general';
+        return {
+          id: `concept-index:${group}:${canonical}`,
+          type: 'concept',
+          domain,
+          title_ar: canonical,
+          index_group: group,
+          index_match: true,
+          alias_match: normalized !== canonical,
+          matched_term: normalized,
+        };
+      }
+    }
+  }
+
   return null;
 }
 
