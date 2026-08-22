@@ -1,0 +1,20 @@
+{
+  "version":"2026.16",
+  "status":"seeded-and-queued",
+  "batch":"01",
+  "tracks":[
+    {"domain":"quran","sources":["King Fahd Quran Complex","Quran Qatar Mushaf"],"records":["quran:3:85","quran-word:3:85:islam"],"ingestion":"canonical-reference-first"},
+    {"domain":"tafsir","sources":["verified tafsir catalogs"],"records":["concept:islam-context-3-85"],"ingestion":"source-linked"},
+    {"domain":"hadith","sources":["King Abdullah bin Abdulaziz Hadith Encyclopedia / Sunna program"],"records":["hadith-concept:iman"],"ingestion":"source-linked-with-takhrij"},
+    {"domain":"aqidah","records":["concept:iman","concept:arkan-al-iman","concept:tawhid"],"ingestion":"evidence-ranked"},
+    {"domain":"fiqh","records":["concept:salah"],"ingestion":"school-and-source-aware"},
+    {"domain":"fatwa","sources":["Saudi General Presidency for Scholarly Research and Ifta","Egyptian Dar al-Ifta","other verified official authorities"],"records":["fatwa-index:seed"],"ingestion":"authority-aware"},
+    {"domain":"seerah","records":["concept:hijrah","concept:prophetic-seerah"],"ingestion":"source-linked"},
+    {"domain":"scholars-books","records":["scholar-index:seed","book-index:seed"],"ingestion":"bibliographic-first"},
+    {"domain":"translations","records":["translation:3:85:language-registry"],"ingestion":"verified-meaning-translation-only"}
+  ],
+  "sharedKeys":["source_id","work_id","author_or_authority_id","location","provenance_id","verification_state","rights_state","language_id","concept_id"],
+  "qualityGates":["source_identity","attribution","location","text_integrity","rights","translation_provenance","duplicate_detection"],
+  "interaction":"all records are addressable by concept cards and long-press contextual explanation",
+  "note":"This batch creates structured ingestion targets and source-linked records; it does not claim that copyrighted full texts have been copied into the repository."
+}
