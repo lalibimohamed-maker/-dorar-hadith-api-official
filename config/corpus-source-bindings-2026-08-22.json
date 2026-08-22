@@ -1,0 +1,12 @@
+{
+  "version":"2026.08",
+  "bindings":[
+    {"source_id":"quran-canonical","kind":"canonical_quran","status":"pending_verification","policy":"arabic_text_immutable"},
+    {"source_id":"alifta-sa","kind":"official_fatwa","country":"SA","status":"pending_verification","policy":"attribute_to_issuer"},
+    {"source_id":"dar-alifta-eg","kind":"official_fatwa","country":"EG","status":"pending_verification","policy":"attribute_to_issuer"},
+    {"source_id":"iifa","kind":"international_fiqh_council","scope":"international","status":"pending_verification","policy":"preserve_resolution_context"},
+    {"source_id":"sunna-alifta-sa","kind":"official_sunnah_resource","country":"SA","status":"pending_verification","policy":"preserve_hadith_provenance"},
+    {"source_id":"qurancomplex","kind":"quran_translations_and_sciences","country":"SA","status":"pending_verification","policy":"translation_is_meaning_not_original"}
+  ],
+  "rule":"Bindings are routing metadata only. They do not certify content until source, rights, attribution and integrity checks pass."
+}

@@ -1,0 +1,23 @@
+name: Corpus validation
+on:
+  pull_request:
+    paths:
+      - 'config/corpus-*.json'
+      - 'scripts/validate-corpus-ingestion.js'
+      - '.github/workflows/corpus-validation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/corpus-*.json'
+      - 'scripts/validate-corpus-ingestion.js'
+      - '.github/workflows/corpus-validation.yml'
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate corpus ingestion
+        run: node scripts/validate-corpus-ingestion.js

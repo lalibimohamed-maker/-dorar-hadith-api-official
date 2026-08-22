@@ -4,7 +4,7 @@ export function encyclopediaSearch(params = {}) {
   const results = searchCorpus(params.query, {
     sourceType: params.sourceType,
     verifiedOnly: params.verifiedOnly
-  });
+  }, params.records);
   return {
     query: params.query ?? "",
     language: params.language ?? "ar",
@@ -23,19 +23,8 @@ export function buildResearchPacket(params = {}) {
   return {
     query: response.query,
     language: response.language,
-    claims: response.results.map((r) => ({
-      recordId: r.recordId,
-      claim: r.textOriginal ?? r.titleOriginal,
-      citation: r.citation ?? null
-    })),
-    sources: response.results.map((r) => ({
-      recordId: r.recordId,
-      sourceId: r.sourceId,
-      title: r.titleOriginal,
-      sourceType: r.sourceType,
-      priority: r.priority,
-      reviewStatus: r.reviewStatus ?? "ingested"
-    })),
+    claims: response.results.map((r) => ({ recordId: r.recordId, claim: r.textOriginal ?? r.titleOriginal, citation: r.citation ?? null })),
+    sources: response.results.map((r) => ({ recordId: r.recordId, sourceId: r.sourceId, title: r.titleOriginal, sourceType: r.sourceType, priority: r.priority, reviewStatus: r.reviewStatus ?? "ingested" })),
     verificationSummary: {
       verifiedCount: response.results.filter((r) => verifyRecord(r).verified).length,
       unverifiedCount: response.results.filter((r) => !verifyRecord(r).verified).length
