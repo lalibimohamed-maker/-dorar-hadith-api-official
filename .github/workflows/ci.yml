@@ -51,7 +51,7 @@ jobs:
             config/corpus-source-routing-2026.json config/corpus-seed-content-batch-05-2026-08-22.json
             config/concept-knowledge-schema-2026.json config/ghaib-source-framework-2026.json config/ghaib-evidence-catalog-2026.json config/ghayb-knowledge-domains-2026.json
             src/corpus_repository.js src/corpus_search.js src/corpus_api.js src/ghayb-router.js src/http_server.js src/index.js
-            test/ghaib-source-framework.test.js
+            test/ghaib-source-framework.test.js test/ghaib-evidence-api.test.js
           )
           for file in "${required_files[@]}"; do
             if [ ! -f "$file" ]; then echo "MISSING REQUIRED FILE: $file"; exit 1; fi
@@ -66,6 +66,8 @@ jobs:
         run: node test/query-intent-router.test.js
       - name: Run ghaib framework tests
         run: node test/ghaib-source-framework.test.js
+      - name: Run ghaib evidence API tests
+        run: node test/ghaib-evidence-api.test.js
       - name: Run corpus API integration tests
         run: npm run test:corpus
       - name: Run full test suite
