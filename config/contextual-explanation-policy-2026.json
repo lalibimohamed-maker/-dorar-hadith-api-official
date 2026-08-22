@@ -1,9 +1,9 @@
 {
-  "version":"2026.15",
-  "feature":"contextual-explanation",
+  "version":"2026.16",
+  "feature":"contextual-knowledge-long-press",
   "activation":{"gesture":"long-press","defaultDurationMs":5000,"configurable":true},
-  "scope":"all-indexed-Islamic-knowledge-domains",
-  "domains":["quran","aqidah","hadith","fiqh","fatwa","tafsir","sirah","biography","history","usul-al-fiqh","legal-maxims","arabic-language","terminology","ethics","worship","transactions","sects-and-methodology","books-and-research"],
+  "scope":"all-indexed-Islamic-knowledge-domains-without-exception",
+  "domains":["quran","aqidah","tawhid","hadith","fiqh","fatwa","tafsir","sirah","biography","history","usul-al-fiqh","legal-maxims","arabic-language","terminology","ethics","worship","transactions","sects-and-methodology","books-and-research"],
   "behavior":{
     "trigger":"Long-press a recognized word, phrase, concept, pillar, category, or technical term for the configured duration.",
     "overlay":"medium contextual panel above the current search/article view; not a tiny tooltip and not a full-page navigation unless the user chooses to open it.",
@@ -11,14 +11,22 @@
     "dismiss":"tap-outside-or-close",
     "expand":"open-full-entry"
   },
+  "contextResolution":{
+    "usePageContext":true,
+    "useSearchContext":true,
+    "useDomainContext":true,
+    "useSourceContext":true,
+    "avoidAmbiguousSenseSelection":true
+  },
   "example":{
     "query":"أركان الإيمان",
     "resultTerms":["الإيمان بالله","ملائكته","كتبه","رسله","اليوم الآخر","القدر خيره وشره"],
     "longPress":"الإيمان بالله",
-    "panel":"Provide a concise, evidence-linked explanation of الإيمان بالله, then offer deeper Quran, authentic Sunnah, Salaf, scholarly and source-linked material without losing the original search context."
+    "panel":"Provide a concise, evidence-linked explanation of the selected concept, followed by relevant Quran, authentic Sunnah, Salaf, scholarly and source-linked material, without losing the original search context."
   },
+  "contentOrder":["concise-definition","primary-evidence","relevant-salaf-or-scholarly-explanation","related-sections","sources-and-verification-on-demand"],
   "language":{
-    "displayLanguage":"user-selected-interface/search-language",
+    "displayLanguage":"user-selected-interface-or-search-language",
     "originalText":"preserve canonical Arabic when source is Arabic",
     "translation":"use verified meaning translation when available",
     "machineTranslation":"never label as verified; separate optional assistance only"
@@ -29,11 +37,13 @@
     "preserveCompanionAndEarlyGenerationAttribution":true,
     "identifyScholarOrInstitution":true,
     "preserveDocumentedDisagreement":true,
-    "neverCreateUnsupportedConsensus":true
+    "neverCreateUnsupportedConsensus":true,
+    "canonicalSourceIsImmutable":true
   },
   "navigation":{
     "sameContextOverlay":true,
     "fullEntryOptional":true,
     "returnToSearchWithoutLoss":true
-  }
+  },
+  "accessibility":{"keyboardAlternative":true,"screenReaderAlternative":true,"touchDurationConfigurable":true}
 }
