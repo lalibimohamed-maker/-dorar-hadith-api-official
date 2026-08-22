@@ -5,6 +5,7 @@
     "aqeedah": {
       "method": ["القرآن والسنة", "فهم الصحابة والسلف", "تمييز النقل الصحيح", "عرض الخلاف العقدي عند الحاجة مع نسبته"],
       "sourcePolicy": "لا يُستدل في طبقة عقيدة أهل السنة بمجرد كون العالم من أهل العلم أو منسوبًا إلى أحد المذاهب الفقهية الأربعة؛ يُشترط توافق المصدر مع منهج الباب وتوثيق القول.",
+      "sourceRoutingConfig": "config/aqeedah-source-routing-2026.json",
       "primaryScholarFilter": "athari_or_source_verified",
       "excludedFromPrimaryAqeedah": [
         {"id":"al-baqillani","nameAr":"الباقلاني","classification":"Ashari theologian","allowedDomains":["usul-al-fiqh","comparative-theology"],"aqeedahRole":"comparative-only"},
@@ -12,13 +13,19 @@
         {"id":"al-ghazali","nameAr":"الغزالي","classification":"Ashari theologian","allowedDomains":["usul-al-fiqh","fiqh","maqasid","comparative-theology"],"aqeedahRole":"comparative-only"}
       ],
       "scholars": [
+        {"id":"abu-hanifa","nameAr":"أبو حنيفة","status":"verified-scholar-record","aqeedahRole":"primary-reference"},
+        {"id":"malik-ibn-anas","nameAr":"مالك بن أنس","status":"verified-scholar-record","aqeedahRole":"primary-reference"},
+        {"id":"al-shafii","nameAr":"الشافعي","status":"verified-scholar-record","aqeedahRole":"primary-reference"},
+        {"id":"ahmad-ibn-hanbal","nameAr":"أحمد بن حنبل","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"al-darimi","nameAr":"عثمان بن سعيد الدارمي","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"ibn-abd-al-barr","nameAr":"ابن عبد البر","status":"verified-scholar-record","aqeedahRole":"primary-reference"},
         {"id":"ibn-taymiyyah","nameAr":"ابن تيمية","status":"verified-scholar-record","aqeedahRole":"primary"},
         {"id":"ibn-al-qayyim","nameAr":"ابن القيم","status":"verified-scholar-record","aqeedahRole":"primary"},
         {"id":"al-ajurri","nameAr":"الآجري","status":"verified-scholar-record","aqeedahRole":"primary"},
         {"id":"al-lalikaei","nameAr":"اللالكائي","status":"verified-scholar-record","aqeedahRole":"primary"},
         {"id":"al-barbahari","nameAr":"البربهاري","status":"verified-scholar-record","aqeedahRole":"primary"},
         {"id":"ibn-battah","nameAr":"ابن بطة العكبري","status":"verified-scholar-record","aqeedahRole":"primary"},
-        {"id":"al-tahawi","nameAr":"الطحاوي","status":"verified-scholar-record","aqeedahRole":"primary"},
+        {"id":"al-tahawi","nameAr":"الطحاوي","status":"verified-scholar-record","aqeedahRole":"primary-reference"},
         {"id":"al-sabuni","nameAr":"الصابوني","status":"verified-scholar-record","aqeedahRole":"primary"},
         {"id":"al-sadi","nameAr":"السعدي","status":"verified-scholar-record","aqeedahRole":"primary"},
         {"id":"ibn-baz","nameAr":"ابن باز","status":"verified-scholar-record","aqeedahRole":"primary"},
@@ -100,6 +107,7 @@
     "preserveScholarlyDisagreement": true,
     "aqeedahPrimarySourceMustPassMethodologyFilter": true,
     "fiqhAndUsulBenefitDoesNotImplyAqeedahEndorsement": true,
+    "comparativeTheologyNeverPromotedToPrimaryAqeedah": true,
     "contemporaryScholarWorksNeedWorkLevelVerification": true,
     "copyright": "catalog-and-link-unless-licensed"
   }
