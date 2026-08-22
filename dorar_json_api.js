@@ -13,7 +13,7 @@ import { getComplexFaraidCase, listComplexFaraidCases } from "./src/faraid-compl
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
-const API_VERSION = "0.8.4";
+const API_VERSION = "0.8.5";
 const MAX_QUERY_LENGTH = Number(process.env.MAX_QUERY_LENGTH || 300);
 const PUBLIC_WINDOW_MS = 60_000;
 const PUBLIC_MAX_PER_WINDOW = Number(process.env.PUBLIC_MAX_PER_MINUTE || 30);
