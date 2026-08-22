@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  # Keep CI active for every repository push; this also provides a simple push trigger to verify the workflow itself.
   push:
   pull_request:
     branches: [main]
