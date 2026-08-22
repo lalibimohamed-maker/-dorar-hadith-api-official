@@ -1,0 +1,19 @@
+{
+  "version":"2026-08",
+  "purpose":"تحويل سجل المؤسسات الموثقة إلى خطة جمع وثائق قابلة للتدقيق دون افتراض حقوق إعادة النشر",
+  "documentStatuses":["discovered","institution-verified","document-verified","edition-verified","rights-verified","ingested","reviewed","published"],
+  "requiredDocumentFields":["documentId","sourceId","title","authorOrInstitution","sourceUrl","documentType","editionOrRevision","locator","rightsStatus","retrievedAt","verificationStatus"],
+  "acquisitionRules":{
+    "officialWebText":"ingest only when reuse basis is verified; otherwise index metadata and link",
+    "publicDomain":"verify edition/host rights before full-text redistribution",
+    "licensed":"store license evidence and license scope",
+    "unknown":"metadata-and-link-only",
+    "translation":"preserve source attribution and do not label machine output as official"
+  },
+  "priorityQueues":[
+    {"queue":"official-fatwa","sources":["saudi-general-ifta","saudi-permanent-fatwa","egypt-dar-al-ifta","kuwait-general-fatwa","jordan-general-iftaa"],"units":["fatwa","resolution","institutional-statement"]},
+    {"queue":"official-scholar-books","sources":["binbaz-official","binothaimeen-official"],"units":["book","fatwa","lesson","lecture","manuscript"]},
+    {"queue":"saudi-institutional","sources":["saudi-senior-scholars-secretariat","saudi-islamic-affairs-ministry"],"units":["resolution","statement","publication","research"]}
+  ],
+  "deduplication":"never merge different editions or institutional answers without explicit provenance review"
+}
