@@ -49,16 +49,21 @@ jobs:
             config/prophets-companions-genealogy-v2.json config/hadith-narrator-methodology-2026.json
             src/inheritance-calculator.js src/faraid-complex-cases.js src/faraid-advanced.js src/tajweed-curriculum.js
             src/prophets-companions-genealogy.js config/knowledge-source-expansion-2026.json
+            config/corpus-source-routing-2026.json config/corpus-seed-content-batch-05-2026-08-22.json
+            config/concept-knowledge-schema-2026.json src/corpus_repository.js src/corpus_search.js src/corpus_api.js src/http_server.js src/index.js
           )
           for file in "${required_files[@]}"; do
             if [ ! -f "$file" ]; then echo "MISSING REQUIRED FILE: $file"; exit 1; fi
           done
           grep -q './app.js' web/index.html
-          node --input-type=module -e "import fs from 'node:fs'; JSON.parse(fs.readFileSync('config/knowledge-source-expansion-2026.json','utf8')); JSON.parse(fs.readFileSync('config/hadith-narrator-methodology-2026.json','utf8')); console.log('Expanded source and hadith methodology JSON OK')"
+          node --input-type=module -e "import fs from 'node:fs'; for (const f of ['config/knowledge-source-expansion-2026.json','config/hadith-narrator-methodology-2026.json','config/corpus-source-routing-2026.json','config/corpus-seed-content-batch-05-2026-08-22.json','config/concept-knowledge-schema-2026.json']) JSON.parse(fs.readFileSync(f,'utf8')); console.log('Corpus/source JSON OK')"
           node --input-type=module -e "import { listNarratorGrades, listCoreRijalBooks, listChainPhenomena } from './src/hadith-narrator-methodology.js'; if(listNarratorGrades().length < 10 || listCoreRijalBooks().length < 10 || listChainPhenomena().length < 5) process.exit(1); console.log('Hadith methodology registry OK')"
 
       - name: Smoke test client configuration
         run: node --input-type=module -e "import fs from 'node:fs'; const s=fs.readFileSync('src/dorar-client.js','utf8'); if(!s.includes('https://dorar.net/dorar_api.json')) process.exit(1); console.log('Dorar client configuration OK')"
 
-      - name: Run test suite
+      - name: Run corpus API integration tests
+        run: npm run test:corpus
+
+      - name: Run full test suite
         run: npm test -- --test-reporter=spec
