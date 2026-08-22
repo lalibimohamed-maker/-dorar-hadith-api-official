@@ -1,0 +1,16 @@
+{
+  "version":"2026.16",
+  "purpose":"Index canonical Islamic source units so search and contextual cards can retrieve exact evidence.",
+  "unitTypes":["quran_ayah","quran_word","hadith","athar","scholarly_statement","fatwa","fatwa_collection","book","book_section","tafsir_entry","fiqh_ruling","fiqh_issue","biography","translation","research"],
+  "identity":{"stableId":true,"canonicalSourceRequired":true,"preserveOriginalText":true},
+  "metadata":["title","author_or_issuer","institution","country","date","language","sourceUrl","edition","volume","page","chapter","hadithNumber","surah","ayah","rightsStatus","verificationStatus","lastVerifiedAt"],
+  "relations":["supports","explains","transmits","quotes","contradicts","qualifies","translates","belongsTo","derivedFrom","relatedConcept"],
+  "evidence":{"preserveAttribution":true,"preserveChainWhenAvailable":true,"doNotMergeDisagreementsSilently":true,"canonicalTextAndCommentarySeparated":true},
+  "retrieval":{"contextAware":true,"languageAware":true,"sourcePriorityAware":true,"provenanceRequired":true},
+  "translation":{"originalLanguagePreserved":true,"verifiedMeaningTranslationPreferred":true,"machineTranslationNeverMarkedVerified":true},
+  "quran":{"canonicalArabicTextImmutable":true,"ayahAddressRequired":true,"wordOffsetsOptional":true},
+  "hadith":{"gradingFieldRequiredWhenKnown":true,"collectionAndLocationRequiredWhenKnown":true,"narratorAttributionPreserved":true},
+  "fatwa":{"issuerAndIssuerTypeRequired":true,"officialInstitutionSeparatedFromIndividualMufti":true,"dateAndReferencePreferred":true},
+  "books":{"authorAndeditionPreferred":true,"volumePagePreferred":true,"copyrightStatusTracked":true},
+  "quality":{"duplicateDetection":true,"brokenReferenceDetection":true,"periodicReverification":true}
+}
