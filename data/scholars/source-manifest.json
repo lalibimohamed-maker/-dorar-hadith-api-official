@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "discover_and_verify_scholars",
+  "sources": [
+    {
+      "id": "islamweb_scholar_translations",
+      "type": "discovery",
+      "url": "https://www.islamweb.net/ar/library/index.php?ID=32749&page=TreeCategory",
+      "note": "واسع لاكتشاف تراجم العلماء؛ لا يُستخدم وحده لإثبات كل نسبة أو تصنيف."
+    },
+    {
+      "id": "binbaz_official",
+      "type": "primary_contemporary_source",
+      "url": "https://binbaz.org.sa/",
+      "note": "مصدر رسمي لمواد الشيخ ابن باز وما يتعلق بتراثه المنشور."
+    },
+    {
+      "id": "saudi_ifta",
+      "type": "official_contemporary_source",
+      "url": "https://alifta.gov.sa/",
+      "note": "مصدر رسمي للفتاوى والمواد المنشورة من جهة الإفتاء السعودية."
+    }
+  ],
+  "pipeline": [
+    "discover names",
+    "normalize Arabic names and kunyah/nisbah variants",
+    "deduplicate identities",
+    "verify identity",
+    "attach biography sources",
+    "attach works and quotations only with provenance",
+    "record methodology/classification only when sourced",
+    "keep disputed claims separate",
+    "publish only after verification threshold"
+  ]
+}
