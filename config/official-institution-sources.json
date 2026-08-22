@@ -3,10 +3,11 @@
     "role": "islamic-official-institution-secondary-reference",
     "neverOverridesPrimaryRijalEvidence": true,
     "neverAutoPromotesToVerified": true,
-    "useCases": ["biography", "institution", "manuscript", "catalog", "modern-context", "identity-cross-check"],
+    "useCases": ["biography", "institution", "manuscript", "catalog", "modern-context", "identity-cross-check", "official-religious-content"],
     "verificationLevels": ["unverified", "accessible", "supported", "verified", "disputed"],
     "displayLabelAr": "مصادر إسلامية رسمية ومؤسسية مساندة",
-    "displayNoteAr": "هذه المصادر مراجع مساندة ولا تُعامل كمصادر أصلية للحكم على الرواة أو الأحاديث."
+    "displayNoteAr": "هذه المصادر مراجع مساندة ولا تُعامل كمصادر أصلية للحكم على الرواة أو الأحاديث.",
+    "selectionRule": "official_domains_verified_before_inclusion"
   },
   "sources": [
     {"id":"algeria-national-library","country":"DZ","nameAr":"المكتبة الوطنية الجزائرية","institutionType":"national-library","url":"https://digitallibrary.biblionat.dz/ar","capabilities":["manuscripts","rare-books","bibliography","catalog"]},
@@ -16,6 +17,15 @@
     {"id":"saudi-libraries-commission","country":"SA","nameAr":"هيئة المكتبات السعودية","institutionType":"government-authority","url":"https://libraries.moc.gov.sa/","capabilities":["digital-library","manuscripts","books","catalog"]},
     {"id":"qatar-ministry-awqaf-islamic-affairs","country":"QA","nameAr":"وزارة الأوقاف والشؤون الإسلامية - دولة قطر","institutionType":"government-ministry","url":"https://www.islam.gov.qa/","capabilities":["quran","religious-education","mosques","institution"]},
     {"id":"uae-general-authority-islamic-affairs-endowments","country":"AE","nameAr":"الهيئة العامة للشؤون الإسلامية والأوقاف والزكاة - الإمارات","institutionType":"government-authority","url":"https://u.ae/en/information-and-services/public-holidays-and-religious-affairs/official-religion-and-religious-affairs-entities","capabilities":["religious-affairs","mosques","quran","hajj","awqaf"]},
+    {"id":"kuwait-ministry-awqaf-islamic-affairs","country":"KW","nameAr":"وزارة الأوقاف والشؤون الإسلامية - الكويت","institutionType":"government-ministry","url":"https://www.awqaf.gov.kw/ar/","capabilities":["quran","islamic-studies","mosques","hajj","official-religious-content"]},
+    {"id":"jordan-ministry-awqaf-islamic-affairs","country":"JO","nameAr":"وزارة الأوقاف والشؤون والمقدسات الإسلامية - الأردن","institutionType":"government-ministry","url":"https://awqaf.gov.jo/Default/Ar","capabilities":["islamic-affairs","awqaf","mosques","quran","hajj","religious-education"]},
+    {"id":"oman-ministry-endowments-religious-affairs","country":"OM","nameAr":"وزارة الأوقاف والشؤون الدينية - عُمان","institutionType":"government-ministry","url":"https://gov.om/ar/ministry-of-endowments-and-religious-affairs","capabilities":["religious-affairs","awqaf","religious-education","official-documents"]},
+    {"id":"bahrain-ministry-justice-islamic-affairs-waqf","country":"BH","nameAr":"وزارة العدل والشؤون الإسلامية والأوقاف - البحرين","institutionType":"government-ministry","url":"https://www.moj.gov.bh/","capabilities":["islamic-affairs","waqf","mosques","religious-services"]},
+    {"id":"egypt-ministry-awqaf","country":"EG","nameAr":"وزارة الأوقاف المصرية","institutionType":"government-ministry","url":"https://awkafonline.gov.eg/","capabilities":["quran","hadith","sira","religious-research","scholar-profiles","official-religious-content"]},
+    {"id":"morocco-ministry-habous-islamic-affairs","country":"MA","nameAr":"وزارة الأوقاف والشؤون الإسلامية - المغرب","institutionType":"government-ministry","url":"https://www.habous.gov.ma/","capabilities":["islamic-heritage","manuscripts","scientific-publications","quran","religious-education"]},
+    {"id":"tunisia-ministry-religious-affairs","country":"TN","nameAr":"وزارة الشؤون الدينية - تونس","institutionType":"government-ministry","url":"https://www.affaires-religieuses.tn/","capabilities":["religious-affairs","religious-education","official-structures","quran"]},
+    {"id":"palestine-ministry-endowments-religious-affairs","country":"PS","nameAr":"وزارة الأوقاف والشؤون الدينية - فلسطين","institutionType":"government-ministry","url":"https://www.pal-wakf.ps/","capabilities":["quran","religious-education","mosques","awqaf","hajj"]},
+    {"id":"yemen-ministry-endowments-guidance","country":"YE","nameAr":"وزارة الأوقاف والإرشاد - اليمن","institutionType":"government-ministry","url":"https://www.agoye.gov.ye/","capabilities":["awqaf","religious-guidance","religious-research","libraries","manuscripts","hajj"]},
     {"id":"malaysia-jakim","country":"MY","nameAr":"إدارة التنمية الإسلامية في ماليزيا (JAKIM)","institutionType":"government-department","url":"https://www.islam.gov.my/en/","capabilities":["islamic-affairs","islamic-library","religious-policy","education","official-information"]},
     {"id":"indonesia-ministry-religious-affairs","country":"ID","nameAr":"وزارة الشؤون الدينية في جمهورية إندونيسيا","institutionType":"government-ministry","url":"https://kemenag.go.id/en","capabilities":["religious-affairs","islamic-education","quran","hajj","official-information"]}
   ]
