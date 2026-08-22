@@ -1,0 +1,45 @@
+name: Scholar Research Batch
+
+on:
+  workflow_dispatch:
+    inputs:
+      offset:
+        description: "Batch offset"
+        required: false
+        default: "0"
+      limit:
+        description: "Batch size"
+        required: false
+        default: "25"
+      query:
+        description: "Optional scholar name or ID"
+        required: false
+        default: ""
+  schedule:
+    - cron: "17 2 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  research-batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build first scholar batch
+        run: node scripts/run-scholar-opinions-batch.js --offset=${{ inputs.offset || '0' }} --limit=${{ inputs.limit || '25' }} --query=${{ inputs.query || '' }} > scholar-opinion-batch.json
+      - name: Probe official web sources
+        run: node scripts/probe-official-scholar-sources.js --offset=${{ inputs.offset || '0' }} --limit=${{ inputs.limit || '25' }} --query=${{ inputs.query || '' }} > scholar-official-source-probe.json
+      - name: Upload research artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: scholar-research-batch
+          path: |
+            scholar-opinion-batch.json
+            scholar-official-source-probe.json
