@@ -1,0 +1,21 @@
+{
+  "version":"2026-08-22",
+  "batch":"03",
+  "status":"queued-for-content-ingestion",
+  "parallelTracks":[
+    {"id":"quran-tafsir","domains":["quran","tafsir","quran-words"],"sourcePolicy":"canonical-arabic-first","translationPolicy":"verified-meaning-only-when-available"},
+    {"id":"sunnah","domains":["hadith","takhrij","narrators","shuruh"],"sourcePolicy":"preserve-book-and-location-provenance"},
+    {"id":"fiqh-aqidah","domains":["fiqh","usul-al-fiqh","aqidah","tawhid"],"sourcePolicy":"attribute-each-view-to-its-author-or-institution"},
+    {"id":"fatwa","domains":["fatwa"],"sourcePolicy":"institution-and-mufti-attribution-required"},
+    {"id":"seerah-books","domains":["seerah","biography","books"],"sourcePolicy":"bibliographic-record-before-full-text"},
+    {"id":"languages","domains":["translations","bilingual-search","concept-cards"],"sourcePolicy":"translation-linked-to-canonical-source"}
+  ],
+  "verifiedOfficialAnchors":[
+    {"id":"saudi-ifta","type":"official-government","url":"https://alifta.gov.sa/","capabilities":["fatwa","senior-scholars","permanent-committee","islamic-research-journal","publications"]},
+    {"id":"saudi-sunnah-portal","type":"official-government","url":"https://sunnah.prh.gov.sa/","capabilities":["sunnah-learning","scientific-texts","hadith-content"]}
+  ],
+  "qualityGates":["source-identity","exact-attribution","location-or-citation","text-integrity","rights-status","translation-provenance","duplicate-detection","conflict-preservation"],
+  "displayRules":{"unverifiedNeverLabeledVerified":true,"originalTextPreserved":true,"mediumOverlayForLongPress":true,"longPressMs":5000,"parentSearchContextPreserved":true},
+  "refresh":{"officialSources":"scheduled-recheck","broken-links":"quarantine","changed-content":"revalidate-before-promotion"},
+  "notes":["This batch defines ingestion connectors and records; it does not claim that entire copyrighted books have been copied into the repository.","Official status is provenance metadata, not a claim of infallibility."]
+}
