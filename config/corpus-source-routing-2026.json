@@ -1,0 +1,9 @@
+{
+  "version":"2026.08",
+  "purpose":"Route searchable knowledge units to authoritative source classes and interactive concept cards",
+  "sourcePriority":["quran_canonical","sunnah_verified","companion_successor_reports","scholarly_books","fiqh_councils","official_fatwa","secondary_research"],
+  "domains":{"quran-tafsir":{"source_classes":["quran_canonical","tafsir"],"translation_mode":"meaning_only"},"hadith-takhrij":{"source_classes":["sunnah_verified","hadith_service"],"requires":["takhrij","grading","attribution"]},"aqidah":{"source_classes":["quran_canonical","sunnah_verified","scholarly_books"]},"fiqh":{"source_classes":["quran_canonical","sunnah_verified","scholarly_books","fiqh_councils","official_fatwa"]},"fatwa":{"source_classes":["official_fatwa","scholarly_fatwa"],"requires":["issuer","date_or_record_id","source_url"]},"seerah":{"source_classes":["sunnah_verified","scholarly_books"]},"scholars-books":{"source_classes":["scholarly_books","bibliographic_catalog"]},"translations":{"source_classes":["official_translation","reviewed_translation"],"translation_mode":"meaning_only"}},
+  "conceptResolution":{"longPressSeconds":5,"contextRequired":true,"originalArabicPreserved":true,"window":"medium","showSourceOnDemand":true,"language":"browser_or_selected_language"},
+  "bilingualSearch":{"enabledByUser":true,"default":"off","resultPattern":["original_arabic","meaning_translation"],"openOriginalOnDemand":true},
+  "verification":{"pendingCannotBePresentedAsVerified":true,"disagreementMustBePreserved":true,"translationCannotReplaceOriginal":true}
+}
