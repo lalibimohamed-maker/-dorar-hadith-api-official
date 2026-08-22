@@ -1,5 +1,5 @@
-const assert = require('assert');
-const { searchCorpus, resolveConcept, makeBilingual } = require('../src/corpus_search');
+import assert from 'node:assert/strict';
+import { searchCorpus, resolveConcept, makeBilingual } from '../src/corpus_search.js';
 
 const records = [
   { id: 'concept:arkan-al-iman', type: 'concept', title_ar: 'أركان الإيمان', verification_state: 'pending' },
@@ -7,17 +7,17 @@ const records = [
 ];
 
 const search = searchCorpus('أركان الإيمان', { language: 'ar' }, records);
-assert.strictEqual(search.results.length, 1);
-assert.strictEqual(search.results[0].trusted, false);
+assert.equal(search.results.length, 1);
+assert.equal(search.results[0].trusted, false);
 
 const card = resolveConcept('الإيمان بالله', 'concept:iman-billah', 'ar', records);
-assert.strictEqual(card.duration_seconds, 5);
-assert.strictEqual(card.window, 'medium');
-assert.strictEqual(card.record.trusted, false);
+assert.equal(card.duration_seconds, 5);
+assert.equal(card.window, 'medium');
+assert.equal(card.record.trusted, false);
 
 const bilingual = makeBilingual('الإسلام', 'Islam', 'en');
-assert.strictEqual(bilingual.original_arabic, 'الإسلام');
-assert.strictEqual(bilingual.meaning_translation.language, 'en');
-assert.strictEqual(bilingual.open_original_on_demand, true);
+assert.equal(bilingual.original_arabic, 'الإسلام');
+assert.equal(bilingual.meaning_translation.language, 'en');
+assert.equal(bilingual.open_original_on_demand, true);
 
 console.log('corpus API contract tests: OK');
