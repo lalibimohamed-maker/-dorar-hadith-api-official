@@ -34,12 +34,17 @@ jobs:
         run: npm install --ignore-scripts --no-package-lock --no-audit --no-fund
 
       - name: Syntax check
-        run: npm run health
+        run: |
+          npm run health
+          node --check web/app.js
 
       - name: Validate required project files
         run: |
           test -f dorar_json_api.js
           test -f openapi.yaml
+          test -f web/index.html
+          test -f web/app.js
+          grep -q 'web/app.js' web/index.html
           test -f src/dorar-client.js
           test -f src/unified-search.js
           test -f src/fiqh-research.js
