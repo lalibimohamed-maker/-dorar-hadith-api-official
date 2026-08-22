@@ -51,7 +51,8 @@ function extractJudgmentEvidence(text, sourceId) {
 
 export function buildRijalIngestionBatch({ sourceId, offset = 0, limit = 100 } = {}) {
   const catalog = sourcesById();
-  const ordered = sourceId ? [sourceId] : plan.order.slice(0, 2);
+  const batch1 = plan.order?.batch1_core_early || [];
+  const ordered = sourceId ? [sourceId] : batch1.slice(0, 2);
   const sources = ordered.map((id) => catalog.get(id)).filter(Boolean);
   return {
     generatedAt: new Date().toISOString(), offset, limit,
