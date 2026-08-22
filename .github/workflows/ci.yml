@@ -51,7 +51,7 @@ jobs:
           for file in "${required_files[@]}"; do
             if [ ! -f "$file" ]; then echo "MISSING REQUIRED FILE: $file"; exit 1; fi
           done
-          grep -q 'web/app.js' web/index.html
+          grep -Eq '(^|["'"'])\.?/app\.js(["'"']|$)' web/index.html
           node --input-type=module -e "import fs from 'node:fs'; JSON.parse(fs.readFileSync('config/knowledge-source-expansion-2026.json','utf8')); console.log('Expanded source catalog JSON OK')"
 
       - name: Smoke test client configuration
