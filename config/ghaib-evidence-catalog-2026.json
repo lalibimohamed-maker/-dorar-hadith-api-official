@@ -1,0 +1,38 @@
+{
+  "version":"2026.08.22.2",
+  "status":"verified-source-seed",
+  "policy":"Only records marked verified may be rendered as established evidence. Unverified hadith/book claims remain research targets.",
+  "sourceClasses":{
+    "quran":"Quran canonical reference",
+    "sunnah":"Hadith source requiring grading/attribution",
+    "scholarBook":"Bibliographic source for attributed scholarly discussion"
+  },
+  "sources":[
+    {"id":"quran","type":"quran","title_ar":"القرآن الكريم","authority":"primary","verification":"canonical","url":"https://quran.com/"},
+    {"id":"dorar-hadith","type":"sunnah","title_ar":"الدرر السنية - الموسوعة الحديثية","authority":"hadith-index","verification":"source-index","url":"https://dorar.net/hadith"},
+    {"id":"hadi-al-arwah","type":"scholarBook","title_ar":"حادي الأرواح إلى بلاد الأفراح","author_ar":"ابن قيم الجوزية","verification":"bibliographic-source","locatorPolicy":"book/chapter/page must be supplied before quoting as evidence"},
+    {"id":"al-ruh-ibn-qayyim","type":"scholarBook","title_ar":"الروح","author_ar":"ابن قيم الجوزية","verification":"bibliographic-source","locatorPolicy":"book/chapter/page must be supplied before quoting as evidence"},
+    {"id":"bidaya-wa-nihaya","type":"scholarBook","title_ar":"البداية والنهاية","author_ar":"ابن كثير","verification":"bibliographic-source","locatorPolicy":"historical report requires report-level grading"}
+  ],
+  "records":[
+    {"id":"ghaib:ruh:quran-17-85","concept":"ruh","evidence_type":"quranic","verification_state":"verified","locator":"17:85","source_id":"quran","claim_ar":"ورد السؤال عن الروح، وأن العلم بها من أمر الله، مع بيان محدودية علم الإنسان.","primary":true},
+    {"id":"ghaib:barzakh:quran-23-99-100","concept":"barzakh","evidence_type":"quranic","verification_state":"verified","locator":"23:99-100","source_id":"quran","claim_ar":"ورد ذكر البرزخ بين الموت والرجوع إلى الدنيا.","primary":true},
+    {"id":"ghaib:keys:quran-6-59","concept":"keys-of-unseen","evidence_type":"quranic","verification_state":"verified","locator":"6:59","source_id":"quran","claim_ar":"ورد ذكر مفاتح الغيب وأن علمها عند الله.","primary":true},
+    {"id":"ghaib:angels:quran-16-2","concept":"angels","evidence_type":"quranic","verification_state":"verified","locator":"16:2","source_id":"quran","claim_ar":"ورد ذكر نزول الملائكة بالروح من أمر الله على من يشاء من عباده.","primary":true},
+    {"id":"ghaib:jinn:quran-51-56","concept":"jinn","evidence_type":"quranic","verification_state":"verified","locator":"51:56","source_id":"quran","claim_ar":"ورد بيان غاية خلق الجن والإنس وهي عبادة الله.","primary":true},
+    {"id":"ghaib:devil:quran-7-11-18","concept":"devil","evidence_type":"quranic","verification_state":"verified","locator":"7:11-18","source_id":"quran","claim_ar":"وردت قصة إبليس وامتناعه واستكباره وطلبه الإغواء.","primary":true},
+    {"id":"ghaib:death:quran-3-185","concept":"death","evidence_type":"quranic","verification_state":"verified","locator":"3:185","source_id":"quran","claim_ar":"كل نفس ذائقة الموت، وإنما توفى الأجور يوم القيامة.","primary":true},
+    {"id":"ghaib:resurrection:quran-22-7","concept":"resurrection","evidence_type":"quranic","verification_state":"verified","locator":"22:7","source_id":"quran","claim_ar":"ورد تقرير أن الساعة آتية لا ريب فيها وأن الله يبعث من في القبور.","primary":true},
+    {"id":"ghaib:paradise:quran-18-107","concept":"paradise","evidence_type":"quranic","verification_state":"verified","locator":"18:107","source_id":"quran","claim_ar":"ورد ذكر جنات الفردوس نزلا للمؤمنين الذين آمنوا وعملوا الصالحات.","primary":true},
+    {"id":"ghaib:paradise:quran-23-10-11","concept":"paradise","evidence_type":"quranic","verification_state":"verified","locator":"23:10-11","source_id":"quran","claim_ar":"ورد ذكر الوارثين الذين يرثون الفردوس وهم فيها خالدون.","primary":true},
+    {"id":"ghaib:paradise:quran-9-72","concept":"paradise","evidence_type":"quranic","verification_state":"verified","locator":"9:72","source_id":"quran","claim_ar":"ورد ذكر جنات تجري من تحتها الأنهار ومساكن طيبة ورضوان الله، وبيان أن ذلك هو الفوز العظيم.","primary":true},
+    {"id":"ghaib:hellfire:quran-4-56","concept":"hellfire","evidence_type":"quranic","verification_state":"verified","locator":"4:56","source_id":"quran","claim_ar":"ورد وعيد الكافرين بالنار وبيان تبديل الجلود ليذوقوا العذاب.","primary":true},
+    {"id":"ghaib:hellfire:quran-67-6-7","concept":"hellfire","evidence_type":"quranic","verification_state":"verified","locator":"67:6-7","source_id":"quran","claim_ar":"ورد ذكر عذاب جهنم وشهيقها وغليانها عند إلقاء أهلها فيها.","primary":true},
+    {"id":"ghaib:istawa:quran-20-5","concept":"istawa","evidence_type":"quranic","verification_state":"verified","locator":"20:5","source_id":"quran","claim_ar":"ورد ذكر استواء الرحمن على العرش كما في النص القرآني، ويُعرض النص دون تكييف أو تمثيل.","primary":true},
+    {"id":"ghaib:istawa:quran-7-54","concept":"istawa","evidence_type":"quranic","verification_state":"verified","locator":"7:54","source_id":"quran","claim_ar":"ورد ذكر خلق السماوات والأرض والاستواء على العرش في الآية.","primary":true},
+    {"id":"ghaib:allah:quran-112","concept":"allah","evidence_type":"quranic","verification_state":"verified","locator":"112:1-4","source_id":"quran","claim_ar":"سورة الإخلاص أصل في بيان توحيد الله وتنزيهه عن المماثلة والوالدية.","primary":true},
+    {"id":"ghaib:scholar-hadi-al-arwah","concept":"paradise","evidence_type":"scholar-book","verification_state":"attributed-book","source_id":"hadi-al-arwah","claim_ar":"يُفهرس كتاب حادي الأرواح كمصدر بحث في أحوال الجنة ونعيمها، ولا تُنسب تفاصيله إلى السنة الصحيحة إلا بعد تخريج كل خبر.","primary":false},
+    {"id":"ghaib:scholar-al-ruh","concept":"ruh","evidence_type":"scholar-book","verification_state":"attributed-book","source_id":"al-ruh-ibn-qayyim","claim_ar":"يُفهرس كتاب الروح كمصدر بحث في مسائل الروح وأحوالها، ولا يُعامل الكتاب بذاته كدليل مستقل على صحة كل خبر.","primary":false},
+    {"id":"ghaib:scholar-bidaya","concept":"prophets-stories","evidence_type":"historical-book","verification_state":"historical-source","source_id":"bidaya-wa-nihaya","claim_ar":"تُستخدم البداية والنهاية لاكتشاف الروايات التاريخية، ثم يلزم فحص كل رواية وإسنادها ودرجتها قبل تقريرها.","primary":false}
+  ]
+}
