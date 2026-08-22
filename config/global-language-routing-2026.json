@@ -1,0 +1,11 @@
+{
+  "version":"2026.9",
+  "defaultLanguage":"ar",
+  "supportedPriorityLanguages":["ar","en","fr","es","de","tr","ur","id","ms","bn","hi","ru","fa","zh","sw","ha","pt","it","ja","ko"],
+  "worldLanguageExpansion":true,
+  "routing":{"source":"user-preference","fallback":"ar","persistPreference":true,"applyTo":"ui,search,research,citations,translation-metadata,quran-verse-card"},
+  "quranVerseCard":{"reference":"3:85","showArabicAlways":true,"translationLabel":"ترجمة معاني القرآن","neverPresentTranslationAsQuran":true,"translationSelection":"user-language","verifiedTranslationPreferred":true,"unverifiedTranslation":"show-status-and-do-not-label-as-official"},
+  "research":{"answerInUserLanguage":true,"preserveOriginalSource":true,"showSourceLocator":true,"showTranslationStatus":true},
+  "citations":{"localizedInterface":true,"canonicalSourceLanguage":"original","neverTranslateCitationIdentity":true},
+  "accessibility":{"rtlForArabicAndRtlLanguages":true,"ltrForLtrLanguages":true,"languageMetadataRequired":true}
+}
