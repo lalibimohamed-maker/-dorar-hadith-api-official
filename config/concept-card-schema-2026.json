@@ -1,0 +1,13 @@
+{
+  "version":"2026.15",
+  "entity":"contextual-concept-card",
+  "purpose":"Provide a verified, context-sensitive explanation when a user long-presses a term or phrase without leaving the current research context.",
+  "identity":["conceptId","canonicalTerm","domain","languageIndependentKey"],
+  "contextResolution":["queryContext","documentContext","sentenceContext","domainContext","sourceContext"],
+  "content":["conciseDefinition","expandedDefinition","relatedConcepts","categoriesOrPillars","evidenceLinks"],
+  "evidenceOrder":["quran","authenticated-sunnah","companion-report","follower-and-early-salaf-report","scholarly-source","official-institutional-source","secondary-study"],
+  "provenanceRequired":["sourceId","locator","authorOrInstitution","verificationStatus","rightsStatus"],
+  "translation":{"canonicalLanguage":"ar","target":"user-selected-or-query-language","verifiedTranslationPreferred":true,"machineTranslationNeverLabeledVerified":true},
+  "ui":{"trigger":"long-press","defaultDurationMs":5000,"overlay":"medium","preserveUnderlyingPage":true,"closeReturnsToExactContext":true,"allowExpand":true},
+  "safety":{"ambiguousMeaningRequiresContextResolution":true,"noUnsupportedReligiousClaimGeneration":true,"noCitationFabrication":true}
+}
