@@ -1,0 +1,12 @@
+{
+  "version":"2026.08.23.1",
+  "id":"zakat-calculator",
+  "nameAr":"محرك الزكاة والحساب التطبيقي",
+  "purpose":"تعليم الزكاة وحسابها تطبيقيًا مع إظهار الدليل والخلاف الفقهي وعدم افتراض نصاب أو سعر دون بيانات موثوقة",
+  "topics":["cash","gold","silver","trade_goods","livestock","agricultural_produce","debts","zakat_al_fitr","hawl","nisab","zakat_due_date","zakat_on_debt","calculation_examples","five_percent_rulings"],
+  "calculationPolicy":["identify_asset_type","determine_nisab_rule","determine_hawl_requirement","collect_amount_and_unit","apply_eligible_deductions_only_when_supported_by_selected_fiqh_rule","calculate_due_zakat","show_formula","show_source_and_madhhab_context"],
+  "safety":"لا يثبت نسبة أو نصاب أو حكم في مسألة خلافية من دون مصدر. القيم السوقية وأسعار الذهب والفضة يجب أن تأتي من بيانات حديثة موثوقة، ولا تُخمن.",
+  "khumsPolicy":"الخُمس ليس بابًا عامًا في كل الأموال؛ يعرضه المحرك بحسب النصوص والمسألة الفقهية والمذهب/القول المعتبر، ولا يساويه تلقائيًا بالزكاة.",
+  "fitrPolicy":"يعرض الأصل الثابت في السنة: صاع من الطعام عن المسلم، ويعرض الخلاف الفقهي في مقدار الوزن وإخراج القيمة بدل اختراع رقم ثابت للجميع.",
+  "output":["eligibility","nisab","hawl","calculation_steps","amount_due","evidence","scholarly_difference","references","language_of_user"]
+}
