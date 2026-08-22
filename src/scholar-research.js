@@ -1,6 +1,6 @@
-import "node:fs" from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from "node:url";
 import domainFramework from "../config/domain-scholar-framework.json" with { type: "json" };
 import contemporary from "../config/contemporary-sunni-scholars.json" with { type: "json" };
 import fiqhSources from "../config/fiqh-fatawa-sources.json" with { type: "json" };
@@ -115,9 +115,10 @@ export function searchScholars(query, { limit = 20, era, verifiedOnly = false } 
     .filter((item) => !era || item.era === era)
     .filter((item) => !verifiedOnly || ["verified", "supported"].includes(item.verification))
     .map((item) => {
-      const haystack = aliasesForScholar(item).map(normalize).join(" ");
-      const exactAlias = aliasesForScholar(item).some((alias) => normalize(alias) === q);
-      const partialAlias = aliasesForScholar(item).some((alias) => {
+      const aliases = aliasesForScholar(item);
+      const haystack = aliases.map(normalize).join(" ");
+      const exactAlias = aliases.some((alias) => normalize(alias) === q);
+      const partialAlias = aliases.some((alias) => {
         const normalizedAlias = normalize(alias);
         return normalizedAlias.includes(q) || q.includes(normalizedAlias);
       });
