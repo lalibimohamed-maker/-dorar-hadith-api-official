@@ -1,0 +1,16 @@
+{
+  "titleAr":"خريطة المصطلحات الفقهية واللغوية",
+  "version":"2026.1",
+  "policy":{"originalArabicCanonical":true,"lexicalMeaningAndTechnicalMeaningSeparated":true,"contextRequired":true,"sourceProvenanceRequired":true,"translationMustFollowResolvedSense":true},
+  "resolutionOrder":["quranic-context","hadith-context","classical-lexicons","arabic-grammar","fiqh-terminology","specific-fiqh-source","target-language-review"],
+  "terms":[
+    {"term":"فرض","root":"فرض","lexicalSources":["لسان العرب","مقاييس اللغة","المعجم الكبير"],"technicalDomains":["usul-al-fiqh","fiqh"],"rule":"never translate from dictionary alone"},
+    {"term":"واجب","root":"وجب","lexicalSources":["لسان العرب","تاج العروس","المعجم الوسيط"],"technicalDomains":["fiqh","usul-al-fiqh"],"rule":"preserve madhhab/context distinctions"},
+    {"term":"سنة","root":"سنن","lexicalSources":["مقاييس اللغة","لسان العرب","مفردات ألفاظ القرآن"],"technicalDomains":["hadith","fiqh","usul-al-fiqh"],"rule":"resolve technical sense from source context"},
+    {"term":"مكروه","root":"كره","lexicalSources":["لسان العرب","تاج العروس","المعجم الكبير"],"technicalDomains":["fiqh"],"rule":"do not collapse juristic درجات الكراهة"},
+    {"term":"باطل","root":"بطل","lexicalSources":["مقاييس اللغة","لسان العرب","المعجم الكبير"],"technicalDomains":["fiqh","usul-al-fiqh"],"rule":"preserve distinction from فاسد when source requires it"},
+    {"term":"فاسد","root":"فسد","lexicalSources":["لسان العرب","تاج العروس","المعجم الكبير"],"technicalDomains":["fiqh","usul-al-fiqh"],"rule":"madhhab-sensitive translation"},
+    {"term":"إجماع","root":"جمع","lexicalSources":["المعجم الكبير","لسان العرب"],"technicalDomains":["usul-al-fiqh","fiqh"],"rule":"must be linked to explicit scholarly claim and source"},
+    {"term":"قياس","root":"قيس","lexicalSources":["مقاييس اللغة","لسان العرب"],"technicalDomains":["usul-al-fiqh"],"rule":"technical definition must come from usul source"}
+  ]
+}
