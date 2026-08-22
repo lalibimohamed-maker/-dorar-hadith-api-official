@@ -1,0 +1,12 @@
+{
+  "version":"2026.15",
+  "entity":"quran-word-knowledge-card",
+  "purpose":"Connect each eligible Quranic word or phrase to verified lexical, contextual, tafsir, and cross-reference knowledge while preserving the canonical Quran text.",
+  "identity":["wordId","lemmaId","surahId","ayahId","tokenPosition","canonicalArabic"],
+  "layers":["reading","lexicalMeaning","morphology","root","contextualMeaning","wujuhWaNazaer","gharibWhenApplicable","tafsir","asbabAlNuzulWhenApplicable","revelationContextWhenApplicable","makkiMadani","relatedAyat","relatedConcepts"],
+  "evidenceOrder":["quran","authenticated-sunnah","companion-report","follower-and-early-salaf-report","recognized-tafsir-source","recognized-arabic-language-source"],
+  "translation":{"canonicalLanguage":"ar","target":"user-selected-or-query-language","verifiedMeaningTranslationPreferred":true,"machineTranslationSeparate":true},
+  "interaction":{"tap":"word-selection","longPress":"contextual-medium-overlay","durationMs":5000,"preserveAyahPosition":true},
+  "provenanceRequired":["sourceId","locator","authorOrInstitution","verificationStatus","rightsStatus"],
+  "constraints":{"neverAlterCanonicalQuranText":true,"neverConflateTafsirWithQuran":true,"neverPresentLexicalGlossAsDefinitiveTafsir":true,"noCitationFabrication":true}
+}
