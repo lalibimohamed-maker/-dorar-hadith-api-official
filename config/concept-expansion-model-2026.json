@@ -1,0 +1,11 @@
+{
+  "version":"2026.08",
+  "principle":"A long-pressed word resolves to the complete knowledge bundle for that word in its current context, not to one predefined concept.",
+  "resolutionOrder":["token","phrase","contextual_concept","linked_evidence","sources","translations"],
+  "bundle":{"definition":true,"meaning_in_context":true,"quran_evidence":true,"hadith_evidence":true,"tafsir":true,"aqidah":true,"fiqh":true,"seerah":true,"scholarly_views":true,"related_concepts":true,"translations":true,"source_records":true,"verification_states":true},
+  "examples":{
+    "arkan-al-iman":{"الإيمان بالله":"full concept bundle","ملائكته":"angels: full contextual bundle","كتبه":"revealed books: full contextual bundle","رسله":"messengers: full contextual bundle","اليوم الآخر":"Hereafter: full contextual bundle","القدر":"divine decree: full contextual bundle"},
+    "arkan-al-islam":{"الشهادتان":"full concept bundle","الصلاة":"full concept bundle","الزكاة":"full concept bundle","الصوم":"full concept bundle","الحج":"full concept bundle"}
+  },
+  "safety":{"contextRequired":true,"pendingNeverTrusted":true,"scholarlyDisagreementPreserved":true,"translationIsMeaningOnly":true}
+}
