@@ -1,6 +1,6 @@
 {
   "titleAr": "المصادر الثانوية الموسعة للفتوى والتراث الإفتائي",
-  "version": "2026.2",
+  "version": "2026.3",
   "policy": {
     "role": "secondary-reference",
     "primarySourcesRemainPreferred": true,
@@ -8,7 +8,8 @@
     "preserveScholarAttribution": true,
     "doNotFlattenDifferentInstitutions": true,
     "catalogAndLinkUnlessLicensed": true,
-    "officialStatusRequiresVerifiedInstitutionalSource": true
+    "officialStatusRequiresVerifiedInstitutionalSource": true,
+    "translationIsPresentationNotSourceSubstitution": true
   },
   "sources": [
     {"id":"algeria-religious-affairs-fatwa","nameAr":"وزارة الشؤون الدينية والأوقاف الجزائرية - الفتوى الإلكترونية","country":"الجزائر","category":"fatwa","url":"https://khadamates.marw.dz/","role":"secondary-official-national-fatwa","sourceKind":"national-religious-affairs-fatwa","coverage":["fatwa","fiqh","national-guidance"],"priority":80},
@@ -17,8 +18,10 @@
     {"id":"palestine-dar-ifta","nameAr":"دار الإفتاء الفلسطينية","country":"فلسطين","category":"fatwa","url":"https://www.darifta.ps/","role":"secondary-official-national-fatwa","sourceKind":"dar-al-ifta","coverage":["fatwa","fiqh","electronic-fatwa","oral-fatwa"],"priority":80},
     {"id":"libya-dar-ifta","nameAr":"دار الإفتاء الليبية","country":"ليبيا","category":"fatwa","url":"https://ifta.ly/","role":"secondary-official-national-fatwa","sourceKind":"dar-al-ifta","coverage":["fatwa","fiqh","research"],"priority":70},
     {"id":"malaysia-mufti-federal-territories","nameAr":"دائرة مفتي الأقاليم الاتحادية الماليزية","country":"ماليزيا","category":"fatwa","url":"https://www.muftiwp.gov.my/en/","role":"secondary-official-national-fatwa","sourceKind":"mufti-department","coverage":["fatwa","fiqh","research","e-fatwa","bayan-linnas"],"priority":80},
+    {"id":"kuwait-government-general-fatwa","nameAr":"خدمة الفتوى العامة - دولة الكويت","country":"الكويت","category":"fatwa","url":"https://e.gov.kw/sites/kgoenglish/Pages/Services/MOIAI/GeneralFatwas.aspx","role":"secondary-official-national-fatwa","sourceKind":"government-fatwa-service","coverage":["fatwa","fiqh","ibadat","muamalat","aqidah"],"priority":80},
+    {"id":"international-islamic-fiqh-academy","nameAr":"مجمع الفقه الإسلامي الدولي - قرارات وتوصيات فقهية","country":"منظمة التعاون الإسلامي","category":"fiqh","url":"https://iifa-aifi.org/en/translations","role":"secondary-institutional-reference","sourceKind":"international-fiqh-academy","coverage":["fiqh","resolutions","recommendations","research"],"priority":85},
     {"id":"ibn-taymiyyah-major-fatwas","nameAr":"الفتاوى الكبرى لشيخ الإسلام ابن تيمية","country":"التراث الإسلامي","category":"fatwa","url":"https://waqfeya.net/books/%D8%A7%D9%84%D9%81%D8%AA%D8%A7%D9%88%D9%89-%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89-%D8%B7-%D8%A7%D9%84%D8%B9%D9%84%D9%85%D9%8A%D8%A9/badd496c88d842d6b2533faf19aaf2ed","role":"secondary-classical-reference","sourceKind":"classical-fatwa-collection","scholar":"أحمد بن عبد الحليم ابن تيمية","coverage":["fatwa","aqidah","fiqh","usul","theology"],"priority":95},
-    {"id":"ibn-taymiyyah-mustadrak-fatwas","nameAr":"المستدرك على مجموع فتاوى شيخ الإسلام ابن تيمية","country":"التراث الإسلامي","category":"fatwa","url":"https://waqfeya.net/books/%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D8%AF%D8%B1%D9%83-%D8%B9%D9%84%D9%89-%D9%85%D8%AC%D9%85%D9%88%D8%B9-%D9%81%D8%AA%D8%A7%D9%88%D9%89-%D8%B4%D9%8A%D8%AE-%D8%A7%D9%84%D8%A5%D8%B3%D9%84%D8%A7%D9%85-%D8%A3%D8%AD%D9%85%D8%AF-%D8%A8%D9%86-%D8%AA%D9%8A%D9%85%D9%8A%D8%A9-066f97d72c8449e88041b6fe758fe0c7","role":"secondary-classical-reference","sourceKind":"fatwa-supplement","scholar":"أحمد بن عبد الحليم ابن تيمية","compilerAr":"محمد بن عبد الرحمن بن محمد بن قاسم","coverage":["fatwa","fiqh","aqidah","supplemental-material"],"priority":95},
+    {"id":"ibn-taymiyyah-mustadrak-fatwas","nameAr":"المستدرك على مجموع فتاوى شيخ الإسلام ابن تيمية","country":"التراث الإسلامي","category":"fatwa","url":"https://waqfeya.net/books/%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D8%AF%D8%B1%D9%83-%D8%B9%D9%84%D9%89-%D9%85%D8%AC%D9%85%D9%88%D8%B9-%D9%81%D8%AA%D8%A7%D9%88%D9%89-%D8%B4%D9%8A%D8%AE-%D8%A7%D9%84%D8%A5%D8%B3%D9%84%D8%A7%D9%85-%D8%A3%D8%AD%D9%85%D8%AF-%D8%A8%D9%86-%D8%AAيمية-066f97d72c8449e88041b6fe758fe0c7","role":"secondary-classical-reference","sourceKind":"fatwa-supplement","scholar":"أحمد بن عبد الحليم ابن تيمية","compilerAr":"محمد بن عبد الرحمن بن محمد بن قاسم","coverage":["fatwa","fiqh","aqidah","supplemental-material"],"priority":95},
     {"id":"fatwa-heritage-salaf-companions","nameAr":"فتاوى الصحابة والتابعين وأئمة السلف ضمن دواوين الآثار","country":"التراث الإسلامي","category":"fatwa","url":"https://shamela.ws/","role":"secondary-classical-reference","sourceKind":"heritage-fatwa-corpus","coverage":["companions","followers","early-scholars","athar","fiqh"],"priority":90}
   ]
 }
