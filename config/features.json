@@ -1,9 +1,30 @@
 {
-  "search": {"smart": true, "advanced": true, "categories":["القرآن","التفسير","التدبر","الهدايات","الحديث","السيرة","المسانيد","الفقه","العقيدة","أركان الإسلام","أركان الإيمان","الرواة","الكتب","مقاصد الشريعة"],"sourceAttribution":true},
-  "quran": {"reading":true,"wordHighlight":true,"ayahHighlight":true,"wordTap":true,"ayahTap":true,"tafsir":true,"revelationContext":true,"asbabAlNuzul":true,"nasikhMansukh":true,"muhkamMutashabih":true,"makkiMadani":true,"gharib":true,"wujuhNazaer":true},
+  "search": {
+    "smart": true,
+    "advanced": true,
+    "categories":["القرآن","التفسير","التدبر","الهدايات","الحديث","السيرة","المسانيد","الفقه","العقيدة","أركان الإسلام","أركان الإيمان","الرواة","الكتب","مقاصد الشريعة"],
+    "sourceAttribution":true,
+    "bilingualOptional":true,
+    "bilingualDefault":"off",
+    "bilingualTargetLanguage":"auto-from-user-selection-or-query-language"
+  },
+  "contextualKnowledge": {
+    "enabled": true,
+    "longPress": true,
+    "defaultDurationMs": 5000,
+    "mediumOverlay": true,
+    "contextAware": true,
+    "allDomains": true,
+    "preserveSearchContext": true,
+    "expandToFullEntry": true,
+    "verifiedEvidenceRequired": true,
+    "verifiedMeaningTranslationWhenAvailable": true,
+    "machineTranslationSeparate": true
+  },
+  "quran": {"reading":true,"wordHighlight":true,"ayahHighlight":true,"wordTap":true,"ayahTap":true,"longPressExplanation":true,"tafsir":true,"revelationContext":true,"asbabAlNuzul":true,"nasikhMansukh":true,"muhkamMutashabih":true,"makkiMadani":true,"gharib":true,"wujuhNazaer":true},
   "audio": {"reciters":true,"surahDownload":true,"fullQuranDownload":true,"ayahRangeDownload":true,"offlineCache":true,"wordSyncRequiresTimestamps":true,"redistributionRequiresPermission":true},
-  "fiqh": {"fourMadhhabs":true,"compareViews":true,"sourceAttribution":true,"notAnAutomatedMufti":true},
-  "seerah": {"timeline":true,"eventToAyahLinks":true,"ayahToEventLinks":true,"sourceAndReliabilityLabels":true},
+  "fiqh": {"fourMadhhabs":true,"compareViews":true,"sourceAttribution":true,"notAnAutomatedMufti":true,"longPressExplanation":true},
+  "seerah": {"timeline":true,"eventToAyahLinks":true,"ayahToEventLinks":true,"sourceAndReliabilityLabels":true,"longPressExplanation":true},
   "i18n": {
     "autoDetectDeviceLanguage":true,
     "detectQueryLanguage":true,
