@@ -169,8 +169,12 @@ export function calculateInheritance(raw = {}) {
     const eligible = allocations.filter(x => x.role === "fixed" && x.id !== "husband" && x.id !== "wives");
     const eligibleTotal = sum(eligible);
     if (gt(eligibleTotal,zero())) {
-      for (const x of eligible) x.share = norm(mul(x.share, f(remaining.num + eligibleTotal.num*remaining.den, remaining.den*eligibleTotal.den)));
-      // The multiplier above is (eligible + remaining) / eligible.
+      // Correct radd multiplier = (eligible fixed shares + residue) / eligible fixed shares.
+      const multiplier = norm(f(
+        eligibleTotal.num * remaining.den + remaining.num * eligibleTotal.den,
+        eligibleTotal.num * remaining.den
+      ));
+      for (const x of eligible) x.share = norm(mul(x.share, multiplier));
       remaining = zero();
       warnings.push("طُبِّق الرد على أصحاب الفروض غير الزوجين/الزوجة في الصورة البسيطة؛ مسائل الرد على الزوجين قد تختلف باختلاف المذهب والتفصيل.");
     } else {
