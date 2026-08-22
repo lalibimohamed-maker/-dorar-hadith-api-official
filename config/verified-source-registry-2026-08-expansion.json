@@ -1,0 +1,17 @@
+{
+  "version":"2026-08-expansion",
+  "policy":"institution verification precedes document ingestion; each document remains independently verified",
+  "sources":[
+    {"id":"saudi-general-ifta","country":"SA","institution":"الرئاسة العامة للبحوث العلمية والإفتاء","type":"government-ifta","tier":"primary","officialUrl":"https://alifta.gov.sa/","evidence":"official government site identifies the Presidency and its Permanent Committee for Fatwa"},
+    {"id":"saudi-permanent-fatwa","country":"SA","institution":"اللجنة الدائمة للفتوى","type":"official-fatwa-body","tier":"primary","officialUrl":"https://alifta.gov.sa/fatwa-committee","evidence":"official Presidency page identifies the committee and its fatwa remit"},
+    {"id":"saudi-senior-scholars-secretariat","country":"SA","institution":"الأمانة العامة لهيئة كبار العلماء","type":"scholarly-institution","tier":"primary-institutional","officialUrl":"https://alifta.gov.sa/general-secretariat","evidence":"official Presidency page describes its records of decisions, statements and fatwas"},
+    {"id":"saudi-islamic-affairs-ministry","country":"SA","institution":"وزارة الشؤون الإسلامية والدعوة والإرشاد","type":"government-ministry","tier":"primary-institutional","officialUrl":"https://www.my.gov.sa/","evidence":"Saudi government portal identifies the ministry and its Qur'an/Sunnah and da'wah remit"},
+    {"id":"binbaz-official","country":"SA","institution":"موقع الشيخ عبد العزيز بن باز","type":"official-scholar-site","tier":"primary-reference","officialUrl":"https://binbaz.org.sa/","evidence":"official site identifies itself as the official site and hosts books and fatwas"},
+    {"id":"binothaimeen-official","country":"SA","institution":"موقع الشيخ محمد بن صالح العثيمين","type":"official-scholar-site","tier":"primary-reference","officialUrl":"https://binothaimeen.net/","evidence":"official site exposes books, fatwas, manuscripts and other scholarly materials"},
+    {"id":"egypt-dar-al-ifta","country":"EG","institution":"دار الإفتاء المصرية","type":"official-ifta","tier":"primary-institutional","officialUrl":"https://www.dar-alifta.org/","evidence":"official Dar al-Ifta domain publishes fatwas and research"},
+    {"id":"kuwait-general-fatwa","country":"KW","institution":"خدمة الفتوى العامة - دولة الكويت","type":"government-fatwa-service","tier":"primary-institutional","officialUrl":"https://e.gov.kw/","evidence":"Kuwait Government Online documents the General Fatwa Service and its procedure"},
+    {"id":"jordan-general-iftaa","country":"JO","institution":"دائرة الإفتاء العام الأردنية","type":"official-ifta","tier":"primary-institutional","officialUrl":"https://www.aliftaa.jo/","evidence":"official Iftaa Department site exposes Iftaa Board, resolutions and fatwa search"}
+  ],
+  "nextVerification": ["Algeria","Morocco","Tunisia","Qatar","UAE","Bahrain","Oman","Turkey","Malaysia","Indonesia","Pakistan","India","Bangladesh","Sudan","Mauritania","West African institutions","European Muslim institutions","North American Muslim institutions"],
+  "rights":"metadata-and-links-until-document-level-reuse-is independently verified"
+}
