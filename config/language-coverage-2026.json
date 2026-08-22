@@ -1,0 +1,36 @@
+{
+  "titleAr": "منظومة اللغات والترجمة للموسوعة الإسلامية",
+  "version": "2026.1",
+  "policy": {
+    "arabicIsSourceLanguage": true,
+    "primarySourceTextMustBePreserved": true,
+    "translationDoesNotReplaceOriginal": true,
+    "everyTranslationCarriesLanguageAndProvenance": true,
+    "machineTranslationRequiresReviewStatus": true,
+    "copyrightAndLicenseMustBePreserved": true,
+    "worldLanguageExpansion": true
+  },
+  "agreed20": [
+    {"code":"ar","name":"العربية"},{"code":"en","name":"English"},{"code":"fr","name":"Français"},{"code":"es","name":"Español"},{"code":"de","name":"Deutsch"},{"code":"tr","name":"Türkçe"},{"code":"ur","name":"اردو"},{"code":"id","name":"Bahasa Indonesia"},{"code":"ms","name":"Bahasa Melayu"},{"code":"bn","name":"বাংলা"},{"code":"hi","name":"हिन्दी"},{"code":"ru","name":"Русский"},{"code":"fa","name":"فارسی"},{"code":"zh","name":"中文"},{"code":"sw","name":"Kiswahili"},{"code":"ha","name":"Hausa"},{"code":"pt","name":"Português"},{"code":"it","name":"Italiano"},{"code":"ja","name":"日本語"},{"code":"ko","name":"한국어"}
+  ],
+  "worldExpansion": {
+    "mode":"open-language-registry",
+    "sourceOfLanguageCodes":"BCP-47/ISO-639",
+    "priority":"agreed20-first-then-worldwide",
+    "includeRightToLeft":true,
+    "includeLowResourceLanguages":true
+  },
+  "translationTiers": {
+    "official-human":"official or institutionally reviewed translation",
+    "reviewed-human":"human translation reviewed for Islamic terminology",
+    "machine-reviewed":"machine translation awaiting or receiving human review",
+    "machine-draft":"machine-generated draft only; never presented as authoritative",
+    "original":"original-language source"
+  },
+  "termPolicy": {
+    "namesOfScholars":"preserve Arabic name plus transliteration where useful",
+    "bookTitles":"preserve original title and provide translated display title separately",
+    "fatwaAttribution":"never translate away the issuing scholar or institution",
+    "legalRuling":"preserve modality and uncertainty exactly; no strengthening or weakening by translation"
+  }
+}
