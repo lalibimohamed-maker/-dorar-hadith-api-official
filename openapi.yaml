@@ -2,188 +2,146 @@ openapi: 3.1.0
 info:
   title: Deen Allah Encyclopedia API
   version: 0.9.0
-  description: Multilingual research API for the Deen Allah Encyclopedia. It provides source-attributed access to Quran, hadith, tafsir, sirah, creed, fiqh, scholars, books, maqasid, inheritance and Quran learning resources. Original texts remain distinct from translations and source attribution is mandatory.
+  description: Multilingual source-attributed research API for Quran, hadith, tafsir, creed, fiqh, sirah, maqasid, faraid and Quran learning. Scholar inclusion is a research index, not automatic endorsement of every statement.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
 paths:
   /health:
     get:
       operationId: healthCheck
-      summary: Check API health
       responses:
         '200': {description: Healthy}
   /locales:
     get:
       operationId: listLocales
-      summary: List supported languages
       responses:
         '200': {description: Supported locales}
   /categories:
     get:
       operationId: listCategories
-      summary: List encyclopedia categories
       responses:
         '200': {description: Categories}
   /sources:
     get:
       operationId: listSources
-      summary: List configured sources
       parameters:
         - {name: category, in: query, required: false, schema: {type: string}}
         - {name: role, in: query, required: false, schema: {type: string}}
       responses:
         '200': {description: Source registry}
-  /sources/one:
-    get:
-      operationId: getSource
-      summary: Get one source by id
-      parameters:
-        - {name: id, in: query, required: true, schema: {type: string}}
-      responses:
-        '200': {description: Source}
-        '404': {description: Source not found}
-  /maqasid:
-    get:
-      operationId: getMaqasid
-      summary: Get maqasid taxonomy and the five necessities
-      responses:
-        '200': {description: Maqasid taxonomy}
   /search:
     get:
       operationId: search
-      summary: Multilingual source-attributed encyclopedia search
-      description: The language detected from the user's query has priority over the configured locale. Original Arabic Quran text is never replaced by translation. Results retain provenance and hadith grading separately from book presence. Fiqh matches preserve madhhab differences and source attribution.
+      summary: Multilingual unified search
       parameters:
         - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
         - {name: lang, in: query, required: false, schema: {type: string}}
         - {name: includePotentialMatches, in: query, required: false, schema: {type: boolean, default: false}}
       responses:
-        '200': {description: Multilingual search response}
-        '400': {description: Missing or invalid query}
+        '200': {description: Search results with provenance}
+        '400': {description: Missing query}
         '413': {description: Query too long}
         '429': {description: Rate limit exceeded}
-        '502': {description: Upstream source failure}
-  /books:
+        '502': {description: Upstream failure}
+  /research/domains:
     get:
-      operationId: listBooks
-      summary: List indexed books
-      parameters:
-        - {name: subject, in: query, required: false, schema: {type: string}}
-        - {name: madhhab, in: query, required: false, schema: {type: string}}
-        - {name: authorId, in: query, required: false, schema: {type: string}}
+      operationId: listResearchDomains
+      summary: List domain-specific research frameworks
       responses:
-        '200': {description: Book catalog}
-  /authors:
+        '200': {description: Research domains and methodology rules}
+  /research/domain:
     get:
-      operationId: listAuthors
-      summary: List indexed scholars and authors
+      operationId: getResearchDomain
+      summary: Get the scholar and methodology framework for one domain
       parameters:
-        - {name: madhhab, in: query, required: false, schema: {type: string}}
+        - {name: id, in: query, required: true, schema: {type: string, enum: [aqeedah, tafsir, hadith, usul-al-fiqh, maqasid, sirah, faraid]}}
       responses:
-        '200': {description: Author catalog}
+        '200': {description: Domain framework}
+        '400': {description: Missing domain}
+        '404': {description: Domain not found}
+  /research/scholars:
+    get:
+      operationId: searchDomainScholars
+      summary: Search qualified Sunni scholars by domain
+      parameters:
+        - {name: q, in: query, required: false, schema: {type: string}}
+        - {name: domain, in: query, required: false, schema: {type: string}}
+      responses:
+        '200': {description: Scholar index}
   /fiqh:
     get:
       operationId: getFiqhFramework
-      summary: Get comparative Sunni fiqh research framework, madhhabs and scholars
+      summary: Comparative Sunni fiqh framework
       parameters:
         - {name: scholar, in: query, required: false, schema: {type: string}}
       responses:
-        '200': {description: Fiqh research framework}
+        '200': {description: Fiqh framework}
   /fiqh/research:
     get:
       operationId: searchFiqhResearch
-      summary: Search fiqh scholars and classical fatwa books
+      summary: Search fiqh scholars and works
       parameters:
-        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+        - {name: q, in: query, required: true, schema: {type: string}}
       responses:
-        '200': {description: Fiqh research records with provenance}
+        '200': {description: Fiqh research results}
         '400': {description: Missing query}
   /fiqh/template:
     get:
       operationId: buildFiqhResearchTemplate
-      summary: Build an evidence-first comparative fiqh analysis template
-      description: The template separates the four Sunni madhhabs, other Sunni views, evidence, causes of disagreement and a preferred view. A preferred view must be supported by cited evidence and is never invented from the presence of a scholar in the index.
+      summary: Build evidence-first comparative fiqh analysis
       parameters:
-        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+        - {name: q, in: query, required: true, schema: {type: string}}
         - {name: madhhab, in: query, required: false, schema: {type: string, enum: [hanafi, maliki, shafii, hanbali]}}
       responses:
-        '200': {description: Comparative fiqh research template}
+        '200': {description: Comparative fiqh template}
         '400': {description: Missing query}
   /inheritance/madhahib:
     get:
       operationId: listInheritanceMadhahib
-      summary: List supported Sunni fiqh contexts for the inheritance calculator
       responses:
         '200': {description: Four Sunni madhhabs}
   /inheritance:
     get:
       operationId: calculateInheritance
-      summary: Calculate a Sunni faraid case with explicit awl, radd and correction reporting
-      description: Educational faraid calculator. It deducts debts and a supplied bequest before distribution, handles common fixed shares and residuary cases, explicitly reports awl and simple radd, and exposes the common denominator/correction information. The four madhhabs are selectable contexts, but complex cases are flagged instead of silently guessed. It is not a fatwa or legal opinion.
+      summary: Educational Sunni faraid calculator
       parameters:
         - {name: estate, in: query, required: true, schema: {type: number, minimum: 0}}
         - {name: debts, in: query, required: false, schema: {type: number, minimum: 0, default: 0}}
         - {name: bequest, in: query, required: false, schema: {type: number, minimum: 0, default: 0}}
         - {name: madhhab, in: query, required: false, schema: {type: string, enum: [hanafi, maliki, shafii, hanbali], default: hanbali}}
-        - {name: husband, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
-        - {name: wives, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 4, default: 0}}
-        - {name: father, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
-        - {name: mother, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
-        - {name: grandfather, in: query, required: false, schema: {type: integer, minimum: 0, maximum: 1, default: 0}}
-        - {name: grandmothers, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: sons, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: daughters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: grandsons, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: granddaughters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: fullBrothers, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: fullSisters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: paternalBrothers, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: paternalSisters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: maternalBrothers, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
-        - {name: maternalSisters, in: query, required: false, schema: {type: integer, minimum: 0, default: 0}}
       responses:
-        '200': {description: Inheritance calculation including allocations, warnings, awl/radd method and sources}
-        '400': {description: Invalid inheritance case}
+        '200': {description: Calculation}
+        '400': {description: Invalid case}
+  /quran/ayah:
+    get:
+      operationId: getQuranAyah
+      parameters:
+        - {name: verse, in: query, required: true, schema: {type: string}}
+        - {name: translationIds, in: query, required: false, schema: {type: string}}
+        - {name: tafsirIds, in: query, required: false, schema: {type: string}}
+        - {name: words, in: query, required: false, schema: {type: boolean}}
+      responses:
+        '200': {description: Quran ayah context}
+        '404': {description: Ayah not found}
   /quran/translations:
     get:
       operationId: listQuranTranslations
-      summary: List Quran translations for a language
       parameters:
         - {name: lang, in: query, required: false, schema: {type: string}}
       responses:
         '200': {description: Quran translations}
-        '502': {description: Translation source failure}
-  /quran/ayah:
-    get:
-      operationId: getQuranAyah
-      summary: Get an ayah with original text, translations and linked evidence
-      parameters:
-        - {name: verse, in: query, required: true, schema: {type: string, pattern: '^[0-9]+:[0-9]+$'}}
-        - {name: translationIds, in: query, required: false, schema: {type: string, description: Comma-separated translation IDs}}
-        - {name: tafsirIds, in: query, required: false, schema: {type: string, description: Comma-separated tafsir IDs}}
-        - {name: lang, in: query, required: false, schema: {type: string}}
-        - {name: words, in: query, required: false, schema: {type: boolean, default: false}}
-      responses:
-        '200': {description: Quran ayah context}
-        '400': {description: Invalid ayah}
-        '404': {description: Ayah not found}
-        '503': {description: Quran service not configured}
-        '502': {description: Quran service failure}
   /tajweed:
     get:
       operationId: getTajweedCurriculum
-      summary: Get the in-app Quran and Tajweed learning curriculum
       responses:
         '200': {description: Tajweed curriculum}
   /tajweed/lesson:
     get:
       operationId: getTajweedLesson
-      summary: Get one Tajweed lesson
       parameters:
         - {name: id, in: query, required: true, schema: {type: string}}
       responses:
         '200': {description: Tajweed lesson}
-        '400': {description: Missing lesson id}
         '404': {description: Lesson not found}
 components:
   securitySchemes:
