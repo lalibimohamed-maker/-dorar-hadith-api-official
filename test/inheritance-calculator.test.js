@@ -69,6 +69,7 @@ test("umariyya: mother receives one-third of the residue with husband, mother an
 });
 
 test("complex cases are flagged instead of silently guessed", () => {
-  const result = calculateInheritance({ estate: 100000, heirs: { fullBrothers: 1, fullSisters: 1 } });
-  assert.ok(result.warnings.length > 0);
+  const result = calculateInheritance({ estate: 100000, heirs: { grandfather: 1, fullBrothers: 1 } });
+  assert.ok(result.warnings.some((warning) => warning.includes("الجد")));
+  assert.ok(result.warnings.some((warning) => warning.includes("الإخوة الأشقاء")));
 });
