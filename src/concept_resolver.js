@@ -1,6 +1,7 @@
 import { conceptCard } from './corpus_api_contract.js';
 import { routeConcept, filterConceptKnowledge } from './methodology-router.js';
 import { loadConceptIndex } from './corpus_repository.js';
+import { resolveGhaybDomain } from './ghayb-router.js';
 
 function resolveFromIndex(text) {
   const normalized = String(text || '').trim();
@@ -19,7 +20,7 @@ export function resolveSelectedConcept(selectedText, contextId, language = 'ar',
   const text = String(selectedText || '').trim();
   const context = records.find(r => r.id === contextId);
   const candidates = records.filter(r => [r.title_ar, r.title, r.id].filter(Boolean).map(String).some(v => v === text || v.includes(text)));
-  const record = context && candidates.length === 0 ? context : candidates[0] || context || resolveFromIndex(text);
+  const record = context && candidates.length === 0 ? context : candidates[0] || context || resolveGhaybDomain(text) || resolveFromIndex(text);
   const routing = routeConcept(record, options);
   return conceptCard({ term: text, contextId: contextId || record?.id || null, language, record, routing });
 }
