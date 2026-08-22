@@ -1,0 +1,27 @@
+{
+  "version":"2026.16",
+  "name":"deen-allah-knowledge-domain-catalog",
+  "purpose":"Unified catalog for contextual concept cards across the encyclopedia",
+  "canonicalLanguage":"ar",
+  "domains":[
+    {"id":"quran","labelAr":"القرآن الكريم","priority":"primary","cardPipeline":"quran-word-card"},
+    {"id":"tafsir","labelAr":"التفسير","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"aqidah","labelAr":"العقيدة","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"tawhid","labelAr":"التوحيد","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"hadith","labelAr":"الحديث وعلومه","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"fiqh","labelAr":"الفقه","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"fatwa","labelAr":"الفتاوى","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"usul-al-fiqh","labelAr":"أصول الفقه والقواعد","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"seerah","labelAr":"السيرة النبوية","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"companions","labelAr":"الصحابة","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"followers","labelAr":"التابعون وأتباع التابعين","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"scholars","labelAr":"العلماء والتراجم","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"islamic-history","labelAr":"التاريخ الإسلامي","priority":"secondary","cardPipeline":"concept-card"},
+    {"id":"ethics","labelAr":"الآداب والأخلاق","priority":"secondary","cardPipeline":"concept-card"},
+    {"id":"language","labelAr":"لغة القرآن والعلوم العربية","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"books","labelAr":"الكتب والمصنفات","priority":"primary","cardPipeline":"concept-card"},
+    {"id":"maqasid","labelAr":"مقاصد الشريعة","priority":"secondary","cardPipeline":"concept-card"},
+    {"id":"comparative-fiqh","labelAr":"الفقه المقارن","priority":"secondary","cardPipeline":"concept-card"}
+  ],
+  "globalRules":{"preserveCanonicalSource":true,"contextRequired":true,"provenanceRequired":true,"translationDoesNotReplaceOriginal":true}
+}
