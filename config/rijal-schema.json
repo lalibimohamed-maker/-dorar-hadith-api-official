@@ -1,0 +1,18 @@
+{
+  "narrator": {
+    "required": ["id","nameAr"],
+    "fields": ["kunya","nasab","laqab","birth","death","era","regions","teachers","students","status","notes"]
+  },
+  "judgment": {
+    "required": ["narratorId","criticId","judgment","sourceId","verification"],
+    "fields": ["reason","quote","volume","page","location","context","date","sourceUrl"]
+  },
+  "relationship": {
+    "types": ["teacher","student","narrated-from","narrated-by","companion","family"],
+    "verification": ["unverified","supported","verified","disputed"]
+  },
+  "hadithLink": {
+    "fields": ["narratorId","hadithId","position","chainId","sourceId","verification"]
+  },
+  "statusCategories": ["thiqa","thabt","hafiz","saduq","salih-al-hadith","layyin","daif","sayyi-al-hifz","majhul","mastur","matruk","kadhdhab","wadda","muttaham-bil-wad","mubham","mukhtalit","mudallis","disputed"]
+}
