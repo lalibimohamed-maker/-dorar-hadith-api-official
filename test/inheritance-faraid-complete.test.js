@@ -20,14 +20,14 @@ test("umariyyatan: husband, mother and father", () => {
 test("awl: husband, mother and two full sisters reduce shares proportionally", () => {
   const r = calculateInheritance({ estate: 120000, heirs: { husband: 1, mother: 1, fullSisters: 2 } });
   assert.equal(r.method.awl, true);
-  // Original fixed shares are 1/2 + 1/6 + 2/3 = 4/3, so the awl origin is 6/4 = 3/2.
-  // The resulting shares are 3/7, 1/7 and 4/7 respectively.
-  assert.equal(r.allocations.find(x => x.id === "husband").fraction, "3/7");
-  assert.equal(r.allocations.find(x => x.id === "mother").fraction, "1/7");
-  assert.equal(r.allocations.find(x => x.id === "fullSisters").fraction, "4/7");
-  assert.equal(r.allocations.find(x => x.id === "husband").amount, 36000);
-  assert.equal(r.allocations.find(x => x.id === "mother").amount, 12000);
-  assert.equal(r.allocations.find(x => x.id === "fullSisters").amount, 48000);
+  // Original fixed shares are 1/2 + 1/6 + 2/3 = 8/6, so the awl origin becomes 8.
+  // The proportional final shares are therefore 3/8, 1/8 and 4/8 respectively.
+  assert.equal(r.allocations.find(x => x.id === "husband").fraction, "3/8");
+  assert.equal(r.allocations.find(x => x.id === "mother").fraction, "1/8");
+  assert.equal(r.allocations.find(x => x.id === "fullSisters").fraction, "1/2");
+  assert.equal(r.allocations.find(x => x.id === "husband").amount, 45000);
+  assert.equal(r.allocations.find(x => x.id === "mother").amount, 15000);
+  assert.equal(r.allocations.find(x => x.id === "fullSisters").amount, 60000);
 });
 
 test("radd is applied to non-spouse fixed heirs in the simple case", () => {
