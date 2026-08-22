@@ -14,6 +14,7 @@ function readJson(name, fallback) {
 const fatwaExpansion = readJson("fatwa-source-expansion-2026.json", { sources: [], taxonomy: [] });
 const contemporaryScholars = readJson("contemporary-sunni-scholars.json", { scholars: [] });
 const knowledgeExpansion = readJson("knowledge-source-expansion-2026.json", { sources: [], policy: {}, rules: {} });
+const officialExpansion = readJson("official-islamic-sources-2026.json", { sources: [], policy: {}, researchRule: "" });
 
 const fatwaSources = (fatwaExpansion.sources || []).map((source) => ({
   ...source,
@@ -46,6 +47,14 @@ const expandedSources = (knowledgeExpansion.sources || []).map((source) => ({
   reusePolicy: source.reuse || "catalog-and-link-unless-licensed",
 }));
 
+const officialSources = (officialExpansion.sources || []).map((source) => ({
+  ...source,
+  sourceKind: source.role || "official-source",
+  attributionRequired: true,
+  noEndorsementByInclusion: true,
+  reusePolicy: "catalog-and-link-unless-licensed",
+}));
+
 const categories = [
   ...registry.categories,
   { id: "fatwa", nameAr: "الفتاوى ومصادر العلماء" },
@@ -54,6 +63,9 @@ const categories = [
   { id: "genealogy", nameAr: "الأنساب والقبائل" },
   { id: "hadith-sciences", nameAr: "علوم الحديث ونقد الرواية" },
   { id: "scholars", nameAr: "مصادر العلماء" },
+  { id: "research", nameAr: "مراكز البحوث والدراسات" },
+  { id: "academic", nameAr: "الجامعات والمؤسسات الأكاديمية" },
+  { id: "manuscripts", nameAr: "المخطوطات والفهارس" },
 ].filter((category, index, all) => all.findIndex((item) => item.id === category.id) === index);
 
 const sourceIds = new Set(registry.sources.map((source) => source.id));
@@ -62,6 +74,7 @@ const mergedSources = [
   ...fatwaSources.filter((source) => !sourceIds.has(source.id)),
   ...scholarSources.filter((source) => !sourceIds.has(source.id)),
   ...expandedSources.filter((source) => !sourceIds.has(source.id)),
+  ...officialSources.filter((source) => !sourceIds.has(source.id)),
 ];
 
 const mergedRegistry = {
@@ -79,15 +92,22 @@ const mergedRegistry = {
     rules: knowledgeExpansion.rules || {},
     sourceCount: expandedSources.length,
   },
+  officialExpansion: {
+    policy: officialExpansion.policy || {},
+    researchRule: officialExpansion.researchRule || "",
+    sourceCount: officialSources.length,
+  },
 };
 
 export function getRegistry() {
   return mergedRegistry;
 }
 
-export function listSources({ category, role } = {}) {
+export function listSources({ category, role, country } = {}) {
   return mergedRegistry.sources.filter((source) =>
-    (!category || source.category === category) && (!role || source.role === role)
+    (!category || source.category === category) &&
+    (!role || source.role === role) &&
+    (!country || source.country === country)
   );
 }
 
