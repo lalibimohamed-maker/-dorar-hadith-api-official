@@ -1,0 +1,11 @@
+{
+  "version":"2026.7",
+  "required":["recordId","sourceId","sourceType","titleOriginal","textOriginal","language","citation","attribution","provenance","rights","reviewStatus"],
+  "citation":{"requiredOneOf":["ayah","hadithNumber","volumePage","chapterSection","fatwaQuestionId","officialUrlAnchor"],"stable":true},
+  "provenance":{"required":["sourceUrl","retrievedAt","editionOrRevision"],"hashRecommended":true},
+  "attribution":{"authorOrScholarRequired":true,"institutionRequiredWhenApplicable":true},
+  "rights":{"required":true,"values":["licensed","public-domain","link-only","unknown"]},
+  "reviewStatus":{"values":["ingested","normalized","source-verified","scholar-reviewed","translation-reviewed","published"]},
+  "translation":{"preserveOriginal":true,"languages":"20-priority-plus-world-expansion","unresolvedTerms":"human-review"},
+  "integrity":{"immutableOriginal":true,"editionChangesCreateNewRecord":true,"noSilentMerge":true}
+}
