@@ -28,12 +28,17 @@ function normalizeSirahBook(book, sourceTag) {
 }
 
 const books = [
-  ...catalog.books,
-  ...sirahCatalog.books.map((book) => normalizeSirahBook(book, "sirah-catalog")),
-  ...sirahSupplement.books.map((book) => normalizeSirahBook(book, "sirah-supplement")),
-  ...verifiedSupplement.books.map((book) => normalizeSirahBook(book, "verified-supplement")),
+  ...(Array.isArray(catalog.books) ? catalog.books : []),
+  ...(Array.isArray(sirahCatalog.books) ? sirahCatalog.books.map((book) => normalizeSirahBook(book, "sirah-catalog")) : []),
+  ...(Array.isArray(sirahSupplement.books) ? sirahSupplement.books.map((book) => normalizeSirahBook(book, "sirah-supplement")) : []),
+  ...(Array.isArray(verifiedSupplement.books) ? verifiedSupplement.books.map((book) => normalizeSirahBook(book, "verified-supplement")) : []),
 ];
-const authors = [...catalog.authors, ...sirahCatalog.authors, ...sirahSupplement.authors, ...verifiedSupplement.authors];
+const authors = [
+  ...(Array.isArray(catalog.authors) ? catalog.authors : []),
+  ...(Array.isArray(sirahCatalog.authors) ? sirahCatalog.authors : []),
+  ...(Array.isArray(sirahSupplement.authors) ? sirahSupplement.authors : []),
+  ...(Array.isArray(verifiedSupplement.authors) ? verifiedSupplement.authors : []),
+];
 
 export function listBooks({ subject, madhhab, authorId, status = "verified" } = {}) {
   return books.filter((book) =>

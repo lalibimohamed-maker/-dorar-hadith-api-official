@@ -108,7 +108,9 @@ export function calculateInheritance(raw = {}) {
   }
 
   // Full/paternal siblings in the common kalalah cases.
-  if (!h.father && !descendants && (h.fullBrothers || h.fullSisters)) {
+  // The presence of a grandfather is intentionally treated as a complex case;
+  // its sibling treatment differs by madhhab and must not be auto-resolved here.
+  if (!h.father && !h.grandfather && !descendants && (h.fullBrothers || h.fullSisters)) {
     if (h.fullBrothers) {
       residuaryCandidates.push({ id:"fullBrothers", count:h.fullBrothers*2, labelAr:"الإخوة الأشقاء", role:"sibling-male" });
       if (h.fullSisters) residuaryCandidates.push({ id:"fullSisters", count:h.fullSisters, labelAr:"الأخوات الشقيقات", role:"sibling-female" });
@@ -116,7 +118,7 @@ export function calculateInheritance(raw = {}) {
       pushFixed(fixed,"fullSisters","الأخوات الشقيقات",h.fullSisters,h.fullSisters===1?f(1,2):f(2,3),"Qur'an 4:176");
     }
   } else if (h.fullBrothers || h.fullSisters) {
-    warnings.push("وجود الإخوة الأشقاء مع الأب أو الفرع الوارث يحتاج تفصيلاً للحجب والتعصيب.");
+    warnings.push("وجود الإخوة الأشقاء مع الأب أو الجد أو الفرع الوارث يحتاج تفصيلاً للحجب والتعصيب.");
   }
 
   if (!h.father && !h.grandfather && !descendants && !h.fullBrothers && !h.fullSisters && (h.paternalBrothers || h.paternalSisters)) {
