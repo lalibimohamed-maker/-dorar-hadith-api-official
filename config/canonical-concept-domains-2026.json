@@ -1,0 +1,29 @@
+{
+  "version":"2026.16",
+  "catalog":"canonical-concept-domains",
+  "domains":[
+    {"id":"quran","areas":["ayat","quran-words","sciences-of-quran","revelation-context","readings"]},
+    {"id":"tafsir","areas":["classical-tafsir","modern-tafsir","linguistic-tafsir","comparative-tafsir"]},
+    {"id":"aqidah","areas":["iman","tawhid","names-and-attributes","prophethood","hereafter"]},
+    {"id":"hadith","areas":["matn","isnad","takhrij","grading","commentary","terminology"]},
+    {"id":"fiqh","areas":["worship","transactions","family","criminal-law","judiciary","food","oaths"]},
+    {"id":"usul-al-fiqh","areas":["evidence","legal-rules","maqasid","ijtihad","taqlid"]},
+    {"id":"fatwa","areas":["individual-fatwa","institutional-fatwa","fatwa-collections","contemporary-issues"]},
+    {"id":"seerah","areas":["prophetic-biography","maghazi","meccan-period","medinan-period"]},
+    {"id":"companions-and-salaf","areas":["companions","followers","early-generations","reports"]},
+    {"id":"biography","areas":["scholars","narrators","authors","rijal"]},
+    {"id":"history","areas":["islamic-history","places","events","chronology"]},
+    {"id":"language","areas":["lexicon","roots","morphology","grammar","rhetoric","usage"]},
+    {"id":"books","areas":["book","chapter","volume","edition","manuscript"]},
+    {"id":"ethics-and-spirituality","areas":["akhlaq","adab","tazkiyah","hearts"]},
+    {"id":"maqasid","areas":["maqasid","legal-maxims","public-interest"]}
+  ],
+  "evidenceRouting":{
+    "primary":["quran","authenticated-sunnah"],
+    "early-reference":["companions-and-salaf"],
+    "scholarly":["tafsir","aqidah","hadith","fiqh","usul-al-fiqh","seerah","biography","language","maqasid"],
+    "institutional":["fatwa"],
+    "secondary":["modern-research"]
+  },
+  "cardPolicy":{"allDomainsEnabled":true,"contextRequired":true,"sourceProvenanceRequired":true,"languageIndependentCanonicalId":true}
+}
