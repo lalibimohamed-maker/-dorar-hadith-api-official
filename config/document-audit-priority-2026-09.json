@@ -1,0 +1,20 @@
+{
+  "version":"2026.09",
+  "priorityOrder":[
+    "official-fatwa-databases",
+    "official-fatwa-collections",
+    "official-council-resolutions",
+    "official-quran-and-tafsir-resources",
+    "official-hadith-and-hadith-research",
+    "official-fiqh-and-usul-research",
+    "official-books-and-periodicals",
+    "official-manuscripts-and-editions"
+  ],
+  "documentRecord": {
+    "required":["institutionId","documentTitle","documentType","officialUrl","retrievedAt","language","authorityStatus","rightsStatus","editionOrRevision","locator","contentIntegrity","reviewStatus"],
+    "publicationStates":["metadata-only","link-only","rights-cleared","source-verified","scholar-reviewed","published"],
+    "never":"Treat an institution's official status as proof that a particular document is authentic, current, complete, or freely reusable."
+  },
+  "batchStrategy":"small-auditable-batches",
+  "translation":"preserve-original; translate only after source verification; expose translation provenance internally"
+}
