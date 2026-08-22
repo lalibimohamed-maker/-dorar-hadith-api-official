@@ -1,0 +1,53 @@
+name: Monitor source freshness
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check registered source URLs
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const files = ['config/source-registry.json','config/official-islamic-sources-2026.json'];
+          const urls = new Map();
+          for (const file of files) {
+            if (!fs.existsSync(file)) continue;
+            const data = JSON.parse(fs.readFileSync(file,'utf8'));
+            for (const s of [...(data.sources||[]), ...(data.officialSources||[])]) {
+              if (s.url && /^https?:\/\//.test(s.url)) urls.set(s.id || s.nameAr || s.url, s.url);
+            }
+          }
+          let failures = 0;
+          for (const [id,url] of urls) {
+            try {
+              const r = await fetch(url, { redirect:'follow', signal:AbortSignal.timeout(10000) });
+              console.log(`${r.ok ? 'OK' : 'WARN'} ${id} ${r.status} ${r.url}`);
+              if (!r.ok) failures++;
+            } catch (e) { console.log(`ERROR ${id} ${url} ${e.message}`); failures++; }
+          }
+          if (failures) console.log(`Source monitor: ${failures} source(s) need attention.`);
+          else console.log(`Source monitor: ${urls.size} registered source(s) reachable.`);
+          NODE
+      - name: Verify live Dorar client
+        run: |
+          node --input-type=module <<'NODE'
+          import { searchDorar } from './src/dorar-client.js';
+          const data = await searchDorar('الله');
+          if (!data) throw new Error('Empty Dorar response');
+          console.log('Dorar live API reachable and queried successfully.');
+          NODE
