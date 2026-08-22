@@ -19,6 +19,9 @@ async function api(path, options = {}) {
 
 function ensureConceptModal() {
   if ($("concept-modal")) return;
+  const style = document.createElement("style");
+  style.textContent = `.concept-target{touch-action:pan-y;user-select:text;transition:box-shadow .2s,transform .2s}.concept-target.long-press-pending{box-shadow:0 0 0 3px #176b4b55,0 14px 38px #17352a25;transform:scale(.995)}#concept-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px}#concept-modal[hidden]{display:none}.concept-backdrop{position:absolute;inset:0;background:#10251db8;backdrop-filter:blur(3px)}.concept-dialog{position:relative;z-index:1;width:min(760px,94vw);max-height:82vh;overflow:auto;background:#fff;border-radius:24px;border:1px solid #dbe8e0;box-shadow:0 24px 70px #0005;padding:28px;color:#17352a}.concept-dialog h2{margin:0 36px 10px 0;font-size:30px}.concept-close{position:absolute;top:12px;left:14px;border:0;background:#e9f4ee;color:#0d4b36;border-radius:50%;width:40px;height:40px;font-size:28px;cursor:pointer}.concept-meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 18px}.concept-meta span{background:#e9f4ee;color:#0d4b36;border-radius:999px;padding:4px 10px;font-size:14px}.concept-text{font-size:21px;line-height:1.9}.concept-policy,.concept-sources,.concept-links{background:#f7fbf8;border:1px solid #dbe8e0;border-radius:16px;padding:14px;margin-top:14px}.concept-dialog details{margin-top:10px}.concept-dialog ol{margin-bottom:0}@media(max-width:600px){.concept-dialog{max-height:86vh;padding:22px 17px}.concept-dialog h2{font-size:26px}.concept-text{font-size:19px}}`;
+  document.head.appendChild(style);
   const modal = document.createElement("div");
   modal.id = "concept-modal";
   modal.hidden = true;
