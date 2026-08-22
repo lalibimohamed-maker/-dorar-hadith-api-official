@@ -1,0 +1,20 @@
+{
+  "version":"2026.08.22",
+  "purpose":"Connect verified institutional and canonical sources to the encyclopedia ingestion layer without conflating source authority with truth claims.",
+  "verifiedSources":[
+    {"country":"Saudi Arabia","institution":"General Presidency for Scholarly Research and Ifta","type":"official_fatwa_authority","site":"https://alifta.gov.sa","collections":["Permanent Committee fatwas","Senior Scholars Council materials"]},
+    {"country":"Egypt","institution":"Dar al-Ifta al-Misriyyah","type":"official_fatwa_authority","site":"https://www.dar-alifta.org","collections":["fatwas","research fatwas","fatwa methodology","publications","fatwa concepts"]}
+  ],
+  "ingestionRules":{
+    "preserveCanonicalSource":true,
+    "storeProvenance":true,
+    "storeAuthorOrInstitution":true,
+    "storePublicationDateWhenAvailable":true,
+    "storeRightsStatus":true,
+    "neverTreatOfficialStatusAsInfallibility":true,
+    "preserveDisagreement":true,
+    "machineTranslationNeverVerified":true
+  },
+  "nextConnectors":["Quran official editions and translations","Saudi Quran Complex","Qatar Mushaf","Kuwait official Ifta","Jordan Ifta","Algeria Ministry of Religious Affairs","UAE Fatwa Council","Malaysia JAKIM","International Islamic Fiqh Academy"],
+  "integration":"feed verified source records into concept cards, Quran word cards, bilingual search and long-press contextual explanations"
+}
