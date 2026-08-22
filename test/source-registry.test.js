@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { getBook, getClassicalFatwaWork, getSource, listCategories, listBooks, listSources } from "../src/source-registry.js";
+import { getBook, getClassicalFatwaWork, getSource, listCategories, listBooks, listLanguages, listSources } from "../src/source-registry.js";
 
 test("source registry exposes fatwa category", () => {
   const category = listCategories().find((item) => item.id === "fatwa");
@@ -30,10 +30,18 @@ test("Saudi official fatwa layer is present and institutionally separated", () =
 
 test("secondary national fatwa layer covers verified countries", () => {
   const secondary = listSources({ category: "fatwa", secondary: true });
-  for (const id of ["algeria-religious-affairs-fatwa", "egypt-dar-al-ifta", "jordan-general-ifta", "palestine-dar-ifta", "libya-dar-ifta", "malaysia-mufti-federal-territories"]) {
+  for (const id of ["algeria-religious-affairs-fatwa", "egypt-dar-al-ifta", "jordan-general-ifta", "palestine-dar-ifta", "libya-dar-ifta", "malaysia-mufti-federal-territories", "kuwait-government-general-fatwa"]) {
     assert.ok(secondary.some((source) => source.id === id));
   }
   assert.equal(getSource("malaysia-mufti-federal-territories").sourceKind, "mufti-department");
+  assert.equal(getSource("kuwait-government-general-fatwa").sourceKind, "government-fatwa-service");
+});
+
+test("international fiqh institution is separated from national fatwa offices", () => {
+  const source = getSource("international-islamic-fiqh-academy");
+  assert.ok(source);
+  assert.equal(source.category, "fiqh");
+  assert.equal(source.sourceKind, "international-fiqh-academy");
 });
 
 test("classical fatwa layer preserves distinct Ibn Taymiyyah collections and early heritage", () => {
@@ -57,6 +65,15 @@ test("Saudi Islamic Research Journal is research, not institutional fatwa", () =
   assert.ok(source);
   assert.equal(source.category, "research");
   assert.equal(source.sourceKind, "islamic-research-journal");
+});
+
+test("multilingual layer exposes the agreed 20 languages and worldwide expansion", () => {
+  const agreed20 = listLanguages({ agreed20: true });
+  assert.equal(agreed20.length, 20);
+  for (const code of ["ar", "en", "fr", "es", "de", "tr", "ur", "id", "ms", "bn", "hi", "ru", "fa", "zh", "sw", "ha", "pt", "it", "ja", "ko"]) {
+    assert.ok(agreed20.some((language) => language.code === code));
+  }
+  assert.ok(listLanguages().some((language) => language.code === "*"));
 });
 
 test("source IDs are unique after all registry expansions are merged", () => {
