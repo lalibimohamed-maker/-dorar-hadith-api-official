@@ -10,7 +10,8 @@
     "health": "find . -type f -name '*.js' -not -path './node_modules/*' -print0 | xargs -0 -n1 node --check",
     "test": "node --test",
     "scholar:batch": "node scripts/run-scholar-opinions-batch.js",
-    "scholar:probe": "node scripts/probe-official-scholar-sources.js"
+    "scholar:probe": "node scripts/probe-official-scholar-sources.js",
+    "rijal:official": "node -e \"import('./src/official-source-verifier.js').then(m=>console.log(JSON.stringify(m.listOfficialSources(),null,2)))\""
   },
   "engines": {
     "node": ">=20"
