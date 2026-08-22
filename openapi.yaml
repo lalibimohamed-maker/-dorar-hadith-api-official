@@ -32,17 +32,41 @@ paths:
   /search:
     get:
       operationId: search
-      summary: Multilingual unified search
+      summary: Multilingual unified search with methodology routing
       parameters:
         - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
         - {name: lang, in: query, required: false, schema: {type: string}}
+        - {name: bilingual, in: query, required: false, schema: {type: boolean, default: false}}
+        - {name: comparative, in: query, required: false, schema: {type: boolean, default: false, description: Enable explicitly attributed comparative theology layer}}
         - {name: includePotentialMatches, in: query, required: false, schema: {type: boolean, default: false}}
       responses:
-        '200': {description: Search results with provenance}
+        '200': {description: Search results with provenance and methodology routing}
         '400': {description: Missing query}
         '413': {description: Query too long}
         '429': {description: Rate limit exceeded}
         '502': {description: Upstream failure}
+  /concept:
+    get:
+      operationId: getConceptCard
+      summary: Medium concept card opened after a five-second long press
+      parameters:
+        - {name: term, in: query, required: true, schema: {type: string, minLength: 1}}
+        - {name: context, in: query, required: false, schema: {type: string}}
+        - {name: lang, in: query, required: false, schema: {type: string}}
+        - {name: comparative, in: query, required: false, schema: {type: boolean, default: false}}
+      responses:
+        '200': {description: Concept card with source-methodology routing}
+        '404': {description: Concept not found}
+  /bilingual:
+    get:
+      operationId: bilingualMeaning
+      summary: Preserve original Arabic and expose a meaning translation in the requested language
+      parameters:
+        - {name: original, in: query, required: true, schema: {type: string}}
+        - {name: translation, in: query, required: true, schema: {type: string}}
+        - {name: lang, in: query, required: false, schema: {type: string, default: en}}
+      responses:
+        '200': {description: Bilingual result with original preserved}
   /research/domains:
     get:
       operationId: listResearchDomains
