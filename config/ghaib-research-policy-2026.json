@@ -1,0 +1,43 @@
+{
+  "version":"2026.08.22.1",
+  "titleAr":"سياسة البحث والتحقق في أخبار الغيب والقصص",
+  "purpose":"منع تحويل الروايات التاريخية أو الضعيفة إلى حقائق دينية، مع تمكين البحث الموسوعي في الموت والبرزخ والبعث والحشر والجنة والنار وقصص الأنبياء وغيرها.",
+  "domains":["life-and-death","barzakh","grave","resurrection","gathering","judgment","paradise","hellfire","prophets-stories","eschatology"],
+  "evidenceLayers":[
+    {"id":"quran","labelAr":"القرآن الكريم","priority":1,"status":"primary"},
+    {"id":"authentic-sunnah","labelAr":"السنة الصحيحة","priority":2,"status":"primary"},
+    {"id":"companions","labelAr":"آثار الصحابة الثابتة","priority":3,"status":"primary-reference"},
+    {"id":"early-salaf","labelAr":"أقوال التابعين وأئمة السلف الموثقة","priority":4,"status":"reference"},
+    {"id":"scholar-books","labelAr":"كتب العلماء والتفسير والتاريخ والرقائق","priority":5,"status":"secondary-source"},
+    {"id":"weak-reports","labelAr":"روايات ضعيفة","priority":6,"status":"warning-only"},
+    {"id":"fabricated-reports","labelAr":"روايات موضوعة أو مكذوبة","priority":7,"status":"reject-as-evidence"}
+  ],
+  "sourceRules": {
+    "bookTitleDoesNotProveReport":true,
+    "historicalBooksNeedReportLevelVerification":true,
+    "tafsirReportsNeedAttributionAndGrading":true,
+    "israiliyyatMustBeLabeled":true,
+    "weakReportsCannotBePresentedAsEstablishedCreed":true,
+    "fabricatedReportsMustNeverBePresentedAsPropheticFact":true,
+    "unknownGradingMustBeLabeledUnknown":true,
+    "conflictingGradingMustPreserveDisagreement":true,
+    "sourceLocatorRequired":true,
+    "propheticAttributionRequiresEvidence":true
+  },
+  "answerStructure": {
+    "requiredSections":["الخلاصة","القرآن","السنة الصحيحة","آثار السلف","أقوال العلماء","روايات تحتاج إلى تحقق","المصادر"],
+    "omitEmptySections":true,
+    "neverFillMissingEvidenceByGeneration":true,
+    "separateNarrativeFromProof":true
+  },
+  "bookHandling": {
+    "examples":["البداية والنهاية","حادي الأرواح إلى بلاد الأفراح","دقائق الأخبار"],
+    "policy":"تُستخدم الكتب كمصادر اكتشاف وفهرسة واستشهاد، ثم يُتحقق من كل خبر بحسب درجته ومصدره؛ لا تُعامل جميع محتويات الكتاب على درجة واحدة.",
+    "copyright":"catalog-and-link-unless-licensed"
+  },
+  "conceptGraph": {
+    "life-and-death":["life-of-this-world","death","barzakh","grave-bliss","grave-punishment"],
+    "eschatology":["trumpet","resurrection","gathering","judgment","scale","sirat","paradise","hellfire"],
+    "prophets-stories":["prophet","messenger","miracle","quranic-story","authentic-hadith-report"]
+  }
+}
