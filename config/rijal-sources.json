@@ -1,30 +1,34 @@
 {
-  "content": "{
-  \"priority\": \"primary-and-early-sources-first\",
-  \"sources\": [
-    {\"id\":\"ibn-abi-hatim-jarh\",\"title\":\"الجرح والتعديل\",\"author\":\"ابن أبي حاتم\",\"type\":\"jarh-taadil\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"bukhari-tarikh-kabir\",\"title\":\"التاريخ الكبير\",\"author\":\"البخاري\",\"type\":\"rijal-history\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"yahya-ibn-main-tarikh\",\"title\":\"تاريخ يحيى بن معين\",\"author\":\"يحيى بن معين\",\"type\":\"jarh-taadil\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"ibn-sad-tabaqat\",\"title\":\"الطبقات الكبرى\",\"author\":\"ابن سعد\",\"type\":\"biography\",\"priority\":1,\"role\":\"early-biographical\"},
-    {\"id\":\"uquili-duafa\",\"title\":\"الضعفاء الكبير\",\"author\":\"العقيلي\",\"type\":\"duafa\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"ibn-adi-kamil\",\"title\":\"الكامل في ضعفاء الرجال\",\"author\":\"ابن عدي\",\"type\":\"duafa\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"ibn-hibban-thiqat\",\"title\":\"الثقات\",\"author\":\"ابن حبان\",\"type\":\"thiqat\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"ibn-hibban-majruhin\",\"title\":\"المجروحين\",\"author\":\"ابن حبان\",\"type\":\"duafa\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"nasai-duafa\",\"title\":\"الضعفاء والمتروكون\",\"author\":\"النسائي\",\"type\":\"duafa\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"darqutni-duafa\",\"title\":\"الضعفاء والمتروكون\",\"author\":\"الدارقطني\",\"type\":\"duafa\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"juzjani-ahwal-al-rijal\",\"title\":\"أحوال الرجال\",\"author\":\"أبو إسحاق الجوزجاني\",\"type\":\"jarh-taadil\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"ibn-al-jawzi-duafa\",\"title\":\"الضعفاء والمتروكون\",\"author\":\"ابن الجوزي\",\"type\":\"duafa\",\"priority\":2,\"role\":\"comparative\"},
-    {\"id\":\"ajurri-sualat-abu-dawud\",\"title\":\"سؤالات أبي عبيد الآجري لأبي داود\",\"author\":\"أبو داود السجستاني\",\"type\":\"jarh-taadil\",\"priority\":1,\"role\":\"primary\"},
-    {\"id\":\"dhahabi-mizan\",\"title\":\"ميزان الاعتدال\",\"author\":\"الذهبي\",\"type\":\"comparative\",\"priority\":2,\"role\":\"comparative\"},
-    {\"id\":\"dhahabi-mughni\",\"title\":\"المغني في الضعفاء\",\"author\":\"الذهبي\",\"type\":\"duafa\",\"priority\":2,\"role\":\"comparative\"},
-    {\"id\":\"dhahabi-siyar\",\"title\":\"سير أعلام النبلاء\",\"author\":\"الذهبي\",\"type\":\"biography\",\"priority\":2,\"role\":\"biographical\"},
-    {\"id\":\"mizzy-tahdhib-kamal\",\"title\":\"تهذيب الكمال\",\"author\":\"المزي\",\"type\":\"comparative\",\"priority\":2,\"role\":\"comparative\"},
-    {\"id\":\"ibn-hajar-tahdhib\",\"title\":\"تهذيب التهذيب\",\"author\":\"ابن حجر\",\"type\":\"comparative\",\"priority\":2,\"role\":\"comparative\"},
-    {\"id\":\"ibn-hajar-taqrib\",\"title\":\"تقريب التهذيب\",\"author\":\"ابن حجر\",\"type\":\"summary\",\"priority\":3,\"role\":\"summary\"},
-    {\"id\":\"ibn-hajar-lisan\",\"title\":\"لسان الميزان\",\"author\":\"ابن حجر\",\"type\":\"comparative\",\"priority\":2,\"role\":\"comparative\"},
-    {\"id\":\"dhahabi-kashif\",\"title\":\"الكاشف\",\"author\":\"الذهبي\",\"type\":\"summary\",\"priority\":3,\"role\":\"summary\"},
-    {\"id\":\"ibn-hajar-tajil\",\"title\":\"تعجيل المنفعة\",\"author\":\"ابن حجر\",\"type\":\"rijal\",\"priority\":3,\"role\":\"supplementary\"}
+  "schemaVersion": "1.1",
+  "policy": {
+    "priority": "primary-and-early-sources-first",
+    "silenceIsNotAutomaticApproval": true,
+    "conflictingJudgmentsMustBePreserved": true,
+    "secondarySourcesNeverReplaceOriginalJudgment": true,
+    "autoVerified": false
+  },
+  "sources": [
+    {"id":"bukhari-tarikh-kabir","title":"التاريخ الكبير","author":"البخاري","type":"rijal-history","priority":1,"role":"primary"},
+    {"id":"ibn-abi-hatim-jarh","title":"الجرح والتعديل","author":"ابن أبي حاتم","type":"jarh-taadil","priority":1,"role":"primary"},
+    {"id":"yahya-ibn-main-tarikh","title":"تاريخ يحيى بن معين","author":"يحيى بن معين","type":"jarh-taadil","priority":1,"role":"early-primary"},
+    {"id":"ibn-sad-tabaqat","title":"الطبقات الكبرى","author":"ابن سعد","type":"biography","priority":1,"role":"early-biographical"},
+    {"id":"uquili-duafa","title":"الضعفاء الكبير","author":"العقيلي","type":"duafa","priority":1,"role":"primary"},
+    {"id":"ibn-adi-kamil","title":"الكامل في ضعفاء الرجال","author":"ابن عدي","type":"duafa","priority":1,"role":"primary"},
+    {"id":"ibn-hibban-thiqat","title":"الثقات","author":"ابن حبان","type":"thiqat","priority":1,"role":"primary"},
+    {"id":"ibn-hibban-majruhin","title":"المجروحين","author":"ابن حبان","type":"duafa","priority":1,"role":"primary"},
+    {"id":"nasai-duafa","title":"الضعفاء والمتروكون","author":"النسائي","type":"duafa","priority":1,"role":"primary"},
+    {"id":"darqutni-duafa","title":"الضعفاء والمتروكون","author":"الدارقطني","type":"duafa","priority":1,"role":"primary","verification":"source-edition-to-be-verified"},
+    {"id":"juzjani-ahwal-al-rijal","title":"أحوال الرجال","author":"أبو إسحاق الجوزجاني","type":"jarh-taadil","priority":1,"role":"primary"},
+    {"id":"ajurri-sualat-abu-dawud","title":"سؤالات أبي عبيد الآجري لأبي داود","author":"أبو داود السجستاني","type":"jarh-taadil","priority":1,"role":"primary"},
+    {"id":"ibn-al-jawzi-duafa","title":"الضعفاء والمتروكون","author":"ابن الجوزي","type":"duafa","priority":2,"role":"comparative"},
+    {"id":"dhahabi-mizan","title":"ميزان الاعتدال","author":"الذهبي","type":"comparative","priority":2,"role":"comparative"},
+    {"id":"dhahabi-mughni","title":"المغني في الضعفاء","author":"الذهبي","type":"duafa","priority":2,"role":"comparative"},
+    {"id":"dhahabi-siyar","title":"سير أعلام النبلاء","author":"الذهبي","type":"biography","priority":2,"role":"biographical"},
+    {"id":"mizzy-tahdhib-kamal","title":"تهذيب الكمال","author":"المزي","type":"comparative","priority":2,"role":"comparative"},
+    {"id":"ibn-hajar-tahdhib","title":"تهذيب التهذيب","author":"ابن حجر","type":"comparative","priority":2,"role":"comparative"},
+    {"id":"ibn-hajar-lisan","title":"لسان الميزان","author":"ابن حجر","type":"comparative","priority":2,"role":"comparative"},
+    {"id":"dhahabi-kashif","title":"الكاشف","author":"الذهبي","type":"summary","priority":3,"role":"summary"},
+    {"id":"ibn-hajar-taqrib","title":"تقريب التهذيب","author":"ابن حجر","type":"summary","priority":3,"role":"summary"},
+    {"id":"ibn-hajar-tajil","title":"تعجيل المنفعة","author":"ابن حجر","type":"rijal","priority":3,"role":"supplementary"}
   ]
-}",
-  "encoding": "utf-8"
 }
