@@ -3,6 +3,7 @@
   "version":"2026.4",
   "policy":{"officialStatusRequiresVerification":true,"jurisdictionPreserved":true,"institutionDoesNotEqualUniversalAuthority":true,"primarySecondaryStatusExplicit":true,"noEndorsementByInclusion":true,"catalogAndLinkUnlessLicensed":true},
   "regions":["الخليج العربي","المغرب العربي","المشرق","إفريقيا","آسيا الوسطى","جنوب آسيا","جنوب شرق آسيا","أوروبا","أمريكا الشمالية","أمريكا الجنوبية","أوقيانوسيا"],
+  "nextAuditRegions":["الخليج العربي","المغرب العربي","المشرق","إفريقيا","آسيا الوسطى","جنوب آسيا","جنوب شرق آسيا","أوروبا","أمريكا الشمالية","أمريكا الجنوبية","أوقيانوسيا"],
   "umbrella":{"id":"general-secretariat-fatwa-authorities-worldwide","nameAr":"الأمانة العامة لدور وهيئات الإفتاء في العالم","url":"https://www.fatwaacademy.org/en/index","role":"global-network-reference","status":"verified","note":"شبكة جامعة؛ كل مؤسسة عضو تبقى مصدرًا مستقلًا باختصاصها ومنهجها"},
   "verifiedAuthorities":[
     {"id":"saudi-ifta","country":"السعودية","nameAr":"الرئاسة العامة للبحوث العلمية والإفتاء","url":"https://alifta.gov.sa/","role":"national-official-fatwa","priority":"primary","languages":["ar"],"jurisdiction":"السعودية","verificationStatus":"verified"},
@@ -15,7 +16,7 @@
     {"id":"kuwait-government-general-fatwa","country":"الكويت","nameAr":"خدمة الفتوى العامة الحكومية","url":"https://e.gov.kw/sites/kgoenglish/Pages/Services/MOIAI/GeneralFatwas.aspx","role":"government-fatwa-service","priority":"secondary-reference","languages":["ar","en"],"jurisdiction":"الكويت","verificationStatus":"verified"},
     {"id":"international-islamic-fiqh-academy","country":"دولي","nameAr":"مجمع الفقه الإسلامي الدولي","url":"https://iifa-aifi.org/en/translations","role":"international-fiqh-academy","priority":"secondary-reference","languages":["ar","en","fr"],"jurisdiction":"دولي","verificationStatus":"verified"}
   ],
-  "candidateDiscovery": {"method":"country-by-country official mandate search","promotionRule":"candidate -> verified only after official institutional evidence","statusValues":["verified","candidate","historical","closed","unverified"]},
+  "candidateDiscovery":{"method":"country-by-country official mandate search","promotionRule":"candidate -> verified only after official institutional evidence","statusValues":["verified","candidate","historical","closed","unverified"]},
   "auditFields":["country","institution","officialUrl","legalBasis","jurisdiction","languages","fatwaSearch","research","resolutions","archive","apiOrFeed","copyright","lastVerified","primaryOrSecondary"],
   "membershipRule":"المؤسسة العضو تُفهرس كمصدر مستقل؛ ولا تُنسب إليها سلطة عالمية بمجرد العضوية في شبكة دولية."
 }
