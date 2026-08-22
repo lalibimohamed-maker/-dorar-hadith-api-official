@@ -1,0 +1,13 @@
+{
+  "version":"2026.13",
+  "classes":[
+    {"id":"revelation","examples":["quran"],"priority":"primary"},
+    {"id":"prophetic-sunnah","examples":["hadith","sunnah"],"priority":"primary-with-authentication"},
+    {"id":"salaf-report","examples":["companion","follower","early-generation"],"priority":"primary-reference"},
+    {"id":"scholar","examples":["tafsir","fiqh","aqidah","biography","fatwa-by-scholar"],"priority":"scholarly"},
+    {"id":"institution","examples":["official-fatwa","council-decision","official-research"],"priority":"institutional"},
+    {"id":"secondary","examples":["modern-study","encyclopedia","academic-analysis"],"priority":"secondary"}
+  ],
+  "requiredProvenance":["sourceId","title","authorOrInstitution","sourceClass","locator","rightsStatus","verificationStatus"],
+  "displayPolicy":{"homepageMinimal":true,"researchDetailed":true,"verificationDetailed":true}
+}
