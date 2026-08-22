@@ -63,8 +63,14 @@ test("normalized book catalog separates compound works", () => {
   assert.equal(getBook("sunan-kubra-bayhaqi").authorAr, "أحمد بن الحسين البيهقي");
 });
 
-test("normalized catalog does not treat madhhabs as books", () => {
-  assert.equal(listBooks({ category: "fiqh" }).some((book) => book.id === "madhhab-hanafi"), false);
+test("normalized catalog contains fiqh books and does not treat madhhabs as books", () => {
+  const fiqhBooks = listBooks({ category: "fiqh" });
+  assert.ok(fiqhBooks.length >= 10);
+  assert.equal(fiqhBooks.some((book) => book.id === "madhhab-hanafi"), false);
+  assert.ok(fiqhBooks.some((book) => book.madhhab === "hanafi"));
+  assert.ok(fiqhBooks.some((book) => book.madhhab === "maliki"));
+  assert.ok(fiqhBooks.some((book) => book.madhhab === "shafii"));
+  assert.ok(fiqhBooks.some((book) => book.madhhab === "hanbali"));
 });
 
 test("core hadith book sources retain distinct catalog identities", () => {
