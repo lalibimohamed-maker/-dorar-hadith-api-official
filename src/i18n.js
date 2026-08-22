@@ -61,8 +61,10 @@ export function listLocales() {
 export function detectLocale(text) {
   const value = String(text || "").trim().toLowerCase();
   if (!value) return null;
-  if (/[\u4e00-\u9fff]/u.test(value)) return getLocale("zh");
+  // Japanese often mixes Kanji with Hiragana/Katakana. Check kana before the
+  // broader CJK range so Japanese text is not misclassified as Chinese.
   if (/[\u3040-\u30ff]/u.test(value)) return getLocale("ja");
+  if (/[\u4e00-\u9fff]/u.test(value)) return getLocale("zh");
   if (/[\uac00-\ud7af]/u.test(value)) return getLocale("ko");
   if (/[\u0400-\u04ff]/u.test(value)) return getLocale("ru");
   if (/[\u0900-\u097f]/u.test(value)) return getLocale("hi");
