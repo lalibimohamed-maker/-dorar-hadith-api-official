@@ -1,0 +1,32 @@
+name: Rijal ingestion validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Source ID (optional)'
+        required: false
+        default: 'bukhari-tarikh-kabir'
+      limit:
+        description: 'Maximum records to process'
+        required: false
+        default: '250'
+  push:
+    paths:
+      - 'config/rijal-*.json'
+      - 'src/rijal-*.js'
+      - 'scripts/validate-rijal-dataset.js'
+      - 'data/rijal/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate source-backed dataset
+        run: node scripts/validate-rijal-dataset.js
