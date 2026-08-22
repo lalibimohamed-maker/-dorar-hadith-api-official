@@ -13,40 +13,13 @@
 <body>
 <header><div class="logo">۞</div><h1>موسوعة دين الله</h1><p>بحث واستكشاف علمي للمصادر الإسلامية مع نسبة الأقوال إلى أصحابها ومصادرها</p></header>
 <main>
-<section class="card">
-<h2>🔎 البحث الموحد</h2>
-<div class="search"><input id="query" aria-label="بحث" placeholder="اكتب سؤالاً أو موضوعاً أو نصاً للبحث"><button id="search-btn" class="btn">بحث</button></div>
-<p class="muted">النتائج لا تُعرض بوصفها فتوى أو حكماً لمجرد وجودها في مصدر؛ تُحفظ نسبة القول والمصدر ومنهجية البحث.</p>
-<div id="api-status" class="status">جاري فحص اتصال الـAPI…</div>
-</section>
-<section class="card">
-<h2>🧭 المجالات</h2>
-<div class="grid">
-<a class="item" data-category="quran">📖 <b>القرآن وعلومه</b>الآيات والترجمات والقراءة</a>
-<a class="item" data-category="tafsir">📚 <b>التفسير</b>مناهج التفاسير ونقول العلماء</a>
-<a class="item" data-category="aqidah">🛡️ <b>العقيدة</b>النصوص والشروح والمناهج</a>
-<a class="item" data-category="hadith">📜 <b>الحديث وعلومه</b>النص والتخريج والراوي</a>
-<a class="item" data-category="fiqh">⚖️ <b>الفقه</b>المذاهب والأقوال والأدلة</a>
-<a class="item" data-category="usul-fiqh">🧩 <b>أصول الفقه والقواعد</b>القواعد والمناهج</a>
-<a class="item" data-category="maqasid">🎯 <b>مقاصد الشريعة</b>الضروريات والحاجيات والتحسينيات</a>
-<a class="item" data-category="sirah">🕌 <b>السيرة والشمائل</b>المغازي والدلائل والشمائل</a>
-<a class="item" data-category="library">📚 <b>المكتبة الإسلامية</b>الكتب والمصادر</a>
-<a class="item" href="#historical">📜 <b>قصص الأنبياء</b>مصادر تاريخية وتفسيرية موثقة</a>
-<a class="item" href="#companions">👥 <b>أخبار الصحابة</b>التراجم والأخبار مع نقد الروايات</a>
-<a class="item" href="#genealogy">🌳 <b>أنساب العرب</b>المصادر المشهورة مع تمييز درجاتها</a>
-</div>
-</section>
+<section class="card"><h2>🔎 البحث الموحد</h2><div class="search"><input id="query" aria-label="بحث" placeholder="اكتب سؤالاً أو موضوعاً أو نصاً للبحث"><button id="search-btn" class="btn">بحث</button></div><p class="muted">النتائج لا تُعرض بوصفها فتوى أو حكماً لمجرد وجودها في مصدر؛ تُحفظ نسبة القول والمصدر ومنهجية البحث.</p><div id="api-status" class="status">جاري فحص اتصال الـAPI…</div></section>
+<section class="card"><h2>🧭 المجالات</h2><div class="grid"><a class="item" data-category="quran">📖 <b>القرآن وعلومه</b>الآيات والترجمات والقراءة</a><a class="item" data-category="tafsir">📚 <b>التفسير</b>مناهج التفاسير ونقول العلماء</a><a class="item" data-category="aqidah">🛡️ <b>العقيدة</b>النصوص والشروح والمناهج</a><a class="item" data-category="hadith">📜 <b>الحديث وعلومه</b>النص والتخريج والراوي</a><a class="item" data-category="fiqh">⚖️ <b>الفقه</b>المذاهب والأقوال والأدلة</a><a class="item" data-category="usul-fiqh">🧩 <b>أصول الفقه والقواعد</b>القواعد والمناهج</a><a class="item" data-category="maqasid">🎯 <b>مقاصد الشريعة</b>الضروريات والحاجيات والتحسينيات</a><a class="item" data-category="sirah">🕌 <b>السيرة والشمائل</b>المغازي والدلائل والشمائل</a><a class="item" data-category="library">📚 <b>المكتبة الإسلامية</b>الكتب والمصادر</a><a class="item" href="#historical">📜 <b>قصص الأنبياء</b>مصادر تاريخية وتفسيرية موثقة</a><a class="item" href="#companions">👥 <b>أخبار الصحابة</b>التراجم والأخبار مع نقد الروايات</a><a class="item" href="#genealogy">🌳 <b>أنساب العرب</b>المصادر المشهورة مع تمييز درجاتها</a></div></section>
+<section class="card" id="rijal"><h2>🧬 علم الرجال والجرح والتعديل</h2><p>يُفصل بين <b>الحكم على الراوي</b> و<b>الحكم على الحديث</b>. لا يكفي وصف الراوي بثقة أو ضعف؛ بل يُحفظ اسم الناقد، ونص حكمه، ومصدره، والسياق، مع إبقاء الخلاف بين النقاد ظاهرًا.</p><div class="grid"><div class="item"><b>مراتب الرواة</b>ثقة، ثبت، صدوق، لين، ضعيف، مجهول، مختلط، مدلس، متروك، كذاب، وضاع، ومختلف فيه.</div><div class="item"><b>شبكة الإسناد</b>الراوي ← الشيوخ ← التلاميذ ← المرويات ← الطرق والمتابعات والشواهد.</div><div class="item"><b>نقد السند</b>الاتصال، المعاصرة واللقاء، التدليس، الاختلاط، التفرد، مخالفة الثقات، والعلل الخفية.</div></div><p class="muted">من الأصول: التاريخ الكبير، الجرح والتعديل، الضعفاء الكبير، الكامل، الثقات، كتب الضعفاء، ميزان الاعتدال، تهذيب الكمال، تهذيب التهذيب، تقريب التهذيب وغيرها. الجامعات والمراكز الرسمية تُستخدم للتحقيق والفهرسة والدراسات، ولا تُعامل تلقائيًا كناقد حديث متقدم.</p></section>
 <section class="card"><h2>👨‍🏫 العلماء والبحث المقارن</h2><p>قاعدة الموسوعة: لا نبحث عن أكبر عدد من الأسماء، بل عن أكبر قدر من العلم الموثق. يدخل العالم عند وجود كتب أو دروس أو فتاوى موثقة وتخصص واضح ومصادر يمكن التحقق منها، ولا يعني إدراجه الموافقة على كل اجتهاد له.</p><div class="chips"><span class="chip">ابن تيمية</span><span class="chip">ابن القيم</span><span class="chip">ابن عبد البر</span><span class="chip">الخطيب البغدادي</span><span class="chip">ابن حزم</span><span class="chip">ابن عاشور</span><span class="chip">السعدي</span><span class="chip">عبد السلام شويعر</span><span class="chip">وغيرهم وفق معيار التوثيق</span></div></section>
 <section class="card"><h2>⚖️ الفقه والمذاهب الأربعة</h2><div class="grid"><a class="item">الحنفي</a><a class="item">المالكي</a><a class="item">الشافعي</a><a class="item">الحنبلي</a></div><p>سيُعرض في المسألة: تصويرها، محل الاتفاق، محل النزاع، قول كل مذهب، الأدلة، وجه الاستدلال، المناقشة، والترجيح عند توفر أساس علمي كافٍ.</p></section>
 <section class="card" id="historical"><h2>📜 التاريخ والسيرة والأنساب</h2><div class="grid"><div class="item"><b>قصص الأنبياء</b>لا تُخلط الروايات الإسرائيلية أو الضعيفة بالثابت دون تنبيه.</div><div class="item"><b>أخبار الصحابة</b>تمييز الصحيح والحسن والضعيف عند توفر الحكم.</div><div class="item"><b>أنساب العرب</b>مقارنة المصادر وعدم تقديم كتاب واحد كحجة مطلقة.</div></div><p class="muted">من المصادر المدرجة: كتب السيرة والتراجم وكتب الأنساب، مع حفظ اسم المؤلف والمصدر ودرجة الاعتماد.</p></section>
 <section class="card"><h2>📊 النتائج</h2><div id="results"><p class="muted">ستظهر هنا نتائج البحث أو المصادر بعد اختيار مجال.</p></div></section>
-<section class="card">
-<h2>🔧 ربط الواجهة بخدمة API</h2>
-<p class="muted">هذه الصفحة واجهة ثابتة. لا نخفي فشل الاتصال ولا ندّعي أن الـAPI يعمل قبل اختباره.</p>
-<div class="search"><input id="api-base" class="api-input" placeholder="https://your-api-host.example.com"><button id="save-api" class="btn">حفظ</button><button id="api-check" class="btn secondary">اختبار</button></div>
-<p class="muted">يمكن تمرير العنوان أيضاً عبر <code>?api=...</code>، ويُحفظ محلياً في المتصفح.</p>
-</section>
-</main>
-<footer>المصادر تُنسب إلى أصحابها، والمحتوى المحمي لا يُعاد توزيعه دون تصريح. موسوعة دين الله — بحث موثق لا فتوى آلية.</footer>
-<script src="./app.js" defer></script>
+<section class="card"><h2>🔧 ربط الواجهة بخدمة API</h2><p class="muted">هذه الصفحة واجهة ثابتة. لا نخفي فشل الاتصال ولا ندّعي أن الـAPI يعمل قبل اختباره.</p><div class="search"><input id="api-base" class="api-input" placeholder="https://your-api-host.example.com"><button id="save-api" class="btn">حفظ</button><button id="api-check" class="btn secondary">اختبار</button></div><p class="muted">يمكن تمرير العنوان أيضاً عبر <code>?api=...</code>، ويُحفظ محلياً في المتصفح.</p></section>
+</main><footer>المصادر تُنسب إلى أصحابها، والمحتوى المحمي لا يُعاد توزيعه دون تصريح. موسوعة دين الله — بحث موثق لا فتوى آلية.</footer><script src="./app.js" defer></script>
 </body></html>
