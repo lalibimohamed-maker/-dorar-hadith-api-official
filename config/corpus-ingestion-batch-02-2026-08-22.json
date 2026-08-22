@@ -1,0 +1,24 @@
+{
+  "version":"2026-08-22",
+  "batch":"02",
+  "purpose":"expand_real_corpus_ingestion_without_claiming_unverified_fulltext_import",
+  "sourceAdapters":[
+    {"id":"kfgqpc-quran","authority":"King Fahd Glorious Quran Printing Complex","class":"official-quran","capabilities":["quran-text","qiraat","tafsir-and-quran-sciences","meaning-translations","digital-formats"],"verification":"official-site","note":"The Complex states that its digital developer platform supports Excel, CSV, HTML5, SQL, XML, JSON and PDF; its Translation Center produces and reviews translations."},
+    {"id":"saudi-sunna-program","authority":"General Presidency for Scholarly Research and Ifta","class":"official-hadith","capabilities":["hadith-books","takhrij","narrators","scholarly-grading","shuruh"],"verification":"official-source-registry"},
+    {"id":"egypt-dar-al-ifta","authority":"Dar al-Ifta al-Misriyyah","class":"official-fatwa","capabilities":["fatwas","research-fatwas","fatwa-methodology","online-fatwa"],"verification":"official-site"},
+    {"id":"iifa","authority":"International Islamic Fiqh Academy","class":"international-fiqh-academy","capabilities":["resolutions","fiqh-research","collective-jurisprudence"],"verification":"official-site"}
+  ],
+  "initialConceptLinks":[
+    {"concept":"islam","domains":["quran","aqidah","fiqh","islamic-terms"]},
+    {"concept":"iman-billah","domains":["aqidah","quran","hadith"]},
+    {"concept":"arkan-al-iman","domains":["aqidah","hadith"]},
+    {"concept":"tawhid","domains":["aqidah","quran","hadith"]},
+    {"concept":"salah","domains":["fiqh","hadith","quran"]},
+    {"concept":"hijrah","domains":["seerah","history","hadith"]}
+  ],
+  "verificationGates":["official-or-canonical-source-identity","exact-provenance","text-integrity","attribution","translation-provenance","rights-status","duplicate-detection","conflict-preservation"],
+  "quranPolicy":{"canonicalArabicPreserved":true,"meaningTranslationsSeparated":true,"tafsirSeparated":true,"verifiedTranslationPreferred":true},
+  "longPress":{"enabled":true,"holdMs":5000,"overlay":"medium","parentViewPreserved":true},
+  "languagePolicy":{"userLanguageFirst":true,"originalAvailableOnDemand":true,"machineTranslationNeverPresentedAsVerified":true},
+  "ingestionStatus":"adapter-and-index-ready; full-text ingestion only after source-specific rights and access validation"
+}
