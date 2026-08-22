@@ -7,7 +7,8 @@
     "primaryFoundations":["Quran","authentic Sunnah","understanding of the Companions","understanding of the Followers","understanding of the early generations"],
     "principle":"Present Islamic knowledge through the methodology adopted by Ahl al-Sunnah, while accurately preserving source attribution and documented scholarly disagreement.",
     "propheticGuidance":"The Prophet Muhammad ﷺ is the final Messenger and his authentic Sunnah is a foundational source of guidance.",
-    "straightPath":"The Quranic concept of the straight path is treated as a theological reference, not as a license to attribute a specific later opinion directly to the Prophet ﷺ without evidence."
+    "straightPath":"The Quranic concept of the straight path is treated as a theological reference, not as a license to attribute a specific later opinion directly to the Prophet ﷺ without evidence.",
+    "sourceRoutingConfig":"config/aqeedah-source-routing-2026.json"
   },
   "sourceHierarchy": [
     {"rank":1,"source":"Quran","status":"primary"},
@@ -18,6 +19,14 @@
     {"rank":6,"source":"official fatwa institutions","status":"institutional-reference"},
     {"rank":7,"source":"secondary research","status":"secondary"}
   ],
+  "aqeedahRouting": {
+    "primaryOnlyAfterMethodologyVerification": true,
+    "fourMadhhabScholarsEligibleWithWorkLevelVerification": true,
+    "fiqhOrUsulScholarshipDoesNotImplyCreedEndorsement": true,
+    "comparativeTheologySeparateLayer": true,
+    "comparativeLayerMustBeExplicitlyAttributed": true,
+    "unsourcedCreedGenerationDisabled": true
+  },
   "disagreementPolicy": {
     "preserveDocumentedDisagreement":true,
     "labelMadhhabAndScholar":true,
