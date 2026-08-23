@@ -1,8 +1,8 @@
 {
-  "version":"2026.08",
+  "version":"2026.09",
   "contract":"corpus-v1",
-  "search":{"input":"user_query","language":"detected_or_selected","bilingual_optional":true,"must_return_source_state":true},
-  "conceptCard":{"trigger":"long_press","duration_seconds":5,"contextual_resolution":true,"medium_window":true,"language":"browser_or_selected","source_on_demand":true},
+  "search":{"input":"user_query","language":"detected_or_selected","bilingual_optional":false,"translation_output":"disabled","must_return_source_state":true},
+  "conceptCard":{"trigger":"long_press","duration_seconds":5,"contextual_resolution":true,"medium_window":true,"language":"browser_or_selected","translation_output":"disabled","source_on_demand":true},
   "recordResponse":{"required":["id","type","domain","title","source_id","verification_state"],"verifiedOnlyForTrustedBadge":true},
   "quran":{"arabicCanonicalImmutable":true,"translationIsMeaningOnly":true,"tafsirSeparate":true},
   "hadith":{"requiresProvenance":true,"requiresAttribution":true,"gradingMustBeSourceBound":true},
