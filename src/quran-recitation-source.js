@@ -35,6 +35,20 @@ function reciterFromEdition(edition = {}) {
   return edition.name || edition.englishName || edition.identifier || null;
 }
 
+function normalizeEdition(edition) {
+  return {
+    identifier: edition?.identifier || null,
+    name: edition?.name || null,
+    englishName: edition?.englishName || null,
+    language: edition?.language || null,
+    format: edition?.format || 'audio',
+    type: edition?.type || null,
+    source: SOURCE_NAME,
+    sourceUrl: SOURCE_URL,
+    termsUrl: TERMS_URL,
+  };
+}
+
 export function createAlQuranCloudRecitationProvider({
   fetchImpl = globalThis.fetch,
   edition = DEFAULT_EDITION,
@@ -43,19 +57,28 @@ export function createAlQuranCloudRecitationProvider({
   if (typeof fetchImpl !== 'function') throw new TypeError('A fetch implementation is required');
   if (!/^[a-z0-9._-]+$/.test(edition)) throw new TypeError('Invalid Quran audio edition');
 
+  const request = async (url) => {
+    const response = await fetchImpl(url, { headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error(`Quran audio provider returned HTTP ${response.status}`);
+    return response.json();
+  };
+
   return Object.freeze({
     supports(capability) {
       return capability === 'quran-recitation';
     },
 
+    async listEditions() {
+      const payload = await request(`${apiBase}/edition/format/audio`);
+      return (Array.isArray(payload?.data) ? payload.data : [])
+        .filter(item => item?.identifier && item?.format === 'audio')
+        .map(normalizeEdition);
+    },
+
     async execute({ ayah, reciter, verifiedOnly = true } = {}) {
       if (!verifiedOnly) throw new Error('Quran recitation requires verifiedOnly=true');
       const number = assertAyah(ayah);
-      const response = await fetchImpl(`${apiBase}/ayah/${number}/${encodeURIComponent(edition)}`, {
-        headers: { Accept: 'application/json' },
-      });
-      if (!response.ok) throw new Error(`Quran audio provider returned HTTP ${response.status}`);
-      const payload = await response.json();
+      const payload = await request(`${apiBase}/ayah/${number}/${encodeURIComponent(edition)}`);
       const data = payload?.data || {};
       const audioUrl = pickAudio(data);
       const providerReciter = reciterFromEdition(data.edition);
