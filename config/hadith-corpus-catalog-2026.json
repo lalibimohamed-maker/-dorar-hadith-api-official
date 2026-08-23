@@ -1,0 +1,20 @@
+{
+  "version": "2026.08.23.1",
+  "purpose": "Structured source metadata for the hadith layer of Din Allah Encyclopedia; metadata only unless text reuse rights are established.",
+  "books": [
+    {"id":"bukhari","titleAr":"صحيح البخاري","authorAr":"محمد بن إسماعيل البخاري","sourceType":"hadith","priority":"primary","canonical":true},
+    {"id":"muslim","titleAr":"صحيح مسلم","authorAr":"مسلم بن الحجاج النيسابوري","sourceType":"hadith","priority":"primary","canonical":true},
+    {"id":"abudawud","titleAr":"سنن أبي داود","authorAr":"أبو داود سليمان بن الأشعث السجستاني","sourceType":"hadith","priority":"primary","canonical":true},
+    {"id":"tirmidhi","titleAr":"جامع الترمذي","authorAr":"محمد بن عيسى الترمذي","sourceType":"hadith","priority":"primary","canonical":true},
+    {"id":"nasai","titleAr":"السنن الصغرى للنسائي","authorAr":"أحمد بن شعيب النسائي","sourceType":"hadith","priority":"primary","canonical":true},
+    {"id":"ibnmajah","titleAr":"سنن ابن ماجه","authorAr":"محمد بن يزيد ابن ماجه القزويني","sourceType":"hadith","priority":"primary","canonical":true},
+    {"id":"malik","titleAr":"الموطأ","authorAr":"مالك بن أنس","sourceType":"hadith","priority":"primary","canonical":true},
+    {"id":"ahmad","titleAr":"مسند أحمد","authorAr":"أحمد بن حنبل","sourceType":"hadith","priority":"primary","canonical":true}
+  ],
+  "metadataPolicy": {
+    "textStatus": "not-implied-by-catalog",
+    "requiredForHadithRecord": ["recordId","sourceId","hadithReference","verificationState","attribution"],
+    "preserveDifferences": true,
+    "doNotConflateNarratorAndHadithGrade": true
+  }
+}
