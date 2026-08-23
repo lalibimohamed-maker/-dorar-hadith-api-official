@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const DEFAULT_DIR = path.join(process.cwd(), "config");
-const VERIFIED_STATUSES = new Set(["source-verified", "edition-verified", "institution-verified", "scholar-reviewed"]);
+const VERIFIED_STATUSES = new Set(["verified", "source-verified", "edition-verified", "institution-verified", "scholar-reviewed"]);
 
 export function normalizeQuery(value = "") {
   return String(value)
