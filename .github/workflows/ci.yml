@@ -38,6 +38,7 @@ jobs:
           node --check src/query-intent-router.js
           node --check src/ghayb-router.js
           node --check src/worship-learning-engine.js
+          node --check src/transactions-riba-engine.js
       - name: Validate required project files
         run: |
           required_files=(
@@ -51,9 +52,9 @@ jobs:
             src/prophets-companions-genealogy.js config/knowledge-source-expansion-2026.json
             config/corpus-source-routing-2026.json config/corpus-seed-content-batch-05-2026-08-22.json
             config/concept-knowledge-schema-2026.json config/ghaib-source-framework-2026.json config/ghaib-evidence-catalog-2026.json config/ghayb-knowledge-domains-2026.json
-            config/specialized-engines-2026.json config/worship-learning-2026.json src/worship-learning-engine.js test/worship-learning-engine.test.js
-            src/corpus_repository.js src/corpus_search.js src/corpus_api.js src/ghayb-router.js src/http_server.js src/index.js
-            test/ghaib-source-framework.test.js test/ghaib-evidence-api.test.js
+            config/specialized-engines-2026.json config/worship-learning-2026.json src/worship-learning-engine.js src/transactions-riba-engine.js test/worship-learning-engine.test.js test/transactions-riba-engine.test.js
+            src/corpus_repository.js src/corpus_search.js src/corpus_api.js src/specialized-engines.js src/ghayb-router.js src/http_server.js src/index.js
+            test/ghaib-source-framework.test.js test/ghaib-evidence-api.test.js test/specialized-engines.test.js
           )
           for file in "${required_files[@]}"; do
             if [ ! -f "$file" ]; then echo "MISSING REQUIRED FILE: $file"; exit 1; fi
@@ -72,6 +73,8 @@ jobs:
         run: node test/ghaib-evidence-api.test.js
       - name: Run worship learning engine tests
         run: node test/worship-learning-engine.test.js
+      - name: Run specialized engine tests
+        run: node test/specialized-engines.test.js && node test/transactions-riba-engine.test.js
       - name: Run corpus API integration tests
         run: npm run test:corpus
       - name: Run full test suite
