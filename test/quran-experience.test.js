@@ -10,6 +10,13 @@ test("Quran reading supports synchronized ayah and word highlighting", () => {
   assert.equal(c.reading.recitation.currentWordHighlight, true);
 });
 
+test("Quran recitation is locked to Saad Al-Ghamdi", () => {
+  const recitation = getQuranExperienceConfig().reading.recitation;
+  assert.equal(recitation.reciterSelection, false);
+  assert.equal(recitation.defaultReciter, "saad-al-ghamdi");
+  assert.deepEqual(recitation.allowedReciters, ["saad-al-ghamdi"]);
+});
+
 test("light, dark and system themes are supported", () => {
   assert.equal(getReadingTheme("light"), "light");
   assert.equal(getReadingTheme("dark"), "dark");
