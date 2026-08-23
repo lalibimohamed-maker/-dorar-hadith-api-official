@@ -15,7 +15,8 @@ function resultNodeIds(results = []) {
 export function unifiedKnowledgeSearch(query, options = {}, records = [], graph = null) {
   const normalizedOptions = normalizeOptions(options);
   const corpus = searchCorpus(query, normalizedOptions, records);
-  const results = Array.isArray(corpus?.results) ? corpus.results : [];
+  const allResults = Array.isArray(corpus?.results) ? corpus.results : [];
+  const results = allResults.slice(0, normalizedOptions.limit);
   const graphPaths = [];
 
   if (graph && Array.isArray(graph.nodes) && Array.isArray(graph.edges)) {
