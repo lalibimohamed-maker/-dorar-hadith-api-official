@@ -1,13 +1,12 @@
 {
-  "version":"2026.15",
+  "version":"2026.16",
   "pipeline":"concept-card",
   "scope":"all-islamic-encyclopedia-domains",
   "stages":["detect-term","resolve-context","retrieve-canonical-sources","rank-evidence","build-card","localize","verify","display"],
   "contextKeys":["domain","documentType","surahOrBook","passage","userQuery","selectedLanguage"],
   "evidenceOrder":["quran","authenticated-sunnah","companion-report","follower-and-early-salaf-report","scholarly-source","official-fatwa-or-institution","secondary-study"],
-  "card":{"mediumOverlay":true,"preserveParentView":true,"summaryFirst":true,"expandableEvidence":true,"sourceOnDemand":true},
-  "translation":{"useVerifiedMeaningTranslationWhenAvailable":true,"machineTranslationNeverLabeledVerified":true,"fallbackToOriginal":true},
+  "card":{"mediumOverlay":true,"preserveParentView":true,"summaryFirst":true,"expandableEvidence":true,"sourceOnDemand":true,"responseLanguage":"user-selected-or-detected","translationOutput":"disabled"},
   "ambiguity":{"requireContextResolution":true,"allowMultipleSenses":true,"neverGuessSilently":true},
   "domains":["quran","tafsir","aqidah","tawhid","hadith","fiqh","fatwa","seerah","biography","usul-al-fiqh","ethics","history","islamic-terms","books","maqasid"],
-  "compatibility":"shares source IDs, provenance, translation IDs, and verification states with bilingual search and Quran word cards"
+  "compatibility":"shares source IDs, provenance, and verification states with the unified search and Quran word cards; translation IDs are not part of the search or long-press presentation contract"
 }
