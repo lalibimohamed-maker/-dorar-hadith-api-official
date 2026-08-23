@@ -23,8 +23,28 @@ const TOPIC_TO_MODULE = {
   prayer_times:"prayer", congregation:"prayer", prohibited_times:"prayer", fajr_taghlees_isfar:"prayer", duha:"prayer", taraweeh:"prayer", night_prayer:"prayer", rawatib:"prayer", eclipse:"prayer", istikhara:"prayer", fear_prayer:"prayer", traveler_prayer:"prayer", prayer_on_mount:"prayer", friday:"prayer", eid:"prayer", sujud_sahw:"prayer", sujud_tilawah:"prayer", sujud_shukr:"prayer"
 };
 
+const TOPIC_PRIORITY = {
+  fajr_taghlees_isfar: 100,
+  traveler_prayer: 90,
+  prohibited_times: 80,
+  prayer_times: 10,
+  prayer: 0
+};
+
 function normalize(value){return String(value||"").toLocaleLowerCase("ar").normalize("NFKC").replace(/[إأآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/\s+/g," ").trim();}
-function findTopic(question){const q=normalize(question);let best=null;for(const [id,aliases] of Object.entries(TOPIC_ALIASES)){for(const alias of aliases){const a=normalize(alias);if(!a||!q.includes(a))continue;const score=a.length*10+a.split(" ").length;if(!best||score>best.score)best={id,score};}}return best?.id||null;}
+function findTopic(question){
+  const q=normalize(question);
+  let best=null;
+  for(const [id,aliases] of Object.entries(TOPIC_ALIASES)){
+    for(const alias of aliases){
+      const a=normalize(alias);
+      if(!a||!q.includes(a))continue;
+      const score=a.length*10+a.split(" ").length+(TOPIC_PRIORITY[id]||0);
+      if(!best||score>best.score)best={id,score};
+    }
+  }
+  return best?.id||null;
+}
 
 export function getWorshipLearningConfig(){return config;}
 export function detectWorshipTopic(question){return findTopic(question);}
