@@ -6,6 +6,7 @@ test("provenance policy defines the corpus source contract", () => {
   const policy = getCorpusProvenancePolicy();
   assert.ok(policy.requiredFields.includes("sourceId"));
   assert.ok(policy.sourceTypes.includes("hadith"));
+  assert.ok(policy.sourceTypes.includes("institutional-fatwa"));
   assert.ok(policy.verificationStates.includes("scholar_reviewed"));
   assert.ok(policy.verificationStates.includes("pending_verification"));
 });
@@ -43,6 +44,18 @@ test("provenance requires source identity and attribution", () => {
     citation: { book: "صحيح البخاري", reference: "1" }
   });
   assert.equal(provenance.trusted, true);
+});
+
+test("institutional fatwa records use an explicitly supported source type", () => {
+  const result = validateCorpusRecord({
+    recordId: "fatwa-saudi-ifta",
+    sourceId: "saudi-ifta",
+    sourceType: "institutional-fatwa",
+    verificationState: "pending_verification",
+    attribution: { authorOrScholar: "الرئاسة العامة للبحوث العلمية والإفتاء" }
+  });
+  assert.equal(result.valid, true);
+  assert.equal(result.trusted, false);
 });
 
 test("summary distinguishes trusted, pending and invalid records", () => {
