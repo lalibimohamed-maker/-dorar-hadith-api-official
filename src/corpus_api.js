@@ -7,6 +7,7 @@ import { routeSpecializedQuestion, getEngine } from './specialized-engines.js';
 import { getWorshipLearningConfig, detectWorshipTopic, createLearningSession } from './worship-learning-engine.js';
 import { routeTransactionQuestion, buildTransactionLesson, listTransactionTopics } from './transactions-riba-engine.js';
 import { searchEncyclopedia, getEncyclopediaSourceInfo, getEncyclopediaDomainInfo } from './encyclopedia-api.js';
+import { hadithSource, hadithSources, validateHadith, narratorProfile, compareNarratorJudgmentsSafe, narratorGrade, rijalBooks } from './hadith-research.js';
 
 export function search(query, options = {}) {
   const records = loadCorpus();
@@ -17,10 +18,16 @@ export function search(query, options = {}) {
   const encyclopedia = searchEncyclopedia(query, options);
   return { ...result, queryPolicy: policy, specializedRouting: specialized, ghaibResearch: ghaibPlan, encyclopedia };
 }
-
 export function encyclopediaSearch(query, options = {}) { return searchEncyclopedia(query, options); }
 export function encyclopediaSource(sourceId) { return getEncyclopediaSourceInfo(sourceId); }
 export function encyclopediaDomain(domain) { return getEncyclopediaDomainInfo(domain); }
+export function hadithCatalog() { return hadithSources(); }
+export function hadithBook(sourceId) { return hadithSource(sourceId); }
+export function hadithRecordValidation(record) { return validateHadith(record); }
+export function hadithNarratorProfile(input) { return narratorProfile(input); }
+export function hadithNarratorJudgmentComparison(judgments) { return compareNarratorJudgmentsSafe(judgments); }
+export function hadithNarratorGrade(id) { return narratorGrade(id); }
+export function hadithRijalBooks() { return rijalBooks(); }
 
 export function concept(term, contextId, language = 'ar', options = {}) {
   const records = loadCorpus();
@@ -30,7 +37,6 @@ export function concept(term, contextId, language = 'ar', options = {}) {
   const ghaibPlan = buildGhaybResearchPlan(term, { ...options, language });
   return { ...result, knowledge, ghaibResearch: ghaibPlan, queryPolicy: queryPolicy(term), specializedRouting: routeSpecializedQuestion(term), routing: loadRouting().domains?.[record?.domain] || null };
 }
-
 export function specializedEngine(id) { return getEngine(id); }
 export function worshipLearning({ topic, question, audience='general', language='ar', mode='guided' } = {}) {
   const detected = topic || detectWorshipTopic(question || '');
