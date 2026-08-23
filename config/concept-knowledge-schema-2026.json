@@ -1,8 +1,7 @@
 {
-  "version":"2026.08",
+  "version":"2026.09",
   "purpose":"Return the full verified knowledge graph for any selected term in its current context",
   "resolution":{"order":["selected_text","phrase","context","concept"],"disambiguationRequired":true},
-  "knowledgeSections":["definition","contextual_meaning","quran_evidence","hadith_evidence","tafsir","aqidah","fiqh","seerah","scholarly_views","related_concepts","translations","sources"],
-  "rules":{"showOnlyAvailableVerifiedMaterial":true,"preserveDisagreement":true,"pendingHiddenFromTrustedView":true,"originalArabicPreserved":true,"translationIsMeaningOnly":true},
-  "examples":{"arkan_al_iman":["iman_billah","angels","books","messengers","last_day","divine_decree"],"arkan_al_islam":["shahadah","salah","zakat","sawm","hajj"]}
+  "knowledgeSections":["definition","contextual_meaning","quran_evidence","hadith_evidence","tafsir","aqidah","fiqh","seerah","scholarly_views","related_concepts","sources"],
+  "rules":{"showOnlyAvailableVerifiedMaterial":true,"preserveDisagreement":true,"pendingHiddenFromTrustedView":true,"originalArabicPreserved":true}
 }
