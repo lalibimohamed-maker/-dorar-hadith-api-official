@@ -1,5 +1,7 @@
 import { searchCorpus, resolveConcept } from './corpus_search.js';
 import { queryEvidencePaths, rankEvidencePaths } from './graph-evidence-query.js';
+import { rankEvidenceByQuality } from './evidence-quality.js';
+import { explainSearchResult } from './search-quality-explanation.js';
 
 function normalizeOptions(options = {}) {
   const limit = Number(options.limit) > 0 ? Math.min(Number(options.limit), 100) : 20;
@@ -12,12 +14,19 @@ function resultNodeIds(results = []) {
   return results.map(result => result.id).filter(Boolean);
 }
 
+function sourceRegistryFrom(options = {}) {
+  if (options.sourceRegistry instanceof Map) return options.sourceRegistry;
+  if (Array.isArray(options.sourceRegistry)) return new Map(options.sourceRegistry.map(source => [source.id, source]));
+  return new Map();
+}
+
 export function unifiedKnowledgeSearch(query, options = {}, records = [], graph = null) {
   const normalizedOptions = normalizeOptions(options);
   const corpus = searchCorpus(query, normalizedOptions, records);
   const allResults = Array.isArray(corpus?.results) ? corpus.results : [];
   const results = allResults.slice(0, normalizedOptions.limit);
   const graphPaths = [];
+  const sourceRegistry = sourceRegistryFrom(normalizedOptions);
 
   if (graph && Array.isArray(graph.nodes) && Array.isArray(graph.edges)) {
     const startId = normalizedOptions.startId || resultNodeIds(results)[0];
@@ -31,19 +40,26 @@ export function unifiedKnowledgeSearch(query, options = {}, records = [], graph 
     }
   }
 
+  const rankedPaths = rankEvidenceByQuality(rankEvidencePaths(graphPaths), sourceRegistry).slice(0, normalizedOptions.maxPaths);
+  const explainedResults = results.map(result => ({
+    ...result,
+    search_explanation: explainSearchResult(result, normalizedOptions)
+  }));
+
   return {
     query,
     language: normalizedOptions.language || 'ar',
-    results,
-    evidence_paths: rankEvidencePaths(graphPaths).slice(0, normalizedOptions.maxPaths),
+    results: explainedResults,
+    evidence_paths: rankedPaths,
     mode: graph ? 'corpus+graph' : 'corpus'
   };
 }
 
 export function explainKnowledgeResult(result, graph, options = {}) {
-  if (!result?.id || !graph) return { result, evidence_paths: [] };
+  if (!result?.id || !graph) return { result, evidence_paths: [], search_explanation: explainSearchResult(result, options) };
   const paths = queryEvidencePaths(graph, options.startId || result.id, options.targetId || result.id, options);
-  return { result, evidence_paths: rankEvidencePaths(paths).slice(0, options.maxPaths || 10) };
+  const ranked = rankEvidenceByQuality(rankEvidencePaths(paths), sourceRegistryFrom(options)).slice(0, options.maxPaths || 10);
+  return { result, evidence_paths: ranked, search_explanation: explainSearchResult(result, options) };
 }
 
 export function resolveKnowledgeConcept(term, contextId, language = 'ar', records = [], options = {}) {
