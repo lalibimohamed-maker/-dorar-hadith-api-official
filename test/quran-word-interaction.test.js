@@ -7,9 +7,10 @@ test("five second Quran word long press remains enabled", () => {
   assert.equal(config.enabled, true);
   assert.equal(config.durationMs, 5000);
   assert.equal(config.open, "word-knowledge-panel");
+  assert.equal(config.translationOutput, "disabled");
 });
 
-test("word knowledge panel keeps the full evidence graph", () => {
+test("word knowledge panel keeps the full evidence graph without translation output", () => {
   const request = buildWordKnowledgeRequest({ word: "الملائكة", root: "ملك", surah: 2, ayah: 285, conceptId: "faith-angels" });
   assert.equal(request.type, "word-knowledge");
   assert.ok(request.sections.includes("tafsir"));
