@@ -40,34 +40,8 @@ jobs:
             );
 
             const failedJobs = jobs.filter(j => j.conclusion !== 'success');
-            const lines = failedJobs.length
-              ? failedJobs.map(job => {
-                  const failedSteps = (job.steps || [])
-                    .filter(step => step.conclusion !== 'success' && step.conclusion !== 'skipped')
-                    .map(step => `  - ${step.name}: ${step.conclusion}`)
-                    .join('\n');
-                  return `- **${job.name}** — ${job.conclusion}\n${failedSteps || '  - No failed step summary returned.'}`;
-                }).join('\n')
-              : '- No failed job details were returned by the Actions API.';
-
-            const title = `CI failure requires repair: run #${run.run_number}`;
-            const body = [
-              '## Automatic CI recovery report',
-              '',
-              `Workflow: ${run.name}`,
-              `Run: ${run.run_number}`,
-              `Commit: ${run.head_sha}`,
-              `Attempt: ${run.run_attempt}`,
-              `URL: ${run.html_url}`,
-              '',
-              '### Failed jobs / steps',
-              lines,
-              '',
-              'The first retry did not pass. Source files are not deleted or replaced blindly.',
-              'The next repair should target the smallest deterministic cause, then CI must pass again.'
-            ].join('\n');
-
             const labelName = 'ci-auto-recovery';
+
             try {
               await github.rest.issues.getLabel({
                 owner: context.repo.owner,
@@ -99,20 +73,45 @@ jobs:
               }
             );
 
-            const sameRun = existing.find(i => i.title === title);
-            if (sameRun) {
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: sameRun.number,
-                body
-              });
-            } else {
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title,
-                body,
-                labels: [labelName]
-              });
+            for (const job of failedJobs) {
+              const failedSteps = (job.steps || [])
+                .filter(step => step.conclusion !== 'success' && step.conclusion !== 'skipped')
+                .map(step => `- **${step.name}** — ${step.conclusion}`)
+                .join('\n');
+
+              const title = `CI failure requires repair: ${run.name} / ${job.name}`;
+              const body = [
+                '## Automatic CI recovery report',
+                '',
+                `Workflow: ${run.name}`,
+                `Run: ${run.run_number}`,
+                `Commit: ${run.head_sha}`,
+                `Attempt: ${run.run_attempt}`,
+                `Job: ${job.name}`,
+                `URL: ${run.html_url}`,
+                '',
+                '### Failed steps',
+                failedSteps || '- No failed step summary returned by the Actions API.',
+                '',
+                'This issue is intentionally deduplicated by workflow and job. New runs update the same open tracking issue instead of creating a new issue for every failed run.',
+                'Source files, books, corpus records, references, and scholarly content must not be deleted or replaced blindly. Repairs must target the smallest deterministic cause and pass CI before merging.'
+              ].join('\n');
+
+              const sameFailure = existing.find(i => i.title === title);
+              if (sameFailure) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: sameFailure.number,
+                  body
+                });
+              } else {
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title,
+                  body,
+                  labels: [labelName]
+                });
+              }
             }

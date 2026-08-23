@@ -21,7 +21,11 @@ export function buildScholarAssessment(item = {}) {
 
 export function groupScholarAssessments(hadithId, assessments = []) {
   const relevant = assessments.filter((item) => item.hadithId === hadithId).map(buildScholarAssessment);
-  const byClassification = Object.groupBy(relevant, (item) => item.classification);
+  const byClassification = relevant.reduce((groups, item) => {
+    const key = item.classification;
+    (groups[key] ||= []).push(item);
+    return groups;
+  }, {});
   const disagreements = Object.keys(byClassification).length > 1;
-  return { hadithId, assessments: relevant, byClassification, disagreements, synthesizedVerdict: null };
+  return { hadithId, count: relevant.length, assessments: relevant, byClassification, disagreements, synthesizedVerdict: null };
 }
