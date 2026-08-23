@@ -4,9 +4,9 @@
     "advanced": true,
     "categories":["القرآن","التفسير","التدبر","الهدايات","الحديث","السيرة","المسانيد","الفقه","العقيدة","أركان الإسلام","أركان الإيمان","الرواة","الكتب","مقاصد الشريعة"],
     "sourceAttribution":true,
-    "bilingualOptional":true,
+    "bilingualOptional":false,
     "bilingualDefault":"off",
-    "bilingualTargetLanguage":"auto-from-user-selection-or-query-language"
+    "translationOutput":"disabled"
   },
   "contextualKnowledge": {
     "enabled": true,
@@ -18,8 +18,8 @@
     "preserveSearchContext": true,
     "expandToFullEntry": true,
     "verifiedEvidenceRequired": true,
-    "verifiedMeaningTranslationWhenAvailable": true,
-    "machineTranslationSeparate": true,
+    "verifiedMeaningTranslationWhenAvailable":false,
+    "translationOutput":"disabled",
     "conceptCardSchema":"config/concept-card-schema-2026.json"
   },
   "quran": {
@@ -40,7 +40,18 @@
     "gharib":true,
     "wujuhNazaer":true
   },
-  "audio": {"reciters":true,"surahDownload":true,"fullQuranDownload":true,"ayahRangeDownload":true,"offlineCache":true,"wordSyncRequiresTimestamps":true,"redistributionRequiresPermission":true},
+  "audio": {
+    "reciters":true,
+    "reciterSelection":false,
+    "defaultReciter":"saad-al-ghamdi",
+    "allowedReciters":["saad-al-ghamdi"],
+    "surahDownload":true,
+    "fullQuranDownload":true,
+    "ayahRangeDownload":true,
+    "offlineCache":true,
+    "wordSyncRequiresTimestamps":true,
+    "redistributionRequiresPermission":true
+  },
   "fiqh": {"fourMadhhabs":true,"compareViews":true,"sourceAttribution":true,"notAnAutomatedMufti":true,"longPressExplanation":true},
   "seerah": {"timeline":true,"eventToAyahLinks":true,"ayahToEventLinks":true,"sourceAndReliabilityLabels":true,"longPressExplanation":true},
   "i18n": {
