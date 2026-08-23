@@ -32,16 +32,38 @@ jobs:
               if (s.url && /^https?:\/\//.test(s.url)) urls.set(s.id || s.nameAr || s.url, s.url);
             }
           }
-          let failures = 0;
+          const failures = [];
           for (const [id,url] of urls) {
-            try {
-              const r = await fetch(url, { redirect:'follow', signal:AbortSignal.timeout(10000) });
-              console.log(`${r.ok ? 'OK' : 'WARN'} ${id} ${r.status} ${r.url}`);
-              if (!r.ok) failures++;
-            } catch (e) { console.log(`ERROR ${id} ${url} ${e.message}`); failures++; }
+            let lastError = null;
+            let response = null;
+            for (let attempt = 1; attempt <= 3; attempt++) {
+              try {
+                response = await fetch(url, {
+                  redirect: 'follow',
+                  signal: AbortSignal.timeout(10000),
+                  headers: { 'user-agent': 'DinAllah-source-monitor/1.0' }
+                });
+                if (response.ok) break;
+                lastError = new Error(`HTTP ${response.status}`);
+              } catch (e) {
+                lastError = e;
+              }
+              if (attempt < 3) await new Promise(r => setTimeout(r, attempt * 1000));
+            }
+            if (response?.ok) {
+              console.log(`OK ${id} ${response.status} ${response.url}`);
+            } else {
+              const detail = lastError?.message || `HTTP ${response?.status ?? 'unknown'}`;
+              console.log(`ERROR ${id} ${url} ${detail}`);
+              failures.push({ id, url, detail });
+            }
           }
-          if (failures) console.log(`Source monitor: ${failures} source(s) need attention.`);
-          else console.log(`Source monitor: ${urls.size} registered source(s) reachable.`);
+          if (failures.length) {
+            console.error(`Source monitor: ${failures.length}/${urls.size} registered source(s) need attention.`);
+            process.exitCode = 1;
+          } else {
+            console.log(`Source monitor: ${urls.size} registered source(s) reachable.`);
+          }
           NODE
       - name: Verify live Dorar client
         run: |
