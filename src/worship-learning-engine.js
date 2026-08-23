@@ -24,7 +24,7 @@ const TOPIC_TO_MODULE = {
 };
 
 function normalize(value){return String(value||"").toLocaleLowerCase("ar").normalize("NFKC").replace(/[إأآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/\s+/g," ").trim();}
-function findTopic(question){const q=normalize(question);let best=null;for(const [id,aliases] of Object.entries(TOPIC_ALIASES)){for(const alias of aliases){const a=normalize(alias);if(!a||!q.includes(a))continue;const score=a.split(" ").length*10+a.length;if(!best||score>best.score)best={id,score};}}return best?.id||null;}
+function findTopic(question){const q=normalize(question);let best=null;for(const [id,aliases] of Object.entries(TOPIC_ALIASES)){for(const alias of aliases){const a=normalize(alias);if(!a||!q.includes(a))continue;const score=a.length*10+a.split(" ").length;if(!best||score>best.score)best={id,score};}}return best?.id||null;}
 
 export function getWorshipLearningConfig(){return config;}
 export function detectWorshipTopic(question){return findTopic(question);}
