@@ -41,9 +41,18 @@ function scoreRecord(record, query, tokens) {
   if (id.includes(query)) matchScore += 20;
   if (author.includes(query)) matchScore += 25;
   if (institution.includes(query)) matchScore += 15;
+
+  // For multi-word queries, partial token coverage must not manufacture a
+  // result that does not actually match the query. A fallback match is only
+  // valid when every query token is present somewhere in the searchable record.
   const coverage = tokens.length ? tokens.filter(token => haystack.includes(token)).length / tokens.length : 0;
-  matchScore += Math.round(coverage * 30);
-  if (coverage === 1 && tokens.length > 1) matchScore += 15;
+  if (tokens.length === 1) {
+    matchScore += Math.round(coverage * 30);
+  } else if (coverage === 1) {
+    matchScore += 30;
+    matchScore += 15;
+  }
+
   const trusted = VERIFIED.has(record.verification_state) || VERIFIED.has(record.reviewStatus) || record.status === 'verified';
   return { score: matchScore + (trusted ? 5 : 0), matchScore, coverage, trusted };
 }
