@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Deen Allah Encyclopedia API
-  version: 0.10.0
+  version: 0.11.0
   description: Multilingual source-attributed research API for Quran, hadith, tafsir, creed, fiqh, sirah, maqasid, faraid and Quran learning. Search and five-second long-press concept cards respond in the selected language without a separate meaning-translation layer.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
@@ -11,24 +11,74 @@ paths:
       operationId: healthCheck
       responses:
         '200': {description: Healthy}
-  /locales:
+  /quran/video/config:
     get:
-      operationId: listLocales
+      operationId: getQuranVideoConfig
+      summary: Get Quran recitation video engine configuration
       responses:
-        '200': {description: Supported locales}
-  /categories:
+        '200': {description: Video configuration}
+  /quran/video/validate:
+    post:
+      operationId: validateQuranVideoSelection
+      summary: Validate selected surahs, ayah ranges, reciter and output settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reciterId]
+              properties:
+                surahs: {type: array, items: {type: integer, minimum: 1, maximum: 114}}
+                ranges: {type: array, items: {type: object}}
+                reciterId: {type: string}
+                format: {type: string, enum: [mp4]}
+                resolution: {type: string, enum: [720p, 1080p, 1440p]}
+      responses:
+        '200': {description: Validated video selection}
+        '400': {description: Invalid selection}
+  /quran/video/background:
+    post:
+      operationId: buildQuranVideoBackgroundPrompt
+      summary: Build an AI background request without altering Quranic text
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt: {type: string}
+                preset: {type: string}
+      responses:
+        '200': {description: Background request}
+  /quran/scientific-signs/config:
     get:
-      operationId: listCategories
+      operationId: getQuranScientificSignsConfig
+      summary: Get Quran scientific signs methodology and video configuration
       responses:
-        '200': {description: Categories}
-  /sources:
-    get:
-      operationId: listSources
-      parameters:
-        - {name: category, in: query, required: false, schema: {type: string}}
-        - {name: role, in: query, required: false, schema: {type: string}}
+        '200': {description: Scientific signs configuration}
+  /quran/scientific-signs/project:
+    post:
+      operationId: createQuranScientificSignsProject
+      summary: Create an evidence-first Quran scientific signs video project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [topic, ayahs, primaryLanguage]
+              properties:
+                topic: {type: string}
+                ayahs: {type: array, items: {type: string}}
+                primaryLanguage: {type: string}
+                additionalLanguages: {type: array, maxItems: 2, items: {type: string}}
+                scientificSources: {type: array, items: {type: object}}
+                religiousSources: {type: array, items: {type: object}}
       responses:
-        '200': {description: Source registry}
+        '200': {description: Project created for source review and video rendering}
+        '400': {description: Invalid project}
   /search:
     get:
       operationId: search
@@ -36,95 +86,19 @@ paths:
       parameters:
         - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
         - {name: lang, in: query, required: false, schema: {type: string}}
-        - {name: comparative, in: query, required: false, schema: {type: boolean, default: false, description: Enable explicitly attributed comparative theology layer}}
-        - {name: includePotentialMatches, in: query, required: false, schema: {type: boolean, default: false}}
+        - {name: comparative, in: query, required: false, schema: {type: boolean, default: false}}
       responses:
-        '200': {description: Search results with provenance and methodology routing in the selected language}
-        '400': {description: Missing query}
-        '413': {description: Query too long}
-        '429': {description: Rate limit exceeded}
-        '502': {description: Upstream failure}
+        '200': {description: Search results with provenance in selected language}
   /concept:
     get:
       operationId: getConceptCard
       summary: Medium concept card opened after a five-second long press; no meaning-translation layer
       parameters:
-        - {name: term, in: query, required: true, schema: {type: string, minLength: 1}}
+        - {name: term, in: query, required: true, schema: {type: string}}
         - {name: context, in: query, required: false, schema: {type: string}}
         - {name: lang, in: query, required: false, schema: {type: string}}
-        - {name: comparative, in: query, required: false, schema: {type: boolean, default: false}}
       responses:
-        '200': {description: Concept card with source-methodology routing}
-        '404': {description: Concept not found}
-  /research/domains:
-    get:
-      operationId: listResearchDomains
-      summary: List domain-specific research frameworks
-      responses:
-        '200': {description: Research domains and methodology rules}
-  /research/domain:
-    get:
-      operationId: getResearchDomain
-      summary: Get the scholar and methodology framework for one domain
-      parameters:
-        - {name: id, in: query, required: true, schema: {type: string, enum: [aqeedah, tafsir, hadith, usul-al-fiqh, maqasid, sirah, faraid]}}
-      responses:
-        '200': {description: Domain framework}
-        '400': {description: Missing domain}
-        '404': {description: Domain not found}
-  /research/scholars:
-    get:
-      operationId: searchDomainScholars
-      summary: Search qualified Sunni scholars by domain
-      parameters:
-        - {name: q, in: query, required: false, schema: {type: string}}
-        - {name: domain, in: query, required: false, schema: {type: string}}
-      responses:
-        '200': {description: Scholar index}
-  /fiqh:
-    get:
-      operationId: getFiqhFramework
-      summary: Comparative Sunni fiqh framework
-      parameters:
-        - {name: scholar, in: query, required: false, schema: {type: string}}
-      responses:
-        '200': {description: Fiqh framework}
-  /fiqh/research:
-    get:
-      operationId: searchFiqhResearch
-      summary: Search fiqh scholars and works
-      parameters:
-        - {name: q, in: query, required: true, schema: {type: string}}
-      responses:
-        '200': {description: Fiqh research results}
-        '400': {description: Missing query}
-  /fiqh/template:
-    get:
-      operationId: buildFiqhResearchTemplate
-      summary: Build evidence-first comparative fiqh analysis
-      parameters:
-        - {name: q, in: query, required: true, schema: {type: string}}
-        - {name: madhhab, in: query, required: false, schema: {type: string, enum: [hanafi, maliki, shafii, hanbali]}}
-      responses:
-        '200': {description: Comparative fiqh template}
-        '400': {description: Missing query}
-  /inheritance/madhahib:
-    get:
-      operationId: listInheritanceMadhahib
-      responses:
-        '200': {description: Four Sunni madhhabs}
-  /inheritance:
-    get:
-      operationId: calculateInheritance
-      summary: Educational Sunni faraid calculator
-      parameters:
-        - {name: estate, in: query, required: true, schema: {type: number, minimum: 0}}
-        - {name: debts, in: query, required: false, schema: {type: number, minimum: 0, default: 0}}
-        - {name: bequest, in: query, required: false, schema: {type: number, minimum: 0, default: 0}}
-        - {name: madhhab, in: query, required: false, schema: {type: string, enum: [hanafi, maliki, shafii, hanbali], default: hanbali}}
-      responses:
-        '200': {description: Calculation}
-        '400': {description: Invalid case}
+        '200': {description: Concept card}
   /quran/ayah:
     get:
       operationId: getQuranAyah
@@ -135,7 +109,6 @@ paths:
         - {name: words, in: query, required: false, schema: {type: boolean}}
       responses:
         '200': {description: Quran ayah context}
-        '404': {description: Ayah not found}
   /quran/translations:
     get:
       operationId: listQuranTranslations
@@ -155,7 +128,6 @@ paths:
         - {name: id, in: query, required: true, schema: {type: string}}
       responses:
         '200': {description: Tajweed lesson}
-        '404': {description: Lesson not found}
 components:
   securitySchemes:
     ApiKey:
