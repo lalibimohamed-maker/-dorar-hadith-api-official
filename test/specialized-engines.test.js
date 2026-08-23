@@ -11,10 +11,10 @@ test("prophetic medicine questions route to medicine engine", () => assert.equal
 test("dua questions route to dua engine", () => assert.equal(routeSpecializedQuestion("ما دعاء الشفاء الصحيح؟").engineId, "dua-adhkar"));
 test("worship questions route to worship engine", () => assert.equal(routeSpecializedQuestion("كيف أصلي صلاة الجنازة؟").engineId, "worship-teaching"));
 test("prayer variant questions route to worship engine", () => {
-  for (const q of ["متى صلاة الفجر والتغليس؟", "ما حكم صلاة الكسوف؟", "كيف أصلي صلاة المسافر بالقصر؟", "متى صلاة التراويح وقيام الليل؟", "ما حكم صلاة العيد للمرأة؟"]) assert.equal(routeSpecializedQuestion(q).engineId, "worship-teaching");
+  for (const q of ["متى صلاة الفجر والتغليس؟", "ما حكم صلاة الكسوف؟", "كيف أصلي صلاة المسافر بالقصر؟", "متى صلاة التراويح وقيام الليل؟", "ما حكم صلاة العيد للمرأة?"]) assert.equal(routeSpecializedQuestion(q).engineId, "worship-teaching");
 });
 test("riba and transaction questions route to transactions engine", () => {
-  for (const q of ["ما الربا؟", "هل بيع الذهب بالذهب فيه ربا؟", "ما حكم فوائد القرض؟", "ما حكم أكل مال اليتيم؟", "ما هو الغرر في البيع؟"]) assert.equal(routeSpecializedQuestion(q).engineId, "fiqh-transactions");
+  for (const q of ["ما الربا؟", "هل بيع الذهب بالذهب فيه ربا؟", "ما حكم فوائد القرض؟", "ما حكم أكل مال اليتيم؟", "ما هو الغرر في البيع؟", "هل يجوز أن أبيع ما ليس عندي؟", "ما حكم الغش في البيع؟", "هل القمار من المعاملات المحرمة؟"]) assert.equal(routeSpecializedQuestion(q).engineId, "fiqh-transactions");
 });
 test("funeral sermon questions still route to sermons engine", () => assert.equal(routeSpecializedQuestion("أعد لي موعظة جنازة عن الصبر").engineId, "sermons-lessons"));
 test("specific worship concepts beat generic funeral aliases", () => { const result = routeSpecializedQuestion("كيف أصلي صلاة الميت؟"); assert.equal(result.engineId, "worship-teaching"); assert.ok(result.candidates.some((candidate) => candidate.id === "sermons-lessons")); });
