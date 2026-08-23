@@ -1,0 +1,46 @@
+{
+  "version": "2026.08.23.1",
+  "project": "موسوعة دين الله",
+  "policy": {
+    "interactiveOnlyAfterEvidence": true,
+    "neverInventEvidence": true,
+    "showDisagreementWhenMaterial": true,
+    "preserveArabicOriginal": true,
+    "languageFollowsUser": true
+  },
+  "quranLearning": {
+    "officialQatarSource": "https://alquran.islam.gov.qa/droos/Sections.html",
+    "officialQatarCurriculum": [
+      {"level":1,"lessons":[1,2,3,4,5,6],"topics":["الحروف المفردة","الحروف المركبة","الحروف المقطعة","الحركات","التنوين","تهجي الكلمات"]},
+      {"level":2,"lessons":[7,8,9,10,11,12],"topics":["المد","حروف المد الصغيرة","اللين","تطبيقات المد واللين","السكون","تطبيقات السكون"]},
+      {"level":3,"lessons":[13,14,15,16,17,18],"topics":["الشدة","تقويم الشدة","الشدة مع السكون","الشدة المزدوجة","الشدة بعد المدة","الخاتمة"]}
+    ],
+    "features": ["ayah-sync-highlight","reciter-selection","repeat-ayah","night-mode","light-mode","tajweed-learning","mushaf-reading","long-press-word"],
+    "secondaryReference": {"name":"QuranFlash","features":["ayah selection","audio synchronized with pages","tajweed","Warsh","memorization tools"],"licenseRule":"use only permitted material and links"}
+  },
+  "worship": [
+    {"id":"wudu","nameAr":"الوضوء","quran":[{"surah":5,"ayah":6}],"hadithSources":["صحيح البخاري","صحيح مسلم"],"steps":["النية","غسل الكفين","المضمضة والاستنشاق","غسل الوجه","غسل اليدين إلى المرفقين","مسح الرأس","غسل الرجلين"],"evidenceStatus":"primary_sources_required_per_step"},
+    {"id":"major-ghusl","nameAr":"الغسل من الجنابة","quran":[{"surah":4,"ayah":43},{"surah":5,"ayah":6}],"hadithSources":["صحيح البخاري","صحيح مسلم"],"steps":["النية","غسل الفرج","الوضوء","إفاضة الماء على الرأس","إفاضة الماء على سائر الجسد"],"evidenceStatus":"primary_sources_required_per_step"},
+    {"id":"tayammum","nameAr":"التيمم","quran":[{"surah":4,"ayah":43},{"surah":5,"ayah":6}],"hadithSources":["صحيح البخاري","صحيح مسلم"],"steps":["تحقق سبب التيمم","القصد إلى الصعيد الطيب","مسح الوجه واليدين على الصفة الثابتة"],"evidenceStatus":"primary_sources_required_per_step"},
+    {"id":"prophetic-prayer","nameAr":"صفة صلاة النبي ﷺ","quran":[{"surah":4,"ayah":103},{"surah":2,"ayah":238}],"hadithSources":["صحيح البخاري","صحيح مسلم","السنن"],"scholars":["ابن القيم - زاد المعاد","ابن تيمية - مجموع الفتاوى"],"steps":["استقبال القبلة","تكبيرة الإحرام","القيام والقراءة","الركوع والرفع","السجود والجلوس","التشهد","السلام"],"evidenceStatus":"primary_sources_required_per_step"},
+    {"id":"sujud-sahw","nameAr":"سجود السهو","quran":[],"hadithSources":["صحيح البخاري","صحيح مسلم"],"steps":["تحديد سبب السهو","موضع السجود بحسب الصورة الواردة في الحديث","التشهد والسلام عند الموضع الذي تدل عليه الرواية"],"evidenceStatus":"hadith_variant_comparison_required"},
+    {"id":"sujud-tilawah","nameAr":"سجود التلاوة","quran":[],"hadithSources":["صحيح البخاري","صحيح مسلم","السنن"],"steps":["معرفة موضع السجدة","التكبير بحسب الحال والرواية","السجود والذكر","الرفع بحسب الحال"],"evidenceStatus":"hadith_variant_comparison_required"},
+    {"id":"sujud-shukr","nameAr":"سجود الشكر","quran":[],"hadithSources":["السنن والمسانيد مع التحقق"],"steps":["تحقق ثبوت السبب","السجود على الصفة التي يثبتها الدليل"],"evidenceStatus":"verification_required"},
+    {"id":"adhan","nameAr":"الأذان","quran":[],"hadithSources":["صحيح البخاري","صحيح مسلم","السنن"],"steps":["الألفاظ الثابتة","الترجيع إن ثبت في الرواية المعتمدة","الحيعلتان","الدعاء بعد الأذان"],"evidenceStatus":"variant_aware"},
+    {"id":"iqamah","nameAr":"الإقامة","quran":[],"hadithSources":["صحيح البخاري","صحيح مسلم","السنن"],"steps":["الألفاظ","عدد التكرار بحسب الرواية","قد قامت الصلاة"],"evidenceStatus":"variant_aware"},
+    {"id":"funeral-prayer","nameAr":"صلاة الجنازة","quran":[{"surah":9,"ayah":84}],"hadithSources":["صحيح البخاري","صحيح مسلم","السنن"],"steps":["التكبيرة الأولى","القراءة بحسب الدليل","التكبيرة الثانية والصلاة على النبي ﷺ","التكبيرة الثالثة والدعاء للميت","التكبيرة الرابعة والسلام"],"evidenceStatus":"hadith_variant_comparison_required"},
+    {"id":"istisqa","nameAr":"صلاة الاستسقاء","quran":[],"hadithSources":["صحيح البخاري","صحيح مسلم","السنن"],"steps":["الخروج والاستسقاء","الصلاة على الصفة الثابتة","الدعاء والاستغفار"],"evidenceStatus":"hadith_variant_comparison_required"},
+    {"id":"fasting","nameAr":"الصيام","quran":[{"surah":2,"ayah":183},{"surah":2,"ayah":184},{"surah":2,"ayah":185},{"surah":2,"ayah":187}],"hadithSources":["صحيح البخاري","صحيح مسلم"],"steps":["النية","الإمساك","آداب الصيام","الإفطار","أحكام الأعذار والقضاء"],"evidenceStatus":"primary_sources_required_per_rule"},
+    {"id":"zakat","nameAr":"الزكاة","quran":[{"surah":2,"ayah":43},{"surah":9,"ayah":103}],"hadithSources":["صحيح البخاري","صحيح مسلم","السنن"],"steps":["تحديد نوع المال","تحديد النصاب","تحقق الحول حيث يشترط","حساب الواجب","التأكد من المصارف"],"evidenceStatus":"fiqh_matrix_required"},
+    {"id":"zakat-fitr","nameAr":"زكاة الفطر","quran":[],"hadithSources":["صحيح البخاري","صحيح مسلم"],"steps":["تحديد من تلزمه","تحديد المقدار بالنص الوارد","تحديد وقت الإخراج","تحديد مصرفها وفق القول الموثق"],"evidenceStatus":"hadith_and_fiqh_matrix_required"},
+    {"id":"hajj","nameAr":"الحج","quran":[{"surah":2,"ayah":196},{"surah":3,"ayah":97},{"surah":22,"ayah":27}],"hadithSources":["صحيح البخاري","صحيح مسلم","السنن"],"steps":["الإحرام","الطواف","السعي","الوقوف بعرفة","المبيت والرمي","التحلل","طواف الإفاضة"],"evidenceStatus":"primary_sources_required_per_rite"},
+    {"id":"umrah","nameAr":"العمرة","quran":[{"surah":2,"ayah":196}],"hadithSources":["صحيح البخاري","صحيح مسلم","السنن"],"steps":["الإحرام","الطواف","السعي","الحلق أو التقصير"],"evidenceStatus":"primary_sources_required_per_rite"},
+    {"id":"ruqyah","nameAr":"الرقية الشرعية","quran":[{"surah":17,"ayah":82},{"surah":41,"ayah":44}],"hadithSources":["صحيح البخاري","صحيح مسلم"],"steps":["القراءة الثابتة","الأدعية الثابتة","النفث حيث ورد","اجتناب الألفاظ والطرق غير المشروعة"],"evidenceStatus":"primary_sources_required_per_text"}
+  ],
+  "islamicTools": {
+    "prayerTimes": {"location":"browser_permission","hijriCalendar":"umm_al_qura_when_supported","calculation":"configurable_with_method_visible","timezone":"device"},
+    "qibla": {"method":"great_circle_initial_bearing","kaabaCoordinates":{"latitude":21.422487,"longitude":39.826206},"requiresCompassCalibration":true},
+    "adhan": {"localPlayback":"browser_audio_with_user_consent","perPrayerSettings":true},
+    "liveChannels": {"makkah":"official-source-required","madinah":"official-source-required"}
+  }
+}
