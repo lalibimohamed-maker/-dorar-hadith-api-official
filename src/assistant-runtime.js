@@ -1,6 +1,7 @@
 import { unifiedSearch } from './unified-search.js';
 import { createMultimodalSession, normalizeLanguage, speechPolicy, exportRequest } from './multimodal-runtime.js';
 import { transcribe, synthesize, quranRecitation, exportMedia } from './media-provider-adapters.js';
+import { createAlQuranCloudRecitationProvider } from './quran-recitation-source.js';
 
 /**
  * Orchestrates the public assistant flow without embedding provider secrets.
@@ -49,8 +50,9 @@ export async function renderAnswerVoice({ provider, answer, language } = {}) {
   return synthesize({ provider, text: answer, language: normalizeLanguage(language) });
 }
 
-export async function renderQuranAudio({ provider, surah, ayah } = {}) {
-  return quranRecitation({ provider, surah, ayah });
+export async function renderQuranAudio({ provider, surah, ayah, reciter } = {}) {
+  const verifiedProvider = provider || createAlQuranCloudRecitationProvider();
+  return quranRecitation({ provider: verifiedProvider, surah, ayah, reciter });
 }
 
 export async function exportAssistantSession({ provider, format, sessionId, includeVoice = false, includeVideo = false } = {}) {
