@@ -44,3 +44,13 @@ export function resolveConcept(term, contextId, language = 'ar', records = [], o
   const record = records.find(r => r.id === contextId) || records.find(r => r.title_ar === term || r.title === term) || records.find(r => String(r.title_ar || '').includes(term)) || resolveIndexedConcept(term) || resolveGhaybDomain(term);
   return conceptCard({ term, contextId: contextId || record?.id || null, language, record, routing: routeConcept(record, options) });
 }
+
+// Compatibility helper for the existing corpus search contract.
+// Translation remains an explicit, on-demand presentation field; search itself stays Arabic-first.
+export function makeBilingual(originalArabic, translation, language = 'en') {
+  return {
+    original_arabic: originalArabic,
+    meaning_translation: { text: translation, language },
+    open_original_on_demand: true
+  };
+}
