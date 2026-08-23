@@ -31,11 +31,17 @@
     const player = ensurePlayer();
     player.hidden = false;
     document.getElementById("quran-recitation-label").textContent = `القارئ: ${meta.reciter} — الآية: ${meta.ayah || "محددة في المصدر"}`;
-    document.getElementById("quran-recitation-source").textContent = `المصدر: ${meta.source}`;
+    document.getElementById("quran-recitation-source").textContent = `المصدر: ${meta.source}${meta.edition ? ` — الإصدار: ${meta.edition}` : ""}`;
     return true;
   }
 
-  window.DeenAllahQuranRecitationUI = { attach };
+  function attachFromResult(result = {}) {
+    const meta = result.recitation || result.quranRecitation || null;
+    if (!meta) return false;
+    return attach(meta);
+  }
+
+  window.DeenAllahQuranRecitationUI = { attach, attachFromResult };
   window.addEventListener("deen-allah:quran-recitation", (event) => {
     if (event.detail?.type === "start") {
       const player = document.getElementById("quran-recitation-player");
