@@ -40,8 +40,11 @@ jobs:
               if (!r.ok) failures++;
             } catch (e) { console.log(`ERROR ${id} ${url} ${e.message}`); failures++; }
           }
-          if (failures) console.log(`Source monitor: ${failures} source(s) need attention.`);
-          else console.log(`Source monitor: ${urls.size} registered source(s) reachable.`);
+          if (failures) {
+            console.error(`Source monitor: ${failures} source(s) need attention.`);
+            process.exit(1);
+          }
+          console.log(`Source monitor: ${urls.size} registered source(s) reachable.`);
           NODE
       - name: Verify live Dorar client
         run: |
