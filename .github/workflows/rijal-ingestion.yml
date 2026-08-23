@@ -2,15 +2,6 @@ name: Rijal ingestion validation
 
 on:
   workflow_dispatch:
-    inputs:
-      source:
-        description: 'Source ID (optional)'
-        required: false
-        default: 'bukhari-tarikh-kabir'
-      limit:
-        description: 'Maximum records to process'
-        required: false
-        default: '250'
   pull_request:
     paths:
       - 'config/rijal-*.json'
