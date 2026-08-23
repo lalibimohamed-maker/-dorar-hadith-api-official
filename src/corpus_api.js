@@ -1,5 +1,5 @@
 import { loadCorpus, loadRouting } from './corpus_repository.js';
-import { searchCorpus, resolveConcept, makeBilingual } from './corpus_search.js';
+import { searchCorpus, resolveConcept } from './corpus_search.js';
 import { buildKnowledgeSections } from './concept_resolver.js';
 import { buildGhaybResearchPlan } from './ghayb-router.js';
 import { queryPolicy } from './query-intent-router.js';
@@ -24,8 +24,6 @@ export function concept(term, contextId, language = 'ar', options = {}) {
   const ghaibPlan = buildGhaybResearchPlan(term, { ...options, language });
   return { ...result, knowledge, ghaibResearch: ghaibPlan, queryPolicy: queryPolicy(term), specializedRouting: routeSpecializedQuestion(term), routing: loadRouting().domains?.[record?.domain] || null };
 }
-
-export function bilingual(originalArabic, meaningTranslation, targetLanguage) { return makeBilingual(originalArabic, meaningTranslation, targetLanguage); }
 
 export function specializedEngine(id) { return getEngine(id); }
 export function worshipLearning({ topic, question, audience='general', language='ar', mode='guided' } = {}) {
