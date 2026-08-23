@@ -3,30 +3,85 @@ import { routeConcept } from './methodology-router.js';
 import { loadConceptIndex } from './corpus_repository.js';
 import { resolveGhaybDomain } from './ghayb-router.js';
 
+const VERIFIED = new Set(['verified','source-verified','edition-verified','institution-verified','scholar-reviewed']);
+
+export function normalizeArabic(value = '') {
+  return String(value)
+    .normalize('NFKC')
+    .replace(/[\u064B-\u065F\u0670]/g, '')
+    .replace(/[إأآٱ]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .replace(/ـ/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function searchable(record) {
+  return normalizeArabic([
+    record.id, record.title_ar, record.title, record.text, record.textOriginal, record.sourceId, record.sourceType,
+    record.domain, record.attribution?.authorOrScholar, record.institution, record.author, record.authorName,
+    record.attribution?.institution, record.citation?.book, record.citation?.chapter,
+    record.citation?.hadithNumber, record.citation?.verse
+  ].filter(Boolean).join(' '));
+}
+
+function scoreRecord(record, query, tokens) {
+  const title = normalizeArabic(record.title_ar || record.title || '');
+  const text = normalizeArabic(record.text || record.textOriginal || '');
+  const id = normalizeArabic(record.id || record.sourceId || '');
+  const author = normalizeArabic(record.author || record.authorName || record.attribution?.authorOrScholar || '');
+  const institution = normalizeArabic(record.attribution?.institution || record.institution || '');
+  const haystack = searchable(record);
+  let matchScore = 0;
+  if (title === query) matchScore += 120;
+  else if (title.includes(query)) matchScore += 60;
+  if (text.includes(query)) matchScore += 35;
+  if (id.includes(query)) matchScore += 20;
+  if (author.includes(query)) matchScore += 25;
+  if (institution.includes(query)) matchScore += 15;
+
+  // For multi-word queries, partial token coverage must not manufacture a
+  // result that does not actually match the query. A fallback match is only
+  // valid when every query token is present somewhere in the searchable record.
+  const coverage = tokens.length ? tokens.filter(token => haystack.includes(token)).length / tokens.length : 0;
+  if (tokens.length === 1) {
+    matchScore += Math.round(coverage * 30);
+  } else if (coverage === 1) {
+    matchScore += 30;
+    matchScore += 15;
+  }
+
+  const trusted = VERIFIED.has(record.verification_state) || VERIFIED.has(record.reviewStatus) || record.status === 'verified';
+  return { score: matchScore + (trusted ? 5 : 0), matchScore, coverage, trusted };
+}
+
 function resolveIndexedConcept(term) {
-  const normalized = String(term || '').trim();
+  const normalized = normalizeArabic(term);
   const index = loadConceptIndex();
   const groups = index.groups || {};
-
   for (const [group, terms] of Object.entries(groups)) {
-    const hit = (terms || []).find(item => item === normalized || item.includes(normalized) || normalized.includes(item));
+    const hit = (terms || []).find(item => {
+      const value = normalizeArabic(item);
+      return value === normalized || value.includes(normalized) || normalized.includes(value);
+    });
     if (hit) {
       const domain = group === 'aqidah' ? 'aqidah' : group === 'quran' || group === 'language' ? 'quran-tafsir' : group === 'hadith' ? 'hadith-takhrij' : group === 'fiqh' || group === 'usul' ? 'fiqh' : group === 'seerah' ? 'seerah' : 'general';
       return { id: `concept-index:${group}:${hit}`, type: 'concept', domain, title_ar: hit, index_group: group, index_match: true };
     }
   }
-
   const aliases = index.aliases || {};
   for (const [canonical, aliasList] of Object.entries(aliases)) {
     const matched = [canonical, ...(aliasList || [])].some(alias => {
-      const value = String(alias || '').trim();
+      const value = normalizeArabic(alias);
       return value === normalized || value.includes(normalized) || normalized.includes(value);
     });
     if (!matched) continue;
     for (const [group, terms] of Object.entries(groups)) {
-      if ((terms || []).includes(canonical)) {
+      if ((terms || []).some(item => normalizeArabic(item) === normalizeArabic(canonical))) {
         const domain = group === 'aqidah' ? 'aqidah' : group === 'quran' || group === 'language' ? 'quran-tafsir' : group === 'hadith' ? 'hadith-takhrij' : group === 'fiqh' || group === 'usul' ? 'fiqh' : group === 'seerah' ? 'seerah' : 'general';
-        return { id:`concept-index:${group}:${canonical}`, type:'concept', domain, title_ar:canonical, index_group:group, index_match:true, alias_match:normalized!==canonical, matched_term:normalized };
+        return { id:`concept-index:${group}:${canonical}`, type:'concept', domain, title_ar:canonical, index_group:group, index_match:true, alias_match:normalized!==normalizeArabic(canonical), matched_term:term };
       }
     }
   }
@@ -35,22 +90,30 @@ function resolveIndexedConcept(term) {
 
 export function searchCorpus(query, options = {}, records = []) {
   const language = options.language || 'ar';
-  const normalized = String(query || '').trim().toLowerCase();
-  const matches = records.filter(r => [r.title_ar, r.title, r.id].filter(Boolean).some(v => String(v).toLowerCase().includes(normalized)));
-  return searchResponse({ query, language, results: matches.map(r => ({ ...r, methodology: routeConcept(r, options) })) });
+  const normalized = normalizeArabic(query);
+  if (!normalized) return searchResponse({ query, language, results: [] });
+  const tokens = normalized.split(' ').filter(Boolean);
+  const limit = Number(options.limit) > 0 ? Math.min(Number(options.limit), 100) : 50;
+  const verifiedOnly = options.verifiedOnly === true;
+  const matches = records.map(record => ({ record, ...scoreRecord(record, normalized, tokens) }))
+    .filter(item => item.matchScore > 0)
+    .filter(item => !verifiedOnly || item.trusted)
+    .sort((a, b) => b.score - a.score || b.coverage - a.coverage)
+    .slice(0, limit)
+    .map(({ record, score, coverage, trusted }) => ({ ...record, score, token_coverage: coverage, trusted, methodology: routeConcept(record, options) }));
+  return searchResponse({ query, language, results: matches });
 }
 
 export function resolveConcept(term, contextId, language = 'ar', records = [], options = {}) {
-  const record = records.find(r => r.id === contextId) || records.find(r => r.title_ar === term || r.title === term) || records.find(r => String(r.title_ar || '').includes(term)) || resolveIndexedConcept(term) || resolveGhaybDomain(term);
+  const normalized = normalizeArabic(term);
+  const record = records.find(r => r.id === contextId)
+    || records.find(r => normalizeArabic(r.title_ar || r.title) === normalized)
+    || records.find(r => normalizeArabic(r.title_ar || r.title).includes(normalized))
+    || resolveIndexedConcept(term)
+    || resolveGhaybDomain(term);
   return conceptCard({ term, contextId: contextId || record?.id || null, language, record, routing: routeConcept(record, options) });
 }
 
-// Compatibility helper for the existing corpus search contract.
-// Translation remains an explicit, on-demand presentation field; search itself stays Arabic-first.
 export function makeBilingual(originalArabic, translation, language = 'en') {
-  return {
-    original_arabic: originalArabic,
-    meaning_translation: { text: translation, language },
-    open_original_on_demand: true
-  };
+  return { original_arabic: originalArabic, meaning_translation: { text: translation, language }, open_original_on_demand: true };
 }
