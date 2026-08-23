@@ -30,14 +30,14 @@ jobs:
             --jq '[.jobs[] | select(.conclusion != "success" and .conclusion != "skipped") | {name,conclusion,steps}]' \
             | jq -s 'add')"
 
-          transient="$(jq '[.[] | .steps // [] | map(select(.conclusion != "success" and .conclusion != "skipped")) | .[]? | .name] | any(test("^(Checkout|Setup Node\\.js|Install dependencies|Set up job|Complete job)"))' <<<"$jobs_json")"
+          transient="$(jq '[ .[]?.steps[]? | select(.conclusion != "success" and .conclusion != "skipped") | .name ] | if length == 0 then false else all(.[]; test("^(Checkout|Setup Node\\.js|Install dependencies|Set up job|Complete job)")) end' <<<"$jobs_json")"
 
           if [ "$transient" = "true" ]; then
-            echo "Transient runner/setup failure detected; retrying failed jobs once."
+            echo "All failed steps are transient runner/setup failures; retrying failed jobs once."
             gh run rerun "$RUN_ID" --failed --repo "$GITHUB_REPOSITORY"
           else
-            echo "Deterministic/project failure detected; skipping automatic retry."
-            echo "Create the recovery issue immediately from this failed run."
+            echo "At least one failed step is project/test related; skipping automatic retry."
+            echo "Create the recovery issue from this failed run."
           fi
 
       - name: Diagnose failed run
