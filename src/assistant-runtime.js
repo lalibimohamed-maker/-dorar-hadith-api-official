@@ -12,12 +12,13 @@ export async function runAssistantSearch({
   language = 'ar',
   searchOptions = {},
   providers = {},
+  searchFn = unifiedSearch,
   records,
   graph,
 } = {}) {
   const normalizedLanguage = normalizeLanguage(language);
   const session = createMultimodalSession({ language: normalizedLanguage });
-  const result = await unifiedSearch(query, {
+  const result = await searchFn(query, {
     ...searchOptions,
     responseLocale: normalizedLanguage,
   });
@@ -35,12 +36,12 @@ export async function runAssistantSearch({
   };
 }
 
-export async function runVoiceQuestion({ provider, audio, language, searchOptions = {} } = {}) {
+export async function runVoiceQuestion({ provider, audio, language, searchOptions = {}, searchFn = unifiedSearch } = {}) {
   const normalizedLanguage = normalizeLanguage(language);
   const transcript = await transcribe({ provider, audio, language: normalizedLanguage });
   const query = typeof transcript === 'string' ? transcript : transcript?.text;
   if (!query) throw new Error('Speech provider returned no transcript');
-  const response = await runAssistantSearch({ query, language: normalizedLanguage, searchOptions });
+  const response = await runAssistantSearch({ query, language: normalizedLanguage, searchOptions, searchFn });
   return { transcript, ...response };
 }
 
