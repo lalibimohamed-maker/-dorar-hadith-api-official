@@ -5,14 +5,24 @@ import { listBooks, listAuthors } from "./book-catalog.js";
 import { loadCorpusRecords, searchCorpus, verifyRecord } from "./corpus-index.js";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
-const config = JSON.parse(fs.readFileSync(path.join(root, "..", "config", "free-core-2026.json"), "utf8"));
+const configDir = path.join(root, "..", "config");
+const config = JSON.parse(fs.readFileSync(path.join(configDir, "free-core-2026.json"), "utf8"));
+const routing = JSON.parse(fs.readFileSync(path.join(configDir, "corpus-source-routing-2026.json"), "utf8"));
 
 export function getFreeCoreConfig() {
   return structuredClone(config);
 }
 
+export function getSourceRouting() {
+  return structuredClone(routing);
+}
+
 export function listFreeCoreDomains() {
-  return config.domains.map((domain) => ({ ...domain, sourceTypes: [...domain.sourceTypes] }));
+  return config.domains.map((domain) => ({
+    ...domain,
+    sourceTypes: [...domain.sourceTypes],
+    routing: routing.domains[domain.id] ?? null
+  }));
 }
 
 export function listFreeCoreSources() {
@@ -32,7 +42,8 @@ export function listFreeCoreSources() {
       type: record.sourceType,
       priority: record.priority,
       status: record.reviewStatus ?? "catalogued",
-      rights: record.rights ?? null
+      rights: record.rights ?? null,
+      attribution: record.attribution ?? null
     });
   }
 
@@ -54,7 +65,8 @@ export function listFreeCoreSources() {
   return {
     sources,
     authorCount: authors.length,
-    sourceCount: sources.length
+    sourceCount: sources.length,
+    sourcePriority: [...routing.sourcePriority]
   };
 }
 
@@ -68,6 +80,7 @@ export function searchFreeCore(query, options = {}) {
     query: query ?? "",
     language: options.language ?? "ar",
     aiRequired: false,
+    sourceRoutingVersion: routing.version,
     count: results.length,
     results: results.map((record) => ({
       ...record,
@@ -88,6 +101,7 @@ export function getFreeCoreSnapshot() {
     corpusRecordCount: records.length,
     sourceCount: sources.sourceCount,
     authorCount: sources.authorCount,
+    sourceRoutingVersion: routing.version,
     principles: [...config.principles]
   };
 }
