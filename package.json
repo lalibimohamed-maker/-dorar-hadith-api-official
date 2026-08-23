@@ -12,6 +12,7 @@
     "test":"node --test",
     "test:corpus":"node test/corpus_search.test.js && node test/corpus_repository.test.js && node test/corpus_api.integration.test.js && node test/http_server.integration.test.js",
     "test:ghaib":"node test/ghaib-evidence-router.test.js && node test/hadith-evidence-registry.test.js && node test/hadith-scholar-linker.test.js",
+    "test:graph":"node test/deen-graph-runtime.test.js && node test/deen-answer-policy.test.js",
     "provenance:audit":"node --input-type=module -e \"import('./src/source-provenance-audit.js').then(m=>console.log(JSON.stringify(m.auditSources(),null,2)))\"",
     "scholar:batch":"node scripts/run-scholar-opinions-batch.js",
     "scholar:probe":"node scripts/probe-official-scholar-sources.js",
