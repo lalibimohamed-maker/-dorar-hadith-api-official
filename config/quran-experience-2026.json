@@ -1,5 +1,5 @@
 {
-  "version":"2026.08.22.3",
+  "version":"2026.08.23.1",
   "reading":{
     "arabicText":"verified_uthmani_source",
     "recitation":{
@@ -7,7 +7,9 @@
       "wordSync":true,
       "currentAyahHighlight":true,
       "currentWordHighlight":true,
-      "reciterSelection":true,
+      "reciterSelection":false,
+      "defaultReciter":"saad-al-ghamdi",
+      "allowedReciters":["saad-al-ghamdi"],
       "repeatAyah":true,
       "repeatRange":true,
       "speedControl":true,
@@ -24,6 +26,7 @@
       "preserveShortTap":true,
       "preserveSelection":true,
       "panelSections":["word","root","morphology","lexical_meaning","quran_occurrences","ayah_context","tafsir","hadith_and_athar","aqidah_context","fiqh_context","scholarly_statements","related_concepts","questions","sources"],
+      "translationOutput":"disabled",
       "evidencePolicy":"source_to_answer",
       "neverTreatWordAloneAsEvidence":true
     },
