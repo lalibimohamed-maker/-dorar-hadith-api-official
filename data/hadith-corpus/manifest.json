@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "status": "ingestion-ready",
+  "generatedTextAllowed": false,
+  "requiredFields": ["hadithId", "sourceId", "book", "reference", "text", "chain", "provenance", "verificationState"],
+  "sources": [
+    {"id":"bukhari","title":"Sahih al-Bukhari","status":"awaiting-redistribution-verification"},
+    {"id":"muslim","title":"Sahih Muslim","status":"awaiting-redistribution-verification"},
+    {"id":"abu-dawud","title":"Sunan Abi Dawud","status":"awaiting-redistribution-verification"},
+    {"id":"tirmidhi","title":"Jami al-Tirmidhi","status":"awaiting-redistribution-verification"},
+    {"id":"nasai","title":"Sunan al-Nasa'i","status":"awaiting-redistribution-verification"},
+    {"id":"ibn-majah","title":"Sunan Ibn Majah","status":"awaiting-redistribution-verification"},
+    {"id":"muwatta-malik","title":"Muwatta Malik","status":"awaiting-redistribution-verification"},
+    {"id":"musnad-ahmad","title":"Musnad Ahmad","status":"awaiting-redistribution-verification"}
+  ]
+}
