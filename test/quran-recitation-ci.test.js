@@ -9,10 +9,10 @@ test("Quran recitation engine uses native audio", () => {
   assert.match(recitation, /audioUrl/);
 });
 
-test("Quran recitation requires provenance fields", () => {
-  assert.match(recitation, /source/);
-  assert.match(recitation, /reciter/);
-  assert.match(recitation, /verifiedOnly/);
+test("Quran recitation validates provenance fields", () => {
+  assert.match(recitation, /function validateSource/);
+  assert.match(recitation, /meta\.source/);
+  assert.match(recitation, /meta\.reciter/);
 });
 
 test("Quran recitation never delegates to generated speech", () => {
@@ -21,7 +21,7 @@ test("Quran recitation never delegates to generated speech", () => {
 });
 
 test("Quran recitation exposes independent playback controls", () => {
-  assert.match(recitation, /play/);
-  assert.match(recitation, /stop/);
-  assert.match(recitation, /onended/);
+  assert.match(recitation, /function play/);
+  assert.match(recitation, /function stop/);
+  assert.match(recitation, /addEventListener\("ended"/);
 });
