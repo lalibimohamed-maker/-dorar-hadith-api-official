@@ -1,0 +1,41 @@
+{
+  "version": "2026.08.23.1",
+  "name": "Deen Allah Encyclopedia — Free Core",
+  "runtime": "node-esm",
+  "requiresOpenAI": false,
+  "requiresPaidAPI": false,
+  "principles": [
+    "primary-sources-first",
+    "source-attribution-required",
+    "rights-aware-ingestion",
+    "verified-before-promoted",
+    "preserve-scholarly-differences",
+    "never-invent-citations"
+  ],
+  "domains": [
+    {"id":"quran","title":"القرآن وعلومه","sourceTypes":["book","quran"]},
+    {"id":"hadith","title":"الحديث وعلومه","sourceTypes":["book","hadith"]},
+    {"id":"tafsir","title":"التفسير","sourceTypes":["book","tafsir"]},
+    {"id":"aqeedah","title":"العقيدة","sourceTypes":["book","fatwa","scholar"]},
+    {"id":"fiqh","title":"الفقه وأصوله","sourceTypes":["book","fatwa","scholar"]},
+    {"id":"sirah","title":"السيرة والشمائل","sourceTypes":["book","sirah","hadith"]},
+    {"id":"fatwa","title":"الفتاوى","sourceTypes":["fatwa","institutional-fatwa"]},
+    {"id":"faraid","title":"الفرائض والمواريث","sourceTypes":["book","fiqh"]},
+    {"id":"tajweed","title":"التجويد والقراءة","sourceTypes":["book","lesson"]},
+    {"id":"learning","title":"التعلم التفاعلي","sourceTypes":["lesson","evidence"]}
+  ],
+  "sourceLayers": [
+    {"id":"quran","priority":"primary","ingestion":"rights-aware"},
+    {"id":"canonical-hadith","priority":"primary","ingestion":"dorar-or-authorized-source"},
+    {"id":"official-fatwa","priority":"primary","ingestion":"official-source-only-when-available"},
+    {"id":"classical-books","priority":"secondary-classical-reference","ingestion":"public-domain-or-authorized"},
+    {"id":"scholar-sources","priority":"primary-or-attributed","ingestion":"official-or-authorized"},
+    {"id":"supplementary","priority":"secondary","ingestion":"never-promote-without-review"}
+  ],
+  "aiPolicy": {
+    "enabledByDefault": false,
+    "apiKeyRequiredForCore": false,
+    "sourceOfTruth": "stored-and-verified-sources",
+    "generationMustCiteRecords": true
+  }
+}
