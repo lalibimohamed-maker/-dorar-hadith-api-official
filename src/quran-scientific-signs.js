@@ -23,7 +23,16 @@ export function createScientificSignsProject({ topic, ayahs, primaryLanguage, ad
   if (!Array.isArray(ayahs) || ayahs.length === 0) throw new TypeError("يجب اختيار آيات موثقة");
   const languages = validateScientificVideoLanguages(primaryLanguage, additionalLanguages);
   if (!Array.isArray(scientificSources) || !Array.isArray(religiousSources)) throw new TypeError("المصادر غير صحيحة");
-  return { type: "quran-scientific-signs-project", topic, ayahs, languages, evidence: { scientific: scientificSources, religious: religiousSources }, policy: config.claimPolicy, video: { arabicAyah: true, meaningTranslation: true, citations: true, endCard: true, format: "mp4" }, status: "ready-for-source-review" };
+  return {
+    type: "quran-scientific-signs-project",
+    topic,
+    ayahs,
+    languages: { ...languages, additional: languages.additionalLanguages },
+    evidence: { scientific: scientificSources, religious: religiousSources },
+    policy: config.claimPolicy,
+    video: { arabicAyah: true, meaningTranslation: true, citations: true, endCard: true, format: "mp4" },
+    status: "ready-for-source-review"
+  };
 }
 
 export function classifyScientificClaim({ status, tafsirSupport = false }) {
