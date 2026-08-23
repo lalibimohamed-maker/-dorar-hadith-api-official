@@ -1,5 +1,5 @@
 {
-  "version":"2026.08.23.2",
+  "version":"2026.08.23.3",
   "engineId":"worship-teaching",
   "runtime":"html5-esm",
   "note":"Use modern JavaScript/HTML5 rather than Flash; Flash is obsolete and unsupported in modern browsers.",
@@ -21,13 +21,58 @@
   "mediaPolicy":{"audio":"licensed_or_public_domain_or_explicit_permission","video":"licensed_or_public_domain_or_explicit_permission","illustrations":"original_or_licensed","neverPresentUnverifiedMediaAsPropheticInstruction":true},
   "sourceOrder":["quran","sahih_bukhari","sahih_muslim","sunan_abi_dawud","jami_at_tirmidhi","sunan_an_nasai","sunan_ibn_majah","musnad_ahmad","riyad_al_saliheen","zad_al_maad","verified_scholar_sources","secondary_sources"],
   "canonicalEvidenceExamples":[
-    {"topic":"prophetic_prayer","source":"Sahih al-Bukhari","reference":"631","note":"Pray as you have seen me praying."},
-    {"topic":"children-prayer","source":"Sunan Abi Dawud","reference":"494","grade":"Hasan Sahih (Al-Albani)"},
-    {"topic":"adhan-response","source":"Sahih Muslim","reference":"383","note":"Repeat what the mu'adhdhin says."},
-    {"topic":"purification","source":"Sunan Abi Dawud","reference":"59","grade":"Sahih (Al-Albani)"},
-    {"topic":"eclipse","source":"Sahih al-Bukhari","reference":"1040","note":"صلاة الكسوف عند رؤية الكسوف"},
-    {"topic":"istikhara","source":"Sahih al-Bukhari","reference":"1166","note":"تعليم صلاة الاستخارة"},
-    {"topic":"travel","source":"Sahih Muslim","reference":"686","note":"أحكام قصر الصلاة للمسافر"},
-    {"topic":"funeral","source":"Sahih al-Bukhari","reference":"1333","note":"الصلاة على الميت"}
-  ]
+    {"topic":"prophetic_prayer","source":"Sahih al-Bukhari","reference":"631","grade":"صحيح","note":"أصل تعليم صفة الصلاة بالاقتداء بالنبي صلى الله عليه وسلم"},
+    {"topic":"children-prayer","source":"Sunan Abi Dawud","reference":"494","grade":"حسن صحيح عند الألباني","note":"تعليم الصلاة للصبيان"},
+    {"topic":"adhan-response","source":"Sahih Muslim","reference":"383","grade":"صحيح","note":"ترديد قول المؤذن"},
+    {"topic":"eclipse","source":"Sahih al-Bukhari","reference":"1040","grade":"صحيح","note":"صلاة الكسوف"},
+    {"topic":"istikhara","source":"Sahih al-Bukhari","reference":"1166","grade":"صحيح","note":"تعليم الاستخارة"},
+    {"topic":"travel","source":"Sahih Muslim","reference":"686","grade":"صحيح","note":"أحكام قصر الصلاة للمسافر"},
+    {"topic":"funeral","source":"Sahih al-Bukhari","reference":"1333","grade":"صحيح","note":"الصلاة على الميت"}
+  ],
+  "lessonSeeds": {
+    "prophetic_prayer": {
+      "title":"صفة صلاة النبي صلى الله عليه وسلم",
+      "steps":[
+        {"objective":"الاستعداد للصلاة","instruction":"تحقق من دخول الوقت والطهارة وستر العورة واستقبال القبلة بحسب حال المصلي.","evidence":[{"kind":"quran","references":["4:103","2:238"]}]},
+        {"objective":"تكبيرة الإحرام والقيام","instruction":"ابدأ الصلاة بالتكبير، ثم طبّق صفة القيام والقراءة كما وردت في السنة.","evidence":[{"kind":"hadith","source":"Sahih al-Bukhari","reference":"631","grade":"صحيح"}]},
+        {"objective":"الركوع والسجود","instruction":"تعلّم الانتقال والطمأنينة وأداء الركوع والسجود على الصفة الموثقة، مع تدريب بصري لا يضيف هيئة غير ثابتة.","evidence":[{"kind":"hadith","source":"Sahih al-Bukhari","reference":"631","grade":"صحيح"}]},
+        {"objective":"الخشوع","instruction":"تدرّب على حضور القلب وفهم ما تقرأ، ويعرض النظام نصوص فضائل الخشوع دون ادعاء طريقة حسية خاصة لم تثبت.","evidence":[{"kind":"quran","references":["23:1-2"]}]}
+      ]
+    },
+    "prayer_times": {
+      "title":"مواقيت الصلوات الخمس",
+      "steps":[
+        {"objective":"فهم أصل المواقيت","instruction":"يتعلم المستخدم أن الصلاة فُرضت في أوقات محددة، ثم يستخدم التطبيق الحساب الفلكي لعرض الوقت المحلي مع بيان طريقة الحساب.","evidence":[{"kind":"quran","references":["4:103","17:78"]}]},
+        {"objective":"تطبيق الوقت المحلي","instruction":"يعرض التطبيق الفجر والشروق والظهر والعصر والمغرب والعشاء حسب الموقع الذي يختاره المستخدم، مع إمكان تعديل طريقة الحساب وفق الإعدادات المعتمدة.","evidence":[{"kind":"quran","references":["17:78"]}]}
+      ]
+    },
+    "prohibited_times": {
+      "title":"أوقات النهي عن الصلاة",
+      "steps":[
+        {"objective":"معرفة الأوقات المنهي عنها","instruction":"يتعلم المستخدم الأوقات التي ورد النهي عن الصلاة فيها، مع التفريق بين النهي المطلق وما استثناه الدليل.","evidence":[{"kind":"hadith","source":"Sahih Muslim","reference":"831","grade":"صحيح"}]},
+        {"objective":"تطبيقها على الوقت المحلي","instruction":"يربط التطبيق وقت النهي بالشروق والغروب الحقيقيين في موقع المستخدم بدلاً من استخدام ساعة ثابتة.","evidence":[{"kind":"hadith","source":"Sahih Muslim","reference":"831","grade":"صحيح"}]}
+      ]
+    },
+    "fajr_taghlees_isfar": {
+      "title":"الفجر: التغليس والإسفار",
+      "steps":[
+        {"objective":"فهم المصطلحين","instruction":"يشرح التطبيق الفرق بين التغليس والإسفار كما استعملهما أهل العلم في باب صلاة الفجر، ثم يعرض النصوص المتعلقة بوقت الفجر.","evidence":[{"kind":"hadith","source":"Sahih al-Bukhari","reference":"578","grade":"صحيح"}]},
+        {"objective":"التطبيق العملي","instruction":"يُعرض وقت الفجر والشفق في الموقع المحلي، ويُذكر أن الحساب التقريبي لا يغني عن ضبط الوقت المعتمد في البلد.","evidence":[{"kind":"hadith","source":"Sahih Muslim","reference":"645","grade":"صحيح"}]}
+      ]
+    },
+    "traveler_prayer": {
+      "title":"صلاة المسافر: القصر والجمع",
+      "steps":[
+        {"objective":"معرفة أصل القصر","instruction":"يتعلم المسافر أصل مشروعية القصر، ثم يحدد حال السفر والمسافة والعرف وما عليه الجهة الفقهية التي يتبعها.","evidence":[{"kind":"quran","references":["4:101"]},{"kind":"hadith","source":"Sahih Muslim","reference":"686","grade":"صحيح"}]},
+        {"objective":"فهم الجمع","instruction":"يفصل التطبيق بين القصر والجمع، لأنهما حكمان مختلفان، ويعرض حالات الجمع الثابتة والخلاف الفقهي المعتبر.","evidence":[{"kind":"hadith","source":"Sahih Muslim","reference":"686","grade":"صحيح"}]}
+      ]
+    },
+    "eclipse": {
+      "title":"صلاة الكسوف والخسوف",
+      "steps":[
+        {"objective":"معرفة سبب الصلاة","instruction":"يتعلم المستخدم أن الكسوف آية من آيات الله وأن المشروع عند وقوعه الصلاة والذكر والدعاء.","evidence":[{"kind":"hadith","source":"Sahih al-Bukhari","reference":"1040","grade":"صحيح"}]},
+        {"objective":"التطبيق العملي","instruction":"يعرض التطبيق خطوات الصلاة على هيئة تفاعلية مع ربط كل خطوة بالدليل، دون إضافة تفاصيل غير موثقة.","evidence":[{"kind":"hadith","source":"Sahih al-Bukhari","reference":"1040","grade":"صحيح"}]}
+      ]
+    }
+  }
 }
