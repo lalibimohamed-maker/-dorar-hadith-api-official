@@ -53,6 +53,10 @@ function tokenScore(text, tokens) {
   return hits / tokens.length;
 }
 
+function isVerifiedRecord(record) {
+  return verifyRecord(record).verified === true;
+}
+
 export function searchCorpus(query, options = {}, records = loadCorpusRecords()) {
   const q = normalizeQuery(query);
   if (!q) return [];
@@ -61,9 +65,13 @@ export function searchCorpus(query, options = {}, records = loadCorpusRecords())
   const type = options.sourceType;
   const verifiedOnly = options.verifiedOnly === true;
 
-  return index
-    .filter((r) => !type || r.sourceType === type)
-    .filter((r) => !verifiedOnly || verifyRecord(r).verified)
+  const eligible = index.filter((r) => {
+    if (type && r.sourceType !== type) return false;
+    if (verifiedOnly && !isVerifiedRecord(r)) return false;
+    return true;
+  });
+
+  const scored = eligible
     .map((r) => {
       const title = normalizeQuery(r.titleOriginal || "");
       const text = normalizeQuery(r.textOriginal || "");
@@ -88,8 +96,13 @@ export function searchCorpus(query, options = {}, records = loadCorpusRecords())
       return { record: r, score, tokenCoverage };
     })
     .filter((r) => r.score > 0)
+    // Defense-in-depth: verifiedOnly is enforced again immediately before
+    // publication so no later scoring/refactoring can leak an unverified row.
+    .filter(({ record }) => !verifiedOnly || isVerifiedRecord(record))
     .sort((a, b) => b.score - a.score || b.tokenCoverage - a.tokenCoverage)
     .map(({ record, score }) => ({ ...record, score }));
+
+  return scored;
 }
 
 export function verifyRecord(record) {
