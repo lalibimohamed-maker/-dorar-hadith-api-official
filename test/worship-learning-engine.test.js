@@ -1,18 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  buildPracticeStep,
-  buildZakatCalculation,
-  createLearningSession,
-  detectWorshipTopic,
-  getCanonicalEvidenceExamples
-} from "../src/worship-learning-engine.js";
+import { buildPracticeStep, buildZakatCalculation, createLearningSession, detectWorshipTopic, getCanonicalEvidenceExamples } from "../src/worship-learning-engine.js";
 
 test("detects core worship topics", () => {
   assert.equal(detectWorshipTopic("علمني الوضوء خطوة خطوة"), "wudu");
   assert.equal(detectWorshipTopic("كيف أصلي صلاة الجنازة؟"), "janazah");
   assert.equal(detectWorshipTopic("كيف أحسب زكاة مالي؟"), "zakat");
   assert.equal(detectWorshipTopic("ما حكم الأذان وكيفيته؟"), "adhan");
+});
+
+test("detects expanded prayer topics", () => {
+  assert.equal(detectWorshipTopic("متى وقت الفجر والتغليس والإسفار؟"), "fajr_taghlees_isfar");
+  assert.equal(detectWorshipTopic("كيف تصلى صلاة الكسوف؟"), "eclipse");
+  assert.equal(detectWorshipTopic("متى تكون التراويح وقيام الليل؟"), "taraweeh");
+  assert.equal(detectWorshipTopic("كيف أصلي صلاة المسافر بالقصر والجمع؟"), "traveler_prayer");
+  assert.equal(detectWorshipTopic("ما حكم صلاة العيد؟"), "eid");
 });
 
 test("creates age-aware guided learning sessions", () => {
