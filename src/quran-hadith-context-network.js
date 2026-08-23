@@ -45,5 +45,5 @@ export function buildQuranHadithContextNetwork(nodes = [], relations = []) {
 
 export function findContextRelations(graph, nodeId) {
   if (!graph || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) throw new TypeError('Invalid context graph');
-  return graph.edges.filter(edge => edge.from === nodeId || edge.to === nodeId).map(structuredClone);
+  return graph.edges.filter(edge => edge.from === nodeId || edge.to === nodeId).map(edge => structuredClone(edge));
 }
