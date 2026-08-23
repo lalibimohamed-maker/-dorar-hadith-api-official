@@ -7,7 +7,7 @@ const config = JSON.parse(fs.readFileSync(path.join(root, "..", "config", "worsh
 
 const TOPIC_ALIASES = {
   wudu: ["وضوء", "وضوئي", "الوضوء"],
-  majorGhusl: ["الغسل الأكبر", "غسل الجنابة", "غسل", "الاغتسال"],
+  majorGhusl: ["الغسل الأكبر", "غسل الجنابة", "الغسل", "الاغتسال"],
   tayammum: ["التيمم", "تيمم"],
   prayer: ["الصلاة", "صلاة", "كيف أصلي", "صفة الصلاة", "صفة صلاة النبي"],
   khushu: ["الخشوع", "خشوع الصلاة"],
@@ -18,6 +18,21 @@ const TOPIC_ALIASES = {
   fasting: ["الصيام", "الصوم", "مفطرات", "القضاء", "الفدية", "الكفارة"],
   hajj: ["الحج", "العمرة", "الإحرام", "الطواف", "السعي"],
   ruqyah: ["الرقية", "الرقية الشرعية", "رقيه"]
+};
+
+const TOPIC_TO_MODULE = {
+  wudu: "purification",
+  majorGhusl: "purification",
+  tayammum: "purification",
+  prayer: "prayer",
+  khushu: "prayer",
+  adhan: "adhan-iqamah",
+  iqamah: "adhan-iqamah",
+  janazah: "janazah",
+  zakat: "zakat",
+  fasting: "fasting",
+  hajj: "hajj-umrah",
+  ruqyah: "ruqyah"
 };
 
 function normalize(value) {
@@ -53,11 +68,13 @@ export function detectWorshipTopic(question) {
 }
 
 export function createLearningSession({ topic, audience = "general", language = "ar", mode = "guided" } = {}) {
-  const normalizedTopic = topic || "prayer";
-  const module = config.modules.find((item) => item.id === normalizedTopic) || config.modules.find((item) => item.id === "prayer");
+  const detected = topic && TOPIC_TO_MODULE[topic] ? topic : "prayer";
+  const moduleId = TOPIC_TO_MODULE[detected] || detected;
+  const module = config.modules.find((item) => item.id === moduleId) || config.modules.find((item) => item.id === "prayer");
   return {
     engineId: config.engineId,
-    topic: module.id,
+    topic: detected,
+    moduleId: module.id,
     audience: config.audiences.includes(audience) ? audience : "general",
     language,
     mode: config.modes.includes(mode) ? mode : "guided",
