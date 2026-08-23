@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildPracticeStep, buildZakatCalculation, createLearningSession, detectWorshipTopic, getCanonicalEvidenceExamples } from "../src/worship-learning-engine.js";
+import { buildPracticeStep, buildZakatCalculation, createLearningSession, detectWorshipTopic, getCanonicalEvidenceExamples, getWorshipLesson, listWorshipLessons } from "../src/worship-learning-engine.js";
 
 test("detects core worship topics", () => {
   assert.equal(detectWorshipTopic("علمني الوضوء خطوة خطوة"), "wudu");
@@ -30,6 +30,16 @@ test("requires evidence for every instructional step", () => {
   assert.throws(() => buildPracticeStep({ objective: "وضوء", instruction: "اغسل" }), /evidence/);
   const step = buildPracticeStep({ objective: "وضوء", instruction: "تعلم الخطوة", evidence: [{ source: "Sahih" }] });
   assert.equal(step.evidence.length, 1);
+});
+
+test("builds evidence-backed practical prayer lessons", () => {
+  const lesson = getWorshipLesson("prophetic_prayer", { language: "fr", audience: "children" });
+  assert.equal(lesson.engineId, "worship-teaching");
+  assert.equal(lesson.language, "fr");
+  assert.equal(lesson.audience, "children");
+  assert.ok(lesson.steps.length >= 4);
+  assert.ok(lesson.steps.every((step) => step.evidence.length > 0));
+  assert.ok(listWorshipLessons().some((item) => item.id === "traveler_prayer"));
 });
 
 test("zakat calculator handles nisab threshold", () => {
