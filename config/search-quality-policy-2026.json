@@ -1,0 +1,8 @@
+{
+  "version": "2026.08.23.1",
+  "name": "Unified Arabic Search Quality Policy",
+  "normalization": ["remove-tashkeel", "normalize-alef", "normalize-ya", "normalize-ta-marbuta", "collapse-whitespace"],
+  "ranking": {"exact_title": 120, "title_contains": 60, "text_contains": 35, "id_contains": 20, "author_or_scholar": 25, "institution": 15, "full_token_coverage_bonus": 15, "verified_bonus": 5},
+  "trust": {"verifiedStates": ["verified", "source-verified", "edition-verified", "institution-verified", "scholar-reviewed"], "pendingStates": ["pending_verification", "pending_review", "ingested"], "neverPromotePendingToFact": true},
+  "principle": "Search improves discovery; verification state and source attribution remain authoritative."
+}
