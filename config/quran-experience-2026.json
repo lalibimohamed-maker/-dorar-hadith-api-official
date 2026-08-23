@@ -1,5 +1,5 @@
 {
-  "version":"2026.08.22.1",
+  "version":"2026.08.22.2",
   "reading":{
     "arabicText":"verified_uthmani_source",
     "recitation":{
@@ -12,6 +12,20 @@
       "repeatRange":true,
       "speedControl":true,
       "backgroundPlayback":true
+    },
+    "themes":["light","dark","system"],
+    "longPressWord":{
+      "enabled":true,
+      "durationMs":5000,
+      "cancelOnMove":true,
+      "cancelOnScroll":true,
+      "hapticFeedback":true,
+      "open":"word-knowledge-panel",
+      "preserveShortTap":true,
+      "preserveSelection":true,
+      "panelSections":["word","root","morphology","lexical_meaning","quran_occurrences","ayah_context","tafsir","hadith_and_athar","aqidah_context","fiqh_context","scholarly_statements","related_concepts","questions","sources"],
+      "evidencePolicy":"source_to_answer",
+      "neverTreatWordAloneAsEvidence":true
     },
     "themes":["light","dark","system"],
     "tajweed":{"interactiveRules":true,"learningLessons":true,"colorCoding":true},
