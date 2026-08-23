@@ -12,7 +12,8 @@ const hadithRegistry = getHadithEvidenceRegistry();
 
 const ALIASES = {
   'المهدي المنتظر': 'eschatology', 'المهدي': 'eschatology',
-  'ذو القرنين': 'prophetic_stories', 'الخضر': 'prophetic_stories', 'السامري': 'prophetic_stories',
+  'ذو القرنين': 'prophetic_stories', 'ذي القرنين': 'prophetic_stories', 'قصة ذي القرنين': 'prophetic_stories',
+  'الخضر': 'prophetic_stories', 'قصة الخضر': 'prophetic_stories', 'السامري': 'prophetic_stories',
   'الذي انسَلَخ من آيات الله': 'quran_tafsir', 'فانسلخ منها': 'quran_tafsir',
   'الروح': 'ruh', 'روح الله': 'creation', 'عيسى': 'creation', 'آدم': 'creation',
   'رجم الشياطين': 'shaytan', 'إبليس': 'shaytan', 'الشيطان': 'shaytan', 'الجن': 'jinn',
@@ -21,19 +22,29 @@ const ALIASES = {
   'كل في فلك يسبحون': 'cosmology', 'مفاتيح الغيب': 'unseen_keys',
   'الجنة': 'paradise', 'درجات الجنة': 'paradise', 'أبواب الجنة': 'paradise', 'أنهار الجنة': 'paradise',
   'القبر': 'barzakh', 'نعيم القبر': 'barzakh', 'عذاب القبر': 'barzakh', 'البرزخ': 'barzakh',
-  'النار': 'hellfire', 'أبواب النار': 'hellfire', 'دركات النار': 'hellfire'
+  'النار': 'hellfire', 'أبواب النار': 'hellfire', 'دركات النار': 'hellfire',
+  'what is the ruh': 'ruh', 'what is ruh': 'ruh', 'ruh': 'ruh',
+  'who is the mahdi': 'eschatology', 'the mahdi': 'eschatology',
+  'tell me about dhu al qarnayn': 'prophetic_stories', 'dhu al qarnayn': 'prophetic_stories',
+  'what is the khidr story': 'prophetic_stories', 'khidr': 'prophetic_stories',
+  'what are the keys of the unseen': 'unseen_keys', 'keys of the unseen': 'unseen_keys',
+  'what is the throne': 'allah', 'the throne': 'allah',
+  'how do the celestial bodies orbit': 'cosmology', 'celestial bodies orbit': 'cosmology'
 };
 
 function normalize(text) {
   return String(text || '').trim().toLocaleLowerCase('ar')
-    .replace(/[إأآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه')
+    .normalize('NFKC')
+    .replace(/[إأآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه')
+    .replace(/[؟?!.,،؛:()[\]{}«»"']/g, ' ')
     .replace(/\s+/g, ' ');
 }
 
 function findDomain(query) {
   const q = normalize(query);
   for (const [alias, domain] of Object.entries(ALIASES)) {
-    if (q === normalize(alias) || q.includes(normalize(alias)) || normalize(alias).includes(q)) return domain;
+    const a = normalize(alias);
+    if (q === a || q.includes(a) || a.includes(q)) return domain;
   }
   return null;
 }
@@ -46,7 +57,7 @@ export function routeGhaibQuestion(query, language = 'ar') {
   const domain = findDomain(query);
   const records = evidence.records.filter(item => !domain || item.domain === domain || item.subtopic === domain);
   const hadithEvidence = hadithEvidenceForDomain(domain);
-  const requiresHadithCheck = ['مهدي', 'المهدي'].some(x => normalize(query).includes(normalize(x)));
+  const requiresHadithCheck = ['مهدي', 'المهدي', 'mahdi'].some(x => normalize(query).includes(normalize(x)));
   const verifiedHadith = hadithEvidence.filter(canPresentAsVerifiedEvidence);
   return {
     query, language, domain, matched: Boolean(domain), evidence: records,
