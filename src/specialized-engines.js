@@ -9,16 +9,19 @@ const aliases = {
   "sermons-lessons": ["محاضرة", "درس", "خطبة", "خطبة الجمعة", "خطبة العيد", "الزواج", "عقد القران", "رمضان", "موعظة", "جنازة"],
   "prophetic-medicine": ["الطب النبوي", "علاج", "عشبة", "أعشاب", "دواء", "الحبة السوداء", "العسل", "الحجامة"],
   "dua-adhkar": ["دعاء", "أدعية", "ذكر", "أذكار", "حصن المسلم", "ورد", "دعاء الشفاء", "دعاء الرزق", "قيام الليل", "ختم القرآن"],
-  "worship-teaching": ["الصلاة", "وضوء", "طهارة", "غسل", "تيمم", "سجود السهو", "سجود التلاوة", "سجود الشكر", "صلاة الاستسقاء", "صلاة الميت", "صلاة الجنازة", "صفة صلاة النبي", "الأذان", "الإقامة", "الصيام", "زكاة", "زكاة الفطر", "الحج", "العمرة", "الرقية"],
+  "worship-teaching": ["الصلاة", "وضوء", "طهارة", "غسل", "تيمم", "سجود السهو", "سجود التلاوة", "سجود الشكر", "صلاة الاستسقاء", "صلاة الميت", "صلاة الجنازة", "صفة صلاة النبي", "الأذان", "الإقامة", "الصيام", "زكاة", "زكاة الفطر", "الحج", "العمرة", "الرقية", "الصلوات الخمس", "مواقيت الصلاة", "شروق الشمس", "غروب الشمس", "وقت النهي", "التغليس", "الإسفار", "صلاة الضحى", "التراويح", "قيام الليل", "الرواتب", "السنن الرواتب", "الكسوف", "الخسوف", "صلاة الاستخارة", "صلاة الخوف", "صلاة المسافر", "القصر", "الجمع", "الراحلة", "صلاة الجمعة", "صلاة العيد", "العيدين", "سجود السهو"],
+  "fiqh-transactions": ["الربا", "فائدة القرض", "فوائد البنك", "بيع الذهب بالذهب", "الذهب بالفضة", "الصرف", "ربا الديون", "ربا الفضل", "ربا النسيئة", "الغرر", "بيع الغرر", "أكل أموال الناس", "مال اليتيم", "أكل مال اليتيم", "الغش", "النجش", "الاحتكار", "القمار", "الميسر", "البيع المحرم", "المعاملات"],
   "quran-learning": ["قرآن", "تجويد", "تلاوة", "مصحف", "قارئ", "رواية ورش", "تحفيظ", "حفظ القرآن"],
   "islamic-tools": ["مواقيت الصلاة", "وقت الصلاة", "القبلة", "اتجاه القبلة", "الأذان", "التقويم الهجري", "حساب الزكاة", "المواريث"]
 };
 
 const priorityRules = [
+  { engineId: "fiqh-transactions", patterns: [["بيع", "الذهب"], ["ذهب", "ذهب"], ["ذهب", "فضة"], ["الربا"], ["فائدة", "القرض"], ["فوائد", "البنك"], ["ربا", "الديون"], ["الغرر"], ["مال", "اليتيم"], ["أكل", "أموال", "الناس"], ["الغش"], ["النجش"], ["القمار"], ["الميسر"]]},
   { engineId: "worship-teaching", patterns: [
     ["صلاة", "الجنازة"], ["صلاة", "الميت"], ["كيف", "اصلي", "الجنازة"], ["كيف", "اصلي", "الميت"],
     ["صفة", "صلاة", "النبي"], ["سجود", "السهو"], ["سجود", "التلاوة"], ["كيف", "اتوضأ"],
-    ["كيف", "اصلي"], ["زكاة", "الفطر"]
+    ["كيف", "اصلي"], ["زكاة", "الفطر"], ["صلاة", "الكسوف"], ["صلاة", "الخسوف"], ["صلاة", "الاستخارة"],
+    ["صلاة", "الخوف"], ["صلاة", "المسافر"], ["صلاة", "الجمعة"], ["صلاة", "العيد"]
   ]},
   { engineId: "quran-learning", patterns: [["تعلم", "التجويد"], ["تعلم", "القرآن"], ["رواية", "ورش"], ["كيف", "اقرا", "القرآن"]]},
   { engineId: "islamic-tools", patterns: [["مواقيت", "الصلاة"], ["اتجاه", "القبلة"], ["حساب", "الزكاة"], ["التقويم", "الهجري"]]},
@@ -37,35 +40,16 @@ function normalize(value) {
     .replace(/\s+/g, " ")
     .trim();
 }
-
-function scoreTerms(q, terms) {
-  return terms.reduce((score, term) => {
-    const normalized = normalize(term);
-    if (!normalized || !q.includes(normalized)) return score;
-    return score + (normalized.split(" ").length > 1 ? 20 : 10);
-  }, 0);
-}
-
-function matchesPriorityRule(q, rule) {
-  return rule.patterns.some((pattern) => pattern.every((term) => q.includes(normalize(term))));
-}
-
-function hasAny(q, terms) {
-  return terms.some((term) => q.includes(normalize(term)));
-}
-
+function scoreTerms(q, terms) { return terms.reduce((score, term) => { const normalized = normalize(term); if (!normalized || !q.includes(normalized)) return score; return score + (normalized.split(" ").length > 1 ? 20 : 10); }, 0); }
+function matchesPriorityRule(q, rule) { return rule.patterns.some((pattern) => pattern.every((term) => q.includes(normalize(term)))); }
+function hasAny(q, terms) { return terms.some((term) => q.includes(normalize(term))); }
 function detectDeterministicIntent(q) {
-  const worshipFuneral = q.includes(normalize("صلاة الميت")) || q.includes(normalize("صلاة الجنازة"));
-  if (worshipFuneral) return "worship-teaching";
-
-  const sermonFuneral = hasAny(q, ["موعظة جنازة", "خطبة جنازة", "درس جنازة"]);
-  if (sermonFuneral) return "sermons-lessons";
-
+  if (hasAny(q, ["الربا", "فائدة القرض", "فوائد البنك", "بيع الذهب بالذهب", "ربا الديون", "الغرر", "مال اليتيم", "أكل أموال الناس", "القمار", "الميسر"])) return "fiqh-transactions";
+  if (q.includes(normalize("صلاة الميت")) || q.includes(normalize("صلاة الجنازة"))) return "worship-teaching";
+  if (hasAny(q, ["موعظة جنازة", "خطبة جنازة", "درس جنازة"])) return "sermons-lessons";
   return null;
 }
-
 export function getSpecializedEngines() { return config.engines; }
-
 export function routeSpecializedQuestion(question) {
   const q = normalize(question);
   const deterministic = detectDeterministicIntent(q);
@@ -75,13 +59,6 @@ export function routeSpecializedQuestion(question) {
   const fallback = config.engines.find((engine) => engine.id === "source-to-answer");
   const source = best && (best.score > 0 || priority) ? best.engine : fallback;
   const winning = priority ? Math.max(best?.score || 0, 100) : (best?.score || 0);
-  return {
-    engineId: source?.id || "source-to-answer",
-    confidence: winning > 0 ? Math.min(winning / 100, 1) : 0.1,
-    candidates: scores.filter((item) => item.score > 0).map((item) => ({ id: item.engine.id, score: item.score })),
-    sourceOrder: source?.sourceOrder || null,
-    languagePolicy: fallback?.languagePolicy || null
-  };
+  return { engineId: source?.id || "source-to-answer", confidence: winning > 0 ? Math.min(winning / 100, 1) : 0.1, candidates: scores.filter((item) => item.score > 0).map((item) => ({ id: item.engine.id, score: item.score })), sourceOrder: source?.sourceOrder || null, languagePolicy: fallback?.languagePolicy || null };
 }
-
 export function getEngine(id) { return config.engines.find((engine) => engine.id === id) || null; }
