@@ -6,6 +6,7 @@ import { queryPolicy } from './query-intent-router.js';
 import { routeSpecializedQuestion, getEngine } from './specialized-engines.js';
 import { getWorshipLearningConfig, detectWorshipTopic, createLearningSession } from './worship-learning-engine.js';
 import { routeTransactionQuestion, buildTransactionLesson, listTransactionTopics } from './transactions-riba-engine.js';
+import { searchEncyclopedia, getEncyclopediaSourceInfo, getEncyclopediaDomainInfo } from './encyclopedia-api.js';
 
 export function search(query, options = {}) {
   const records = loadCorpus();
@@ -13,8 +14,13 @@ export function search(query, options = {}) {
   const specialized = routeSpecializedQuestion(query);
   const result = searchCorpus(query, { ...options, queryPolicy: policy }, records);
   const ghaibPlan = policy.intent === 'ghaib' ? buildGhaybResearchPlan(query, options) : null;
-  return { ...result, queryPolicy: policy, specializedRouting: specialized, ghaibResearch: ghaibPlan };
+  const encyclopedia = searchEncyclopedia(query, options);
+  return { ...result, queryPolicy: policy, specializedRouting: specialized, ghaibResearch: ghaibPlan, encyclopedia };
 }
+
+export function encyclopediaSearch(query, options = {}) { return searchEncyclopedia(query, options); }
+export function encyclopediaSource(sourceId) { return getEncyclopediaSourceInfo(sourceId); }
+export function encyclopediaDomain(domain) { return getEncyclopediaDomainInfo(domain); }
 
 export function concept(term, contextId, language = 'ar', options = {}) {
   const records = loadCorpus();
