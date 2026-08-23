@@ -39,14 +39,15 @@ jobs:
           node --check src/ghayb-router.js
           node --check src/worship-learning-engine.js
           node --check src/free-core.js
+          node --check src/corpus-index.js
           node --check src/transactions-riba-engine.js
       - name: Validate required project files
         run: |
           required_files=(
             dorar_json_api.js openapi.yaml web/index.html web/app.js
             src/dorar-client.js src/unified-search.js src/scholar-research.js src/fiqh-research.js src/knowledge-context.js
-            src/hadith-narrator-methodology.js src/query-intent-router.js src/concept_resolver.js
-            data/scholars/registry.json data/concept-index-seed-2026.json test/scholar-registry.test.js test/query-intent-router.test.js
+            src/hadith-narrator-methodology.js src/query-intent-router.js src/concept_resolver.js src/corpus-index.js
+            data/scholars/registry.json data/concept-index-seed-2026.json test/scholar-registry.test.js test/query-intent-router.test.js test/corpus-search.test.js
             config/fiqh-research-framework.json config/fiqh-fatawa-sources.json config/fiqh-classical-fatwa-books.json
             config/prophets-companions-genealogy-v2.json config/hadith-narrator-methodology-2026.json
             src/inheritance-calculator.js src/faraid-complex-cases.js src/faraid-advanced.js src/tajweed-curriculum.js
@@ -69,6 +70,8 @@ jobs:
         run: node --input-type=module -e "import fs from 'node:fs'; const s=fs.readFileSync('src/dorar-client.js','utf8'); if(!s.includes('https://dorar.net/dorar_api.json')) process.exit(1); console.log('Dorar client configuration OK')"
       - name: Run query intent tests
         run: node test/query-intent-router.test.js
+      - name: Run corpus search tests
+        run: node test/corpus-search.test.js
       - name: Run ghaib framework tests
         run: node test/ghaib-source-framework.test.js
       - name: Run ghaib evidence API tests
