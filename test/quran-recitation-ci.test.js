@@ -1,0 +1,27 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+const recitation = fs.readFileSync(new URL("../web/quran-recitation.js", import.meta.url), "utf8");
+
+test("Quran recitation engine uses native audio", () => {
+  assert.match(recitation, /new Audio/);
+  assert.match(recitation, /audioUrl/);
+});
+
+test("Quran recitation validates provenance fields", () => {
+  assert.match(recitation, /function validateSource/);
+  assert.match(recitation, /meta\.source/);
+  assert.match(recitation, /meta\.reciter/);
+});
+
+test("Quran recitation never delegates to generated speech", () => {
+  assert.doesNotMatch(recitation, /speechSynthesis/);
+  assert.doesNotMatch(recitation, /SpeechSynthesisUtterance/);
+});
+
+test("Quran recitation exposes independent playback controls", () => {
+  assert.match(recitation, /function play/);
+  assert.match(recitation, /function stop/);
+  assert.match(recitation, /addEventListener\("ended"/);
+});
