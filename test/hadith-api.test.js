@@ -1,0 +1,2 @@
+import assert from 'node:assert/strict';import test from 'node:test';import {hadithApi} from '../src/hadith-api.js';
+test('unified hadith facade exposes search reference and card',()=>{const api=hadithApi([{hadithId:'h1',text:'طلب العلم',sourceId:'bukhari',reference:'1'}]);assert.equal(api.search('العلم')[0].hadithId,'h1');assert.deepEqual(api.byReference('bukhari','1'),['h1']);assert.equal(api.card({hadithId:'h1',sourceId:'bukhari',reference:'1',chain:['n1']}).type,'hadith-card');});
