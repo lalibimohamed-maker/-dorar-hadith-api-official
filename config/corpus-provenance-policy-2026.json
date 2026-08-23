@@ -1,10 +1,10 @@
 {
-  "version": "2026.08.23.2",
+  "version": "2026.08.23.3",
   "name": "Corpus Source Provenance Policy",
   "purpose": "Make every corpus record traceable to a source without treating a catalogue entry as verified text.",
   "requiredFields": ["recordId", "sourceId", "sourceType", "verificationState", "attribution"],
   "verificationStates": ["ingested", "pending_review", "pending_verification", "source_verified", "edition_verified", "scholar_reviewed"],
-  "sourceTypes": ["quran", "hadith", "tafsir", "fiqh", "aqeedah", "fatwa", "sirah", "book", "lesson", "institutional"],
+  "sourceTypes": ["quran", "hadith", "tafsir", "fiqh", "aqeedah", "fatwa", "institutional-fatwa", "sirah", "book", "lesson", "institutional"],
   "rules": [
     "Never invent a citation.",
     "Never promote pending material to verified fact through search ranking.",
