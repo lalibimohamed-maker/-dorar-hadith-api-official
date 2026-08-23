@@ -1,9 +1,9 @@
 {
-  "version": "2026.08.23.1",
+  "version": "2026.08.23.2",
   "name": "Corpus Source Provenance Policy",
   "purpose": "Make every corpus record traceable to a source without treating a catalogue entry as verified text.",
   "requiredFields": ["recordId", "sourceId", "sourceType", "verificationState", "attribution"],
-  "verificationStates": ["ingested", "pending_review", "source_verified", "edition_verified", "scholar_reviewed"],
+  "verificationStates": ["ingested", "pending_review", "pending_verification", "source_verified", "edition_verified", "scholar_reviewed"],
   "sourceTypes": ["quran", "hadith", "tafsir", "fiqh", "aqeedah", "fatwa", "sirah", "book", "lesson", "institutional"],
   "rules": [
     "Never invent a citation.",
@@ -12,6 +12,7 @@
     "Keep copyrighted text out of the repository unless reuse rights are established.",
     "Catalogue records may describe a work without containing its full text.",
     "Prefer primary or officially attributed sources when available.",
-    "Conflicting scholarly positions remain separately attributable records."
+    "Conflicting scholarly positions remain separately attributable records.",
+    "pending_verification is a non-trusted state used by corpus ingestion until source verification is completed."
   ]
 }
