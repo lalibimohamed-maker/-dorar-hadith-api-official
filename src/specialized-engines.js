@@ -33,6 +33,7 @@ function normalize(value) {
     .replace(/ى/g, "ي")
     .replace(/ة/g, "ه")
     .replace(/[ًٌٍَُِّْـ]/g, "")
+    .replace(/[؟?!.,،؛:()[\]{}«»"']/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -49,11 +50,26 @@ function matchesPriorityRule(q, rule) {
   return rule.patterns.some((pattern) => pattern.every((term) => q.includes(normalize(term))));
 }
 
+function hasAny(q, terms) {
+  return terms.some((term) => q.includes(normalize(term)));
+}
+
+function detectDeterministicIntent(q) {
+  const worshipFuneral = q.includes(normalize("صلاة الميت")) || q.includes(normalize("صلاة الجنازة"));
+  if (worshipFuneral) return "worship-teaching";
+
+  const sermonFuneral = hasAny(q, ["موعظة جنازة", "خطبة جنازة", "درس جنازة"]);
+  if (sermonFuneral) return "sermons-lessons";
+
+  return null;
+}
+
 export function getSpecializedEngines() { return config.engines; }
 
 export function routeSpecializedQuestion(question) {
   const q = normalize(question);
-  const priority = priorityRules.find((rule) => matchesPriorityRule(q, rule));
+  const deterministic = detectDeterministicIntent(q);
+  const priority = deterministic ? { engineId: deterministic } : priorityRules.find((rule) => matchesPriorityRule(q, rule));
   const scores = config.engines.map((engine) => ({ engine, score: scoreTerms(q, aliases[engine.id] || [engine.nameAr]) })).sort((a, b) => b.score - a.score);
   const best = priority ? scores.find((item) => item.engine.id === priority.engineId) : scores[0];
   const fallback = config.engines.find((engine) => engine.id === "source-to-answer");
