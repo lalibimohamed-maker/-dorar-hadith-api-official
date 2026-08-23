@@ -33,15 +33,17 @@ jobs:
           transient="$(jq '[ .[]?.steps[]? | select(.conclusion != "success" and .conclusion != "skipped") | .name ] | if length == 0 then false else all(.[]; test("^(Checkout|Setup Node\\.js|Install dependencies|Set up job|Complete job)")) end' <<<"$jobs_json")"
 
           if [ "$transient" = "true" ]; then
+            echo "transient=true" >> "$GITHUB_OUTPUT"
             echo "All failed steps are transient runner/setup failures; retrying failed jobs once."
             gh run rerun "$RUN_ID" --failed --repo "$GITHUB_REPOSITORY"
           else
+            echo "transient=false" >> "$GITHUB_OUTPUT"
             echo "At least one failed step is project/test related; skipping automatic retry."
             echo "Create the recovery issue from this failed run."
           fi
 
       - name: Diagnose failed run
-        if: ${{ github.event.workflow_run.run_attempt > 1 || steps.retry.outcome == 'success' || steps.retry.outcome == 'skipped' }}
+        if: ${{ github.event.workflow_run.run_attempt > 1 || steps.retry.outputs.transient != 'true' }}
         uses: actions/github-script@v7
         with:
           script: |
