@@ -1,0 +1,13 @@
+{
+  "version":"2026.08.23.3",
+  "engine":"quran-recitation-video",
+  "enabled":true,
+  "selection":{"surah":true,"ayahRange":true,"wholeSurah":true,"multipleSurahs":true,"customPlaylist":true},
+  "reciter":{"selection":true,"registry":"data/reciters.json","rightsRequired":true},
+  "output":{"formats":["mp4"],"resolutionPresets":["720p","1080p","1440p"],"audioSync":true,"ayahSync":true,"wordSync":true},
+  "background":{"aiGeneration":true,"promptInput":true,"presets":["quranic-manuscript-border","islamic-geometric","sky","mountains","sea","nature","cosmic","scientific-visualization"],"animatedVideo":true,"image":true,"userAsset":true,"noHumanReligiousFiguresByDefault":true},
+  "overlay":{"arabicAyah":true,"selectedMeaningTranslation":false,"ayahNumber":true,"surahName":true,"reciterAttribution":true},
+  "export":{"download":true,"bundleMetadata":true,"sourceAttribution":true,"licenseCheck":true},
+  "safety":{"neverAlterQuranicText":true,"neverGenerateFalseScientificClaims":true,"scientificVisualsRequireEvidence":true,"rightsCheckForThirdPartyAssets":true},
+  "sources":{"audio":"verified-recitation-registry","quranText":"verified_uthmani_source","background":"ai_or_rights_cleared_assets"}
+}
