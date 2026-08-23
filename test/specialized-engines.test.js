@@ -25,6 +25,16 @@ test("worship questions route to worship engine", () => {
   assert.equal(routeSpecializedQuestion("كيف أصلي صلاة الجنازة؟").engineId, "worship-teaching");
 });
 
+test("funeral sermon questions still route to sermons engine", () => {
+  assert.equal(routeSpecializedQuestion("أعد لي موعظة جنازة عن الصبر").engineId, "sermons-lessons");
+});
+
+test("specific worship concepts beat generic funeral aliases", () => {
+  const result = routeSpecializedQuestion("كيف أصلي صلاة الميت؟");
+  assert.equal(result.engineId, "worship-teaching");
+  assert.ok(result.candidates.some((candidate) => candidate.id === "sermons-lessons"));
+});
+
 test("unknown questions fall back to unified evidence engine", () => {
   assert.equal(routeSpecializedQuestion("ما معنى البرزخ؟").engineId, "source-to-answer");
 });
