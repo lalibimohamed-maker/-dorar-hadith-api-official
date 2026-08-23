@@ -21,7 +21,13 @@ export function buildScholarAssessment(item = {}) {
 
 export function groupScholarAssessments(hadithId, assessments = []) {
   const relevant = assessments.filter((item) => item.hadithId === hadithId).map(buildScholarAssessment);
-  const byClassification = Object.groupBy(relevant, (item) => item.classification);
+  // Object.groupBy is not available in all supported Node runtimes; keep this
+  // deterministic and dependency-free so the scholarly layer works on Node 20+.
+  const byClassification = relevant.reduce((groups, item) => {
+    const key = item.classification;
+    (groups[key] ||= []).push(item);
+    return groups;
+  }, {});
   const disagreements = Object.keys(byClassification).length > 1;
   return { hadithId, assessments: relevant, byClassification, disagreements, synthesizedVerdict: null };
 }
