@@ -44,15 +44,11 @@ export async function synthesize({ provider, text, language }) {
   return adapter.execute({ text, language });
 }
 
-export async function quranRecitation({ provider, surah, ayah, reciter = 'Saad Al-Ghamdi' }) {
+export async function quranRecitation({ provider, surah, ayah, reciter } = {}) {
   const adapter = requireProvider(provider, SUPPORTED.quranRecitation);
-  return adapter.execute({
-    surah,
-    ayah,
-    language: 'ar',
-    reciter,
-    verifiedOnly: true,
-  });
+  const request = { surah, ayah, language: 'ar', verifiedOnly: true };
+  if (reciter) request.reciter = reciter;
+  return adapter.execute(request);
 }
 
 export async function exportMedia({ provider, request }) {
