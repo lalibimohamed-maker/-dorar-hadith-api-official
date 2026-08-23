@@ -26,7 +26,7 @@ export function resolveSelectedConcept(selectedText, contextId, language = 'ar',
 }
 
 export function buildKnowledgeSections(record, knowledge = {}, options = {}) {
-  const sections = ['definition', 'contextual_meaning', 'quran_evidence', 'hadith_evidence', 'tafsir', 'aqidah', 'fiqh', 'seerah', 'scholarly_views', 'related_concepts', 'translations', 'sources'];
+  const sections = ['definition', 'contextual_meaning', 'quran_evidence', 'hadith_evidence', 'tafsir', 'aqidah', 'fiqh', 'seerah', 'scholarly_views', 'related_concepts', 'sources'];
   const selected = sections.reduce((out, s) => {
     if (knowledge[s] !== undefined) out[s] = knowledge[s];
     return out;
