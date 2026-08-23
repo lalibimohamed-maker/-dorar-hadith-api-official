@@ -36,6 +36,22 @@ test('Al Quran Cloud provider returns explicit audio provenance', async () => {
   assert.equal(result.provenance.edition, 'ar.alafasy');
 });
 
+test('provider exposes a source-backed catalog of audio editions', async () => {
+  const provider = createAlQuranCloudRecitationProvider({
+    fetchImpl: async url => {
+      assert.match(url, /\/edition\/format\/audio$/);
+      return response({ data: [
+        { identifier: 'ar.alafasy', name: 'Mishary Rashid Alafasy', format: 'audio', language: 'ar' },
+        { identifier: 'ar.other', name: 'Another Reciter', format: 'audio', language: 'ar' },
+        { identifier: 'en.sahih', name: 'Translation', format: 'text', language: 'en' },
+      ] });
+    },
+  });
+  const editions = await provider.listEditions();
+  assert.deepEqual(editions.map(item => item.identifier), ['ar.alafasy', 'ar.other']);
+  assert.equal(editions[0].source, 'Al Quran Cloud');
+});
+
 test('provider rejects unverified recitation requests', async () => {
   const provider = createAlQuranCloudRecitationProvider({ fetchImpl: async () => { throw new Error('must not fetch'); } });
   await assert.rejects(() => provider.execute({ ayah: 1, verifiedOnly: false }), /verifiedOnly=true/);
