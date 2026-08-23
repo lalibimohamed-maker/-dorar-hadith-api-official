@@ -14,6 +14,7 @@ function normalize(value) {
     .replace(/ى/g, "ي")
     .replace(/ة/g, "ه")
     .replace(/[ًٌٍَُِّْـ]/g, "")
+    .replace(/[؟?!.,،؛:()[\]{}«»"']/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -52,6 +53,14 @@ export function listWorshipModules() {
 
 export function resolveLearningIntent(question) {
   const q = normalize(question);
+
+  // Deterministic specific intents must win over the generic "prayer" alias.
+  const funeralTerms = aliases.get("funeral-prayer") || [];
+  if (funeralTerms.some((term) => q.includes(normalize(term)))) {
+    const module = getWorshipModule("funeral-prayer");
+    if (module) return { id: module.id, nameAr: module.nameAr, score: 100 };
+  }
+
   const matches = [];
   for (const item of catalog.worship) {
     const terms = aliases.get(item.id) || [item.nameAr];
