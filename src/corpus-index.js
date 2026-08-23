@@ -63,7 +63,7 @@ export function searchCorpus(query, options = {}, records = loadCorpusRecords())
 
   return index
     .filter((r) => !type || r.sourceType === type)
-    .filter((r) => !verifiedOnly || VERIFIED_STATUSES.has(r.reviewStatus))
+    .filter((r) => !verifiedOnly || verifyRecord(r).verified)
     .map((r) => {
       const title = normalizeQuery(r.titleOriginal || "");
       const text = normalizeQuery(r.textOriginal || "");
@@ -98,7 +98,7 @@ export function verifyRecord(record) {
   const hasProvenance = Boolean(record.provenance);
   const status = record.reviewStatus || "ingested";
   return {
-    verified: hasCitation && hasProvenance && status !== "ingested",
+    verified: hasCitation && hasProvenance && VERIFIED_STATUSES.has(status),
     status,
     sourceId: record.sourceId,
     citation: record.citation ?? null,
