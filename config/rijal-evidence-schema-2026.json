@@ -1,0 +1,16 @@
+{
+  "version": "2026.08.23.1",
+  "purpose": "Structured narrator identity and jarh-ta'dil evidence without collapsing independent scholarly statements.",
+  "requiredNarratorFields": ["narratorId", "primaryName", "identityStatus", "statements"],
+  "identityStatuses": ["provisional", "identified", "disputed", "unresolved"],
+  "statementRequiredFields": ["statementId", "critic", "sourceId", "reference", "text", "classification"],
+  "classifications": ["jarh", "taadil", "mixed", "uncategorized"],
+  "rules": [
+    "A narrator catalogue entry is not itself a scholarly judgement.",
+    "Every judgement remains attributed to its named critic and source.",
+    "Different critics' statements must remain separately retrievable.",
+    "Identity uncertainty must be preserved rather than guessed away.",
+    "A hadith grade and a narrator grade are different evidence types.",
+    "No final automatic narrator verdict is produced from keywords alone."
+  ]
+}

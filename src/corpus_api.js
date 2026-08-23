@@ -8,6 +8,7 @@ import { getWorshipLearningConfig, detectWorshipTopic, createLearningSession } f
 import { routeTransactionQuestion, buildTransactionLesson, listTransactionTopics } from './transactions-riba-engine.js';
 import { searchEncyclopedia, getEncyclopediaSourceInfo, getEncyclopediaDomainInfo } from './encyclopedia-api.js';
 import { hadithSource, hadithSources, validateHadith, narratorProfile, compareNarratorJudgmentsSafe, narratorGrade, rijalBooks } from './hadith-research.js';
+import { validateNarratorRecord, summarizeNarratorEvidence, compareNarratorStatements } from './rijal-evidence.js';
 
 export function search(query, options = {}) {
   const records = loadCorpus();
@@ -28,6 +29,7 @@ export function hadithNarratorProfile(input) { return narratorProfile(input); }
 export function hadithNarratorJudgmentComparison(judgments) { return compareNarratorJudgmentsSafe(judgments); }
 export function hadithNarratorGrade(id) { return narratorGrade(id); }
 export function hadithRijalBooks() { return rijalBooks(); }
+export function narratorEvidence(record) { return { validation: validateNarratorRecord(record), summary: summarizeNarratorEvidence(record), statements: compareNarratorStatements(record) }; }
 
 export function concept(term, contextId, language = 'ar', options = {}) {
   const records = loadCorpus();
