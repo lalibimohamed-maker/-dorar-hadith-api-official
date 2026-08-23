@@ -22,11 +22,49 @@ const TOPIC_TO_MODULE = {
   wudu:"purification", majorGhusl:"purification", tayammum:"purification", prayer:"prayer", khushu:"prayer", adhan:"adhan-iqamah", iqamah:"adhan-iqamah", janazah:"janazah", zakat:"zakat", fasting:"fasting", hajj:"hajj-umrah", ruqyah:"ruqyah",
   prayer_times:"prayer", congregation:"prayer", prohibited_times:"prayer", fajr_taghlees_isfar:"prayer", duha:"prayer", taraweeh:"prayer", night_prayer:"prayer", rawatib:"prayer", eclipse:"prayer", istikhara:"prayer", fear_prayer:"prayer", traveler_prayer:"prayer", prayer_on_mount:"prayer", friday:"prayer", eid:"prayer", sujud_sahw:"prayer", sujud_tilawah:"prayer", sujud_shukr:"prayer"
 };
+
 function normalize(value){return String(value||"").toLocaleLowerCase("ar").normalize("NFKC").replace(/[إأآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/\s+/g," ").trim();}
 function findTopic(question){const q=normalize(question);let best=null;for(const [id,aliases] of Object.entries(TOPIC_ALIASES)){for(const alias of aliases){const a=normalize(alias);if(!a||!q.includes(a))continue;const score=a.split(" ").length*10+a.length;if(!best||score>best.score)best={id,score};}}return best?.id||null;}
+
 export function getWorshipLearningConfig(){return config;}
 export function detectWorshipTopic(question){return findTopic(question);}
-export function createLearningSession({topic,question,audience="general",language="ar",mode="guided"}={}){const detected=topic&&TOPIC_TO_MODULE[topic]?topic:(question?findTopic(question):"prayer");const safeTopic=detected&&TOPIC_TO_MODULE[detected]?detected:"prayer";const moduleId=TOPIC_TO_MODULE[safeTopic];const module=config.modules.find(item=>item.id===moduleId)||config.modules.find(item=>item.id==="prayer");return{engineId:config.engineId,topic:safeTopic,moduleId:module.id,audience:config.audiences.includes(audience)?audience:"general",language,mode:config.modes.includes(mode)?mode:"guided",modules:module.topics,lessonModel:config.lessonModel,sourceOrder:config.sourceOrder};}
-export function buildPracticeStep({objective,instruction,visualCue=null,audioCue=null,action="observe",evidence=[],commonMistakes=[],practiceCheck=null,next=null}={}){if(!objective||!instruction)throw new TypeError("objective and instruction are required");if(!Array.isArray(evidence)||evidence.length===0)throw new TypeError("each instructional step requires evidence");return{objective,instruction,visualCue,audioCue,action,evidence,commonMistakes,practiceCheck,next};}
+
+export function createLearningSession({topic,question,audience="general",language="ar",mode="guided"}={}){
+  const detected=topic&&TOPIC_TO_MODULE[topic]?topic:(question?findTopic(question):"prayer");
+  const safeTopic=detected&&TOPIC_TO_MODULE[detected]?detected:"prayer";
+  const moduleId=TOPIC_TO_MODULE[safeTopic];
+  const module=config.modules.find(item=>item.id===moduleId)||config.modules.find(item=>item.id==="prayer");
+  return{engineId:config.engineId,topic:safeTopic,moduleId:module.id,audience:config.audiences.includes(audience)?audience:"general",language,mode:config.modes.includes(mode)?mode:"guided",modules:module.topics,lessonModel:config.lessonModel,sourceOrder:config.sourceOrder};
+}
+
+export function buildPracticeStep({objective,instruction,visualCue=null,audioCue=null,action="observe",evidence=[],commonMistakes=[],practiceCheck=null,next=null}={}){
+  if(!objective||!instruction)throw new TypeError("objective and instruction are required");
+  if(!Array.isArray(evidence)||evidence.length===0)throw new TypeError("each instructional step requires evidence");
+  return{objective,instruction,visualCue,audioCue,action,evidence,commonMistakes,practiceCheck,next};
+}
+
+export function getWorshipLesson(topic,{language="ar",audience="general"}={}){
+  const seed=config.lessonSeeds?.[topic];
+  if(!seed)return null;
+  return{
+    engineId:config.engineId,
+    topic,
+    title:seed.title,
+    language,
+    audience:config.audiences.includes(audience)?audience:"general",
+    steps:seed.steps.map((step,index)=>buildPracticeStep({
+      objective:step.objective,
+      instruction:step.instruction,
+      evidence:step.evidence,
+      action:"learn",
+      practiceCheck:{type:"evidence-backed",step:index+1},
+      next:index<seed.steps.length-1?index+2:null
+    })),
+    sourceOrder:config.sourceOrder,
+    policy:config.lessonModel
+  };
+}
+
+export function listWorshipLessons(){return Object.entries(config.lessonSeeds||{}).map(([id,seed])=>({id,title:seed.title,steps:seed.steps.length}));}
 export function buildZakatCalculation({assets={},liabilities=0,nisab=0,rate=0.025,eligible=true}={}){const totalAssets=Object.values(assets).reduce((sum,value)=>sum+Number(value||0),0);const netEligible=Math.max(totalAssets-Number(liabilities||0),0);return{eligible,totalAssets,netEligible,nisab,rate,due:eligible&&netEligible>=nisab?netEligible*rate:0,requiresScholarlyRulesForAssets:true};}
 export function getCanonicalEvidenceExamples(){return[...config.canonicalEvidenceExamples];}
