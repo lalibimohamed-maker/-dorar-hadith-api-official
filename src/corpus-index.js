@@ -79,23 +79,29 @@ export function searchCorpus(query, options = {}, records = loadCorpusRecords())
       const institution = normalizeQuery(r.attribution?.institution || "");
       const sourceId = normalizeQuery(r.sourceId || "");
       const searchText = r._searchText;
-      let score = 0;
+      let matchScore = 0;
 
-      if (title === q) score += 120;
-      else if (title.includes(q)) score += 60;
-      if (text.includes(q)) score += 35;
-      if (sourceId.includes(q)) score += 20;
-      if (author.includes(q)) score += 25;
-      if (institution.includes(q)) score += 15;
+      if (title === q) matchScore += 120;
+      else if (title.includes(q)) matchScore += 60;
+      if (text.includes(q)) matchScore += 35;
+      if (sourceId.includes(q)) matchScore += 20;
+      if (author.includes(q)) matchScore += 25;
+      if (institution.includes(q)) matchScore += 15;
 
       const tokenCoverage = tokenScore(searchText, tokens);
-      score += Math.round(tokenCoverage * 30);
-      if (tokenCoverage === 1 && tokens.length > 1) score += 15;
-      if (VERIFIED_STATUSES.has(r.reviewStatus)) score += 5;
+      matchScore += Math.round(tokenCoverage * 30);
+      if (tokenCoverage === 1 && tokens.length > 1) matchScore += 15;
 
-      return { record: r, score, tokenCoverage };
+      // Verification is a ranking bonus only; it must never manufacture a
+      // search hit for a record that does not match the user's query.
+      const verificationBonus = VERIFIED_STATUSES.has(r.reviewStatus) ? 5 : 0;
+      const score = matchScore + verificationBonus;
+
+      return { record: r, score, matchScore, tokenCoverage };
     })
-    .filter((r) => r.score > 0)
+    // A record must match the query before any verification/relevance bonus
+    // can make it eligible for publication.
+    .filter((r) => r.matchScore > 0)
     // Defense-in-depth: verifiedOnly is enforced again immediately before
     // publication so no later scoring/refactoring can leak an unverified row.
     .filter(({ record }) => !verifiedOnly || isVerifiedRecord(record))
