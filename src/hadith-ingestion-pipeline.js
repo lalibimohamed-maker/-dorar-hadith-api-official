@@ -17,34 +17,29 @@ export function normalizeHadithRecord(input = {}) {
   };
 }
 
-export function validateIngestionRecord(record, registry) {
+export function validateIngestionRecord(record) {
   const hadith = validateHadith(record);
-  const source = record?.sourceId ? getSource(registry, record.sourceId) : null;
+  const source = record?.sourceId ? getSource(record.sourceId) : null;
   const errors = [...hadith.errors];
   if (!source) errors.push('source:not-registered');
   return { valid: errors.length === 0, errors, source };
 }
 
-export function ingestHadithRecord(registry, input, { allowPending = true } = {}) {
+export function ingestHadithRecord(input, { allowPending = true } = {}) {
   const record = normalizeHadithRecord(input);
-  const result = validateIngestionRecord(record, registry);
+  const result = validateIngestionRecord(record);
   if (!result.valid) throw new TypeError(`Rejected hadith: ${result.errors.join(',')}`);
-  if (!allowPending && record.verificationState === 'pending') {
-    throw new TypeError('Rejected hadith:verification-pending');
-  }
+  if (!allowPending && record.verificationState === 'pending') throw new TypeError('Rejected hadith:verification-pending');
   if (record.generated === true) throw new TypeError('Rejected hadith:generated-content');
   return { ...record, ingestionState: record.verificationState === 'pending' ? 'review' : 'accepted' };
 }
 
-export function ingestBatch(registry, records, options = {}) {
+export function ingestBatch(records, options = {}) {
   const accepted = [];
   const rejected = [];
   for (const input of records ?? []) {
-    try {
-      accepted.push(ingestHadithRecord(registry, input, options));
-    } catch (error) {
-      rejected.push({ input, reason: error.message });
-    }
+    try { accepted.push(ingestHadithRecord(input, options)); }
+    catch (error) { rejected.push({ input, reason: error.message }); }
   }
   return { accepted, rejected, total: (records ?? []).length };
 }
