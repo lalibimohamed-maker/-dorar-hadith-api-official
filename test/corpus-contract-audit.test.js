@@ -3,6 +3,7 @@ import test from "node:test";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getRegistry, getSource } from "../src/source-registry.js";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const configDir = path.join(root, "..", "config");
@@ -14,7 +15,7 @@ function readJson(name) {
 test("canonical corpus is covered by the provenance source contract", () => {
   const corpus = readJson("canonical-corpus-seed-2026.json");
   const policy = readJson("corpus-provenance-policy-2026.json");
-  const registry = readJson("source-registry.json");
+  const registry = getRegistry();
   const registryIds = new Set((registry.sources || []).map((source) => source.id));
   const policyTypes = new Set(policy.sourceTypes || []);
 
@@ -26,7 +27,7 @@ test("canonical corpus is covered by the provenance source contract", () => {
     if (!policyTypes.has(record.sourceType)) {
       failures.push(`${record.recordId}: unsupported sourceType ${record.sourceType}`);
     }
-    if (!registryIds.has(record.sourceId)) {
+    if (!registryIds.has(record.sourceId) || !getSource(record.sourceId)) {
       failures.push(`${record.recordId}: sourceId ${record.sourceId} missing from source registry`);
     }
   }
