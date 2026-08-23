@@ -1,0 +1,2 @@
+import assert from 'node:assert/strict';import test from 'node:test';import {linkHadithNarrators,unresolvedNarrators} from '../src/hadith-narrator-linkage.js';
+test('links resolved narrators and reports unresolved ones',()=>{const h={chain:['n1','n2']};const r=linkHadithNarrators(h,[{narratorId:'n1',name:'A'}]);assert.equal(r[0].resolved,true);assert.equal(unresolvedNarrators(h,[{narratorId:'n1'}]).length,1);});
