@@ -44,6 +44,7 @@ function scoreTerms(q, terms) { return terms.reduce((score, term) => { const nor
 function matchesPriorityRule(q, rule) { return rule.patterns.some((pattern) => pattern.every((term) => q.includes(normalize(term)))); }
 function hasAny(q, terms) { return terms.some((term) => q.includes(normalize(term))); }
 function detectDeterministicIntent(q) {
+  if (hasAny(q, ["بيع ما ليس عندي", "بيع ما ليس عندك"])) return "fiqh-transactions";
   if (hasAny(q, ["الربا", "فائدة القرض", "فوائد البنك", "بيع الذهب بالذهب", "ربا الديون", "الغرر", "مال اليتيم", "أكل أموال الناس", "القمار", "الميسر"])) return "fiqh-transactions";
   if (q.includes(normalize("صلاة الميت")) || q.includes(normalize("صلاة الجنازة"))) return "worship-teaching";
   if (hasAny(q, ["موعظة جنازة", "خطبة جنازة", "درس جنازة"])) return "sermons-lessons";
