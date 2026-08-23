@@ -7,19 +7,22 @@ test("provenance policy defines the corpus source contract", () => {
   assert.ok(policy.requiredFields.includes("sourceId"));
   assert.ok(policy.sourceTypes.includes("hadith"));
   assert.ok(policy.verificationStates.includes("scholar_reviewed"));
+  assert.ok(policy.verificationStates.includes("pending_verification"));
 });
 
 test("pending records are never trusted", () => {
-  const result = validateCorpusRecord({
-    recordId: "hadith:1",
-    sourceId: "bukhari",
-    sourceType: "hadith",
-    verificationState: "pending_review",
-    attribution: { authorOrScholar: "محمد بن إسماعيل البخاري" }
-  });
-  assert.equal(result.valid, true);
-  assert.equal(result.trusted, false);
-  assert.equal(isVerifiedState("pending_review"), false);
+  for (const verificationState of ["pending_review", "pending_verification"]) {
+    const result = validateCorpusRecord({
+      recordId: "hadith:1",
+      sourceId: "bukhari",
+      sourceType: "hadith",
+      verificationState,
+      attribution: { authorOrScholar: "محمد بن إسماعيل البخاري" }
+    });
+    assert.equal(result.valid, true);
+    assert.equal(result.trusted, false);
+    assert.equal(isVerifiedState(verificationState), false);
+  }
 });
 
 test("verified states are explicitly trusted", () => {
@@ -46,9 +49,10 @@ test("summary distinguishes trusted, pending and invalid records", () => {
   const summary = summarizeCorpusProvenance([
     { recordId: "1", sourceId: "quran", sourceType: "quran", verificationState: "source_verified", attribution: {} },
     { recordId: "2", sourceId: "bukhari", sourceType: "hadith", verificationState: "pending_review", attribution: {} },
-    { recordId: "3", sourceType: "hadith", verificationState: "pending_review", attribution: {} }
+    { recordId: "3", sourceId: "bukhari", sourceType: "hadith", verificationState: "pending_verification", attribution: {} },
+    { recordId: "4", sourceType: "hadith", verificationState: "pending_review", attribution: {} }
   ]);
   assert.equal(summary.trusted, 1);
-  assert.equal(summary.pending, 1);
+  assert.equal(summary.pending, 2);
   assert.equal(summary.invalid, 1);
 });
