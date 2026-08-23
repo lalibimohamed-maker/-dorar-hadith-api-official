@@ -49,8 +49,8 @@ export function neighbors(graph, nodeId, { edgeTypes = null } = {}) {
 
 export function snapshotGraph(graph) {
   return {
-    nodes: [...graph.nodes.values()].map(structuredClone),
-    edges: [...graph.edges.values()].map(structuredClone)
+    nodes: [...graph.nodes.values()].map((node) => structuredClone(node)),
+    edges: [...graph.edges.values()].map((edge) => structuredClone(edge))
   };
 }
 
