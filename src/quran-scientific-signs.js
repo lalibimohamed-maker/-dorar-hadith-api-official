@@ -7,21 +7,23 @@ const config = JSON.parse(fs.readFileSync(path.join(root, "..", "config", "quran
 
 export function getScientificSignsConfig() { return config; }
 
+export function validateScientificVideoLanguages(primaryLanguage, additionalLanguages = []) {
+  if (!primaryLanguage || typeof primaryLanguage !== "string") throw new TypeError("اللغة الأساسية مطلوبة");
+  if (!Array.isArray(additionalLanguages)) throw new TypeError("اللغات الإضافية يجب أن تكون قائمة");
+  if (additionalLanguages.length > config.languages.additionalLanguages) throw new RangeError("اللغات الإضافية في فيديو الإعجاز لا تتجاوز لغتين");
+  if (additionalLanguages.some((language) => typeof language !== "string" || !language.trim())) throw new TypeError("لغة إضافية غير صحيحة");
+  const uniqueAdditional = [...new Set(additionalLanguages)];
+  if (uniqueAdditional.length !== additionalLanguages.length) throw new RangeError("لا يمكن تكرار اللغة الإضافية");
+  if (uniqueAdditional.includes(primaryLanguage)) throw new RangeError("اللغة الأساسية لا تُكرر ضمن اللغات الإضافية");
+  return { primaryLanguage, additionalLanguages: uniqueAdditional, meaningTranslation: true };
+}
+
 export function createScientificSignsProject({ topic, ayahs, primaryLanguage, additionalLanguages = [], scientificSources = [], religiousSources = [] }) {
   if (!topic) throw new TypeError("الموضوع مطلوب");
   if (!Array.isArray(ayahs) || ayahs.length === 0) throw new TypeError("يجب اختيار آيات موثقة");
-  if (additionalLanguages.length > config.languages.additionalLanguages) throw new RangeError("اللغات الإضافية في فيديو الإعجاز لا تتجاوز لغتين");
+  const languages = validateScientificVideoLanguages(primaryLanguage, additionalLanguages);
   if (!Array.isArray(scientificSources) || !Array.isArray(religiousSources)) throw new TypeError("المصادر غير صحيحة");
-  return {
-    type: "quran-scientific-signs-project",
-    topic,
-    ayahs,
-    languages: { primary: primaryLanguage, additional: additionalLanguages },
-    evidence: { scientific: scientificSources, religious: religiousSources },
-    policy: config.claimPolicy,
-    video: { arabicAyah: true, meaningTranslation: true, citations: true, endCard: true, format: "mp4" },
-    status: "ready-for-source-review"
-  };
+  return { type: "quran-scientific-signs-project", topic, ayahs, languages, evidence: { scientific: scientificSources, religious: religiousSources }, policy: config.claimPolicy, video: { arabicAyah: true, meaningTranslation: true, citations: true, endCard: true, format: "mp4" }, status: "ready-for-source-review" };
 }
 
 export function classifyScientificClaim({ status, tafsirSupport = false }) {
