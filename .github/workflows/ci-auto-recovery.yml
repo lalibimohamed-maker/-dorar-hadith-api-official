@@ -16,15 +16,32 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Retry failed jobs once
+      - name: Inspect failed jobs and retry only transient failures once
+        id: retry
         if: ${{ github.event.workflow_run.run_attempt == 1 }}
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.event.workflow_run.id }}
-        run: gh run rerun "$RUN_ID" --failed --repo "$GITHUB_REPOSITORY"
+        run: |
+          set -euo pipefail
+          jobs_json="$(gh api --paginate \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?per_page=100" \
+            --jq '[.jobs[] | select(.conclusion != "success" and .conclusion != "skipped") | {name,conclusion,steps}]' \
+            | jq -s 'add')"
 
-      - name: Diagnose failed run after retry
-        if: ${{ github.event.workflow_run.run_attempt > 1 }}
+          transient="$(jq '[ .[]?.steps[]? | select(.conclusion != "success" and .conclusion != "skipped") | .name ] | if length == 0 then false else all(.[]; test("^(Checkout|Setup Node\\.js|Install dependencies|Set up job|Complete job)")) end' <<<"$jobs_json")"
+
+          if [ "$transient" = "true" ]; then
+            echo "All failed steps are transient runner/setup failures; retrying failed jobs once."
+            gh run rerun "$RUN_ID" --failed --repo "$GITHUB_REPOSITORY"
+          else
+            echo "At least one failed step is project/test related; skipping automatic retry."
+            echo "Create the recovery issue from this failed run."
+          fi
+
+      - name: Diagnose failed run
+        if: ${{ github.event.workflow_run.run_attempt > 1 || steps.retry.outcome == 'success' || steps.retry.outcome == 'skipped' }}
         uses: actions/github-script@v7
         with:
           script: |
@@ -39,7 +56,9 @@ jobs:
               }
             );
 
-            const failedJobs = jobs.filter(j => j.conclusion !== 'success');
+            const failedJobs = jobs.filter(j => j.conclusion !== 'success' && j.conclusion !== 'skipped');
+            if (!failedJobs.length) return;
+
             const labelName = 'ci-auto-recovery';
 
             try {
@@ -93,8 +112,8 @@ jobs:
                 '### Failed steps',
                 failedSteps || '- No failed step summary returned by the Actions API.',
                 '',
-                'This issue is intentionally deduplicated by workflow and job. New runs update the same open tracking issue instead of creating a new issue for every failed run.',
-                'Source files, books, corpus records, references, and scholarly content must not be deleted or replaced blindly. Repairs must target the smallest deterministic cause and pass CI before merging.'
+                'Automatic retry is intentionally limited to transient runner/setup failures. Project/test failures are reported without blind retries.',
+                'This issue is deduplicated by workflow and job. Source files, books, corpus records, references, and scholarly content must not be deleted or replaced blindly. Repairs must target the smallest deterministic cause and pass CI before merging.'
               ].join('\n');
 
               const sameFailure = existing.find(i => i.title === title);
