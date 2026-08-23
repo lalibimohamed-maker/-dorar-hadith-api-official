@@ -1,0 +1,41 @@
+{
+  "version": "2026.08.23.1",
+  "engineId": "worship-teaching",
+  "runtime": "html5-esm",
+  "note": "Use modern JavaScript/HTML5 rather than Flash; Flash is obsolete and unsupported in modern browsers.",
+  "audiences": ["children", "teens", "adults", "men", "women", "new_muslims", "general"],
+  "modes": ["guided", "visual", "audio", "practice", "quiz", "comparison", "calculation"],
+  "modules": [
+    {"id":"purification","topics":["wudu","major_ghusl","tayammum","impurities","nullifiers"],"interactive":true},
+    {"id":"prayer","topics":["conditions","pillars","obligations","sunnahs","opening_takbir","standing","recitation","ruku","sujud","tashahhud","salam","khushu","sujud_sahw","sujud_tilawah","sujud_shukr"],"interactive":true,"audio":true},
+    {"id":"adhan-iqamah","topics":["adhan","iqamah","caller_responses","common_mistakes"],"interactive":true,"audio":true},
+    {"id":"janazah","topics":["washing_deceased","shrouding","funeral_prayer","burial_etiquette"],"interactive":true},
+    {"id":"children-prayer","topics":["learning_by_age","practice_routines","parent_guidance"],"interactive":true},
+    {"id":"zakat","topics":["nisab","hawl","cash","gold","silver","trade_goods","livestock","agriculture","zakat_al_fitr"],"interactive":true,"calculator":true},
+    {"id":"fasting","topics":["intention","suhur","fast_breakers","exemptions","qada","fidya","kaffarah"],"interactive":true},
+    {"id":"hajj-umrah","topics":["ihram","talbiyah","tawaf","sai","arafah","mabit","ramy","hady","halq_taqsir"],"interactive":true},
+    {"id":"ruqyah","topics":["quranic_ruqyah","verified_sunnah_duas","audio_recitation","source_verification"],"interactive":true,"audio":true},
+    {"id":"family-and-etiquette","topics":["children","women_prayer_clothing","congregation","travel_prayer","sickness_prayer"],"interactive":true}
+  ],
+  "lessonModel": {
+    "stepFields": ["objective","instruction","visualCue","audioCue","action","evidence","commonMistakes","practiceCheck","next"],
+    "evidenceRequiredPerInstruction": true,
+    "gradeRequiredForHadith": true,
+    "scholarlyDifferencePolicy": "show_relevant_valid_difference_with_attribution",
+    "madhhabPolicy": "do_not_hide_valid_fiqh_differences",
+    "translationPolicy": "answer_in_user_language_keep_arabic_original_for_scriptural_text"
+  },
+  "mediaPolicy": {
+    "audio": "licensed_or_public_domain_or_explicit_permission",
+    "video": "licensed_or_public_domain_or_explicit_permission",
+    "illustrations": "original_or_licensed",
+    "neverPresentUnverifiedMediaAsPropheticInstruction": true
+  },
+  "sourceOrder": ["quran","sahih_bukhari","sahih_muslim","sunan_abi_dawud","jami_at_tirmidhi","sunan_an_nasai","sunan_ibn_majah","musnad_ahmad","riyad_al_saliheen","zad_al_maad","verified_scholar_sources","secondary_sources"],
+  "canonicalEvidenceExamples": [
+    {"topic":"prophetic_prayer","source":"Sahih al-Bukhari","reference":"631","note":"Pray as you have seen me praying."},
+    {"topic":"children-prayer","source":"Sunan Abi Dawud","reference":"494","grade":"Hasan Sahih (Al-Albani)"},
+    {"topic":"adhan-response","source":"Sahih Muslim","reference":"383","note":"Repeat what the mu'adhdhin says."},
+    {"topic":"purification","source":"Sunan Abi Dawud","reference":"59","grade":"Sahih (Al-Albani)"}
+  ]
+}
