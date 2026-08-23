@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { getSpecializedEngines, routeSpecializedQuestion } from "../src/specialized-engines.js";
 
-test("specialized engine registry has four required engines", () => {
+test("specialized engine registry includes the required learning and answer engines", () => {
   const engines = getSpecializedEngines();
-  for (const id of ["sermons-lessons", "prophetic-medicine", "dua-adhkar", "worship-teaching"]) {
+  for (const id of ["sermons-lessons", "prophetic-medicine", "dua-adhkar", "worship-teaching", "quran-learning", "islamic-tools", "source-to-answer"]) {
     assert.ok(engines.some((engine) => engine.id === id));
   }
 });
@@ -33,6 +33,14 @@ test("specific worship concepts beat generic funeral aliases", () => {
   const result = routeSpecializedQuestion("كيف أصلي صلاة الميت؟");
   assert.equal(result.engineId, "worship-teaching");
   assert.ok(result.candidates.some((candidate) => candidate.id === "sermons-lessons"));
+});
+
+test("Quran learning questions route to Quran learning engine", () => {
+  assert.equal(routeSpecializedQuestion("كيف أتعلم التجويد؟").engineId, "quran-learning");
+});
+
+test("Islamic tool questions route to tools engine", () => {
+  assert.equal(routeSpecializedQuestion("ما اتجاه القبلة ومواقيت الصلاة؟").engineId, "islamic-tools");
 });
 
 test("unknown questions fall back to unified evidence engine", () => {
