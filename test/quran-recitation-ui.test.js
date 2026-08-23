@@ -11,6 +11,12 @@ test("Quran recitation UI loads as a separate browser module", () => {
   assert.match(ui, /validateSource/);
 });
 
+test("recitation UI exposes verified result binding", () => {
+  assert.match(ui, /attachFromResult/);
+  assert.match(ui, /result\.recitation/);
+  assert.match(ui, /quranRecitation/);
+});
+
 test("recitation UI exposes play and stop controls without TTS", () => {
   assert.match(ui, /quran-recitation-play/);
   assert.match(ui, /quran-recitation-stop/);
@@ -19,8 +25,9 @@ test("recitation UI exposes play and stop controls without TTS", () => {
   assert.doesNotMatch(ui, /speechSynthesis/);
 });
 
-test("recitation UI displays source and reciter provenance", () => {
+test("recitation UI displays source, reciter, and edition provenance", () => {
   assert.match(ui, /meta\.reciter/);
   assert.match(ui, /meta\.source/);
   assert.match(ui, /meta\.ayah/);
+  assert.match(ui, /meta\.edition/);
 });
