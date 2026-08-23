@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Evidence-first manifest for ingesting real hadith corpus records into Din Allah Encyclopedia.",
+  "policy": {
+    "textMustHaveProvenance": true,
+    "noSyntheticHadithText": true,
+    "noAutomaticGradeSynthesis": true,
+    "preserveScholarDisagreement": true,
+    "licenseRequiredBeforeBulkIngestion": true
+  },
+  "sourcePriority": [
+    "official_publisher_or_rightsholder",
+    "verified_digital_edition",
+    "trusted_secondary_index"
+  ],
+  "recordRequiredFields": [
+    "hadithId",
+    "sourceId",
+    "reference",
+    "text",
+    "chain"
+  ],
+  "assessmentRequiredFields": [
+    "hadithId",
+    "scholarId",
+    "sourceId",
+    "reference",
+    "text"
+  ],
+  "initialSourceTargets": [
+    {"sourceId":"bukhari","name":"صحيح البخاري","domain":"hadith","status":"source-first"},
+    {"sourceId":"muslim","name":"صحيح مسلم","domain":"hadith","status":"source-first"},
+    {"sourceId":"abudawud","name":"سنن أبي داود","domain":"hadith","status":"source-first"},
+    {"sourceId":"tirmidhi","name":"جامع الترمذي","domain":"hadith","status":"source-first"},
+    {"sourceId":"nasai","name":"السنن الكبرى/الصغرى للنسائي","domain":"hadith","status":"source-first"},
+    {"sourceId":"ibnmajah","name":"سنن ابن ماجه","domain":"hadith","status":"source-first"},
+    {"sourceId":"muwatta","name":"موطأ مالك","domain":"hadith","status":"source-first"},
+    {"sourceId":"ahmad","name":"مسند أحمد","domain":"hadith","status":"source-first"}
+  ]
+}
