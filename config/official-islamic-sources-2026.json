@@ -1,15 +1,12 @@
 {
-  "policy": {
-    "titleAr": "سياسة المصادر الرسمية",
-    "descriptionAr": "تُسجل المؤسسات الرسمية والوطنية والأكاديمية كمصادر ببليوغرافية أو بحثية، ولا يعني إدراجها اعتماد جميع موادها أو مناهجها. تُعرض الفتوى منسوبة إلى الجهة وبسياقها المذهبي والعلمي.",
-    "reuse": "catalog-and-link-unless-licensed"
-  },
+  "policy": {"titleAr": "سياسة المصادر الرسمية", "descriptionAr": "تُسجل المؤسسات الرسمية والوطنية والأكاديمية كمصادر ببليوغرافية أو بحثية، ولا يعني إدراجها اعتماد جميع موادها أو مناهجها. تُعرض الفتوى منسوبة إلى الجهة وبسياقها المذهبي والعلمي.", "reuse": "catalog-and-link-unless-licensed"},
   "sources": [
     {"id":"egypt-dar-alifta","nameAr":"دار الإفتاء المصرية","country":"مصر","category":"fatwa","url":"https://www.dar-alifta.org/ar/","role":"official-fatwa-source","madhhabContext":"Sunni; institutional fatwa source; preserve its own methodology and attribution","coverage":["fatwa","fiqh","usul-fiqh","nawazil"]},
     {"id":"jordan-iftaa","nameAr":"دائرة الإفتاء العام الأردنية","country":"الأردن","category":"fatwa","url":"https://aliftaa.jo/","role":"official-fatwa-source","madhhabContext":"Sunni; historically Hanafi institutional context; preserve attribution","coverage":["fatwa","fiqh","family-law","nawazil"]},
     {"id":"qatar-awqaf","nameAr":"وزارة الأوقاف والشؤون الإسلامية القطرية","country":"قطر","category":"official","url":"https://www.islam.gov.qa/","role":"official-islamic-source","coverage":["quran","dawah","lessons","islamic-studies"]},
     {"id":"qatar-quran-lessons","nameAr":"دروس القرآن الكريم بوزارة الأوقاف القطرية","country":"قطر","category":"quran","url":"https://alquran.islam.gov.qa/droos/Sections.html","role":"official-educational-source","coverage":["tajweed","recitation","quran-lessons"]},
     {"id":"saudi-quran-complex","nameAr":"مجمع الملك فهد لطباعة المصحف الشريف","country":"السعودية","category":"quran","url":"https://qurancomplex.gov.sa/","role":"official-primary","coverage":["quran","qiraat","translations","tafsir","quran-sciences","digital-quran"]},
+    {"id":"quran","nameAr":"القرآن الكريم - المصدر الأساسي","category":"quran","role":"canonical-primary","canonicalSourceId":"saudi-quran-complex","url":"https://qurancomplex.gov.sa/","reusePolicy":"source-permission-dependent","coverage":["quran","qiraat","quran-sciences"]},
     {"id":"saudi-islamic-ministry","nameAr":"وزارة الشؤون الإسلامية والدعوة والإرشاد","country":"السعودية","category":"official","url":"https://moia.gov.sa/","role":"official-primary","coverage":["quran","dawah","islamic-books","research"]},
     {"id":"saudi-islamic-ebook","nameAr":"المكتبة الإلكترونية الإسلامية لوزارة الشؤون الإسلامية","country":"السعودية","category":"library","url":"https://ebook.moia.gov.sa/","role":"official-digital-library","coverage":["books","lessons","hadith","aqidah","fiqh"]},
     {"id":"saudi-digital-libraries","nameAr":"منصة المكتبات الرقمية السعودية","country":"السعودية","category":"library","url":"https://libraries.moc.gov.sa/","role":"official-digital-library","coverage":["books","manuscripts","research"]},
