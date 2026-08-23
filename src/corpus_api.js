@@ -3,13 +3,17 @@ import { searchCorpus, resolveConcept, makeBilingual } from './corpus_search.js'
 import { buildKnowledgeSections } from './concept_resolver.js';
 import { buildGhaybResearchPlan } from './ghayb-router.js';
 import { queryPolicy } from './query-intent-router.js';
+import { routeSpecializedQuestion, getEngine } from './specialized-engines.js';
+import { getWorshipLearningConfig, detectWorshipTopic, createLearningSession } from './worship-learning-engine.js';
+import { routeTransactionQuestion, buildTransactionLesson, listTransactionTopics } from './transactions-riba-engine.js';
 
 export function search(query, options = {}) {
   const records = loadCorpus();
   const policy = queryPolicy(query);
+  const specialized = routeSpecializedQuestion(query);
   const result = searchCorpus(query, { ...options, queryPolicy: policy }, records);
   const ghaibPlan = policy.intent === 'ghaib' ? buildGhaybResearchPlan(query, options) : null;
-  return { ...result, queryPolicy: policy, ghaibResearch: ghaibPlan };
+  return { ...result, queryPolicy: policy, specializedRouting: specialized, ghaibResearch: ghaibPlan };
 }
 
 export function concept(term, contextId, language = 'ar', options = {}) {
@@ -18,15 +22,18 @@ export function concept(term, contextId, language = 'ar', options = {}) {
   const record = result.record;
   const knowledge = buildKnowledgeSections(record, record?.knowledge || {}, options);
   const ghaibPlan = buildGhaybResearchPlan(term, { ...options, language });
-  return {
-    ...result,
-    knowledge,
-    ghaibResearch: ghaibPlan,
-    queryPolicy: queryPolicy(term),
-    routing: loadRouting().domains?.[record?.domain] || null
-  };
+  return { ...result, knowledge, ghaibResearch: ghaibPlan, queryPolicy: queryPolicy(term), specializedRouting: routeSpecializedQuestion(term), routing: loadRouting().domains?.[record?.domain] || null };
 }
 
-export function bilingual(originalArabic, meaningTranslation, targetLanguage) {
-  return makeBilingual(originalArabic, meaningTranslation, targetLanguage);
+export function bilingual(originalArabic, meaningTranslation, targetLanguage) { return makeBilingual(originalArabic, meaningTranslation, targetLanguage); }
+
+export function specializedEngine(id) { return getEngine(id); }
+export function worshipLearning({ topic, question, audience='general', language='ar', mode='guided' } = {}) {
+  const detected = topic || detectWorshipTopic(question || '');
+  return { config: getWorshipLearningConfig(), session: createLearningSession({ topic: detected, audience, language, mode }), detectedTopic: detected };
+}
+export function transactionLearning({ topic, question, language='ar' } = {}) {
+  const routing = question ? routeTransactionQuestion(question) : { engineId:'fiqh-transactions', topicId:topic || null, confidence: topic ? 1 : 0.1, candidates: [] };
+  const selected = topic || routing.topicId;
+  return { routing, topics: listTransactionTopics(), lesson: selected ? buildTransactionLesson(selected, { language }) : null };
 }
