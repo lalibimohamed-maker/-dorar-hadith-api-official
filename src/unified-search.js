@@ -9,7 +9,7 @@ import { searchOfficialInstitutions, officialInstitutionPolicy } from "./officia
 import { searchRijalResearch } from "./rijal-search.js";
 import { searchScholars } from "./scholar-research.js";
 
-function sourceRecords() {
+export function buildUnifiedSourceRecords() {
   const registryRecords = listSources().map((source) => ({
     id: source.id,
     title: source.nameAr || source.id,
@@ -77,7 +77,7 @@ function fiqhMatches(query) {
 }
 
 export async function unifiedSearch(query, { signal, includePotentialMatches = false, responseLocale = "ar" } = {}) {
-  const records = sourceRecords();
+  const records = buildUnifiedSourceRecords();
   const [hadithData, sourceMatches] = await Promise.all([
     searchDorar(query, { signal }),
     Promise.resolve(searchUnified(query, records, {
