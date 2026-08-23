@@ -17,6 +17,11 @@ test("detects expanded prayer topics", () => {
   assert.equal(detectWorshipTopic("ما حكم صلاة العيد؟"), "eid");
 });
 
+test("prefers the most specific worship alias over a generic alias", () => {
+  assert.equal(detectWorshipTopic("متى وقت الفجر والتغليس والإسفار؟"), "fajr_taghlees_isfar");
+  assert.equal(detectWorshipTopic("كيف أصلي صلاة المسافر بالقصر والجمع؟"), "traveler_prayer");
+});
+
 test("creates age-aware guided learning sessions", () => {
   const session = createLearningSession({ topic: "prayer", audience: "children", language: "fr", mode: "visual" });
   assert.equal(session.engineId, "worship-teaching");

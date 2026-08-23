@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const DEFAULT_DIR = path.join(process.cwd(), "config");
+const VERIFIED_STATUSES = new Set(["source-verified", "edition-verified", "institution-verified", "scholar-reviewed"]);
 
 export function normalizeQuery(value = "") {
   return String(value)
@@ -36,33 +37,58 @@ export function buildCorpusIndex(records = []) {
       record.sourceId,
       record.sourceType,
       record.attribution?.authorOrScholar,
-      record.attribution?.institution
+      record.attribution?.institution,
+      record.citation?.book,
+      record.citation?.chapter,
+      record.citation?.hadithNumber,
+      record.citation?.verse
     ].filter(Boolean).join(" "))
   }));
+}
+
+function tokenScore(text, tokens) {
+  if (!tokens.length) return 0;
+  let hits = 0;
+  for (const token of tokens) if (text.includes(token)) hits += 1;
+  return hits / tokens.length;
 }
 
 export function searchCorpus(query, options = {}, records = loadCorpusRecords()) {
   const q = normalizeQuery(query);
   if (!q) return [];
+  const tokens = q.split(" ").filter(Boolean);
   const index = buildCorpusIndex(records);
   const type = options.sourceType;
   const verifiedOnly = options.verifiedOnly === true;
 
   return index
     .filter((r) => !type || r.sourceType === type)
-    .filter((r) => !verifiedOnly || ["source-verified", "edition-verified", "institution-verified", "scholar-reviewed"].includes(r.reviewStatus))
+    .filter((r) => !verifiedOnly || VERIFIED_STATUSES.has(r.reviewStatus))
     .map((r) => {
       const title = normalizeQuery(r.titleOriginal || "");
       const text = normalizeQuery(r.textOriginal || "");
+      const author = normalizeQuery(r.attribution?.authorOrScholar || "");
+      const institution = normalizeQuery(r.attribution?.institution || "");
+      const sourceId = normalizeQuery(r.sourceId || "");
+      const searchText = r._searchText;
       let score = 0;
-      if (title === q) score += 100;
-      if (title.includes(q)) score += 40;
-      if (text.includes(q)) score += 20;
-      if (normalizeQuery(r.sourceId).includes(q)) score += 10;
-      return { record: r, score };
+
+      if (title === q) score += 120;
+      else if (title.includes(q)) score += 60;
+      if (text.includes(q)) score += 35;
+      if (sourceId.includes(q)) score += 20;
+      if (author.includes(q)) score += 25;
+      if (institution.includes(q)) score += 15;
+
+      const tokenCoverage = tokenScore(searchText, tokens);
+      score += Math.round(tokenCoverage * 30);
+      if (tokenCoverage === 1 && tokens.length > 1) score += 15;
+      if (VERIFIED_STATUSES.has(r.reviewStatus)) score += 5;
+
+      return { record: r, score, tokenCoverage };
     })
     .filter((r) => r.score > 0)
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => b.score - a.score || b.tokenCoverage - a.tokenCoverage)
     .map(({ record, score }) => ({ ...record, score }));
 }
 
