@@ -20,7 +20,7 @@ const graph = {
 };
 
 test('combines corpus results with provenance-aware graph paths', () => {
-  const result = unifiedKnowledgeSearch('الصلاة', { startId: 'a1', targetIds: ['h1'], maxDepth: 2 }, records, graph);
+  const result = unifiedKnowledgeSearch('الصلاة', { limit: 1, startId: 'a1', targetIds: ['h1'], maxDepth: 2 }, records, graph);
   assert.equal(result.mode, 'corpus+graph');
   assert.equal(result.results.length, 1);
   assert.equal(result.evidence_paths.length, 1);
@@ -28,7 +28,7 @@ test('combines corpus results with provenance-aware graph paths', () => {
 });
 
 test('keeps corpus-only search available when graph is absent', () => {
-  const result = unifiedKnowledgeSearch('الصلاة', {}, records);
+  const result = unifiedKnowledgeSearch('الصلاة', { limit: 1 }, records);
   assert.equal(result.mode, 'corpus');
   assert.equal(result.evidence_paths.length, 0);
   assert.equal(result.results.length, 1);
