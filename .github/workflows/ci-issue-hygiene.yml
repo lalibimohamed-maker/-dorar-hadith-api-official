@@ -1,0 +1,48 @@
+name: CI Issue Hygiene
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  close-superseded-recovery-issues:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Close legacy run-specific recovery issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = 'ci-auto-recovery';
+            const issues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: label,
+                per_page: 100
+              }
+            );
+
+            for (const issue of issues) {
+              // Legacy recovery issues were keyed by a single run number.
+              // Current recovery issues are keyed by workflow + job and should remain open
+              // when a current failure exists.
+              if (/^CI failure requires repair: run #\d+$/.test(issue.title)) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed',
+                  state_reason: 'completed',
+                  body: `${issue.body || ''}\n\n---\nClosed automatically after a later CI run completed successfully. This report referred to a historical run and is retained for audit history.`
+                });
+              }
+            }
