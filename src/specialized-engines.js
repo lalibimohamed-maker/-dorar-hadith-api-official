@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "config", "specialized-engines-2026.json"), "utf8"));
 
 const aliases = {
-  "sermons-lessons": ["محاضرة", "درس", "خطبة", "خطبة الجمعة", "خطبة العيد", "الزواج", "عقد القران", "رمضان", "موعظة"],
+  "sermons-lessons": ["محاضرة", "درس", "خطبة", "خطبة الجمعة", "خطبة العيد", "الزواج", "عقد القران", "رمضان", "موعظة", "جنازة", "صلاة الجنازة", "صلاة الميت"],
   "prophetic-medicine": ["الطب النبوي", "علاج", "عشبة", "أعشاب", "دواء", "الحبة السوداء", "العسل", "الحجامة"],
   "dua-adhkar": ["دعاء", "أدعية", "ذكر", "أذكار", "حصن المسلم", "ورد", "دعاء الشفاء", "دعاء الرزق", "قيام الليل", "ختم القرآن"],
   "worship-teaching": ["الصلاة", "وضوء", "طهارة", "غسل", "تيمم", "سجود السهو", "سجود التلاوة", "سجود الشكر", "صلاة الاستسقاء", "صلاة الميت", "صلاة الجنازة", "صفة صلاة النبي", "الأذان", "الإقامة", "الصيام", "زكاة", "زكاة الفطر", "الحج", "العمرة", "الرقية"],
@@ -49,22 +49,16 @@ function matchesPriorityRule(q, rule) {
   return rule.patterns.some((pattern) => pattern.every((term) => q.includes(normalize(term))));
 }
 
-export function getSpecializedEngines() {
-  return config.engines;
-}
+export function getSpecializedEngines() { return config.engines; }
 
 export function routeSpecializedQuestion(question) {
   const q = normalize(question);
   const priority = priorityRules.find((rule) => matchesPriorityRule(q, rule));
-  const scores = config.engines
-    .map((engine) => ({ engine, score: scoreTerms(q, aliases[engine.id] || [engine.nameAr]) }))
-    .sort((a, b) => b.score - a.score);
-
+  const scores = config.engines.map((engine) => ({ engine, score: scoreTerms(q, aliases[engine.id] || [engine.nameAr]) })).sort((a, b) => b.score - a.score);
   const best = priority ? scores.find((item) => item.engine.id === priority.engineId) : scores[0];
   const fallback = config.engines.find((engine) => engine.id === "source-to-answer");
   const source = best && (best.score > 0 || priority) ? best.engine : fallback;
   const winning = priority ? Math.max(best?.score || 0, 100) : (best?.score || 0);
-
   return {
     engineId: source?.id || "source-to-answer",
     confidence: winning > 0 ? Math.min(winning / 100, 1) : 0.1,
@@ -74,6 +68,4 @@ export function routeSpecializedQuestion(question) {
   };
 }
 
-export function getEngine(id) {
-  return config.engines.find((engine) => engine.id === id) || null;
-}
+export function getEngine(id) { return config.engines.find((engine) => engine.id === id) || null; }
