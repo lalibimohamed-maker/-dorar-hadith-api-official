@@ -1,4 +1,20 @@
 /** Corpus API contract layer. */
+
+const VERIFIED_STATES = new Set([
+  'verified',
+  'source-verified',
+  'edition-verified',
+  'institution-verified',
+  'scholar-reviewed'
+]);
+
+function isTrustedRecord(record) {
+  return VERIFIED_STATES.has(record?.verification_state)
+    || VERIFIED_STATES.has(record?.reviewStatus)
+    || record?.status === 'verified'
+    || record?.trusted === true;
+}
+
 export function normalizeLanguage(requestedLanguage, browserLanguage = 'ar') {
   return requestedLanguage || browserLanguage || 'ar';
 }
@@ -9,7 +25,7 @@ export function searchResponse({ query, language, results = [] }) {
     language: normalizeLanguage(language),
     bilingual: false,
     translationMode: 'disabled_for_search',
-    results: results.map(r => ({ ...r, trusted: r.verification_state === 'verified' }))
+    results: results.map(r => ({ ...r, trusted: isTrustedRecord(r) }))
   };
 }
 
@@ -24,7 +40,7 @@ export function conceptCard({ term, contextId, language, record, routing = null,
     translationMode: 'disabled_for_long_press',
     window: 'medium',
     source_on_demand: true,
-    record: record ? { ...record, trusted: record.verification_state === 'verified' } : null,
+    record: record ? { ...record, trusted: isTrustedRecord(record) } : null,
     methodology: routing
   };
 }
