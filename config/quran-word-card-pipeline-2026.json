@@ -1,13 +1,12 @@
 {
-  "version":"2026.15",
+  "version":"2026.16",
   "pipeline":"quran-word-card",
   "scope":"quran",
   "stages":["tokenize","canonicalize-uthmani-text","resolve-lemma-and-root","resolve-context","retrieve-tafsir-and-language-sources","rank-evidence","build-word-card","localize","verify","display"],
   "preserveCanonicalText":true,
   "fields":["word","lemma","root","morphology","lexicalMeaning","contextualMeaning","gharib","wujuhWaNazaer","tafsir","relevantAyat","revelationContext","relatedConcepts"],
   "evidenceOrder":["quran","authenticated-sunnah","companion-report","follower-and-early-salaf-report","classical-tafsir","language-source","scholarly-source"],
-  "interaction":{"longPressMs":5000,"mediumOverlay":true,"parentContextPreserved":true,"expandable":true},
-  "translation":{"target":"user-selected-or-query-language","verifiedMeaningTranslationWhenAvailable":true,"machineTranslationSeparate":true},
+  "interaction":{"longPressMs":5000,"mediumOverlay":true,"parentContextPreserved":true,"expandable":true,"responseLanguage":"user-selected-or-detected","translationOutput":"disabled"},
   "safety":{"neverRewriteQuranicText":true,"neverConflateTafsirWithQuran":true,"neverInferUnverifiedMeaningAsCanonical":true},
-  "compatibility":"uses the same concept IDs, source IDs, provenance records, translation IDs, and verification states as the unified concept-card pipeline"
+  "compatibility":"uses the same concept IDs, source IDs, provenance records, and verification states as the unified concept-card pipeline"
 }
