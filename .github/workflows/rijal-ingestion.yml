@@ -11,21 +11,38 @@ on:
         description: 'Maximum records to process'
         required: false
         default: '250'
-  push:
+  pull_request:
     paths:
       - 'config/rijal-*.json'
       - 'src/rijal-*.js'
       - 'scripts/validate-rijal-*.js'
       - 'data/rijal/**'
+      - '.github/workflows/rijal-ingestion.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/rijal-*.json'
+      - 'src/rijal-*.js'
+      - 'scripts/validate-rijal-*.js'
+      - 'data/rijal/**'
+      - '.github/workflows/rijal-ingestion.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rijal-validation-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Validate complete Rijal corpus configuration

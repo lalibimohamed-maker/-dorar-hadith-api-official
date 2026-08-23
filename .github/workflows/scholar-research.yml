@@ -21,6 +21,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: scholar-research
+  cancel-in-progress: true
+
 jobs:
   research-batch:
     runs-on: ubuntu-latest
