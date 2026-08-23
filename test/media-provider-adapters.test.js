@@ -29,8 +29,16 @@ const recitation = await quranRecitation({
   ayah: 1,
 });
 assert.equal(recitation.input.language, 'ar');
-assert.equal(recitation.input.reciter, 'Saad Al-Ghamdi');
+assert.equal('reciter' in recitation.input, false);
 assert.equal(recitation.input.verifiedOnly, true);
+
+const selectedRecitation = await quranRecitation({
+  provider: registry.quranRecitation,
+  surah: 1,
+  ayah: 1,
+  reciter: 'Mishary Rashid Alafasy',
+});
+assert.equal(selectedRecitation.input.reciter, 'Mishary Rashid Alafasy');
 
 const exported = await exportMedia({
   provider: registry.export,
