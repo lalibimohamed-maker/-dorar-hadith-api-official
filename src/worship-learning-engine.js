@@ -27,7 +27,7 @@ const TOPIC_PRIORITY = {
   fajr_taghlees_isfar: 100,
   traveler_prayer: 90,
   prohibited_times: 80,
-  taraweeh: 30,
+  taraweeh: 100,
   night_prayer: 20,
   prayer_times: 10,
   prayer: 0
