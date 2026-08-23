@@ -4,6 +4,10 @@ const URL_RE = /^https?:\/\/[^\s]+$/i;
 const RIGHTS = new Set(['licensed', 'public-domain', 'permission-required', 'link-only', 'unknown']);
 const VERIFICATION = new Set(['verified', 'partially_verified', 'unverified', 'needs_review']);
 
+const CANONICAL_IDENTITIES = Object.freeze({
+  shamela: 'المكتبة الشاملة'
+});
+
 function inferSourceType(source) {
   if (source.category === 'fatwa' || String(source.sourceKind || '').includes('fatwa')) return 'fatwa';
   if (source.role === 'primary-book' || source.role === 'book' || source.category === 'library') return 'book';
@@ -16,7 +20,9 @@ function inferSourceType(source) {
 
 function normalize(source) {
   const sourceType = source.sourceType || inferSourceType(source);
-  const hasIdentity = Boolean(source.id && (source.nameAr || source.name || source.scholar));
+  const canonicalIdentity = CANONICAL_IDENTITIES[source.id] || null;
+  const identityName = source.nameAr || source.name || source.scholar || canonicalIdentity;
+  const hasIdentity = Boolean(source.id && identityName);
   const hasLocator = Boolean(source.url || source.canonicalUrl || source.bibliographicLocator);
   const rights = source.rights?.status || source.rightsStatus || source.reusePolicy || 'unknown';
   const verification = source.verification?.status || source.verificationStatus || 'unverified';
@@ -26,7 +32,7 @@ function normalize(source) {
   return {
     sourceId: source.id,
     identity: {
-      nameAr: source.nameAr || source.name || source.scholar || null,
+      nameAr: identityName || null,
       author: source.authorAr || source.author || source.scholar || null,
       institution: source.institution || null,
       country: source.country || null
