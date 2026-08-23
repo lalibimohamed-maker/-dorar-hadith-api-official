@@ -1,30 +1,24 @@
 {
-  "version":"2026.14",
-  "feature":"optional-bilingual-search",
+  "version":"2026.15",
+  "feature":"disabled-for-search-and-long-press",
   "defaultMode":"single-language",
   "uiLanguage":"auto-from-user-selection",
-  "secondLanguage":"auto-from-search-language",
   "behavior":{
-    "off":"Search and display results in the user's selected language, with access to the Arabic original when available.",
-    "on":"Show the verified Arabic original together with an available verified meaning translation in the selected/search language.",
-    "neverRequireBilingualForEverySearch":true
+    "search":"Display the answer and evidence in the user's selected/requested language without a separate meaning-translation layer.",
+    "longPress":"Display the word or concept knowledge card in the user's selected/requested language without a separate meaning-translation layer.",
+    "threeLanguageMeaningTranslation":false
   },
   "translationPolicy":{
-    "preferred":"verified-human-or-official-meaning-translation",
-    "neverPresentMachineTranslationAsVerified":true,
-    "machineTranslation":"optional-separate-assistance-only",
-    "missingVerifiedTranslation":"show-original-and-do-not-invent-a-verified-translation"
+    "search":"disabled",
+    "longPress":"disabled",
+    "machineTranslation":"disabled_for_these_surfaces",
+    "canonicalSource":"preserve_original_when_required_by_source"
   },
   "languageRouting":{
-    "sourceLanguage":"Arabic when the canonical source is Arabic",
-    "targetLanguage":"user-selected-or-search-language",
-    "supportedPairs":"Arabic plus any supported interface/search language",
-    "manualOverride":true
+    "sourceLanguage":"Preserve the canonical source language where applicable",
+    "responseLanguage":"user-selected-or-detected-interface-language",
+    "translationPairsForSearch":"none",
+    "translationPairsForLongPress":"none"
   },
-  "display":{
-    "single":"localized-result + optional Arabic original",
-    "bilingual":"Arabic original + verified meaning translation",
-    "verification":"source and provenance available on demand"
-  },
-  "persistence":"store preference per user/browser settings without changing the canonical source record"
+  "persistence":"Keep the user's language preference without enabling translation output in search or long-press cards."
 }
