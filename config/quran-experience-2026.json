@@ -1,5 +1,5 @@
 {
-  "version":"2026.08.23.1",
+  "version":"2026.08.23.2",
   "reading":{
     "arabicText":"verified_uthmani_source",
     "recitation":{
@@ -7,33 +7,61 @@
       "wordSync":true,
       "currentAyahHighlight":true,
       "currentWordHighlight":true,
-      "reciterSelection":false,
+      "reciterSelection":true,
       "defaultReciter":"saad-al-ghamdi",
-      "allowedReciters":["saad-al-ghamdi"],
+      "allowedReciters":"all-reciter-registry-entries-with-verified-audio-rights",
+      "reciterRegistry":"data/reciters.json",
       "repeatAyah":true,
       "repeatRange":true,
       "speedControl":true,
       "backgroundPlayback":true
     },
-    "themes":["light","dark","system"],
-    "longPressWord":{
+    "memorization":{
       "enabled":true,
-      "durationMs":5000,
-      "cancelOnMove":true,
-      "cancelOnScroll":true,
-      "hapticFeedback":true,
-      "open":"word-knowledge-panel",
-      "preserveShortTap":true,
-      "preserveSelection":true,
-      "panelSections":["word","root","morphology","lexical_meaning","quran_occurrences","ayah_context","tafsir","hadith_and_athar","aqidah_context","fiqh_context","scholarly_statements","related_concepts","questions","sources"],
-      "translationOutput":"disabled",
-      "evidencePolicy":"source_to_answer",
-      "neverTreatWordAloneAsEvidence":true
-    },
-    "tajweed":{"interactiveRules":true,"learningLessons":true,"colorCoding":true},
-    "sources":["Quran Foundation","QuranFlash","Qatar Ministry Quran lessons","Quran Majeed"],
-    "rights":"store_source_license_and_attribution_before_redistribution"
+      "ayahRangeSelection":true,
+      "minAyahs":1,
+      "maxAyahs":20,
+      "repeatCountSelection":true,
+      "minRepeats":1,
+      "maxRepeats":20,
+      "repeatSelectedRange":true,
+      "autoAdvanceAfterSelectedRepeats":true,
+      "loopMode":true,
+      "pauseBetweenCyclesMs":0,
+      "persistSelection":true,
+      "persistProgress":true,
+      "showProgress":true,
+      "tajweedOverlay":{
+        "enabled":true,
+        "ruleHighlighting":true,
+        "coloredLetters":true,
+        "colorLegend":true,
+        "sourceReference":"Qatar Ministry Quran lessons",
+        "sourceUrl":"https://alquran.islam.gov.qa/droos/Sections.html",
+        "useOnlyVerifiedRuleMappings":true,
+        "licenseAndAttributionRequired":true,
+        "doNotCopyProtectedAssetsWithoutPermission":true
+      }
+    }
   },
+  "themes":["light","dark","system"],
+  "longPressWord":{
+    "enabled":true,
+    "durationMs":5000,
+    "cancelOnMove":true,
+    "cancelOnScroll":true,
+    "hapticFeedback":true,
+    "open":"word-knowledge-panel",
+    "preserveShortTap":true,
+    "preserveSelection":true,
+    "panelSections":["word","root","morphology","lexical_meaning","quran_occurrences","ayah_context","tafsir","hadith_and_athar","aqidah_context","fiqh_context","scholarly_statements","related_concepts","questions","sources"],
+    "translationOutput":"disabled",
+    "evidencePolicy":"source_to_answer",
+    "neverTreatWordAloneAsEvidence":true
+  },
+  "tajweed":{"interactiveRules":true,"learningLessons":true,"colorCoding":true},
+  "sources":["Quran Foundation","QuranFlash","Qatar Ministry Quran lessons","Quran Majeed"],
+  "rights":"store_source_license_and_attribution_before_redistribution",
   "tajweedLearning":{
     "qatarLessons":"https://alquran.islam.gov.qa/droos/Sections.html",
     "levels":["letters","vowels","tanween","madd","leen","sukun","shaddah","tajweed_applications"],
