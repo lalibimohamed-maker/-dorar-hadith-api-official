@@ -8,6 +8,6 @@ export function server(){return http.createServer((req,res)=>{const url=new URL(
   if(req.method==='GET'&&url.pathname==='/api/v1/bilingual') return json(res,200,api.bilingual(url.searchParams.get('original')||'',url.searchParams.get('translation')||'',url.searchParams.get('lang')||'en'));
   if(req.method==='GET'&&url.pathname==='/api/v1/engines/worship') return json(res,200,api.worshipLearning({topic:url.searchParams.get('topic')||undefined,question:url.searchParams.get('q')||undefined,audience:url.searchParams.get('audience')||'general',language:url.searchParams.get('lang')||'ar',mode:url.searchParams.get('mode')||'guided'}));
   if(req.method==='GET'&&url.pathname==='/api/v1/engines/transactions') return json(res,200,api.transactionLearning({topic:url.searchParams.get('topic')||undefined,question:url.searchParams.get('q')||undefined,language:url.searchParams.get('lang')||'ar'}));
-  if(req.method==='GET'&&url.pathname==='/api/v1/engines/:id') return json(res,200,api.specializedEngine(url.pathname.split('/').pop()));
+  if(req.method==='GET'&&url.pathname.startsWith('/api/v1/engines/')) { const id=url.pathname.slice('/api/v1/engines/'.length); if(id) return json(res,200,api.specializedEngine(id)); }
   return json(res,404,{error:'not_found'});
 }catch(error){return json(res,500,{error:'internal_error',message:error.message});}});}
