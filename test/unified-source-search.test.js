@@ -14,7 +14,7 @@ test("unified source records include both sources and book catalog", () => {
 test("unified metadata search finds a book by title and preserves provenance", () => {
   const records = buildUnifiedSourceRecords();
   const results = searchUnified("صحيح البخاري", records, { corpus: "sunni", requireSource: true });
-  const bukhari = results.find((record) => record.title === "صحيح البخاري");
+  const bukhari = results.find((record) => record.title === "صحيح البخاري" && record.sourceKind === "book-catalog");
   assert.ok(bukhari);
   assert.equal(bukhari.corpus, "sunni");
   assert.ok(bukhari.source);
