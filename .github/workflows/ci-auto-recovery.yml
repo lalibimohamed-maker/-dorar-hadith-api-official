@@ -1,4 +1,6 @@
 name: CI Auto Recovery
+# workflow-run-justification: trusted CI recovery automation; processes only completed CI runs and is not triggered by PR code.
+# actions-write-justification: narrowly scoped rerun of failed CI jobs, only on first attempt and only after transient-runner diagnosis.
 
 on:
   workflow_run:
