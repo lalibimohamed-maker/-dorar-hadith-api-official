@@ -4,8 +4,8 @@ import fs from "node:fs";
 
 const catalog = JSON.parse(fs.readFileSync(new URL("../data/quran-knowledge-catalog.json", import.meta.url), "utf8"));
 
-test("Quran knowledge catalog has exactly three top-level user features", () => {
-  assert.deepEqual(catalog.categories.map((item) => item.id), ["tafsir", "tadabbur", "visual-learning"]);
+test("Quran knowledge catalog keeps Quran learning categories separate", () => {
+  assert.deepEqual(catalog.categories.map((item) => item.id), ["tafsir", "tadabbur", "visual-learning", "collective-fiqh"]);
 });
 
 test("catalog includes the requested seed works", () => {
@@ -15,9 +15,12 @@ test("catalog includes the requested seed works", () => {
     "تفسير القرآن العظيم",
     "تيسير الكريم الرحمن في تفسير كلام المنان",
     "تفسير الجلالين",
+    "التفسير الميسر",
+    "التفسير الوسيط للقرآن الكريم",
     "القرآن تدبر وعمل",
     "هدايات القرآن الكريم",
-    "جعلناه نورا"
+    "جعلناه نورا",
+    "الفقه الميسر في ضوء الكتاب والسنة"
   ]) assert.ok(titles.includes(title), title);
 });
 
