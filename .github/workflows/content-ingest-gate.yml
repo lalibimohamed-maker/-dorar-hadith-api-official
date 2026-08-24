@@ -1,0 +1,26 @@
+name: Content Ingest Gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '41 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  ingest-gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ce3f1b4a1d5f6f0a0d1b5f # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Validate content-ingest policy
+        shell: bash
+        run: node scripts/content-ingest-gate.mjs
