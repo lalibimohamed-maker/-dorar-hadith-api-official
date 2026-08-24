@@ -23,7 +23,8 @@
     "rijal:validate": "node scripts/validate-rijal-corpus.js",
     "test:orchestration": "node test/orchestration-kernel.test.js && node test/orchestration-runtime.test.js",
     "test:search-discovery": "node --test test/search-discovery-federation.test.js",
-    "test:rights": "node --test test/book-rights-resolver.test.js"
+    "test:rights": "node --test test/book-rights-resolver.test.js",
+    "test:library-editions": "node --test test/library-edition-registry.test.js"
   },
   "engines": {
     "node": ">=20"
