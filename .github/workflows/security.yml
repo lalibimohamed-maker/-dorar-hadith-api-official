@@ -20,8 +20,11 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
+          package-manager-cache: false
+      - name: Create an ephemeral lockfile for the audit
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Install from the ephemeral lockfile
+        run: npm ci --ignore-scripts
       - name: Audit dependencies
         run: npm audit --audit-level=high
 
