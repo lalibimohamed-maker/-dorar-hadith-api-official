@@ -13,7 +13,7 @@ function normalize(text) {
 }
 
 function scholarRecords() {
-  const registryScholars = registry.scholars.map((scholar) => ({
+  const registryScholars = (registry.scholars || []).map((scholar) => ({
     ...scholar,
     era: "contemporary",
     verification: "source-verified",
