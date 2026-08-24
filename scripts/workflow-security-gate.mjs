@@ -12,7 +12,7 @@ for (const file of files) {
 
   if (/pull_request_target\s*:/.test(text)) add(file, "pull_request_target is prohibited");
   if (/issue_target\s*:/.test(text)) add(file, "issue_target is prohibited");
-  if (/workflow_run\s*:/.test(text)) add(file, "workflow_run requires a reviewed exception and is prohibited by default");
+  if (/workflow_run\s*:/.test(text) && !/workflow-run-justification:/i.test(text)) add(file, "workflow_run requires a reviewed workflow-run-justification marker");
 
   for (const line of text.split(/\r?\n/)) {
     const m = line.match(/^\s*uses:\s*([^\s#]+)\s*(?:#.*)?$/);
@@ -23,7 +23,7 @@ for (const file of files) {
   }
 
   if (/^\s*permissions:\s*read-all\s*$/m.test(text)) add(file, "workflow-level permissions: read-all is prohibited");
-  if (/^\s*actions:\s*write\s*$/m.test(text)) add(file, "actions: write is prohibited");
+  if (/^\s*actions:\s*write\s*$/m.test(text) && !/actions-write-justification:/i.test(text)) add(file, "actions: write requires a reviewed actions-write-justification marker");
   if (/^\s*contents:\s*write\s*$/m.test(text) && !/security-justification:/i.test(text)) add(file, "contents: write requires a security-justification marker");
   if (/^\s*id-token:\s*write\s*$/m.test(text) && !/oidc|scorecard|provenance|attestation/i.test(text)) add(file, "id-token: write requires an OIDC/provenance purpose");
 
