@@ -4,7 +4,7 @@
     "displayEraLabelAr": "القرون الوسطى",
     "scope": "scholars-from-prophetic-era-through-9th-hijri-century",
     "goal": "catalogue scholars and works from the Prophetic era through the end of the 9th Hijri century, across hadith, tafsir, fiqh, usul, aqidah, language, history, biography, medicine, mathematics, astronomy and other Islamic-era sciences",
-    "exhaustiveness": "source-driven-incremental-discovery; never claim completeness from a single index",
+    "exhaustiveness": "source-driven-incremental-discovery; every century must be harvested from multiple indexes before it can be marked complete",
     "dateBoundary": "through 900 AH; preserve exact death date where known and uncertainty where disputed",
     "doNotInferAuthenticityFromAge": true,
     "doNotInferBookAttributionFromCatalogPresence": true,
@@ -13,10 +13,21 @@
   },
   "discoverySources": [
     {"nameAr": "المكتبة الوقفية", "url": "https://waqfeya.com/", "role": "books, authors and century indexes; source discovery only"},
-    {"nameAr": "موسوعة المصنفات العربية", "url": "https://www.arabic-dic.com/home/", "role": "bibliographic author/work discovery across fourteen Hijri centuries"},
+    {"nameAr": "موسوعة المصنفات العربية", "url": "https://www.arabic-dic.com/home/", "role": "bibliographic author/work discovery across Hijri centuries"},
     {"nameAr": "مؤسسة الفرقان للتراث الإسلامي", "url": "https://al-furqan.com/", "role": "bibliographic and manuscript scholarship"},
     {"nameAr": "كلية الحديث الشريف الرقمية", "url": "https://hadithcollege.org/scholars", "role": "reviewed hadith-scholar biographies and chronological discovery"},
-    {"nameAr": "الكتابدار - مراجع التراجم", "url": "https://alkitabdar.com/reference/bibliographies/", "role": "bibliography and biographical-reference discovery"}
+    {"nameAr": "ويكي مصدر - مؤلفون حسب القرن", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفون_حسب_القرن_الهجري", "role": "public author-page and work discovery; must be independently verified"}
+  ],
+  "centuryIndexes": [
+    {"century": 1, "labelAr": "القرن الأول الهجري", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفو_القرن_الأول_الهجري"},
+    {"century": 2, "labelAr": "القرن الثاني الهجري", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفو_القرن_الثاني_الهجري", "indexedCount": 57},
+    {"century": 3, "labelAr": "القرن الثالث الهجري", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفو_القرن_الثالث_الهجري", "indexedCount": 94},
+    {"century": 4, "labelAr": "القرن الرابع الهجري", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفو_القرن_الرابع_الهجري", "indexedCount": 100},
+    {"century": 5, "labelAr": "القرن الخامس الهجري", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفو_القرن_الخامس_الهجري"},
+    {"century": 6, "labelAr": "القرن السادس الهجري", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفو_القرن_السادس_الهجري"},
+    {"century": 7, "labelAr": "القرن السابع الهجري", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفو_القرن_السابع_الهجري", "indexedCount": 77},
+    {"century": 8, "labelAr": "القرن الثامن الهجري", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفو_القرن_الثامن_الهجري"},
+    {"century": 9, "labelAr": "القرن التاسع الهجري", "url": "https://ar.wikisource.org/wiki/تصنيف:مؤلفو_القرن_التاسع_الهجري"}
   ],
   "eraBuckets": [
     {"id": "prophetic", "labelAr": "عصر النبوة", "startHijri": -53, "endHijri": 11},
@@ -32,20 +43,23 @@
     {"id": "9th", "labelAr": "القرن التاسع الهجري", "startHijri": 801, "endHijri": 900}
   ],
   "anchorScholars": [
-    "محمد رسول الله صلى الله عليه وسلم",
-    "أبو بكر الصديق", "عمر بن الخطاب", "عثمان بن عفان", "علي بن أبي طالب",
-    "عائشة أم المؤمنين", "ابن عباس", "ابن عمر", "أبو هريرة", "ابن مسعود", "زيد بن ثابت",
-    "سعيد بن المسيب", "الحسن البصري", "محمد بن سيرين", "عطاء بن أبي رباح", "مجاهد بن جبر",
-    "عروة بن الزبير", "وهب بن منبه", "سعيد بن جبير", "الزهري", "قتادة", "مكحول الشامي",
-    "أبو حنيفة", "مالك بن أنس", "الأوزاعي", "سفيان الثوري", "الليث بن سعد", "عبد الله بن المبارك",
-    "الشافعـي", "أحمد بن حنبل", "إسحاق بن راهويه", "يحيى بن معين", "علي بن المديني",
-    "البخاري", "مسلم", "أبو داود", "الترمذي", "النسائي", "ابن ماجه", "الطبري",
-    "ابن أبي حاتم", "أبو بكر الإسماعيلي", "الدارقطني", "الحاكم النيسابوري", "البيهقي",
-    "أبو نعيم الأصبهاني", "ابن عبد البر", "ابن حزم", "الخطيب البغدادي", "الباقلاني", "الماوردي",
-    "الجويني", "الغزالي", "ابن رشد", "القاضي عياض", "ابن العربي المعافري", "السمعاني",
-    "عبد القاهر الجرجاني", "الزمخشري", "الفخر الرازي", "ابن قدامة", "النووي", "ابن الصلاح",
-    "ابن تيمية", "ابن القيم", "المزي", "الذهبي", "الصفدي", "ابن كثير", "المقريزي",
-    "ابن خلدون", "الشاطبي", "ابن رجب", "ابن حجر العسقلاني", "العراقي", "السخاوي"
+    "محمد رسول الله صلى الله عليه وسلم", "أبو بكر الصديق", "عمر بن الخطاب", "عثمان بن عفان", "علي بن أبي طالب",
+    "عائشة أم المؤمنين", "ابن عباس", "ابن عمر", "أبو هريرة", "ابن مسعود", "زيد بن ثابت", "معاذ بن جبل",
+    "سعيد بن المسيب", "الحسن البصري", "محمد بن سيرين", "عطاء بن أبي رباح", "مجاهد بن جبر", "عروة بن الزبير",
+    "وهب بن منبه", "سعيد بن جبير", "الزهري", "قتادة", "مكحول الشامي", "إبراهيم النخعي", "الشعبي", "عكرمة",
+    "أبو حنيفة", "مالك بن أنس", "الأوزاعي", "سفيان الثوري", "الليث بن سعد", "عبد الله بن المبارك", "شعبة بن الحجاج",
+    "الشافعـي", "أحمد بن حنبل", "إسحاق بن راهويه", "يحيى بن معين", "علي بن المديني", "عبد الرزاق الصنعاني",
+    "ابن أبي شيبة", "أبو عبيد القاسم بن سلام", "البخاري", "مسلم", "أبو داود", "الترمذي", "النسائي", "ابن ماجه",
+    "ابن خزيمة", "ابن حبان", "الطبري", "ابن أبي حاتم", "الآجري", "أبو بكر الإسماعيلي", "الدارقطني", "الحاكم النيسابوري",
+    "البيهقي", "أبو نعيم الأصبهاني", "الماوردي", "ابن عبد البر", "ابن حزم", "الخطيب البغدادي", "الباقلاني", "عبد القاهر البغدادي",
+    "عبد القاهر الجرجاني", "الخطابي", "الطحاوي", "أبو سليمان السجستاني", "ابن سينا", "البيروني", "ابن الهيثم",
+    "الجويني", "الغزالي", "القاضي عياض", "ابن العربي المعافري", "ابن رشد", "السمعاني", "الزمخشري", "الفخر الرازي",
+    "ابن قدامة", "ابن الصلاح", "النووي", "العز بن عبد السلام", "ابن خلكان", "ياقوت الحموي", "ابن الأثير الجزري",
+    "ابن أبي أصيبعة", "ابن البيطار", "ابن دقيق العيد", "القرافي", "القرطبي", "أبو حيان الأندلسي", "ابن تيمية", "ابن القيم",
+    "المزي", "الذهبي", "الصفدي", "ابن كثير", "ابن رجب", "الشاطبي", "المقريزي", "ابن خلدون", "ابن حجر العسقلاني", "السخاوي"
+  ],
+  "regionalExpansionSeeds": [
+    "الأندلسيون", "القرطبيون", "الغرناطيون", "الإشبيليون", "المغاربة", "الإفريقيون", "المصريون", "الشاميون", "العراقيون", "الخراسانيون", "المروزيون", "النيسابوريون", "الأصفهانيون", "اليمانيون", "الحجازيون", "أهل ما وراء النهر", "علماء الهند والسند", "علماء بلاد الروم"
   ],
   "authorRecords": [
     {"id":"ibn-abd-al-barr","nameAr":"يوسف بن عبد الله ابن عبد البر النمري القرطبي","deathHijri":463,"regions":["الأندلس","قرطبة"],"status":"verified-anchor","works":["جامع بيان العلم وفضله","التمهيد","الاستذكار","الاستيعاب","الكافي","بهجة المجالس"]},
@@ -58,17 +72,18 @@
     {"id":"ibn-taymiyyah","nameAr":"أحمد بن عبد الحليم ابن تيمية","deathHijri":728,"regions":["الشام","دمشق"],"status":"anchor-for-work-level-verification","works":["مجموع الفتاوى","درء تعارض العقل والنقل","منهاج السنة","اقتضاء الصراط المستقيم"]},
     {"id":"al-dhahabi","nameAr":"محمد بن أحمد الذهبي","deathHijri":748,"regions":["الشام","دمشق"],"status":"anchor-for-work-level-verification","works":["سير أعلام النبلاء","تاريخ الإسلام","ميزان الاعتدال"]},
     {"id":"ibn-kathir","nameAr":"إسماعيل بن عمر ابن كثير","deathHijri":774,"regions":["الشام","دمشق"],"status":"anchor-for-work-level-verification","works":["تفسير القرآن العظيم","البداية والنهاية","اختصار علوم الحديث"]},
-    {"id":"ibn-khaldun","nameAr":"عبد الرحمن بن محمد ابن خلدون","deathHijri":808,"regions":["المغرب","إفريقية","مصر"],"status":"anchor-for-work-level-verification","works":["المقدمة","كتاب العبر"]},
     {"id":"al-shatibi","nameAr":"إبراهيم بن موسى الشاطبي","deathHijri":790,"regions":["الأندلس","غرناطة"],"status":"anchor-for-work-level-verification","works":["الموافقات","الاعتصام"]},
+    {"id":"ibn-khaldun","nameAr":"عبد الرحمن بن محمد ابن خلدون","deathHijri":808,"regions":["المغرب","إفريقية","مصر"],"status":"anchor-for-work-level-verification","works":["المقدمة","كتاب العبر"]},
     {"id":"ibn-hajar-al-asqalani","nameAr":"أحمد بن علي ابن حجر العسقلاني","deathHijri":852,"regions":["مصر","المشرق"],"status":"anchor-for-work-level-verification","works":["فتح الباري","الإصابة","تهذيب التهذيب","تقريب التهذيب","بلوغ المرام","نخبة الفكر","الدرر الكامنة"]},
     {"id":"al-sakhawi","nameAr":"محمد بن عبد الرحمن السخاوي","deathHijri":902,"regions":["مصر","الحجاز"],"status":"boundary-record; death-after-900","works":["الضوء اللامع","فتح المغيث"]}
   ],
   "verificationStates": ["candidate","bibliographically-attested","work-level-verified","text-verified","manuscript-only","lost-work-attested","attribution-disputed","duplicate-title","rights-restricted"],
   "nextStages": [
-    "harvest-author-and-work indexes from the discovery sources",
-    "normalize Arabic names and variant titles",
+    "harvest every author page from each century index rather than only famous scholars",
+    "cross-check each harvested author against biographical dictionaries and specialist bibliographies",
+    "normalize Arabic names, nisbahs and variant titles",
     "deduplicate authors and works",
-    "verify death dates and regional attribution from biographical sources",
+    "verify death dates and regional attribution",
     "verify each work's attribution independently",
     "record surviving manuscript/edition/read-online/download availability",
     "record rights separately from bibliographic existence",
