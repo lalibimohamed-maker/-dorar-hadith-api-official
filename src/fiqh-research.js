@@ -1,6 +1,7 @@
 import framework from "../config/fiqh-research-framework.json" with { type: "json" };
 import registry from "../config/fiqh-fatawa-sources.json" with { type: "json" };
 import classical from "../config/fiqh-classical-fatwa-books.json" with { type: "json" };
+import medieval from "../config/medieval-scholars-catalog.json" with { type: "json" };
 
 function normalize(text) {
   return String(text || "")
@@ -18,21 +19,27 @@ function scholarRecords() {
     verification: "source-verified",
     sourceIds: [...(scholar.sourceIds || [])],
   }));
+  const medievalScholars = medieval.authors.map((scholar) => ({
+    ...scholar,
+    era: "medieval",
+    verification: "bibliographic-catalogue",
+    sourceIds: [...(scholar.sourceIds || [])],
+  }));
   const classicalScholars = framework.classicalMethodologists.map((scholar) => ({
     ...scholar,
-    era: "classical-or-later",
+    era: "early-or-later",
     verification: "framework-record",
     sourceIds: [],
   }));
   const classicalBookAuthors = classical.authors.map((author) => ({
     id: author.id,
     nameAr: author.nameAr,
-    era: "classical",
+    era: "medieval",
     verification: "bibliographic-record",
     sourceIds: [...(author.sourceIds || [])],
   }));
   const seen = new Set();
-  return [...registryScholars, ...classicalScholars, ...classicalBookAuthors].filter((item) => {
+  return [...registryScholars, ...medievalScholars, ...classicalScholars, ...classicalBookAuthors].filter((item) => {
     if (seen.has(item.id)) return false;
     seen.add(item.id);
     return true;
@@ -53,6 +60,7 @@ export function getFiqhResearchFramework() {
     ...framework,
     sources: registry.sources,
     scholarCount: scholarRecords().length,
+    medievalScholarCount: medieval.authors.length,
     policy: registry.policy,
   };
 }
@@ -90,6 +98,7 @@ export function searchFiqhResearch(query) {
         title: scholar.nameAr,
         author: scholar.nameAr,
         verification: scholar.verification,
+        era: scholar.era,
         sourceIds: scholar.sourceIds,
         corpus: "sunni",
       });
@@ -106,7 +115,26 @@ export function searchFiqhResearch(query) {
           author: author.nameAr,
           status: work.status,
           source: work.source,
+          era: "medieval",
           sourceIds: [...(author.sourceIds || [])],
+          corpus: "sunni",
+        });
+      }
+    }
+  }
+  for (const author of medieval.authors) {
+    for (const title of author.works || []) {
+      const haystack = normalize(`${title} ${author.nameAr}`);
+      if (haystack.includes(q)) {
+        records.push({
+          type: "medieval-book",
+          id: `${author.id}:${title}`,
+          title,
+          author: author.nameAr,
+          status: "catalogued-work",
+          era: "medieval",
+          sourceIds: [...(author.sourceIds || [])],
+          discoverySources: author.discoverySources || [],
           corpus: "sunni",
         });
       }
