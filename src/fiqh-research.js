@@ -12,6 +12,20 @@ function normalize(text) {
     .trim();
 }
 
+function getMedievalAuthors() {
+  return Array.isArray(medieval.authors)
+    ? medieval.authors
+    : Array.isArray(medieval.authorRecords)
+      ? medieval.authorRecords
+      : [];
+}
+
+function getMedievalWorks(author) {
+  return (author.works || []).map((work) =>
+    typeof work === "string" ? { title: work } : work
+  );
+}
+
 function scholarRecords() {
   const registryScholars = (registry.scholars || []).map((scholar) => ({
     ...scholar,
@@ -19,7 +33,8 @@ function scholarRecords() {
     verification: "source-verified",
     sourceIds: [...(scholar.sourceIds || [])],
   }));
-  const medievalScholars = medieval.authors.map((scholar) => ({
+  const medievalAuthors = getMedievalAuthors();
+  const medievalScholars = medievalAuthors.map((scholar) => ({
     ...scholar,
     era: "medieval",
     verification: "bibliographic-catalogue",
@@ -60,7 +75,7 @@ export function getFiqhResearchFramework() {
     ...framework,
     sources: registry.sources,
     scholarCount: scholarRecords().length,
-    medievalScholarCount: medieval.authors.length,
+    medievalScholarCount: getMedievalAuthors().length,
     policy: registry.policy,
   };
 }
@@ -122,8 +137,9 @@ export function searchFiqhResearch(query) {
       }
     }
   }
-  for (const author of medieval.authors) {
-    for (const title of author.works || []) {
+  for (const author of getMedievalAuthors()) {
+    for (const work of getMedievalWorks(author)) {
+      const title = work.titleAr || work.title || "";
       const haystack = normalize(`${title} ${author.nameAr}`);
       if (haystack.includes(q)) {
         records.push({
@@ -131,10 +147,10 @@ export function searchFiqhResearch(query) {
           id: `${author.id}:${title}`,
           title,
           author: author.nameAr,
-          status: "catalogued-work",
+          status: work.status || "catalogued-work",
           era: "medieval",
           sourceIds: [...(author.sourceIds || [])],
-          discoverySources: author.discoverySources || [],
+          discoverySources: author.discoverySources || medieval.discoverySources || [],
           corpus: "sunni",
         });
       }
