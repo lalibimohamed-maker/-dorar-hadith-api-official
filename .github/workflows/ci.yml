@@ -88,6 +88,8 @@ jobs:
           node --input-type=module -e "import registry from './data/scholars/registry.json' with { type: 'json' }; if(registry.records.length < 100 || !registry.records.some(x => x.name_ar === 'أبو بكر الجزائري') || !registry.records.some(x => x.name_ar === 'القاضي عياض')) process.exit(1); console.log('Scholar registry OK:', registry.records.length)"
       - name: Smoke test client configuration
         run: node --input-type=module -e "import fs from 'node:fs'; const s=fs.readFileSync('src/dorar-client.js','utf8'); if(!s.includes('https://dorar.net/dorar_api.json')) process.exit(1); console.log('Dorar client configuration OK')"
+      - name: Run source audit trail tests
+        run: npm run test:source-audit
       - name: Run source refresh history tests
         run: npm run test:source-refresh-history
       - name: Run source refresh quarantine tests
