@@ -1,0 +1,50 @@
+name: Guardian Mesh
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "47 * * * *"
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+concurrency:
+  group: guardian-mesh
+  cancel-in-progress: false
+
+jobs:
+  guardian:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Validate security invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f SECURITY.md
+          test -f docs/security/threat-model.md
+          test -f docs/security/source-refresh.md
+          test -f docs/security/guardian-mesh.md
+          for f in .github/workflows/*.yml .github/workflows/*.yaml; do
+            [ -f "$f" ] || continue
+            grep -q '^permissions:' "$f" || {
+              echo "SECURITY: workflow without explicit permissions: $f"
+              exit 1
+            }
+          done
+
+      - name: Check for suspicious privileged workflow patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE --exclude-dir=.git '(curl[^|]*\|[[:space:]]*(bash|sh)|wget[^|]*\|[[:space:]]*(bash|sh)|git config --global|chmod[[:space:]]+777)' .github/workflows; then
+            echo "SECURITY: suspicious workflow pattern detected"
+            exit 1
+          fi
