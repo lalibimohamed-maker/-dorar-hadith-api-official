@@ -18,13 +18,10 @@ for (const name of workflowFiles) {
         findings.push(`${file}:${index + 1}: external action is not pinned to a full SHA: ${ref}`);
       }
     }
-
-    // Match executable shell commands, not regex literals embedded in a scanner.
-    const commandPrefix = "(?:^|(?:run:\s*|[;&|]\s*))";
-    if (new RegExp(`${commandPrefix}(?:curl|wget)\\b[^|;\\n]*\\|\\s*(?:bash|sh)\\b`, "i").test(line)) {
+    if (/\b(curl|wget)\b[^\n]*(\||&&)\s*(bash|sh)\b/i.test(line)) {
       findings.push(`${file}:${index + 1}: remote shell execution pattern detected`);
     }
-    if (new RegExp(`${commandPrefix}chmod\\s+777\\b`, "i").test(line)) {
+    if (/\bchmod\s+777\b/i.test(line)) {
       findings.push(`${file}:${index + 1}: world-writable chmod detected`);
     }
   }
