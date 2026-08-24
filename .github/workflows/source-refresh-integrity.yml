@@ -1,0 +1,30 @@
+name: Source refresh integrity gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/source-refresh-*.mjs'
+      - 'docs/security/source-publication-gate.md'
+      - 'docs/security/source-refresh-gate.md'
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+      - name: Validate policy documents
+        run: |
+          test -f docs/security/source-refresh-gate.md
+          test -f docs/security/source-publication-gate.md
+      - name: Validate source refresh implementation
+        run: node --check scripts/source-refresh-gate.mjs && node --check scripts/source-refresh-integrity.mjs
