@@ -29,8 +29,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        run: npm install --ignore-scripts --no-package-lock --no-audit --no-fund
+          cache: npm
+      - name: Validate package metadata
+        run: node --input-type=module -e "import fs from 'node:fs'; const p=JSON.parse(fs.readFileSync('package.json','utf8')); if(!p.name || !p.scripts || !p.scripts.test) process.exit(1); console.log('package metadata OK')"
+      - name: Install dependencies reproducibly
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Syntax check
         run: |
           npm run health
