@@ -1,16 +1,17 @@
 /**
  * Rights-aware, lossless digital-book pipeline contract.
  *
- * This module deliberately does not perform OCR/PDF/DOCX conversion itself.
- * It defines the immutable source + derived representation contract that
- * adapters (OCR, PDF, DOCX, renderers/exporters) must obey.
+ * This module does not perform OCR/PDF/DOCX conversion itself. It defines
+ * the immutable source + derived representation contract that adapters
+ * (OCR engines, alignment, renderers and exporters) must obey.
  */
 
 import { createHash } from 'node:crypto';
 import { RIGHTS } from './book-rights-resolver.js';
 
 const PRESENTATION_MODES = new Set(['paper', 'light', 'dark', 'sepia']);
-const EXPORT_FORMATS = new Set(['pdf', 'docx', 'pptx']);
+const EXPORT_FORMATS = new Set(['pdf', 'docx', 'epub', 'pptx']);
+const REDISTRIBUTABLE_RIGHTS = new Set([RIGHTS.REDISTRIBUTABLE]);
 
 export function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
@@ -53,14 +54,41 @@ export function createDigitalRepresentation({ source, pages, extraction }) {
 }
 
 /**
+ * Multi-OCR evidence is a derived comparison layer. It never silently
+ * replaces the source. At least two independent OCR engines are required
+ * before alignment can be promoted to a digital master.
+ */
+export function evaluateOcrAlignment({ source, engines = [], alignment }) {
+  const failures = [];
+  if (!source?.immutable || !source.sourceSha256) failures.push('immutable_source_required');
+  if (!Array.isArray(engines) || engines.length < 2) failures.push('multi_ocr_required');
+  if (new Set(engines.map((engine) => engine?.id).filter(Boolean)).size < 2) failures.push('independent_ocr_engines_required');
+  if (alignment?.sourceSha256 !== source?.sourceSha256) failures.push('alignment_source_mismatch');
+  if (alignment?.status !== 'aligned') failures.push('alignment_required');
+  return failures.length ? { allowed: false, state: 'blocked', failures } : { allowed: true, state: 'aligned', failures: [] };
+}
+
+export function createDigitalMaster({ source, alignment, pages }) {
+  const gate = evaluateOcrAlignment({ source, engines: alignment?.engines, alignment });
+  if (!gate.allowed) throw new Error(`Digital master blocked: ${gate.failures.join(',')}`);
+  const representation = createDigitalRepresentation({ source, pages, extraction: 'multi-ocr-aligned' });
+  return Object.freeze({
+    id: `${source.id}:digital-master`,
+    sourceId: source.id,
+    sourceSha256: source.sourceSha256,
+    representation,
+    status: 'validated-derived',
+  });
+}
+
+/**
  * Export is an authorization gate, not a presentation decision.
- * The caller should pass the final status returned by resolveRights().
  * Read-only, read-copy, link-only, unclear and restricted books can never
  * reach a redistribution export.
  */
 export function canExport(source, format) {
   const normalizedFormat = String(format).toLowerCase();
-  return EXPORT_FORMATS.has(normalizedFormat) && source?.rights === RIGHTS.REDISTRIBUTABLE;
+  return EXPORT_FORMATS.has(normalizedFormat) && REDISTRIBUTABLE_RIGHTS.has(source?.rights);
 }
 
 export function readingTheme(mode = 'paper') {
