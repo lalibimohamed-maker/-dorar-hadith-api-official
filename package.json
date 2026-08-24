@@ -21,7 +21,8 @@
     "rijal:batch": "node scripts/run-rijal-ingestion-batch.js",
     "rijal:extract": "node src/rijal-ingestion.js",
     "rijal:validate": "node scripts/validate-rijal-corpus.js",
-    "test:orchestration": "node test/orchestration-kernel.test.js && node test/orchestration-runtime.test.js"
+    "test:orchestration": "node test/orchestration-kernel.test.js && node test/orchestration-runtime.test.js",
+    "test:search-discovery": "node --test test/search-discovery-federation.test.js"
   },
   "engines": {
     "node": ">=20"
