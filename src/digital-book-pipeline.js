@@ -7,9 +7,10 @@
  */
 
 import { createHash } from 'node:crypto';
+import { RIGHTS } from './book-rights-resolver.js';
 
-const REDISTRIBUTABLE = new Set(['public-domain', 'cc-by', 'cc-by-sa', 'explicit-redistribution']);
 const PRESENTATION_MODES = new Set(['paper', 'light', 'dark', 'sepia']);
+const EXPORT_FORMATS = new Set(['pdf', 'docx', 'pptx']);
 
 export function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
@@ -51,9 +52,15 @@ export function createDigitalRepresentation({ source, pages, extraction }) {
   });
 }
 
+/**
+ * Export is an authorization gate, not a presentation decision.
+ * The caller should pass the final status returned by resolveRights().
+ * Read-only, read-copy, link-only, unclear and restricted books can never
+ * reach a redistribution export.
+ */
 export function canExport(source, format) {
   const normalizedFormat = String(format).toLowerCase();
-  return ['pdf', 'docx'].includes(normalizedFormat) && REDISTRIBUTABLE.has(source?.rights);
+  return EXPORT_FORMATS.has(normalizedFormat) && source?.rights === RIGHTS.REDISTRIBUTABLE;
 }
 
 export function readingTheme(mode = 'paper') {
