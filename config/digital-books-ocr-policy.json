@@ -1,0 +1,64 @@
+{
+  "titleAr": "سياسة رقمنة الكتب وOCR والمصادر",
+  "purpose": "تحويل النسخ المسموح بمعالجتها إلى نص قابل للبحث مع إبقاء النسخة الأصلية، الموضع، النسبة، المصدر والحقوق منفصلة.",
+  "sourceAuthority": {
+    "primarySources": "مصادر أصلية أو معتمدة بحسب المجال",
+    "secondaryScholarlySources": "كتب العلماء والباحثين للاستشهاد والتتبع دون رفعها تلقائيا إلى مرتبة المصدر الأساسي",
+    "heritageSources": "الكتب التراثية والطبعات والمخطوطات للفهرسة والاستدلال عند توثيقها"
+  },
+  "bookRecord": {
+    "required": [
+      "authorId",
+      "workId",
+      "titleAr",
+      "attributionStatus",
+      "editionOrManuscript",
+      "discoverySource",
+      "rightsStatus",
+      "availabilityStatus"
+    ],
+    "optional": ["publisher", "publicationYear", "volumeCount", "isbn", "language", "archiveIdentifier"]
+  },
+  "rightsStatuses": [
+    "public-domain",
+    "licensed-republication",
+    "read-only-link",
+    "restricted",
+    "unknown"
+  ],
+  "availabilityStatuses": [
+    "full-digital-copy",
+    "read-online",
+    "downloadable",
+    "manuscript-only",
+    "lost-work-attested",
+    "metadata-only"
+  ],
+  "ocrPipeline": {
+    "steps": [
+      "preserve-original-page-image",
+      "extract-page-image-at-source-quality",
+      "ocr-per-page",
+      "store-raw-ocr-separately",
+      "normalize-without-changing-meaning",
+      "human-or-source-assisted-verification",
+      "store-corrected-text-as-reviewed-layer",
+      "link-every-text-block-to-page-and-edition"
+    ],
+    "rule": "OCR output is never authoritative merely because it was generated; the page image or verified source remains the reference.",
+    "qualityFields": ["ocrEngine", "ocrVersion", "confidence", "reviewStatus", "reviewer", "reviewedAt"]
+  },
+  "citationModel": {
+    "chain": "author -> work -> edition/manuscript -> page -> image -> rawOcr -> reviewedText -> citation",
+    "requiredForScholarlyQuote": ["authorId", "workId", "editionId", "pageOrLocation", "sourceUrlOrIdentifier", "attributionStatus"],
+    "primaryVsSecondary": "A secondary heritage quotation may support explanation or scholarly context but must not silently replace a primary evidentiary source."
+  },
+  "copyrightRule": "Catalog and link when republication is not licensed; only ingest and redistribute full text when rights permit or the material is public domain.",
+  "noFabrication": [
+    "never invent a missing page",
+    "never silently repair uncertain OCR",
+    "never treat catalog presence as proof of attribution",
+    "never treat antiquity as proof of authenticity",
+    "never treat availability online as permission to redistribute"
+  ]
+}
