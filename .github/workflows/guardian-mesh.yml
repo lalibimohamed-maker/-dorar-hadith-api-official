@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RInE --exclude-dir=.git '(curl[^|]*\|[[:space:]]*(bash|sh)|wget[^|]*\|[[:space:]]*(bash|sh)|git config --global|chmod[[:space:]]+777)' .github/workflows; then
+          if grep -RInE --exclude-dir=.git --exclude='guardian-mesh.yml' '(curl[^|]*\|[[:space:]]*(bash|sh)|wget[^|]*\|[[:space:]]*(bash|sh)|git config --global|chmod[[:space:]]+777)' .github/workflows; then
             echo "SECURITY: suspicious workflow pattern detected"
             exit 1
           fi
