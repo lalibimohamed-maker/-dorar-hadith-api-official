@@ -1,22 +1,21 @@
-import { describe, expect, it } from 'vitest';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import { RIGHTS, resolveRights } from '../src/book-rights-resolver.js';
 
-describe('book rights resolver', () => {
-  it('does not treat free availability alone as redistribution permission', () => {
-    expect(resolveRights([{ source: 'example', kind: 'free-download' }]).status).toBe(RIGHTS.RIGHTS_UNCLEAR);
-  });
+test('free availability alone is not redistribution permission', () => {
+  assert.equal(resolveRights([{ source: 'example', kind: 'free-download' }]).status, RIGHTS.RIGHTS_UNCLEAR);
+});
 
-  it('recognizes explicit redistribution permission', () => {
-    expect(resolveRights([{ source: 'publisher', kind: 'explicit-redistribution-permission' }]).status).toBe(RIGHTS.REDISTRIBUTABLE);
-  });
+test('explicit redistribution permission is accepted', () => {
+  assert.equal(resolveRights([{ source: 'publisher', kind: 'explicit-redistribution-permission' }]).status, RIGHTS.REDISTRIBUTABLE);
+});
 
-  it('supports read-only and read-copy permissions', () => {
-    expect(resolveRights([{ source: 'library', kind: 'read-only-permission' }]).status).toBe(RIGHTS.READ_ONLY);
-    expect(resolveRights([{ source: 'library', kind: 'read-copy-permission' }]).status).toBe(RIGHTS.READ_COPY);
-  });
+test('read-only and read-copy permissions are distinguished', () => {
+  assert.equal(resolveRights([{ source: 'library', kind: 'read-only-permission' }]).status, RIGHTS.READ_ONLY);
+  assert.equal(resolveRights([{ source: 'library', kind: 'read-copy-permission' }]).status, RIGHTS.READ_COPY);
+});
 
-  it('requires explicit redistribution permission for waqf redistribution', () => {
-    expect(resolveRights([{ source: 'waqf-site', kind: 'waqf' }]).status).toBe(RIGHTS.RIGHTS_UNCLEAR);
-    expect(resolveRights([{ source: 'waqf-site', kind: 'waqf', allowsRedistribution: true }]).status).toBe(RIGHTS.REDISTRIBUTABLE);
-  });
+test('waqf does not imply redistribution unless the evidence says so', () => {
+  assert.equal(resolveRights([{ source: 'waqf-site', kind: 'waqf' }]).status, RIGHTS.RIGHTS_UNCLEAR);
+  assert.equal(resolveRights([{ source: 'waqf-site', kind: 'waqf', allowsRedistribution: true }]).status, RIGHTS.REDISTRIBUTABLE);
 });
