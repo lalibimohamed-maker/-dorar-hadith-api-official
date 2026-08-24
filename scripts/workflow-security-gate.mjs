@@ -4,6 +4,7 @@ import path from "node:path";
 const root = ".github/workflows";
 const files = fs.existsSync(root) ? fs.readdirSync(root).filter(f => /\.(yml|yaml)$/i.test(f)).sort() : [];
 const findings = [];
+// Central gate policy: findings are hard failures unless the workflow carries a narrowly scoped reviewed justification.
 const sha40 = /^[0-9a-f]{40}$/i;
 const add = (f, m) => findings.push(`${f}: ${m}`);
 
