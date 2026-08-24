@@ -37,6 +37,7 @@ test('quarantines output rejected by a downstream validator', async () => {
   const result = await runGovernedOperation({
     request: { action: 'transform', target: 'book:123', rollbackAvailable: true },
     execute: async () => ({ text: 'changed' }),
+    audit: async () => {},
     checkpoint: async () => {},
     validateOutput: async () => false,
     quarantine: async (event) => quarantined.push(event.status)
