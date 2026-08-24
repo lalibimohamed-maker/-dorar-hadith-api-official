@@ -29,7 +29,7 @@ function scholarRecords() {
     nameAr: author.nameAr,
     era: "classical",
     verification: "bibliographic-record",
-    sourceIds: [],
+    sourceIds: [...(author.sourceIds || [])],
   }));
   const seen = new Set();
   return [...registryScholars, ...classicalScholars, ...classicalBookAuthors].filter((item) => {
@@ -106,6 +106,7 @@ export function searchFiqhResearch(query) {
           author: author.nameAr,
           status: work.status,
           source: work.source,
+          sourceIds: [...(author.sourceIds || [])],
           corpus: "sunni",
         });
       }
