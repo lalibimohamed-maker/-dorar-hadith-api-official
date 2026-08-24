@@ -27,7 +27,8 @@
     "test:library-editions": "node --test test/library-edition-registry.test.js",
     "test:source-refresh": "node --test test/source-refresh-quarantine.test.js",
     "test:source-refresh-history": "node --test test/source-refresh-history.test.js",
-    "test:source-audit": "node --test test/source-audit-trail.test.js"
+    "test:source-audit": "node --test test/source-audit-trail.test.js",
+    "test:corpus-boundary": "node --test test/corpus-write-boundary.test.js"
   },
   "engines": {
     "node": ">=20"
