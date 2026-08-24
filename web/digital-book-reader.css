@@ -1,0 +1,46 @@
+:root {
+  --book-page-bg: #f6edcf;
+  --book-text: #2b2924;
+  --book-muted: #6f6758;
+  --book-border: #d8cda9;
+  --book-accent: #7a5a22;
+}
+
+.book-reader {
+  background: var(--book-page-bg);
+  color: var(--book-text);
+  border: 1px solid var(--book-border);
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(60, 45, 20, 0.12);
+  font-family: system-ui, -apple-system, 'Noto Naskh Arabic', serif;
+  line-height: 1.95;
+}
+
+.book-reader__page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 4vw, 3.5rem);
+  font-size: clamp(1.05rem, 1.2vw + 0.7rem, 1.35rem);
+}
+
+.book-reader__section {
+  color: var(--book-accent);
+  font-weight: 700;
+}
+
+.book-reader__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
+  color: var(--book-muted);
+}
+
+/* Visual styling only. The digital text/source representation is immutable. */
+.book-reader--dark {
+  --book-page-bg: #1d1b18;
+  --book-text: #f3efe5;
+  --book-muted: #c8c0b2;
+  --book-border: #4b453c;
+  --book-accent: #e0c27c;
+}
