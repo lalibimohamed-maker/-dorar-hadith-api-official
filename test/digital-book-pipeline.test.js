@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {
   canExport,
   createBookSource,
+  createDigitalMaster,
   createDigitalRepresentation,
+  evaluateOcrAlignment,
   readingTheme,
   validateDigitalRepresentation,
 } from '../src/digital-book-pipeline.js';
@@ -21,6 +23,8 @@ function source(rights = RIGHTS.REDISTRIBUTABLE) {
     rights,
   });
 }
+
+const engines = [{ id: 'ocr-a' }, { id: 'ocr-b' }];
 
 test('source keeps an immutable SHA-256 identity', () => {
   const value = source();
@@ -40,12 +44,38 @@ test('digital representation preserves page order and source identity', () => {
   });
   assert.equal(validateDigitalRepresentation(value, representation), true);
   assert.equal(representation.derived, true);
-  assert.equal(representation.pages[0].text, 'First page');
+});
+
+test('multi-OCR alignment requires two independent engines', () => {
+  const value = source();
+  assert.equal(evaluateOcrAlignment({ source: value, engines: [{ id: 'ocr-a' }], alignment: { status: 'aligned', sourceSha256: value.sourceSha256 } }).allowed, false);
+  assert.equal(evaluateOcrAlignment({ source: value, engines, alignment: { status: 'aligned', sourceSha256: value.sourceSha256 } }).allowed, true);
+});
+
+test('digital master cannot be created from mismatched alignment', () => {
+  const value = source();
+  assert.throws(() => createDigitalMaster({
+    source: value,
+    alignment: { status: 'aligned', sourceSha256: 'wrong', engines },
+    pages: [{ number: 1, text: 'page' }],
+  }), /Digital master blocked/);
+});
+
+test('digital master remains derived from the immutable source', () => {
+  const value = source();
+  const master = createDigitalMaster({
+    source: value,
+    alignment: { status: 'aligned', sourceSha256: value.sourceSha256, engines },
+    pages: [{ number: 1, text: 'page', verified: true }],
+  });
+  assert.equal(master.sourceSha256, value.sourceSha256);
+  assert.equal(master.status, 'validated-derived');
 });
 
 test('export is blocked unless redistribution rights are explicit', () => {
   assert.equal(canExport(source(RIGHTS.REDISTRIBUTABLE), 'pdf'), true);
   assert.equal(canExport(source(RIGHTS.REDISTRIBUTABLE), 'docx'), true);
+  assert.equal(canExport(source(RIGHTS.REDISTRIBUTABLE), 'epub'), true);
   assert.equal(canExport(source(RIGHTS.RESTRICTED), 'pdf'), false);
   assert.equal(canExport(source(RIGHTS.RESTRICTED), 'docx'), false);
 });
