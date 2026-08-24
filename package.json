@@ -1,26 +1,29 @@
 {
-  "name":"deen-allah-encyclopedia-api",
-  "version":"0.9.2",
-  "private":true,
-  "type":"module",
-  "description":"Multilingual Deen Allah Encyclopedia API with source-aware Quran, hadith, tafsir, sirah, fiqh, creed and Tajweed resources.",
-  "main":"dorar_json_api.js",
-  "scripts":{
-    "start":"node dorar_json_api.js",
-    "start:corpus":"node src/index.js",
-    "health":"find . -type f -name '*.js' -not -path './node_modules/*' -print0 | xargs -0 -n1 node --check",
-    "test":"node --test",
-    "test:governance":"node test/orchestration-kernel.test.js",
-    "test:corpus":"node test/corpus_search.test.js && node test/corpus_repository.test.js && node test/corpus_api.integration.test.js && node test/http_server.integration.test.js",
-    "test:ghaib":"node test/ghaib-evidence-router.test.js && node test/hadith-evidence-registry.test.js && node test/hadith-scholar-linker.test.js",
-    "test:graph":"node test/deen-graph-runtime.test.js && node test/deen-answer-policy.test.js",
-    "provenance:audit":"node --input-type=module -e \"import('./src/source-provenance-audit.js').then(m=>console.log(JSON.stringify(m.auditSources(),null,2)))\"",
-    "scholar:batch":"node scripts/run-scholar-opinions-batch.js",
-    "scholar:probe":"node scripts/probe-official-scholar-sources.js",
-    "rijal:official":"node -e \"import('./src/official-source-verifier.js').then(m=>console.log(JSON.stringify(m.listOfficialSources(),null,2)))\"",
-    "rijal:batch":"node scripts/run-rijal-ingestion-batch.js",
-    "rijal:extract":"node src/rijal-ingestion.js",
-    "rijal:validate":"node scripts/validate-rijal-corpus.js"
+  "name": "deen-allah-encyclopedia-api",
+  "version": "0.9.2",
+  "private": true,
+  "type": "module",
+  "description": "Multilingual Deen Allah Encyclopedia API with source-aware Quran, hadith, tafsir, sirah, fiqh, creed and Tajweed resources.",
+  "main": "dorar_json_api.js",
+  "scripts": {
+    "start": "node dorar_json_api.js",
+    "start:corpus": "node src/index.js",
+    "health": "find . -type f -name '*.js' -not -path './node_modules/*' -print0 | xargs -0 -n1 node --check",
+    "test": "node --test",
+    "test:governance": "node test/orchestration-kernel.test.js",
+    "test:corpus": "node test/corpus_search.test.js && node test/corpus_repository.test.js && node test/corpus_api.integration.test.js && node test/http_server.integration.test.js",
+    "test:ghaib": "node test/ghaib-evidence-router.test.js && node test/hadith-evidence-registry.test.js && node test/hadith-scholar-linker.test.js",
+    "test:graph": "node test/deen-graph-runtime.test.js && node test/deen-answer-policy.test.js",
+    "provenance:audit": "node --input-type=module -e \"import('./src/source-provenance-audit.js').then(m=>console.log(JSON.stringify(m.auditSources(),null,2)))\"",
+    "scholar:batch": "node scripts/run-scholar-opinions-batch.js",
+    "scholar:probe": "node scripts/probe-official-scholar-sources.js",
+    "rijal:official": "node -e \"import('./src/official-source-verifier.js').then(m=>console.log(JSON.stringify(m.listOfficialSources(),null,2)))\"",
+    "rijal:batch": "node scripts/run-rijal-ingestion-batch.js",
+    "rijal:extract": "node src/rijal-ingestion.js",
+    "rijal:validate": "node scripts/validate-rijal-corpus.js",
+    "test:orchestration": "node test/orchestration-kernel.test.js && node test/orchestration-runtime.test.js"
   },
-  "engines":{"node":">=20"}
+  "engines": {
+    "node": ">=20"
+  }
 }
