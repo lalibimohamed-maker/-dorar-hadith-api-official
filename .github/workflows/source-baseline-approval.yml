@@ -1,0 +1,29 @@
+name: Source baseline approval gate
+
+on:
+  pull_request:
+    paths:
+      - 'config/source-refresh-baselines.json'
+      - 'scripts/source-anomaly-gate.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Validate baseline JSON
+        run: node -e "const x=require('./config/source-refresh-baselines.json'); if(x.schemaVersion!==1||typeof x.sources!=='object') process.exit(1); console.log('baseline schema OK')"
+      - name: Ensure baseline contains metadata only
+        run: |
+          if grep -RniE '"(content|text|body|raw|html|pdf|document)"[[:space:]]*:' config/source-refresh-baselines.json; then
+            echo "Baseline must remain metadata-only"
+            exit 1
+          fi
