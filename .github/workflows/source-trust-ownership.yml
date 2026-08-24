@@ -1,0 +1,31 @@
+name: Source trust control ownership check
+
+on:
+  pull_request:
+    paths:
+      - 'CODEOWNERS'
+      - '.github/workflows/source-refresh-gate.yml'
+      - '.github/workflows/source-refresh-integrity.yml'
+      - '.github/workflows/source-anomaly-gate.yml'
+      - '.github/workflows/source-baseline-approval.yml'
+      - 'config/source-refresh-baselines.json'
+      - 'docs/security/**'
+
+permissions:
+  contents: read
+
+jobs:
+  ownership:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Verify protected paths are owned
+        run: |
+          grep -F '/.github/workflows/source-refresh-gate.yml' CODEOWNERS
+          grep -F '/.github/workflows/source-refresh-integrity.yml' CODEOWNERS
+          grep -F '/.github/workflows/source-anomaly-gate.yml' CODEOWNERS
+          grep -F '/.github/workflows/source-baseline-approval.yml' CODEOWNERS
+          grep -F '/config/source-refresh-baselines.json' CODEOWNERS
+          grep -F '/docs/security/' CODEOWNERS
