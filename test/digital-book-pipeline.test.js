@@ -7,10 +7,11 @@ import {
   readingTheme,
   validateDigitalRepresentation,
 } from '../src/digital-book-pipeline.js';
+import { RIGHTS } from '../src/book-rights-resolver.js';
 
 const bytes = Buffer.from('immutable source artifact');
 
-function source(rights = 'public-domain') {
+function source(rights = RIGHTS.REDISTRIBUTABLE) {
   return createBookSource({
     id: 'book-1',
     title: 'Example Book',
@@ -43,10 +44,10 @@ test('digital representation preserves page order and source identity', () => {
 });
 
 test('export is blocked unless redistribution rights are explicit', () => {
-  assert.equal(canExport(source('public-domain'), 'pdf'), true);
-  assert.equal(canExport(source('public-domain'), 'docx'), true);
-  assert.equal(canExport(source('restricted'), 'pdf'), false);
-  assert.equal(canExport(source('restricted'), 'docx'), false);
+  assert.equal(canExport(source(RIGHTS.REDISTRIBUTABLE), 'pdf'), true);
+  assert.equal(canExport(source(RIGHTS.REDISTRIBUTABLE), 'docx'), true);
+  assert.equal(canExport(source(RIGHTS.RESTRICTED), 'pdf'), false);
+  assert.equal(canExport(source(RIGHTS.RESTRICTED), 'docx'), false);
 });
 
 test('reading themes are presentation-only and do not alter text', () => {
