@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "purpose": "Untrusted external content must be quarantined and verified before trusted corpus publication.",
+  "trusted_roots": ["data/"],
+  "quarantine_root": "artifacts/quarantine/",
+  "max_item_bytes": 52428800,
+  "max_manifest_bytes": 1048576,
+  "allowed_schemes": ["https"],
+  "required_hash": "sha256",
+  "publication_rule": "quarantine_then_verify_then_atomic_publish",
+  "required_metadata": ["sourceId", "sourceUrl", "retrievedAt", "sha256", "bytes", "status"],
+  "allowed_status": ["quarantined", "verified"],
+  "forbidden_status_for_publish": ["blocked", "failed", "unverified"],
+  "path_rules": {
+    "reject_absolute": true,
+    "reject_parent_segments": true,
+    "reject_backslash": true,
+    "reject_symlink_targets": true
+  }
+}
