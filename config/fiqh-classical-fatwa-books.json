@@ -8,89 +8,19 @@
     "scholarSelection": "include-qualified-sunni-scholars with identifiable works and source provenance; never infer a ruling from inclusion alone"
   },
   "authors": [
-    {
-      "id": "ibn-taymiyyah",
-      "nameAr": "أحمد بن عبد الحليم ابن تيمية",
-      "works": [
-        {"titleAr":"مجموع الفتاوى","kind":"fatwa-collection","volumes":"37","status":"bibliographically-verified","source":"Dorar refs / Shamela"},
-        {"titleAr":"الفتاوى الكبرى","kind":"fatwa-collection","volumes":"6","status":"bibliographically-verified","source":"Shamela / bibliographic indexes"},
-        {"titleAr":"جامع الرسائل والمسائل","kind":"fatwa-and-epistles","status":"bibliographically-verified","source":"Dorar refs / bibliographic indexes"},
-        {"titleAr":"جامع المسائل","kind":"fatwa-and-research-collection","status":"bibliographically-verified","source":"published editions"},
-        {"titleAr":"مجموعة الرسائل والمسائل","kind":"epistles-and-fatwas","status":"bibliographically-verified","source":"Dorar refs / bibliographic indexes"},
-        {"titleAr":"المستدرك على مجموع الفتاوى","kind":"supplement","volumes":"5","status":"bibliographically-verified","source":"bibliographic indexes"}
-      ]
-    },
-    {
-      "id": "ibn-al-qayyim",
-      "nameAr": "محمد بن أبي بكر ابن قيم الجوزية",
-      "works": [
-        {"titleAr":"إعلام الموقعين عن رب العالمين","kind":"fiqh-fatwa-usul","volumes":"4","status":"bibliographically-verified","source":"Shamela"},
-        {"titleAr":"الطرق الحكمية في السياسة الشرعية","kind":"fiqh-judiciary-governance","status":"bibliographically-verified","source":"Islamic content / bibliographic sources"},
-        {"titleAr":"زاد المعاد في هدي خير العباد","kind":"fiqh-sirah-hadith","status":"bibliographically-verified","source":"bibliographic sources"},
-        {"titleAr":"بدائع الفوائد","kind":"fiqh-usul-benefits","status":"bibliographically-verified","source":"bibliographic sources"},
-        {"titleAr":"أحكام أهل الذمة","kind":"fiqh","status":"bibliographically-verified","source":"bibliographic sources"},
-        {"titleAr":"تحفة المودود بأحكام المولود","kind":"family-fiqh","status":"bibliographically-verified","source":"bibliographic sources"},
-        {"titleAr":"أعلام الموقعين - الفتاوى والأحكام المنقولة","kind":"fatwa-material","status":"catalogued-not-republished","source":"Shamela / Ibn al-Qayyim research index"}
-      ]
-    },
-    {
-      "id": "al-saadi",
-      "nameAr": "عبد الرحمن بن ناصر السعدي",
-      "roles": ["tafsir","fiqh","usul","fatwa","maqasid"],
-      "works": [
-        {"titleAr":"تيسير الكريم الرحمن في تفسير كلام المنان","kind":"tafsir-fiqh","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},
-        {"titleAr":"تيسير اللطيف المنان في خلاصة مقاصد القرآن","kind":"tafsir-education","status":"bibliographically-verified","source":"published editions"},
-        {"titleAr":"القواعد الحسان المتعلقة بتفسير القرآن","kind":"tafsir-usul","status":"bibliographically-verified","source":"published editions"},
-        {"titleAr":"الفتاوى السعدية","kind":"fatwa","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},
-        {"titleAr":"منظومة القواعد الفقهية","kind":"fiqh-maxims","status":"bibliographically-verified","source":"published editions"}
-      ]
-    },
-    {
-      "id": "abd-al-salam-al-shuwayir",
-      "nameAr": "عبد السلام بن محمد الشويعر",
-      "roles": ["fiqh","usul","comparative-fiqh","teaching"],
-      "works": [],
-      "status": "scholar-indexed-source-requires-work-level-verification"
-    },
-    {
-      "id": "ibn-abd-al-barr",
-      "nameAr": "يوسف بن عبد الله ابن عبد البر",
-      "roles": ["maliki-fiqh","hadith","comparative-fiqh","ijma"],
-      "works": [
-        {"titleAr":"الاستذكار","kind":"hadith-fiqh","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},
-        {"titleAr":"التمهيد","kind":"hadith-fiqh","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},
-        {"titleAr":"الكافي في فقه أهل المدينة","kind":"maliki-fiqh","status":"bibliographically-verified","source":"published editions"}
-      ]
-    },
-    {
-      "id": "al-khatib-al-baghdadi",
-      "nameAr": "أحمد بن علي الخطيب البغدادي",
-      "roles": ["hadith","usul","scholarly-method"],
-      "works": [
-        {"titleAr":"الفقيه والمتفقه","kind":"fiqh-usul-method","status":"bibliographically-verified","source":"published editions"}
-      ]
-    },
-    {
-      "id": "ibn-hazm",
-      "nameAr": "علي بن أحمد ابن حزم",
-      "roles": ["fiqh","usul","comparative-fiqh"],
-      "works": [
-        {"titleAr":"المحلى بالآثار","kind":"comparative-fiqh","status":"bibliographically-verified","source":"published editions"}
-      ]
-    },
-    {
-      "id": "ibn-ashur",
-      "nameAr": "محمد الطاهر ابن عاشور",
-      "roles": ["maliki-fiqh","usul","maqasid","tafsir"],
-      "works": [
-        {"titleAr":"مقاصد الشريعة الإسلامية","kind":"maqasid-usul","status":"bibliographically-verified","source":"published editions"},
-        {"titleAr":"التحرير والتنوير","kind":"tafsir","status":"bibliographically-verified","source":"published editions"}
-      ]
-    }
+    {"id":"ibn-taymiyyah","nameAr":"أحمد بن عبد الحليم ابن تيمية","sourceIds":["dorar-books-index","shamela-reference"],"works":[{"titleAr":"مجموع الفتاوى","kind":"fatwa-collection","volumes":"37","status":"bibliographically-verified","source":"Dorar refs / Shamela"},{"titleAr":"الفتاوى الكبرى","kind":"fatwa-collection","volumes":"6","status":"bibliographically-verified","source":"Shamela / bibliographic indexes"},{"titleAr":"جامع الرسائل والمسائل","kind":"fatwa-and-epistles","status":"bibliographically-verified","source":"Dorar refs / bibliographic indexes"},{"titleAr":"جامع المسائل","kind":"fatwa-and-research-collection","status":"bibliographically-verified","source":"published editions"},{"titleAr":"مجموعة الرسائل والمسائل","kind":"epistles-and-fatwas","status":"bibliographically-verified","source":"Dorar refs / bibliographic indexes"},{"titleAr":"المستدرك على مجموع الفتاوى","kind":"supplement","volumes":"5","status":"bibliographically-verified","source":"bibliographic indexes"}]},
+    {"id":"ibn-al-qayyim","nameAr":"محمد بن أبي بكر ابن قيم الجوزية","sourceIds":["dorar-books-index","shamela-reference","ibn-al-qayyim-reference"],"works":[{"titleAr":"إعلام الموقعين عن رب العالمين","kind":"fiqh-fatwa-usul","volumes":"4","status":"bibliographically-verified","source":"Shamela"},{"titleAr":"الطرق الحكمية في السياسة الشرعية","kind":"fiqh-judiciary-governance","status":"bibliographically-verified","source":"Islamic content / bibliographic sources"},{"titleAr":"زاد المعاد في هدي خير العباد","kind":"fiqh-sirah-hadith","status":"bibliographically-verified","source":"bibliographic sources"},{"titleAr":"بدائع الفوائد","kind":"fiqh-usul-benefits","status":"bibliographically-verified","source":"bibliographic sources"},{"titleAr":"أحكام أهل الذمة","kind":"fiqh","status":"bibliographically-verified","source":"bibliographic sources"},{"titleAr":"تحفة المودود بأحكام المولود","kind":"family-fiqh","status":"bibliographically-verified","source":"bibliographic sources"},{"titleAr":"أعلام الموقعين - الفتاوى والأحكام المنقولة","kind":"fatwa-material","status":"catalogued-not-republished","source":"Shamela / Ibn al-Qayyim research index"}]},
+    {"id":"al-saadi","nameAr":"عبد الرحمن بن ناصر السعدي","sourceIds":["dorar-books-index","published-bibliography"],"roles":["tafsir","fiqh","usul","fatwa","maqasid"],"works":[{"titleAr":"تيسير الكريم الرحمن في تفسير كلام المنان","kind":"tafsir-fiqh","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},{"titleAr":"تيسير اللطيف المنان في خلاصة مقاصد القرآن","kind":"tafsir-education","status":"bibliographically-verified","source":"published editions"},{"titleAr":"القواعد الحسان المتعلقة بتفسير القرآن","kind":"tafsir-usul","status":"bibliographically-verified","source":"published editions"},{"titleAr":"الفتاوى السعدية","kind":"fatwa","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},{"titleAr":"منظومة القواعد الفقهية","kind":"fiqh-maxims","status":"bibliographically-verified","source":"published editions"}]},
+    {"id":"abd-al-salam-al-shuwayir","nameAr":"عبد السلام بن محمد الشويعر","sourceIds":["dorar-books-index"],"roles":["fiqh","usul","comparative-fiqh","teaching"],"works":[],"status":"scholar-indexed-source-requires-work-level-verification"},
+    {"id":"ibn-abd-al-barr","nameAr":"يوسف بن عبد الله ابن عبد البر","sourceIds":["dorar-books-index","published-bibliography"],"roles":["maliki-fiqh","hadith","comparative-fiqh","ijma"],"works":[{"titleAr":"الاستذكار","kind":"hadith-fiqh","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},{"titleAr":"التمهيد","kind":"hadith-fiqh","status":"bibliographically-verified","source":"published editions / bibliographic indexes"},{"titleAr":"الكافي في فقه أهل المدينة","kind":"maliki-fiqh","status":"bibliographically-verified","source":"published editions"}]},
+    {"id":"al-khatib-al-baghdadi","nameAr":"أحمد بن علي الخطيب البغدادي","sourceIds":["dorar-books-index","published-bibliography"],"roles":["hadith","usul","scholarly-method"],"works":[{"titleAr":"الفقيه والمتفقه","kind":"fiqh-usul-method","status":"bibliographically-verified","source":"published editions"}]},
+    {"id":"ibn-hazm","nameAr":"علي بن أحمد ابن حزم","sourceIds":["dorar-books-index","published-bibliography"],"roles":["fiqh","usul","comparative-fiqh"],"works":[{"titleAr":"المحلى بالآثار","kind":"comparative-fiqh","status":"bibliographically-verified","source":"published editions"}]},
+    {"id":"ibn-ashur","nameAr":"محمد الطاهر ابن عاشور","sourceIds":["dorar-books-index","published-bibliography"],"roles":["maliki-fiqh","usul","maqasid","tafsir"],"works":[{"titleAr":"مقاصد الشريعة الإسلامية","kind":"maqasid-usul","status":"bibliographically-verified","source":"published editions"},{"titleAr":"التحرير والتنوير","kind":"tafsir","status":"bibliographically-verified","source":"published editions"}]}
   ],
   "sources": [
-    {"nameAr":"الدرر السنية - فهارس الكتب","url":"https://dorar.net/refs","role":"bibliographic-verification"},
-    {"nameAr":"المكتبة الشاملة","url":"https://shamela.ws/","role":"digital-book-reference"},
-    {"nameAr":"موقع الإمام ابن قيم الجوزية","url":"https://www.ibnalqayem.net/","role":"author-and-research-reference"}
+    {"id":"dorar-books-index","nameAr":"الدرر السنية - فهارس الكتب","url":"https://dorar.net/refs","role":"bibliographic-verification"},
+    {"id":"shamela-reference","nameAr":"المكتبة الشاملة","url":"https://shamela.ws/","role":"digital-book-reference"},
+    {"id":"ibn-al-qayyim-reference","nameAr":"موقع الإمام ابن قيم الجوزية","url":"https://www.ibnalqayem.net/","role":"author-and-research-reference"},
+    {"id":"published-bibliography","nameAr":"الطبعات المنشورة والفهارس الببليوغرافية","role":"bibliographic-record","rights":"source-dependent"}
   ]
 }
