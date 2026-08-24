@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Source-aware catalog for Quran tafsir, tadabbur, visual learning, and related collective scholarly works.",
+  "policy": {
+    "completenessGoal": "catalog_all_identifiable_works",
+    "ingestionRule": "No full-text ingestion unless source, edition, provenance, and redistribution rights are verified.",
+    "sourcePriority": ["official", "institutional", "licensed", "public-domain", "secondary_reference"],
+    "secondarySourcesAreDiscoveryOnly": true
+  },
+  "categories": [
+    {
+      "id": "tafsir",
+      "label": "التفاسير",
+      "description": "تفاسير القرآن وشروحه وكتب الاختصار والتيسير.",
+      "seedWorks": [
+        {"title":"جامع البيان عن تأويل آي القرآن","author":"محمد بن جرير الطبري","status":"reference_seed","sourceTier":"institutional"},
+        {"title":"تفسير القرآن العظيم","author":"إسماعيل بن عمر ابن كثير","status":"reference_seed","sourceTier":"institutional"},
+        {"title":"تيسير الكريم الرحمن في تفسير كلام المنان","author":"عبد الرحمن بن ناصر السعدي","status":"reference_seed","sourceTier":"institutional"},
+        {"title":"تفسير الجلالين","author":"جلال الدين المحلي وجلال الدين السيوطي","status":"reference_seed","sourceTier":"institutional"},
+        {"title":"تفسير البغوي","author":"الحسين بن مسعود البغوي","status":"reference_seed","sourceTier":"institutional"},
+        {"title":"تفسير القرطبي","author":"محمد بن أحمد القرطبي","status":"reference_seed","sourceTier":"institutional"},
+        {"title":"التفسير الميسر","author":"نخبة من العلماء","status":"reference_seed","sourceTier":"official_institutional","publisher":"مجمع الملك فهد لطباعة المصحف الشريف","edition":"الثانية، مزيدة ومنقحة، 1430هـ/2009م"},
+        {"title":"التفسير الوسيط للقرآن الكريم","author":"لجنة من العلماء بإشراف مجمع البحوث الإسلامية بالأزهر","status":"reference_seed","sourceTier":"institutional","publisher":"الهيئة العامة لشئون المطابع الأميرية","edition":"الطبعة الثالثة، 1413هـ/1992م"},
+        {"title":"المختصر في تفسير القرآن الكريم","author":"مجموعة من العلماء","status":"candidate","sourceTier":"official_institutional"},
+        {"title":"المنتخب في تفسير القرآن الكريم","author":"لجنة من العلماء في المجلس الأعلى للشؤون الإسلامية","status":"candidate","sourceTier":"institutional"},
+        {"title":"زبدة التفاسير","author":"فتح الله بن شكر الله الشريف الكاشاني","status":"candidate","sourceTier":"secondary_reference","notes":"Identity verified; provenance and methodological classification must be preserved before ingestion."}
+      ]
+    },
+    {
+      "id": "tadabbur",
+      "label": "التدبر والهدايات",
+      "description": "كتب ومشروعات التدبر والهدايات والوقفات التطبيقية المرتبطة بالآيات.",
+      "seedWorks": [
+        {"title":"القرآن تدبر وعمل","author":"مشروع القرآن تدبر وعمل","status":"candidate","sourceTier":"official_project","notes":"Copyright/redistribution status must be verified before full-text ingestion."},
+        {"title":"هدايات القرآن الكريم","author":"فريق من المتخصصين والباحثين - معالم التدبر","status":"candidate","sourceTier":"official_project","notes":"Project reports published hidayat; full-text rights require verification."},
+        {"title":"جعلناه نورا","author":"خالد أبو شادي","status":"candidate","sourceTier":"secondary_reference","notes":"Treat as a copyrighted work unless explicit redistribution permission is obtained."}
+      ]
+    },
+    {
+      "id": "visual-learning",
+      "label": "الخرائط والوسائل البصرية",
+      "description": "الخرائط الذهنية، خرائط السور، المحاور، الجداول والوسائل التي تبسط فهم المعاني.",
+      "seedWorks": [
+        {"title":"خرائط ذهنية للقرآن الكريم","status":"discovery_target","sourceTier":"secondary_reference"},
+        {"title":"خرائط القرآن / تحفيز الأذهان","status":"discovery_target","sourceTier":"secondary_reference"},
+        {"title":"زوايا وخرائط سور القرآن","status":"discovery_target","sourceTier":"secondary_reference"}
+      ]
+    },
+    {
+      "id": "collective-fiqh",
+      "label": "الفقه والعلوم الشرعية - أعمال جماعية",
+      "description": "كتب أعدتها لجان أو نخبة من العلماء، تُفهرس مستقلة عن التفاسير والتدبر.",
+      "seedWorks": [
+        {"title":"الفقه الميسر في ضوء الكتاب والسنة","author":"نخبة من العلماء","status":"reference_seed","sourceTier":"official_institutional","publisher":"مجمع الملك فهد لطباعة المصحف الشريف","edition":"1424هـ","notes":"Collective fiqh work; do not confuse with similarly titled single-author works."}
+      ]
+    }
+  ],
+  "sourceRegistry": [
+    {"id":"ksu-quran-tafsir","name":"جامعة الملك سعود - القرآن الكريم","role":"tafsir_reference","tier":"institutional","url":"https://quran.ksu.edu.sa/"},
+    {"id":"quranenc","name":"موسوعة القرآن الكريم","role":"translations_and_tafsir_reference","tier":"institutional","url":"https://quranenc.com/"},
+    {"id":"tafsir-center-mokhtasr","name":"مركز تفسير للدراسات القرآنية","role":"official_work_source","tier":"official_institutional","url":"https://mtafsir.com/ar"},
+    {"id":"tadabbur-project","name":"القرآن تدبر وعمل","role":"tadabbur_project","tier":"official_project","url":"https://altadabbur.com/"},
+    {"id":"hdaiat-project","name":"هدايات القرآن الكريم","role":"hidayat_project","tier":"official_project","url":"https://hdaiat.com/about_project"},
+    {"id":"king-fahd-complex","name":"مجمع الملك فهد لطباعة المصحف الشريف","role":"official_quran_and_collective_works_source","tier":"official_institutional","url":"https://qurancomplex.gov.sa/"},
+    {"id":"azhar-research-complex","name":"مجمع البحوث الإسلامية بالأزهر","role":"collective_tafsir_source","tier":"institutional","url":"https://www.azhar.eg/"},
+    {"id":"waqfeya","name":"المكتبة الوقفية","role":"discovery_and_scan_reference","tier":"secondary_reference","url":"https://waqfeya.net/"}
+  ]
+}
