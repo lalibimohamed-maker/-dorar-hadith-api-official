@@ -10,13 +10,15 @@ test("Quran reading supports synchronized ayah and word highlighting", () => {
   assert.equal(c.reading.recitation.currentWordHighlight, true);
 });
 
-test("Quran supports a rights-aware reciter registry", () => {
+test("Quran reciter selection fails closed until a verified registry entry exists", () => {
   const recitation = getQuranExperienceConfig().reading.recitation;
   const registry = getReciterRegistry();
-  assert.equal(recitation.reciterSelection, true);
-  assert.equal(recitation.defaultReciter, "saad-al-ghamdi");
-  assert.equal(registry.selection, true);
-  assert.equal(registry.registryMode, "dynamic");
+  assert.equal(recitation.reciterSelection, false);
+  assert.equal(recitation.defaultReciter, null);
+  assert.deepEqual(recitation.allowedReciters, []);
+  assert.equal(recitation.selectionRequiresVerifiedRegistryEntry, true);
+  assert.equal(registry.selection, false);
+  assert.equal(registry.default, null);
   assert.deepEqual(registry.entries, []);
 });
 
