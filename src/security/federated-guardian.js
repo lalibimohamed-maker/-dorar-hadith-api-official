@@ -1,9 +1,11 @@
 /**
  * Federated Guardian
  *
- * Deterministic policy for coordinating a primary repository with a future
- * peer repository/account. This module never grants GitHub permissions and
- * never performs destructive remediation. It only produces an auditable plan.
+ * Deterministic policy for two owner-controlled GitHub identities working as
+ * complementary defensive members of one system. The identities cooperate
+ * for monitoring/evidence/recovery, but neither identity is a universal
+ * recovery key for the other. This module never grants GitHub permissions
+ * and never performs destructive remediation; it only produces an auditable plan.
  */
 
 const MODES = Object.freeze(['observe', 'quarantine', 'restore', 'rebuild']);
@@ -19,7 +21,20 @@ const ENGINES = Object.freeze([
 
 const PEER_ROLES = Object.freeze(['read-replica', 'evidence-replica', 'recovery-source']);
 
+// Both identities are owner-controlled. Keep permissions asymmetric and
+// least-privilege even though the accounts belong to the same owner.
+const OWNER_IDENTITIES = Object.freeze([
+  'lalibimohamed-maker',
+  'lalibimohamed82-coder'
+]);
+
 export function validatePeer(peer = {}) {
+  if (!peer.account || typeof peer.account !== 'string') {
+    return { valid: false, reason: 'peer account is required' };
+  }
+  if (!OWNER_IDENTITIES.includes(peer.account)) {
+    return { valid: false, reason: 'peer account is not an approved owner-controlled identity' };
+  }
   if (!peer.repository || typeof peer.repository !== 'string') {
     return { valid: false, reason: 'peer repository is required' };
   }
@@ -29,7 +44,15 @@ export function validatePeer(peer = {}) {
   if (peer.writeAccess === true) {
     return { valid: false, reason: 'peer write access is forbidden by default' };
   }
-  return { valid: true, repository: peer.repository, role: peer.role };
+  if (peer.canChangeSecurityPolicy === true || peer.canDeleteRecoveryData === true) {
+    return { valid: false, reason: 'peer cannot independently disable security or destroy recovery data' };
+  }
+  return {
+    valid: true,
+    account: peer.account,
+    repository: peer.repository,
+    role: peer.role,
+  };
 }
 
 export function assessSecuritySignal(signal = {}) {
@@ -78,8 +101,10 @@ export function createRecoveryPlan({ signal = {}, peer = {}, checkpointAvailable
     destructiveAutomation: false,
     auditRequired: true,
     provenanceRequired: true,
+    mutualMonitoring: true,
+    independentRecoveryEvidence: true,
     engines: ENGINES,
   };
 }
 
-export { MODES, ENGINES, PEER_ROLES };
+export { MODES, ENGINES, PEER_ROLES, OWNER_IDENTITIES };
