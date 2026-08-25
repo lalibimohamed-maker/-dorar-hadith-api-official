@@ -1,0 +1,262 @@
+name: Free Antivirus Analysis Mesh
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: antivirus-analysis-mesh-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clamav:
+    name: ClamAV malware scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install ClamAV
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clamav
+
+      - name: Stop package updater before manual signature refresh
+        run: sudo systemctl stop clamav-freshclam.service || true
+
+      - name: Refresh official ClamAV signatures
+        run: sudo freshclam --stdout
+
+      - name: Scan repository
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/security/clamav
+          clamscan --recursive --infected \
+            --exclude-dir='^./.git$' \
+            --exclude-dir='^./node_modules$' \
+            --exclude-dir='^./artifacts$' \
+            --exclude-dir='^./security-rules$' \
+            . | tee artifacts/security/clamav/scan.txt
+
+      - name: Preserve ClamAV evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: security-clamav-${{ github.run_id }}
+          path: artifacts/security/clamav
+          if-no-files-found: error
+          retention-days: 14
+
+  yara:
+    name: YARA Forge Core malware-pattern scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install YARA, archive tools and rsync
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends yara unzip rsync
+          mkdir -p security-rules artifacts/security/yara
+
+      - name: Download curated YARA Forge Core rules
+        run: |
+          curl --fail --location --retry 4 --retry-delay 3 \
+            -o security-rules/yara-forge-rules-core.zip \
+            https://github.com/YARAHQ/yara-forge/releases/download/20260726/yara-forge-rules-core.zip
+          unzip -q security-rules/yara-forge-rules-core.zip -d security-rules
+          test -s security-rules/packages/core/yara-rules-core.yar
+          sha256sum security-rules/yara-forge-rules-core.zip | tee artifacts/security/yara/rules.sha256
+
+      - name: Prepare scan tree
+        run: |
+          rm -rf scan-root
+          mkdir -p scan-root
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='node_modules/' \
+            --exclude='artifacts/' \
+            --exclude='security-rules/' \
+            ./ scan-root/
+
+      - name: Run YARA Forge Core scan
+        shell: bash
+        run: |
+          set +e
+          yara -w -r \
+            security-rules/packages/core/yara-rules-core.yar \
+            scan-root/ \
+            > artifacts/security/yara/detections.txt \
+            2> artifacts/security/yara/errors.txt
+          rc=$?
+          cat artifacts/security/yara/detections.txt
+          cat artifacts/security/yara/errors.txt >&2
+          if [ "$rc" -gt 1 ]; then
+            echo "YARA execution failed with exit code $rc"
+            exit "$rc"
+          fi
+          if [ -s artifacts/security/yara/detections.txt ]; then
+            echo "YARA detected one or more matching rules. Review the evidence artifact; source content is not modified automatically."
+            exit 1
+          fi
+          echo "YARA completed without detections. YARA exit code: $rc"
+
+      - name: Preserve YARA evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: security-yara-${{ github.run_id }}
+          path: artifacts/security/yara
+          if-no-files-found: error
+          retention-days: 14
+
+  trivy:
+    name: Trivy repository security scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Run Trivy repository shield
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          version: v0.72.0
+          scan-type: repo
+          scan-ref: .
+          scanners: vuln,misconfig,secret,license
+          severity: HIGH,CRITICAL
+          ignore-unfixed: false
+          exit-code: 1
+          format: sarif
+          output: artifacts-security-trivy.sarif
+
+      - name: Preserve Trivy evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: security-trivy-${{ github.run_id }}
+          path: artifacts-security-trivy.sarif
+          if-no-files-found: warn
+          retention-days: 14
+
+  gitleaks:
+    name: Gitleaks secret-history scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install pinned Gitleaks
+        run: |
+          mkdir -p artifacts/security/gitleaks
+          curl --fail --location --retry 4 --retry-delay 3 \
+            -o gitleaks.tar.gz \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks.tar.gz' | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          sudo install -m 0755 gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Scan full Git history
+        run: |
+          gitleaks git --redact --report-format sarif --report-path artifacts/security/gitleaks/gitleaks.sarif .
+
+      - name: Preserve Gitleaks evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: security-gitleaks-${{ github.run_id }}
+          path: artifacts/security/gitleaks
+          if-no-files-found: error
+          retention-days: 14
+
+  npm-audit:
+    name: npm dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: 22
+
+      - name: Install dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts --no-fund
+
+      - name: Audit dependency tree and retain evidence
+        shell: bash
+        run: |
+          mkdir -p artifacts/security/npm-audit
+          set +e
+          npm audit --json > artifacts/security/npm-audit/report.json
+          rc=$?
+          cat artifacts/security/npm-audit/report.json
+          exit "$rc"
+
+      - name: Preserve npm audit evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: security-npm-audit-${{ github.run_id }}
+          path: artifacts/security/npm-audit
+          if-no-files-found: error
+          retention-days: 14
+
+  summary:
+    name: Security analysis summary
+    needs: [clamav, yara, trivy, gitleaks, npm-audit]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail closed when any scanner fails
+        shell: bash
+        run: |
+          echo "ClamAV: ${{ needs.clamav.result }}"
+          echo "YARA: ${{ needs.yara.result }}"
+          echo "Trivy: ${{ needs.trivy.result }}"
+          echo "Gitleaks: ${{ needs.gitleaks.result }}"
+          echo "npm audit: ${{ needs.npm-audit.result }}"
+          for result in \
+            "${{ needs.clamav.result }}" \
+            "${{ needs.yara.result }}" \
+            "${{ needs.gitleaks.result }}" \
+            "${{ needs.npm-audit.result }}"; do
+            if [ "$result" != "success" ]; then
+              exit 1
+            fi
+          done
+          echo "Trivy: ${{ needs.trivy.result }}"
+          if [ "${{ needs.trivy.result }}" != "success" ]; then
+            exit 1
+          fi
