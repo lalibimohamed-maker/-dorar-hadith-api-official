@@ -1,6 +1,8 @@
 name: Supply Chain Attestation
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
     tags: ['v*']
@@ -50,7 +52,7 @@ jobs:
         run: |
           cosign verify-blob source.tar \
             --bundle source.tar.sigstore.json \
-            --certificate-identity-regexp='^https://github\.com/lalibimohamed-maker/-dorar-hadith-api-official/\.github/workflows/supply-chain-attestation\.yml@refs/(heads/main|tags/v.*)$' \
+            --certificate-identity-regexp='^https://github\.com/lalibimohamed-maker/-dorar-hadith-api-official/\.github/workflows/supply-chain-attestation\.yml@refs/(heads/main|heads/[^/]+|tags/v.*)$' \
             --certificate-oidc-issuer=https://token.actions.githubusercontent.com
       - name: Create GitHub artifact attestation
         uses: actions/attest-build-provenance@977bb373ede497ca404e3987e11acfb6ea52e6c0 # v3.1.0
