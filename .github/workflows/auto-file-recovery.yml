@@ -55,7 +55,8 @@ jobs:
             exit 0
           fi
 
-          git checkout "${files[@]}" -- main
+          # Capture the last known-good workflow file from protected main.
+          git checkout main -- "${files[@]}"
           APPLY_RECOVERY=1 node scripts/recovery-engine.mjs "${files[@]}"
 
           changed=false
