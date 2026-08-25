@@ -23,7 +23,7 @@ Keep the primary account (`lalibimohamed-maker`) and secondary account (`lalibim
 3. The account that authored/pushed the latest change cannot satisfy the independent-review requirement for that same change.
 4. The other account reviews the exact current diff.
 5. A changed diff invalidates the old approval where GitHub's stale-review policy applies; the current state must be re-reviewed.
-6. Protected `main` remains the only promotion path.
+6. protected `main` remains the only promotion path.
 7. Auto-merge may complete only after the configured checks and review requirements are satisfied.
 
 ## Scope separation
