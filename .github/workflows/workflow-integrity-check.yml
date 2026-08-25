@@ -1,0 +1,35 @@
+name: Workflow Integrity Check
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'config/auto-recovery-policy-2026.json'
+      - 'scripts/recovery-engine.mjs'
+      - 'test/recovery-engine.test.js'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'config/auto-recovery-policy-2026.json'
+      - 'scripts/recovery-engine.mjs'
+      - 'test/recovery-engine.test.js'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Validate YAML syntax
+        run: |
+          ruby -e 'require "yaml"; Dir[".github/workflows/*.{yml,yaml}"].sort.each { |f| YAML.load_file(f, aliases: true); puts "YAML OK: #{f}" }'
+      - name: Validate recovery engine syntax
+        run: node --check scripts/recovery-engine.mjs
+      - name: Test recovery engine
+        run: node --test test/recovery-engine.test.js
