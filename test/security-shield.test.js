@@ -6,7 +6,8 @@ import {
   authorize,
   createAuditEvent,
   detectAnomalies,
-  lockdownStatus
+  lockdownStatus,
+  verifyAuditChain
 } from "../src/security/security-shield.js";
 
 test("lockdown mode denies high-impact capabilities but preserves read", () => {
@@ -24,6 +25,18 @@ test("audit events form a hash-linked chain", () => {
   assert.equal(first.previousHash, "GENESIS");
   assert.equal(second.previousHash, first.hash);
   assert.notEqual(second.hash, first.hash);
+});
+
+test("audit chain verification detects tampering and broken links", () => {
+  const first = createAuditEvent({ actor: "agent:test", action: "analyze", target: "source:1", result: "success", timestamp: "2026-08-25T00:00:00.000Z" });
+  const second = createAuditEvent({ actor: "agent:test", action: "propose", target: "corpus:1", result: "success", timestamp: "2026-08-25T00:00:01.000Z", previousHash: first.hash });
+  assert.equal(verifyAuditChain([first, second]).valid, true);
+
+  const tampered = [{ ...first }, { ...second, target: "corpus:tampered" }];
+  assert.deepEqual(verifyAuditChain(tampered), { valid: false, reason: "hash_mismatch", index: 1 });
+
+  const broken = [{ ...first }, { ...second, previousHash: "wrong-link" }];
+  assert.deepEqual(verifyAuditChain(broken), { valid: false, reason: "broken_link", index: 1 });
 });
 
 test("anomaly detector catches burst of sensitive denials", () => {
