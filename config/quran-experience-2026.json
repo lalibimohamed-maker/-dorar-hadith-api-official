@@ -1,5 +1,5 @@
 {
-  "version":"2026.08.23.2",
+  "version":"2026.08.25.1",
   "reading":{
     "arabicText":"verified_uthmani_source",
     "recitation":{
@@ -7,10 +7,12 @@
       "wordSync":true,
       "currentAyahHighlight":true,
       "currentWordHighlight":true,
-      "reciterSelection":true,
-      "defaultReciter":"saad-al-ghamdi",
-      "allowedReciters":"all-reciter-registry-entries-with-verified-audio-rights",
+      "reciterSelection":false,
+      "defaultReciter":null,
+      "allowedReciters":[],
+      "allowedRecitersPolicy":"all-reciter-registry-entries-with-verified-audio-rights",
       "reciterRegistry":"data/reciters.json",
+      "selectionRequiresVerifiedRegistryEntry":true,
       "repeatAyah":true,
       "repeatRange":true,
       "speedControl":true,
@@ -67,7 +69,7 @@
     "levels":["letters","vowels","tanween","madd","leen","sukun","shaddah","tajweed_applications"],
     "mode":"interactive_step_by_step"
   },
-  "ruqyah":{"enabled":true,"sourcePolicy":"Quran_and_verified_sunnah","reciterSelection":true,"playlist":true,"sourceAndGradeRequired":true},
+  "ruqyah":{"enabled":true,"sourcePolicy":"Quran_and_verified_sunnah","reciterSelection":false,"playlist":false,"sourceAndGradeRequired":true},
   "prayerTimes":{"location":"device_or_user_selected_city","calendar":"umm_al_qura_for_hijri_reference","time":"local_device_timezone","calculation":"configurable_and_explicit"},
   "adhan":{"enabled":true,"notifications":true,"soundSelection":true,"volumeAndVibration":true,"perPrayerSettings":true},
   "qibla":{"enabled":true,"target":"Kaaba_coordinates","calculation":"great_circle_bearing","sensorCalibration":true,"accuracyWarning":true},

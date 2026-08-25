@@ -43,17 +43,18 @@
   "audio": {
     "reciters":true,
     "reciterSelection":false,
-    "defaultReciter":"saad-al-ghamdi",
-    "allowedReciters":["saad-al-ghamdi"],
+    "defaultReciter":null,
+    "allowedReciters":[],
     "surahDownload":true,
     "fullQuranDownload":true,
     "ayahRangeDownload":true,
     "offlineCache":true,
     "wordSyncRequiresTimestamps":true,
-    "redistributionRequiresPermission":true
+    "redistributionRequiresPermission":true,
+    "selectionRequiresVerifiedRegistryEntry":true
   },
   "fiqh": {"fourMadhhabs":true,"compareViews":true,"sourceAttribution":true,"notAnAutomatedMufti":true,"longPressExplanation":true},
-  "seerah": {"timeline":true,"eventToAyahLinks":true,"ayahToEventLinks":true,"sourceAndReliabilityLabels":true,"longPressExplanation":true},
+  "seerah": {"timeline":true,"eventToAyahLinks":true,"ayahToEventLinks":true,"sourceAndReliabilityLabels":true,"longPressExplanation":true,"catalog":"data/seerah-catalog-2026.json","eventPopulationRequiresEvidence":true},
   "i18n": {
     "autoDetectDeviceLanguage":true,
     "detectQueryLanguage":true,
@@ -63,6 +64,8 @@
     "rtlLtrAuto":true,
     "launchLocaleCount":20,
     "allowFutureExpansion":true,
-    "languages":["ar","en","zh","ko","bn","pl","fr","es","it","de","ru","ja","hi","fi","ber","tr","id","ms","ur","fa"]
+    "languages":["ar","en","zh","ko","bn","pl","fr","es","it","de","ru","ja","hi","fi","ber","tr","id","ms","ur","fa"],
+    "scholarlyTranslationOutput":"disabled",
+    "translationRegistry":"config/translation-sources-2026.json"
   }
 }

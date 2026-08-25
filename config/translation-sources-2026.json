@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Rights-aware registry for verified Quran translation and meaning resources.",
+  "policy": {
+    "canonicalArabicRemainsDistinct": true,
+    "machineTranslationNeverAuthoritative": true,
+    "translationRightsRequired": true,
+    "preservePublisherVersion": true,
+    "preserveTranslatorAttribution": true,
+    "sourceTermsMustBeRetained": true
+  },
+  "sources": [
+    {
+      "id": "quranenc",
+      "name": "موسوعة القرآن الكريم - QuranEnc",
+      "url": "https://quranenc.com/",
+      "role": "translation_and_tafsir_reference",
+      "status": "verified_external_source",
+      "rightsModel": "conditional_republication",
+      "rightsEvidence": "https://quranenc.com/ar/home/about",
+      "conditions": [
+        "no_modification_addition_or_deletion",
+        "clear_publisher_and_source_attribution",
+        "include_version_number",
+        "retain_transcript_information",
+        "notify_source_of_translation_notes",
+        "update_to_latest_source_version",
+        "no_inappropriate_advertising"
+      ],
+      "notes": "Use source-versioned records; do not merge distinct translations into one canonical text."
+    }
+  ],
+  "translationRecordRequired": [
+    "translationId",
+    "language",
+    "publisherOrTranslator",
+    "sourceId",
+    "sourceVersion",
+    "rightsState",
+    "verificationState",
+    "canonicalTextRelation",
+    "lastCheckedAt"
+  ],
+  "statusVocabulary": ["verified_republishable", "official_view_only", "link_only", "rights_unclear", "restricted", "needs_review"],
+  "nextStep": "Populate individual translations from source APIs/pages only after preserving attribution, version and rights evidence."
+}
