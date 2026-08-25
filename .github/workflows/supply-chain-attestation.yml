@@ -19,19 +19,42 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
 
-      - name: Generate SPDX SBOM
+      - name: Build source bundle and SPDX file inventory
+        shell: bash
         run: |
           set -euo pipefail
-          tar --exclude=.git --exclude=sbom.spdx.json --exclude=source-bundle.tar.gz -czf source-bundle.tar.gz .
+          git ls-files -z -- ':!.git' | python3 - <<'PY'
+          import hashlib, json, os, sys
+          paths = [p.decode() for p in sys.stdin.buffer.read().split(b'\0') if p]
+          files = []
+          for path in paths:
+              data = open(path, 'rb').read()
+              files.append({
+                  "SPDXID": "SPDXRef-File-" + hashlib.sha1(path.encode()).hexdigest(),
+                  "fileName": "./" + path,
+                  "checksums": [{"algorithm": "SHA256", "checksumValue": hashlib.sha256(data).hexdigest()}]
+              })
+          doc = {
+              "spdxVersion": "SPDX-2.3",
+              "SPDXID": "SPDXRef-DOCUMENT",
+              "name": "dorar-hadith-api-official-source",
+              "dataLicense": "CC0-1.0",
+              "documentNamespace": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/spdx/source",
+              "files": files
+          }
+          json.dump(doc, open('sbom.spdx.json', 'w'), indent=2)
+          PY
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner --exclude=.git --exclude=source-bundle.tar.gz -cf source-bundle.tar .
+          gzip -n -f source-bundle.tar
+          mv source-bundle.tar.gz source-bundle.tar.gz
           sha256sum source-bundle.tar.gz | tee source-bundle.sha256
-          printf '{"SPDXID":"SPDXRef-Document","spdxVersion":"SPDX-2.3","name":"dorar-hadith-api-official-source","dataLicense":"CC0-1.0","files":[]}' > sbom.spdx.json
 
       - name: Upload validation evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: supply-chain-validation-${{ github.event.pull_request.number }}
           path: |
@@ -50,44 +73,62 @@ jobs:
       attestations: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3.8.1
+        uses: sigstore/cosign-installer@d7d6bc7722e3daa8354c50bcb52f4837da5e9b6a # v3.8.1
 
-      - name: Build deterministic source bundle
+      - name: Build deterministic source bundle and SPDX file inventory
+        shell: bash
         run: |
           set -euo pipefail
-          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner --exclude=.git --exclude=sbom.spdx.json --exclude=source-bundle.tar.gz -czf source-bundle.tar.gz .
+          git ls-files -z -- ':!.git' | python3 - <<'PY'
+          import hashlib, json, sys
+          paths = [p.decode() for p in sys.stdin.buffer.read().split(b'\0') if p]
+          files = []
+          for path in paths:
+              data = open(path, 'rb').read()
+              files.append({
+                  "SPDXID": "SPDXRef-File-" + hashlib.sha1(path.encode()).hexdigest(),
+                  "fileName": "./" + path,
+                  "checksums": [{"algorithm": "SHA256", "checksumValue": hashlib.sha256(data).hexdigest()}]
+              })
+          json.dump({
+              "spdxVersion": "SPDX-2.3",
+              "SPDXID": "SPDXRef-DOCUMENT",
+              "name": "dorar-hadith-api-official-source",
+              "dataLicense": "CC0-1.0",
+              "documentNamespace": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/spdx/source",
+              "files": files
+          }, open('sbom.spdx.json', 'w'), indent=2)
+          PY
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner --exclude=.git --exclude=source-bundle.tar.gz -cf source-bundle.tar .
+          gzip -n -f source-bundle.tar
+          mv source-bundle.tar.gz source-bundle.tar.gz
           sha256sum source-bundle.tar.gz | tee source-bundle.sha256
-          printf '{"SPDXID":"SPDXRef-Dokument","spdxVersion":"SPDX-2.3","name":"dorar-hadith-api-official-source","dataLicense":"CC0-1.0","files":[]}' > sbom.spdx.json
 
       - name: Sign source bundle with keyless Sigstore
         run: |
           set -euo pipefail
-          cosign sign-blob source-bundle.tar.gz \
-            --yes \
-            --bundle source-bundle.sigstore.json
+          cosign sign-blob source-bundle.tar.gz --yes --bundle source-bundle.sigstore.json
 
       - name: Verify Sigstore signature
-        env:
-          COSIGN_CERT_IDENTITY: https://github.com/${{ github.repository }}/.github/workflows/supply-chain-attestation.yml@refs/heads/${{ github.ref_name }}
         run: |
           set -euo pipefail
           cosign verify-blob source-bundle.tar.gz \
             --bundle source-bundle.sigstore.json \
-            --certificate-identity-regexp "^https://github\\.com/${GITHUB_REPOSITORY}/\.github/workflows/supply-chain-attestation\.yml@refs/(heads|tags)/" \
+            --certificate-identity-regexp "^https://github\\.com/${GITHUB_REPOSITORY}/\.github/workflows/supply-chain-attestation\.yml@refs/(heads/main|tags/v[^/]+)$" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
 
       - name: Generate GitHub artifact attestation
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
         with:
           subject-path: source-bundle.tar.gz
 
       - name: Upload supply-chain evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: supply-chain-attestation-${{ github.ref_name }}
           path: |
