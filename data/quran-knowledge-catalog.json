@@ -5,7 +5,8 @@
     "completenessGoal": "catalog_all_identifiable_works",
     "ingestionRule": "No full-text ingestion unless source, edition, provenance, and redistribution rights are verified.",
     "sourcePriority": ["official", "institutional", "licensed", "public-domain", "secondary_reference"],
-    "secondarySourcesAreDiscoveryOnly": true
+    "secondarySourcesAreDiscoveryOnly": true,
+    "catalogEntryDoesNotImplyFullTextPresence": true
   },
   "categories": [
     {
@@ -19,6 +20,17 @@
         {"title":"تفسير الجلالين","author":"جلال الدين المحلي وجلال الدين السيوطي","status":"reference_seed","sourceTier":"institutional"},
         {"title":"تفسير البغوي","author":"الحسين بن مسعود البغوي","status":"reference_seed","sourceTier":"institutional"},
         {"title":"تفسير القرطبي","author":"محمد بن أحمد القرطبي","status":"reference_seed","sourceTier":"institutional"},
+        {"title":"المحرر الوجيز في تفسير الكتاب العزيز","author":"عبد الحق بن غالب ابن عطية","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"مفاتيح الغيب","author":"محمد بن عمر الرازي","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"الكشاف عن حقائق غوامض التنزيل","author":"محمود بن عمر الزمخشري","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"البحر المحيط","author":"محمد بن يوسف أبو حيان الأندلسي","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"الدر المنثور في التفسير بالمأثور","author":"عبد الرحمن بن أبي بكر السيوطي","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"نظم الدرر في تناسب الآيات والسور","author":"إبراهيم بن عمر البقاعي","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"فتح القدير","author":"محمد بن علي الشوكاني","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"التحرير والتنوير","author":"محمد الطاهر بن عاشور","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"أضواء البيان في إيضاح القرآن بالقرآن","author":"محمد الأمين الشنقيطي","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"تفسير النسفي","author":"عبد الله بن أحمد النسفي","status":"candidate","sourceTier":"secondary_reference"},
+        {"title":"تفسير أبي السعود","author":"محمد بن محمد أبو السعود","status":"candidate","sourceTier":"secondary_reference"},
         {"title":"التفسير الميسر","author":"نخبة من العلماء","status":"reference_seed","sourceTier":"official_institutional","publisher":"مجمع الملك فهد لطباعة المصحف الشريف","edition":"الثانية، مزيدة ومنقحة، 1430هـ/2009م"},
         {"title":"التفسير الوسيط للقرآن الكريم","author":"لجنة من العلماء بإشراف مجمع البحوث الإسلامية بالأزهر","status":"reference_seed","sourceTier":"institutional","publisher":"الهيئة العامة لشئون المطابع الأميرية","edition":"الطبعة الثالثة، 1413هـ/1992م"},
         {"title":"المختصر في تفسير القرآن الكريم","author":"مجموعة من العلماء","status":"candidate","sourceTier":"official_institutional"},
