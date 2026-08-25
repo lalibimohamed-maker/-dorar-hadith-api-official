@@ -1,3 +1,5 @@
+import { authorize, CAPABILITY } from "../security/security-shield.js";
+
 const ALLOWED_ACTIONS = new Set([
   "read", "discover", "transform", "write", "publish", "export"
 ]);
@@ -8,6 +10,15 @@ const DEFAULT_POLICY = Object.freeze({
   requireValidationForWrite: true,
   allowSearchAsEvidence: false,
   failClosed: true
+});
+
+const ACTION_CAPABILITY = Object.freeze({
+  read: CAPABILITY.READ,
+  discover: CAPABILITY.ANALYZE,
+  transform: CAPABILITY.ANALYZE,
+  write: CAPABILITY.CORPUS_WRITE,
+  publish: CAPABILITY.MERGE,
+  export: CAPABILITY.PROPOSE
 });
 
 export class GovernanceBlockedError extends Error {
@@ -26,6 +37,13 @@ export function validateOperation(operation, policy = DEFAULT_POLICY) {
   const action = operation.action;
   if (!ALLOWED_ACTIONS.has(action)) {
     throw new GovernanceBlockedError("ACTION_NOT_ALLOWED", `Unsupported action: ${action}`);
+  }
+
+  const capability = ACTION_CAPABILITY[action];
+  const capabilities = Array.isArray(operation.capabilities) ? operation.capabilities : [];
+  const authorization = authorize({ capabilities, requested: capability });
+  if (!authorization.allowed) {
+    throw new GovernanceBlockedError("SECURITY_CAPABILITY_DENIED", authorization.reason);
   }
 
   if (policy.requireProvenance && !operation.provenance) {
@@ -48,14 +66,14 @@ export function validateOperation(operation, policy = DEFAULT_POLICY) {
     throw new GovernanceBlockedError("SEARCH_NOT_EVIDENCE", "Search results are discovery only; verify the original source");
   }
 
-  return Object.freeze({ ok: true, action, policy: { ...policy } });
+  return Object.freeze({ ok: true, action, capability, authorization, policy: { ...policy } });
 }
 
 export function planOperation(operation, policy = DEFAULT_POLICY) {
   const gate = validateOperation(operation, policy);
   return Object.freeze({
     status: "approved-for-execution",
-    gates: ["provenance", "validation", ...(operation.action === "publish" || operation.action === "export" ? ["rights"] : [])],
+    gates: ["security-capability", "provenance", "validation", ...(operation.action === "publish" || operation.action === "export" ? ["rights"] : [])],
     ...gate
   });
 }

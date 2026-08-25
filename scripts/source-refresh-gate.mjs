@@ -1,5 +1,17 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
+import { authorize, CAPABILITY } from "../src/security/security-shield.js";
+
+const actor = process.env.SECURITY_ACTOR || "source-refresh";
+const capabilities = String(process.env.SECURITY_CAPABILITIES || "")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
+const security = authorize({ capabilities, requested: CAPABILITY.SOURCE_REFRESH });
+if (!security.allowed) {
+  console.error(`Source refresh denied by Security Shield: ${security.reason}`);
+  process.exit(2);
+}
 
 const files=["config/source-registry.json","config/official-islamic-sources-2026.json"];
 const sources=new Map();
@@ -40,14 +52,14 @@ for(const [id,s] of sources){
         if(bytes>2*1024*1024){await reader.cancel(); throw new Error("response too large");}
         hash.update(part.value);
       }
-      results.push({id,url:s.url,status:"verified",finalUrl:u.toString(),bytes,sha256:hash.digest("hex"),checkedAt:new Date().toISOString()});
+      results.push({id,url:s.url,status:"verified",finalUrl:u.toString(),bytes,sha256:hash.digest("hex"),checkedAt:new Date().toISOString(),actor});
       ok=true; break;
     }
     if(!ok) throw new Error("redirect limit exceeded");
   }catch(e){
-    results.push({id,url:s.url,status:"blocked",error:e.message,checkedAt:new Date().toISOString()});
+    results.push({id,url:s.url,status:"blocked",error:e.message,checkedAt:new Date().toISOString(),actor});
   }
 }
 fs.mkdirSync("artifacts/source-refresh",{recursive:true});
-fs.writeFileSync("artifacts/source-refresh/manifest.json",JSON.stringify({schemaVersion:1,mode:"verification-only",sources:results},null,2)+"\n");
+fs.writeFileSync("artifacts/source-refresh/manifest.json",JSON.stringify({schemaVersion:1,mode:"verification-only",security:{actor,capabilities:[CAPABILITY.SOURCE_REFRESH]},sources:results},null,2)+"\n");
 if(results.some(x=>x.status!=="verified")) process.exit(1);
