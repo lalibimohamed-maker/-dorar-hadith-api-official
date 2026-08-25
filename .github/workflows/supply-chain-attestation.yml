@@ -27,9 +27,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git ls-files -z -- ':!.git' | python3 - <<'PY'
-          import hashlib, json, os, sys
-          paths = [p.decode() for p in sys.stdin.buffer.read().split(b'\0') if p]
+          python3 - <<'PY'
+          import hashlib, json, subprocess
+          paths = [p.decode() for p in subprocess.check_output(['git', 'ls-files', '-z']).split(b'\0') if p]
           files = []
           for path in paths:
               data = open(path, 'rb').read()
@@ -38,19 +38,17 @@ jobs:
                   "fileName": "./" + path,
                   "checksums": [{"algorithm": "SHA256", "checksumValue": hashlib.sha256(data).hexdigest()}]
               })
-          doc = {
+          json.dump({
               "spdxVersion": "SPDX-2.3",
               "SPDXID": "SPDXRef-DOCUMENT",
               "name": "dorar-hadith-api-official-source",
               "dataLicense": "CC0-1.0",
               "documentNamespace": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/spdx/source",
               "files": files
-          }
-          json.dump(doc, open('sbom.spdx.json', 'w'), indent=2)
+          }, open('sbom.spdx.json', 'w'), indent=2)
           PY
           tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner --exclude=.git --exclude=source-bundle.tar.gz -cf source-bundle.tar .
           gzip -n -f source-bundle.tar
-          mv source-bundle.tar.gz source-bundle.tar.gz
           sha256sum source-bundle.tar.gz | tee source-bundle.sha256
 
       - name: Upload validation evidence
@@ -84,9 +82,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git ls-files -z -- ':!.git' | python3 - <<'PY'
-          import hashlib, json, sys
-          paths = [p.decode() for p in sys.stdin.buffer.read().split(b'\0') if p]
+          python3 - <<'PY'
+          import hashlib, json, subprocess
+          paths = [p.decode() for p in subprocess.check_output(['git', 'ls-files', '-z']).split(b'\0') if p]
           files = []
           for path in paths:
               data = open(path, 'rb').read()
@@ -106,7 +104,6 @@ jobs:
           PY
           tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner --exclude=.git --exclude=source-bundle.tar.gz -cf source-bundle.tar .
           gzip -n -f source-bundle.tar
-          mv source-bundle.tar.gz source-bundle.tar.gz
           sha256sum source-bundle.tar.gz | tee source-bundle.sha256
 
       - name: Sign source bundle with keyless Sigstore
