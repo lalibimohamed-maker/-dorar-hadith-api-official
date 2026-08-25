@@ -41,7 +41,20 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p artifacts/security
-          clamscan --recursive --infected --exclude-dir='^./.git$' --exclude-dir='^./node_modules$' --exclude-dir='^./artifacts/security$' . | tee artifacts/security/clamav.txt
+          clamscan --recursive --infected \
+            --exclude-dir='^./.git$' \
+            --exclude-dir='^./node_modules$' \
+            --exclude-dir='^./artifacts/security$' \
+            . | tee artifacts/security/clamav.txt
+
+      - name: Preserve ClamAV report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: security-clamav
+          path: artifacts/security/clamav.txt
+          if-no-files-found: ignore
+          retention-days: 14
 
   yara:
     name: YARA malware-pattern scan
@@ -65,25 +78,32 @@ jobs:
           curl --fail --location --retry 4 --retry-delay 3 \
             -o security-rules/yara-forge-rules-core.zip \
             https://github.com/YARAHQ/yara-forge/releases/download/20260726/yara-forge-rules-core.zip
-          unzip -q security-rules/yara-forge-rules-core.zip -d security-rules/core
-          test -n "$(find security-rules/core -type f -name '*.yar' -o -name '*.yara' | head -n 1)"
+          unzip -q security-rules/yara-forge-rules-core.zip -d security-rules
+          test -s security-rules/packages/core/yara-rules-core.yar
 
-      - name: Run YARA scan
+      - name: Run YARA core rules
         shell: bash
         run: |
           set +e
-          mapfile -t RULES < <(find security-rules/core -type f \( -name '*.yar' -o -name '*.yara' \) -print | sort)
-          : > artifacts/security/yara.txt
-          for rule in "${RULES[@]}"; do
-            yara -r "$rule" . >> artifacts/security/yara.txt 2>&1
-          done
+          mkdir -p artifacts/security
+          yara -w -r security-rules/packages/core/yara-rules-core.yar . > artifacts/security/yara.txt 2>&1
           rc=$?
-          if grep -qv '^$' artifacts/security/yara.txt; then
-            echo "YARA produced detections or diagnostics; review the artifact before changing source content."
+          if [ -s artifacts/security/yara.txt ]; then
+            echo "YARA produced detections or diagnostics. Review the report before changing source content."
+            cat artifacts/security/yara.txt
           fi
           if [ "$rc" -gt 1 ]; then
             exit "$rc"
           fi
+
+      - name: Preserve YARA report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: security-yara
+          path: artifacts/security/yara.txt
+          if-no-files-found: ignore
+          retention-days: 14
 
   trivy:
     name: Trivy vulnerability, misconfiguration and secret scan
@@ -134,6 +154,15 @@ jobs:
           mkdir -p artifacts/security
           gitleaks git --redact --report-format sarif --report-path artifacts/security/gitleaks.sarif .
 
+      - name: Preserve Gitleaks report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: security-gitleaks
+          path: artifacts/security/gitleaks.sarif
+          if-no-files-found: ignore
+          retention-days: 14
+
   npm-audit:
     name: npm dependency audit
     runs-on: ubuntu-latest
@@ -152,16 +181,5 @@ jobs:
       - name: Install dependencies without lifecycle scripts
         run: npm ci --ignore-scripts --no-fund
 
-      - name: Audit production and development dependency tree
+      - name: Audit dependency tree
         run: npm audit --audit-level=high
-
-  reports:
-    name: Publish security analysis artifacts
-    needs: [clamav, yara, gitleaks]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Downloading is intentionally omitted
-        run: |
-          echo "Security artifacts are produced by the scanner jobs."
-          echo "GitHub job logs remain the authoritative evidence for blocking scanners."
