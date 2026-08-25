@@ -1,0 +1,98 @@
+name: Supply Chain Attestation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Build and validate source bundle (pull_request)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Generate SPDX SBOM
+        run: |
+          set -euo pipefail
+          tar --exclude=.git --exclude=sbom.spdx.json --exclude=source-bundle.tar.gz -czf source-bundle.tar.gz .
+          sha256sum source-bundle.tar.gz | tee source-bundle.sha256
+          printf '{"SPDXID":"SPDXRef-Document","spdxVersion":"SPDX-2.3","name":"dorar-hadith-api-official-source","dataLicense":"CC0-1.0","files":[]}' > sbom.spdx.json
+
+      - name: Upload validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: supply-chain-validation-${{ github.event.pull_request.number }}
+          path: |
+            source-bundle.tar.gz
+            source-bundle.sha256
+            sbom.spdx.json
+          if-no-files-found: error
+
+  attest:
+    name: Build, attest and verify trusted source bundle
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3.8.1
+
+      - name: Build deterministic source bundle
+        run: |
+          set -euo pipefail
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner --exclude=.git --exclude=sbom.spdx.json --exclude=source-bundle.tar.gz -czf source-bundle.tar.gz .
+          sha256sum source-bundle.tar.gz | tee source-bundle.sha256
+          printf '{"SPDXID":"SPDXRef-Dokument","spdxVersion":"SPDX-2.3","name":"dorar-hadith-api-official-source","dataLicense":"CC0-1.0","files":[]}' > sbom.spdx.json
+
+      - name: Sign source bundle with keyless Sigstore
+        run: |
+          set -euo pipefail
+          cosign sign-blob source-bundle.tar.gz \
+            --yes \
+            --bundle source-bundle.sigstore.json
+
+      - name: Verify Sigstore signature
+        env:
+          COSIGN_CERT_IDENTITY: https://github.com/${{ github.repository }}/.github/workflows/supply-chain-attestation.yml@refs/heads/${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          cosign verify-blob source-bundle.tar.gz \
+            --bundle source-bundle.sigstore.json \
+            --certificate-identity-regexp "^https://github\\.com/${GITHUB_REPOSITORY}/\.github/workflows/supply-chain-attestation\.yml@refs/(heads|tags)/" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+
+      - name: Generate GitHub artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: source-bundle.tar.gz
+
+      - name: Upload supply-chain evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: supply-chain-attestation-${{ github.ref_name }}
+          path: |
+            source-bundle.tar.gz
+            source-bundle.sha256
+            source-bundle.sigstore.json
+            sbom.spdx.json
+          if-no-files-found: error
