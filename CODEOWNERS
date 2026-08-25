@@ -3,17 +3,6 @@
 # content, application, test, documentation, performance and UI paths.
 * @lalibimohamed-maker @lalibimohamed82-coder
 
-# Governance file itself: primary account only.
-/CODEOWNERS @lalibimohamed-maker
-
-# Security and source-trust controls: primary account only.
-/.github/ @lalibimohamed-maker
-/SECURITY.md @lalibimohamed-maker
-/config/source-refresh-baselines.json @lalibimohamed-maker
-/package.json @lalibimohamed-maker
-/package-lock.json @lalibimohamed-maker
-/docs/security/ @lalibimohamed-maker
-
 # Ordinary content/application maintenance: both accounts.
 /src/ @lalibimohamed-maker @lalibimohamed82-coder
 /test/ @lalibimohamed-maker @lalibimohamed82-coder
@@ -21,5 +10,12 @@
 /docs/ @lalibimohamed-maker @lalibimohamed82-coder
 /config/ @lalibimohamed-maker @lalibimohamed82-coder
 
-# Sensitive source-refresh configuration remains primary-only.
+# Sensitive controls: keep these rules LAST because CODEOWNERS uses the last
+# matching pattern for a path.
+/.github/ @lalibimohamed-maker
+/CODEOWNERS @lalibimohamed-maker
+/SECURITY.md @lalibimohamed-maker
 /config/source-refresh-baselines.json @lalibimohamed-maker
+/package.json @lalibimohamed-maker
+/package-lock.json @lalibimohamed-maker
+/docs/security/ @lalibimohamed-maker
