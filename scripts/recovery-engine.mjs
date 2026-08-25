@@ -20,7 +20,7 @@ export function readAtRef(ref, path) {
   return git(['show', `${ref}:${path}`]);
 }
 
-export function buildRecoveryPlan({ files = [], sourceRef = 'main' } = {}) {
+export function buildRecoveryPlan({ files = [], sourceRef = 'origin/main' } = {}) {
   const plan = [];
   for (const path of files) {
     if (!allowed(path) || policy.forbiddenAutomaticRestore.some((p) => p.endsWith('/**') && path.startsWith(p.slice(0, -3)))) continue;
