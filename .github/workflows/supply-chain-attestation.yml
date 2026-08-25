@@ -116,7 +116,7 @@ jobs:
           set -euo pipefail
           cosign verify-blob source-bundle.tar.gz \
             --bundle source-bundle.sigstore.json \
-            --certificate-identity-regexp "^https://github\\.com/${GITHUB_REPOSITORY}/\.github/workflows/supply-chain-attestation\.yml@refs/(heads/main|tags/v[^/]+)$" \
+            --certificate-identity-regexp "^https://github\\.com/lalibimohamed-maker/-dorar-hadith-api-official/\\.github/workflows/supply-chain-attestation\\.yml@refs/(heads/main|tags/v[^/]+)$" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
 
       - name: Generate GitHub artifact attestation
