@@ -33,6 +33,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends clamav
 
+      - name: Stop package updater before manual signature refresh
+        run: sudo systemctl stop clamav-freshclam.service || true
+
       - name: Refresh official ClamAV signatures
         run: sudo freshclam --stdout
 
