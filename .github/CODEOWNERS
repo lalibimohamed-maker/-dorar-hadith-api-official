@@ -1,0 +1,31 @@
+# Dual-account governance: shared operational/content ownership with primary-only security governance.
+# Generic shared rules come first; sensitive primary-only rules come last because the last matching pattern wins.
+
+# Shared operational and scholarly engineering ownership.
+/docs/ @lalibimohamed-maker @lalibimohamed82-coder
+/data/ @lalibimohamed-maker @lalibimohamed82-coder
+/config/ @lalibimohamed-maker @lalibimohamed82-coder
+/src/ @lalibimohamed-maker @lalibimohamed82-coder
+/test/ @lalibimohamed-maker @lalibimohamed82-coder
+/web/ @lalibimohamed-maker @lalibimohamed82-coder
+*.js @lalibimohamed-maker @lalibimohamed82-coder
+*.mjs @lalibimohamed-maker @lalibimohamed82-coder
+*.json @lalibimohamed-maker @lalibimohamed82-coder
+*.md @lalibimohamed-maker @lalibimohamed82-coder
+
+# Primary-only security and repository-governance ownership.
+/.github/workflows/source-refresh-gate.yml @lalibimohamed-maker
+/.github/workflows/source-refresh-integrity.yml @lalibimohamed-maker
+/.github/workflows/source-anomaly-gate.yml @lalibimohamed-maker
+/.github/workflows/source-baseline-approval.yml @lalibimohamed-maker
+/.github/workflows/action-pin-guard.yml @lalibimohamed-maker
+/.github/workflows/security-baseline.yml @lalibimohamed-maker
+/.github/workflows/security.yml @lalibimohamed-maker
+/.github/workflows/codeql.yml @lalibimohamed-maker
+/.github/workflows/scorecard.yml @lalibimohamed-maker
+/config/source-refresh-baselines.json @lalibimohamed-maker
+/docs/security/ @lalibimohamed-maker
+/SECURITY.md @lalibimohamed-maker
+/.github/CODEOWNERS @lalibimohamed-maker
+/package.json @lalibimohamed-maker
+/package-lock.json @lalibimohamed-maker
