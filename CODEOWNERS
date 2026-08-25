@@ -1,15 +1,25 @@
-# Security ownership for source trust and security controls
-/.github/workflows/source-refresh-gate.yml @lalibimohamed-maker
-/.github/workflows/source-refresh-integrity.yml @lalibimohamed-maker
-/.github/workflows/source-anomaly-gate.yml @lalibimohamed-maker
-/.github/workflows/source-baseline-approval.yml @lalibimohamed-maker
-/.github/workflows/action-pin-guard.yml @lalibimohamed-maker
-/.github/workflows/security-baseline.yml @lalibimohamed-maker
-/.github/workflows/security.yml @lalibimohamed-maker
-/.github/workflows/codeql.yml @lalibimohamed-maker
-/.github/workflows/scorecard.yml @lalibimohamed-maker
+# Dual-account governance: the primary account retains final authority;
+# the secondary account is an independent maintainer/reviewer for ordinary
+# content, application, test, documentation, performance and UI paths.
+* @lalibimohamed-maker @lalibimohamed82-coder
+
+# Governance file itself: primary account only.
+/CODEOWNERS @lalibimohamed-maker
+
+# Security and source-trust controls: primary account only.
+/.github/ @lalibimohamed-maker
+/SECURITY.md @lalibimohamed-maker
 /config/source-refresh-baselines.json @lalibimohamed-maker
 /package.json @lalibimohamed-maker
 /package-lock.json @lalibimohamed-maker
 /docs/security/ @lalibimohamed-maker
-/SECURITY.md @lalibimohamed-maker
+
+# Ordinary content/application maintenance: both accounts.
+/src/ @lalibimohamed-maker @lalibimohamed82-coder
+/test/ @lalibimohamed-maker @lalibimohamed82-coder
+/scripts/ @lalibimohamed-maker @lalibimohamed82-coder
+/docs/ @lalibimohamed-maker @lalibimohamed82-coder
+/config/ @lalibimohamed-maker @lalibimohamed82-coder
+
+# Sensitive source-refresh configuration remains primary-only.
+/config/source-refresh-baselines.json @lalibimohamed-maker
