@@ -1,0 +1,49 @@
+name: Federated Guardian
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: federated-guardian-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  policy:
+    name: Validate federation and recovery safety policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts --no-fund
+
+      - name: Run guardian policy tests
+        run: node --test test/federated-guardian.test.js
+
+      - name: Enforce non-destructive recovery invariant
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "destructiveAutomation: false" src/security/federated-guardian.js
+          grep -q "human-approval-before-publish" src/security/federated-guardian.js
+          grep -q "peer write access is forbidden" src/security/federated-guardian.js
