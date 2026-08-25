@@ -58,6 +58,29 @@ export function createAuditEvent({ actor, action, target, result, timestamp = ne
   return { ...event, hash: hashAuditEvent(event, previousHash) };
 }
 
+/**
+ * Verify an audit chain without trusting the stored hash values.
+ * A single modified event, reordered event, or broken previousHash link fails closed.
+ */
+export function verifyAuditChain(events) {
+  if (!Array.isArray(events)) return { valid: false, reason: "invalid_events" };
+
+  let previousHash = "GENESIS";
+  for (let index = 0; index < events.length; index += 1) {
+    const event = events[index];
+    if (!event || event.previousHash !== previousHash) {
+      return { valid: false, reason: "broken_link", index };
+    }
+    const expectedHash = hashAuditEvent(event, previousHash);
+    if (event.hash !== expectedHash) {
+      return { valid: false, reason: "hash_mismatch", index };
+    }
+    previousHash = event.hash;
+  }
+
+  return { valid: true, reason: "valid", length: events.length, lastHash: previousHash };
+}
+
 export function detectAnomalies(events, options = {}) {
   const windowMs = Number(options.windowMs ?? 60_000);
   const maxWrites = Number(options.maxWrites ?? 20);
