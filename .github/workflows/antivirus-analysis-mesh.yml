@@ -103,16 +103,21 @@ jobs:
           set +e
           yara -w -r \
             security-rules/packages/core/yara-rules-core.yar \
-            scan-root/ | tee artifacts/security/yara/detections.txt
-          rc=${PIPESTATUS[0]}
+            scan-root/ \
+            > artifacts/security/yara/detections.txt \
+            2> artifacts/security/yara/errors.txt
+          rc=$?
+          cat artifacts/security/yara/detections.txt
+          cat artifacts/security/yara/errors.txt >&2
           if [ "$rc" -gt 1 ]; then
             echo "YARA execution failed with exit code $rc"
             exit "$rc"
           fi
-          if [ "$rc" -eq 1 ]; then
+          if [ -s artifacts/security/yara/detections.txt ]; then
             echo "YARA detected one or more matching rules. Review the evidence artifact; source content is not modified automatically."
             exit 1
           fi
+          echo "YARA completed without detections. YARA exit code: $rc"
 
       - name: Preserve YARA evidence
         if: always()
@@ -245,10 +250,13 @@ jobs:
           for result in \
             "${{ needs.clamav.result }}" \
             "${{ needs.yara.result }}" \
-            "${{ needs.trivy.result }}" \
             "${{ needs.gitleaks.result }}" \
             "${{ needs.npm-audit.result }}"; do
             if [ "$result" != "success" ]; then
               exit 1
             fi
           done
+          echo "Trivy: ${{ needs.trivy.result }}"
+          if [ "${{ needs.trivy.result }}" != "success" ]; then
+            exit 1
+          fi
