@@ -54,7 +54,7 @@ jobs:
       - name: Upload validation evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: supply-chain-validation-${{ github.event.pull_request.number }}
+          name: supply-chain-validation
           path: |
             source-bundle.tar.gz
             source-bundle.sha256
@@ -127,7 +127,7 @@ jobs:
       - name: Upload supply-chain evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: supply-chain-attestation-${{ github.ref_name }}
+          name: supply-chain-attestation
           path: |
             source-bundle.tar.gz
             source-bundle.sha256
