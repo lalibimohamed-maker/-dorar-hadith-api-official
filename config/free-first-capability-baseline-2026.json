@@ -1,0 +1,20 @@
+{
+  "schemaVersion":"1.0.0",
+  "policy":{
+    "paidProviderAsSilentDependency":false,
+    "fallbackRequiredWhenFeasible":true,
+    "automaticFailoverAllowedForHealthAndCompatibility":true,
+    "scholarlyPromotionAlwaysGated":true,
+    "freeFirstPreference":true
+  },
+  "capabilities":{
+    "malwareScanning":{"primary":"ClamAV","alternatives":["YARA","repository-native static checks"],"failClosed":true},
+    "vulnerabilityScanning":{"primary":"Trivy","alternatives":["npm audit","repository-native dependency checks"],"failClosed":true},
+    "secretScanning":{"primary":"Gitleaks","alternatives":["repository-native secret hygiene"],"failClosed":true},
+    "codeAnalysis":{"primary":"CodeQL","alternatives":["Node.js tests","static syntax checks"],"failClosed":true},
+    "dependencyUpdates":{"primary":"Dependabot","alternatives":["GitHub Actions dependency review","manual protected PR"],"failClosed":false},
+    "ocr":{"primary":"repository/open-source OCR pipeline","alternatives":["source-image preservation + delayed OCR"],"failClosed":true},
+    "contentDiscovery":{"primary":"registered source watch","alternatives":["manual source review issue"],"failClosed":false},
+    "uiPerformance":{"primary":"browser-native optimization","alternatives":["progressive loading","asset reduction"],"failClosed":false}
+  }
+}
