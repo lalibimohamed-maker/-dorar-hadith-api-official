@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "mode": "fail-closed",
+  "sourcePriority": ["last-known-good-main", "file-creation-commit"],
+  "autoRestore": {
+    "enabled": true,
+    "sameRepositoryPrOnly": true,
+    "protectedBranchDirectWrite": false,
+    "requireIndependentReview": true
+  },
+  "allowlist": [
+    { "pattern": ".github/workflows/*.yml", "strategy": "last-known-good-main" },
+    { "pattern": ".github/workflows/*.yaml", "strategy": "last-known-good-main" }
+  ],
+  "forbiddenAutomaticRestore": [
+    "CODEOWNERS",
+    "SECURITY.md",
+    "package.json",
+    "package-lock.json",
+    "config/source-refresh-baselines.json",
+    "docs/security/**",
+    "src/**",
+    "data/**"
+  ],
+  "invariants": [
+    "Never write directly to protected main",
+    "Never restore scholarly corpus or source content automatically",
+    "Never bypass rights, provenance, review, or security gates",
+    "Every repair must leave an auditable Git commit and PR trail"
+  ]
+}
