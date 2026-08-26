@@ -9,14 +9,17 @@ test('green when no security signals exist', () => {
   assert.deepEqual(assessment.actions, []);
 });
 
-test('warning does not activate destructive response', () => {
+test('warning freezes promotion without destructive response', () => {
   const assessment = assessSecurityEmergency([
     { kind: 'workflow_anomaly', severity: 'warning', source: 'workflow-integrity' }
   ]);
   const plan = emergencyResponsePlan(assessment);
   assert.equal(assessment.state, 'WARNING');
+  assert.equal(assessment.failClosed, true);
   assert.equal(plan.promotionAllowed, false);
   assert.equal(plan.destructiveAutomationAllowed, false);
+  assert.equal(plan.requireIndependentReview, true);
+  assert.equal(plan.quarantine, false);
 });
 
 test('one trusted malware signal raises critical state', () => {
@@ -24,7 +27,6 @@ test('one trusted malware signal raises critical state', () => {
     { kind: 'malware_detected', severity: 'critical', source: 'clamav' }
   ]);
   assert.equal(assessment.state, 'CRITICAL');
-  assert.equal(assessment.quarantine, undefined);
   const plan = emergencyResponsePlan(assessment);
   assert.equal(plan.promotionAllowed, false);
   assert.equal(plan.quarantine, true);
