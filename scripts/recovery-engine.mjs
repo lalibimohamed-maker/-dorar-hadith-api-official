@@ -7,10 +7,13 @@ const policy = JSON.parse(fs.readFileSync(POLICY_PATH, 'utf8'));
 
 const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex');
 const git = (args) => execFileSync('git', args, { encoding: 'utf8' }).replace(/\n$/, '');
-const allowed = (path) => policy.allowlist.some((rule) => {
-  const prefix = rule.pattern.replace(/\*\*?|\*/g, '');
-  return path.startsWith(prefix) && (rule.pattern.endsWith('.yml') ? path.endsWith('.yml') : path.endsWith('.yaml'));
-});
+
+const globToRegExp = (pattern) => new RegExp(`^${pattern
+  .split('*')
+  .map((part) => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&'))
+  .join('.*')}$`);
+
+const allowed = (path) => policy.allowlist.some((rule) => globToRegExp(rule.pattern).test(path));
 
 export function findCreationCommit(path) {
   return git(['log', '--diff-filter=A', '--format=%H', '--', path]).split('\n').filter(Boolean).at(-1) ?? null;
