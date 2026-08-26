@@ -77,11 +77,14 @@ jobs:
           sudo apt-get install -y --no-install-recommends yara unzip rsync
           mkdir -p security-rules artifacts/security/yara
 
-      - name: Download curated YARA Forge Core rules
+      - name: Download and verify curated YARA Forge Core rules
+        shell: bash
         run: |
+          set -euo pipefail
           curl --fail --location --retry 4 --retry-delay 3 \
             -o security-rules/yara-forge-rules-core.zip \
             https://github.com/YARAHQ/yara-forge/releases/download/20260726/yara-forge-rules-core.zip
+          echo '8d370f848885aca8cb0ae5e27ef8e79601fbd454fd0675182d5f5e9a98e7c029  security-rules/yara-forge-rules-core.zip' | sha256sum -c -
           unzip -q security-rules/yara-forge-rules-core.zip -d security-rules
           test -s security-rules/packages/core/yara-rules-core.yar
           sha256sum security-rules/yara-forge-rules-core.zip | tee artifacts/security/yara/rules.sha256
