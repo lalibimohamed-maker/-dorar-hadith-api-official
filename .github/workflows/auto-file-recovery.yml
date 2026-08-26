@@ -1,0 +1,75 @@
+name: Auto File Recovery
+# workflow-run-justification: runs only after the trusted Workflow Integrity Check fails.
+# security-justification: contents: write is narrowly scoped to restoring allowlisted workflow files on same-repository PR branches; never writes protected main.
+
+on:
+  workflow_run:
+    workflows: [Workflow Integrity Check]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: read
+
+jobs:
+  recover:
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.pull_requests[0] != null &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.head_branch != 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout the PR head branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Configure recovery identity
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: Recover allowlisted files from main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          PR_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          git fetch origin main --no-tags
+
+          mapfile -t files < <(
+            gh api --paginate \
+              -H 'Accept: application/vnd.github+json' \
+              "/repos/${REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
+              --jq '.[].filename' \
+              | grep -E '^\.github/workflows/[^/]+\.(yml|yaml)$' || true
+          )
+
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo 'No allowlisted workflow files changed; nothing to restore.'
+            exit 0
+          fi
+
+          # Capture the last known-good workflow file from protected main.
+          git checkout main -- "${files[@]}"
+          APPLY_RECOVERY=1 node scripts/recovery-engine.mjs "${files[@]}"
+
+          changed=false
+          for file in "${files[@]}"; do
+            if ! git diff --quiet -- "$file"; then changed=true; fi
+          done
+
+          if [ "$changed" != 'true' ]; then
+            echo 'No recoverable difference found against main.'
+            exit 0
+          fi
+
+          git add -- "${files[@]}"
+          git commit -m 'security: auto-recover broken workflow files'
+          git push origin "HEAD:${PR_BRANCH}"
+          echo 'Recovery commit pushed to the PR branch. GitHub will re-run checks and require fresh independent review.'
