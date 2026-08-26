@@ -1,0 +1,59 @@
+name: Generate source baseline candidate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-baseline-candidate
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Run protected source verification
+        id: verify
+        shell: bash
+        run: |
+          set +e
+          node scripts/source-refresh-gate.mjs
+          code=$?
+          echo "gate_exit=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Generate metadata-only baseline candidate
+        if: ${{ steps.verify.outputs.gate_exit == '0' }}
+        run: node scripts/source-baseline-candidate.mjs
+
+      - name: Upload baseline candidate and verification manifest
+        if: ${{ steps.verify.outputs.gate_exit == '0' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: source-baseline-candidate-${{ github.run_id }}
+          path: |
+            artifacts/source-refresh/baseline-candidate.json
+            artifacts/source-refresh/manifest.json
+          if-no-files-found: error
+
+      - name: Preserve protected gate result
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.verify.outputs.gate_exit }}" = "0" || {
+            echo "Protected verification gate did not fully pass. No baseline candidate was generated." >&2
+            exit 1
+          }
