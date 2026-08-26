@@ -3,7 +3,7 @@ services:
     name: deen-allah-encyclopedia-api
     runtime: node
     plan: free
-    buildCommand: npm install --ignore-scripts --no-package-lock --no-audit --no-fund
+    buildCommand: npm ci --ignore-scripts --no-audit --no-fund
     startCommand: npm start
     healthCheckPath: /health
     envVars:
