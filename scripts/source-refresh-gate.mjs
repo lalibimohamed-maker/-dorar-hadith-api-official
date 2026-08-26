@@ -45,9 +45,15 @@ for(const [id,s] of sources){
     }
     if(!ok) throw new Error("redirect limit exceeded");
   }catch(e){
-    results.push({id,url:s.url,status:"blocked",error:e.message,checkedAt:new Date().toISOString()});
+    error=e instanceof Error ? e.message : "unknown error";
+    results.push({id,url:s.url,status:"blocked",error,checkedAt:new Date().toISOString()});
+    console.error(`[source-refresh-gate] blocked source: ${String(id)} — ${error}`);
   }
 }
 fs.mkdirSync("artifacts/source-refresh",{recursive:true});
 fs.writeFileSync("artifacts/source-refresh/manifest.json",JSON.stringify({schemaVersion:1,mode:"verification-only",sources:results},null,2)+"\n");
-if(results.some(x=>x.status!=="verified")) process.exit(1);
+if(results.some(x=>x.status!=="verified")){
+  const blocked=results.filter(x=>x.status!=="verified");
+  console.error(`[source-refresh-gate] verification failed: ${blocked.length} source(s) blocked`);
+  process.exit(1);
+}
