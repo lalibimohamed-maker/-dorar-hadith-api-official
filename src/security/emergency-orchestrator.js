@@ -82,7 +82,13 @@ export function assessSecurityEmergency(signals = []) {
   const emergency = explicitEmergency || corroborated;
   const critical = emergency || highConfidence.length > 0 || score >= 75;
 
-  const state = emergency ? 'EMERGENCY' : critical ? 'CRITICAL' : score >= 25 ? 'WARNING' : 'GREEN';
+  const state = emergency
+    ? 'EMERGENCY'
+    : critical
+      ? 'CRITICAL'
+      : score >= 10
+        ? 'WARNING'
+        : 'GREEN';
 
   const actions = state === 'GREEN'
     ? []
