@@ -1,6 +1,6 @@
 name: Auto File Recovery
 # workflow-run-justification: runs only after the trusted Workflow Integrity Check fails.
-# recovery-write-justification: restores only allowlisted workflow files on same-repository PR branches; never writes protected main.
+# security-justification: contents: write is narrowly scoped to restoring allowlisted workflow files on same-repository PR branches; never writes protected main.
 
 on:
   workflow_run:
