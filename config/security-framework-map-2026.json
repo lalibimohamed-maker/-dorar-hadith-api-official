@@ -1,0 +1,61 @@
+{
+  "version": "2026-08-26",
+  "purpose": "Map the article-derived security requirements to evidence-based controls suitable for the Din Allah Encyclopedia.",
+  "principles": {
+    "failClosed": true,
+    "leastPrivilege": true,
+    "continuousAssessment": true,
+    "independentReview": true,
+    "preserveEvidence": true,
+    "noDestructiveAutonomousResponse": true
+  },
+  "articleTopics": {
+    "protection_systems": {
+      "controls": ["NIST-CSF-2.0", "CIS-Controls-8.1", "NIST-SSDF-1.1"]
+    },
+    "malware": {
+      "controls": ["ClamAV", "YARA", "Trivy", "Gitleaks"]
+    },
+    "network_and_transport": {
+      "controls": ["TLS-at-deployment-boundary", "least-privilege-network-egress", "rate-limiting-and-resource-bounds"]
+    },
+    "application_security": {
+      "controls": ["OWASP-ASVS-5.0"]
+    },
+    "adversary_detection": {
+      "controls": ["MITRE-ATT&CK", "Emergency-Security-Orchestrator", "Wazuh-optional-runtime", "Falco-optional-runtime"]
+    },
+    "supply_chain": {
+      "controls": ["GitHub-Artifact-Attestations", "Sigstore", "SLSA", "OpenSSF-Scorecard", "CycloneDX-SBOM"]
+    },
+    "incident_response": {
+      "controls": ["NIST-Incident-Response", "freeze", "quarantine", "evidence-preservation", "independent-review"]
+    },
+    "content_and_corpus": {
+      "controls": ["provenance", "rights-verification", "source-integrity", "OCR-verification", "immutable-revision-lineage", "corpus-write-boundary"]
+    },
+    "updates": {
+      "controls": ["Dependabot", "automated-patch-review", "dependency-review", "continuous-vulnerability-management"]
+    }
+  },
+  "externalSystems": {
+    "Wazuh": {
+      "role": "runtime-file-integrity-and-active-response-sensor",
+      "status": "optional-external-deployment",
+      "mustNotBeClaimedInstalledByRepo": true,
+      "ingestPolicy": "read-only-alerts-until-explicitly-approved"
+    },
+    "Falco": {
+      "role": "runtime-event-detection",
+      "status": "optional-external-deployment",
+      "mustNotBeClaimedInstalledByRepo": true,
+      "ingestPolicy": "read-only-alerts-until-explicitly-approved"
+    }
+  },
+  "evidenceStandards": [
+    "A documented control is not considered enabled without code/configuration evidence or a positive GitHub control-plane signal.",
+    "A malware or integrity alert blocks promotion when its trusted policy threshold is reached.",
+    "Emergency mode never bypasses protected main, review requirements, provenance, or rights controls.",
+    "Imported scholarly material remains non-authoritative until source, provenance, rights, and verification requirements are satisfied."
+  ]
+}
