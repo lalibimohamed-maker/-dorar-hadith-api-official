@@ -20,13 +20,12 @@ jobs:
           persist-credentials: false
 
       - name: Check curated upstream releases
-        env:
-          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           import json, os, urllib.request
+          from datetime import datetime, timezone
           cfg = json.load(open('config/media-tool-discovery-registry-2026.json', encoding='utf-8'))
           found = []
           for cap in cfg['capabilities']:
@@ -36,7 +35,10 @@ jobs:
               urls.extend([u for u in cap.get('upstreams', []) if u.startswith('https://github.com/')])
               for url in urls:
                   repo = url.rstrip('/').removeprefix('https://github.com/')
-                  req = urllib.request.Request(f'https://api.github.com/repos/{repo}/releases/latest', headers={'Accept':'application/vnd.github+json','User-Agent':'Din-Allah-Encyclopedia-capability-watch'})
+                  req = urllib.request.Request(
+                      f'https://api.github.com/repos/{repo}/releases/latest',
+                      headers={'Accept':'application/vnd.github+json','User-Agent':'Din-Allah-Encyclopedia-capability-watch'}
+                  )
                   try:
                       with urllib.request.urlopen(req, timeout=15) as r:
                           release = json.load(r)
@@ -44,7 +46,7 @@ jobs:
                   except Exception as exc:
                       found.append({'capability': cap['id'], 'repository': repo, 'error': str(exc)})
           os.makedirs('artifacts', exist_ok=True)
-          json.dump({'checkedAt': __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(), 'results': found}, open('artifacts/media-tool-upstream-status.json','w'), indent=2)
+          json.dump({'checkedAt': datetime.now(timezone.utc).isoformat(), 'results': found}, open('artifacts/media-tool-upstream-status.json','w'), indent=2)
           PY
 
       - name: Publish discovery report
@@ -61,7 +63,12 @@ jobs:
         run: |
           set -euo pipefail
           body="$(cat artifacts/media-tool-upstream-status.json)"
-          gh issue create --title "automation: media/tool capability discovery report" --body "Automated discovery only. No software was installed or trusted. Review upstream release signals, licenses, security advisories, compatibility, resource requirements, and provenance before proposing any update.\n\n\`\`\`json\n${body}\n\`\`\`" || true
+          existing=$(gh issue list --state open --search 'in:title "media/tool capability discovery report"' --json number --jq '.[0].number // empty')
+          if [ -n "${existing}" ]; then
+            gh issue comment "${existing}" --body "Weekly capability discovery report:\n\n\`\`\`json\n${body}\n\`\`\`"
+          else
+            gh issue create --title "automation: media/tool capability discovery report" --body "Automated discovery only. No software was installed or trusted. Review upstream release signals, licenses, security advisories, compatibility, resource requirements, and provenance before proposing any update.\n\n\`\`\`json\n${body}\n\`\`\`"
+          fi
 
       - name: Policy assertion
         run: |
