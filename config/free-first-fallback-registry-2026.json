@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Free-first, provider-neutral fallback policy for Din Allah Encyclopedia.",
+  "principles": {
+    "freeFirst": true,
+    "openSourcePreferred": true,
+    "noPaidDependencyRequired": true,
+    "neverSilentlyLowerScientificAssurance": true,
+    "automaticFallbackAllowedForHealthAndAvailability": true,
+    "automaticScholarlyPromotionForbidden": true,
+    "betterMeansHigherVerifiedCapabilityNotJustPopularity": true
+  },
+  "selectionOrder": [
+    "eligible_free",
+    "verified_open_source",
+    "compatible",
+    "healthy",
+    "current",
+    "quality_score",
+    "fallback_priority"
+  ],
+  "domains": {
+    "malware": {
+      "primary": "clamav",
+      "fallbacks": ["yara-forge-core"],
+      "minimum": "at_least_one_independent_malware_engine"
+    },
+    "malware_patterns": {
+      "primary": "yara-forge-core",
+      "fallbacks": ["clamav"],
+      "minimum": "pattern_scan_or_safe_fail_closed"
+    },
+    "vulnerability_scanning": {
+      "primary": "trivy",
+      "fallbacks": ["npm-audit"],
+      "minimum": "do_not_claim_complete_coverage_when_fallback_is_narrower"
+    },
+    "secrets": {
+      "primary": "gitleaks",
+      "fallbacks": [],
+      "minimum": "fail_closed_if_no_equivalent_free_engine_is_available"
+    },
+    "javascript_dependencies": {
+      "primary": "npm-audit",
+      "fallbacks": [],
+      "minimum": "fail_closed"
+    },
+    "ocr": {
+      "primary": "tesseract-ocr",
+      "fallbacks": ["ocrmypdf"],
+      "minimum": "retain_source_image_and_verification_state"
+    },
+    "speech_to_text": {
+      "primary": "whisper-cpp",
+      "fallbacks": ["faster-whisper"],
+      "minimum": "language_and_model_provenance_required"
+    },
+    "source_discovery": {
+      "primary": "official_and_institutional_sources",
+      "fallbacks": ["public_research_indexes", "secondary_catalogs"],
+      "minimum": "discovery_only_until_verified"
+    }
+  },
+  "runtimeRules": {
+    "healthWindowMinutes": 30,
+    "maxAutomaticFallbackDepth": 3,
+    "recheckPrimaryOnEveryScheduledCycle": true,
+    "recordFallbackEvent": true,
+    "recordEngineVersion": true,
+    "recordWhyPrimaryWasSkipped": true,
+    "restorePrimaryWhenHealthy": true,
+    "doNotReplacePrimaryPermanentlyWithoutReview": true
+  }
+}
