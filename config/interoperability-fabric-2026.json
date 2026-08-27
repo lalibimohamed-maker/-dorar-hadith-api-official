@@ -1,0 +1,47 @@
+{
+  "version": "2026-08-27",
+  "purpose": "Open-source interoperability fabric for media, dataflow, digital-twin, messaging and 3D systems.",
+  "principle": "Integrate interoperable open software; do not copy proprietary implementations or bypass attribution, licensing, security or provenance controls.",
+  "components": [
+    {
+      "capability": "dataflow-orchestration",
+      "project": "apache/nifi",
+      "license": "Apache-2.0",
+      "role": "managed data routing, transformation, mediation and provenance",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "https://nifi.apache.org/nifi-docs/overview.html"
+    },
+    {
+      "capability": "digital-twin-and-device-interoperability",
+      "project": "eclipse-ditto/ditto",
+      "license": "EPL-2.0",
+      "role": "JSON-based digital-twin model and policy-controlled connectivity",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "https://eclipse.dev/ditto/"
+    },
+    {
+      "capability": "messaging-fabric",
+      "project": "nats-io/nats-server",
+      "license": "Apache-2.0",
+      "role": "low-latency pub/sub, request/reply and streaming transport",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "https://nats.io/about/"
+    },
+    {
+      "capability": "3d-scene-interchange",
+      "project": "PixarAnimationStudios/OpenUSD",
+      "license": "Apache-2.0",
+      "role": "interoperable composition and interchange for complex 3D scenes",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "https://openusd.org/"
+    }
+  ],
+  "integration_rules": [
+    "Each external component is pinned and license-verified before activation.",
+    "No proprietary product is cloned from protected source code, binaries, credentials or private data.",
+    "Open-source code remains subject to its upstream license, notices and attribution requirements.",
+    "Unknown or unverified releases remain untrusted.",
+    "A component may be replaced when a verified alternative scores better on security, quality, performance, compatibility, maintenance and license suitability.",
+    "Trusted Corpus and scholarly source material are never mutated by interoperability automation."
+  ]
+}
