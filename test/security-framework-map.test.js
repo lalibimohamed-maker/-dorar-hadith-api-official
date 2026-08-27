@@ -17,15 +17,8 @@ test('security framework map is valid JSON and fail-closed', () => {
 test('article security domains are represented', () => {
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   for (const key of [
-    'protection_systems',
-    'malware',
-    'network_and_transport',
-    'application_security',
-    'adversary_detection',
-    'supply_chain',
-    'incident_response',
-    'content_and_corpus',
-    'updates'
+    'protection_systems', 'malware', 'network_and_transport', 'application_security',
+    'adversary_detection', 'supply_chain', 'incident_response', 'content_and_corpus', 'updates'
   ]) {
     assert.ok(config.articleTopics[key]?.controls?.length > 0, `missing controls for ${key}`);
   }
