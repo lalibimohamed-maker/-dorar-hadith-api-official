@@ -62,6 +62,7 @@
       "id": "3d-interchange",
       "preferredProjects": ["KhronosGroup/glTF", "PixarAnimationStudios/OpenUSD"],
       "upstreams": ["https://github.com/KhronosGroup/glTF", "https://github.com/PixarAnimationStudios/OpenUSD"],
+      "currentLicenseEvidence": ["Apache-2.0 for OpenUSD; glTF license metadata must be checked per release"],
       "selectionCriteria": ["web-interoperability", "scene-composition", "animation", "asset-lineage", "license"]
     },
     {
@@ -77,6 +78,27 @@
       "upstreams": ["https://github.com/bluenviron/mediamtx"],
       "selectionCriteria": ["WebRTC", "HLS", "RTSP", "SRT", "RTMP", "360-video-delivery", "maintainability", "license"],
       "standardVocabulary": ["360-degree", "3DoF", "3DoF+", "6DoF", "volumetric"]
+    },
+    {
+      "id": "dataflow-orchestration",
+      "preferredProject": "apache/nifi",
+      "upstream": "https://nifi.apache.org/",
+      "currentLicenseEvidence": "Apache-2.0",
+      "selectionCriteria": ["data-routing", "transformation", "provenance", "throughput", "security", "license"]
+    },
+    {
+      "id": "digital-twin-interoperability",
+      "preferredProject": "eclipse-ditto/ditto",
+      "upstream": "https://eclipse.dev/ditto/",
+      "currentLicenseEvidence": "EPL-2.0",
+      "selectionCriteria": ["device-interoperability", "policy-control", "protocol-mapping", "maintainability", "license"]
+    },
+    {
+      "id": "messaging-fabric",
+      "preferredProject": "nats-io/nats-server",
+      "upstream": "https://nats.io/",
+      "currentLicenseEvidence": "Apache-2.0",
+      "selectionCriteria": ["low-latency", "pub-sub", "request-reply", "streaming", "edge", "license"]
     }
   ],
   "discoverySources": [
@@ -89,6 +111,7 @@
     "replace-trusted-content",
     "change-main-without-protected-pr",
     "change-corpus-without-provenance-rights-verification",
-    "assume-future-version-retains-current-license"
+    "assume-future-version-retains-current-license",
+    "clone-proprietary-system-or-data-to-hide-origin"
   ]
 }
