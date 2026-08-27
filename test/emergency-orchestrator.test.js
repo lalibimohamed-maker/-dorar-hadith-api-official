@@ -9,9 +9,20 @@ test('green when no security signals exist', () => {
   assert.deepEqual(assessment.actions, []);
 });
 
+test('signal trust and independence must be explicit', () => {
+  assert.throws(
+    () => assessSecurityEmergency([{ kind: 'workflow_anomaly', severity: 'warning', source: 'workflow-integrity' }]),
+    /trust must be explicit/
+  );
+  assert.throws(
+    () => assessSecurityEmergency([{ kind: 'workflow_anomaly', severity: 'warning', source: 'workflow-integrity', trusted: true }]),
+    /independence must be explicit/
+  );
+});
+
 test('warning freezes promotion without destructive response', () => {
   const assessment = assessSecurityEmergency([
-    { kind: 'workflow_anomaly', severity: 'warning', source: 'workflow-integrity' }
+    { kind: 'workflow_anomaly', severity: 'warning', source: 'workflow-integrity', trusted: true, independent: true }
   ]);
   const plan = emergencyResponsePlan(assessment);
   assert.equal(assessment.state, 'WARNING');
@@ -24,7 +35,7 @@ test('warning freezes promotion without destructive response', () => {
 
 test('one trusted malware signal raises critical state', () => {
   const assessment = assessSecurityEmergency([
-    { kind: 'malware_detected', severity: 'critical', source: 'clamav' }
+    { kind: 'malware_detected', severity: 'critical', source: 'clamav', trusted: true, independent: true }
   ]);
   assert.equal(assessment.state, 'CRITICAL');
   const plan = emergencyResponsePlan(assessment);
@@ -35,8 +46,8 @@ test('one trusted malware signal raises critical state', () => {
 
 test('two independent high-confidence sensors trigger emergency', () => {
   const assessment = assessSecurityEmergency([
-    { kind: 'malware_detected', severity: 'critical', source: 'clamav' },
-    { kind: 'artifact_tamper', severity: 'critical', source: 'integrity' }
+    { kind: 'malware_detected', severity: 'critical', source: 'clamav', trusted: true, independent: true },
+    { kind: 'artifact_tamper', severity: 'critical', source: 'integrity', trusted: true, independent: true }
   ]);
   assert.equal(assessment.state, 'EMERGENCY');
   assert.equal(assessment.independentHighCount, 2);
@@ -48,22 +59,33 @@ test('two independent high-confidence sensors trigger emergency', () => {
 
 test('explicit emergency signal triggers emergency immediately', () => {
   const assessment = assessSecurityEmergency([
-    { kind: 'workflow_security_breach', severity: 'emergency', source: 'workflow-security' }
+    { kind: 'workflow_security_breach', severity: 'emergency', source: 'workflow-security', trusted: true, independent: false }
   ]);
   assert.equal(assessment.state, 'EMERGENCY');
 });
 
-test('untrusted signals cannot independently trigger emergency', () => {
+test('untrusted signals cannot independently trigger emergency or raise score', () => {
   const assessment = assessSecurityEmergency([
-    { kind: 'malware_detected', severity: 'critical', source: 'untrusted-feed', trusted: false },
-    { kind: 'workflow_anomaly', severity: 'warning', source: 'monitor' }
+    { kind: 'malware_detected', severity: 'critical', source: 'untrusted-feed', trusted: false, independent: true },
+    { kind: 'workflow_anomaly', severity: 'warning', source: 'monitor', trusted: false, independent: true }
   ]);
-  assert.notEqual(assessment.state, 'EMERGENCY');
+  assert.equal(assessment.state, 'GREEN');
+  assert.equal(assessment.score, 0);
+  assert.equal(assessment.failClosed, false);
+});
+
+test('untrusted telemetry cannot corroborate trusted high-severity signals', () => {
+  const assessment = assessSecurityEmergency([
+    { kind: 'malware_detected', severity: 'critical', source: 'clamav', trusted: true, independent: true },
+    { kind: 'artifact_tamper', severity: 'critical', source: 'untrusted-integrity', trusted: false, independent: true }
+  ]);
+  assert.equal(assessment.state, 'CRITICAL');
+  assert.equal(assessment.independentHighCount, 1);
 });
 
 test('emergency plan never grants bypass or destructive automation', () => {
   const assessment = assessSecurityEmergency([
-    { kind: 'secret_exposed', severity: 'emergency', source: 'secret-scan' }
+    { kind: 'secret_exposed', severity: 'emergency', source: 'secret-scan', trusted: true, independent: true }
   ]);
   const plan = emergencyResponsePlan(assessment);
   assert.equal(plan.destructiveAutomationAllowed, false);
