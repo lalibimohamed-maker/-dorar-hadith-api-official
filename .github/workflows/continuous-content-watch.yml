@@ -1,0 +1,83 @@
+name: Continuous Content Watch
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "13 2 * * *"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: continuous-content-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+
+      - name: Run continuous content watch
+        id: watch
+        continue-on-error: true
+        run: node scripts/continuous-content-watch.mjs
+
+      - name: Verify free-first fallback registry and selector
+        run: |
+          node --test test/free-first-fallback-registry.test.js
+          node --test test/free-first-fallback-selector.test.js
+
+      - name: Run source-refresh validation
+        run: node scripts/source-refresh-gate.mjs
+
+      - name: Run content governance tests
+        run: |
+          node --test test/source-refresh-quarantine.test.js
+          node --test test/source-refresh-history.test.js
+          node --test test/source-audit-trail.test.js
+          node --test test/corpus-write-boundary.test.js
+
+      - name: Write report summary
+        if: always()
+        run: |
+          {
+            echo "## Continuous Content Watch"
+            echo
+            echo "The scheduled watcher checks registered sources, coverage gaps, refresh controls, fallback policy, and content-governance boundaries."
+            echo
+            if [ -f continuous-content-watch.md ]; then
+              cat continuous-content-watch.md
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open review issue when the watch detects a gap
+        if: steps.watch.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title="automation: continuous content watch detected source or coverage gaps"
+          existing="$(gh issue list --state open --search \"$title in:title\" --limit 1 --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file continuous-content-watch.md
+          else
+            gh issue create --title "$title" --body-file continuous-content-watch.md
+          fi
+
+      - name: Fail closed on watcher findings
+        if: steps.watch.outcome == 'failure'
+        run: |
+          echo "Continuous content watch found source health or coverage findings; review issue/report is required."
+          exit 1
