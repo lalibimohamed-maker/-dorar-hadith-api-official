@@ -6,7 +6,8 @@
   "description": "Multilingual Deen Allah Encyclopedia API with source-aware Quran, hadith, tafsir, sirah, fiqh, creed and Tajweed resources.",
   "main": "dorar_json_api.js",
   "scripts": {
-    "start": "node dorar_json_api.js",
+    "start": "node src/accelerated-server.js",
+    "start:core": "node dorar_json_api.js",
     "start:corpus": "node src/index.js",
     "health": "find . -type f -name '*.js' -not -path './node_modules/*' -print0 | xargs -0 -n1 node --check",
     "test": "node --test",
