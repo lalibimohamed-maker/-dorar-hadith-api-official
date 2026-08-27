@@ -13,7 +13,7 @@ function scoreCandidate(candidate, status = {}) {
   if (status.compatible === true) score += 300;
   if (status.current === true) score += 200;
   if (Number.isFinite(status.qualityScore)) score += Math.max(0, Math.min(100, status.qualityScore));
-  if (status.free !== false) score += 50;
+  if (status.free === true) score += 50;
   if (status.openSource === true) score += 25;
   score -= (status.failureCount ?? 0) * 10;
   score -= (status.latencyMs ?? 0) / 1000;
@@ -28,7 +28,13 @@ export function selectEngine(domain, statuses = {}) {
   const candidates = [definition.primary, ...(definition.fallbacks ?? [])];
   const eligible = candidates.filter((name) => {
     const status = statuses[name] ?? {};
-    return status.available !== false && status.free !== false && status.blocked !== true;
+    return (
+      status.available === true &&
+      status.healthy === true &&
+      status.compatible === true &&
+      status.free === true &&
+      status.blocked !== true
+    );
   });
 
   if (!eligible.length) {
