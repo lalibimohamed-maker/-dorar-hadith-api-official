@@ -68,6 +68,7 @@ export function createAccelerationMesh(options = {}) {
   function set(key, body, meta = {}) {
     const buffer = Buffer.isBuffer(body) ? body : Buffer.from(body);
     if (buffer.length > maxBytes) return;
+    const ttlMs = toPositiveInt(meta.ttlMs, 30_000);
     remove(key);
     const entry = {
       body: buffer,
@@ -75,7 +76,9 @@ export function createAccelerationMesh(options = {}) {
       status: Number(meta.status || 200),
       contentType: meta.contentType || "application/json; charset=utf-8",
       etag: meta.etag || `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`,
-      expiresAt: Date.now() + toPositiveInt(meta.ttlMs, 30_000),
+      ttlMs,
+      staleWhileRevalidate: toPositiveInt(meta.staleWhileRevalidate, 0),
+      expiresAt: Date.now() + ttlMs,
     };
     cache.set(key, entry);
     bytes += entry.size;
@@ -83,11 +86,14 @@ export function createAccelerationMesh(options = {}) {
   }
 
   async function singleFlight(key, work) {
-    if (inFlight.has(key)) {
+    const existing = inFlight.get(key);
+    if (existing) {
       coalesced += 1;
-      return inFlight.get(key);
+      return existing;
     }
-    const promise = Promise.resolve().then(work).finally(() => inFlight.delete(key));
+    const promise = Promise.resolve().then(work).finally(() => {
+      inFlight.delete(key);
+    });
     inFlight.set(key, promise);
     return promise;
   }
