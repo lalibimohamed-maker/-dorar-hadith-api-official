@@ -27,3 +27,18 @@ test('the selector fails closed when no free eligible engine remains', () => {
   assert.equal(result.selected, null);
   assert.equal(result.failClosed, true);
 });
+
+test('unknown or incomplete engine status is not eligible', () => {
+  const result = selectEngine('malware', {});
+  assert.equal(result.selected, null);
+  assert.equal(result.failClosed, true);
+});
+
+test('unhealthy or incompatible fallbacks are not eligible', () => {
+  const result = selectEngine('malware', {
+    clamav: { available: false, free: true },
+    'yara-forge-core': { available: true, healthy: false, compatible: true, current: true, free: true }
+  });
+  assert.equal(result.selected, null);
+  assert.equal(result.failClosed, true);
+});
