@@ -36,16 +36,27 @@ test("cache policies favor short search TTLs and longer corpus TTLs", () => {
   assert.equal(cachePolicyForPath("/health").cache, false);
 });
 
-test("single-flight coalesces identical expensive work", async () => {
+test("cache entries retain policy TTL metadata", () => {
+  const mesh = createAccelerationMesh();
+  mesh.set("policy", Buffer.from("payload"), { ttlMs: 8_000, staleWhileRevalidate: 30 });
+  const entry = mesh.get("policy");
+  assert.equal(entry?.ttlMs, 8_000);
+  assert.equal(entry?.staleWhileRevalidate, 30);
+});
+
+test("single-flight coalesces work and returns the same data result", async () => {
   const mesh = createAccelerationMesh();
   let calls = 0;
   const work = () => mesh.singleFlight("same", async () => {
     calls += 1;
     await new Promise((resolve) => setTimeout(resolve, 10));
-    return 42;
+    return { status: 200, body: Buffer.from("ok") };
   });
   const results = await Promise.all([work(), work(), work(), work()]);
-  assert.deepEqual(results, [42, 42, 42, 42]);
   assert.equal(calls, 1);
   assert.equal(mesh.profile().coalesced, 3);
+  for (const result of results) {
+    assert.equal(result.status, 200);
+    assert.equal(result.body.toString(), "ok");
+  }
 });
