@@ -42,14 +42,16 @@ function normalizeSignal(signal = {}) {
   const score = SEVERITY_SCORE[severity];
   if (score === undefined) throw new TypeError(`unknown severity: ${severity}`);
   if (!signal.kind) throw new TypeError('security signal kind is required');
+  if (typeof signal.trusted !== 'boolean') throw new TypeError('security signal trust must be explicit');
+  if (typeof signal.independent !== 'boolean') throw new TypeError('security signal independence must be explicit');
 
   return {
     kind: String(signal.kind),
     severity,
     score,
     source: String(signal.source ?? 'unknown'),
-    independent: signal.independent !== false,
-    trusted: signal.trusted !== false,
+    independent: signal.independent,
+    trusted: signal.trusted,
     message: signal.message ? String(signal.message) : null
   };
 }
@@ -70,13 +72,13 @@ export function assessSecurityEmergency(signals = []) {
   const independentHighCount = independentHigh.size;
   const score = Math.min(
     100,
-    normalized.reduce((sum, signal) => sum + signal.score, 0)
+    trusted.reduce((sum, signal) => sum + signal.score, 0)
   );
 
   // A single trusted, high-confidence security breach is enough for CRITICAL.
   // EMERGENCY requires either an explicit emergency signal or corroboration
-  // from two independent high-severity sources. This avoids one noisy sensor
-  // causing destructive automation while still failing closed on clear abuse.
+  // from two independent high-severity sources. Untrusted telemetry cannot
+  // raise the security state or satisfy corroboration requirements.
   const explicitEmergency = trusted.some((signal) => signal.severity === 'emergency');
   const corroborated = independentHighCount >= 2 && highConfidence.length >= 2;
   const emergency = explicitEmergency || corroborated;
