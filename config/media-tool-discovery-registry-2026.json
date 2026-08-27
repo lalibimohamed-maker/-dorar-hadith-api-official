@@ -9,13 +9,15 @@
     "requireLicenseCheck": true,
     "requireSecurityValidation": true,
     "requireProtectedPRForUpdates": true,
-    "unknownProjectIsUntrusted": true
+    "unknownProjectIsUntrusted": true,
+    "futureReleaseIsNotAutomaticallyFreeForever": true
   },
   "capabilities": [
     {
       "id": "image-super-resolution",
       "preferredProject": "xinntao/Real-ESRGAN",
       "upstream": "https://github.com/xinntao/Real-ESRGAN",
+      "currentLicenseEvidence": "BSD-3-Clause",
       "selectionCriteria": ["quality", "tiling", "scale-flexibility", "active-maintenance", "license"]
     },
     {
@@ -32,9 +34,10 @@
     },
     {
       "id": "ocr-document-processing",
-      "preferredProject": "tesseract-ocr/tesseract",
-      "upstream": "https://github.com/tesseract-ocr/tesseract",
-      "selectionCriteria": ["ocr-quality", "language-coverage", "maintainability", "license"]
+      "preferredProjects": ["tesseract-ocr/tesseract", "PaddlePaddle/PaddleOCR"],
+      "upstreams": ["https://github.com/tesseract-ocr/tesseract", "https://github.com/PaddlePaddle/PaddleOCR"],
+      "currentLicenseEvidence": ["Apache-2.0", "Apache-2.0"],
+      "selectionCriteria": ["ocr-quality", "language-coverage", "document-structure", "maintainability", "license"]
     },
     {
       "id": "backup-integrity",
@@ -52,7 +55,28 @@
       "id": "live-media-routing",
       "preferredProject": "bluenviron/mediamtx",
       "upstream": "https://github.com/bluenviron/mediamtx",
+      "currentLicenseEvidence": "MIT",
       "selectionCriteria": ["WebRTC", "HLS", "RTSP", "SRT", "RTMP", "maintainability", "license"]
+    },
+    {
+      "id": "3d-interchange",
+      "preferredProjects": ["KhronosGroup/glTF", "PixarAnimationStudios/OpenUSD"],
+      "upstreams": ["https://github.com/KhronosGroup/glTF", "https://github.com/PixarAnimationStudios/OpenUSD"],
+      "selectionCriteria": ["web-interoperability", "scene-composition", "animation", "asset-lineage", "license"]
+    },
+    {
+      "id": "3d-reconstruction",
+      "preferredProjects": ["colmap/colmap", "isl-org/Open3D"],
+      "upstreams": ["https://github.com/colmap/colmap", "https://github.com/isl-org/Open3D"],
+      "currentLicenseEvidence": ["BSD-3-Clause", "MIT"],
+      "selectionCriteria": ["multi-view-reconstruction", "point-cloud", "mesh", "maintainability", "license"]
+    },
+    {
+      "id": "immersive-media",
+      "preferredProjects": ["bluenviron/mediamtx"],
+      "upstreams": ["https://github.com/bluenviron/mediamtx"],
+      "selectionCriteria": ["WebRTC", "HLS", "RTSP", "SRT", "RTMP", "360-video-delivery", "maintainability", "license"],
+      "standardVocabulary": ["360-degree", "3DoF", "3DoF+", "6DoF", "volumetric"]
     }
   ],
   "discoverySources": [
@@ -64,6 +88,7 @@
     "install-unreviewed-system",
     "replace-trusted-content",
     "change-main-without-protected-pr",
-    "change-corpus-without-provenance-rights-verification"
+    "change-corpus-without-provenance-rights-verification",
+    "assume-future-version-retains-current-license"
   ]
 }
