@@ -47,9 +47,9 @@ export function selectEngine(domain, statuses = {}) {
   }
 
   const ranked = eligible
-    .map((name, index) => ({
+    .map((name) => ({
       name,
-      index,
+      index: candidates.indexOf(name),
       score: scoreCandidate(name, statuses[name] ?? {})
     }))
     .sort((a, b) => b.score - a.score || a.index - b.index);
