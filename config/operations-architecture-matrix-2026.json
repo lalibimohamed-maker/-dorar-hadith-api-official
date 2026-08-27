@@ -1,0 +1,127 @@
+{
+  "version": "2026-08-27",
+  "purpose": "Define capability classes for security, recovery, storage, processing, observability and maintenance without granting any tool automatic authority over protected main or trusted scholarly content.",
+  "principles": {
+    "failClosed": true,
+    "leastPrivilege": true,
+    "toolIsNotTrust": true,
+    "noSilentContentPromotion": true,
+    "noDestructiveAutonomousResponse": true,
+    "verifyBeforeRestore": true,
+    "updatesRequireProtectedPR": true,
+    "unknownToolStatusMeansNotEnabled": true
+  },
+  "controlPipeline": [
+    "discover",
+    "classify",
+    "license-check",
+    "pin-or-verify",
+    "sandbox-or-quarantine",
+    "scan",
+    "test",
+    "review",
+    "promote"
+  ],
+  "capabilities": [
+    {
+      "id": "malware-detection",
+      "functions": ["detect", "scan", "classify"],
+      "preferred": ["ClamAV", "YARA", "Trivy", "Gitleaks", "CodeQL"],
+      "promotionEffect": "block-on-trusted-policy-hit",
+      "destructiveAction": "never-directly"
+    },
+    {
+      "id": "file-integrity-and-recovery",
+      "functions": ["hash", "snapshot", "backup", "restore", "integrity-check"],
+      "preferred": ["restic", "BorgBackup"],
+      "status": "candidate-until-deployment-evidence-exists",
+      "restorePolicy": "restore-to-quarantine-then-scan-and-verify",
+      "destructiveAction": "never-auto-delete-trusted-content"
+    },
+    {
+      "id": "download-and-ingestion",
+      "functions": ["resumable-download", "retry", "range-request", "archive-ingestion"],
+      "preferred": ["native-http-client", "rclone-where-authorized"],
+      "status": "controlled-by-source-rights-policy",
+      "policy": "download-is-not-redistribution-permission",
+      "destructiveAction": "none"
+    },
+    {
+      "id": "media-processing",
+      "functions": ["decode", "encode", "transcode", "extract-audio", "thumbnail"],
+      "preferred": ["FFmpeg"],
+      "status": "candidate-until-workflow-evidence-exists",
+      "resourceControls": ["time-limit", "memory-limit", "disk-limit", "input-size-limit"],
+      "qualityPolicy": "retain-source-and-record-derived-artifact-lineage"
+    },
+    {
+      "id": "ocr-and-document-processing",
+      "functions": ["ocr", "text-extraction", "document-normalization"],
+      "preferred": ["Tesseract"],
+      "status": "candidate-until-workflow-evidence-exists",
+      "authority": "derived-text-is-non-authoritative-until-source-and-verification-gates-pass",
+      "qualityControls": ["source-image-retention", "confidence-or-review-marker", "revision-lineage"]
+    },
+    {
+      "id": "storage-and-cache",
+      "functions": ["store", "deduplicate", "cache", "restore"],
+      "preferred": ["restic", "BorgBackup", "rclone-where-authorized"],
+      "policy": "separate-cache-from-trusted-source-and-corpus",
+      "integrity": ["encryption-where-configured", "checksums", "periodic-verification"]
+    },
+    {
+      "id": "supply-chain",
+      "functions": ["dependency-update", "sbom", "attestation", "signature-verification"],
+      "preferred": ["Dependabot", "Dependency Review", "CycloneDX", "Sigstore", "GitHub Artifact Attestations", "OpenSSF Scorecard"],
+      "policy": "automated-proposal-only-until-protected-review"
+    },
+    {
+      "id": "runtime-observability",
+      "functions": ["file-integrity-monitoring", "runtime-event-detection", "alerting"],
+      "preferred": ["Wazuh", "Falco"],
+      "status": "optional-external-deployment",
+      "policy": "alerts-ingested-read-only-until-explicitly-approved"
+    },
+    {
+      "id": "orchestration-and-compute",
+      "functions": ["job-scheduling", "resource-management", "pipeline-execution"],
+      "preferred": ["existing-GitHub-Actions", "Flux-Framework-only-when-a-concrete-HPC-requirement-exists"],
+      "status": "not-required-by-default",
+      "policy": "do-not-add-an-orchestrator-merely-because-a-product-name-was-mentioned"
+    }
+  ],
+  "notApprovedAsCore": [
+    {
+      "name": "SaveFrom-like-web-download-service",
+      "reason": "external service dependency, unclear redistribution boundary, and unnecessary when authorized direct retrieval is sufficient"
+    },
+    {
+      "name": "uTorrent-like-client",
+      "reason": "not a security or trust layer; torrent acquisition requires explicit source/right handling and quarantine"
+    },
+    {
+      "name": "Unspecified-Flux-or-FSS-product",
+      "reason": "name is ambiguous; exact project and security properties must be identified before evaluation"
+    }
+  ],
+  "selfHealing": {
+    "allowed": [
+      "detect-missing-nontrusted-derived-file",
+      "rebuild-cache-from-verified-source",
+      "restore-verified-artifact-to-quarantine",
+      "rerun-safe-validation"
+    ],
+    "requiresApprovalOrProtectedFlow": [
+      "write-to-trusted-corpus",
+      "replace-verified-source",
+      "delete-trusted-content",
+      "change-security-policy",
+      "change-branch-protection"
+    ]
+  },
+  "autoUpdate": {
+    "allowed": ["discover-updates", "open-protected-PR", "run-tests", "report-vulnerability"],
+    "forbidden": ["silent-main-mutation", "silent-security-policy-change", "silent-corpus-mutation"]
+  },
+  "evidenceRule": "A tool is not considered installed, active or trusted until code/configuration evidence and a positive control-plane signal demonstrate that state."
+}
