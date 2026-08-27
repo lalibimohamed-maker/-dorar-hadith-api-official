@@ -1,0 +1,11 @@
+{
+  "version": "2026-08-27",
+  "purpose": "Define a safe, capability-based image/video quality pipeline for high-resolution media without claiming engines are installed when they are not.",
+  "profiles": {"native":{"maxLongEdge":null},"4k":{"maxLongEdge":3840},"8k":{"maxLongEdge":7680},"12k":{"maxLongEdge":11520},"future":{"maxLongEdge":null,"policy":"environment-and-engine-evidence-required"}},
+  "image": {"preferredEngine":"Real-ESRGAN","engineProject":"https://github.com/xinntao/Real-ESRGAN","license":"BSD-3-Clause","status":"runtime-candidate-until-executable-and-model-evidence-exists","capabilities":["super-resolution","restoration","denoise","tiled-inference","16-bit-input"],"policy":"preserve-original-and-record-derived-lineage","networkModelDownload":"disabled-by-default","safety":["input-size-limit","memory-limit","time-limit","malware-scan-before-processing","hash-before-and-after"]},
+  "video": {"preferredOrchestrator":"Video2X","engineProject":"https://github.com/K4YT3X/video2x","status":"runtime-candidate-until-executable-and-gpu-evidence-exists","capabilities":["upscaling","frame-interpolation"],"backends":["Real-ESRGAN","Real-CUGAN","RIFE","Anime4K"],"containerTranscoder":"FFmpeg","policy":"retain-source-and-derived-artifact-lineage","safety":["input-size-limit","memory-limit","disk-limit","time-limit","malware-scan-before-processing"]},
+  "delivery":{"liveStreamingCandidate":"MediaMTX","protocols":["WebRTC","HLS","LL-HLS","SRT","RTSP","RTMP","MPEG-TS","RTP"],"status":"deployment-candidate","policy":"rights-and-source-policy-before-publication"},
+  "download":{"preferred":"native-http-client","optional":"rclone-where-authorized","policy":"download-is-not-redistribution-permission","destructiveAction":"none"},
+  "integrity":{"preserveOriginal":true,"recordInputSha256":true,"recordOutputSha256":true,"recordSourceProvenance":true,"recordProcessingParameters":true,"trustedContentAutoReplacement":false},
+  "governance":{"noSilentMainMutation":true,"noSilentCorpusPromotion":true,"noSilentTrustedSourceReplacement":true,"unknownEngineStateMeansNotEnabled":true,"selfHealingScope":"derived-artifacts-only-until-protected-review"}
+}
