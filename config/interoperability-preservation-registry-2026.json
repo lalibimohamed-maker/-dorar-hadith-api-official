@@ -1,0 +1,27 @@
+{
+  "version": "2026-08-28",
+  "purpose": "Standardize interoperability, scholarly interchange and long-term preservation for approved encyclopedia objects and their derivatives.",
+  "standards": {
+    "dublinCore": {"role":"descriptive-metadata","source":"https://www.dublincore.org/specifications/dublin-core/dcmi-terms/"},
+    "iiifPresentation": {"role":"compound-manuscript-and-media-presentation","version":"3.0","source":"https://iiif.io/api/presentation/3.0/"},
+    "webAnnotation": {"role":"fine-grained-annotations","source":"https://www.w3.org/TR/annotation-model/"},
+    "roCrate": {"role":"portable-research-object-and-provenance-package","version":"1.2","source":"https://www.researchobject.org/ro-crate/specification/1.2/"},
+    "premis": {"role":"digital-preservation-events-rights-agents-and-objects","version":"3.0","source":"https://www.loc.gov/standards/premis/v3/index.html"},
+    "wcag": {"role":"accessibility","version":"2.2","source":"https://www.w3.org/TR/WCAG22/"},
+    "traceContext": {"role":"distributed-request-tracing","source":"https://www.w3.org/TR/trace-context/"},
+    "iso16363": {"role":"trustworthy-digital-repository-assurance-reference","version":"2025","source":"https://www.iso.org/standard/87472.html"}
+  },
+  "exportProfiles": ["json", "jsonld", "xml-tei-when-applicable", "iiif-manifest", "ro-crate", "pdf", "epub-when-rights-permit"],
+  "preservation": {
+    "checksums": ["sha256"],
+    "events": ["ingest", "validation", "ocr", "human-correction", "transformation", "publication", "withdrawal", "supersession", "restore-test"],
+    "restoreVerificationRequired": true,
+    "noSilentOverwrite": true
+  },
+  "identifierPolicy": {
+    "stableIdsRequired": true,
+    "persistentExternalIdsWhenAvailable": true,
+    "aliasesAllowed": true,
+    "displayNameIsNotIdentity": true
+  }
+}
