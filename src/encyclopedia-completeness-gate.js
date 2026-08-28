@@ -44,13 +44,25 @@ export function validateCompletenessArchitecture() {
     'Model output must never become primary evidence.'
   );
   assert(
-    cfg.resilience.noSilentOverwrite === true || cfg.resilience.presence?.noSilentOverwrite === true,
+    cfg.resilience.backup.noSilentOverwrite === true,
     'Silent overwrite protection is required.'
   );
-  assert(cfg.accessibility.accessibility.target === 'WCAG-2.2-AA', 'Accessibility target must be WCAG 2.2 AA.');
-  assert(cfg.interoperability.standards.iiifPresentation.version === '3.0', 'IIIF Presentation 3.0 is required.');
-  assert(cfg.interoperability.standards.roCrate.version === '1.2', 'RO-Crate 1.2 is required.');
-  assert(cfg.interoperability.preservation.restoreVerificationRequired === true, 'Restore verification is required.');
+  assert(
+    cfg.accessibility.accessibility.target === 'WCAG-2.2-AA',
+    'Accessibility target must be WCAG 2.2 AA.'
+  );
+  assert(
+    cfg.interoperability.standards.iiifPresentation.version === '3.0',
+    'IIIF Presentation 3.0 is required.'
+  );
+  assert(
+    cfg.interoperability.standards.roCrate.version === '1.2',
+    'RO-Crate 1.2 is required.'
+  );
+  assert(
+    cfg.interoperability.preservation.restoreVerificationRequired === true,
+    'Restore verification is required.'
+  );
 
   const engines = cfg.engines.engines ?? {};
   for (const [capability, entries] of Object.entries(engines)) {
