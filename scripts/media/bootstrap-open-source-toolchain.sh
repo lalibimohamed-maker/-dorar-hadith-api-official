@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Governed deployment bootstrap. It installs only from the host's configured
-# package indexes. It never executes an arbitrary URL, downloads model weights,
-# or modifies trusted Corpus content.
+# package indexes. It does not execute arbitrary URLs, download model weights,
+# or modify trusted Corpus content.
 
 : "${MEDIA_TOOLCHAIN_INSTALL:=0}"
 if [[ "$MEDIA_TOOLCHAIN_INSTALL" != "1" ]]; then
