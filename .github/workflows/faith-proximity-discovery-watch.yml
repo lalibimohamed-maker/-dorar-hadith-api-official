@@ -1,0 +1,71 @@
+name: Faith Proximity Discovery Watch
+
+on:
+  schedule:
+    - cron: '31 4 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate knowledge and engine registries
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          for path in [
+              'config/faith-proximity-domain-registry-2026.json',
+              'config/scholarly-engine-mesh-2026.json',
+              'config/card-studio-registry-2026.json'
+          ]:
+              with open(path, encoding='utf-8') as f:
+                  json.load(f)
+              print('valid:', path)
+          PY
+
+      - name: Produce discovery manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          python3 - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          domain = json.load(open('config/faith-proximity-domain-registry-2026.json', encoding='utf-8'))
+          mesh = json.load(open('config/scholarly-engine-mesh-2026.json', encoding='utf-8'))
+          card = json.load(open('config/card-studio-registry-2026.json', encoding='utf-8'))
+          report = {
+              'generatedAt': datetime.now(timezone.utc).isoformat(),
+              'navigationEntries': len(domain['navigation']['entries']),
+              'proximityFamilies': len(domain['proximityToAllah']['families']),
+              'capabilities': {k: len(v) for k, v in mesh['engines'].items()},
+              'cardFormats': card['formats'],
+              'policy': 'discover automatically; install/promote only through protected review'
+          }
+          json.dump(report, open('artifacts/faith-proximity-discovery.json','w',encoding='utf-8'), ensure_ascii=False, indent=2)
+          PY
+
+      - name: Upload discovery artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: faith-proximity-discovery
+          path: artifacts/faith-proximity-discovery.json
+          if-no-files-found: error
+
+      - name: Policy assertion
+        run: |
+          test "$(python3 -c "import json; print(json.load(open('config/scholarly-engine-mesh-2026.json'))['minimumRedundancy']['perCapability'])")" -ge 2
+          grep -q 'No single engine can approve' config/scholarly-engine-mesh-2026.json
+          grep -q 'free-to-access-does-not-mean-every-web-asset-is-free-to-redistribute' config/card-studio-registry-2026.json

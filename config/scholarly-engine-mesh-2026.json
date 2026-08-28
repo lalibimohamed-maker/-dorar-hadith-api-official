@@ -1,0 +1,63 @@
+{
+  "version": "2026-08-28",
+  "purpose": "Fail-closed multi-engine orchestration for discovery, provenance, integrity, scholarly review and multilingual/media processing.",
+  "rule": "No single engine can approve a scholarly item for publication by itself.",
+  "minimumRedundancy": {
+    "perCapability": 2,
+    "preferred": 3
+  },
+  "engines": {
+    "sourceDiscovery": [
+      {"id":"web-discovery","role":"discover","trust":"untrusted-input"},
+      {"id":"publisher-discovery","role":"discover","trust":"untrusted-input"},
+      {"id":"scholar-library-discovery","role":"discover","trust":"untrusted-input"}
+    ],
+    "provenance": [
+      {"id":"source-provenance-audit","role":"lineage-and-owner"},
+      {"id":"rights-resolver","role":"license-and-redistribution"},
+      {"id":"cross-source-concordance","role":"independent-confirmation"}
+    ],
+    "hadithEvidence": [
+      {"id":"hadith-source-metadata","role":"source-identification"},
+      {"id":"hadith-grading-registry","role":"reported-grading-only"},
+      {"id":"hadith-route-concordance","role":"chains-and-variants"}
+    ],
+    "quranAndTafsir": [
+      {"id":"quran-canonical-text-check","role":"text-integrity"},
+      {"id":"tafsir-source-linker","role":"commentary-provenance"},
+      {"id":"tafsir-concordance","role":"independent-cross-reference"}
+    ],
+    "ocr": [
+      {"id":"tesseract","role":"baseline-ocr","upstream":"https://github.com/tesseract-ocr/tesseract","licenseEvidence":"Apache-2.0"},
+      {"id":"paddleocr","role":"independent-ocr","upstream":"https://github.com/PaddlePaddle/PaddleOCR","licenseEvidence":"Apache-2.0"},
+      {"id":"layout-and-text-integrity","role":"post-ocr-structural-check"}
+    ],
+    "translation": [
+      {"id":"machine-translation-a","role":"draft-only"},
+      {"id":"machine-translation-b","role":"independent-draft-only"},
+      {"id":"bilingual-review","role":"quality-gate"}
+    ],
+    "mediaQuality": [
+      {"id":"image-quality-a","role":"enhancement"},
+      {"id":"image-quality-b","role":"independent-enhancement-check"},
+      {"id":"visual-integrity-review","role":"human-or-independent-review"}
+    ],
+    "publication": [
+      {"id":"schema-validator","role":"structure"},
+      {"id":"provenance-validator","role":"evidence"},
+      {"id":"rights-validator","role":"distribution"}
+    ]
+  },
+  "decisions": {
+    "discover": "allow",
+    "download": "allow-only-after-policy-check",
+    "parse": "sandbox",
+    "publish": "blocked-until-all-required-gates-pass",
+    "replace-trusted-content": "blocked",
+    "mutate-corpus": "blocked-without-provenance-rights-and-protected-review"
+  },
+  "confidence": {
+    "policy": "confidence is an evidence state, never a substitute for scholarly authority",
+    "states": ["unreviewed","discovered","corroborated","scholarly-reviewed","rights-cleared","publishable","withdrawn"]
+  }
+}
