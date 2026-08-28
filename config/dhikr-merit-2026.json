@@ -1,0 +1,116 @@
+{
+  "version": "2026-08-28",
+  "scope": "quran-and-authentic-sunnah-dhikr-only",
+  "title": "فضل الذكر — evidence-linked guided dhikr",
+  "principles": {
+    "islamicScopeOnly": true,
+    "sourceFirst": true,
+    "hadithGradeMustBeRecorded": true,
+    "quranReferenceMustBeRecorded": true,
+    "variantCountsMustStaySeparated": true,
+    "noInventedCounts": true,
+    "noFalseReligiousClaims": true,
+    "unlimitedUserCountingAllowed": true,
+    "guidedTargetIsNotReligiousMaximum": true
+  },
+  "quranThemes": [
+    {"id":"remember-me","reference":"2:152","theme":"ذكر الله وشكره"},
+    {"id":"remember-humbly","reference":"7:205","theme":"الذكر في النفس بالغدو والآصال"},
+    {"id":"frequent-remembrance","reference":"33:41","theme":"الإكثار من ذكر الله"},
+    {"id":"seek-forgiveness","reference":"71:10","theme":"الاستغفار"},
+    {"id":"gratitude","reference":"2:152","theme":"الشكر وترك كفر النعم"},
+    {"id":"tranquility","reference":"13:28","theme":"طمأنينة القلوب بذكر الله"}
+  ],
+  "dhikrItems": [
+    {
+      "id":"subhanallah-wa-bihamdihi-100",
+      "phrase":"سبحان الله وبحمده",
+      "arabicMeaning":"تنزيه الله وحمده",
+      "event":"daily",
+      "guidedTarget":100,
+      "targetMode":"hadith-stated-count",
+      "countIsMaximum":false,
+      "evidence":[{"collection":"Sahih al-Bukhari","number":"6405","grade":"sahih","url":"https://sunnah.com/bukhari:6405"}]
+    },
+    {
+      "id":"istighfar-70",
+      "phrase":"أستغفر الله وأتوب إليه",
+      "arabicMeaning":"طلب المغفرة والتوبة إلى الله",
+      "event":"daily",
+      "guidedTarget":70,
+      "targetMode":"hadith-stated-count",
+      "countIsMaximum":false,
+      "evidence":[{"collection":"Sahih al-Bukhari","number":"6307","grade":"sahih","url":"https://sunnah.com/bukhari/80/4"},{"collection":"Jami at-Tirmidhi","number":"3259","grade":"hasan-sahih","url":"https://sunnah.com/tirmidhi/47/311"}]
+    },
+    {
+      "id":"istighfar-100-variant",
+      "phrase":"أستغفر الله وأتوب إليه",
+      "arabicMeaning":"طلب المغفرة والتوبة إلى الله",
+      "event":"daily",
+      "guidedTarget":100,
+      "targetMode":"reported-variant",
+      "countIsMaximum":false,
+      "evidence":[{"collection":"Jami at-Tirmidhi","number":"3259","grade":"reported-variant","url":"https://sunnah.com/tirmidhi/47/311"}]
+    },
+    {
+      "id":"la-ilaha-illallah-100",
+      "phrase":"لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير",
+      "arabicMeaning":"إفراد الله بالعبادة والملك والحمد والقدرة",
+      "event":"daily",
+      "guidedTarget":100,
+      "targetMode":"hadith-stated-count",
+      "countIsMaximum":false,
+      "evidence":[{"collection":"Riyad as-Salihin","number":"1410","grade":"muttafaqun-alayh","url":"https://sunnah.com/riyadussalihin/15"}]
+    },
+    {
+      "id":"after-prayer-tasbih",
+      "phrase":"سبحان الله",
+      "arabicMeaning":"تنزيه الله",
+      "event":"after-each-obligatory-prayer",
+      "guidedTarget":33,
+      "targetMode":"hadith-stated-count",
+      "countIsMaximum":false,
+      "groupedSequence":{"type":"post-prayer","steps":[{"phrase":"سبحان الله","count":33},{"phrase":"الحمد لله","count":33},{"phrase":"الله أكبر","count":33},{"phrase":"لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير","count":1}]},
+      "evidence":[{"collection":"Sahih Muslim","number":"597a","grade":"sahih","url":"https://sunnah.com/muslim:597a"}]
+    },
+    {
+      "id":"salat-on-prophet",
+      "phrase":"الصلاة على النبي ﷺ",
+      "arabicMeaning":"الصلاة والسلام على رسول الله ﷺ",
+      "event":"general",
+      "guidedTarget":null,
+      "targetMode":"merit-per-one-no-fixed-count",
+      "countIsMaximum":false,
+      "evidence":[{"collection":"Sahih Muslim","number":"408","grade":"sahih","url":"https://sunnah.com/muslim:408"}]
+    },
+    {
+      "id":"two-beloved-phrases",
+      "phraseOptions":["سبحان الله وبحمده","سبحان الله العظيم"],
+      "event":"general",
+      "guidedTarget":null,
+      "targetMode":"merit-no-fixed-count",
+      "countIsMaximum":false,
+      "evidence":[{"collection":"Sahih al-Bukhari","number":"6406","grade":"sahih","url":"https://sunnah.com/bukhari:6406"}]
+    },
+    {
+      "id":"keep-tongue-wet",
+      "phrase":"ذكر الله",
+      "event":"general",
+      "guidedTarget":null,
+      "targetMode":"continuous-practice",
+      "countIsMaximum":false,
+      "evidence":[{"collection":"Jami at-Tirmidhi","number":"3375","grade":"hasan","url":"https://sunnah.com/tirmidhi:3375"}]
+    }
+  ],
+  "dailyCards": {
+    "allowedSources": ["Quran","Sahih al-Bukhari","Sahih Muslim","Jami at-Tirmidhi","Sunan Abi Dawud","Sunan an-Nasa'i","Sunan Ibn Majah"],
+    "maxQuranAyahsPerCard": 2,
+    "cardMustShowSource": true,
+    "cardMustShowOriginalText": true,
+    "backgroundIsDerivedDesignOnly": true,
+    "brand":"موسوعة دين الله",
+    "rotation": "date-deterministic-then-evidence-ranked",
+    "eventAwareness": true,
+    "noUnsourcedIslamicQuote": true
+  }
+}
