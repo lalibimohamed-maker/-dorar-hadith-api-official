@@ -1,0 +1,23 @@
+{
+  "version": "2026-08-28",
+  "purpose": "Make the encyclopedia usable across languages, scripts, devices and accessibility needs without changing canonical religious texts.",
+  "accessibility": {
+    "target": "WCAG-2.2-AA",
+    "requirements": ["keyboard-navigation", "visible-focus", "target-size", "contrast", "captions", "transcripts", "audio-description-when-applicable", "reduced-motion", "semantic-headings", "screen-reader-labels", "skip-links", "accessible-authentication", "no-drag-only-interactions"],
+    "testModes": ["automated", "manual", "screen-reader", "keyboard-only", "zoom-and-reflow", "mobile"],
+    "contentAlternatives": ["text-alternative-for-images", "transcript-for-audio", "captions-for-video", "structured-text-for-cards"]
+  },
+  "i18n": {
+    "localeModel": "BCP47-compatible language-script-region identifiers",
+    "scriptAware": true,
+    "rtlAware": true,
+    "localeDiscovery": true,
+    "languageFallback": "source-language-display-when-no-reviewed-translation-exists",
+    "translationStates": ["source", "machine-draft", "human-reviewed", "scholarly-reviewed", "published", "superseded"],
+    "translationLineageRequired": true,
+    "protectedContent": ["canonical-quran-text", "verified-hadith-arabic-text", "source-page-image"],
+    "search": ["cross-language-query-expansion", "transliteration-where-safe", "diacritic-tolerant-index", "display-text-preservation"]
+  },
+  "scriptsToPlanFor": ["Arabic", "Latin", "Cyrillic", "Devanagari", "Perso-Arabic", "Bengali", "Chinese", "Japanese", "Korean", "Thai", "Ethiopic", "Hebrew"],
+  "qualityRule": "Never silently replace source-language canonical text with machine-translated or transliterated text."
+}
