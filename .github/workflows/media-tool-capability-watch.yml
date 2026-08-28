@@ -1,0 +1,84 @@
+name: Media Tool Capability Watch
+
+on:
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Check curated upstream releases
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, urllib.request
+          from datetime import datetime, timezone
+          cfg = json.load(open('config/media-tool-discovery-registry-2026.json', encoding='utf-8'))
+          found = []
+          for cap in cfg['capabilities']:
+              urls = []
+              if cap.get('upstream', '').startswith('https://github.com/'):
+                  urls.append(cap['upstream'])
+              urls.extend([u for u in cap.get('upstreams', []) if u.startswith('https://github.com/')])
+              for url in urls:
+                  repo = url.rstrip('/').removeprefix('https://github.com/')
+                  req = urllib.request.Request(
+                      f'https://api.github.com/repos/{repo}/releases/latest',
+                      headers={'Accept':'application/vnd.github+json','User-Agent':'Din-Allah-Encyclopedia-capability-watch'}
+                  )
+                  try:
+                      with urllib.request.urlopen(req, timeout=15) as r:
+                          release = json.load(r)
+                      found.append({'capability': cap['id'], 'repository': repo, 'tag': release.get('tag_name'), 'published_at': release.get('published_at'), 'html_url': release.get('html_url')})
+                  except Exception as exc:
+                      found.append({'capability': cap['id'], 'repository': repo, 'error': str(exc)})
+          os.makedirs('artifacts', exist_ok=True)
+          json.dump({'checkedAt': datetime.now(timezone.utc).isoformat(), 'results': found}, open('artifacts/media-tool-upstream-status.json','w'), indent=2)
+          PY
+
+      - name: Publish discovery report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: media-tool-upstream-status
+          path: artifacts/media-tool-upstream-status.json
+          if-no-files-found: error
+
+      - name: Open or update discovery issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(cat artifacts/media-tool-upstream-status.json)"
+          existing=$(gh issue list --state open --search 'in:title "media/tool capability discovery report"' --json number --jq '.[0].number // empty')
+          if [ -n "${existing}" ]; then
+            gh issue comment "${existing}" --body "Weekly capability discovery report:\n\n\`\`\`json\n${body}\n\`\`\`"
+          else
+            gh issue create --title "automation: media/tool capability discovery report" --body "Automated discovery only. No software was installed or trusted. Review upstream release signals, licenses, security advisories, compatibility, resource requirements, and provenance before proposing any update.\n\n\`\`\`json\n${body}\n\`\`\`"
+          fi
+
+      - name: Policy assertion
+        run: |
+          python3 - <<'PY'
+          import json
+          cfg=json.load(open('config/media-tool-discovery-registry-2026.json', encoding='utf-8'))
+          assert cfg['policy']['discoverAutomatically'] is True
+          assert cfg['policy']['installAutomatically'] is False
+          assert cfg['policy']['promoteAutomatically'] is False
+          assert cfg['policy']['requireProtectedPRForUpdates'] is True
+          assert 'download-and-execute-unknown-binary' in cfg['prohibitedAutoActions']
+          print('Capability discovery policy is fail-closed.')
+          PY

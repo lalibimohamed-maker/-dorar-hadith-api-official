@@ -1,0 +1,26 @@
+{
+  "version": "2026-08-27",
+  "purpose": "Provide large authorized Islamic-media downloads without an artificial application file-size ceiling.",
+  "policy": {
+    "applicationMaxFileSizeBytes": null,
+    "allowRangeRequests": true,
+    "allowResumableDownloads": true,
+    "allowChunkedTransfer": true,
+    "allowParallelChunks": true,
+    "verifySha256BeforeServe": true,
+    "rightsCheckBeforeServe": true,
+    "sourceProvenanceRequired": true,
+    "malwareScanRequired": true,
+    "trustedContentImmutable": true
+  },
+  "delivery": {
+    "protocols": ["HTTP-range", "HTTPS-range"],
+    "recommendedClientBehavior": ["resume", "retry-with-backoff", "verify-checksum"],
+    "optionalProtocol": "tus-for-upload-ingestion"
+  },
+  "limits": {
+    "applicationImposedFileSizeLimit": "none",
+    "realInfrastructureLimitsRemain": ["storage-capacity", "bandwidth", "reverse-proxy-limits", "filesystem-limits", "browser/device-capability"]
+  },
+  "scope": "Only materials admitted by the encyclopedia's source, rights and publication policies may be served."
+}

@@ -1,0 +1,47 @@
+{
+  "version": "2026-08-27",
+  "scope": "Islamic scholarly books and other materials admitted by the existing source, rights, provenance and verification gates.",
+  "pipeline": [
+    "preserve-source-pages",
+    "preprocess-image",
+    "multi-engine-ocr",
+    "layout-detection",
+    "question-answer-segmentation",
+    "semantic-indexing",
+    "derived-edition-rendering",
+    "human-or-independent-verification",
+    "publish-derived-artifact"
+  ],
+  "ocrEngines": [
+    {"project":"tesseract-ocr/tesseract","role":"baseline-ocr","licenseEvidence":"Apache-2.0"},
+    {"project":"PaddlePaddle/PaddleOCR","role":"layout-and-ocr-candidate","licenseEvidence":"Apache-2.0"}
+  ],
+  "answerPolicy": {
+    "extractedAnswerIsAuthoritative": false,
+    "generatedExplanationIsAuthoritative": false,
+    "mustRetainPageReference": true,
+    "mustRetainSourceText": true,
+    "mustRetainQuestionContext": true,
+    "promotionRequiresVerification": true
+  },
+  "qaPatterns": {
+    "supportedLabels": ["السؤال", "الجواب", "سؤال", "جواب", "لماذا", "كيف", "ما الدليل"],
+    "language": "ar",
+    "preserveOriginalOrdering": true
+  },
+  "derivedEdition": {
+    "canEnhanceScan": true,
+    "canImproveContrast": true,
+    "canCreateSearchableTextLayer": true,
+    "canCreateStructuredQuestionAnswerPanels": true,
+    "canColorQuranTextForTajweedOnlyWhenVerified": true,
+    "canReplaceOriginalPage": false
+  },
+  "governance": {
+    "corpusWriteBoundary": true,
+    "rightsCheckBeforeRedistribution": true,
+    "provenanceRequired": true,
+    "unknownOcrConflictFailsClosed": true,
+    "noSilentScholarlyClaims": true
+  }
+}
