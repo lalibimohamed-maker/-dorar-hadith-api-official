@@ -1,0 +1,34 @@
+{
+  "version": "2026-08-28",
+  "purpose": "Operational resilience for a public, multilingual, scholarly service with verifiable recovery and no silent data loss.",
+  "availability": {
+    "degradedModes": ["read-only", "cached-search", "offline-bundle", "source-link-only", "maintenance"],
+    "gracefulDegradation": true,
+    "healthChecks": ["api", "search", "corpus-read", "source-connectors", "media", "translation", "storage"]
+  },
+  "backup": {
+    "strategies": ["immutable-snapshot", "versioned-object-storage", "database-backup", "metadata-export"],
+    "encryptionAtRestRequired": true,
+    "restoreDrillRequired": true,
+    "restoreDrillFrequency": "quarterly",
+    "backupVerification": "checksum-plus-sample-read"
+  },
+  "offline": {
+    "supportedArtifacts": ["selected-books", "approved-corpus-slices", "audio", "cards", "iiif-manifests", "ro-crates"],
+    "verification": ["manifest", "checksum", "source-lineage"],
+    "neverClaimOfflineCopyIsLive": true
+  },
+  "schemaEvolution": {
+    "compatibility": "backward-compatible-when-possible",
+    "migrationRequired": true,
+    "dual-read-windowWhenBreaking": true,
+    "migrationAudit": true
+  },
+  "observability": {
+    "traceContext": true,
+    "structuredLogs": true,
+    "metrics": ["latency", "error-rate", "search-quality", "ingestion-rate", "review-queue-age", "rights-denials", "translation-coverage"],
+    "privacyPreservingAnalytics": true,
+    "noRawUserQueriesByDefault": true
+  }
+}
