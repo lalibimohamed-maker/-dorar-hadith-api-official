@@ -1,0 +1,51 @@
+name: Encyclopedia Completeness Gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Validate JSON registries
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const files = [
+            'config/encyclopedia-completeness-registry-2026.json',
+            'config/interoperability-preservation-registry-2026.json',
+            'config/accessibility-i18n-registry-2026.json',
+            'config/resilience-operations-registry-2026.json',
+            'config/evaluation-risk-governance-registry-2026.json',
+            'config/scholarly-engine-mesh-2026.json'
+          ];
+          for (const file of files) {
+            JSON.parse(fs.readFileSync(file, 'utf8'));
+            console.log(`valid: ${file}`);
+          }
+          NODE
+
+      - name: Run completeness gate
+        run: node src/encyclopedia-completeness-gate.js
+
+      - name: Run focused test
+        run: node --test test/encyclopedia-completeness-gate.test.js
