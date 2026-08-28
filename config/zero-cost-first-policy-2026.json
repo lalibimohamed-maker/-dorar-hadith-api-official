@@ -1,0 +1,48 @@
+{
+  "version": "2026-08-28",
+  "title": "Zero-Cost-First and Free-to-Access Policy",
+  "purpose": "Keep Din Allah Encyclopedia freely accessible while avoiding required paid services for users and preferring open-source, free-tier, and self-hostable components.",
+  "principles": [
+    "free-access-by-default",
+    "no-required-paid-subscription-for-users",
+    "no-required-paid-api-key",
+    "open-source-first",
+    "self-hostable-first",
+    "free-tier-aware",
+    "no-vendor-lock-in",
+    "graceful-degradation-when-a-free-service-limit-is-reached",
+    "preserve-content-quality-over-cheap-automation",
+    "do-not-confuse-free-software-with-free-content-rights"
+  ],
+  "servicePolicy": {
+    "requiredPaidServices": false,
+    "requiredPaidApiKeys": false,
+    "requiredSubscriptionForCoreReading": false,
+    "requiredSubscriptionForCoreDownloads": false,
+    "preferredOrder": [
+      "native-open-source",
+      "self-hosted-open-source",
+      "public-free-service-with-appropriate-rate-limits",
+      "free-tier-service-with-clear-fallback",
+      "paid-service-only-as-optional-enhancement"
+    ]
+  },
+  "fallbackRules": {
+    "paidDependencyBecomesRequired": "block-and-replace",
+    "freeQuotaExhausted": "degrade-to-local-or-queued-processing",
+    "providerUnavailable": "switch-to-independent-provider-or-self-hosted-path",
+    "licenseChanges": "revalidate-before-use",
+    "serviceTermsConflict": "disable-integration-until-reviewed"
+  },
+  "userGuarantees": [
+    "core scholarly reading remains free",
+    "core source discovery remains free",
+    "approved downloadable artifacts remain free when redistribution rights permit",
+    "translations and media remain free to access when legally redistributable",
+    "no advertising or paid gate is required by this policy"
+  ],
+  "costReality": {
+    "statement": "Software can be free and self-hostable while compute, storage, bandwidth, domains, and third-party quotas may have limits or costs at scale.",
+    "policy": "Never hide operational cost risk; design for zero-cost operation first and make paid infrastructure optional rather than a user requirement."
+  }
+}
