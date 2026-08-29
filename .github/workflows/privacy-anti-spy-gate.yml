@@ -3,13 +3,12 @@ name: Privacy Anti-Spy Gate
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-  merge_group:
 
 permissions:
   contents: read
 
 concurrency:
-  group: privacy-anti-spy-${{ github.event.pull_request.number || github.ref }}
+  group: privacy-anti-spy-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -54,8 +53,8 @@ jobs:
 
       - name: Inspect changed files for forbidden Corpus edits
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         shell: bash
         run: |
           set -euo pipefail
