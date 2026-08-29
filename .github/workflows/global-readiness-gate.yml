@@ -3,13 +3,12 @@ name: Global Readiness Gate
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-  merge_group:
 
 permissions:
   contents: read
 
 concurrency:
-  group: global-readiness-${{ github.event.pull_request.number || github.ref }}
+  group: global-readiness-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -45,8 +44,8 @@ jobs:
       - name: Enforce global readiness policy
         shell: bash
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
           changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
