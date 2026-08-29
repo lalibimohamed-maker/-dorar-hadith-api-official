@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Validate JSON governance files
         shell: bash
@@ -156,4 +157,4 @@ jobs:
           PY
 
       - name: Gate result
-        run: 'echo "GLOBAL READINESS GATE: PASS"'
+        run: echo "GLOBAL READINESS GATE: PASS"
