@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "purpose": "Free/open-source self-hosted engine registry for Deen Allah Encyclopedia media quality and performance.",
+  "costPolicy": {
+    "software": "free-and-open-source-preferred",
+    "subscription": "none-required",
+    "hosting": "self-hosted",
+    "note": "Free software does not mean zero infrastructure cost. No paid API is required by this registry."
+  },
+  "audio": {
+    "primary": {
+      "id": "deepfilternet",
+      "role": "speech-enhancement-and-noise-suppression",
+      "license": ["MIT", "Apache-2.0"],
+      "mode": "batch-or-realtime-where-supported",
+      "source": "https://github.com/Rikorose/DeepFilterNet"
+    },
+    "secondary": {
+      "id": "rnnoise",
+      "role": "recurrent-neural-noise-suppression",
+      "license": ["BSD-3-Clause"],
+      "mode": "realtime-capable",
+      "source": "https://github.com/xiph/rnnoise"
+    },
+    "postProcessing": {
+      "id": "ffmpeg",
+      "role": "format-normalization-and-audio-filter-pipeline",
+      "license": ["LGPL-2.1-or-later", "GPL-2.0-or-later-depending-on-build"],
+      "source": "https://ffmpeg.org/"
+    }
+  },
+  "image": {
+    "primary": {
+      "id": "real-esrgan",
+      "role": "real-world-super-resolution-and-restoration",
+      "license": ["BSD-3-Clause"],
+      "source": "https://github.com/xinntao/Real-ESRGAN"
+    },
+    "secondary": {
+      "id": "swinir",
+      "role": "super-resolution-denoising-and-restoration",
+      "license": ["Apache-2.0"],
+      "source": "https://github.com/JingyunLiang/SwinIR"
+    },
+    "pipeline": {
+      "id": "8k-plus-upscale",
+      "role": "multi-pass-upscaling-with-quality-gates",
+      "target": "8K-or-higher-when-source-quality-and-hardware-permit",
+      "policy": "never-claim-native-detail-that-the-source-does-not-contain"
+    },
+    "encoding": {
+      "id": "sharp",
+      "role": "fast-image-transcoding-and-AVIF-WebP-delivery",
+      "source": "https://sharp.pixelplumbing.com/"
+    }
+  },
+  "architecture": {
+    "search": ["meilisearch", "qdrant"],
+    "design": ["penpot"],
+    "build": ["vite-rolldown"],
+    "offline": ["workbox"],
+    "performanceVerification": ["lighthouse", "pagespeed-insights", "webpagetest"],
+    "scientificContentBoundary": "These engines may transform presentation media only; they must never rewrite, infer, or replace authoritative Corpus text, provenance, attribution, or rights metadata."
+  },
+  "rightsPolicy": {
+    "modelsAndCode": "verify upstream license and model-specific terms before redistribution",
+    "sourceMedia": "do-not-process-or-rehost-unknown-rights-material-as-authoritative-content",
+    "fallback": "link-to-original-source-when-redistribution-rights-are-unclear"
+  }
+}
