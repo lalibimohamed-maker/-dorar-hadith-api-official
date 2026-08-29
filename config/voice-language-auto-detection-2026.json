@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Automatic spoken-language detection and same-language response policy for the Deen Allah Encyclopedia voice assistant.",
+  "assistantName": "يا بوابة العلم",
+  "defaults": {
+    "autoDetectLanguage": true,
+    "respondInDetectedLanguage": true,
+    "uiLanguageFollowsSpeech": false,
+    "conversationLanguageMemory": true,
+    "manualLanguageLock": true,
+    "mixedLanguageMode": true,
+    "localFirst": true
+  },
+  "pipeline": [
+    "wake_word",
+    "vad",
+    "language_id",
+    "speech_to_text",
+    "language_confidence_fusion",
+    "intent_and_retrieval",
+    "response_generation",
+    "translation_if_requested",
+    "text_to_speech"
+  ],
+  "engines": {
+    "languageId": {
+      "primary": "sherpa-onnx",
+      "secondary": "silero-language-classifier",
+      "fallback": "multilingual-whisper-language-identification"
+    },
+    "speechToText": ["whisper.cpp", "faster-whisper"],
+    "textToSpeech": ["Piper1-GPL", "sherpa-onnx"]
+  },
+  "decisionPolicy": {
+    "minimumAudioWindowBeforeSwitch": true,
+    "ignoreSingleForeignToken": true,
+    "requireConfidenceThreshold": true,
+    "retainPreviousLanguageOnLowConfidence": true,
+    "recheckOnLongerUtterance": true,
+    "preventLanguageOscillation": true,
+    "preserveExplicitManualLanguageLock": true
+  },
+  "mixedLanguage": {
+    "defaultResponseLanguage": "dominant_conversation_language",
+    "preserveProperNames": true,
+    "preserveQuotedOriginalText": true,
+    "doNotTranslateSacredTextSilently": true
+  },
+  "translation": {
+    "isPresentationLayerOnly": true,
+    "neverAuthoritativeSource": true,
+    "retainOriginalArabicText": true,
+    "retainTranslationLanguage": true,
+    "retainTranslationSource": true,
+    "retainTranslationConfidence": true
+  },
+  "privacy": {
+    "voiceProcessingLocalPreferred": true,
+    "rawAudioNotPersistedByDefault": true,
+    "externalRecognitionRequiresConsent": true,
+    "languageHistoryUserDeletable": true
+  },
+  "evaluation": {
+    "languageIdentificationAccuracy": true,
+    "shortUtteranceAccuracy": true,
+    "arabicDialectRobustness": true,
+    "mixedLanguageRobustness": true,
+    "falseLanguageSwitchRate": true,
+    "responseLanguageConsistency": true,
+    "latency": true,
+    "privacy": true
+  },
+  "supportedInitialLanguages": ["ar", "en", "fr"],
+  "expansionPolicy": "Add a language after model, TTS voice, privacy, licensing, and benchmark validation; never assume all languages have equal model quality."
+}
