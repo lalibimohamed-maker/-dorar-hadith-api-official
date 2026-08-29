@@ -1,0 +1,200 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-08-29",
+  "purpose": "Continuous evaluation and advancement registry for the free, self-hosted engines used by Deen Allah Encyclopedia.",
+  "principles": {
+    "freeFirst": true,
+    "openSourcePreferred": true,
+    "noPaidApiRequired": true,
+    "selfHostedPreferred": true,
+    "doNotAutoPromoteUnreviewedEngines": true,
+    "preserveCorpusAndProvenance": true,
+    "failClosedOnUnknownRights": true,
+    "measureBeforeReplacing": true
+  },
+  "evaluationAxes": [
+    "license_and_cost",
+    "security",
+    "release_activity",
+    "maintenance_health",
+    "performance",
+    "quality",
+    "arabic_support",
+    "offline_or_self_hosting",
+    "resource_usage",
+    "reproducibility",
+    "provenance_and_rights"
+  ],
+  "engines": {
+    "design": {
+      "primary": "penpot",
+      "alternates": [],
+      "status": "adopted",
+      "evaluation": "watch_upstream_for_design-system-prototyping-and-self-hosting-advances",
+      "source": "https://penpot.app/"
+    },
+    "build": {
+      "primary": "vite-rolldown",
+      "alternates": [],
+      "status": "adopted",
+      "evaluation": "benchmark-build-time-bundle-size-and-plugin-compatibility-before-upgrade",
+      "source": "https://vite.dev/"
+    },
+    "search_text": {
+      "primary": "meilisearch",
+      "alternates": [],
+      "status": "adopted",
+      "evaluation": "benchmark-arabic-typo-tolerance-prefix-latency-and-index-size",
+      "source": "https://www.meilisearch.com/"
+    },
+    "search_semantic": {
+      "primary": "qdrant",
+      "alternates": [],
+      "status": "adopted",
+      "evaluation": "benchmark-hybrid-retrieval-recall-latency-memory-and-filtering",
+      "source": "https://qdrant.tech/"
+    },
+    "pwa": {
+      "primary": "workbox",
+      "alternates": [],
+      "status": "adopted",
+      "evaluation": "measure-cache-hit-ratio-offline-boot-and-storage-footprint",
+      "source": "https://developer.chrome.com/docs/workbox/"
+    },
+    "image_encoding": {
+      "primary": "sharp",
+      "alternates": [],
+      "status": "adopted",
+      "evaluation": "benchmark-avif-webp-quality-size-and-throughput",
+      "source": "https://sharp.pixelplumbing.com/"
+    },
+    "image_restoration": {
+      "primary": "real-esrgan",
+      "alternates": ["swinir"],
+      "status": "adopted",
+      "evaluation": "blind-comparison-artifacts-text-legibility-and-source-faithfulness",
+      "source": "https://github.com/xinntao/Real-ESRGAN"
+    },
+    "audio_enhancement": {
+      "primary": "deepfilternet",
+      "alternates": ["rnnoise"],
+      "status": "adopted",
+      "evaluation": "speech-intelligibility-noise-reduction-musical-artifact-and-realtime-latency",
+      "source": "https://github.com/Rikorose/DeepFilterNet"
+    },
+    "media_pipeline": {
+      "primary": "ffmpeg",
+      "alternates": [],
+      "status": "adopted",
+      "currentReference": "8.1.2",
+      "evaluation": "track-stable-release-security-fixes-codec-support-and-reproducible-builds",
+      "source": "https://www.ffmpeg.org/"
+    },
+    "download": {
+      "primary": "aria2",
+      "alternates": ["wget2", "curl"],
+      "status": "adopted",
+      "evaluation": "benchmark-resume-range-requests-multisource-protocol-coverage-and-server-friendliness",
+      "source": "https://github.com/aria2/aria2"
+    },
+    "media_download": {
+      "primary": "yt-dlp",
+      "alternates": [],
+      "status": "adopted_with_rights_gate",
+      "currentReference": "2026.08.19",
+      "evaluation": "track-extractor-health-format-support-security-and-source-terms",
+      "source": "https://github.com/yt-dlp/yt-dlp"
+    },
+    "cloud_transfer": {
+      "primary": "rclone",
+      "alternates": [],
+      "status": "adopted",
+      "currentReference": "1.75.0",
+      "evaluation": "track-security-fixes-provider-coverage-transfer-integrity-and-performance",
+      "source": "https://rclone.org/"
+    },
+    "security_vulnerability": {
+      "primary": "trivy",
+      "alternates": ["grype", "osv-scanner", "npm-audit"],
+      "status": "adopted_multi_engine",
+      "evaluation": "correlate_findings_do_not_assume_single_scanner_complete",
+      "sources": [
+        "https://github.com/aquasecurity/trivy",
+        "https://github.com/anchore/grype",
+        "https://github.com/google/osv-scanner"
+      ]
+    },
+    "software_inventory": {
+      "primary": "syft",
+      "alternates": [],
+      "status": "recommended",
+      "evaluation": "generate-and-compare-SBOMs-for-dependencies-and-build-artifacts",
+      "source": "https://github.com/anchore/syft"
+    },
+    "workflow_security": {
+      "primary": "zizmor",
+      "alternates": ["openssf-scorecard"],
+      "status": "adopted_or_watch",
+      "currentReferences": {
+        "zizmorAction": "v0.6.2",
+        "scorecardAction": "v2.4.4"
+      },
+      "evaluation": "scan-workflow-injection-pinning-privilege-and-supply-chain-risks",
+      "sources": [
+        "https://github.com/zizmorcore/zizmor",
+        "https://github.com/ossf/scorecard"
+      ]
+    },
+    "runner_hardening": {
+      "primary": "harden-runner",
+      "alternates": [],
+      "status": "recommended",
+      "currentReference": "v2.20.0",
+      "evaluation": "monitor-network-egress-process-and-file-integrity-capabilities",
+      "source": "https://github.com/step-security/harden-runner"
+    },
+    "secrets": {
+      "primary": "gitleaks",
+      "alternates": [],
+      "status": "adopted",
+      "evaluation": "keep-current-and-correlate-with-repository-secret-detection",
+      "source": "https://github.com/gitleaks/gitleaks"
+    },
+    "supply_chain_policy": {
+      "primary": "openssf-scorecard",
+      "alternates": ["allstar"],
+      "status": "recommended",
+      "evaluation": "continuously-assess-repository-security-practices-and-enforcement",
+      "sources": [
+        "https://github.com/ossf/scorecard",
+        "https://github.com/ossf/allstar"
+      ]
+    }
+  },
+  "observedUpstreamAdvances": {
+    "vite": "Vite 8.0 stable uses Rolldown as its unified Rust-based bundler and reports major build-speed improvements.",
+    "ffmpeg": "FFmpeg 8.1.2 is the latest stable release in the 8.1 branch as of 2026-08-29.",
+    "rclone": "rclone 1.75.0 is the latest listed release as of 2026-08-29 and includes multiple security fixes in the 1.75 cycle.",
+    "ytDlp": "yt-dlp 2026.08.19 is the latest listed release as of 2026-08-29.",
+    "deepFilterNet": "DeepFilterNet v0.5.6 is the latest listed release in the upstream releases page.",
+    "realEsrgan": "Real-ESRGAN v0.3.0 remains the latest listed upstream release; newer research should be benchmarked before adoption.",
+    "security": "Zizmor, Scorecard, OSV-Scanner, Syft, Grype and Harden Runner all remain active upstream projects with 2026 releases or current maintenance signals."
+  },
+  "cadence": {
+    "releaseWatch": "weekly",
+    "securityWatch": "daily",
+    "performanceBenchmark": "monthly",
+    "qualityBenchmark": "monthly",
+    "rightsAndLicenseReview": "on_change_and_quarterly",
+    "majorPromotion": "human_review_required"
+  },
+  "promotionRules": {
+    "securityRegression": "block",
+    "licenseRegression": "block",
+    "scientificContentImpact": "block",
+    "provenanceLoss": "block",
+    "measuredPerformanceGainRequiredForHotPathReplacement": true,
+    "rollbackOnRegression": true,
+    "neverReplaceAuthoritativeScientificSources": true
+  }
+}
