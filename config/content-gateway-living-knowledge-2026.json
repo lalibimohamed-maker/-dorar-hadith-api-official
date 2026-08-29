@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Living knowledge gateway for Deen Allah Encyclopedia: verified sources, books, journals, scientific discoveries, and Quran-related research candidates.",
+  "principles": {
+    "sourceFirst": true,
+    "preserveOriginalText": true,
+    "provenanceRequired": true,
+    "rightsRequired": true,
+    "noSilentSubstitution": true,
+    "scientificClaimsRequireIndependentEvidence": true,
+    "quranicMiracleClaimsRequireScholarlyAndScientificReview": true
+  },
+  "sourceRegistry": [
+    {
+      "id": "dorar",
+      "type": "islamic_reference",
+      "role": "hadith_tafsir_fiqh_creed_ethics_language",
+      "url": "https://dorar.net/",
+      "access": "link_and_authorized_api_or_content_only",
+      "rights": "source_specific",
+      "verification": "institutional_reference"
+    },
+    {
+      "id": "waqfeya",
+      "type": "digital_library",
+      "role": "books_manuscripts_scans_search",
+      "url": "https://waqfeya.net/",
+      "access": "browse_and_link; download_when_source_terms_permit",
+      "rights": "verify_per_item",
+      "verification": "library_catalog"
+    },
+    {
+      "id": "quranic_arabic_corpus",
+      "type": "quranic_linguistics",
+      "role": "morphology_syntax_ontology",
+      "url": "https://corpus.quran.com/",
+      "access": "open_project; use_under_stated_license_and_attribution",
+      "rights": "GPL_per_project_terms",
+      "verification": "research_resource"
+    },
+    {
+      "id": "nasa_science",
+      "type": "science_authority",
+      "role": "astronomy_cosmology_earth_space_science",
+      "url": "https://science.nasa.gov/",
+      "access": "public_science_reporting_and_data_links",
+      "rights": "verify_asset_specific_terms",
+      "verification": "official_agency"
+    },
+    {
+      "id": "esa_science",
+      "type": "science_authority",
+      "role": "astronomy_space_science",
+      "url": "https://www.esa.int/",
+      "access": "public_science_reporting_and_data_links",
+      "rights": "verify_asset_specific_terms",
+      "verification": "official_agency"
+    },
+    {
+      "id": "romes",
+      "type": "academic_journal",
+      "role": "middle_east_and_islamic_studies",
+      "url": "https://www.cambridge.org/core/journals/review-of-middle-east-studies",
+      "access": "open_access_articles_and_metadata",
+      "rights": "article_specific_cc_license_or_access_terms",
+      "verification": "peer_reviewed_journal"
+    },
+    {
+      "id": "scientific_miracles_methodology_2026",
+      "type": "research_article",
+      "role": "methodology_for_scientific_miracles_research",
+      "url": "https://ceapress.org/index.php/cpgdpe/article/view/88",
+      "access": "open_article",
+      "rights": "article_license_and_site_terms",
+      "verification": "published_research_2026"
+    }
+  ],
+  "contentStreams": {
+    "books": ["verified Islamic libraries", "publisher sites", "institutional repositories", "public-domain collections"],
+    "journals": ["peer-reviewed Islamic studies", "Arabic studies", "Middle East studies", "open-access scientific journals"],
+    "science": ["NASA", "ESA", "national observatories", "official mission releases", "peer-reviewed papers", "structured research databases"],
+    "quran_studies": ["tafsir", "ulum_al_quran", "quranic_linguistics", "recitation", "manuscripts", "tadabbur"],
+    "miracles_research": ["candidate_only_until_evidenced", "independent_scientific_evidence", "classical_arabic_and_tafsir_context", "peer_review", "scholarly_review"]
+  },
+  "candidateResearchQueue": [
+    {
+      "id": "webb-beta-pictoris-d-2026",
+      "topic": "astronomy",
+      "status": "science_fact",
+      "summary": "NASA reported in July 2026 a giant exoplanet, Beta Pictoris d, identified through a distinctive atmospheric chemical fingerprint.",
+      "source": "https://science.nasa.gov/missions/webb/nasas-webb-discovers-hidden-planet-in-famous-star-system/",
+      "quranic_relation": "none_asserted",
+      "next_step": "research_only; do_not_label_as_miracle_without independent scholarly review"
+    },
+    {
+      "id": "omega-centauri-black-hole-2026",
+      "topic": "astronomy",
+      "status": "science_fact",
+      "summary": "ESA reported in July 2026 the identification of a stellar-mass black hole in Omega Centauri using archival Hubble data supported by Webb observations.",
+      "source": "https://www.esa.int/ESA_Multimedia/Images/2026/07/Hubble_discovers_first_of_star_cluster_s_missing_black_holes",
+      "quranic_relation": "none_asserted",
+      "next_step": "research_only"
+    },
+    {
+      "id": "webb-terzan5-2026",
+      "topic": "galactic_archaeology",
+      "status": "science_fact",
+      "summary": "ESA reported that Webb and Hubble established Terzan 5 as a bulge fossil fragment with multiple stellar generations, changing its classification from a globular cluster.",
+      "source": "https://www.esa.int/Science_Exploration/Space_Science/Webb/Webb_Hubble_reveal_relic_of_our_galaxy_s_formation",
+      "quranic_relation": "none_asserted",
+      "next_step": "research_only"
+    },
+    {
+      "id": "scientific-miracles-methodology-2026",
+      "topic": "quran_science_methodology",
+      "status": "methodological_reference",
+      "summary": "A 2026 published paper addresses rules and mechanisms for researching scientific miracles of the Quran.",
+      "source": "https://ceapress.org/index.php/cpgdpe/article/view/88",
+      "quranic_relation": "methodology_only",
+      "next_step": "use_as_methodological_input; never as proof of a specific miracle"
+    }
+  ],
+  "updatePolicy": {
+    "dailyDiscovery": true,
+    "weeklySourceRefresh": true,
+    "monthlyCompletenessAudit": true,
+    "rightsRecheckOnChange": true,
+    "scienceReleaseDateTracked": true,
+    "duplicateDetection": true,
+    "brokenLinkDetection": true,
+    "sourceHealthRecorded": true,
+    "humanReviewForScientificMiraclePublication": true
+  },
+  "publicationStates": [
+    "discovered",
+    "source_verified",
+    "rights_verified",
+    "independently_verified",
+    "scholarly_review",
+    "published",
+    "quarantined"
+  ],
+  "hardStops": {
+    "unknownRights": "do_not_rehost",
+    "brokenProvenance": "do_not_publish_as_authoritative",
+    "singleSourceExtraordinaryClaim": "research_only",
+    "scientificFactWithoutPrimaryOrInstitutionalEvidence": "research_only",
+    "miracleClaimWithoutClassicalContextAndIndependentEvidence": "reject_publication"
+  }
+}
