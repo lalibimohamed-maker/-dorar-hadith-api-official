@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Accessible sign-language layer for Deen Allah Encyclopedia, with Arabic and Algerian sign-language support, recognition, translation, and avatar output.",
+  "principles": {
+    "accessibilityFirst": true,
+    "localFirst": true,
+    "openSourcePreferred": true,
+    "licenseVerifiedPerAsset": true,
+    "nativeSignerReviewRequired": true,
+    "originalTextImmutable": true,
+    "noSilentLanguageSubstitution": true,
+    "confidenceRequired": true
+  },
+  "languages": {
+    "arabic_sign_language": {
+      "status": "adopt",
+      "notes": "Use verified Arabic sign-language datasets/models and retain dialect/region metadata."
+    },
+    "algerian_sign_language": {
+      "status": "trial",
+      "notes": "Prioritize Algerian Sign Language where verified lexical resources exist; require signer/expert validation before authoritative publication."
+    },
+    "other_sign_languages": {
+      "status": "assess",
+      "notes": "Do not treat sign languages as interchangeable; every language/dialect gets its own lexicon and grammar metadata."
+    }
+  },
+  "recognition": {
+    "primary_stack": ["MediaPipe", "ArSLr"],
+    "poseAndHandTracking": true,
+    "faceAndNonManualFeatures": true,
+    "dynamicSequenceRecognition": true,
+    "webcamInput": true,
+    "onDeviceInferencePreferred": true,
+    "confidenceDisplayed": true,
+    "lowConfidenceFallsBackToText": true
+  },
+  "translation": {
+    "signToText": true,
+    "signToSpeech": true,
+    "textToSign": true,
+    "signToSign": "future",
+    "preserveOriginalSourceText": true,
+    "grammarAwareTranslation": true,
+    "humanReviewForAuthoritativeEducationalContent": true
+  },
+  "avatar": {
+    "enabled": true,
+    "preferredRepresentation": "3d_avatar",
+    "notation": ["HamNoSys", "SiGML"],
+    "renderer": "CWASA",
+    "algerian_avatar": {
+      "status": "trial",
+      "reason": "Useful Algerian reference implementation, but upstream asset licensing must be checked per asset before redistribution or production use."
+    }
+  },
+  "openResources": [
+    {
+      "id": "arslr",
+      "role": "arabic_sign_language_recognition",
+      "license": "MIT",
+      "source": "https://github.com/mahmoudmhashem/ArSLr",
+      "evidence": "32-letter alphabet recognition plus dynamic-word recognition; README reports 95% test accuracy for letters and 97% for dynamic words.",
+      "status": "adopt_as_research_baseline"
+    },
+    {
+      "id": "mediapipe",
+      "role": "hand_pose_tracking",
+      "license": "Apache-2.0",
+      "source": "https://github.com/google-ai-edge/mediapipe",
+      "status": "adopt"
+    },
+    {
+      "id": "arsl_dataset_arslw",
+      "role": "arabic_sign_language_dataset",
+      "license": "MIT",
+      "source": "https://github.com/Mimouni-Abdessamed/ARSLW",
+      "status": "assess_then_adopt",
+      "notes": "Use only after validating dataset quality, provenance, signer consent, and licensing of any embedded media."
+    },
+    {
+      "id": "algerian_sign_language_avatar",
+      "role": "algerian_text_to_sign_avatar_reference",
+      "license": "CC-BY-NC-4.0",
+      "source": "https://github.com/linuxscout/algerianSignLanguage-avatar",
+      "status": "trial_noncommercial_only",
+      "notes": "Do not assume commercial/redistribution rights. Verify upstream asset terms, credits, and contributor permissions."
+    }
+  ],
+  "evaluation": {
+    "wordAccuracy": true,
+    "continuousSentenceAccuracy": true,
+    "dialectAccuracy": true,
+    "falseRecognitionRate": true,
+    "latency": true,
+    "onDeviceResourceUse": true,
+    "nativeSignerAcceptance": true,
+    "accessibility": true,
+    "licenseProvenance": true
+  },
+  "safety": {
+    "cameraPermissionRequired": true,
+    "processingDisclosure": true,
+    "noRawVideoUploadByDefault": true,
+    "noAuthoritativeOutputAtLowConfidence": true,
+    "noInventedSignForMissingLexicon": true,
+    "unknownLexiconEntryState": "quarantine",
+    "originalIslamicAndScientificTextRemainsUnchanged": true
+  },
+  "roadmap": {
+    "phase1": "Arabic sign-language recognition and text output",
+    "phase2": "Algerian sign-language lexicon and avatar",
+    "phase3": "text-to-sign multilingual avatar",
+    "phase4": "continuous sign-language conversation",
+    "phase5": "on-device bidirectional sign/speech interaction"
+  }
+}
