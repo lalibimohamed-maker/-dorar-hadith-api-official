@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "purpose": "Free/open-source self-hosted engine registry for Deen Allah Encyclopedia media quality and performance.",
+  "version": 2,
+  "purpose": "Free/open-source self-hosted engine registry for Deen Allah Encyclopedia media quality, performance, and lawful downloads.",
   "costPolicy": {
     "software": "free-and-open-source-preferred",
     "subscription": "none-required",
@@ -54,13 +54,77 @@
       "source": "https://sharp.pixelplumbing.com/"
     }
   },
+  "download": {
+    "orchestrator": {
+      "id": "aria2",
+      "role": "multi-source-segmented-downloader",
+      "protocols": ["HTTP", "HTTPS", "FTP", "SFTP", "BitTorrent", "Metalink"],
+      "features": ["resume", "segmented", "multi-source", "checksum-validation", "JSON-RPC"],
+      "license": ["GPL-2.0"],
+      "source": "https://github.com/aria2/aria2"
+    },
+    "webFallback": {
+      "id": "wget2",
+      "role": "modern-web-downloader-fallback",
+      "features": ["parallel-downloads", "HTTP2", "HTTP3-where-supported", "resume"],
+      "license": ["GPL-3.0-or-later"],
+      "source": "https://gitlab.com/gnuwget/wget2"
+    },
+    "protocolClient": {
+      "id": "curl",
+      "role": "universal-protocol-transfer-client",
+      "features": ["HTTP", "HTTPS", "FTP", "SFTP", "SCP", "resume", "redirects"],
+      "license": ["curl-license"],
+      "source": "https://curl.se/"
+    },
+    "mediaExtractor": {
+      "id": "yt-dlp",
+      "role": "authorized-audio-video-media-extraction",
+      "features": ["large-extractor-set", "format-selection", "metadata", "subtitle-download"],
+      "license": ["Unlicense"],
+      "source": "https://github.com/yt-dlp/yt-dlp",
+      "policy": "use-only-where-the-user-has-the-right-to-download-and-the-source-terms-permit-it"
+    },
+    "cloudSync": {
+      "id": "rclone",
+      "role": "cloud-and-remote-storage-transfer",
+      "features": ["multi-provider", "multithread-downloads", "restartable-transfers", "hash-verification", "S3", "WebDAV", "SFTP", "HTTP"],
+      "license": ["MIT"],
+      "source": "https://github.com/rclone/rclone"
+    },
+    "torrentClient": {
+      "id": "qbittorrent",
+      "role": "optional-open-torrent-client-for-lawful-public-or-licensed-distribution",
+      "license": ["GPL-2.0-or-later", "GPL-3.0-or-later-for-binary-distribution"],
+      "source": "https://github.com/qbittorrent/qBittorrent",
+      "policy": "disabled-by-default-for-unknown-rights-and-never-used-to-bypass-access-controls"
+    },
+    "gui": {
+      "id": "motrix",
+      "role": "optional-user-facing-download-manager-ui",
+      "license": ["MIT"],
+      "source": "https://github.com/agalwood/Motrix"
+    }
+  },
+  "downloadPolicy": {
+    "rightsFirst": true,
+    "allowed": ["public-domain", "open-license", "explicit-permission", "source-authorized-download"],
+    "unknownRights": "link-to-original-source-and-do-not-rehost",
+    "accessControls": "never-bypass",
+    "robotsAndTerms": "respect-source-terms-and-applicable-law",
+    "provenance": "preserve-source-url-license-attribution-and-integrity-hash-when-available",
+    "integrity": "verify-checksums-or-signatures-when-provided",
+    "resume": true,
+    "deduplication": true,
+    "parallelism": "bounded-by-source-and-server-policy"
+  },
   "architecture": {
     "search": ["meilisearch", "qdrant"],
     "design": ["penpot"],
     "build": ["vite-rolldown"],
     "offline": ["workbox"],
     "performanceVerification": ["lighthouse", "pagespeed-insights", "webpagetest"],
-    "scientificContentBoundary": "These engines may transform presentation media only; they must never rewrite, infer, or replace authoritative Corpus text, provenance, attribution, or rights metadata."
+    "scientificContentBoundary": "These engines may transform presentation media and transfer files only; they must never rewrite, infer, or replace authoritative Corpus text, provenance, attribution, or rights metadata."
   },
   "rightsPolicy": {
     "modelsAndCode": "verify upstream license and model-specific terms before redistribution",
