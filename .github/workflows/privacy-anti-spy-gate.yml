@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Validate anti-spy policy
         shell: bash
@@ -116,4 +117,4 @@ jobs:
           [ "$bad" -eq 0 ]
 
       - name: Gate result
-        run: 'echo "PRIVACY ANTI-SPY GATE: PASS"'
+        run: echo "PRIVACY ANTI-SPY GATE: PASS"
