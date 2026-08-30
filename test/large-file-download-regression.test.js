@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { loadLargeFilePolicy, validateServeRequest } from '../src/media/download-policy.mjs';
 
 test('the application imposes no file-size ceiling', () => {
@@ -22,10 +23,17 @@ test('20 GB is only a regression-test case, not a configured maximum', () => {
   assert.equal(result.resumable, true);
 });
 
-test('quality labels are not size ceilings', () => {
-  const policy = loadLargeFilePolicy();
-  assert.equal(policy.policy.applicationMaxFileSizeBytes, null);
-  assert.equal(policy.limits.applicationImposedFileSizeLimit, 'none');
+test('quality ladder is open-ended and exposes preferred 24K/16K/12K/8K/4K tiers', () => {
+  const quality = JSON.parse(fs.readFileSync('config/media-quality-ladder-2026.json', 'utf8'));
+  assert.equal(quality.master.maxResolution, null);
+  assert.equal(quality.master.upscaleLowerResolutionAsNative, false);
+  assert.deepEqual(quality.preferredDownloadTiers.map((tier) => tier.label), ['24K', '16K', '12K', '8K', '4K']);
+  assert.equal(quality.selection.allowManualQualityChoice, true);
+  assert.equal(quality.selection.showOnlyExistingDerivatives, true);
+  assert.equal(quality.trueResolution.24KMeansNativeDetail, true);
+  assert.equal(quality.trueResolution.forbidMisleadingUpscaleLabel, true);
+  assert.equal(quality.freeFirst.paidApiRequired, false);
+  assert.equal(quality.freeFirst.subscriptionRequired, false);
 });
 
 test('publication gates remain mandatory independently of file size', () => {
