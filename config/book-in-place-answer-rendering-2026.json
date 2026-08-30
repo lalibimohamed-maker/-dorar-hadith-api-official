@@ -1,23 +1,35 @@
 {
-  "schemaVersion": "1.0.0",
-  "purpose": "Fill unanswered question areas inside the original PDF page without reflowing or rebuilding the surrounding content.",
+  "schemaVersion": "1.1.0",
+  "purpose": "Fill unanswered question placeholders inside the original PDF page without reflowing or rebuilding the surrounding content.",
   "inputInvariant": {
     "preserveOriginalPageGeometry": true,
     "preserveOriginalVisibleContent": true,
     "preserveOriginalReadingOrder": true,
-    "neverReplaceWholePage": true
+    "neverReplaceWholePage": true,
+    "preserveQuestionTextVerbatim": true
+  },
+  "placeholderReplacement": {
+    "marker": "……………………",
+    "markerVariants": ["……………………", "........", "......", "……", "__________"],
+    "replaceOnlyMarkerRegion": true,
+    "neverEditQuestionRegion": true,
+    "neverEditSourceBodyOutsideMarker": true,
+    "replaceMarkerWithAnswer": true,
+    "answerNumbering": "arabic-indic-or-source-compatible",
+    "ifMarkerNotDetected": "needs_review"
   },
   "pipeline": [
     "render-source-page-if-image-only",
     "layout-detection",
     "multi-engine-ocr",
     "question-region-detection",
+    "placeholder-marker-detection",
     "answer-region-detection",
     "evidence-retrieval",
     "answer-generation-with-evidence",
     "answer-verification",
-    "remove-only-answer-guide-marks",
-    "insert-answer-into-original-region",
+    "remove-only-placeholder-marker",
+    "insert-answer-into-original-marker-region",
     "roundtrip-visual-and-ocr-check"
   ],
   "engines": {
@@ -42,14 +54,15 @@
     ]
   },
   "answerPlacement": {
-    "anchor": "original_answer_region",
+    "anchor": "exact_placeholder_marker_bbox",
     "numberAnswers": true,
     "keepExistingQuestionAndContext": true,
-    "fontPolicy": "fit-to-region-with-readable-minimum",
+    "fontPolicy": "fit-to-placeholder-region-with-readable-minimum",
     "rtl": true,
     "collisionCheck": true,
-    "overflowPolicy": "reduce-font-then-split-within-original-region; otherwise needs_review",
-    "neverMoveOtherPageContent": true
+    "overflowPolicy": "reduce-font-within-original-marker-region; otherwise needs_review",
+    "neverMoveOtherPageContent": true,
+    "neverCreateSeparateAnswerPage": true
   },
   "sourcePreservation": {
     "retainOriginalPdf": true,
@@ -61,10 +74,12 @@
   "qualityGates": {
     "noTextOutsideTargetRegionChanged": true,
     "noQuestionTextChanged": true,
+    "noSourceContentOutsidePlaceholderChanged": true,
     "noReferenceLineChanged": true,
     "visualDiffOutsideEditedRegionsMustBeZeroOrNearZero": true,
     "postRenderOcrRoundTripRequired": true,
-    "unresolvedAnswerIsNeverGuessed": true
+    "unresolvedAnswerIsNeverGuessed": true,
+    "markerReplacementMustBeLocalized": true
   },
   "rights": {
     "originalRightsRemainUnchanged": true,
