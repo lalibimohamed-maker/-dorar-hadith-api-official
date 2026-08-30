@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "1.0.0",
-  "purpose": "Track global public, philanthropic, and open-research funding pathways that can sustainably support the encyclopedia's open-source research and infrastructure without making paid services part of the core runtime.",
+  "schemaVersion": "1.1.0",
+  "purpose": "Track global public, philanthropic, research and open-source funding pathways that can sustainably support the encyclopedia and other public-benefit work without making paid services part of the core runtime or surrendering project independence.",
   "policy": {
     "fundingIsNotRuntimeDependency": true,
     "fundingCannotUnlockPaidCoreDependency": true,
@@ -12,7 +12,22 @@
     "eligibilityMustBeVerifiedPerCall": true,
     "deadlineMustBeVerifiedBeforeSubmission": true,
     "conflictAndDoubleFundingMustBeChecked": true,
-    "fundingDoesNotOverrideLicenseGate": true
+    "fundingDoesNotOverrideLicenseGate": true,
+    "fundingDoesNotTransferProjectOwnershipByDefault": true,
+    "projectIndependenceMustBePreserved": true,
+    "personalContributionRequired": false,
+    "donationsAreOptionalAndSecondary": true,
+    "fundsMaySupportPublicBenefitWorkBeyondTheEncyclopedia": true,
+    "useOfFundsMustFollowGrantTermsTaxLawAndApplicableLaw": true
+  },
+  "fundingPrinciples": {
+    "coreIdea": "Accept compatible external support without making payment a condition for access or making a funder the owner of the project.",
+    "noForcedDonation": true,
+    "noPaidSubscriptionCore": true,
+    "optionalDonateChannelAllowed": true,
+    "fundsCanBeReinvestedInPublicBenefitProjects": true,
+    "ownershipAndLicensingMustBeReviewedPerAgreement": true,
+    "noRepresentationThatFundingIsGuaranteed": true
   },
   "opportunities": [
     {
@@ -115,18 +130,18 @@
     }
   ],
   "applicationStrategy": {
-    "tier1_now": ["NSF PESOSE", "NLnet Restack"],
+    "tier1_now": ["NLnet Restack"],
     "tier2_upcoming": ["NLnet Open Internet Stack successor calls", "suitable Horizon Europe calls"],
-    "tier3_institutional": ["Google Research Awards", "Meta Llama Impact programs"],
+    "tier3_institutional": ["Google Research Awards", "Meta Llama Impact programs", "NSF PESOSE through eligible institutional partners"],
     "partnership_strategy": ["Arabic digital humanities centres", "universities and research consortia", "open-source infrastructure organisations"],
-    "doNotDo": ["make paid APIs a core dependency because a grant is available", "adopt a restricted model only because funding pays for it", "claim eligibility without checking the current call", "double-fund the same proposed activity across public grants"]
+    "doNotDo": ["make paid APIs a core dependency because a grant is available", "adopt a restricted model only because funding pays for it", "claim eligibility without checking the current call", "double-fund the same proposed activity across public grants", "promise ownership rights that the signed funding agreement does not provide"]
   },
   "fitMatrix": {
-    "arabic_ocr": ["NSF PESOSE", "NLnet Restack", "Horizon Europe", "Google Research Awards"],
-    "arabic_asr": ["NSF PESOSE", "Google Research Awards", "Meta Llama Impact programs"],
-    "document_parsing": ["NSF PESOSE", "NLnet", "Horizon Europe"],
-    "open_search_and_knowledge": ["NSF PESOSE", "NLnet", "Sovereign Tech Fund"],
-    "security_and_provenance": ["NSF PESOSE", "Sovereign Tech Fund", "Google Research Awards"],
+    "arabic_ocr": ["NLnet Restack", "Horizon Europe", "Google Research Awards"],
+    "arabic_asr": ["Google Research Awards", "Meta Llama Impact programs", "suitable open-source research calls"],
+    "document_parsing": ["NLnet", "Horizon Europe"],
+    "open_search_and_knowledge": ["NLnet", "Sovereign Tech Fund", "suitable Horizon Europe calls"],
+    "security_and_provenance": ["Sovereign Tech Fund", "Google Research Awards", "NLnet"],
     "digital_humanities_and_arabic_books": ["Horizon Europe", "academic partnerships", "Google Research Awards", "COST-like future calls"]
   },
   "submissionRules": [
@@ -135,6 +150,8 @@
     "Keep all license, provenance, model, dataset and voice gates unchanged.",
     "Publish research outputs under compatible open terms whenever the fund requires openness.",
     "Record any funded activity and avoid claiming the same cost or work twice.",
-    "Funding status never promotes an Engine Evolution candidate to adopted."
+    "Funding status never promotes an Engine Evolution candidate to adopted.",
+    "Do not promise that funding preserves ownership until the funding agreement has been reviewed.",
+    "Any optional donations or sponsorships are secondary support, never a condition of access to the encyclopedia."
   ]
 }
