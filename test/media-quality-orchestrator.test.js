@@ -6,8 +6,13 @@ test('high-resolution profiles are explicit without claiming engines are install
   const config = loadMediaConfig();
   assert.equal(config.profiles['8k'].maxLongEdge, 7680);
   assert.equal(config.profiles['12k'].maxLongEdge, 11520);
-  assert.equal(config.image.status, 'runtime-candidate-until-executable-and-model-evidence-exists');
-  assert.equal(config.video.status, 'runtime-candidate-until-executable-and-gpu-evidence-exists');
+  assert.equal(config.profiles['16k'].maxLongEdge, 15360);
+  assert.equal(config.profiles['24k'].maxLongEdge, null);
+  assert.equal(config.orchestration.noApplicationResolutionCeiling, true);
+  assert.equal(config.orchestration.neverPresentUpscaleAsNative, true);
+  assert.ok(config.engines.image.some((engine) => engine.name === 'Real-ESRGAN' && engine.status === 'candidate'));
+  assert.ok(config.engines.video.some((engine) => engine.name === 'SeedVR2' && engine.status === 'candidate'));
+  assert.ok(config.engines.video.some((engine) => engine.name === 'AVSR-Diff' && engine.status === 'candidate'));
 });
 
 test('8K scale is calculated from the real input dimensions', () => {
