@@ -1,0 +1,48 @@
+{
+  "version": "2026-08-30",
+  "name": "global-free-first-principle",
+  "purpose": "حاكم موحد لجميع الأنظمة والمحركات في موسوعة دين الله.",
+  "principle": "مجاني أولًا، بلا اشتراك مدفوع، وبلا اعتماد لازم على API مدفوع، مع الحفاظ على كامل الخاصية المطلوبة وعدم خفض القدرة العلمية أو الوظيفية بسبب الكلفة.",
+  "rules": {
+    "freeFirst": true,
+    "noPaidSubscriptionRequired": true,
+    "noPaidApiRequired": true,
+    "noFeatureDroppedBecauseOfCost": true,
+    "noSilentCapabilityDowngrade": true,
+    "freeAlternativeMustBeSearchedBeforePaidDependency": true,
+    "localFirstWhenFeasible": true,
+    "openSourcePreferred": true,
+    "quotaGatedDoesNotBecomeMandatory": true,
+    "licenseGatedDoesNotBecomeCoreWithoutReview": true,
+    "modelWeightsLicenseCheckedSeparately": true,
+    "futureVersionsRechecked": true,
+    "resourceCostIsTrackedButNotConfusedWithServiceSubscription": true
+  },
+  "researchPolicy": {
+    "globalSearchRequiredForCapabilityGaps": true,
+    "searchAgainWhenNewerOrBetterFreeCapabilityAppears": true,
+    "preserveFullRequestedCapability": true,
+    "documentWhyAnyCapabilityIsDeferred": true
+  },
+  "scientificPolicy": {
+    "singleEngineCannotEstablishScholarlyTruth": true,
+    "sourceProvenanceRequired": true,
+    "uncertaintyPreserved": true,
+    "contradictionsRemainVisible": true,
+    "derivedClaimsRetainOriginChain": true
+  },
+  "bookPolicy": {
+    "preserveOriginal": true,
+    "preserveDiplomaticText": true,
+    "historicalRepairCannotSilentlyChangeContent": true,
+    "readableDerivedEditionAllowed": true,
+    "yellowPaperReadingEditionAllowed": true,
+    "multiFormatExportAllowed": true
+  },
+  "enforcement": {
+    "policyFileIsNormative": true,
+    "ciMustRejectPaidMandatoryDependencies": true,
+    "ciMustRejectUnexplainedCapabilityLoss": true,
+    "ciMustRequireLicenseGateForRestrictedModels": true
+  }
+}
