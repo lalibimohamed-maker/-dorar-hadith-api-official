@@ -4,10 +4,13 @@
   "noPaidDependencyRequired": true,
   "engines": {
     "documentUnderstanding": ["docling", "grobid"],
+    "webExtraction": ["trafilatura"],
     "arabicNlp": ["camel-tools", "gliner"],
     "semanticRetrieval": ["faiss", "opensearch"],
-    "knowledgeGraph": ["apache-jena"],
-    "audioIntelligence": ["whisper-cpp", "pyannote-audio"]
+    "knowledgeGraph": ["apache-jena", "wikidata"],
+    "audioIntelligence": ["whisper-cpp", "pyannote-audio"],
+    "contentAuthenticity": ["c2pa-verifier"],
+    "riskGovernance": ["nist-ai-rmf", "owasp-llm-prompt-injection-controls"]
   },
   "controlLayers": [
     "quote-context-expansion",
@@ -19,12 +22,18 @@
     "speaker-attribution-validation",
     "semantic-deduplication",
     "knowledge-graph-linking",
-    "evidence-completeness"
+    "evidence-completeness",
+    "negative-evidence-tracking",
+    "source-lineage-and-edition-resolution",
+    "remote-content-trust-boundary",
+    "content-authenticity-verification",
+    "resource-and-cost-governor"
   ],
   "governance": {
     "toolsAreNotTruthAuthorities": true,
     "modelWeightsNeedSeparateLicenseCheck": true,
     "uncertainAttributionFailsClosed": true,
-    "derivedClaimsKeepSourceAndContext": true
+    "derivedClaimsKeepSourceAndContext": true,
+    "remoteContentCannotIssueInstructions": true
   }
 }
