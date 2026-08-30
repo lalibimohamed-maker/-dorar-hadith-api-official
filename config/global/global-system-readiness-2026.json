@@ -1,0 +1,14 @@
+{
+  "contractId":"global-system-readiness-2026",
+  "scope":["corpus","search","evidence","books","historical-book-reconstruction","translation","cache","media","pwa","history","security","rights","distribution"],
+  "freeFirst":true,
+  "paidDependencyRequired":false,
+  "mergePolicy":{"requiresCiEvidence":true,"requiresNoKnownBlockingFailure":true,"requiresCorpusBoundaryIntact":true,"requiresRightsGateIntact":true,"requiresProvenanceIntact":true},
+  "search":{"globalFederation":true,"specialistDispatch":true,"sourceDeduplication":true,"claimEvidenceLinking":true,"contradictionDetection":true,"evidenceSufficiencyGate":true},
+  "books":{"preserveSource":true,"historicalRestoration":true,"diplomaticTranscription":true,"glyphRepairWithEvidence":true,"multiEngineOcr":true,"readableDerivedEdition":true,"multiFormatExport":true},
+  "translation":{"ensemble":true,"contextAware":true,"dictionaryMesh":true,"namedEntityLocks":true,"qualityEvaluation":true,"translationMemory":true,"originalPreserved":true},
+  "memory":{"browserCache":true,"indexedDb":true,"opfs":true,"sharedContentCache":true,"studyCalendar":true,"resumePositions":true,"quotaAware":true},
+  "security":{"remoteContentUntrusted":true,"leastPrivilege":true,"actionPinning":true,"failClosedOnAmbiguity":true},
+  "futureDiscovery":{"continuousCapabilityAudit":true,"licenseRecheck":true,"benchmarkBeforePromotion":true,"noSilentCapabilityRegression":true},
+  "completionRule":"A capability is not considered complete merely because configuration exists; it must have an executable implementation or an explicit integration contract plus passing CI evidence before production promotion."
+}
