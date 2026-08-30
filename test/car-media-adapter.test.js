@@ -15,13 +15,14 @@ test('Quran audio is available through Bluetooth and USB without generated speec
   assert.ok(bluetoothAudioProfiles().includes('LE-Audio-when-supported'));
 });
 
-test('Quran audio has free-first local playback engine preferences', () => {
+test('Quran audio preserves free-first local playback preferences', () => {
   const config = loadCarMediaConfig();
   assert.deepEqual(config.quranAudio.playbackEnginePreference, ['GStreamer', 'mpv', 'platform-native']);
   assert.equal(config.freeFirst.paidCloudDependency, false);
+  assert.equal(config.quranAudio.nativeAudioPreserved, true);
 });
 
-test('local free-first playback engines are accepted by the planner', () => {
+test('local playback engines are selectable without a paid API', () => {
   for (const engine of ['GStreamer', 'mpv', 'platform-native']) {
     const result = planCarMedia({ transport: 'usb', contentType: 'audio-quran', engine });
     assert.equal(result.allowed, true);
