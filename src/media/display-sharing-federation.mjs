@@ -34,35 +34,69 @@ export function listProtocolsForDevice(deviceClass) {
   return config.protocols.filter((protocol) => ids.includes(protocol.id));
 }
 
+function validateDimension(value) {
+  return value !== null && Number.isInteger(value) && value > 0;
+}
+
 export function negotiateResolution({ sourceWidth, sourceHeight, sinkWidth, sinkHeight, requestedWidth = null, requestedHeight = null }) {
   for (const value of [sourceWidth, sourceHeight, sinkWidth, sinkHeight, requestedWidth, requestedHeight]) {
-    if (value !== null && (!Number.isInteger(value) || value <= 0)) {
+    if (value !== null && !validateDimension(value)) {
       throw new Error('Invalid display dimension');
     }
   }
   if (![sourceWidth, sourceHeight, sinkWidth, sinkHeight].every(Number.isInteger)) {
     return { allowed: false, reason: 'missing-capability-probe' };
   }
-  const negotiatedWidth = requestedWidth && requestedHeight
-    ? Math.min(sourceWidth, sinkWidth, requestedWidth)
-    : Math.min(sourceWidth, sinkWidth);
-  const negotiatedHeight = requestedWidth && requestedHeight
-    ? Math.min(sourceHeight, sinkHeight, requestedHeight)
-    : Math.min(sourceHeight, sinkHeight);
+  if ((requestedWidth === null) !== (requestedHeight === null)) {
+    throw new Error('Requested width and height must be supplied together');
+  }
+
+  const maxWidth = Math.min(
+    sourceWidth,
+    sinkWidth,
+    requestedWidth ?? Number.POSITIVE_INFINITY,
+  );
+  const maxHeight = Math.min(
+    sourceHeight,
+    sinkHeight,
+    requestedHeight ?? Number.POSITIVE_INFINITY,
+  );
+  const sourceAspect = sourceWidth / sourceHeight;
+
+  // Fit the source rectangle inside the negotiated envelope while preserving
+  // its native aspect ratio. No crop and no aspect-ratio distortion occur here.
+  let negotiatedWidth = Math.floor(maxWidth);
+  let negotiatedHeight = Math.floor(negotiatedWidth / sourceAspect);
+  if (negotiatedHeight > maxHeight) {
+    negotiatedHeight = Math.floor(maxHeight);
+    negotiatedWidth = Math.floor(negotiatedHeight * sourceAspect);
+  }
+
+  if (negotiatedWidth <= 0 || negotiatedHeight <= 0) {
+    return { allowed: false, reason: 'no-compatible-resolution' };
+  }
+
   return {
     allowed: true,
     negotiatedWidth,
     negotiatedHeight,
-    derivedFromHigherRequest: Boolean(requestedWidth && (requestedWidth > negotiatedWidth || requestedHeight > negotiatedHeight)),
+    aspectRatioPreserved: true,
+    derivedFromHigherRequest: Boolean(
+      requestedWidth !== null
+      && (requestedWidth > negotiatedWidth || requestedHeight > negotiatedHeight),
+    ),
   };
 }
 
-export function validateNativeClaim({ width, height, nativeCapabilityVerified }) {
-  if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0) {
+export function validateNativeClaim({ width, height, nativeCapability }) {
+  if (!validateDimension(width) || !validateDimension(height)) {
     throw new Error('Invalid target dimensions');
   }
-  if (!nativeCapabilityVerified) {
+  if (!nativeCapability || !validateDimension(nativeCapability.width) || !validateDimension(nativeCapability.height)) {
     return { allowed: false, reason: 'native-capability-not-verified' };
   }
-  return { allowed: true, reason: 'native-target-capability-verified' };
+  if (nativeCapability.width !== width || nativeCapability.height !== height) {
+    return { allowed: false, reason: 'native-geometry-mismatch' };
+  }
+  return { allowed: true, reason: 'native-target-geometry-verified' };
 }
