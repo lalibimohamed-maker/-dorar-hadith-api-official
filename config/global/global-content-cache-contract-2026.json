@@ -1,0 +1,24 @@
+{
+  "contractId": "global-content-cache-contract-2026",
+  "principle": "compute_once_reuse_many",
+  "freeFirst": true,
+  "paidDependencyRequired": false,
+  "layers": {
+    "browser": ["ServiceWorkerCache", "IndexedDB", "OPFS"],
+    "shared": ["contentAddressedObjects", "translationMemory", "derivedMediaCache", "verifiedEditionCache"],
+    "history": ["applicationStudyCalendar", "contentResumePosition", "languageVariant"],
+    "integrity": ["contentHash", "editionId", "sourceId", "modelVersion", "provenance", "rights"],
+    "eviction": ["quotaAware", "leastValueFirst", "neverEvictAuthoritativeMetadataSilently"],
+    "offline": ["offlineReadWhenCached", "staleWhileRevalidateForRefreshable", "networkFirstForAuthoritative"]
+  },
+  "translationKey": ["contentHash", "editionId", "sourceLanguage", "targetLanguage", "translationEngineVersion"],
+  "rules": {
+    "neverTreatCacheAsAuthorityOverSource": true,
+    "neverMixEditions": true,
+    "neverMixTranslationVersionsSilently": true,
+    "preserveOriginalAndDerivedSeparately": true,
+    "recordProvenanceForDerivedContent": true,
+    "applicationHistoryOnly": true,
+    "noPaidServiceRequiredForCore": true
+  }
+}
