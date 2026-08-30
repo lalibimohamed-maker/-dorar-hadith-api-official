@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0.0",
+  "name": "ULTRA-VSR / 36K-48K Faithful Restoration Research Stack",
+  "purpose": "International-observer-backed research framework for extreme-resolution video restoration with measurable fidelity, temporal coherence, reproducibility, provenance and no fabricated historical detail.",
+  "status": "research_program_only",
+  "policy": {
+    "freeFirst": true,
+    "selfHostedPreferred": true,
+    "noPaidCoreDependency": true,
+    "noOriginalReplacement": true,
+    "noSilentHallucination": true,
+    "candidateOnlyUntilBenchmarked": true,
+    "softwareModelWeightsDatasetLicensesSeparate": true,
+    "fundingDoesNotOwnProject": true,
+    "internationalObserverReviewPreferred": true
+  },
+  "target": {
+    "delivery": ["8K", "16K", "32K", "36K", "48K-class when technically justified"],
+    "claimRule": "Output pixel count is not proof of recovered factual detail.",
+    "fidelityPriority": "historical/content fidelity > temporal consistency > OCR/text fidelity > perceptual quality > pixel count"
+  },
+  "newResearchCandidates": [
+    {"name":"AVSR-Diff","domain":"arbitrary-scale-video-super-resolution","status":"candidate","license":"verify-current-repository-and-model-terms","why":"Scale-agnostic diffusion priors, continuous decoding, temporally-gated feature recurrence and scale-aware Fourier refinement; directly relevant to arbitrary target resolutions."},
+    {"name":"SeedVR2","domain":"high-resolution-video-restoration","status":"candidate","license":"Apache-2.0-code; verify-model-terms","why":"One-step diffusion-transformer restoration with adaptive window attention and sequence parallel inference; official repo documents high-resolution VR and current compute limits."},
+    {"name":"UltraVSR","domain":"temporal-coherent-video-super-resolution","status":"candidate","license":"Apache-2.0","why":"One-step diffusion VSR with degradation-aware restoration schedule, recurrent temporal shift and long-range temporally asynchronous inference."},
+    {"name":"FlashVSR","domain":"streaming-high-resolution-video-super-resolution","status":"candidate","license":"verify-current-terms","why":"One-step streaming VSR using sparse attention and lightweight decoder; important efficiency comparator for extreme-resolution tiling."},
+    {"name":"SparkVSR","domain":"keyframe-propagation-video-restoration","status":"candidate","license":"verify-current-terms","why":"Keyframe/propagation strategy for extending restoration consistency across long videos."},
+    {"name":"RealBasicVSR","domain":"real-world-video-super-resolution","status":"candidate","license":"Apache-2.0-code; verify-weights","why":"Established real-world VSR baseline for degradation-aware comparison."},
+    {"name":"BasicVSR++","domain":"video-super-resolution-propagation-alignment","status":"candidate","license":"verify-current-terms","why":"Strong propagation and alignment baseline useful as deterministic/temporal comparator."},
+    {"name":"VRT","domain":"video-restoration-transformer","status":"license_gated","license":"CC-BY-NC-for-majority-code","why":"High-quality VSR/deblurring/denoising reference, but current official repository is not unrestricted for commercial production."},
+    {"name":"RVRT","domain":"recurrent-video-restoration","status":"candidate","license":"verify-current-terms","why":"Memory-aware recurrent restoration comparator; useful for long clips and tiling studies."},
+    {"name":"DiffVSR","domain":"diffusion-real-world-video-super-resolution","status":"candidate","license":"verify-current-terms","why":"Multi-scale temporal attention and temporal-enhanced VAE for fidelity and temporal consistency."},
+    {"name":"AVSR-Diff","domain":"arbitrary-scale-temporal-stable-VSR","status":"priority_candidate","license":"verify-current-terms","why":"Newest direct match to arbitrary-scale target generation and temporal stability."},
+    {"name":"VSRELL","domain":"low-light-low-resolution-video-restoration","status":"watch","license":"verify-current-terms","why":"Joint low-light enhancement and VSR; useful for degraded archival footage where illumination and resolution are coupled."}
+  ],
+  "observerAndStandardsFramework": [
+    {"observer":"ITU-R BT.500","role":"television-subjective-quality-methodology","use":"Use controlled subjective TV-image assessment for observer panels and device/display comparisons."},
+    {"observer":"ITU-T P.910","role":"multimedia-video-quality-assessment","use":"Use ACR/SAMVIQ/DMOS-style methodologies, high-quality reference stimuli, and documented test conditions."},
+    {"observer":"FIAF Technical Commission","role":"archival-film-restoration-ethics","use":"Use archival-restoration principles: preserve original characteristics, entire frame, aspect ratio, version identity, provenance and research documentation."},
+    {"observer":"Library of Congress / NDNP ecosystem","role":"large-scale-historical-OCR-reprocessing","use":"Study open archival batch pipelines, ALTO/METS workflows and reproducible processing rather than treating commercial enhancement as a black box."},
+    {"observer":"IIIF ecosystem","role":"interoperable-image-and-manifest-preservation","use":"Where applicable, retain image/frame references, manifests and region-level provenance for auditability."}
+  ],
+  "stackArchitecture": [
+    "immutable_original",
+    "lossless_intermediate",
+    "metadata_and_codec_audit",
+    "scene_cut_detection",
+    "motion_estimation_and_alignment",
+    "temporal_denoise",
+    "deblur",
+    "exposure_and_dynamic_range_normalization",
+    "spatial_super_resolution",
+    "text_and_glyph_aware_restoration",
+    "arbitrary_scale_renderer",
+    "overlap_tiled_extreme_resolution",
+    "multi_engine_consensus",
+    "temporal_consistency_validation",
+    "OCR_or_ASR_cross_check",
+    "hallucinated_detail_detection",
+    "objective_metrics",
+    "human_observer_tests",
+    "provenance_and_checksums",
+    "master_plus_derivative_outputs"
+  ],
+  "extremeResolutionRules": [
+    "Never upscale in one monolithic allocation when tiled or progressive processing is safer.",
+    "Use overlapping spatial tiles and temporal windows to reduce seams and flicker.",
+    "Use multiple restoration engines as independent witnesses, not as blind sequential filters.",
+    "Where engines disagree on high-frequency detail, preserve uncertainty or prefer the conservative reconstruction.",
+    "Never use a generative frame as evidence for a fact absent from the source unless independently corroborated.",
+    "Preserve frame rate, aspect ratio and edit/version identity unless the project explicitly documents a justified transformation.",
+    "Keep source checksum, processing configuration, model identifiers, weights hashes and random seeds where applicable.",
+    "36K/48K is a delivery target, not a claim of native optical information.",
+    "A lower-resolution output with higher measured fidelity can outrank a higher-resolution output with hallucinated details."
+  ],
+  "benchmarkPlan": {
+    "spatial": ["PSNR", "SSIM", "MS-SSIM", "LPIPS", "DISTS"],
+    "temporal": ["tLP", "warping_error", "flicker_rate", "temporal_LPIPS", "motion_boundary_consistency", "scene_cut_integrity"],
+    "content_fidelity": ["OCR-CER", "OCR-WER", "Arabic-glyph-error-rate", "Arabic-diacritic-error-rate", "subtitle-text-integrity", "logo/seal integrity", "face-identity-preservation-when-applicable"],
+    "archival": ["false-detail-rate", "hallucinated-detail-rate", "frame-coverage", "aspect-ratio-preservation", "version-identity-preservation", "source-to-output-provenance-completeness"],
+    "systems": ["VRAM", "RAM", "disk-throughput", "latency", "frames-per-second", "energy-cost", "distributed-scaling-efficiency", "failure-recovery"],
+    "human": ["BT.500-style observer score", "P.910/SAMVIQ-style observer score", "expert archival review", "blind A/B/C comparison", "inter-rater agreement"]
+  },
+  "observerPanel": {
+    "principle": "Independent observers should judge both visual quality and whether restoration remains faithful to the source.",
+    "recommended_groups": ["archivists", "broadcast/video engineers", "computer-vision researchers", "OCR/NLP researchers", "digital-humanities scholars", "independent quality assessors"],
+    "blindProtocol": true,
+    "publishRawScores": true,
+    "publishConfidenceIntervals": true,
+    "publishFailureCases": true,
+    "noHandPickedDemoOnly": true
+  },
+  "productionGate": [
+    "rights_clearance",
+    "immutable-source-check",
+    "reproducible-run",
+    "spatial-benchmark-pass",
+    "temporal-benchmark-pass",
+    "text-fidelity-pass",
+    "hallucination-gate-pass",
+    "human-observer-pass",
+    "provenance-complete",
+    "security-review",
+    "resource-feasibility",
+    "archive-master-separate-from-viewer-derivative"
+  ],
+  "globalSearchEvidence": [
+    {"name":"AVSR-Diff","source":"https://arxiv.org/abs/2607.00987","note":"ECCV 2026; arbitrary-scale VSR with temporal gating and scale-aware Fourier refinement."},
+    {"name":"SeedVR2","source":"https://github.com/ByteDance-Seed/SeedVR","note":"ICLR 2026; adaptive-window high-resolution video restoration; current README documents prototype limitations and compute requirements."},
+    {"name":"UltraVSR","source":"https://github.com/yongliuy/UltraVSR","note":"ACM MM 2025; one-step diffusion VSR with explicit temporal coherence mechanisms."},
+    {"name":"FlashVSR","source":"https://github.com/OpenImagingLab/FlashVSR","note":"CVPR 2026; one-step streaming VSR aimed at efficiency and scalable high-resolution processing."},
+    {"name":"ITU-R BT.500","source":"https://www.itu.int/rec/R-REC-BT.500","note":"Current in-force methodology for subjective assessment of television images."},
+    {"name":"ITU-T P.910","source":"https://www.itu.int/epublications/en/publication/itu-t-p-910-2023-10-subjective-video-quality-assessment-methods-for-multimedia-applications/en","note":"Subjective multimedia video-quality assessment including SAMVIQ and high-quality reference-stimulus guidance."},
+    {"name":"FIAF Digital Statement Part III","source":"https://www.fiafnet.org/pages/E-Resources/Digital-Statement-part-III.html","note":"Archival restoration ethics: preserve original frame, aspect ratio, version identity and provenance; restoration should remain faithful to historical characteristics."}
+  ],
+  "doNotClaim": [
+    "36K/48K native detail from a lower-resolution source without evidence",
+    "AI-generated detail is historical fact",
+    "a single model is universally best",
+    "subjective quality without controlled testing",
+    "benchmark score on generic video equals archival fidelity",
+    "open-source code automatically means open model weights or open training data"
+  ]
+}
