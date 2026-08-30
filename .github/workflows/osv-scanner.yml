@@ -11,7 +11,12 @@ on:
     - cron: "12 12 * * 1"
   workflow_dispatch:
 
-permissions: {}
+# Reusable workflows cannot elevate permissions above the caller.
+# Grant only the permissions required by OSV's nested scan job.
+permissions:
+  actions: read
+  contents: read
+  security-events: write
 
 jobs:
   scan-scheduled:
