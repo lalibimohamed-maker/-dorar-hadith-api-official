@@ -14,8 +14,14 @@ on:
 permissions:
   contents: read
 
-# Do not add a concurrency group here. A canceled security scan is an unknown
-# security result, and the summary gate intentionally remains fail-closed.
+# Queue security runs instead of allowing an older pending run to be
+# superseded. A cancelled scanner is never treated as a successful scan.
+# The group is scoped to the PR/merge ref so unrelated refs do not cancel
+# one another.
+concurrency:
+  group: antivirus-analysis-mesh-${{ github.event.pull_request.number || github.ref || github.run_id }}
+  cancel-in-progress: false
+  queue: max
 
 jobs:
   clamav:
