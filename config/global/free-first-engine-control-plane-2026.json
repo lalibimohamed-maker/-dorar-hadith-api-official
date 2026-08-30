@@ -1,0 +1,17 @@
+{
+  "registryId": "deen-allah-free-first-engine-control-plane-2026",
+  "version": "2026-08-30",
+  "policy": {"freeFirst": true, "paidApiRequired": false, "subscriptionRequired": false, "selfHostedPreferred": true, "preserveOriginal": true, "noSilentOverwrite": true, "unknownCapability": "blocked"},
+  "states": ["DISCOVERED", "LICENSE_REVIEW", "SECURITY_REVIEW", "BENCHMARKING", "RUNTIME_VERIFIED", "APPROVED", "ENABLED", "QUARANTINED", "REJECTED"],
+  "evidenceRequired": ["officialSource", "codeLicense", "modelLicenseIfApplicable", "dependencyLicenseReview", "securityReview", "runtimeProof", "benchmarkProof", "provenanceProof"],
+  "domains": {
+    "ocr": {"candidates": [{"id":"tesseract","role":"ocr"},{"id":"paddleocr","role":"multilingual-ocr"},{"id":"kraken","role":"historical-document-ocr"},{"id":"ocrmypdf","role":"searchable-pdf-orchestration"}]},
+    "speech": {"candidates": [{"id":"piper","role":"local-tts","policy":"voice-model-license-per-model"},{"id":"web-speech-api","role":"device-tts-adapter"}]},
+    "search": {"candidates": [{"id":"opensearch","role":"hybrid-search"},{"id":"meilisearch","role":"full-text-autocomplete"},{"id":"typesense","role":"autocomplete-search"},{"id":"searxng","role":"web-metasearch"}]},
+    "security": {"candidates": [{"id":"ossf-scorecard","role":"supply-chain-posture"},{"id":"osv-scanner","role":"dependency-vulnerability-scan"},{"id":"zizmor","role":"github-actions-security"},{"id":"codeql","role":"static-analysis"}]},
+    "media": {"candidates": [{"id":"ffmpeg","role":"media-processing"},{"id":"gstreamer","role":"cross-platform-media-pipeline"},{"id":"mpv","role":"local-media-playback"},{"id":"realesrgan","role":"image-restoration"},{"id":"seedvr2","role":"video-restoration"},{"id":"flashvsr","role":"video-super-resolution"}]},
+    "display": {"candidates": [{"id":"miraclecast","role":"miracast"},{"id":"uxplay","role":"airplay-receiver"},{"id":"google-cast-adapter","role":"cast"},{"id":"webrtc-display","role":"browser-display-share"},{"id":"scrcpy","role":"android-mirroring"},{"id":"sunshine-moonlight","role":"low-latency-streaming"}]}
+  },
+  "resolution": {"applicationCeiling": null, "targets": ["native", "4K", "8K", "10K", "12K", "16K", "24K", "future"], "nativeClaimRequiresMeasurement": true, "derivedOutputMustBeLabeledDerived": true},
+  "releaseGate": ["tests", "ci", "security", "rights", "provenance", "corpus-boundary", "runtime-proof"]
+}
