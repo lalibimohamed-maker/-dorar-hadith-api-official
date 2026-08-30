@@ -9,9 +9,6 @@ on:
 permissions:
   contents: read
 
-env:
-  BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-
 jobs:
   validate-global-candidates:
     runs-on: ubuntu-latest
@@ -43,7 +40,11 @@ jobs:
       - name: Fail closed on Corpus or runtime mutation
         run: |
           set -euo pipefail
-          if [ -n "${BASE_SHA:-}" ] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+          BASE_SHA="${GITHUB_BEFORE:-}"
+          if [ -n "${GITHUB_BASE_REF:-}" ]; then
+            BASE_SHA="$(git rev-parse "origin/${GITHUB_BASE_REF}")"
+          fi
+          if [ -n "$BASE_SHA" ] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
             changed="$(git diff --name-only "${BASE_SHA}" "${GITHUB_SHA}")"
             if printf '%s\n' "$changed" | grep -E '^(corpus/|config/corpus\.json|src/|app/|package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$'; then
               echo 'Forbidden Corpus/runtime mutation detected.'
