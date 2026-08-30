@@ -1,0 +1,30 @@
+{
+  "version": "2026-08-30",
+  "freeFirst": true,
+  "noPaidDependencyRequired": true,
+  "engines": {
+    "documentUnderstanding": ["docling", "grobid"],
+    "arabicNlp": ["camel-tools", "gliner"],
+    "semanticRetrieval": ["faiss", "opensearch"],
+    "knowledgeGraph": ["apache-jena"],
+    "audioIntelligence": ["whisper-cpp", "pyannote-audio"]
+  },
+  "controlLayers": [
+    "quote-context-expansion",
+    "claim-extraction",
+    "entity-resolution",
+    "relation-extraction",
+    "temporal-consistency",
+    "document-structure-validation",
+    "speaker-attribution-validation",
+    "semantic-deduplication",
+    "knowledge-graph-linking",
+    "evidence-completeness"
+  ],
+  "governance": {
+    "toolsAreNotTruthAuthorities": true,
+    "modelWeightsNeedSeparateLicenseCheck": true,
+    "uncertainAttributionFailsClosed": true,
+    "derivedClaimsKeepSourceAndContext": true
+  }
+}
