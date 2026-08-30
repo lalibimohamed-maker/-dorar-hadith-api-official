@@ -1,0 +1,50 @@
+name: Engine Evolution Global Candidates
+
+on:
+  push:
+    branches: [chore/engine-evolution-global-candidates-2026-08]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-global-candidates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate registry policy
+        run: |
+          python - <<'PY'
+          import json
+          p='config/engine-evolution-global-additions-2026.json'
+          d=json.load(open(p, encoding='utf-8'))
+          policy=d['policy']
+          assert policy['freeFirst'] is True
+          assert policy['paidApiRequired'] is False
+          assert policy['subscriptionRequired'] is False
+          assert policy['noRuntimePromotion'] is True
+          assert policy['noCorpusMutation'] is True
+          required={'software','model','weights','voice_asset','dataset','hosted_service'}
+          assert required.issubset(set(policy['licenseDimensions']))
+          assert len(d['candidates']) >= 20
+          for c in d['candidates']:
+              assert c.get('runtimeDependency') is False
+              assert c.get('status') in {'candidate','benchmark_only','license_gated'}
+          print('global candidate registry: PASS')
+          PY
+      - name: Fail closed on Corpus or runtime mutation
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          git fetch --no-tags --prune --unshallow 2>/dev/null || true
+          if [ -n "$BASE_SHA" ] && git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            if git diff --name-only "$BASE_SHA" "$GITHUB_SHA" | grep -E '^(corpus/|config/corpus\.json|src/|app/|package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$'; then
+              echo 'Forbidden Corpus/runtime mutation detected.'
+              exit 1
+            fi
+          fi
+          echo 'Corpus/runtime mutation gate: PASS'
