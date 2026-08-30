@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bluetoothAudioProfiles, planCarMedia } from '../src/media/car-media-adapter.mjs';
+import { bluetoothAudioProfiles, planCarMedia, loadCarMediaConfig } from '../src/media/car-media-adapter.mjs';
 
 test('Quran audio is available through Bluetooth and USB without generated speech', () => {
   for (const transport of ['bluetooth', 'usb']) {
@@ -13,6 +13,12 @@ test('Quran audio is available through Bluetooth and USB without generated speec
   assert.ok(bluetoothAudioProfiles().includes('A2DP'));
   assert.ok(bluetoothAudioProfiles().includes('AVRCP'));
   assert.ok(bluetoothAudioProfiles().includes('LE-Audio-when-supported'));
+});
+
+test('Quran audio has free-first local playback engine preferences', () => {
+  const config = loadCarMediaConfig();
+  assert.deepEqual(config.quranAudio.playbackEnginePreference, ['GStreamer', 'mpv', 'platform-native']);
+  assert.equal(config.freeFirst.paidCloudDependency, false);
 });
 
 test('local free-first playback engines are accepted by the planner', () => {
