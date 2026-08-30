@@ -45,7 +45,9 @@ jobs:
             echo "Potential environment/secret file found"
             exit 1
           fi
-          if grep -RInE --exclude-dir=.git --exclude='*.md' --exclude='SECURITY.md' '(sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9_]{20,}|BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY)' .; then
+          # Match secret prefixes only at token boundaries; do not mistake words
+          # such as "risk-governance" for the OpenAI "sk-" token prefix.
+          if grep -RInE --exclude-dir=.git --exclude='*.md' --exclude='SECURITY.md' '(^|[^A-Za-z0-9_-])(sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9_]{20,})([^A-Za-z0-9_-]|$)|BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY' .; then
             echo "Potential secret material detected"
             exit 1
           fi
