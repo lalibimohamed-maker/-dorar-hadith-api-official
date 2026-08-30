@@ -26,20 +26,28 @@
     "preserveAllIntermediatesNeededForAudit": true
   },
   "registeredEngines": [
-    {"name":"Real-ESRGAN","family":"image-restoration-super-resolution","source":"https://github.com/xinntao/Real-ESRGAN"},
-    {"name":"SwinIR","family":"image-restoration-super-resolution","source":"https://github.com/JingyunLiang/SwinIR"},
-    {"name":"HAT","family":"image-super-resolution","source":"https://github.com/XPixelGroup/HAT"},
-    {"name":"Video2X","family":"video-orchestration-upscaling","source":"https://github.com/K4YT3X/video2x"},
-    {"name":"BasicVSR++","family":"video-super-resolution-temporal","source":"https://github.com/ckkelvinchan/BasicVSR_PlusPlus"},
-    {"name":"SeedVR2","family":"video-restoration-diffusion","source":"https://github.com/IceClear/SeedVR2"},
-    {"name":"FlashVSR","family":"streaming-video-super-resolution","source":"https://github.com/OpenImagingLab/FlashVSR"},
-    {"name":"PS-SR","family":"video-super-resolution-speculative-diffusion","source":"https://github.com/HiDream-ai/PS-SR"},
-    {"name":"AVSR-Diff","family":"arbitrary-scale-video-super-resolution","source":"https://github.com/KAIST-VICLab/AVSR-Diff"},
-    {"name":"Real-CUGAN","family":"super-resolution","status":"candidate"},
-    {"name":"RIFE","family":"frame-interpolation","source":"https://github.com/hzwer/ECCV2022-RIFE"},
-    {"name":"Anime4K","family":"real-time-upscaling","status":"candidate"},
-    {"name":"FFmpeg","family":"decode-encode-container","source":"https://ffmpeg.org/"}
+    {"name":"Real-ESRGAN","family":"image-restoration-super-resolution","license":"BSD-3-Clause","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/xinntao/Real-ESRGAN"},
+    {"name":"SwinIR","family":"image-restoration-super-resolution","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/JingyunLiang/SwinIR"},
+    {"name":"HAT","family":"image-super-resolution","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/XPixelGroup/HAT"},
+    {"name":"Video2X","family":"video-orchestration-upscaling","license":"AGPL-3.0-or-later","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/K4YT3X/video2x"},
+    {"name":"BasicVSR++","family":"video-super-resolution-temporal","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/ckkelvinchan/BasicVSR_PlusPlus"},
+    {"name":"SeedVR2","family":"video-restoration-diffusion","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/ByteDance-Seed/SeedVR"},
+    {"name":"FlashVSR","family":"streaming-video-super-resolution","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/OpenImagingLab/FlashVSR"},
+    {"name":"PS-SR","family":"video-super-resolution-speculative-diffusion","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/HiDream-ai/PS-SR"},
+    {"name":"AVSR-Diff","family":"arbitrary-scale-video-super-resolution","license":"MIT","licenseEvidence":"official-upstream","status":"candidate","modelAvailability":"pretrained-model-release-pending-per-upstream","source":"https://github.com/KAIST-VICLab/AVSR-Diff"},
+    {"name":"Real-CUGAN","family":"super-resolution","license":"MIT","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/bilibili/ailab/tree/main/Real-CUGAN"},
+    {"name":"RIFE","family":"frame-interpolation","license":"MIT","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/hzwer/ECCV2022-RIFE"},
+    {"name":"Anime4K","family":"real-time-upscaling","license":"MIT","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/bloc97/Anime4K"},
+    {"name":"FFmpeg","family":"decode-encode-container","license":"LGPL-2.1-or-GPL-2.0 depending on build/configuration","licenseEvidence":"official-upstream","status":"candidate","source":"https://ffmpeg.org/legal.html"}
   ],
+  "licensePolicy": {
+    "freeSoftwareDoesNotEqualLicenseIdentical": true,
+    "codeLicenseMustBeReviewed": true,
+    "modelWeightsLicenseMustBeReviewed": true,
+    "dependencyLicensesMustBeReviewed": true,
+    "commercialRedistributionMustBeVerifiedPerComponent": true,
+    "noEngineMayBePromotedOnRepositoryPopularityAlone": true
+  },
   "futureDiscovery": {
     "enabled": true,
     "autoInstall": false,
@@ -58,7 +66,7 @@
       "checksum-and-lineage"
     ],
     "promotionStates":["discovered","audited","benchmarking","approved","enabled"],
-    "unknownStateMeansDisabled":true
+    "unknownEngineStateMeansNotEnabled":true
   },
   "nativeVsDerived": {
     "native": "captured/source geometry and characteristics verified",
