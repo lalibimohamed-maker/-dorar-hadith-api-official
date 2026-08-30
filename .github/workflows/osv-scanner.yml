@@ -11,73 +11,33 @@ on:
     - cron: "12 12 * * 1"
   workflow_dispatch:
 
-permissions:
-  actions: read
-  contents: read
-  security-events: write
+permissions: {}
 
 jobs:
   scan-scheduled:
     if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
     name: OSV full vulnerability scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Prepare isolated result path
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/osv"
-          test ! -e "$RUNNER_TEMP/osv/results.sarif"
-      - name: Run OSV-Scanner full scan
-        uses: google/osv-scanner-action/osv-scanner-action@06b2ab4348248b456ee06c9e953637f55e03504f # v2.5.0
-        with:
-          scan-args: |-
-            --format=sarif
-            --output=${{ runner.temp }}/osv/results.sarif
-            --include-git-root
-            -r
-            ./
-      - name: Upload OSV SARIF
-        if: ${{ !cancelled() }}
-        uses: github/codeql-action/upload-sarif@5595ccaf912ebad46d1a7f4f8a4dc4b0b8d6b8f1 # v4.37.6
-        with:
-          sarif_file: ${{ runner.temp }}/osv/results.sarif
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@0c58c542420dfd23fcac08dd9c8ca3cca9c36f1a # v2.5.0
+    with:
+      scan-args: |-
+        --include-git-root
+        -r
+        ./
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
   scan-pr:
     if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
     name: OSV PR/Merge Queue vulnerability scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Prepare isolated result path
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/osv"
-          test ! -e "$RUNNER_TEMP/osv/results.sarif"
-      - name: Reject unsafe repository symlinks for scanner result namespace
-        run: |
-          set -euo pipefail
-          if find "$RUNNER_TEMP/osv" -maxdepth 1 -type l -print -quit | grep -q .; then
-            echo "Unsafe symlink detected in isolated OSV result namespace" >&2
-            exit 1
-          fi
-      - name: Run OSV-Scanner PR scan
-        uses: google/osv-scanner-action/osv-scanner-action@06b2ab4348248b456ee06c9e953637f55e03504f # v2.5.0
-        with:
-          scan-args: |-
-            --format=sarif
-            --output=${{ runner.temp }}/osv/results.sarif
-            --include-git-root
-            -r
-            ./
-      - name: Upload OSV SARIF
-        if: ${{ !cancelled() }}
-        uses: github/codeql-action/upload-sarif@5595ccaf912ebad46d1a7f4f8a4dc4b0b8d6b8f1 # v4.37.6
-        with:
-          sarif_file: ${{ runner.temp }}/osv/results.sarif
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@0c58c542420dfd23fcac08dd9c8ca3cca9c36f1a # v2.5.0
+    with:
+      scan-args: |-
+        --include-git-root
+        -r
+        ./
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
