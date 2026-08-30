@@ -7,6 +7,7 @@
     "subscriptionRequired": false,
     "noHardResolutionCeiling": true,
     "preserveSourcePixels": true,
+    "preserveSourceAspectRatio": true,
     "noAutomaticNative24KClaim": true,
     "noSilentInternetExposure": true,
     "noPrivilegedAutoInstall": true
@@ -40,6 +41,8 @@
     "tiers":["native","4K","8K","10K","12K","16K","24K","future"],
     "policy":"open-ended",
     "nativeClaimRequiresActualTargetCapability": true,
+    "nativeClaimRequiresExactNegotiatedGeometry": true,
+    "preserveAspectRatio": true,
     "derivedOutputMustBeMarkedDerived": true,
     "platformLimitsDoNotChangeInternalMaster": true
   },
