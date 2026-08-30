@@ -121,7 +121,7 @@ jobs:
           echo "YARA completed without detections. YARA exit code: $rc"
       - name: Preserve YARA evidence
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a0 # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: security-yara-${{ github.run_id }}
           path: artifacts/security/yara
@@ -184,7 +184,7 @@ jobs:
           gitleaks git --redact --report-format sarif --report-path artifacts/security/gitleaks/gitleaks.sarif .
       - name: Preserve Gitleaks evidence
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a0 # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: security-gitleaks-${{ github.run_id }}
           path: artifacts/security/gitleaks
@@ -217,7 +217,7 @@ jobs:
           exit "$rc"
       - name: Preserve npm audit evidence
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a0 # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: security-npm-audit-${{ github.run_id }}
           path: artifacts/security/npm-audit
