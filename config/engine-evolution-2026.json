@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "2.0.0",
+  "verifiedAt": "2026-08-30",
+  "baseMain": "52f5567ddd226cf7f45b0ed6bb779b5391878607",
+  "purpose": "Continuous, measurable evaluation of free-first and self-hosted engines without changing canonical scholarly content.",
+  "principles": {
+    "freeFirst": true,
+    "paidApiRequired": false,
+    "subscriptionRequired": false,
+    "selfHostedPreferred": true,
+    "noArtificialApplicationCeiling": true,
+    "measureBeforePromotion": true,
+    "humanReviewBeforeAdoption": true,
+    "preserveOriginal": true,
+    "preserveCorpusAndProvenance": true,
+    "failClosedOnUnknownRights": true,
+    "softwareLicenseDistinctFromModelLicense": true,
+    "modelLicenseDistinctFromVoiceLicense": true,
+    "hostedPricingDistinctFromSoftwareLicense": true
+  },
+  "evaluationGates": [
+    "software_license",
+    "model_or_weight_license",
+    "voice_or_asset_license",
+    "hosted_service_pricing",
+    "security",
+    "maintenance_health",
+    "release_activity",
+    "arabic_quality",
+    "performance",
+    "resource_cost",
+    "offline_self_hosting",
+    "reproducibility",
+    "provenance",
+    "rights",
+    "human_review"
+  ],
+  "statusDefinitions": {
+    "adopted": "Already selected as a production-capable primary; still continuously evaluated.",
+    "candidate": "Eligible for benchmark and review; not a production dependency by this registry.",
+    "license_gated": "Technically relevant but cannot be promoted until every relevant artifact/model/voice license is verified.",
+    "watch": "Observed for future capability or replacement evidence."
+  },
+  "engines": {
+    "ocr": {
+      "primary": "paddleocr",
+      "alternates": ["tesseract", "kraken"],
+      "status": "candidate",
+      "versionReference": "3.7.0",
+      "softwareLicense": "Apache-2.0",
+      "modelLicense": "verify_per_model",
+      "watch": "Arabic OCR accuracy, degraded scans, tables, layout, CPU/mobile performance",
+      "source": "https://github.com/PaddlePaddle/PaddleOCR"
+    },
+    "search_text": {
+      "primary": "opensearch",
+      "alternates": ["meilisearch"],
+      "status": "candidate",
+      "versionReference": "3.6.0",
+      "softwareLicense": "Apache-2.0",
+      "modelLicense": "not_applicable",
+      "watch": "Arabic lexical search, typo tolerance, hybrid retrieval, index size, latency",
+      "source": "https://opensearch.org/"
+    },
+    "search_federated": {
+      "primary": "searxng",
+      "status": "candidate",
+      "versionReference": "rolling",
+      "softwareLicense": "AGPL-3.0-or-later",
+      "modelLicense": "not_applicable",
+      "watch": "engine availability, source terms, rate limits, privacy, result provenance",
+      "source": "https://github.com/searxng/searxng"
+    },
+    "search_semantic": {
+      "primary": "qdrant",
+      "alternates": ["oxigraph"],
+      "status": "candidate",
+      "versionReference": "1.18.x",
+      "softwareLicense": "Apache-2.0",
+      "modelLicense": "embedding_model_dependent",
+      "watch": "hybrid recall, Arabic embeddings, latency, memory, filtering, provenance"
+    },
+    "knowledge_graph": {
+      "primary": "oxigraph",
+      "alternates": ["apache-jena"],
+      "status": "candidate",
+      "versionReference": "rolling",
+      "softwareLicense": "MIT OR Apache-2.0",
+      "modelLicense": "not_applicable",
+      "watch": "SPARQL correctness, graph growth, transaction behavior, query performance",
+      "source": "https://github.com/oxigraph/oxigraph"
+    },
+    "translation": {
+      "primary": "argostranslate",
+      "alternates": ["libretranslate"],
+      "status": "candidate",
+      "versionReference": "Argos 1.4.0 / LibreTranslate 1.9.6",
+      "softwareLicense": "MIT / AGPL-3.0 respectively",
+      "modelLicense": "verify_per_language_model",
+      "watch": "Arabic fidelity, terminology, offline operation, model rights, resource cost",
+      "source": "https://github.com/argosopentech/argos-translate"
+    },
+    "speech_to_text": {
+      "primary": "whisper.cpp",
+      "status": "candidate",
+      "versionReference": "1.9.1",
+      "softwareLicense": "MIT",
+      "modelLicense": "Whisper_model_terms_must_be_verified_separately",
+      "watch": "Arabic transcription, diacritics, streaming, CPU/Apple Silicon performance, timestamps",
+      "source": "https://github.com/ggml-org/whisper.cpp"
+    },
+    "text_to_speech": {
+      "primary": "piper1-gpl",
+      "status": "license_gated",
+      "versionReference": "1.4.2",
+      "softwareLicense": "GPL-3.0",
+      "modelLicense": "verify_per_voice_model",
+      "watch": "Arabic voices, voice quality, latency, redistribution rights, model provenance",
+      "source": "https://github.com/OHF-Voice/piper1-gpl"
+    },
+    "media_download": {
+      "primary": "yt-dlp",
+      "status": "license_gated",
+      "versionReference": "2026.08.19",
+      "softwareLicense": "Unlicense",
+      "modelLicense": "not_applicable",
+      "artifactLicense": "verify_packaged_artifact_components",
+      "watch": "extractor health, source terms, checksums/signatures, packaged component licenses",
+      "source": "https://github.com/yt-dlp/yt-dlp"
+    },
+    "image_restoration": {
+      "primary": "real-esrgan",
+      "alternates": ["swinir"],
+      "status": "license_gated",
+      "versionReference": "0.3.0",
+      "softwareLicense": "verify_current_project_license",
+      "modelLicense": "verify_per_weight",
+      "watch": "artifact rate, Arabic text legibility, source faithfulness, weight provenance"
+    }
+  },
+  "promotionPolicy": {
+    "candidateToAdopted": [
+      "all_required_license_fields_verified",
+      "no_unknown_rights",
+      "security_gate_passed",
+      "Arabic_quality_benchmark_passed",
+      "performance_benchmark_passed",
+      "provenance_preserved",
+      "human_review_recorded",
+      "CI_passed"
+    ],
+    "automaticUpgrade": false,
+    "silentReplacement": false,
+    "canonicalCorpusMutation": false
+  },
+  "cadence": {
+    "securityWatch": "daily",
+    "releaseWatch": "weekly",
+    "performanceBenchmark": "monthly",
+    "qualityBenchmark": "monthly",
+    "licenseReview": "on_change_and_quarterly"
+  }
+}
