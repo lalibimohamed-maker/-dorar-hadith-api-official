@@ -11,15 +11,38 @@ on:
     - cron: "12 12 * * 1"
   workflow_dispatch:
 
+# Reusable workflows cannot elevate permissions above the caller.
+# Grant only the permissions required by OSV's nested scan job.
 permissions:
+  actions: read
   contents: read
+  security-events: write
 
 jobs:
-  scan:
-    name: OSV vulnerability scan
-    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@0c58c542420dfd23fcac08dd9c8ca3cca9c36f1a
+  scan-scheduled:
+    if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    name: OSV full vulnerability scan
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@0c58c542420dfd23fcac08dd9c8ca3cca9c36f1a # v2.5.0
     with:
       scan-args: |-
         --include-git-root
         -r
         ./
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+  scan-pr:
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+    name: OSV PR/Merge Queue vulnerability scan
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@0c58c542420dfd23fcac08dd9c8ca3cca9c36f1a # v2.5.0
+    with:
+      scan-args: |-
+        --include-git-root
+        -r
+        ./
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
