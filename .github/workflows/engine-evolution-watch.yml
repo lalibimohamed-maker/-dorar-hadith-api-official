@@ -1,0 +1,70 @@
+name: Engine Evolution Watch
+
+on:
+  pull_request:
+    paths:
+      - 'config/engine-evolution-2026.json'
+      - '.github/workflows/engine-evolution-watch.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/engine-evolution-2026.json'
+      - '.github/workflows/engine-evolution-watch.yml'
+  schedule:
+    - cron: '13 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: false
+      - name: Validate evolution registry
+        run: |
+          node -e "const fs=require('fs'); const p='config/engine-evolution-2026.json'; const x=JSON.parse(fs.readFileSync(p,'utf8')); if(x.principles.noPaidApiRequired!==true) throw new Error('noPaidApiRequired must remain true'); if(x.principles.preserveCorpusAndProvenance!==true) throw new Error('Corpus/provenance protection missing'); if(x.principles.failClosedOnUnknownRights!==true) throw new Error('rights fail-closed protection missing'); for (const [k,v] of Object.entries(x.engines)) { if(!v.primary) throw new Error('missing primary engine: '+k); if(!v.watch) throw new Error('missing evaluation watch: '+k); } console.log('Validated', Object.keys(x.engines).length, 'engine domains.');"
+
+  upstream-release-snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Snapshot selected GitHub upstream releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          repos=(
+            "yt-dlp/yt-dlp"
+            "Rikorose/DeepFilterNet"
+            "xiph/rnnoise"
+            "xinntao/Real-ESRGAN"
+            "JingyunLiang/SwinIR"
+            "aria2/aria2"
+            "rclone/rclone"
+            "aquasecurity/trivy"
+            "anchore/grype"
+            "anchore/syft"
+            "google/osv-scanner"
+            "zizmorcore/zizmor"
+            "ossf/scorecard"
+            "step-security/harden-runner"
+            "gitleaks/gitleaks"
+          )
+          printf '%-35s %s\n' 'Repository' 'Latest release'
+          for repo in "${repos[@]}"; do
+            tag=$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$repo/releases/latest" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const x=JSON.parse(s);console.log(x.tag_name||'no-release')}catch(e){console.log('unavailable')}})")
+            printf '%-35s %s\n' "$repo" "$tag"
+          done
+          echo 'Release drift is informational here; upgrades require review, benchmarks, license checks, and CI.'

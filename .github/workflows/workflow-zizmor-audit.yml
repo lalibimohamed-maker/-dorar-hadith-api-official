@@ -1,0 +1,38 @@
+name: GitHub Actions Security Audit
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/workflows/workflow-zizmor-audit.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - '.github/workflows/workflow-zizmor-audit.yml'
+  schedule:
+    - cron: '47 3 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  zizmor:
+    name: Zizmor workflow audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Audit GitHub Actions workflows
+        uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
+        with:
+          inputs: ./.github/workflows/
+          advanced-security: false
+          annotations: true
