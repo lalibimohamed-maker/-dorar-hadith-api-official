@@ -1,0 +1,41 @@
+{
+  "version": "2026-08-30",
+  "purpose": "Prevent copied-source inflation and context loss in evidence synthesis.",
+  "identity": {
+    "sourceIdRequired": true,
+    "editionIdRequired": true,
+    "contentHashPreferred": true,
+    "pageOrTimestampRequiredWhenAvailable": true,
+    "parentSourceRelation": true
+  },
+  "independence": {
+    "clusterByOrigin": true,
+    "copiedPagesDoNotCountAsIndependent": true,
+    "translationsAndParaphrasesLinkedToOrigin": true,
+    "mirrorSitesLinkedToCanonicalSource": true
+  },
+  "context": {
+    "expandBeforeQuote": true,
+    "expandAfterQuote": true,
+    "preserveHeadingAndSection": true,
+    "preserveFootnotesAndReferenceLinks": true,
+    "preserveSpeakerAndAttribution": true
+  },
+  "temporal": {
+    "capturePublicationDate": true,
+    "captureModificationDate": true,
+    "detectSupersededVersions": true,
+    "surfaceDateConflicts": true
+  },
+  "negativeEvidence": {
+    "recordSearchMisses": true,
+    "recordUnavailableSources": true,
+    "distinguishNotFoundFromNotExisting": true,
+    "neverTreatAbsenceAsDisproofWithoutMethodology": true
+  },
+  "derivedClaims": {
+    "mustRetainOriginChain": true,
+    "mustRetainContext": true,
+    "mustRetainUncertainty": true
+  }
+}
