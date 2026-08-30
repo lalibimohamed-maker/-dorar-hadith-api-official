@@ -1,0 +1,47 @@
+{
+  "version": "2026-08-28",
+  "purpose": "Measure correctness, surface uncertainty, control risks and make scholarly publication auditable.",
+  "evidenceStates": ["verified", "supported", "disputed", "weak-evidence", "unverified", "superseded", "withdrawn"],
+  "claimModel": {
+    "claimLevelCitationRequired": true,
+    "counterEvidenceAllowed": true,
+    "conflictingSourcesMustRemainVisibleToReviewers": true,
+    "inferenceMustBeExplicitlyLabeled": true,
+    "modelGeneratedTextNeverCountsAsPrimaryEvidence": true
+  },
+  "qualityMetrics": [
+    "citation-completeness",
+    "source-identity-accuracy",
+    "text-integrity",
+    "hadith-grading-traceability",
+    "ocr-character-error-rate",
+    "translation-review-coverage",
+    "duplicate-detection-rate",
+    "broken-link-rate",
+    "rights-classification-accuracy",
+    "restore-success-rate",
+    "accessibility-conformance",
+    "search-precision-and-recall",
+    "false-positive-provenance-rate"
+  ],
+  "riskControls": {
+    "hallucination": ["retrieval-first", "claim-citations", "source-bounded-generation", "abstention"],
+    "source-poisoning": ["domain-reputation", "cross-source-confirmation", "content-hash", "quarantine"],
+    "prompt-injection": ["treat-web-content-as-data", "tool-boundary", "untrusted-instructions-blocked"],
+    "supply-chain": ["pinned-releases", "license-check", "security-scan", "protected-pr"],
+    "privacy": ["data-minimization", "redaction", "retention-policy", "privacy-preserving-analytics"],
+    "availability": ["rate-limits", "circuit-breakers", "cache", "degraded-read-mode"]
+  },
+  "publication": {
+    "requiresPassingGates": true,
+    "humanReviewRequiredForHighRiskReligiousClaims": true,
+    "automatedOnlyPublicationAllowedFor": ["non-semantic-formatting", "deterministic-derived-renders"],
+    "correctionMustLeaveAuditTrail": true,
+    "withdrawalIsReversible": true
+  },
+  "community": {
+    "publicContributions": "quarantine-first",
+    "reporting": ["factual-error", "citation-error", "rights-concern", "accessibility-issue", "security-issue"],
+    "moderationDoesNotAlterCanonicalSources": true
+  }
+}

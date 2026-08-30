@@ -12,9 +12,10 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: antivirus-analysis-mesh-${{ github.ref }}
-  cancel-in-progress: true
+# Do not cancel an in-flight security scan when another run is queued.
+# Cancellation is an unknown security result and the summary gate is fail-closed.
+# GitHub's default concurrency behavior can cancel pending work; no concurrency
+# group is used here so each security run completes independently.
 
 jobs:
   clamav:
@@ -253,13 +254,12 @@ jobs:
           for result in \
             "${{ needs.clamav.result }}" \
             "${{ needs.yara.result }}" \
+            "${{ needs.trivy.result }}" \
             "${{ needs.gitleaks.result }}" \
             "${{ needs.npm-audit.result }}"; do
             if [ "$result" != "success" ]; then
+              echo "Security analysis failed or was cancelled: $result"
               exit 1
             fi
           done
-          echo "Trivy: ${{ needs.trivy.result }}"
-          if [ "${{ needs.trivy.result }}" != "success" ]; then
-            exit 1
-          fi
+          echo "All security scanners completed successfully."

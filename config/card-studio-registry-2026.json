@@ -1,0 +1,53 @@
+{
+  "version": "2026-08-28",
+  "name": "Din Allah Card Studio",
+  "purpose": "Generate large multilingual الدعوية/الذكرية/التعليمية cards from approved structured content while preserving provenance, attribution and the Din Allah Encyclopedia engineering signature.",
+  "principles": [
+    "content-first-not-decoration-first",
+    "canonical-text-is-immutable",
+    "derived-translation-is-labeled",
+    "assets-require-license-evidence",
+    "every-export-carries-provenance-metadata",
+    "every-card-can-be-regenerated-deterministically",
+    "free-to-access-does-not-mean-every-web-asset-is-free-to-redistribute"
+  ],
+  "formats": ["html","svg","png","webp","pdf","print-a4","social-vertical","mobile-story"],
+  "languages": "all-supported-locales-through-registry; fallback to source language until reviewed translation exists",
+  "signature": {
+    "footerText": "موسوعة دين الله",
+    "includeSourceShortForm": true,
+    "includeLicenseNoticeWhenRequired": true,
+    "includeGeneratedAt": true,
+    "includeStableCardId": true
+  },
+  "pipeline": [
+    "load-approved-content",
+    "resolve-locale",
+    "compose-layout",
+    "render-vector-first",
+    "rasterize-when-requested",
+    "render-pdf",
+    "attach-provenance-and-rights",
+    "run-visual-and-text-integrity-checks",
+    "publish-to-card-library"
+  ],
+  "toolingCandidates": [
+    {"id":"svg-first","type":"format","reason":"resolution-independent typography and export"},
+    {"id":"lucide","type":"icons","upstream":"https://github.com/lucide-icons/lucide","licenseEvidence":"ISC"},
+    {"id":"weasyprint","type":"pdf-renderer","upstream":"https://github.com/Kozea/WeasyPrint","licenseEvidence":"BSD-3-Clause"},
+    {"id":"ffmpeg","type":"media-transcode","upstream":"https://github.com/FFmpeg/FFmpeg","licenseCheck":"required-per-release"},
+    {"id":"openverse","type":"asset-discovery","licenseCheck":"required-per-asset"},
+    {"id":"wikimedia-commons","type":"asset-discovery","licenseCheck":"required-per-asset"}
+  ],
+  "assetPolicy": {
+    "accepted": ["public-domain","cc0","cc-by","cc-by-sa","explicit-permission","owned-original"],
+    "reviewRequired": ["publisher-content","unknown-license","platform-terms-only","noncommercial-only"],
+    "blocked": ["copyright-unknown","license-conflict","watermark-removal-request"]
+  },
+  "translationPolicy": {
+    "machineOutputStatus": "draft",
+    "requiresReviewForReligiousMeaning": true,
+    "neverRewriteCanonicalQuranAsMachineTranslation": true,
+    "storeTranslatorAndModelLineage": true
+  }
+}

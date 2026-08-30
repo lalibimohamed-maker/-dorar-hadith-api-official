@@ -1,0 +1,100 @@
+{
+  "version": "2026-08-28",
+  "title": "Faith, Reverence, Proximity and Following Knowledge Domains",
+  "purpose": "A source-aware knowledge architecture for linking Allah, creation, the Prophet, Ahl al-Bayt, Companions, acts of worship, remembrance, character and related scholarly domains without conflating source text with interpretation.",
+  "navigation": {
+    "placement": "right-sidebar",
+    "root": "أبواب الإيمان والتعظيم والاقتداء",
+    "entries": [
+      {"id":"allah","labelAr":"الله","order":10},
+      {"id":"allah-names-attributes","labelAr":"أسماء الله وصفاته","order":20},
+      {"id":"divine-greatness","labelAr":"عظمة الله","order":30},
+      {"id":"creation-signs","labelAr":"آيات الله في الخَلْق","order":40},
+      {"id":"prophet-muhammad","labelAr":"محمد ﷺ","order":50},
+      {"id":"prophetic-character","labelAr":"شمائل النبي ﷺ","order":60},
+      {"id":"prophetic-guidance","labelAr":"هدي النبي ﷺ ووصاياه","order":70},
+      {"id":"ahl-al-bayt","labelAr":"أهل البيت","order":80},
+      {"id":"mothers-of-believers","labelAr":"أمهات المؤمنين","order":90},
+      {"id":"companions","labelAr":"الصحابة رضي الله عنهم","order":100},
+      {"id":"prophets-and-messengers","labelAr":"الأنبياء والرسل","order":110},
+      {"id":"scholars-and-salaf","labelAr":"السلف والعلماء","order":120},
+      {"id":"proximity-to-allah","labelAr":"القربات إلى الله","order":130},
+      {"id":"remembrance","labelAr":"أبواب الذكر","order":140},
+      {"id":"repentance","labelAr":"التوبة والاستغفار","order":150},
+      {"id":"taqwa","labelAr":"التقوى","order":160},
+      {"id":"ihsan","labelAr":"الإحسان","order":170},
+      {"id":"noble-character","labelAr":"مكارم الأخلاق","order":180},
+      {"id":"hereafter","labelAr":"الآخرة","order":190},
+      {"id":"lessons-and-guidance","labelAr":"قصص العبرة والهداية","order":200}
+    ]
+  },
+  "proximityToAllah": {
+    "definition": "Every legislated statement, deed or inward act by which a servant seeks the pleasure and nearness of Allah, subject to sincerity, sound evidence and following the Prophetic guidance.",
+    "families": [
+      "obligatory-worship",
+      "voluntary-worship",
+      "heart-actions",
+      "spoken-devotions",
+      "financial-devotions",
+      "seasonal-devotions",
+      "ritual-sacrifices",
+      "social-good",
+      "seeking-and-teaching-knowledge",
+      "lawful-customs-with-good-intention",
+      "avoiding-sins-and-harm"
+    ],
+    "exampleTopics": [
+      "prayer",
+      "fasting",
+      "fasting-the-day-of-arafah",
+      "charity",
+      "quran-recitation",
+      "udhiyah",
+      "hajj",
+      "umrah",
+      "dhikr",
+      "dua",
+      "repentance",
+      "seeking-forgiveness",
+      "birr-al-walidayn",
+      "maintaining-kinship",
+      "helping-people",
+      "patience",
+      "gratitude",
+      "sincerity",
+      "taqwa",
+      "tawakkul"
+    ]
+  },
+  "recordModel": {
+    "requiredLayers": [
+      "canonical-text",
+      "source-provenance",
+      "authenticity-or-grading",
+      "scholarly-explanation",
+      "analysis-or-synthesis",
+      "benefits-and-guidance",
+      "relationships",
+      "rights-and-redistribution"
+    ],
+    "sourceTypes": ["quran","hadith","tafsir","sirah","fiqh","usul-al-fiqh","ulum-al-quran","ulum-al-hadith","rijal","biography","scholarly-opinion","educational-card","media"],
+    "neverConflate": [
+      "quran-with-hadith",
+      "prophetic-text-with-scholar-commentary",
+      "authenticated-report-with-unverified-story",
+      "source-text-with-model-inference",
+      "open-license-with-public-domain",
+      "machine-translation-with-reviewed-translation"
+    ]
+  },
+  "companionRegistry": {
+    "policy": "Treat the Companion register as a biographical evidence graph, not merely a name list.",
+    "recommendedCoreReferences": [
+      "al-Isticab fi Ma'rifat al-Ashab",
+      "Usud al-Ghabah fi Ma'rifat al-Sahabah",
+      "al-Isabah fi Tamyiz al-Sahabah"
+    ],
+    "statuses": ["established-companion","disputed-companionship","name-or-lineage-disputed","not-established-as-companion"],
+    "childRule": "Do not infer companionship merely from being born before the Prophet's death; require evidence of meeting according to the adopted scholarly definition and record disputed cases explicitly."
+  }
+}

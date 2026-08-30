@@ -1,0 +1,51 @@
+{
+  "version": "2026-08-28",
+  "purpose": "Close identified and latent completeness gaps across scholarly content, discovery, interoperability, preservation, accessibility, resilience, evaluation and governance without mutating the authoritative Corpus.",
+  "architectureRule": "System capabilities must remain layered above authoritative content and may propose derived artifacts but cannot silently rewrite authoritative records.",
+  "domains": {
+    "quran": ["canonical-text-integrity", "script-and-reading-metadata", "recitation-and-tajwid-metadata", "tafsir-linking", "ayah-level-provenance", "translation-lineage", "manuscript-links-when-available"],
+    "hadith": ["multi-collection-coverage", "isnad-graph", "rijal-linking", "matn-variants", "grading-provenance", "source-concordance", "fiqh-tafsir-links", "hadith-change-log"],
+    "tafsir": ["school-and-method metadata", "ayah-aligned commentary", "edition metadata", "scholar authority records", "variant-opinion modeling", "cross-tafsir comparison"],
+    "sirah": ["event timeline", "places", "participants", "source-chain", "ayah-hadith links", "uncertainty and disputed reports"],
+    "fiqh-and-usul": ["madhhab-aware modeling", "issue-to-evidence links", "usul principles", "ikhtilaf modeling", "jurisdiction-and-context metadata", "fatwa-separation"],
+    "biography": ["person authority records", "variant names", "teachers-and-students graph", "hadith narrator links", "event participation", "confidence states"],
+    "manuscripts": ["page/image preservation", "IIIF interoperability", "witness metadata", "edition relationships", "OCR provenance", "human correction trail"],
+    "digital-library": ["book editions", "publisher metadata", "rights status", "stable identifiers", "download policy", "derivative relationships"],
+    "media": ["audio provenance", "video provenance", "subtitle/transcript lineage", "text-audio synchronization", "image rights", "media integrity checks"],
+    "educational-artifacts": ["card provenance", "generation recipe", "stable artifact id", "language lineage", "accessibility alternatives", "regeneration" ]
+  },
+  "latentGaps": [
+    "uncertainty-modeling-for-disputed-evidence",
+    "claim-level-citations",
+    "negative-evidence-recording",
+    "duplicate-and-near-duplicate-detection",
+    "canonicalization-of-arabic-text-for-search-without-altering-display-text",
+    "reversible-derived-transformations",
+    "data-quality-slos",
+    "incident-and-correction-reports",
+    "dependency-and-model-supply-chain-provenance",
+    "offline-verifiable-bundles",
+    "reader-personalization-without-altering-source-content",
+    "privacy-preserving-analytics",
+    "accessibility-test-matrix",
+    "disaster-recovery-and-restore-drills",
+    "schema-migration-compatibility",
+    "internationalization-script-coverage",
+    "abuse-resistant-public-contribution-workflow",
+    "content-deprecation-without-data-erasure",
+    "scholarly-retraction-and-supersession-model",
+    "evidence-conflict-resolution"
+  ],
+  "qualityGates": [
+    "source-identity",
+    "provenance",
+    "rights",
+    "text-integrity",
+    "scholarly-status",
+    "independent-cross-check",
+    "derivation-lineage",
+    "publication-eligibility",
+    "accessibility",
+    "preservation"
+  ]
+}
