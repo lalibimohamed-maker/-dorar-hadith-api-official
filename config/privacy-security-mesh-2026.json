@@ -1,0 +1,46 @@
+{
+  "version":"2026-08-30",
+  "purpose":"Free-first defensive privacy, anti-spyware, anti-spam and anti-unwanted-access mesh for web and supported client applications.",
+  "principles":{"paidApiRequired":false,"subscriptionRequired":false,"localFirst":true,"failClosed":true,"leastPrivilege":true,"noSilentSensorAccess":true},
+  "cameraAndMicrophone":{
+    "default":"blocked-until-explicit-user-grant",
+    "web":{"permissionPromptRequired":true,"backgroundCapture":false,"recordingIndicatorRequired":true,"permissionsPolicy":"camera-and-microphone-explicit-only"},
+    "mobile":{"permissionStateMustBeChecked":true,"sessionScopedAccessPreferred":true,"revokeOnSessionEnd":true},
+    "detection":"permission-state-and-active-session-audit-not-malware-proof",
+    "unsupportedClaim":"cannot guarantee detection of every OS-level or hardware-level spy" 
+  },
+  "bluetoothPrivacy":{
+    "discoverableDefault":false,
+    "explicitPairingRequired":true,
+    "unexpectedDeviceChange":"alert-and-block-sensitive-session",
+    "nearbyPermissionRequired":true,
+    "trackableIdentifiers":"minimize-and-never-log-unnecessary-stable-identifiers",
+    "transport":"use-only-after-user-approval"
+  },
+  "antiSpam":{
+    "layers":["token-bucket-rate-limit","burst-control","duplicate-content-detection","abuse-score","progressive-cooldown","ip-and-account-reputation","captcha-or-human-check-when-risk-rises"],
+    "failClosedAt":"resource-exhaustion-or-abuse-threshold",
+    "neverBlockOnContentBeliefAlone":true
+  },
+  "malwareAndSpyware":{
+    "fileScanning":"ClamAV-or-equivalent-local-scanner",
+    "ruleScanning":"YARA-or-equivalent-local-rules",
+    "dependencyAudit":"npm-audit-and-lockfile-integrity",
+    "staticAnalysis":"CodeQL-or-equivalent",
+    "unknownExecutable":"blocked",
+    "sensorPermissionAnomaly":"alert"
+  },
+  "networkAndSession":{
+    "httpsRequiredForRemoteSessions":true,
+    "secureHeaders":true,
+    "csrfProtectionForStateChangingWebActions":true,
+    "sessionRevocation":true,
+    "screenSharingInternetExposure":"never-by-default",
+    "bluetoothInternetBridge":"never-by-default"
+  },
+  "evidence":{
+    "requiredForPrivacySensitiveAction":["explicit-consent","permission-state","target-device","session-id"],
+    "auditLog":"minimal-data-and-integrity-protected",
+    "privacyClaimScope":"defensive-controls-not-guaranteed-absolute-detection"
+  }
+}
