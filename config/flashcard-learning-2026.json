@@ -1,0 +1,36 @@
+{
+  "version": "2026-08-30",
+  "purpose": "Free-first interactive learning and FlashCard engine for Deen Allah Encyclopedia.",
+  "questionModes": [
+    "flashcard-recall",
+    "single-choice",
+    "multiple-choice",
+    "matching",
+    "drag-and-drop",
+    "fill-in-the-blank",
+    "true-false",
+    "ordering",
+    "image-pairing",
+    "memory-game",
+    "short-answer",
+    "spoken-answer",
+    "interactive-video-question",
+    "scenario-branching"
+  ],
+  "answerOptions": {"minimumChoices": 2,"maximumChoices": null,"allowMultipleCorrect":true,"randomizeChoices":true},
+  "feedback": {"correct":"positive-and-explanatory","incorrect":"gentle-correction-with-evidence-link","retry":true,"showSolutionOptional":true},
+  "voice": {"questionDelivery":"device-or-approved-local-tts","webSpeechPreferred":true,"speechRecognitionOptional":true,"microphonePermissionExplicit":true,"generatedReligiousAudioNotAuthoritative":true},
+  "spacedRepetition": {"enabled":true,"scheduler":"evidence-preserving-spaced-review","sourceProvenanceRequired":true},
+  "interactiveMedia": {"videoQuestions":true,"audioQuestions":true,"imageQuestions":true,"adaptiveBranching":true},
+  "openSourceEngines": [
+    {"name":"H5P.Flashcards","license":"MIT","source":"https://github.com/h5p/h5p-flashcards","status":"adapter-candidate"},
+    {"name":"H5P.QuestionSet","license":"MIT","source":"https://github.com/h5p/h5p-question-set","status":"adapter-candidate"},
+    {"name":"H5P.MultiChoice","license":"MIT","source":"https://github.com/h5p/h5p-multi-choice","status":"adapter-candidate"},
+    {"name":"H5P.DragQuestion","license":"MIT","source":"https://github.com/h5p/h5p-drag-question","status":"adapter-candidate"},
+    {"name":"H5P.Blanks","license":"MIT","source":"https://github.com/h5p/h5p-blanks","status":"adapter-candidate"},
+    {"name":"H5P.MemoryGame","license":"MIT","source":"https://github.com/h5p/h5p-memory-game","status":"adapter-candidate"},
+    {"name":"H5P.SpeakTheWords","license":"MIT","source":"https://github.com/h5p/h5p-speak-the-words","status":"adapter-candidate"}
+  ],
+  "freeFirst": {"paidApiRequired":false,"subscriptionRequired":false,"localExecutionPreferred":true},
+  "integrity": {"sourceIdRequired":true,"canonicalAnswerRequired":true,"scholarlyContentReviewRequired":true,"neverInventSourceAnswer":true}
+}
