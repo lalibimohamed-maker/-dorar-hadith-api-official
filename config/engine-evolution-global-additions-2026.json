@@ -9,14 +9,23 @@
     "promotionRequiresEvidence": true,
     "licenseDimensions": ["software", "model", "weights", "voice_asset", "dataset", "hosted_service"]
   },
+  "globalSearchUpdate": {
+    "checkedOn": "2026-08-30",
+    "newReferences": [
+      {"name":"NeoAraBERT","domain":"arabic_embeddings","status":"candidate","runtimeDependency":false,"modelLicenseMustBeVerified":true,"notes":"Arabic-specific embedding research/reference; benchmark across MSA, classical and dialectal Arabic."},
+      {"name":"Open Universal Arabic ASR Leaderboard","domain":"arabic_asr_benchmark","status":"benchmark_only","runtimeDependency":false,"notes":"Reference leaderboard for current Arabic ASR comparisons; not a runtime dependency."},
+      {"name":"raqeem","domain":"arabic_asr_client","status":"candidate","runtimeDependency":false,"notes":"Thin client around Cohere Transcribe Arabic or self-hosted OpenAI-compatible inference; no local model weights in the client."}
+    ]
+  },
   "candidates": [
-    {"name":"Cohere Transcribe Arabic","domain":"arabic_asr","status":"candidate","runtimeDependency":false,"notes":"Benchmark/self-hosting candidate; verify model and deployment terms separately."},
+    {"name":"Cohere Transcribe Arabic","domain":"arabic_asr","status":"candidate","runtimeDependency":false,"notes":"Open-weights Arabic ASR candidate; verify model and deployment terms separately."},
     {"name":"MAS","domain":"arabic_manuscript_ocr","status":"benchmark_only","runtimeDependency":false,"notes":"Arabic historical/manuscript OCR benchmark reference."},
     {"name":"QLever","domain":"rdf_sparql","status":"candidate","runtimeDependency":false,"licenseGate":true},
     {"name":"RTL geometry-first PDF parsing","domain":"rtl_pdf_parsing","status":"benchmark_only","runtimeDependency":false,"licenseGate":true},
     {"name":"MinerU","domain":"document_parsing","status":"license_gated","runtimeDependency":false,"licenseGate":true},
     {"name":"Surya","domain":"arabic_ocr_layout","status":"license_gated","runtimeDependency":false,"licenseGate":true},
     {"name":"BGE-M3","domain":"embeddings","status":"candidate","runtimeDependency":false,"modelLicenseMustBeVerified":true},
+    {"name":"NeoAraBERT","domain":"arabic_embeddings","status":"candidate","runtimeDependency":false,"modelLicenseMustBeVerified":true},
     {"name":"Qwen3-Reranker","domain":"reranking","status":"candidate","runtimeDependency":false,"modelLicenseMustBeVerified":true},
     {"name":"Jina Embeddings v3","domain":"embeddings","status":"license_gated","runtimeDependency":false,"licenseGate":true},
     {"name":"Kokoro","domain":"tts_multilingual","status":"candidate","runtimeDependency":false,"arabicSupportMustBeBenchmarked":true},
@@ -24,6 +33,7 @@
     {"name":"EasyOCR","domain":"ocr_alternates","status":"candidate","runtimeDependency":false,"arabicBenchmarkRequired":true},
     {"name":"Qwen3-ASR","domain":"speech_to_text_modern","status":"candidate","runtimeDependency":false,"modelLicenseMustBeVerified":true},
     {"name":"whisper.cpp","domain":"speech_to_text_local","status":"candidate","runtimeDependency":false,"modelLicenseMustBeVerified":true},
+    {"name":"Open Universal Arabic ASR Leaderboard","domain":"arabic_asr_benchmark","status":"benchmark_only","runtimeDependency":false},
     {"name":"PaddleOCR","domain":"ocr_primary_candidate","status":"candidate","runtimeDependency":false,"modelLicenseMustBeVerified":true},
     {"name":"OpenSearch","domain":"lexical_hybrid_search","status":"candidate","runtimeDependency":false},
     {"name":"SearXNG","domain":"metasearch","status":"candidate","runtimeDependency":false,"licenseGate":true},
@@ -34,7 +44,8 @@
     {"name":"yt-dlp","domain":"media_ingestion","status":"candidate","runtimeDependency":false,"artifactLicenseAuditRequired":true},
     {"name":"Real-ESRGAN","domain":"image_restoration","status":"candidate","runtimeDependency":false,"modelLicenseMustBeVerified":true},
     {"name":"OpenVoice","domain":"voice_conversion","status":"candidate","runtimeDependency":false,"voiceAssetLicenseRequired":true},
-    {"name":"Coqui TTS / XTTS-v2","domain":"tts_multilingual","status":"license_gated","runtimeDependency":false,"licenseGate":true,"modelLicenseMustBeVerified":true}
+    {"name":"Coqui TTS / XTTS-v2","domain":"tts_multilingual","status":"license_gated","runtimeDependency":false,"licenseGate":true,"modelLicenseMustBeVerified":true},
+    {"name":"raqeem","domain":"arabic_asr_client","status":"candidate","runtimeDependency":false,"hostedServiceMustNotBeRequired":true}
   ],
   "promotionGate": ["license", "model_weights", "voice_asset", "dataset_rights", "hosted_pricing", "security", "arabic_quality", "resource_cost", "provenance", "human_review", "ci"]
 }
