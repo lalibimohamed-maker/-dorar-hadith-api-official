@@ -1,0 +1,45 @@
+{
+  "version": "2026-08-30",
+  "purpose": "Global capability registry for screen sharing and mirroring across TVs, monitors, projectors, computers, phones, tablets and embedded displays. Resolution is capability-driven and open-ended.",
+  "design": {
+    "mode": "protocol-federation",
+    "preserveSourcePixels": true,
+    "noHardResolutionCeiling": true,
+    "noAutomaticNative24KClaim": true,
+    "capabilityProbeBeforeSession": true,
+    "preferDirectDisplayTransport": true,
+    "fallbackToCompressedStreaming": true
+  },
+  "protocols": [
+    {"id":"miracast","engine":"MiracleCast","direction":["source-to-display","display-sink"],"targets":["tv","monitor","projector","computer","embedded"],"status":"candidate","license":"LGPL","source":"https://github.com/albfan/miraclecast","resolutionPolicy":"negotiate-with-sink"},
+    {"id":"airplay-mirror","engine":"UxPlay","direction":["source-to-display"],"targets":["tv","computer","projector","embedded"],"status":"candidate","license":"GPL-3.0","source":"https://github.com/FDH2/UxPlay","resolutionPolicy":"negotiate-with-client-and-renderer"},
+    {"id":"google-cast","engine":"Google Cast adapter","direction":["source-to-display"],"targets":["tv","display","tablet","vehicle-display"],"status":"adapter","license":"upstream-platform","source":"https://support.google.com/googlecast/answer/6102923","resolutionPolicy":"target-and-app-capability"},
+    {"id":"webrtc-display","engine":"Browser getDisplayMedia/WebRTC adapter","direction":["browser-to-browser","browser-to-display"],"targets":["computer","phone","tablet","tv-browser","projector-browser"],"status":"adapter","license":"web-platform","source":"https://developer.mozilla.org/docs/Web/API/MediaDevices/getDisplayMedia","resolutionPolicy":"capture-and-receiver-capability"},
+    {"id":"android-mirroring","engine":"scrcpy","direction":["android-to-computer"],"targets":["computer"],"status":"candidate","license":"Apache-2.0","source":"https://github.com/Genymobile/scrcpy","resolutionPolicy":"device-and-transport-capability"},
+    {"id":"low-latency-streaming","engine":"Sunshine/Moonlight","direction":["computer-to-client"],"targets":["computer","phone","tablet","tv-client","projector-client"],"status":"candidate","license":"open-source-components","source":"https://github.com/LizardByte/Sunshine","resolutionPolicy":"host-gpu-client-capability"}
+  ],
+  "transport": {
+    "preferred": ["USB-C/DisplayPort","DisplayPort","HDMI","wired-ethernet","Wi-Fi-local","internet-relay-only-when-explicit"],
+    "wireless": {"sameLanPreferred":true,"avoidInternetByDefault":true,"measureBandwidth":true,"measureJitter":true,"measurePacketLoss":true,"adaptBitrate":true},
+    "wired": {"preserveUncompressedOrVisuallyLosslessWhenPossible":true,"supportDisplayPortAndHDMIAdapters":true}
+  },
+  "quality": {
+    "tiers":["native","4K","8K","10K","12K","16K","24K","future"],
+    "futurePolicy":"open-ended",
+    "native24KRequiresTargetCapability":true,
+    "derivedOutputsMustBeMarkedDerived":true,
+    "neverInventTargetCapability":true,
+    "highResolutionTransport":{"displayCompression":"VESA-DSC-or-target-equivalent","codecCandidates":["AV1","HEVC","H.264"],"preferLosslessOrVisuallyLosslessForScreenContent":true}
+  },
+  "deviceClasses": {
+    "television":["google-cast","airplay-mirror","miracast"],
+    "computer":["miracast","airplay-mirror","android-mirroring","webrtc-display","low-latency-streaming"],
+    "projector":["miracast","airplay-mirror","webrtc-display"],
+    "iphone-ipad":["airplay-mirror","google-cast","webrtc-display"],
+    "android-phone-tablet":["miracast","google-cast","android-mirroring","webrtc-display"],
+    "embedded":["miracast","airplay-mirror","webrtc-display"]
+  },
+  "security":{"explicitUserApprovalRequired":true,"pairingRequiredForControlledSessions":true,"localNetworkDiscoveryOnlyByDefault":true,"neverAutoExposeScreenToInternet":true,"sessionRevocationSupported":true},
+  "installation":{"autoInstall":false,"autoEnable":false,"verifiedInstallerRequired":true,"reason":"External display engines are OS/hardware dependent; the repository must not silently execute privileged installs or claim an engine is installed when it is not."},
+  "evidence":{"requiredBeforeEnable":["official-upstream","license","runtime-present","hardware-support","protocol-handshake","actual-negotiated-resolution","latency-measurement","image-integrity-test"],"unknownMeans":"blocked"}
+}
