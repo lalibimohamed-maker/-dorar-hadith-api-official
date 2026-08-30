@@ -30,7 +30,7 @@ test('quality ladder is open-ended and exposes preferred 24K/16K/12K/8K/4K tiers
   assert.deepEqual(quality.preferredDownloadTiers.map((tier) => tier.label), ['24K', '16K', '12K', '8K', '4K']);
   assert.equal(quality.selection.allowManualQualityChoice, true);
   assert.equal(quality.selection.showOnlyExistingDerivatives, true);
-  assert.equal(quality.trueResolution.24KMeansNativeDetail, true);
+  assert.equal(quality.trueResolution['24KMeansNativeDetail'], true);
   assert.equal(quality.trueResolution.forbidMisleadingUpscaleLabel, true);
   assert.equal(quality.freeFirst.paidApiRequired, false);
   assert.equal(quality.freeFirst.subscriptionRequired, false);
