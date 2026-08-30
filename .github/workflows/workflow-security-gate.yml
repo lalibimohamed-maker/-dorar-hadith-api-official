@@ -4,6 +4,8 @@ on:
   pull_request:
   push:
     branches: [main]
+  merge_group:
+    types: [checks_requested]
   schedule:
     - cron: '53 3 * * 1'
 
