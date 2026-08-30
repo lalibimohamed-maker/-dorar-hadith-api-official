@@ -11,7 +11,8 @@
     "encryptionAtRestRequired": true,
     "restoreDrillRequired": true,
     "restoreDrillFrequency": "quarterly",
-    "backupVerification": "checksum-plus-sample-read"
+    "backupVerification": "checksum-plus-sample-read",
+    "noSilentOverwrite": true
   },
   "offline": {
     "supportedArtifacts": ["selected-books", "approved-corpus-slices", "audio", "cards", "iiif-manifests", "ro-crates"],
