@@ -25,9 +25,7 @@ export function probePlaybackEngines() {
 
 export function planCarMedia({ transport, contentType, context = 'parked', nativeResolution = null, engine = 'platform-native' }) {
   const config = loadCarMediaConfig();
-  if (!config.transports[transport]) {
-    return { allowed: false, reason: 'unknown-transport' };
-  }
+  if (!config.transports[transport]) return { allowed: false, reason: 'unknown-transport' };
 
   if (contentType === 'audio-quran') {
     if (!config.quranAudio.transports.includes(transport)) return { allowed: false, reason: 'transport-not-supported-for-quran-audio' };
