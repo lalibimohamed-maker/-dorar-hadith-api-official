@@ -12,28 +12,6 @@
     "contentAuthenticity": ["c2pa-verifier"],
     "riskGovernance": ["nist-ai-rmf", "owasp-llm-prompt-injection-controls"]
   },
-  "controlLayers": [
-    "quote-context-expansion",
-    "claim-extraction",
-    "entity-resolution",
-    "relation-extraction",
-    "temporal-consistency",
-    "document-structure-validation",
-    "speaker-attribution-validation",
-    "semantic-deduplication",
-    "knowledge-graph-linking",
-    "evidence-completeness",
-    "negative-evidence-tracking",
-    "source-lineage-and-edition-resolution",
-    "remote-content-trust-boundary",
-    "content-authenticity-verification",
-    "resource-and-cost-governor"
-  ],
-  "governance": {
-    "toolsAreNotTruthAuthorities": true,
-    "modelWeightsNeedSeparateLicenseCheck": true,
-    "uncertainAttributionFailsClosed": true,
-    "derivedClaimsKeepSourceAndContext": true,
-    "remoteContentCannotIssueInstructions": true
-  }
+  "controlLayers": ["quote-context-expansion","claim-extraction","entity-resolution","relation-extraction","temporal-consistency","document-structure-validation","speaker-attribution-validation","semantic-deduplication","knowledge-graph-linking","evidence-completeness","negative-evidence-tracking","source-lineage-and-edition-resolution","remote-content-trust-boundary","content-authenticity-verification","resource-and-cost-governor"],
+  "governance": {"toolsAreNotTruthAuthorities":true,"modelWeightsNeedSeparateLicenseCheck":true,"uncertainAttributionFailsClosed":true,"derivedClaimsKeepSourceAndContext":true,"remoteContentCannotIssueInstructions":true}
 }
