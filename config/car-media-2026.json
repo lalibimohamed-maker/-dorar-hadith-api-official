@@ -13,24 +13,8 @@
     "losslessSourcePreservation":true
   },
   "playbackEngines":[
-    {
-      "name":"GStreamer",
-      "role":["audio-playback","video-playback","decode","pipeline-routing"],
-      "license":"LGPL-2.1-or-later",
-      "status":"candidate",
-      "platforms":["linux","windows","macos","android","ios","tvos"],
-      "source":"https://gstreamer.freedesktop.org/",
-      "selection":"prefer-when-runtime-capabilities-are-verified"
-    },
-    {
-      "name":"mpv",
-      "role":["audio-playback","video-playback","hardware-decoding","hdr-and-color-output"],
-      "license":"GPL-2.0-or-later",
-      "status":"candidate",
-      "platforms":["linux","windows","macos","bsd"],
-      "source":"https://mpv.io/",
-      "selection":"prefer-when-runtime-capabilities-are-verified"
-    }
+    {"name":"GStreamer","role":["audio-playback","video-playback","decode","pipeline-routing"],"license":"LGPL-2.1-or-later","status":"candidate","platforms":["linux","windows","macos","android","ios","tvos"],"source":"https://gstreamer.freedesktop.org/","selection":"prefer-when-runtime-capabilities-are-verified"},
+    {"name":"mpv","role":["audio-playback","video-playback","hardware-decoding","hdr-and-color-output"],"license":"GPL-2.0-or-later","status":"candidate","platforms":["linux","windows","macos","bsd"],"source":"https://mpv.io/","selection":"prefer-when-runtime-capabilities-are-verified"}
   ],
   "audioFormats":{
     "preferredForVerifiedQuranMasters":["FLAC","WAV","ALAC"],
@@ -38,42 +22,14 @@
     "policy":"never-downgrade-or-reencode-the-authoritative-source-just-for-car-playback"
   },
   "transports":{
-    "usb":{
-      "roles":["wired-phone-car-bridge","direct-media-transfer","display-link-when-supported"],
-      "capabilities":["audio","media-controls","android-auto-or-equivalent","carplay-or-equivalent","usb-c-displayport-when-hardware-supports"],
-      "qualityPolicy":"negotiate-with-vehicle-and-device"
-    },
-    "bluetooth":{
-      "roles":["audio-output","media-control"],
-      "profiles":["A2DP","AVRCP","LE-Audio-when-supported"],
-      "capabilities":["quran-audio","play-pause","next-previous","metadata-when-supported"],
-      "video":false,
-      "qualityPolicy":"negotiate-codec-and-sink-capability"
-    },
-    "wifi-native-car":{
-      "roles":["platform-display","media-control","streaming-when-supported"],
-      "qualityPolicy":"capability-probed"
-    }
+    "usb":{"roles":["wired-phone-car-bridge","direct-media-transfer","display-link-when-supported"],"capabilities":["audio","media-controls","android-auto-or-equivalent","carplay-or-equivalent","usb-c-displayport-when-hardware-supports"],"qualityPolicy":"negotiate-with-vehicle-and-device"},
+    "bluetooth":{"roles":["audio-output","media-control"],"profiles":["A2DP","AVRCP","LE-Audio-when-supported"],"capabilities":["quran-audio","play-pause","next-previous","metadata-when-supported"],"video":false,"qualityPolicy":"negotiate-codec-and-sink-capability"},
+    "wifi-native-car":{"roles":["platform-display","media-control","streaming-when-supported"],"qualityPolicy":"capability-probed"}
   },
   "carPlatforms":{
-    "android-auto":{
-      "audio":"MediaLibraryService+MediaSession",
-      "video":"parked-only-video-category-when-supported",
-      "status":"adapter",
-      "source":"https://developer.android.com/media/implement/surfaces/cars"
-    },
-    "android-automotive-os":{
-      "audio":"MediaLibraryService+MediaSession",
-      "video":"parked-only-video-category-when-supported",
-      "status":"adapter",
-      "source":"https://developer.android.com/media/implement/surfaces/cars"
-    },
-    "carplay":{
-      "audio":"CarPlay-audio-app",
-      "video":"supported-cars-when-parked",
-      "status":"adapter",
-      "source":"https://developer.apple.com/carplay/"
-    }
+    "android-auto":{"audio":"MediaLibraryService+MediaSession","video":"parked-only-video-category-when-supported","status":"adapter","source":"https://developer.android.com/media/implement/surfaces/cars"},
+    "android-automotive-os":{"audio":"MediaLibraryService+MediaSession","video":"parked-only-video-category-when-supported","status":"adapter","source":"https://developer.android.com/media/implement/surfaces/cars"},
+    "carplay":{"audio":"CarPlay-audio-app","video":"supported-cars-when-parked","status":"adapter","source":"https://developer.apple.com/carplay/"}
   },
   "quranAudio":{
     "sourceRule":"verified-recitation-only",
@@ -98,16 +54,6 @@
     "playbackEnginePreference":["GStreamer","mpv","platform-native"]
   },
   "deviceClasses":["iphone","ipad","android-phone","android-tablet","car-head-unit","android-automotive","carplay-head-unit"],
-  "safety":{
-    "explicitUserActionForPlayback":true,
-    "noScreenVideoWhileDriving":true,
-    "doNotBypassCarSafetyPolicy":true,
-    "sessionRevocation":true,
-    "unknownCapability":"blocked"
-  },
-  "freeFirst":{
-    "localPlaybackPreferred":true,
-    "platformAdaptersOptional":true,
-    "paidCloudDependency":false
-  }
+  "safety":{"explicitUserActionForPlayback":true,"noScreenVideoWhileDriving":true,"doNotBypassCarSafetyPolicy":true,"sessionRevocation":true,"unknownCapability":"blocked"},
+  "freeFirst":{"localPlaybackPreferred":true,"platformAdaptersOptional":true,"paidCloudDependency":false}
 }
