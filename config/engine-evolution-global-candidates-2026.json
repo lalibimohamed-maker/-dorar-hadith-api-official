@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Global candidate extension for Engine Evolution. Candidates are benchmark targets only and are not runtime dependencies.",
+  "rules": {
+    "freeFirst": true,
+    "noPaidCoreDependency": true,
+    "selfHostedPreferred": true,
+    "noAutomaticPromotion": true,
+    "failClosedOnUnknownRights": true,
+    "softwareModelAssetServiceLicensesAreSeparate": true
+  },
+  "candidates": {
+    "document_parsing": {
+      "primary": "docling",
+      "alternates": ["docling-core"],
+      "status": "candidate",
+      "softwareLicense": "MIT",
+      "modelLicense": "verify_per_model",
+      "watch": "PDF/DOCX/PPTX/XLSX structure, Arabic RTL, tables, reading order, page provenance",
+      "source": "https://github.com/docling-project/docling"
+    },
+    "ocr_alternates": {
+      "primary": "easyocr",
+      "alternates": ["tesseract", "kraken"],
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0 for EasyOCR; verify each alternate",
+      "modelLicense": "verify_per_model",
+      "watch": "Arabic printed text, RTL order, diacritics, degraded scans, CPU performance",
+      "source": "https://github.com/JaidedAI/EasyOCR"
+    },
+    "arabic_document_benchmark": {
+      "primary": "KITAB-Bench",
+      "status": "benchmark_reference",
+      "softwareLicense": "MIT",
+      "modelLicense": "not_applicable",
+      "watch": "Arabic OCR, printed/handwritten recognition, layout, tables, PDF-to-text and document understanding",
+      "source": "https://github.com/mbzuai-oryx/KITAB-Bench"
+    },
+    "speech_to_text_modern": {
+      "primary": "Qwen3-ASR",
+      "alternates": ["whisper.cpp"],
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "modelLicense": "verify_exact_model_and_weights_before_adoption",
+      "watch": "MSA, classical Arabic, dialects, language detection, timestamps, streaming, CPU/GPU resource cost",
+      "source": "https://github.com/QwenLM/Qwen3-ASR"
+    },
+    "arabic_asr_dataset": {
+      "primary": "BULBUL",
+      "status": "benchmark_reference",
+      "softwareLicense": "not_applicable",
+      "modelLicense": "dataset_terms_must_be_verified_before_redistribution",
+      "watch": "11-country dialect coverage, MSA/classical Arabic, accent robustness, speaker diversity",
+      "source": "https://arxiv.org/abs/2608.21950"
+    },
+    "tts_multilingual": {
+      "primary": "coqui-tts",
+      "alternates": ["openvoice", "piper1-gpl"],
+      "status": "license_gated",
+      "softwareLicense": "MPL-2.0 for current fork",
+      "modelLicense": "XTTS-v2 uses CPML and is non-commercial; verify every model",
+      "watch": "Arabic quality, voice rights, model redistribution, cloning consent, latency",
+      "source": "https://github.com/idiap/coqui-ai-TTS"
+    },
+    "voice_conversion": {
+      "primary": "openvoice",
+      "status": "candidate",
+      "softwareLicense": "MIT for V1/V2 code",
+      "modelLicense": "verify released model/voice assets separately",
+      "watch": "Arabic voice quality, consent, speaker identity protection, latency, redistribution",
+      "source": "https://github.com/myshell-ai/OpenVoice"
+    },
+    "embeddings": {
+      "primary": "local_multilingual_embedding_models",
+      "alternates": ["sentence-transformers", "fastembed"],
+      "status": "candidate",
+      "softwareLicense": "verify_per_framework",
+      "modelLicense": "verify_per_embedding_model",
+      "watch": "Arabic semantic recall, MSA/classical vocabulary, morphology, memory, dimension, license",
+      "source": "https://www.sbert.net/"
+    },
+    "reranking": {
+      "primary": "local_cross_encoder_rerankers",
+      "status": "candidate",
+      "softwareLicense": "verify_per_framework",
+      "modelLicense": "verify_per_model",
+      "watch": "Arabic MRR/NDCG, latency, CPU feasibility, hallucination resistance, license",
+      "source": "https://www.sbert.net/"
+    },
+    "pdf_processing": {
+      "primary": "ocrmypdf",
+      "status": "candidate",
+      "softwareLicense": "MPL-2.0",
+      "modelLicense": "Tesseract/language-data terms must be verified separately",
+      "watch": "deskew, rotation, searchable PDF, archival preservation, OCR provenance",
+      "source": "https://github.com/ocrmypdf/OCRmyPDF"
+    },
+    "provenance_integrity": {
+      "primary": "sha256_checksums_and_signed_releases",
+      "status": "adopted_policy",
+      "softwareLicense": "not_applicable",
+      "modelLicense": "not_applicable",
+      "watch": "artifact hash, release signature, source commit, model revision, dataset revision"
+    }
+  },
+  "benchmarkSuites": {
+    "arabic_ocr": ["KITAB-Bench", "clean_printed_arabic", "degraded_scan", "diacritics", "rtl_layout", "tables"],
+    "arabic_asr": ["MSA", "classical_arabic", "dialects", "accented_MSA", "noise", "long_form", "timestamps"],
+    "arabic_search": ["exact", "morphological_variants", "diacritics_variants", "typos", "semantic", "hybrid", "source_provenance"],
+    "documents": ["PDF", "DOCX", "PPTX", "XLSX", "tables", "footnotes", "headers", "multi_column", "RTL"],
+    "tts": ["Arabic_fluency", "pronunciation", "prosody", "names", "Quranic_text_isolation", "latency", "voice_rights"],
+    "restoration": ["text_legibility", "source_faithfulness", "artifact_rate", "deskew", "deblur", "upscale"],
+    "retrieval": ["Recall@K", "MRR", "NDCG", "precision", "latency_p50", "latency_p95", "memory", "index_size"]
+  },
+  "promotionRequirements": [
+    "exact_version_or_commit_recorded",
+    "software_license_verified",
+    "model_weight_license_verified",
+    "voice_asset_license_verified_when_applicable",
+    "dataset_license_verified_when_applicable",
+    "hosted_pricing_not_required_for_core_path",
+    "security_scan_passed",
+    "checksum_or_signature_recorded",
+    "Arabic_benchmark_recorded",
+    "resource_benchmark_recorded",
+    "provenance_preserved",
+    "human_review_recorded",
+    "CI_passed"
+  ]
+}
