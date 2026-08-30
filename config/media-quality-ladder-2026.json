@@ -8,12 +8,18 @@
     "futureHigherResolutionsAllowed": true
   },
   "preferredDownloadTiers": [
-    {"label":"24K","width":23040,"height":12960,"aspect":"16:9","status":"available-when-source-and-pipeline-support"},
-    {"label":"16K","width":15360,"height":8640,"aspect":"16:9","status":"available-when-source-and-pipeline-support"},
-    {"label":"12K","width":11520,"height":6480,"aspect":"16:9","status":"available-when-source-and-pipeline-support"},
-    {"label":"8K","width":7680,"height":4320,"aspect":"16:9","status":"available-when-source-and-pipeline-support"},
-    {"label":"4K","width":3840,"height":2160,"aspect":"16:9","status":"available-when-source-and-pipeline-support"}
+    {"label":"24K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"},
+    {"label":"16K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"},
+    {"label":"12K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"},
+    {"label":"8K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"},
+    {"label":"4K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"}
   ],
+  "geometryPolicy": {
+    "resolutionLabelIsNotUniversalPixelGeometry":true,
+    "recordActualWidthAndHeight":true,
+    "recordAspectRatio":true,
+    "supportMultipleStandards":true
+  },
   "selection": {
     "mode":"adaptive",
     "showOnlyExistingDerivatives":true,
