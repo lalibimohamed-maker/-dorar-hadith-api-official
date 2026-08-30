@@ -19,7 +19,7 @@ test('benchmark priorities include missing research and user-experience capabili
 });
 
 test('existing architectural differentiators remain protected', () => {
-  for (const id of ['source-and-edition-lineage','rights-aware-ingestion','no-single-engine scholarly authority'.replace(' scholarly','')]) {
+  for (const id of ['source-and-edition-lineage','rights-aware-ingestion','no-single-engine scholarly authority']) {
     assert.ok(cfg.ourDistinctivesToPreserve.includes(id), `missing distinctive: ${id}`);
   }
   assert.ok(cfg.ourDistinctivesToPreserve.includes('global cross-system integration gate'));
