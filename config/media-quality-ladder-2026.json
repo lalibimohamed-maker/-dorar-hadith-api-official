@@ -1,0 +1,53 @@
+{
+  "version": "2026-08-30",
+  "principle": "No application-imposed master-resolution ceiling.",
+  "master": {
+    "maxResolution": null,
+    "preserveSourceNativeDetail": true,
+    "upscaleLowerResolutionAsNative": false,
+    "futureHigherResolutionsAllowed": true
+  },
+  "preferredDownloadTiers": [
+    {"label":"24K","width":23040,"height":12960,"aspect":"16:9","status":"available-when-source-and-pipeline-support"},
+    {"label":"16K","width":15360,"height":8640,"aspect":"16:9","status":"available-when-source-and-pipeline-support"},
+    {"label":"12K","width":11520,"height":6480,"aspect":"16:9","status":"available-when-source-and-pipeline-support"},
+    {"label":"8K","width":7680,"height":4320,"aspect":"16:9","status":"available-when-source-and-pipeline-support"},
+    {"label":"4K","width":3840,"height":2160,"aspect":"16:9","status":"available-when-source-and-pipeline-support"}
+  ],
+  "selection": {
+    "mode":"adaptive",
+    "showOnlyExistingDerivatives":true,
+    "considerViewerDevice":true,
+    "considerNetwork":true,
+    "allowManualQualityChoice":true,
+    "neverAdvertiseUnavailableTier":true
+  },
+  "platformPublishing": {
+    "mode":"capability-driven",
+    "rule":"Keep the best internal master independently; publish the highest derivative actually supported by the target platform.",
+    "reprobePlatformCapabilities":"before-publish-and-when-platform-policy-changes"
+  },
+  "integrity": {
+    "preserveNativeFrameRate":true,
+    "preserveNativeAspectRatio":true,
+    "preserveBitDepthWhenSupported":true,
+    "preserveChromaFormatWhenSupported":true,
+    "preserveColorPrimariesAndTransfer":true,
+    "preserveHdrMetadataWhenPresent":true,
+    "recordSourceDimensions":true,
+    "recordDerivativeDimensions":true,
+    "recordCodecAndProfile":true,
+    "recordChecksum":true
+  },
+  "trueResolution": {
+    "24KMeansNativeDetail":true,
+    "forbidMisleadingUpscaleLabel":true,
+    "requireDisplayValidationForPhysical24K":true,
+    "physicalDisplayMayUseDocumentedTiling":true
+  },
+  "freeFirst": {
+    "paidApiRequired":false,
+    "subscriptionRequired":false,
+    "externalPlatformAdaptersOptional":true
+  }
+}
