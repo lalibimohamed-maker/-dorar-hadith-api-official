@@ -15,7 +15,7 @@ test('OSV workflow is fail-closed and uses isolated SARIF output', () => {
   assert.match(workflow, /--format=sarif/);
   assert.match(workflow, /\$\{\{ runner\.temp \}\}\/osv\/results\.sarif/);
   assert.match(workflow, /test ! -e "\$RUNNER_TEMP\/osv\/results\.sarif"/);
-  assert.match(workflow, /type -l/);
+  assert.match(workflow, /-type l/);
 });
 
 test('all action references are full commit SHAs', () => {
