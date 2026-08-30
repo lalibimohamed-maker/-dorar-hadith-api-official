@@ -22,6 +22,12 @@ test('20 GB is only a regression-test case, not a configured maximum', () => {
   assert.equal(result.resumable, true);
 });
 
+test('quality labels are not size ceilings', () => {
+  const policy = loadLargeFilePolicy();
+  assert.equal(policy.policy.applicationMaxFileSizeBytes, null);
+  assert.equal(policy.limits.applicationImposedFileSizeLimit, 'none');
+});
+
 test('publication gates remain mandatory independently of file size', () => {
   const blocked = validateServeRequest({
     rightsVerified: true,
