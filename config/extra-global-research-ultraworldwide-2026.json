@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Extra worldwide research map for Arabic/Islamic digital humanities, OCR/HTR, ASR, diacritization, scholarly corpora, Quran/Hadith resources and public funding. Research references never become runtime dependencies or automatic content imports.",
+  "policy": {
+    "researchOnlyByDefault": true,
+    "noAutomaticCorpusImport": true,
+    "rightsVerifiedPerSource": true,
+    "softwareModelDatasetLicensesAreSeparate": true,
+    "noPaidCoreDependency": true,
+    "noProjectOwnershipTransfer": true,
+    "freePublicAccessPreferred": true,
+    "rehostOnlyWhenRightsPermit": true
+  },
+  "highValueResearchSources": [
+    {"name":"OpenITI Corpus","domain":"arabic_islamic_corpus","status":"research_reference","rights":"verify_per_text","value":"Open-access machine-actionable Arabic/Persian corpus; current work scales OCR-derived texts and metadata enrichment."},
+    {"name":"OpenITI MAKHZAN","domain":"arabic_script_ocr_htr","status":"research_reference","rights":"CC_BY_4_0_for_published_dataset_article; verify dataset terms","value":"Open annotated Arabic, Persian, Ottoman Turkish and Urdu print/manuscript data for OCR/HTR."},
+    {"name":"TariMa","domain":"maghrebi_arabic_htr_ocr","status":"research_reference","rights":"verify_dataset_license","value":"Ground truth for OCR/HTR of Maghrebi Arabic documents; especially relevant to North African material."},
+    {"name":"MAS","domain":"arabic_manuscript_ocr","status":"benchmark_reference","rights":"verify_dataset_terms","value":"Line-level historical Arabic manuscript OCR benchmark spanning Naskh, Taliq and Nastaliq."},
+    {"name":"KITAB-Bench","domain":"arabic_document_benchmark","status":"benchmark_reference","rights":"MIT","value":"Arabic OCR/document benchmark covering printed/handwritten recognition, layout, tables and PDF-to-text."},
+    {"name":"Mozilla Common Voice Arabic 26.0","domain":"arabic_asr","status":"benchmark_dataset_reference","rights":"CC0_1_0; redistribution restrictions apply to dataset packaging","value":"Large current Arabic read-speech resource for ASR evaluation/training; must not be re-hosted when prohibited by current terms."},
+    {"name":"ArabicSpeech","domain":"arabic_speech_resources","status":"research_reference","rights":"verify_each_dataset","value":"Community hub with multiple Arabic speech datasets including ArA-DF and regional resources."},
+    {"name":"CATT","domain":"arabic_diacritization","status":"candidate_research_engine","rights":"Apache_2_0_repository; verify packaged model/data licenses","value":"Character-based Arabic Tashkeel Transformer."},
+    {"name":"Shakkelha","domain":"arabic_diacritization","status":"candidate_research_engine","rights":"MIT_repository; verify model/data assets","value":"Arabic text diacritization models, datasets and comparative evaluation."},
+    {"name":"Rawi/text2tashkeel","domain":"arabic_diacritization_offline","status":"candidate_research_engine","rights":"Apache_2_0_code; verify each bundled model credit/license","value":"Offline ONNX Arabic diacritization with published DER/latency figures."},
+    {"name":"Canonical Islamic Corpus","domain":"quran_hadith_corpus","status":"research_reference","rights":"verify_source_rights_before_import","value":"Current 2026 corpus combining Quran and hadith material for evaluation; use as a provenance lead, not authoritative replacement."},
+    {"name":"Quranic Arabic Corpus","domain":"quran_morphology_syntax","status":"research_reference","rights":"GPL_with_no_change_requirement_and_attribution","value":"Morphological/syntactic annotation; changes to distributed annotation are restricted by its stated terms."},
+    {"name":"Tanzil Quran Text","domain":"quran_canonical_text_reference","status":"authoritative_reference_candidate","rights":"CC_BY_3_0_with_no_modification_and_attribution","value":"Highly verified Quran text; may be used in applications with attribution/link while preserving the text unchanged."},
+    {"name":"Quran Foundation APIs","domain":"quran_api","status":"external_service_reference","rights":"API_terms_control_display_and_redistribution","value":"Useful API integration path, but raw QF content may not be redistributed; do not make it a paid/core dependency."}
+  ],
+  "funding_and_partnership_targets": [
+    {"name":"NLnet Foundation","status":"high_fit","eligibility":"individuals_can_apply_in_principle; call_specific","window":"reopens_2026_09_03; deadline_2026_11_03","notes":"Free/open outputs are transversal requirements; strong fit for open OCR/search/security infrastructure."},
+    {"name":"Makiya-Kufa Gallery Annual Grants","status":"high_thematic_fit","eligibility":"individuals_and_organisations_worldwide","window":"2026_08_01_to_2026_09_30","amount":"up_to_USD_15000","notes":"Advances public understanding of Arab Islamic culture; reports and acknowledgment required."},
+    {"name":"Modern Endangered Archives Program (UCLA/Arcadia)","status":"conditional_fit","eligibility":"call_specific; project/regional/planning grants","window":"applications_open_2026_09_14; preliminary_due_2026_11_16","notes":"Best for endangered collections/documentation/digitization; funded materials are published open access."},
+    {"name":"Endangered Archives Programme","status":"conditional_fit","eligibility":"project_and_archive_specific","window":"annual cycle typically opens September and closes November","notes":"Strong heritage digitization route when a concrete endangered archival collection and eligible custodial partner exist."},
+    {"name":"Horizon Europe Cluster 2 - Cultural Heritage","status":"conditional_fit","eligibility":"consortium_and_call_specific","window":"2026 heritage deadline 2026_09_23","notes":"Potential fit for open cultural-heritage digitization and trustworthy AI through eligible consortium routes."},
+    {"name":"Makiya-Kufa / Arab Islamic culture ecosystem","status":"direct_apply_candidate","eligibility":"worldwide_individuals","window":"2026_09_30_deadline","notes":"Particularly relevant because the grant explicitly targets public understanding of Arab Islamic culture."}
+  ],
+  "benchmarks_to_add": [
+    "Arabic_historical_manuscript_OCR",
+    "Maghrebi_Arabic_HTR_OCR",
+    "Arabic_diacritization_DER_WER",
+    "Arabic_ASR_MSA_classical_dialects",
+    "Algerian_Maghrebi_ASR",
+    "Arabic_document_layout_RTL_reading_order",
+    "Quran_text_fidelity_no_invention",
+    "Hadith_provenance_and_variant_linking",
+    "Arabic_morphology_and_syntax",
+    "Arabic_semantic_retrieval",
+    "Arabic_reranking",
+    "scholarly_source_provenance",
+    "dataset_rights_and_rehostability"
+  ],
+  "doNotImportAutomatically": [
+    "copyrighted_books_without_permission",
+    "datasets_with_no_clear_redistribution_terms",
+    "Quran Foundation raw API data when redistribution is prohibited",
+    "Common Voice Arabic archives where current terms prohibit re-sharing",
+    "model weights with non-commercial restrictions into a commercial path",
+    "any funding-conditioned proprietary service into the core runtime"
+  ]
+}
