@@ -1,11 +1,131 @@
 {
-  "version": "2026-08-27",
-  "purpose": "Define a safe, capability-based image/video quality pipeline for high-resolution media without claiming engines are installed when they are not.",
-  "profiles": {"native":{"maxLongEdge":null},"4k":{"maxLongEdge":3840},"8k":{"maxLongEdge":7680},"12k":{"maxLongEdge":11520},"future":{"maxLongEdge":null,"policy":"environment-and-engine-evidence-required"}},
-  "image": {"preferredEngine":"Real-ESRGAN","engineProject":"https://github.com/xinntao/Real-ESRGAN","license":"BSD-3-Clause","status":"runtime-candidate-until-executable-and-model-evidence-exists","capabilities":["super-resolution","restoration","denoise","tiled-inference","16-bit-input"],"policy":"preserve-original-and-record-derived-lineage","networkModelDownload":"disabled-by-default","safety":["input-size-limit","memory-limit","time-limit","malware-scan-before-processing","hash-before-and-after"]},
-  "video": {"preferredOrchestrator":"Video2X","engineProject":"https://github.com/K4YT3X/video2x","status":"runtime-candidate-until-executable-and-gpu-evidence-exists","capabilities":["upscaling","frame-interpolation"],"backends":["Real-ESRGAN","Real-CUGAN","RIFE","Anime4K"],"containerTranscoder":"FFmpeg","policy":"retain-source-and-derived-artifact-lineage","safety":["input-size-limit","memory-limit","disk-limit","time-limit","malware-scan-before-processing"]},
-  "delivery":{"liveStreamingCandidate":"MediaMTX","protocols":["WebRTC","HLS","LL-HLS","SRT","RTSP","RTMP","MPEG-TS","RTP"],"status":"deployment-candidate","policy":"rights-and-source-policy-before-publication"},
-  "download":{"preferred":"native-http-client","optional":"rclone-where-authorized","policy":"download-is-not-redistribution-permission","destructiveAction":"none"},
-  "integrity":{"preserveOriginal":true,"recordInputSha256":true,"recordOutputSha256":true,"recordSourceProvenance":true,"recordProcessingParameters":true,"trustedContentAutoReplacement":false},
-  "governance":{"noSilentMainMutation":true,"noSilentCorpusPromotion":true,"noSilentTrustedSourceReplacement":true,"unknownEngineStateMeansNotEnabled":true,"selfHealingScope":"derived-artifacts-only-until-protected-review"}
+  "version": "2026-08-30",
+  "purpose": "Unified, evidence-gated, open-ended media quality pipeline. Preserve native masters; allow future higher resolutions without a hard application ceiling; never mislabel reconstructed detail as native.",
+  "profiles": {
+    "native": {"maxLongEdge": null},
+    "4k": {"maxLongEdge": 3840},
+    "8k": {"maxLongEdge": 7680},
+    "12k": {"maxLongEdge": 11520},
+    "16k": {"maxLongEdge": 15360},
+    "24k": {"maxLongEdge": null, "dimensionPolicy": "source-or-verified-target-geometry"},
+    "future": {"maxLongEdge": null, "policy": "environment-and-engine-evidence-required"}
+  },
+  "orchestration": {
+    "mode": "evidence-gated-pipeline",
+    "preserveNativeMaster": true,
+    "noApplicationResolutionCeiling": true,
+    "selectBestVerifiedEnginePerStage": true,
+    "allowMultiStageProcessing": true,
+    "allowA_B_Benchmark": true,
+    "neverOverwriteSource": true,
+    "neverPresentUpscaleAsNative": true
+  },
+  "stages": [
+    "quarantine-and-integrity",
+    "source-metadata-capture",
+    "content-and-rights-gate",
+    "restoration",
+    "spatial-super-resolution",
+    "temporal-consistency",
+    "frame-interpolation-optional",
+    "color-and-hdr-preservation",
+    "target-resolution-render",
+    "quality-metrics-and-artifact-review",
+    "checksum-and-lineage",
+    "adaptive-delivery-export"
+  ],
+  "engines": {
+    "image": [
+      {"name":"Real-ESRGAN","role":["restoration","super-resolution"],"license":"BSD-3-Clause","status":"candidate","source":"https://github.com/xinntao/Real-ESRGAN"},
+      {"name":"SwinIR","role":["image-restoration","super-resolution"],"license":"verified-per-upstream","status":"candidate","source":"https://github.com/JingyunLiang/SwinIR"},
+      {"name":"HAT","role":["image-super-resolution"],"license":"verified-per-upstream","status":"candidate","source":"https://github.com/XPixelGroup/HAT"}
+    ],
+    "video": [
+      {"name":"Video2X","role":["orchestration","upscaling","frame-interpolation"],"license":"AGPL-3.0-or-later","status":"candidate","source":"https://github.com/K4YT3X/video2x"},
+      {"name":"BasicVSR++","role":["video-super-resolution","temporal-propagation"],"license":"Apache-2.0","status":"candidate","source":"https://github.com/ckkelvinchan/BasicVSR_PlusPlus"},
+      {"name":"SeedVR2","role":["video-restoration","high-resolution-reconstruction"],"license":"Apache-2.0","status":"candidate","source":"https://github.com/IceClear/SeedVR2"},
+      {"name":"FlashVSR","role":["streaming-video-super-resolution","video-restoration"],"license":"Apache-2.0","status":"candidate","source":"https://github.com/OpenImagingLab/FlashVSR"},
+      {"name":"PS-SR","role":["video-super-resolution","speculative-diffusion"],"license":"Apache-2.0","status":"candidate","source":"https://github.com/HiDream-ai/PS-SR"},
+      {"name":"AVSR-Diff","role":["arbitrary-scale-video-super-resolution","temporal-consistency"],"license":"verified-per-upstream-before-enable","status":"candidate","source":"https://github.com/KAIST-VICLab/AVSR-Diff"},
+      {"name":"Real-CUGAN","role":["super-resolution"],"license":"verified-per-upstream-before-enable","status":"candidate"},
+      {"name":"RIFE","role":["frame-interpolation"],"license":"MIT","status":"candidate","source":"https://github.com/hzwer/ECCV2022-RIFE"},
+      {"name":"Anime4K","role":["real-time-upscaling"],"license":"verified-per-upstream-before-enable","status":"candidate"}
+    ],
+    "transcode": [
+      {"name":"FFmpeg","role":["decode","encode","container"],"license":"build-dependent-LGPL-or-GPL","status":"candidate","source":"https://ffmpeg.org/legal.html"}
+    ]
+  },
+  "selection": {
+    "qualityTiers":["24K","16K","12K","8K","4K"],
+    "mode":"adaptive-plus-manual",
+    "showOnlyVerifiedExistingDerivatives":true,
+    "preferNativeOverReconstruction":true,
+    "preferHighestVerifiedQualitySupportedByTarget":true,
+    "neverAdvertiseUnavailableTier":true
+  },
+  "integrity": {
+    "preserveOriginal":true,
+    "recordSourceSha256":true,
+    "recordOutputSha256":true,
+    "recordSourceDimensions":true,
+    "recordDerivativeDimensions":true,
+    "recordFrameRate":true,
+    "recordAspectRatio":true,
+    "recordBitDepth":true,
+    "recordChromaFormat":true,
+    "recordColorPrimaries":true,
+    "recordTransferFunction":true,
+    "recordHdrMetadata":true,
+    "recordCodecProfile":true,
+    "recordProcessingParameters":true,
+    "recordEngineAndModelVersions":true,
+    "recordArtifactLineage":true
+  },
+  "trueResolution": {
+    "native24KRequiresVerifiedSourceGeometry":true,
+    "reconstructed24KMustBeLabeledDerived":true,
+    "forbidMisleadingUpscaleLabel":true,
+    "physicalDisplayValidationRequired":true,
+    "documentTiledOrMultiProjectorArchitecture":true
+  },
+  "display": {
+    "profiles":["generic","OLED","Mini-LED","NanoCell","projector","multi-projector-tiled"],
+    "nanocell": {
+      "role":"display-target-compatibility",
+      "notAProcessingEngine":true,
+      "doNotClaim24KGeneration":true,
+      "preserveColorPipelineBeforeDisplay":true
+    }
+  },
+  "platformPublishing": {
+    "mode":"capability-driven",
+    "keepBestInternalMaster":true,
+    "publishHighestActuallySupportedDerivative":true,
+    "reprobeCapabilitiesBeforePublish":true,
+    "platformLimitsNeverChangeMaster":true
+  },
+  "discovery": {
+    "enabled":true,
+    "sources":["official-upstream-repositories","peer-reviewed-or-conference-repositories","official-model-releases"],
+    "autoInstall":false,
+    "autoEnable":false,
+    "requiredEvidence":["license","source-integrity","reproducible-install","runtime-capability","model-availability","hardware-requirements","quality-benchmark","temporal-stability","color-hdr-preservation"],
+    "unknownEngineStateMeansNotEnabled":true,
+    "approvalRequiredBeforeProduction":true
+  },
+  "freeFirst": {
+    "paidApiRequired":false,
+    "subscriptionRequired":false,
+    "externalPlatformAdaptersOptional":true,
+    "localOpenSourceEnginesPreferred":true
+  },
+  "safety": {
+    "inputSizeLimit":"resource-safety-only-not-quality-cap",
+    "memoryLimit":"resource-safety-only-not-quality-cap",
+    "diskLimit":"resource-safety-only-not-quality-cap",
+    "timeLimit":"resource-safety-only-not-quality-cap",
+    "malwareScanBeforeProcessing":true,
+    "rightsAndProvenanceBeforePublication":true,
+    "derivedArtifactFailureMustNotReplaceSource":true
+  }
 }
