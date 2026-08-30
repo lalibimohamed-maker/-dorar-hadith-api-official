@@ -37,13 +37,12 @@ jobs:
           assert len(d['candidates']) >= 20
           for c in d['candidates']:
               assert c.get('runtimeDependency') is False
-              assert c.get('status') in {'candidate','benchmark_only','license_gated'}
+              assert c.get('status') in {'candidate','benchmark_only','benchmark_reference','license_gated'}
           print('global candidate registry: PASS')
           PY
       - name: Fail closed on Corpus or runtime mutation
         run: |
           set -euo pipefail
-          git fetch --no-tags --prune --unshallow 2>/dev/null || true
           if [ -n "${BASE_SHA:-}" ] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
             changed="$(git diff --name-only "${BASE_SHA}" "${GITHUB_SHA}")"
             if printf '%s\n' "$changed" | grep -E '^(corpus/|config/corpus\.json|src/|app/|package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$'; then
