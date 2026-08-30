@@ -32,31 +32,15 @@ export function planCarMedia({ transport, contentType, context = 'parked', nativ
     if (engine !== 'platform-native' && !config.playbackEngines.some(item => item.name === engine)) {
       return { allowed: false, reason: 'unknown-playback-engine' };
     }
-    return {
-      allowed: true,
-      mode: 'audio-first',
-      generatedSpeech: false,
-      transport,
-      engine,
-      preserveOriginal: config.quranAudio.nativeAudioPreserved,
-      explicitUserActionRequired: config.safety.explicitUserActionForPlayback
-    };
+    return { allowed: true, mode: 'audio-first', generatedSpeech: false, transport, engine, preserveOriginal: config.quranAudio.nativeAudioPreserved, explicitUserActionRequired: config.safety.explicitUserActionForPlayback };
   }
 
   if (contentType === 'video') {
     if (transport === 'bluetooth') return { allowed: false, reason: 'bluetooth-audio-only' };
     if (!config.video.transports.includes(transport)) return { allowed: false, reason: 'transport-not-supported-for-video' };
     if (context === 'driving') return { allowed: false, reason: 'video-blocked-while-driving' };
-    if (engine !== 'platform-native' && !config.playbackEngines.some(item => item.name === engine)) {
-      return { allowed: false, reason: 'unknown-playback-engine' };
-    }
-    return {
-      allowed: true,
-      mode: 'parked-video',
-      engine,
-      nativeResolution,
-      preserveMaster: config.video.nativeQualityPolicy === 'preserve-master-and-negotiate-derivative'
-    };
+    if (engine !== 'platform-native' && !config.playbackEngines.some(item => item.name === engine)) return { allowed: false, reason: 'unknown-playback-engine' };
+    return { allowed: true, mode: 'parked-video', engine, nativeResolution, preserveMaster: config.video.nativeQualityPolicy === 'preserve-master-and-negotiate-derivative' };
   }
 
   return { allowed: false, reason: 'unsupported-content-type' };
