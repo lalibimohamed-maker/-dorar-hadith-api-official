@@ -1,0 +1,62 @@
+{
+  "version": "2026-08-30",
+  "purpose": "Capability-driven cross-device display federation for TVs, monitors, projectors, computers, phones, tablets and compatible embedded displays.",
+  "principles": {
+    "freeFirst": true,
+    "paidApiRequired": false,
+    "subscriptionRequired": false,
+    "noHardResolutionCeiling": true,
+    "preserveSourcePixels": true,
+    "preserveSourceAspectRatio": true,
+    "noAutomaticNative24KClaim": true,
+    "noSilentInternetExposure": true,
+    "noPrivilegedAutoInstall": true
+  },
+  "protocols": [
+    {"id":"miracast","engine":"MiracleCast","transport":"Wi-Fi Display/Miracast","status":"candidate"},
+    {"id":"airplay-mirror","engine":"UxPlay","transport":"AirPlay","status":"candidate"},
+    {"id":"cast","engine":"platform-cast-adapter","transport":"Cast","status":"adapter"},
+    {"id":"webrtc-display","engine":"browser-getDisplayMedia/WebRTC","transport":"WebRTC","status":"adapter"},
+    {"id":"android-mirroring","engine":"scrcpy","transport":"USB-or-TCP/IP","status":"candidate"},
+    {"id":"low-latency-streaming","engine":"Sunshine/Moonlight","transport":"IP-streaming","status":"candidate"}
+  ],
+  "deviceClasses": {
+    "television":["miracast","airplay-mirror","cast"],
+    "monitor":["miracast","airplay-mirror","webrtc-display","low-latency-streaming"],
+    "projector":["miracast","airplay-mirror","webrtc-display"],
+    "computer":["miracast","airplay-mirror","webrtc-display","android-mirroring","low-latency-streaming"],
+    "iphone-ipad":["airplay-mirror","cast","webrtc-display"],
+    "android-phone-tablet":["miracast","cast","webrtc-display","android-mirroring"],
+    "embedded":["miracast","airplay-mirror","webrtc-display"]
+  },
+  "transport": {
+    "preferred":["USB-C/DisplayPort","DisplayPort","HDMI","wired-ethernet","local-Wi-Fi"],
+    "internetRelayRequiresExplicitConsent": true,
+    "measureBandwidth": true,
+    "measureJitter": true,
+    "measurePacketLoss": true,
+    "adaptBitrate": true
+  },
+  "quality": {
+    "tiers":["native","4K","8K","10K","12K","16K","24K","future"],
+    "policy":"open-ended",
+    "nativeClaimRequiresActualTargetCapability": true,
+    "nativeClaimRequiresExactNegotiatedGeometry": true,
+    "preserveAspectRatio": true,
+    "derivedOutputMustBeMarkedDerived": true,
+    "platformLimitsDoNotChangeInternalMaster": true
+  },
+  "security": {
+    "explicitUserApprovalRequired": true,
+    "controlledPairingPreferred": true,
+    "localDiscoveryPreferred": true,
+    "sessionRevocationSupported": true,
+    "internetExposureDefault": false
+  },
+  "evidence": {
+    "requiredBeforeProduction":["upstream-identity","license","runtime-presence","protocol-handshake","negotiated-resolution","transport-measurement","image-integrity"],
+    "unknownEngineState":"blocked",
+    "autoInstall": false,
+    "autoEnable": false
+  }
+}
