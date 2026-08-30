@@ -1,0 +1,95 @@
+{
+  "version": "2026-08-30",
+  "purpose": "Discover, benchmark and coordinate open-source media engines as a single evidence-gated processing mesh for true high-resolution media.",
+  "principle": "No application-imposed quality ceiling; no engine is enabled solely because it was discovered.",
+  "pipeline": [
+    "quarantine",
+    "source-integrity",
+    "rights-and-provenance",
+    "metadata-capture",
+    "restoration-selection",
+    "spatial-super-resolution",
+    "temporal-consistency",
+    "optional-frame-interpolation",
+    "color-hdr-preservation",
+    "target-render",
+    "objective-quality-evaluation",
+    "artifact-lineage-and-checksum",
+    "adaptive-delivery"
+  ],
+  "engineSelection": {
+    "strategy": "capability-and-evidence-scoring",
+    "neverChainBlindly": true,
+    "benchmarkBeforePromotion": true,
+    "compareSourceAndDerived": true,
+    "preferNativeSource": true,
+    "preserveAllIntermediatesNeededForAudit": true
+  },
+  "registeredEngines": [
+    {"name":"Real-ESRGAN","family":"image-restoration-super-resolution","license":"BSD-3-Clause","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/xinntao/Real-ESRGAN"},
+    {"name":"SwinIR","family":"image-restoration-super-resolution","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/JingyunLiang/SwinIR"},
+    {"name":"HAT","family":"image-super-resolution","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/XPixelGroup/HAT"},
+    {"name":"Video2X","family":"video-orchestration-upscaling","license":"AGPL-3.0-or-later","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/K4YT3X/video2x"},
+    {"name":"BasicVSR++","family":"video-super-resolution-temporal","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/ckkelvinchan/BasicVSR_PlusPlus"},
+    {"name":"SeedVR2","family":"video-restoration-diffusion","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/ByteDance-Seed/SeedVR"},
+    {"name":"FlashVSR","family":"streaming-video-super-resolution","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/OpenImagingLab/FlashVSR"},
+    {"name":"PS-SR","family":"video-super-resolution-speculative-diffusion","license":"Apache-2.0","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/HiDream-ai/PS-SR"},
+    {"name":"AVSR-Diff","family":"arbitrary-scale-video-super-resolution","license":"MIT","licenseEvidence":"official-upstream","status":"candidate","modelAvailability":"pretrained-model-release-pending-per-upstream","source":"https://github.com/KAIST-VICLab/AVSR-Diff"},
+    {"name":"Real-CUGAN","family":"super-resolution","license":"MIT","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/bilibili/ailab/tree/main/Real-CUGAN"},
+    {"name":"RIFE","family":"frame-interpolation","license":"MIT","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/hzwer/ECCV2022-RIFE"},
+    {"name":"Anime4K","family":"real-time-upscaling","license":"MIT","licenseEvidence":"official-upstream","status":"candidate","source":"https://github.com/bloc97/Anime4K"},
+    {"name":"FFmpeg","family":"decode-encode-container","license":"LGPL-2.1-or-GPL-2.0 depending on build/configuration","licenseEvidence":"official-upstream","status":"candidate","source":"https://ffmpeg.org/legal.html"}
+  ],
+  "licensePolicy": {
+    "freeSoftwareDoesNotEqualLicenseIdentical": true,
+    "codeLicenseMustBeReviewed": true,
+    "modelWeightsLicenseMustBeReviewed": true,
+    "dependencyLicensesMustBeReviewed": true,
+    "commercialRedistributionMustBeVerifiedPerComponent": true,
+    "noEngineMayBePromotedOnRepositoryPopularityAlone": true
+  },
+  "futureDiscovery": {
+    "enabled": true,
+    "autoInstall": false,
+    "autoEnable": false,
+    "requiredEvidence": [
+      "upstream-identity",
+      "license-and-redistribution-review",
+      "model-license-review",
+      "reproducible-install",
+      "runtime-detection",
+      "hardware-and-vram-profile",
+      "resolution-capability",
+      "temporal-consistency-benchmark",
+      "perceptual-and-fidelity-benchmark",
+      "color-and-hdr-preservation-check",
+      "checksum-and-lineage"
+    ],
+    "promotionStates":["discovered","audited","benchmarking","approved","enabled"],
+    "unknownEngineStateMeansNotEnabled":true
+  },
+  "nativeVsDerived": {
+    "native": "captured/source geometry and characteristics verified",
+    "derived": "generated or reconstructed by processing",
+    "neverLabelDerivedAsNative":true
+  },
+  "targetQuality": {
+    "masterResolution": null,
+    "tiers":["24K","16K","12K","8K","4K"],
+    "futureTiersAllowed":true,
+    "tierAvailabilityDependsOnActualArtifact":true
+  },
+  "display": {
+    "nanocell": {
+      "enabledAsDisplayProfile": true,
+      "processingRole": false,
+      "preserveColorAndHdrMetadata": true,
+      "true24KRequiresPhysicalDisplayValidation": true
+    }
+  },
+  "freeFirst": {
+    "paidApiRequired": false,
+    "subscriptionRequired": false,
+    "preferLocalOpenSourceTooling": true
+  }
+}

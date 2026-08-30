@@ -1,0 +1,59 @@
+{
+  "version": "2026-08-30",
+  "principle": "No application-imposed master-resolution ceiling.",
+  "master": {
+    "maxResolution": null,
+    "preserveSourceNativeDetail": true,
+    "upscaleLowerResolutionAsNative": false,
+    "futureHigherResolutionsAllowed": true
+  },
+  "preferredDownloadTiers": [
+    {"label":"24K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"},
+    {"label":"16K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"},
+    {"label":"12K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"},
+    {"label":"8K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"},
+    {"label":"4K","width":null,"height":null,"geometry":"source-or-verified-target-geometry","status":"available-when-source-and-pipeline-support"}
+  ],
+  "geometryPolicy": {
+    "resolutionLabelIsNotUniversalPixelGeometry":true,
+    "recordActualWidthAndHeight":true,
+    "recordAspectRatio":true,
+    "supportMultipleStandards":true
+  },
+  "selection": {
+    "mode":"adaptive",
+    "showOnlyExistingDerivatives":true,
+    "considerViewerDevice":true,
+    "considerNetwork":true,
+    "allowManualQualityChoice":true,
+    "neverAdvertiseUnavailableTier":true
+  },
+  "platformPublishing": {
+    "mode":"capability-driven",
+    "rule":"Keep the best internal master independently; publish the highest derivative actually supported by the target platform.",
+    "reprobePlatformCapabilities":"before-publish-and-when-platform-policy-changes"
+  },
+  "integrity": {
+    "preserveNativeFrameRate":true,
+    "preserveNativeAspectRatio":true,
+    "preserveBitDepthWhenSupported":true,
+    "preserveChromaFormatWhenSupported":true,
+    "preserveColorPrimariesAndTransfer":true,
+    "preserveHdrMetadataWhenPresent":true,
+    "recordSourceDimensions":true,
+    "recordDerivativeDimensions":true,
+    "recordCodecAndProfile":true,
+    "recordChecksum":true
+  },
+  "trueResolution": {
+    "24KMeansNativeDetail":true,
+    "forbidMisleadingUpscaleLabel":true,
+    "requireDisplayValidationForPhysical24K":true,
+    "physicalDisplayMayUseDocumentedTiling":true
+  },
+  "freeFirst": {
+    "paidApiRequired":false,
+    "subscriptionRequired":false,
+    "externalPlatformAdaptersOptional":true
+  }
+}
