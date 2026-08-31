@@ -56,11 +56,13 @@ jobs:
           if (x.outputProfiles['8K'].maxWidth !== 7680) throw new Error('8K profile drifted');
           if (x.outputPolicy.maximumHorizontalPixels !== 46080 || x.outputPolicy.maximumVerticalPixels !== 25920) throw new Error('output ceiling drifted');
           if (x.outputPolicy.maximumLandscapeProfile !== '46080x25920') throw new Error('landscape ceiling drifted');
-          if (x.renderStrategy && x.renderStrategy.native48K === true) throw new Error('must not claim universal native 48K generation');
+          if (x.outputPolicy.maximumPortraitProfile !== '25920x46080') throw new Error('portrait ceiling drifted');
+          if (x.outputPolicy.importantConstraint.includes('native 48K frames')) throw new Error('registry must not claim universal native 48K generation');
           if (x.videoCreationEngines.voice_engine.status !== 'license_gated') throw new Error('voice engine must remain license_gated');
-          for (const row of Object.values(x.technicalCandidates).flat()) {
-            for (const candidate of row) {
-              if (!candidate.status || !candidate.name) throw new Error('technical candidate record incomplete');
+          for (const [groupName, group] of Object.entries(x.technicalCandidates)) {
+            if (!Array.isArray(group)) throw new Error(`technical candidate group must be an array: ${groupName}`);
+            for (const candidate of group) {
+              if (!candidate.status || !candidate.name) throw new Error(`technical candidate record incomplete: ${groupName}`);
             }
           }
           console.log('Scientific-religious video engine registry: PASS');
