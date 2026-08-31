@@ -1,0 +1,45 @@
+name: Ant Documentary Video Prototype
+
+on:
+  pull_request:
+    paths:
+      - 'config/video-prototypes/ant-communication-27-18-2026.json'
+      - 'scripts/render-ant-video-animatic.mjs'
+      - 'test/ant-video-prototype.test.js'
+      - '.github/workflows/ant-video-prototype.yml'
+      - 'docs/video-prototype-ant-communication-27-18.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-ant-video-prototype:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout trusted repository content
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate prototype manifest
+        run: node --test test/ant-video-prototype.test.js
+
+      - name: Render deterministic MP4 animatic
+        run: node scripts/render-ant-video-animatic.mjs
+
+      - name: Verify rendered media
+        run: |
+          set -euo pipefail
+          test -s dist/video-prototypes/ant-communication-27-18/ant-communication-27-18-animatic.mp4
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,r_frame_rate -of default=noprint_wrappers=1 dist/video-prototypes/ant-communication-27-18/ant-communication-27-18-animatic.mp4
+
+      - name: Upload prototype artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ant-communication-27-18-prototype
+          path: dist/video-prototypes/ant-communication-27-18/
+          if-no-files-found: error
+          retention-days: 30
