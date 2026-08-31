@@ -8,6 +8,7 @@ on:
       - 'config/video-prototypes/global-video-source-catalog-2026.json'
       - 'scripts/render-ant-video-animatic.mjs'
       - 'scripts/render-ant-documentary-real-media.mjs'
+      - 'scripts/render-ant-documentary-real-media-v2.mjs'
       - 'test/ant-video-prototype.test.js'
       - '.github/workflows/ant-video-prototype.yml'
       - 'docs/video-prototype-ant-communication-27-18.md'
@@ -60,7 +61,7 @@ jobs:
           retention-days: 30
 
       - name: Validate and render real-media documentary
-        run: node scripts/render-ant-documentary-real-media.mjs
+        run: node scripts/render-ant-documentary-real-media-v2.mjs
 
       - name: Verify real-media documentary and provenance
         run: |
