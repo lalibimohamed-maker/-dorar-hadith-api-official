@@ -7,6 +7,8 @@ on:
       - 'test/din-allah-media-engine-benchmark-runner.test.js'
       - 'config/din-allah-media-engine-candidate-registry-2026.json'
       - 'test/din-allah-media-engine-candidate-registry.test.js'
+      - 'config/din-allah-media-engine-benchmark-prompt-suite-2026.json'
+      - 'test/din-allah-media-engine-benchmark-prompt-suite.test.js'
       - '.github/workflows/din-allah-media-engine-benchmark-runner.yml'
   workflow_dispatch:
 
@@ -29,5 +31,5 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends ffmpeg
 
-      - name: Test benchmark runner and candidate registry
-        run: node --test test/din-allah-media-engine-benchmark-runner.test.js test/din-allah-media-engine-candidate-registry.test.js
+      - name: Test benchmark runner, candidate registry, and prompt suite
+        run: node --test test/din-allah-media-engine-benchmark-runner.test.js test/din-allah-media-engine-candidate-registry.test.js test/din-allah-media-engine-benchmark-prompt-suite.test.js
