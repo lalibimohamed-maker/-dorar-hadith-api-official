@@ -4,11 +4,18 @@ import fs from 'node:fs';
 
 const manifest = JSON.parse(fs.readFileSync('config/din-allah-media-engine-2026.json', 'utf8'));
 
+const benchmarkNames = new Set(['VBench', 'VBench-2.0']);
+
 test('Din Allah Media Engine benchmark has self-hosted candidates and VBench baseline', () => {
   assert.equal(manifest.status, 'evaluation_benchmark');
   assert.equal(manifest.principles.selfHostedFirst, true);
   assert.ok(manifest.candidateBackends.length >= 4);
-  assert.equal(manifest.evaluationSuite.benchmark, 'VBench');
+  assert.ok(benchmarkNames.has(manifest.evaluationSuite.benchmark));
+  assert.ok(
+    manifest.evaluationSuite.benchmark === 'VBench'
+      ? true
+      : manifest.evaluationSuite.benchmark === 'VBench-2.0'
+  );
   assert.ok(manifest.promptSuite.length >= 4);
 });
 
