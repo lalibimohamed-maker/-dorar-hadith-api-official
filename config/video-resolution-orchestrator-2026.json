@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Global cooperative video restoration, temporal consistency, and high-resolution delivery pipeline for Deen Allah Encyclopedia.",
+  "principles": {
+    "sourceFirst": true,
+    "temporalConsistencyFirst": true,
+    "noDetailFabricationClaim": true,
+    "adaptiveRouting": true,
+    "resourceAware": true,
+    "provenanceRequired": true,
+    "modelLicenseRequired": true,
+    "neverRunAllModelsByDefault": true,
+    "mobileDeliveryVariantRequired": true,
+    "archiveMasterSeparateFromDelivery": true
+  },
+  "outputTargets": {
+    "standard": [2160, 4320],
+    "ultra": [5760, 7680],
+    "extremeResearchTarget": [12288, 16384, 24576],
+    "unit": "long_edge_pixels",
+    "note": "Targets are output dimensions. They do not imply native source detail at the target resolution."
+  },
+  "engines": [
+    {
+      "id": "basicvsr-plus-plus",
+      "role": "temporal_video_super_resolution",
+      "status": "trial",
+      "license": "Apache-2.0",
+      "notes": "Temporal propagation and alignment path for video SR; use for sequence consistency rather than independent frame enlargement."
+    },
+    {
+      "id": "realbasicvsr",
+      "role": "real_world_video_restoration",
+      "status": "adopt",
+      "license": "Apache-2.0",
+      "notes": "Real-world video restoration path for noisy, compressed, or degraded footage."
+    },
+    {
+      "id": "real-esrgan",
+      "role": "frame_restoration_fallback",
+      "status": "adopt",
+      "license": "BSD-3-Clause",
+      "notes": "Frame-level restoration fallback when temporal models are unavailable or unsuitable."
+    },
+    {
+      "id": "swinir",
+      "role": "frame_quality_validation",
+      "status": "adopt",
+      "license": "Apache-2.0",
+      "notes": "Frame restoration/SR validation path; invoke selectively."
+    },
+    {
+      "id": "hat",
+      "role": "high_detail_frame_validation",
+      "status": "trial",
+      "license": "verify_current_project_terms",
+      "notes": "High-quality frame SR candidate; not run on every frame by default."
+    },
+    {
+      "id": "thera",
+      "role": "arbitrary_scale_delivery_stage",
+      "status": "trial",
+      "license": "Apache-2.0",
+      "notes": "Arbitrary-scale output stage after temporal restoration when the chosen model/runtime is validated for the asset."
+    }
+  ],
+  "pipeline": [
+    "ingest_video",
+    "verify_source_rights_and_provenance",
+    "measure_source_resolution_fps_codec_noise_compression",
+    "scene_change_detection",
+    "motion_estimation_and_temporal_consistency_check",
+    "select_temporal_restoration_engine",
+    "restore_and_super_resolve_sequence",
+    "optional_frame_level_validation",
+    "arbitrary_scale_to_target",
+    "flicker_and_temporal_artifact_check",
+    "face_text_and_edge_integrity_check",
+    "encode_archive_master",
+    "encode_mobile_delivery",
+    "encode_projector_delivery",
+    "attach_provenance_hash_and_processing_manifest"
+  ],
+  "routing": {
+    "mobile": {
+      "maxTargetLongEdge": 4320,
+      "prefer": ["realbasicvsr", "basicvsr-plus-plus"],
+      "maxModelPasses": 1,
+      "hardwareAccelerationPreferred": true
+    },
+    "projector": {
+      "maxTargetLongEdge": 7680,
+      "prefer": ["basicvsr-plus-plus", "realbasicvsr", "thera"],
+      "maxModelPasses": 2
+    },
+    "archive": {
+      "maxTargetLongEdge": 24576,
+      "prefer": ["realbasicvsr", "basicvsr-plus-plus", "thera"],
+      "maxModelPasses": 3,
+      "heavyComputeWarning": true
+    },
+    "rule": "Do not independently upscale every frame with multiple image models. Temporal video models handle sequence coherence; frame models are selective validators/fallbacks."
+  },
+  "qualityGate": {
+    "mustRecord": ["sourceDimensions", "sourceFPS", "outputDimensions", "outputFPS", "codec", "engine", "modelVersion", "runtime", "processingPasses", "durationMs", "peakMemory", "temporalMetrics", "spatialMetrics", "provenanceHash"],
+    "rejectOn": ["missingProvenance", "unknownModelLicense", "severeFlicker", "frameDropOrDuplication", "corruptedOutput", "unacceptableTextDegradation"],
+    "warningOn": ["sourceTooSmallForTarget", "extremeScale", "syntheticDetailHeavy", "extremeComputeCost", "projectorRequiresHigherBitrate"]
+  },
+  "truthPolicy": {
+    "24KIsOutputTarget": true,
+    "24KDoesNotMeanNative24KDetail": true,
+    "syntheticDetailMustNotBePresentedAsOriginal": true,
+    "originalSourceResolutionMustRemainVisible": true,
+    "scientificOrHistoricalVideosMustRetainSourceProvenance": true
+  }
+}

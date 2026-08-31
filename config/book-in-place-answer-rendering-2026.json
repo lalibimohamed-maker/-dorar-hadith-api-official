@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.1.0",
+  "purpose": "Fill unanswered question placeholders inside the original PDF page without reflowing or rebuilding the surrounding content.",
+  "inputInvariant": {
+    "preserveOriginalPageGeometry": true,
+    "preserveOriginalVisibleContent": true,
+    "preserveOriginalReadingOrder": true,
+    "neverReplaceWholePage": true,
+    "preserveQuestionTextVerbatim": true
+  },
+  "placeholderReplacement": {
+    "marker": "……………………",
+    "markerVariants": ["……………………", "........", "......", "……", "__________"],
+    "replaceOnlyMarkerRegion": true,
+    "neverEditQuestionRegion": true,
+    "neverEditSourceBodyOutsideMarker": true,
+    "replaceMarkerWithAnswer": true,
+    "answerNumbering": "arabic-indic-or-source-compatible",
+    "ifMarkerNotDetected": "needs_review"
+  },
+  "pipeline": [
+    "render-source-page-if-image-only",
+    "layout-detection",
+    "multi-engine-ocr",
+    "question-region-detection",
+    "placeholder-marker-detection",
+    "answer-region-detection",
+    "evidence-retrieval",
+    "answer-generation-with-evidence",
+    "answer-verification",
+    "remove-only-placeholder-marker",
+    "insert-answer-into-original-marker-region",
+    "roundtrip-visual-and-ocr-check"
+  ],
+  "engines": {
+    "layout": [
+      {"project":"PaddlePaddle/PaddleOCR", "role":"layout_and_geometry"},
+      {"project":"docling-project/docling", "role":"document_structure_and_reading_order"}
+    ],
+    "ocr": [
+      {"project":"PaddlePaddle/PaddleOCR", "role":"primary"},
+      {"project":"tesseract-ocr/tesseract", "role":"independent_cross_check"}
+    ],
+    "guideLineRemoval": [
+      {"project":"advimman/lama", "role":"local_inpainting_for_image_only_pages"},
+      {"project":"opencv/opencv", "role":"deterministic_thin_line_cleanup"}
+    ],
+    "pdfRendering": [
+      {"project":"pymupdf/PyMuPDF", "role":"in_place_text_insertion_and_pdf_roundtrip"}
+    ],
+    "retrieval": [
+      {"project":"Meilisearch", "role":"lexical_evidence"},
+      {"project":"Qdrant", "role":"semantic_evidence"}
+    ]
+  },
+  "answerPlacement": {
+    "anchor": "exact_placeholder_marker_bbox",
+    "numberAnswers": true,
+    "keepExistingQuestionAndContext": true,
+    "fontPolicy": "fit-to-placeholder-region-with-readable-minimum",
+    "rtl": true,
+    "collisionCheck": true,
+    "overflowPolicy": "reduce-font-within-original-marker-region; otherwise needs_review",
+    "neverMoveOtherPageContent": true,
+    "neverCreateSeparateAnswerPage": true
+  },
+  "sourcePreservation": {
+    "retainOriginalPdf": true,
+    "retainSourcePageHash": true,
+    "recordEditedRegions": true,
+    "recordAnswerEvidence": true,
+    "recordModelVersions": true
+  },
+  "qualityGates": {
+    "noTextOutsideTargetRegionChanged": true,
+    "noQuestionTextChanged": true,
+    "noSourceContentOutsidePlaceholderChanged": true,
+    "noReferenceLineChanged": true,
+    "visualDiffOutsideEditedRegionsMustBeZeroOrNearZero": true,
+    "postRenderOcrRoundTripRequired": true,
+    "unresolvedAnswerIsNeverGuessed": true,
+    "markerReplacementMustBeLocalized": true
+  },
+  "rights": {
+    "originalRightsRemainUnchanged": true,
+    "derivedRedistributionRequiresRightsCheck": true
+  }
+}

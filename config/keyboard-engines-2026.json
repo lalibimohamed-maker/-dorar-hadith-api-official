@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Open, free, privacy-preserving keyboard and Arabic input engine registry for Deen Allah Encyclopedia.",
+  "policy": {
+    "openSourcePreferred": true,
+    "selfHostedPreferred": true,
+    "noPaidRuntimeDependency": true,
+    "offlineFirst": true,
+    "noSilentTextMutation": true,
+    "originalTextImmutable": true,
+    "licenseMustBeVerified": true,
+    "networkAccessMustBeExplicit": true
+  },
+  "engines": [
+    {
+      "id": "keyman",
+      "role": "primary_cross_platform_input",
+      "license": "MIT",
+      "platforms": ["android", "ios", "windows", "macos", "linux", "web"],
+      "arabic": true,
+      "status": "adopt",
+      "notes": "Primary layout and multilingual input engine; prefer Unicode release keyboards and verified lexical models."
+    },
+    {
+      "id": "openboard",
+      "role": "android_foss_fallback",
+      "license": "GPL-3.0",
+      "platforms": ["android"],
+      "arabic": true,
+      "status": "adopt",
+      "notes": "Privacy-oriented FOSS Android keyboard; use only compatible components and preserve license obligations."
+    },
+    {
+      "id": "anysoftkeyboard",
+      "role": "android_suggestions_and_correction",
+      "license": "Apache-2.0",
+      "platforms": ["android"],
+      "arabic": true,
+      "status": "adopt",
+      "notes": "Secondary Android input engine with word and next-word suggestions and configurable autocorrection."
+    },
+    {
+      "id": "arabicime",
+      "role": "windows_arabic_ime",
+      "license": "LGPL-2.1",
+      "platforms": ["windows"],
+      "arabic": true,
+      "status": "trial",
+      "notes": "Specialized Arabic IME for non-Arabic physical layouts; lower maintenance activity requires periodic reassessment."
+    },
+    {
+      "id": "deen_allah_arabic_input_layer",
+      "role": "encyclopedia_search_input_normalization",
+      "license": "project_code",
+      "platforms": ["web"],
+      "arabic": true,
+      "status": "adopt",
+      "notes": "Project layer for search-only normalization, Arabic diacritics, Unicode normalization, sacred symbols, and multilingual shortcuts. It must never rewrite authoritative source text."
+    }
+  ],
+  "arabicFeatures": {
+    "unicodeNormalization": true,
+    "hamzaVariants": true,
+    "alifMaqsuraNormalizationForSearchOnly": true,
+    "taMarbutaNormalizationForSearchOnly": true,
+    "diacriticAwareSearch": true,
+    "quranicMarksPreserved": true,
+    "rtlAware": true,
+    "sacredSymbols": ["﷽", "ﷺ", "ﷻ", "﴿", "﴾", "۝"],
+    "harakat": ["َ", "ً", "ُ", "ٌ", "ِ", "ٍ", "ْ", "ّ", "ٰ"]
+  },
+  "privacy": {
+    "keystrokesMustNotBeUploaded": true,
+    "telemetryOptInOnly": true,
+    "localDictionariesPreferred": true,
+    "networkModelsMustDeclareEndpoint": true,
+    "sensitiveFieldsDisableLearning": true
+  },
+  "evaluation": {
+    "latency": true,
+    "arabicAccuracy": true,
+    "diacriticAccuracy": true,
+    "quranicTextIntegrity": true,
+    "privacy": true,
+    "license": true,
+    "maintenanceActivity": true,
+    "resourceUsage": true,
+    "accessibility": true
+  }
+}
