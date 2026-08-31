@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "purpose": "Advanced registry for original scientific-religious video creation, evidence-driven composition, lawful media synthesis, and high-fidelity rendering up to 48K-class masters.",
   "status": "candidate_benchmark_only",
   "principles": {
@@ -65,7 +65,14 @@
       {"name":"RealBasicVSR","status":"candidate","softwareLicense":"verify_current_repository_terms","role":"real_world_video_super_resolution_restoration","weights":"verify_checkpoint_terms","source":"https://github.com/c-ck/RealBasicVSR"},
       {"name":"Video2X","status":"license_gated","softwareLicense":"AGPL-3.0","role":"video_upscaling_orchestration","weights":"verify_each_backend","source":"https://github.com/k4yt3x/video2x"},
       {"name":"Video Super Resolution Library","status":"candidate","softwareLicense":"BSD-3-Clause","role":"video_super_resolution_components","weights":"verify_model_terms","source":"https://github.com/OpenVisualCloud/Video-Super-Resolution-Library"},
-      {"name":"Real-ESRGAN","status":"license_gated","softwareOrModelLicense":"verify_project_and_each_weight","role":"image_restoration_and_frame_restoration","source":"https://github.com/xinntao/Real-ESRGAN"}
+      {"name":"Real-ESRGAN","status":"license_gated","softwareOrModelLicense":"verify_project_and_each_weight","role":"image_restoration_and_frame_restoration","source":"https://github.com/xinntao/Real-ESRGAN"},
+      {"name":"NanoVSR","status":"candidate","softwareLicense":"MIT","role":"resource-efficient_4x_video_super_resolution_and_temporal_consistency","rightsGate":"verify_checkpoint_and_dataset_terms","source":"https://github.com/filippawlicki/nanovsr"},
+      {"name":"AVSR-Diff","status":"candidate","softwareLicense":"verify_current_repository_license","role":"arbitrary-scale_video_super_resolution_with_temporally_gated_features_and_continuous_decoding","rightsGate":"verify_code_model_and_dataset_terms","source":"https://github.com/KAIST-VICLab/AVSR-Diff"}
+    ],
+    "color_and_fidelity": [
+      {"name":"OpenColorIO","status":"candidate","softwareLicense":"BSD-3-Clause","role":"color_space_management_and_display_transforms","source":"https://opencolorio.org/"},
+      {"name":"ACES","status":"candidate_standard","role":"scene_referred_wide_gamut_color_management_and_mastering","source":"https://www.acescentral.com/"},
+      {"name":"TCA","status":"candidate","softwareLicense":"Apache-2.0","role":"temporal_consistency_learning_for_video_super_resolution","source":"https://github.com/mrluin/TCA"}
     ]
   },
   "mastering": {
@@ -87,7 +94,9 @@
       "denoise_deblur",
       "temporal_consistency",
       "video_super_resolution",
+      "arbitrary_scale_refinement_when_supported",
       "detail_recovery",
+      "color_management_and_gamut_mapping",
       "text_and_diagram_vector_overlay_at_target_resolution",
       "artifact_detection",
       "frame_consistency_check",
@@ -102,7 +111,10 @@
       "preserveCitations": true,
       "preferVectorTextOverUpscaledText": true,
       "masterMayExceedGenerationResolution": true,
-      "nativeGenerationAt48KNotRequired": true
+      "nativeGenerationAt48KNotRequired": true,
+      "temporalFlickerMustBeMeasured": true,
+      "sourceFidelityMustBeMeasuredBeforeAndAfterEnhancement": true,
+      "colorPurityMustNotOverrideSourceFidelity": true
     }
   },
   "rightsPolicy": {
@@ -112,7 +124,7 @@
     "voice": "No voice cloning or synthetic identity imitation without explicit rights; a licensed original recording may be aligned word-by-word."
   },
   "promotion": {
-    "productionUseRequires": ["rights_verified","evidence_verified","security_passed","arabic_quality_benchmark","visual_quality_benchmark","performance_benchmark","provenance_complete","human_review","CI_passed"],
+    "productionUseRequires": ["rights_verified","evidence_verified","security_passed","arabic_quality_benchmark","visual_quality_benchmark","temporal_consistency_benchmark","color_fidelity_benchmark","performance_benchmark","provenance_complete","human_review","CI_passed"],
     "automaticPromotion": false
   }
 }
