@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.1.0",
+  "purpose": "Global candidate extension for Engine Evolution. Candidates are benchmark targets only and are not runtime dependencies.",
+  "rules": {
+    "freeFirst": true,
+    "noPaidCoreDependency": true,
+    "selfHostedPreferred": true,
+    "noAutomaticPromotion": true,
+    "failClosedOnUnknownRights": true,
+    "softwareModelAssetServiceLicensesAreSeparate": true,
+    "candidateOnlyUntilEvidence": true,
+    "noHostedEndpointRequired": true,
+    "noCorpusMutation": true
+  },
+  "candidates": {
+    "document_parsing": {"primary":"docling","alternates":["mineru","docling-core"],"status":"candidate","softwareLicense":"MIT for Docling; MinerU uses a custom open-source license based on Apache-2.0 with additional conditions","modelLicense":"verify_per_model","watch":"PDF/DOCX/PPTX/XLSX structure, Arabic RTL, tables, reading order, page provenance, model provenance","source":"https://github.com/docling-project/docling"},
+    "ocr_alternates": {"primary":"easyocr","alternates":["tesseract","kraken","surya"],"status":"candidate","softwareLicense":"Apache-2.0 for EasyOCR; verify each alternate","modelLicense":"verify_per_model; Surya weights are license-gated","watch":"Arabic printed text, RTL order, diacritics, degraded scans, handwriting, CPU performance, layout","source":"https://github.com/JaidedAI/EasyOCR"},
+    "arabic_document_benchmark": {"primary":"KITAB-Bench","status":"benchmark_reference","softwareLicense":"MIT","modelLicense":"not_applicable","watch":"Arabic OCR, printed/handwritten recognition, layout, tables, PDF-to-text and document understanding","source":"https://github.com/mbzuai-oryx/KITAB-Bench"},
+    "speech_to_text_modern": {"primary":"Qwen3-ASR","alternates":["whisper.cpp"],"status":"candidate","softwareLicense":"Apache-2.0 for Qwen3-ASR; MIT for whisper.cpp","modelLicense":"verify_exact_model_and_weights_before_adoption","watch":"MSA, classical Arabic, dialects, language detection, timestamps, streaming, CPU/GPU resource cost","source":"https://github.com/QwenLM/Qwen3-ASR"},
+    "arabic_asr_dataset": {"primary":"BULBUL","status":"benchmark_reference","softwareLicense":"not_applicable","modelLicense":"dataset_terms_must_be_verified_before_redistribution","watch":"11-country dialect coverage, MSA/classical Arabic, accent robustness, speaker diversity","source":"https://arxiv.org/abs/2608.21950"},
+    "tts_multilingual": {"primary":"coqui-tts","alternates":["openvoice","piper1-gpl","kokoro"],"status":"license_gated","softwareLicense":"MPL-2.0 for current Coqui fork; verify each alternate","modelLicense":"XTTS-v2 uses CPML and is non-commercial; Piper voices vary; Kokoro weights are Apache-2.0 but current official language set does not establish Arabic support","watch":"Arabic quality, voice rights, model redistribution, cloning consent, phonemizer license, latency","source":"https://github.com/idiap/coqui-ai-TTS"},
+    "voice_conversion": {"primary":"openvoice","status":"candidate","softwareLicense":"MIT for V1/V2 code","modelLicense":"verify released model/voice assets separately","watch":"Arabic voice quality, consent, speaker identity protection, latency, redistribution","source":"https://github.com/myshell-ai/OpenVoice"},
+    "embeddings": {"primary":"BAAI/bge-m3","alternates":["Qwen3-Embedding-0.6B","jina-embeddings-v3","sentence-transformers","fastembed"],"status":"candidate","softwareLicense":"MIT for BGE-M3; verify framework licenses separately","modelLicense":"verify exact embedding model; Jina v3 is CC-BY-NC-4.0 and therefore license-gated for commercial use","watch":"Arabic semantic recall, MSA/classical vocabulary, morphology, long context, memory, dimension, quantization, license","source":"https://huggingface.co/BAAI/bge-m3"},
+    "reranking": {"primary":"Qwen3-Reranker-0.6B","alternates":["BGE-reranker-v2-m3","local_cross_encoder_rerankers"],"status":"candidate","softwareLicense":"verify framework","modelLicense":"verify exact reranker model and weights","watch":"Arabic MRR/NDCG, latency, CPU feasibility, false-positive resistance, license","source":"https://github.com/QwenLM/Qwen3-Embedding"},
+    "vector_search": {"primary":"qdrant","alternates":["opensearch","faiss"],"status":"candidate","softwareLicense":"verify exact release license; Qdrant is open-source and self-hostable","modelLicense":"not_applicable","watch":"dense/sparse/hybrid retrieval, filtering, Arabic recall, persistence, RAM, index size, backup/restore","source":"https://qdrant.tech/"},
+    "lexical_hybrid_search": {"primary":"opensearch","alternates":["meilisearch","searxng"],"status":"candidate","softwareLicense":"Apache-2.0 for OpenSearch; MIT for Meilisearch; AGPL-3.0 for SearXNG","modelLicense":"not_applicable","watch":"Arabic analyzers, exact/fuzzy/semantic hybrid search, RRF, faceting, provenance filters, self-hosting","source":"https://opensearch.org/"},
+    "metasearch": {"primary":"searxng","status":"candidate","softwareLicense":"AGPL-3.0","modelLicense":"not_applicable","watch":"source diversity, engine availability, rate limits, robots/terms compliance, privacy, self-hosting","source":"https://github.com/searxng/searxng"},
+    "pdf_processing": {"primary":"ocrmypdf","alternates":["docling","mineru"],"status":"candidate","softwareLicense":"MPL-2.0 for OCRmyPDF; verify alternates","modelLicense":"Tesseract/language-data and document-model terms must be verified separately","watch":"deskew, rotation, searchable PDF, archival preservation, OCR provenance, page geometry","source":"https://github.com/ocrmypdf/OCRmyPDF"},
+    "document_vlm_parsing": {"primary":"mineru","alternates":["docling"],"status":"license_gated","softwareLicense":"MinerU Open Source License based on Apache-2.0 with additional conditions","modelLicense":"verify MinerU model/weights individually","watch":"109-language OCR, tables, formulas, charts, multi-column reading order, CPU/MPS/GPU, model terms","source":"https://github.com/opendatalab/MinerU"},
+    "arabic_ocr_layout": {"primary":"surya","status":"license_gated","softwareLicense":"verify current code license","modelLicense":"current Surya weights have non-commercial/revenue restrictions; not eligible for core adoption without rights clearance","watch":"Arabic OCR, layout, reading order, tables, degraded scans, Apple Silicon feasibility","source":"https://github.com/datalab-to/surya"},
+    "knowledge_graph_rdf": {"primary":"oxigraph","alternates":["apache-jena"],"status":"candidate","softwareLicense":"Apache-2.0 or MIT for Oxigraph; verify Jena release","modelLicense":"not_applicable","watch":"RDF, SPARQL, provenance triples, canonical source relations, query latency, durability","source":"https://github.com/oxigraph/oxigraph"},
+    "data_versioning_provenance": {"primary":"dvc","alternates":["git-annex","datalad"],"status":"candidate","softwareLicense":"verify exact release license","modelLicense":"not_applicable","watch":"dataset revision, large-file provenance, reproducibility, remote storage independence, checksums","source":"https://dvc.org/"},
+    "provenance_integrity": {"primary":"sha256_checksums_and_signed_releases","status":"adopted_policy","softwareLicense":"not_applicable","modelLicense":"not_applicable","watch":"artifact hash, release signature, source commit, model revision, dataset revision, immutable evidence"}
+  },
+  "benchmarkSuites": {
+    "arabic_ocr":["KITAB-Bench","clean_printed_arabic","degraded_scan","diacritics","rtl_layout","tables","handwriting_when_rights_permit"],
+    "arabic_asr":["MSA","classical_arabic","dialects","accented_MSA","noise","long_form","timestamps","speaker_variation"],
+    "arabic_search":["exact","morphological_variants","diacritics_variants","typos","semantic","hybrid","source_provenance","cross_source_dedup"],
+    "documents":["PDF","DOCX","PPTX","XLSX","tables","footnotes","headers","multi_column","RTL","reading_order","formula_preservation"],
+    "tts":["Arabic_fluency","pronunciation","prosody","names","Quranic_text_isolation","latency","voice_rights","phonemizer_rights"],
+    "restoration":["text_legibility","source_faithfulness","artifact_rate","deskew","deblur","upscale","no_content_invention"],
+    "retrieval":["Recall@K","MRR","NDCG","precision","latency_p50","latency_p95","memory","index_size","hybrid_fusion"],
+    "embeddings":["Arabic_semantic_similarity","Arabic_retrieval","long_document","morphology","diacritics_variants","memory","quantized_vs_full_precision"],
+    "reranking":["MRR@10","NDCG@10","precision@10","p50","p95","CPU_only","Arabic_false_positive_rate"],
+    "knowledge_graph":["RDF_integrity","SPARQL_correctness","provenance_traversal","source_owner_relation","rights_relation","query_latency"],
+    "provenance":["SHA256","signed_release","source_commit","model_revision","dataset_revision","reproducible_manifest"],
+    "security_supply_chain":["dependency_audit","SBOM","secret_hygiene","action_pin_integrity","artifact_signature","license_scan","malicious_package_scan"]
+  },
+  "promotionRequirements":[
+    "exact_version_or_commit_recorded","software_license_verified","model_weight_license_verified","voice_asset_license_verified_when_applicable","dataset_license_verified_when_applicable","hosted_pricing_not_required_for_core_path","security_scan_passed","checksum_or_signature_recorded","Arabic_benchmark_recorded","resource_benchmark_recorded","provenance_preserved","human_review_recorded","CI_passed","no_corpus_mutation","no_silent_replacement","rollback_path_recorded"
+  ]
+}

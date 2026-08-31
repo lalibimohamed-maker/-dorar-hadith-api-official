@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Ultra-global research registry for high-fidelity video restoration, temporal super-resolution, frame interpolation, deblurring, denoising and extreme-resolution delivery. The target is 36K/48K-class output where technically and evidentially justified, without treating invented detail as historical truth.",
+  "policy": {
+    "freeFirst": true,
+    "selfHostedPreferred": true,
+    "noPaidCoreDependency": true,
+    "candidateOnlyUntilBenchmarked": true,
+    "softwareModelWeightDatasetLicensesAreSeparate": true,
+    "noOriginalDeletion": true,
+    "preserveOriginalBitstream": true,
+    "noSilentHallucination": true,
+    "temporalConsistencyOutranksSingleFrameBeauty": true,
+    "humanReviewRequiredForArchivalMasters": true,
+    "noAutomaticPromotion": true
+  },
+  "qualityTarget": {
+    "marketingTerm": "36K/48K-class Full Ultra HD research target",
+    "engineeringMeaning": "Extreme-resolution delivery target, not a claim that 36K or 48K factual detail can be recovered from a lower-resolution source.",
+    "coreRule": "Output dimensions may be increased only as far as faithful evidence and compute permit; missing information must not be presented as recovered fact.",
+    "referenceReality": "Current research found strong arbitrary-resolution/high-resolution video restoration systems, but no verified open-source system in this search that establishes faithful 36K or 48K video super-resolution as a standard production capability.",
+    "recommendedOutputs": ["immutable_original", "restored_master", "archival_frame_sequence", "high_resolution_delivery", "optional_perceptual_preview"]
+  },
+  "newCandidates": [
+    {
+      "name": "SeedVR2",
+      "domain": "one_step_high_resolution_video_restoration",
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "notes": "ICLR 2026 one-step diffusion-transformer video restoration; adaptive window attention is designed for high-resolution restoration and the official repository states restoration at any resolution. Official inference documents large-GPU requirements, so 36K/48K must be treated as a distributed/tiled research target, not a claimed capability.",
+      "source": "https://github.com/ByteDance-Seed/SeedVR"
+    },
+    {
+      "name": "FlashVSR",
+      "domain": "streaming_diffusion_video_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "notes": "CVPR 2026 one-step streaming VSR with locality-constrained sparse attention; official results emphasize scalability to ultra-high resolutions and efficiency. Benchmark temporal consistency and text/detail fidelity before archival use.",
+      "source": "https://github.com/OpenImagingLab/FlashVSR"
+    },
+    {
+      "name": "SparkVSR",
+      "domain": "interactive_keyframe_propagation_vsr",
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "notes": "Interactive VSR using sparse keyframe propagation; candidate for long-video efficiency and temporal consistency. Verify the complete model-card/license stack before use.",
+      "source": "https://huggingface.co/JiongzeYu/SparkVSR"
+    },
+    {
+      "name": "Upscale-A-Video",
+      "domain": "temporal_consistent_diffusion_vsr",
+      "status": "license_gated",
+      "softwareLicense": "NTU-S-Lab-License-1.0",
+      "notes": "CVPR 2024 temporal-consistent diffusion VSR; useful research comparator, but license must be cleared before unrestricted production integration.",
+      "source": "https://github.com/sczhou/Upscale-A-Video"
+    },
+    {
+      "name": "RealBasicVSR",
+      "domain": "real_world_video_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "notes": "Real-world VSR baseline focused on restoration trade-offs; strong deterministic/reference baseline for degraded historical footage.",
+      "source": "https://github.com/ckkelvinchan/realbasicvsr"
+    },
+    {
+      "name": "BasicVSR++",
+      "domain": "propagation_alignment_video_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "notes": "Enhanced propagation and alignment; useful baseline for temporal information fusion and comparison against diffusion methods.",
+      "source": "https://github.com/ckkelvinchan/BasicVSR_PlusPlus"
+    },
+    {
+      "name": "VRT",
+      "domain": "transformer_video_restoration_super_resolution",
+      "status": "license_gated",
+      "softwareLicense": "CC-BY-NC",
+      "notes": "Video Restoration Transformer covers video SR, deblurring, denoising, frame interpolation and space-time VSR; current official license is non-commercial, so keep outside unrestricted production unless separately cleared.",
+      "source": "https://github.com/JingyunLiang/VRT"
+    },
+    {
+      "name": "RVRT",
+      "domain": "recurrent_video_restoration_transformer",
+      "status": "license_gated",
+      "softwareLicense": "CC-BY-NC",
+      "notes": "Recurrent video restoration transformer with guided deformable attention; strong VSR/deblurring/denoising comparator but non-commercial license requires gating.",
+      "source": "https://github.com/JingyunLiang/RVRT"
+    },
+    {
+      "name": "RIFE",
+      "domain": "frame_interpolation",
+      "status": "candidate",
+      "softwareLicense": "MIT",
+      "notes": "Frame interpolation for motion-compensated temporal enhancement; use only to increase temporal sampling, never as evidence that spatial detail was recovered.",
+      "source": "https://github.com/hzwer/ECCV2022-RIFE"
+    },
+    {
+      "name": "VideoGigaGAN",
+      "domain": "generative_video_super_resolution",
+      "status": "research_reference",
+      "softwareLicense": "verify-current-license",
+      "notes": "Generative VSR research aimed at realistic detail and temporal consistency; suitable for research comparison with strict false-detail controls.",
+      "source": "https://github.com/lifeiteng/VideoGigaGAN"
+    }
+  ],
+  "deliveryStack": [
+    "lossless_original_bitstream",
+    "frame_integrity_checksums",
+    "scene_boundary_detection",
+    "motion_estimation",
+    "temporal_denoising",
+    "temporal_deblurring",
+    "video_super_resolution_candidates",
+    "text_and_glyph_aware_restoration_when_needed",
+    "frame_interpolation_optional",
+    "tile_or_windowed_extreme_resolution_processing",
+    "temporal_overlap_and_blending",
+    "multi_pass_cross_engine_consistency_check",
+    "OCR_or_transcript_cross_check_for_textual_content",
+    "artifact_and_hallucination_detection",
+    "human_visual_review",
+    "high_bit_depth_export",
+    "lossless_or_visually_lossless_master_encoding",
+    "provenance_and_checksums"
+  ],
+  "extremeResolutionStrategy": {
+    "goal": "36K/48K-class output where justified",
+    "method": "distributed tiled/windowed temporal restoration rather than assuming one GPU can hold the complete frame sequence",
+    "rules": [
+      "Never upscale by chaining arbitrary multipliers without cross-stage validation.",
+      "Keep immutable original frames and a direct faithful restoration beside every extreme-resolution derivative.",
+      "Use overlapping tiles/windows with temporal consistency to reduce seams and flicker.",
+      "Prefer source-native evidence and multi-frame information over hallucinated texture.",
+      "A larger pixel count is not evidence of a larger recovered information content.",
+      "Any 36K/48K result must report source resolution, scale factor, compute path, model versions, seed, codec, bit depth and quality metrics."
+    ]
+  },
+  "benchmarks": [
+    "PSNR",
+    "SSIM",
+    "MS-SSIM",
+    "LPIPS",
+    "DISTS",
+    "tOF",
+    "warping_error",
+    "temporal_consistency",
+    "flicker_rate",
+    "scene_cut_integrity",
+    "OCR-CER",
+    "OCR-WER",
+    "Arabic-glyph-error-rate",
+    "diacritic-error-rate",
+    "false-detail-rate",
+    "hallucinated-detail-rate",
+    "motion-boundary-integrity",
+    "edge-stability",
+    "compression-artifact-rate",
+    "RAM/VRAM",
+    "latency",
+    "throughput",
+    "energy-cost",
+    "distributed-scaling-efficiency"
+  ],
+  "resolutionEvidence": [
+    {
+      "claim": "SeedVR2 supports arbitrary/high resolution restoration",
+      "evidence": "Official project states it can restore videos with any resolution and describes adaptive window attention for high-resolution VR; published inference guidance currently demonstrates 720p on 1x H100 and 1080p/2K on 4x H100.",
+      "source": "https://github.com/ByteDance-Seed/SeedVR"
+    },
+    {
+      "claim": "FlashVSR targets ultra-high-resolution scalability",
+      "evidence": "Official CVPR 2026 repository states reliable scaling to ultra-high resolutions and reports 17 FPS for 768x1408 input on one A100 under its benchmark setup.",
+      "source": "https://github.com/OpenImagingLab/FlashVSR"
+    },
+    {
+      "claim": "16K delivery exists in community/local tooling",
+      "evidence": "A 2026 community application advertises local 16K video output using RTX Video Super Resolution plus Real-ESRGAN restoration. This is a delivery/tooling claim, not peer-reviewed proof of faithful 16K reconstruction.",
+      "source": "https://sourceforge.net/projects/smoothmyvideo/files/1.0.3/SmoothMyVideo-1.0.3-win.zip/download"
+    }
+  ],
+  "promotionRules": [
+    "36K/48K is a target output class, not a guaranteed recovered-information class.",
+    "No candidate is promoted solely because it emits a larger frame.",
+    "Temporal stability must be measured across consecutive frames and scene cuts.",
+    "For videos containing Arabic text, OCR/glyph/diacritic fidelity outranks generic perceptual scores.",
+    "Any generative model that creates plausible but unsupported detail is rejected for archival-faithful paths.",
+    "Model weights, base models, datasets and third-party components require independent rights review.",
+    "Non-commercial components remain license_gated even when their code is publicly available.",
+    "Extreme-resolution processing must preserve audio, subtitles, chapters and provenance where applicable.",
+    "No proprietary cloud service may become a core requirement merely to reach the target resolution."
+  ]
+}

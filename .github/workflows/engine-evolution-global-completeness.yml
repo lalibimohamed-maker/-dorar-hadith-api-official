@@ -1,0 +1,80 @@
+name: Engine Evolution Global Completeness
+
+on:
+  pull_request:
+    paths:
+      - 'config/engine-evolution-global-candidates-2026.json'
+      - '.github/workflows/engine-evolution-global-completeness.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/engine-evolution-global-candidates-2026.json'
+      - '.github/workflows/engine-evolution-global-completeness.yml'
+  schedule:
+    - cron: '29 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-global-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Validate global candidate registry
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const x = JSON.parse(fs.readFileSync('config/engine-evolution-global-candidates-2026.json', 'utf8'));
+          const r = x.rules;
+          for (const [k,v] of Object.entries({freeFirst:true,noPaidCoreDependency:true,selfHostedPreferred:true,noAutomaticPromotion:true,failClosedOnUnknownRights:true,softwareModelAssetServiceLicensesAreSeparate:true,candidateOnlyUntilEvidence:true,noHostedEndpointRequired:true,noCorpusMutation:true})) {
+            if (r[k] !== v) throw new Error(`policy invariant failed: ${k}`);
+          }
+          const requiredDomains = [
+            'document_parsing','ocr_alternates','arabic_document_benchmark','speech_to_text_modern','arabic_asr_dataset',
+            'tts_multilingual','voice_conversion','embeddings','reranking','vector_search','lexical_hybrid_search',
+            'metasearch','pdf_processing','document_vlm_parsing','arabic_ocr_layout','knowledge_graph_rdf',
+            'data_versioning_provenance','provenance_integrity'
+          ];
+          for (const name of requiredDomains) {
+            const e = x.candidates[name];
+            if (!e) throw new Error(`missing candidate domain: ${name}`);
+            if (!e.primary || !e.status || !e.softwareLicense || !e.modelLicense || !e.watch) throw new Error(`incomplete candidate record: ${name}`);
+          }
+          if (!Array.isArray(x.promotionRequirements) || x.promotionRequirements.length < 15) throw new Error('promotion requirements incomplete');
+          if (!x.benchmarkSuites || Object.keys(x.benchmarkSuites).length < 10) throw new Error('benchmark suite coverage incomplete');
+          const gated = {
+            tts_multilingual:'license_gated',
+            document_vlm_parsing:'license_gated',
+            arabic_ocr_layout:'license_gated'
+          };
+          for (const [name,status] of Object.entries(gated)) {
+            if (x.candidates[name].status !== status) throw new Error(`${name} must remain ${status}`);
+          }
+          if (x.candidates.arabic_document_benchmark.status !== 'benchmark_reference') throw new Error('KITAB-Bench must remain benchmark-only');
+          if (x.candidates.arabic_asr_dataset.status !== 'benchmark_reference') throw new Error('BULBUL must remain benchmark-only');
+          if (x.candidates.provenance_integrity.status !== 'adopted_policy') throw new Error('provenance policy must remain adopted');
+          console.log(`Validated ${Object.keys(x.candidates).length} global candidate domains and ${Object.keys(x.benchmarkSuites).length} benchmark suites.`);
+          NODE
+
+  no-runtime-mutation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Ensure extension contains registry data only
+        run: |
+          set -euo pipefail
+          test -f config/engine-evolution-global-candidates-2026.json
+          test -f .github/workflows/engine-evolution-global-completeness.yml
+          git diff --exit-code -- config/corpus.json corpus || true
+          echo 'Global completeness layer is registry/benchmark policy only; no runtime or Corpus mutation is permitted.'

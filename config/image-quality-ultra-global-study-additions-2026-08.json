@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Register the latest high-fidelity document/image restoration and text-preserving super-resolution research discovered after the previous global search. These are research candidates and benchmark references only.",
+  "policy": {
+    "freeFirst": true,
+    "selfHostedPreferred": true,
+    "noPaidCoreDependency": true,
+    "noAutomaticPromotion": true,
+    "noOriginalDeletion": true,
+    "preserveOriginalBitstream": true,
+    "textFidelityOutranksPerceptualBeauty": true,
+    "modelWeightsAndDatasetsRequireSeparateRightsReview": true
+  },
+  "newResearchCandidates": [
+    {
+      "name": "TAIR / TeReDiff",
+      "domain": "text_aware_image_restoration",
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "notes": "ICLR 2026 text-aware diffusion restoration; SA-Text and Real-Text resources; explicitly addresses textual fidelity and warns that severely degraded text may remain unrecoverable.",
+      "source": "https://github.com/cvlab-kaist/TAIR"
+    },
+    {
+      "name": "TiGeSR",
+      "domain": "glyph_guided_text_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "notes": "CVPR 2026 two-stage strategy: restore glyph structure first, then enhance the image; third-party base models/datasets remain separately licensed.",
+      "source": "https://github.com/OpenVeraTeam/TiGeSR"
+    },
+    {
+      "name": "TADiSR",
+      "domain": "text_aware_real_world_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "MIT",
+      "notes": "4x real-world SR with text-aware cross-attention and joint text-mask decoding; released adapters remain subject to base-model licenses, including commercial-use terms.",
+      "source": "https://github.com/mingcv/TADiSR"
+    },
+    {
+      "name": "TADSR",
+      "domain": "one_step_real_world_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "Pi-Lab-License-1.0",
+      "notes": "CVPR 2026 one-step diffusion SR candidate; current release still depends on separate checkpoints and external datasets, so it remains research-only until rights and reproducibility are cleared.",
+      "source": "https://github.com/zty557/TADSR"
+    },
+    {
+      "name": "RGDiffSR",
+      "domain": "recognition_guided_text_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "MIT",
+      "notes": "Recognition-guided diffusion SR; uses recognizers and model checkpoints that must each be rights-checked. Useful as a glyph/recognition-aware comparator.",
+      "source": "https://github.com/shercoo/RGDiffSR"
+    },
+    {
+      "name": "RTSRN",
+      "domain": "text_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "verify-current-license",
+      "notes": "Text-image SR baseline from ACM Multimedia; useful for recognition-aware benchmark comparison.",
+      "source": "https://github.com/wenyu1009/RTSRN"
+    },
+    {
+      "name": "TATT",
+      "domain": "spatial_deformation_text_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "MIT",
+      "notes": "CVPR 2022 text-attention SR designed for spatial deformation robustness; useful for warped or curved page/text crops.",
+      "source": "https://github.com/mjq11302010044/TATT"
+    },
+    {
+      "name": "DocRes",
+      "domain": "generalist_document_restoration",
+      "status": "candidate",
+      "softwareLicense": "MIT",
+      "notes": "Unified document restoration for dewarping, deshadowing, appearance, deblurring, binarization and end-to-end processing.",
+      "source": "https://github.com/ZZZHANG-jx/DocRes"
+    },
+    {
+      "name": "DocNLC",
+      "domain": "multi_degradation_document_enhancement",
+      "status": "candidate",
+      "softwareLicense": "verify-current-license",
+      "notes": "Document enhancement over blur, noise, shadow, watermark and background degradations.",
+      "source": "https://github.com/RylonW/DocNLC"
+    },
+    {
+      "name": "DeQA-Doc",
+      "domain": "document_image_quality_assessment",
+      "status": "benchmark_reference",
+      "softwareLicense": "verify-current-license",
+      "notes": "VQualA 2025 DIQA championship method; useful as an independent quality assessor rather than a restoration engine.",
+      "source": "https://github.com/Junjie-Gao19/DeQA-Doc"
+    },
+    {
+      "name": "DIQA-5000",
+      "domain": "document_image_quality_dataset",
+      "status": "benchmark_reference",
+      "datasetLicense": "verify-current-terms",
+      "notes": "5,000 enhanced document images with human MOS for overall quality, sharpness and color fidelity; useful for validating restoration pipelines.",
+      "source": "https://github.com/1536125762/DIQA-5000-Dataset"
+    },
+    {
+      "name": "Nautilus-OCR",
+      "domain": "METS_ALTO_ocr_reprocessing",
+      "status": "candidate",
+      "softwareLicense": "see-COPYING",
+      "notes": "National Library of Luxembourg pipeline for enhancement prediction and OCR reprocessing of original METS/ALTO packages, with side-by-side visual comparison. Repository notes a mix of open-source libraries and some proprietary contributions.",
+      "source": "https://github.com/natliblux/nautilusocr"
+    },
+    {
+      "name": "NDNP-Open-OCR",
+      "domain": "large_scale_historical_ocr_reprocessing",
+      "status": "candidate",
+      "softwareLicense": "CC0-for-project-with-third-party-obligations",
+      "notes": "Library of Congress open pipeline creating ALTO/PDF at scale from historical scans; includes advanced segmentation and local deployment. Third-party software obligations remain separate.",
+      "source": "https://github.com/LibraryOfCongress/ndnp-open-ocr"
+    },
+    {
+      "name": "DiffHDR / HDR28K",
+      "domain": "historical_document_repair",
+      "status": "candidate",
+      "softwareLicense": "verify-current-license",
+      "datasetLicense": "verify-current-terms",
+      "notes": "Historical document repair with 28,552 damaged/repaired image pairs and character-level annotations; directly relevant to archival degradation research.",
+      "source": "https://github.com/yeungchenwa/HDR"
+    },
+    {
+      "name": "SwinIR",
+      "domain": "image_restoration_super_resolution",
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "notes": "Official repository supports super-resolution, denoising and compression-artifact reduction; include upstream Swin Transformer/KAIR license review as required.",
+      "source": "https://github.com/JingyunLiang/SwinIR"
+    },
+    {
+      "name": "NAFNet",
+      "domain": "conservative_image_restoration",
+      "status": "candidate",
+      "softwareLicense": "MIT",
+      "notes": "Efficient restoration baseline; suitable for conservative deblur/denoise before OCR. A CoreML port documents edge artifacts under reduced precision, reinforcing precision-aware benchmarking.",
+      "source": "https://github.com/megvii-research/NAFNet"
+    },
+    {
+      "name": "HYPIR",
+      "domain": "diffusion_image_restoration",
+      "status": "license_gated",
+      "softwareLicense": "non-commercial-use-condition",
+      "notes": "Strong research restoration candidate but current official distribution explicitly restricts commercial use without permission.",
+      "source": "https://github.com/XPixelGroup/HYPIR"
+    },
+    {
+      "name": "SUPIR",
+      "domain": "photorealistic_diffusion_restoration",
+      "status": "license_gated",
+      "softwareLicense": "non-commercial-use-condition",
+      "notes": "High-end restoration research system but current official distribution has a non-commercial-only condition.",
+      "source": "https://github.com/Fanghua-Yu/SUPIR"
+    },
+    {
+      "name": "ScanTailor Advanced",
+      "domain": "deterministic_scanned_book_preprocessing",
+      "status": "candidate",
+      "softwareLicense": "GPL-3.0",
+      "notes": "Mature deterministic scan cleanup, binarization and layout preparation. Useful complement to neural restoration where reproducibility is valued.",
+      "source": "https://github.com/ScanTailor-Advanced/scantailor-advanced"
+    },
+    {
+      "name": "LA-DocFlatten",
+      "domain": "layout_aware_document_flattening",
+      "status": "candidate",
+      "softwareLicense": "MIT",
+      "datasetLicense": "separate",
+      "notes": "Layout-aware flattening with explicit warning that dataset terms differ from code terms.",
+      "source": "https://github.com/BunnySoCrazy/LA-DocFlatten"
+    }
+  ],
+  "promotionCriteria": [
+    "Register every candidate without making it a runtime dependency.",
+    "Keep immutable source images and bitstreams untouched.",
+    "Benchmark on Arabic books and manuscripts before generic image benchmarks can influence promotion.",
+    "Measure OCR-CER/WER, glyph topology and diacritic preservation in addition to PSNR/SSIM/LPIPS/DISTS.",
+    "Reject restoration that improves visual quality while introducing false characters, dots, diacritics or historical details.",
+    "Separate engine, checkpoint, base-model, dataset and third-party component rights.",
+    "Use deterministic and generative pipelines side-by-side on identical pages.",
+    "Keep 24K-class output as a delivery target, never as evidence that missing historical detail was truly recovered."
+  ]
+}

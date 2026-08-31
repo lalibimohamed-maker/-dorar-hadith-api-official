@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "1.0.0",
+  "name": "ULTRA-VSR / 36K-48K Faithful Restoration Research Stack",
+  "purpose": "Turn the international-observer research findings into a modular, evidence-gated architecture for extreme-resolution video restoration without treating generated detail as historical truth.",
+  "principles": {
+    "freeFirst": true,
+    "selfHostedPreferred": true,
+    "noPaidCoreDependency": true,
+    "preserveOriginalBitstream": true,
+    "noSilentHallucination": true,
+    "noAutomaticPromotion": true,
+    "engineModelWeightDatasetRightsSeparate": true,
+    "resolutionIsNotEvidenceOfRecoveredDetail": true,
+    "textAndHistoricalFidelityOutrankPerceptualBeauty": true,
+    "humanReviewRequiredForArchivalMaster": true
+  },
+  "architecture": {
+    "stage0_source": {
+      "inputs": ["original_video", "audio", "captions_if_present", "metadata"],
+      "outputs": ["immutable_source_hash", "source_metadata_record", "working_proxy"],
+      "rules": ["never_modify_original", "record_codec_container_frame_rate_color_metadata"]
+    },
+    "stage1_diagnostics": {
+      "tasks": ["true_information_resolution_estimation", "compression_artifact_analysis", "noise_profile", "blur_kernel_estimation", "motion_analysis", "scene_cut_detection", "text_region_detection", "field_or_interlace_detection"],
+      "goal": "Estimate degradation and information content before choosing restoration scale or model."
+    },
+    "stage2_registration": {
+      "tasks": ["global_motion_alignment", "local_motion_alignment", "occlusion_detection", "confidence_map_generation"],
+      "gate": "Do not fuse frames where alignment confidence is insufficient."
+    },
+    "stage3_conservative_restoration": {
+      "engines": ["NAFNet", "Restormer", "VRT", "RVRT", "BasicVSR++", "RealBasicVSR"],
+      "goal": "Recover signal conservatively before generative enhancement.",
+      "policy": "Prefer deterministic or recognition-safe restoration when it improves fidelity without inventing structure."
+    },
+    "stage4_video_restoration_experts": {
+      "engines": ["SeedVR2", "SeedVR", "FlashVSR", "UltraVSR", "AVSR-Diff", "DiffVSR"],
+      "routing": "Dynamic candidate routing based on degradation, motion, resolution and confidence diagnostics.",
+      "constraint": "No single model is authoritative; outputs are treated as hypotheses."
+    },
+    "stage5_text_and_glyph_expert": {
+      "engines": ["TAIR", "TiGeSR", "TADiSR", "RGDiffSR", "TATT", "RTSRN", "PreP-OCR"],
+      "trigger": "Text-bearing frames or regions.",
+      "goal": "Protect glyph geometry, Arabic dots, diacritics, subtitles and small text from generic perceptual hallucination."
+    },
+    "stage6_extreme_resolution_tiling": {
+      "method": "overlapping spatial-temporal tiles",
+      "controls": ["adaptive_window_size", "overlap_consistency", "seam_detection", "cross_tile_confidence", "memory_budget", "multi_pass_optional"],
+      "target_profiles": ["8K", "16K", "24K", "36K", "48K"],
+      "rule": "Profiles are delivery targets; unsupported source information is never represented as factual recovery."
+    },
+    "stage7_temporal_consensus": {
+      "methods": ["multi_frame_consensus", "temporal_warp_error", "flicker_detection", "motion_boundary_consistency", "occlusion_aware_blending", "seed_consensus_when_generators_are_stochastic"],
+      "gate": "Reject or downgrade frames with unstable invented detail across time."
+    },
+    "stage8_cross_engine_consensus": {
+      "method": "run independent experts and compare outputs",
+      "signals": ["structural_agreement", "ocr_agreement", "edge_agreement", "temporal_agreement", "detail_confidence"],
+      "decision": "A detail seen consistently across independent methods receives higher confidence than a detail produced by one generative expert only."
+    },
+    "stage9_quality_assessment": {
+      "objective": ["PSNR", "SSIM", "MS-SSIM", "LPIPS", "DISTS", "VMAF_when_appropriate"],
+      "temporal": ["tOF", "warping_error", "flicker_rate", "motion_consistency"],
+      "text": ["OCR-CER", "OCR-WER", "Arabic-glyph-error-rate", "diacritic-error-rate", "subtitle-integrity"],
+      "archival": ["false-detail-rate", "hallucinated-detail-rate", "historical-fidelity", "provenance-completeness"],
+      "resource": ["VRAM", "RAM", "latency", "throughput", "energy-cost", "distributed-scaling-efficiency"]
+    },
+    "stage10_human_observer": {
+      "frameworks": ["ITU-T P.910 07/26", "ITU-R BT.500", "FIAF Digital Statement"],
+      "protocol": ["double_blind_pairwise_or_sequential_comparison", "expert_review_for_archival_content", "scene_stratified_sampling", "record_reason_codes_for_rejection"],
+      "gate": "No generated master is archival-facing as faithful restoration without human approval."
+    },
+    "stage11_outputs": {
+      "outputs": ["immutable_original", "faithful_restoration_master", "36K_or_48K_class_derivative_if_supported", "ocr_proxy", "preview_derivative", "quality_report", "provenance_manifest"],
+      "separation": "Never overwrite or replace the original with a derived restoration."
+    }
+  },
+  "observerProgram": {
+    "purpose": "Independent international scrutiny of quality claims and methodology.",
+    "observers": ["ITU_quality_methodologies", "FIAF_archival_principles", "independent_video_restoration_researchers", "Arabic_document_and_OCR_researchers"],
+    "evidence_package": ["source_hash", "model_versions", "weights_hashes", "dataset_versions", "configuration", "random_seeds", "hardware", "metrics", "side_by_side_samples", "failure_cases", "human_review_log"],
+    "rule": "Publish failures and uncertainty alongside successes."
+  },
+  "research_questions": [
+    "How far can arbitrary-scale VSR extend before hallucination dominates evidence?",
+    "Can multi-engine consensus create a calibrated confidence map for restored details?",
+    "Can tiled 36K-48K delivery remain temporally coherent without seam artifacts?",
+    "Can Arabic glyph and subtitle fidelity remain stable under extreme upscaling?",
+    "Can source-information resolution be estimated well enough to avoid pseudo-resolution inflation?",
+    "Which cascades provide the best fidelity/quality/compute trade-off for archival video?"
+  ],
+  "promotionRules": [
+    "A model cannot become the production default solely because it produces higher perceptual scores.",
+    "If OCR, glyph, subtitle or temporal stability worsens, the candidate is rejected for archival restoration even when images look sharper.",
+    "Any non-commercial or otherwise restricted model remains license_gated.",
+    "Any missing or uncertain dataset/weight rights fail closed.",
+    "36K/48K claims require reproducible output dimensions, processing configuration and evidence that the pipeline did not silently crop, invent or alter historical content.",
+    "The final confidence report must distinguish observed detail, inferred detail and generated detail."
+  ],
+  "evidence": [
+    {"source":"SeedVR2","finding":"Supports arbitrary-resolution video restoration and adaptive window attention; current official documentation confirms high-resolution restoration but does not establish faithful 36K/48K recovery.","url":"https://github.com/IceClear/SeedVR2"},
+    {"source":"FlashVSR","finding":"One-step streaming diffusion VSR with sparse attention; official project claims scaling to ultra-high resolutions but recommends 4x for stability, so extreme factors require separate validation.","url":"https://github.com/OpenImagingLab/FlashVSR"},
+    {"source":"UltraVSR","finding":"One-step diffusion VSR with recurrent temporal shift and temporally asynchronous inference for coherence under memory constraints.","url":"https://arxiv.org/abs/2505.19958"},
+    {"source":"AVSR-Diff","finding":"Scale-agnostic diffusion priors for temporally consistent arbitrary-scale VSR, directly relevant to non-fixed target scales.","url":"https://github.com/KAIST-VICLab/AVSR-Diff"},
+    {"source":"ITU-T P.910 07/26","finding":"Current in-force 2026 recommendation for subjective video quality assessment methods; can underpin controlled observer studies.","url":"https://www.itu.int/rec/T-REC-P.910-202607-P/en"},
+    {"source":"ITU-R BT.500-15","finding":"Methodologies for subjective assessment of television image quality, including expert viewing protocols suitable for high-resolution evaluation.","url":"https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.500-15-202305-I!!PDF-E.pdf"},
+    {"source":"FIAF Digital Statement","finding":"Archival digitization/restoration should seek the closest possible digital approximation and preserve accurate reproduction; scan at the highest practical, available and affordable resolution.","url":"https://www.fiafnet.org/pages/E-Resources/Digital-Statement-part-III.html"}
+  ]
+}

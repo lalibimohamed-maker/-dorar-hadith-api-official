@@ -1,0 +1,202 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Global neighbor discovery around the ULTRA-VSR 36K-48K Faithful Restoration Research Stack. These candidates expand the expert mesh and quality-evaluation perimeter without becoming automatic runtime dependencies.",
+  "policy": {
+    "freeFirst": true,
+    "selfHostedPreferred": true,
+    "noPaidCoreDependency": true,
+    "candidateOnlyUntilBenchmarked": true,
+    "noAutomaticPromotion": true,
+    "preserveOriginalBitstream": true,
+    "resolutionIsNotEvidenceOfRecoveredDetail": true,
+    "softwareModelWeightDatasetServiceRightsAreSeparate": true,
+    "textAndHistoricalFidelityOutrankPerceptualBeauty": true,
+    "internationalObserverReviewPreferred": true
+  },
+  "newDiscoveries": [
+    {
+      "name": "PS-SR",
+      "domain": "pseudo_single_step_diffusion_vsr",
+      "status": "candidate",
+      "softwareLicense": "Apache-2.0",
+      "role": "frequency_domain_refinement_expert",
+      "notes": "CVPR 2026 method using a strong base model followed by lightweight speculative refinement; frequency-domain update is designed to add high-frequency detail while preserving low-frequency structure.",
+      "source": "https://github.com/HiDream-ai/PS-SR"
+    },
+    {
+      "name": "DGAF-VSR",
+      "domain": "dense_guidance_diffusion_vsr",
+      "status": "candidate",
+      "role": "aligned_feature_guidance_expert",
+      "notes": "CVPR 2026 method with optical-guided warping and feature-wise temporal conditioning; reported gains cover perceptual quality, fidelity and temporal consistency.",
+      "source": "https://openaccess.thecvf.com/content/CVPR2026/html/Xu_Rethinking_Diffusion_Model-Based_Video_Super-Resolution_Leveraging_Dense_Guidance_from_Aligned_CVPR_2026_paper.html"
+    },
+    {
+      "name": "STCDiT",
+      "domain": "spatiotemporally_consistent_diffusion_vsr",
+      "status": "candidate",
+      "role": "anchor_frame_temporal_stability_expert",
+      "notes": "CVPR 2026 method using motion-aware segment reconstruction and anchor-frame latent guidance for structural fidelity and temporal consistency under complex camera motion.",
+      "source": "https://openaccess.thecvf.com/content/CVPR2026/html/Chen_STCDiT_Spatio-Temporally_Consistent_Diffusion_Transformer_for_High-Quality_Video_Super-Resolution_CVPR_2026_paper.html"
+    },
+    {
+      "name": "AVSR-Diff",
+      "domain": "arbitrary_scale_diffusion_vsr",
+      "status": "candidate",
+      "role": "scale_agnostic_expert",
+      "notes": "ECCV 2026; decouples scale-agnostic latent denoising from continuous coordinate rendering and adds temporally gated recurrence plus scale-aware Fourier refinement.",
+      "source": "https://github.com/KAIST-VICLab/AVSR-Diff"
+    },
+    {
+      "name": "FlashVSR",
+      "domain": "streaming_diffusion_vsr",
+      "status": "candidate",
+      "role": "high_resolution_streaming_expert",
+      "notes": "CVPR 2026; one-step streaming VSR with locality-constrained sparse attention and a tiny conditional decoder. Official documentation says the method scales to ultra-high resolutions but recommends 4x as the practical stability setting.",
+      "source": "https://github.com/OpenImagingLab/FlashVSR"
+    },
+    {
+      "name": "Vivid-VR",
+      "domain": "photorealistic_generative_video_restoration",
+      "status": "license_gated",
+      "role": "perceptual_restoration_research_reference",
+      "notes": "ICLR 2026; uses a text-to-video diffusion transformer foundation with restoration-guided sampling and long-video aggregation. It is not placed on the unrestricted path because its required CogVideoX, CogVLM2/Llama and EasyOCR assets carry separate terms.",
+      "source": "https://github.com/csbhr/Vivid-VR"
+    },
+    {
+      "name": "HiRT",
+      "domain": "hierarchical_recurrent_transformer_vsr",
+      "status": "candidate",
+      "role": "frequency_recurrent_baseline",
+      "notes": "2026 publication/repository; hierarchical recurrent propagation uses forward/backward and bidirectional stages with global/local/image transformer blocks and frequency-domain propagation.",
+      "source": "https://github.com/smu-ivpl/HiRT"
+    },
+    {
+      "name": "TIG-SVQA",
+      "domain": "super_resolution_video_quality_assessment",
+      "status": "benchmark_reference",
+      "role": "temporal_quality_observer",
+      "notes": "AAAI 2026; explicitly models temporal inconsistency in SR video quality assessment and localizes unstable regions.",
+      "source": "https://ojs.aaai.org/index.php/AAAI/article/view/37599"
+    },
+    {
+      "name": "TSAR",
+      "domain": "compressed_video_vsr",
+      "status": "research_reference",
+      "role": "compression_aware_expert",
+      "notes": "2026 Neurocomputing framework using artifact-guided temporal sampling plus motion vectors and residual maps from compressed video streams. Relevant for archived compressed sources.",
+      "source": "https://www.sciencedirect.com/science/article/pii/S0925231226008076"
+    },
+    {
+      "name": "TCSAF",
+      "domain": "reference_based_video_super_resolution",
+      "status": "research_reference",
+      "role": "reference_bank_expert",
+      "notes": "2026 reference-based VSR using a learnable reference bank updated from super-resolved frames and cross-attention for alignment; useful when trustworthy high-resolution references exist.",
+      "source": "https://www.sciencedirect.com/science/article/pii/S0957417426007311"
+    },
+    {
+      "name": "FDI-VSR",
+      "domain": "frequency_domain_video_super_resolution",
+      "status": "research_reference",
+      "role": "frequency_spatiotemporal_expert",
+      "notes": "2025 open-access framework integrating dynamic offsets, temporal aggregation and frequency-spatial integration; useful as a non-diffusion comparator for high-frequency reconstruction.",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12031633/"
+    },
+    {
+      "name": "SAVSR",
+      "domain": "arbitrary_scale_video_super_resolution",
+      "status": "research_reference",
+      "role": "continuous_scale_baseline",
+      "notes": "AAAI method for arbitrary, non-integer and asymmetric spatial scales; valuable as a pre-diffusion continuous-scale comparator.",
+      "source": "https://ojs.aaai.org/index.php/AAAI/article/view/28114"
+    },
+    {
+      "name": "Self-Blind-VSR",
+      "domain": "blind_video_super_resolution",
+      "status": "research_reference",
+      "role": "unknown_degradation_expert",
+      "notes": "Self-supervised blind VSR line; useful for source videos whose degradation kernel is unknown or differs from synthetic training assumptions.",
+      "source": "https://github.com/csbhr/Self-Blind-VSR"
+    },
+    {
+      "name": "Deep-Blind-VSR",
+      "domain": "blind_video_super_resolution",
+      "status": "research_reference",
+      "role": "blind_degradation_baseline",
+      "notes": "Blind VSR baseline from the same research lineage; useful for testing whether explicit degradation estimation improves robustness.",
+      "source": "https://github.com/csbhr/Deep-Blind-VSR"
+    }
+  ],
+  "meshConnections": [
+    {"from":"diagnostics.degradation_estimation","to":["Self-Blind-VSR","Deep-Blind-VSR","TSAR","FlashVSR"]},
+    {"from":"motion_registration","to":["DGAF-VSR","STCDiT","AVSR-Diff","HiRT","FDI-VSR"]},
+    {"from":"frequency_analysis","to":["PS-SR","AVSR-Diff","HiRT","FDI-VSR"]},
+    {"from":"continuous_scale","to":["AVSR-Diff","SAVSR"]},
+    {"from":"text_region_router","to":["TextOVSR","TAIR","TiGeSR","TADiSR"]},
+    {"from":"reference_available_router","to":["TCSAF"]},
+    {"from":"compression_artifact_router","to":["TSAR"]},
+    {"from":"temporal_quality_observer","to":["TIG-SVQA","DGAF-VSR","STCDiT","FlashVSR","AVSR-Diff"]},
+    {"from":"perceptual_research_pool","to":["Vivid-VR","PS-SR","SeedVR2"]}
+  ],
+  "selectionPolicy": {
+    "minimumIndependentExpertsPerSpecialty": 2,
+    "preferredIndependentExpertsPerSpecialty": 3,
+    "activateReservePoolOnDisagreement": true,
+    "doNotAverageBlindly": true,
+    "useConfidenceWeightedFusion": true,
+    "preserveConservativeFallback": true,
+    "routeByDegradationBeforeResolution": true,
+    "textIntegrityGateOverridesPerceptualScore": true,
+    "temporalIntegrityGateOverridesSingleFrameScore": true
+  },
+  "extremeResolutionRule": {
+    "targetProfiles": ["8K","16K","24K","36K","48K"],
+    "tilingRequiredAtExtremeScale": true,
+    "cross_tile_overlap_consistency_required": true,
+    "cross_frame_consistency_required": true,
+    "48KFaithfulClaimRequiresIndependentEvidence": true,
+    "pixel_count_is_not_information_gain_proof": true,
+    "generated_details_must_be_marked": true
+  },
+  "rightsPolicy": {
+    "engine_code_rights": "separate",
+    "checkpoint_rights": "separate",
+    "base_model_rights": "separate",
+    "dataset_rights": "separate",
+    "third_party_dependency_rights": "separate",
+    "hosted_service_pricing": "separate",
+    "commercial_use_claims_require_actual_asset_terms": true,
+    "unknown_rights_fail_closed": true
+  },
+  "qualityGates": [
+    "PSNR",
+    "SSIM",
+    "MS-SSIM",
+    "LPIPS",
+    "DISTS",
+    "VMAF_when_appropriate",
+    "temporal_warp_error",
+    "flicker_rate",
+    "motion_boundary_consistency",
+    "OCR-CER",
+    "OCR-WER",
+    "Arabic_glyph_integrity",
+    "diacritic_integrity",
+    "subtitle_integrity",
+    "false_detail_rate",
+    "hallucinated_detail_rate",
+    "reproducibility",
+    "VRAM",
+    "RAM",
+    "latency",
+    "throughput",
+    "energy_cost"
+  ],
+  "observerEvidence": {
+    "ITU_T_P_910": "subjective video quality assessment framework",
+    "ITU_R_BT_500": "television image quality and expert viewing methodology",
+    "FIAF_Digital_Statement": "archival fidelity and digitization principles",
+    "rule": "Publish successful and failed cases and distinguish observed, inferred and generated detail."
+  }
+}

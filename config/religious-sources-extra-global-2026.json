@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Extra-global discovery registry for religious and Islamic book sources. Discovery does not imply redistribution permission; every title/edition/asset is rights-gated before ingestion.",
+  "policy": {
+    "freeFirst": true,
+    "sourceDiscoveryIsNotRedistributionPermission": true,
+    "editionSpecificRightsRequired": true,
+    "noSilentScraping": true,
+    "failClosedOnUnknownRights": true,
+    "preserveProvenance": true,
+    "preserveSourceIdentity": true,
+    "noCorpusMutationDuringDiscovery": true,
+    "sunnyPath": "metadata_then_rights_then_acquisition_then_multiengine_ocr_then_qc_then_digital_master",
+    "copyrightAndPublisherRightsMustBeChecked": true,
+    "publicDomainIsNotAssumedFromAuthorDeathAlone": true
+  },
+  "sources": [
+    {
+      "name": "OpenITI Corpus",
+      "type": "open_research_corpus",
+      "scope": "Arabic and Persian Islamicate texts; expanding to Ottoman Turkish and Urdu",
+      "value": "Machine-actionable scholarly corpus with provenance-oriented metadata and standards-based text representations.",
+      "access": "open_access_research",
+      "redistribution": "verify per corpus release and source edition",
+      "source": "https://openiti.org/projects/OpenITI%20Corpus.html"
+    },
+    {
+      "name": "KITAB",
+      "type": "arabic_book_history_corpus",
+      "scope": "Arabic texts, text reuse, Arabic book history",
+      "value": "Curated corpus and metadata for Arabic book history and text reuse research.",
+      "access": "research_access",
+      "redistribution": "verify project terms per dataset",
+      "source": "https://kitab-project.org/corpus-and-data"
+    },
+    {
+      "name": "Al-Maktaba al-Waqfeya",
+      "type": "religious_book_library",
+      "scope": "Arabic Islamic books, scanned editions, metadata and browsing by author/section/century",
+      "value": "Large discovery source for scanned religious books and scholarly editions; useful as a discovery and verification layer.",
+      "access": "public_web",
+      "redistribution": "edition_and_site_terms_required",
+      "source": "https://www.waqfeya.net/"
+    },
+    {
+      "name": "Maktabat Sayd al-Fawaid",
+      "type": "religious_book_library",
+      "scope": "Quran and tafsir, hadith, fiqh, aqidah, seerah, biographies, Arabic and foreign-language Islamic books",
+      "value": "Current catalog exposes thousands of titles across major Islamic disciplines.",
+      "access": "public_web",
+      "redistribution": "verify per title and publisher",
+      "source": "https://saaid.org/book/"
+    },
+    {
+      "name": "IslamWeb Islamic Library",
+      "type": "religious_book_library",
+      "scope": "Hadith, tafsir, Quran sciences, fiqh, usul, aqidah, seerah, biographies, fatwas and more",
+      "value": "Large structured catalog with subject and book lists and many PDF records.",
+      "access": "public_web",
+      "redistribution": "verify publisher/edition rights; site availability does not itself grant redistribution",
+      "source": "https://www.islamweb.net/ar/library/"
+    },
+    {
+      "name": "Alukah Library",
+      "type": "religious_book_and_audio_library",
+      "scope": "Readable, audio, visual and Islamic books; current scholarly additions",
+      "value": "Current active library with books, PDFs and audio resources; useful for discovery and source comparison.",
+      "access": "public_web",
+      "redistribution": "verify page/book rights",
+      "source": "https://www.alukah.net/library/"
+    },
+    {
+      "name": "Alwaraq Heritage Library",
+      "type": "arabic_heritage_library",
+      "scope": "Classical Arabic works including tafsir, hadith, biographies, history, language and Islamic culture",
+      "value": "Large heritage catalog including works such as Tafsir al-Qurtubi, Ihya Ulum al-Din and Tadhkirat al-Huffaz-related materials.",
+      "access": "public_web",
+      "redistribution": "verify site and digitized-edition terms for every work",
+      "source": "https://www.alwaraq.net/Core/library-main.jsp"
+    },
+    {
+      "name": "Princeton Manuscripts of the Islamic World",
+      "type": "digitized_manuscript_collection",
+      "scope": "Predominantly Arabic manuscripts plus Persian and Ottoman Turkish; Islamic law, Quranic sciences, seerah and related works",
+      "value": "3,453 items in the curated collection, with many item-level scans and rights metadata; includes Yemeni manuscript digitization work.",
+      "access": "open_access_collection",
+      "redistribution": "item-level rights must be checked; collection includes No Known Copyright and also contractual restrictions",
+      "source": "https://digital-collections.princeton.edu/collections/islamicmss"
+    },
+    {
+      "name": "Library of Congress Arabic Manuscripts / St. Catherine's collections",
+      "type": "digitized_manuscript_collection",
+      "scope": "Arabic manuscripts including religious materials and Prophet-related documents",
+      "value": "Provides high-value scans plus item-level rights/access metadata and IIIF manifests where available.",
+      "access": "public_digital_collection",
+      "redistribution": "check each item rights field; some items are explicitly public domain",
+      "source": "https://www.loc.gov/item/00279388963-ms/"
+    },
+    {
+      "name": "Tanzil Quran Text",
+      "type": "quran_text_source",
+      "scope": "Verified Quran text in multiple formats",
+      "value": "Explicit terms allow verbatim copying/distribution in websites/apps with attribution, while changing the text is prohibited and updates should be tracked.",
+      "access": "downloadable",
+      "redistribution": "CC BY 3.0 with source-specific no-change condition",
+      "source": "https://tanzil.ca/docs/text_license"
+    },
+    {
+      "name": "Quranic Arabic Corpus",
+      "type": "quran_annotation_corpus",
+      "scope": "Morphology, syntax, ontology and Quranic linguistic annotation",
+      "value": "Useful enrichment layer for morphology and linguistic analysis; its data license and attribution/no-change terms must be preserved.",
+      "access": "download with terms",
+      "redistribution": "GNU public license plus source-specific no-change/attribution terms",
+      "source": "https://corpus.quran.com/download/"
+    },
+    {
+      "name": "Sunnah.com",
+      "type": "hadith_reference_platform",
+      "scope": "Hadith collections, translations, grading and API",
+      "value": "Important reference and API source, but current terms explicitly prohibit scraping and mass reproduction of entire books/collections.",
+      "access": "API_key_for_API; public_web_for_reference",
+      "redistribution": "do_not_scrape_or_mass_reproduce; request API/offline access from maintainers when available",
+      "source": "https://sunnah.com/developers"
+    },
+    {
+      "name": "Sanadset",
+      "type": "hadith_research_dataset",
+      "scope": "650k+ hadith-chain records from 926 historical Arabic hadith books",
+      "value": "Strong research resource for isnad/narrator modeling and hadith-structure analysis.",
+      "access": "open_research_dataset",
+      "redistribution": "verify original-source rights before incorporation into a production corpus",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9440281/"
+    },
+    {
+      "name": "LK-Hadith-Corpus",
+      "type": "bilingual_hadith_corpus",
+      "scope": "39,038 annotated hadiths from six canonical hadith books with Arabic-English alignment",
+      "value": "Useful benchmark and bilingual retrieval/translation resource.",
+      "access": "public GitHub",
+      "redistribution": "verify repository license and underlying text rights",
+      "source": "https://github.com/ShathaTm/LK-Hadith-Corpus"
+    },
+    {
+      "name": "NAH-Hadith-Corpus",
+      "type": "negative_hadith_research_corpus",
+      "scope": "452,624 words from lesser-known hadith books with isnad/matan/comment annotations",
+      "value": "Useful for negative-class and isnad/matan/comment boundary research; not a theological endorsement of included claims.",
+      "access": "public GitHub",
+      "redistribution": "verify dataset and source-book rights before production use",
+      "source": "https://github.com/TaghreedT/NAH-Corpus"
+    },
+    {
+      "name": "ArabicNLPWorld Canonical Islamic Corpus",
+      "type": "quran_hadith_benchmark_corpus",
+      "scope": "Quran verses plus curated hadith matns",
+      "value": "Useful contemporary benchmark/reference corpus for hallucination detection and canonical-text retrieval.",
+      "access": "Hugging Face public dataset",
+      "redistribution": "verify dataset card and upstream rights before redistribution",
+      "source": "https://huggingface.co/datasets/ArabicNLPWorld/canonical-islamic-corpus"
+    },
+    {
+      "name": "Fiqh Corpus (Arabic Digital Humanities)",
+      "type": "fiqh_research_corpus",
+      "scope": "Arabic jurisprudence texts ca. 800-1950 across legal-school subcorpora",
+      "value": "Large research corpus with approximately 49.3 million tokens; particularly important for comparative fiqh and Maghreb/Maliki research.",
+      "access": "public GitHub",
+      "redistribution": "verify underlying Shamela/source terms and each subcorpus before production ingestion",
+      "source": "https://github.com/arabic-digital-humanities/fiqh"
+    },
+    {
+      "name": "Tashkeela",
+      "type": "arabic_diacritization_corpus",
+      "scope": "75M+ fully vocalized words, mainly classical Arabic texts from Islamic books",
+      "value": "Important for Arabic diacritization, pronunciation, search normalization and TTS preparation.",
+      "access": "research corpus",
+      "redistribution": "verify current data license and source-book rights before bundling",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5310197/"
+    }
+  ],
+  "discoveryGaps": [
+    "Author-level authority files across Islamic disciplines",
+    "Edition-level bibliographic normalization and duplicate detection",
+    "Arabic manuscript provenance and chain-of-custody metadata",
+    "Maliki/Maghrebi manuscript sources and North-African printed editions",
+    "Hadith narrator authority graphs and rijal cross-references",
+    "Tafsir cross-edition alignment and verse-level citation graphs",
+    "Quran readings/Qiraat manuscript and text witnesses",
+    "Waqf/charitable publication editions with explicit redistribution grants",
+    "Publisher permissions and explicit open-license religious editions",
+    "Institutional digital Islamic collections exposed through IIIF",
+    "Arabic book OCR ground truth by script, century, region and print technology",
+    "Book-level rights registry separating public-domain work from copyrighted edition formatting"
+  ],
+  "ingestionPipeline": [
+    "discover_source",
+    "record_title_author_edition_metadata",
+    "identify_rightsholder",
+    "classify_rights_status",
+    "verify_redistribution_permission",
+    "verify_model_dataset_asset_terms_if_ai_is_involved",
+    "capture_source_url_and_access_date",
+    "download_only_when_permitted",
+    "multi_engine_ocr_when_needed",
+    "page_level_alignment_and_provenance",
+    "human_quality_review",
+    "publish_or_link_according_to_rights"
+  ]
+}

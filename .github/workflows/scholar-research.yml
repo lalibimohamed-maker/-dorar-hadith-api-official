@@ -39,9 +39,17 @@ jobs:
         with:
           node-version: 22
       - name: Build first scholar batch
-        run: node scripts/run-scholar-opinions-batch.js --offset=${{ inputs.offset || '0' }} --limit=${{ inputs.limit || '25' }} --query=${{ inputs.query || '' }} > scholar-opinion-batch.json
+        env:
+          OFFSET: ${{ inputs.offset || '0' }}
+          LIMIT: ${{ inputs.limit || '25' }}
+          QUERY: ${{ inputs.query || '' }}
+        run: node scripts/run-scholar-opinions-batch.js --offset="$OFFSET" --limit="$LIMIT" --query="$QUERY" > scholar-opinion-batch.json
       - name: Probe official web sources
-        run: node scripts/probe-official-scholar-sources.js --offset=${{ inputs.offset || '0' }} --limit=${{ inputs.limit || '25' }} --query=${{ inputs.query || '' }} > scholar-official-source-probe.json
+        env:
+          OFFSET: ${{ inputs.offset || '0' }}
+          LIMIT: ${{ inputs.limit || '25' }}
+          QUERY: ${{ inputs.query || '' }}
+        run: node scripts/probe-official-scholar-sources.js --offset="$OFFSET" --limit="$LIMIT" --query="$QUERY" > scholar-official-source-probe.json
       - name: Upload research artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
