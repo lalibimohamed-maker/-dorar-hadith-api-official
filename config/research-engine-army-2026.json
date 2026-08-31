@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Evidence-oriented multi-specialist research acquisition layer for Din Allah Encyclopedia.",
+  "policy": {
+    "freeFirst": true,
+    "openSourcePreferred": true,
+    "noPaidDependencyRequired": true,
+    "discoverOnlyUntilSourceIsVerified": true,
+    "noSingleEngineMayEstablishScholarlyTruth": true,
+    "noPopularityAsTruthProxy": true,
+    "preserveProvenance": true,
+    "contradictionDetection": true,
+    "falseCertaintyForbidden": true
+  },
+  "specialistGroups": {
+    "web_general_and_meta": [
+      {"id":"searxng","role":"metasearch_router","license":"AGPL-3.0"},
+      {"id":"common-crawl","role":"web-archive-discovery","license":"data-access-rules-apply"}
+    ],
+    "official_and_institutional": [
+      {"id":"library-of-congress","role":"books-newspapers-photos-audio-video-maps","access":"public-api"},
+      {"id":"official-domain-search","role":"targeted-primary-source-discovery"}
+    ],
+    "scholarly": [
+      {"id":"openalex","role":"scholarly-discovery-and-citation-graph"},
+      {"id":"crossref","role":"doi-and-bibliographic-metadata","access":"public-api"},
+      {"id":"semantic-scholar","role":"papers-citations-references","access":"public-api-with-rate-limits"},
+      {"id":"arxiv","role":"open-research-discovery"},
+      {"id":"europe-pmc","role":"life-sciences-and-medical-literature"},
+      {"id":"zenodo","role":"open-research-records"},
+      {"id":"unpaywall","role":"open-access-location-and-status"}
+    ],
+    "books_and_libraries": [
+      {"id":"open-library","role":"book-discovery-and-inside-search","policy":"human-facing-low-volume-and-cache"},
+      {"id":"internet-archive","role":"digitized-books-periodicals-audio-video-archive"},
+      {"id":"library-of-congress","role":"institutional-library-materials"}
+    ],
+    "images_and_visual_evidence": [
+      {"id":"openverse","role":"openly-licensed-images-and-audio"},
+      {"id":"wikimedia","role":"commons-images-and-media-metadata"},
+      {"id":"iiif","role":"image-manifest-and-region-access"},
+      {"id":"gdelt-vgkg","role":"near-term-news-image-discovery"}
+    ],
+    "audio_and_video": [
+      {"id":"library-of-congress-av","role":"institutional-audio-video"},
+      {"id":"internet-archive-av","role":"archival-audio-video"},
+      {"id":"openverse","role":"openly-licensed-audio"},
+      {"id":"youtube-data-api","role":"video-discovery-only","policy":"quota-and-terms-gated"}
+    ],
+    "documents_and_local_corpus": [
+      {"id":"apache-tika","role":"multi-format-text-and-metadata-extraction","license":"Apache-2.0"},
+      {"id":"local-corpus","role":"authoritative-internal-source-index"},
+      {"id":"book-processing-group","role":"scan-cleanup-ocr-and-derived-editions"}
+    ]
+  },
+  "evidenceModel": {
+    "dimensions": [
+      "source_authority",
+      "primary_source_directness",
+      "independence",
+      "recency",
+      "document_integrity",
+      "citation_support",
+      "cross_source_agreement",
+      "rights_and_access_status"
+    ],
+    "rules": {
+      "independent_sourcesPreferred": true,
+      "primarySourcePreferred": true,
+      "retractedOrCorrectedWorkMustBeFlagged": true,
+      "licenseDoesNotEqualTruth": true,
+      "multipleCopiesOfSameSourceDoNotCountAsIndependent": true,
+      "conflictMustRemainVisible": true
+    }
+  },
+  "synthesisController": {
+    "layers": [
+      "query_decomposer",
+      "specialist_dispatcher",
+      "result_normalizer",
+      "entity_and_document_deduplicator",
+      "provenance_tracker",
+      "source_quality_ranker",
+      "independence_clusterer",
+      "claim_evidence_linker",
+      "contradiction_detector",
+      "evidence_sufficiency_gate",
+      "citation_builder",
+      "answer_synthesizer",
+      "uncertainty_and_review_gate"
+    ],
+    "outputModes": [
+      "direct_answer_with_citations",
+      "evidence_table",
+      "source_comparison",
+      "conflicting_evidence_report",
+      "insufficient_evidence_report"
+    ],
+    "forbiddenOutputs": [
+      "unsupported_claim_presented_as_fact",
+      "synthetic_citation",
+      "invented_page_number",
+      "silent_resolution_of_primary_source_conflict",
+      "single_engine_certainty"
+    ]
+  },
+  "searchInterface": {
+    "oneUserQuery": true,
+    "fanOutToSpecialists": true,
+    "parallelCollection": true,
+    "progressiveDeepening": true,
+    "showSourceClasses": true,
+    "showEvidenceStrength": true,
+    "showConflicts": true,
+    "preserveClickableProvenance": true
+  },
+  "rights": {
+    "metadataDiscoveryAllowedSeparatelyFromContentRehosting": true,
+    "licensedOrPublicDomainContentMayBeStoredWhenPermitted": true,
+    "copyrightedContentDefaultsToMetadataAndOfficialLink": true,
+    "sourceTermsMustBeRecorded": true
+  }
+}

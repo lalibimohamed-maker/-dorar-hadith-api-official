@@ -1,12 +1,16 @@
 {
-  "version": "2026-08-27",
+  "version": "2026-08-30",
   "scope": "Islamic scholarly books and other materials admitted by the existing source, rights, provenance and verification gates.",
+  "processingGroup": "config/free-book-processing-group-2026.json",
   "pipeline": [
     "preserve-source-pages",
-    "preprocess-image",
+    "classify-input",
+    "preprocess-image-with-free-group",
     "multi-engine-ocr",
-    "layout-detection",
+    "layout-detection-and-reading-order-cross-check",
+    "ocr-consensus",
     "question-answer-segmentation",
+    "blank-marker-local-background-masking",
     "semantic-indexing",
     "derived-edition-rendering",
     "human-or-independent-verification",
@@ -14,7 +18,23 @@
   ],
   "ocrEngines": [
     {"project":"tesseract-ocr/tesseract","role":"baseline-ocr","licenseEvidence":"Apache-2.0"},
-    {"project":"PaddlePaddle/PaddleOCR","role":"layout-and-ocr-candidate","licenseEvidence":"Apache-2.0"}
+    {"project":"PaddlePaddle/PaddleOCR","role":"primary-document-ocr-and-layout","licenseEvidence":"Apache-2.0"},
+    {"project":"mittagessen/kraken","role":"historical-and-nonlatin-rtl-verifier","licenseEvidence":"Apache-2.0"}
+  ],
+  "processingUtilities": [
+    {"project":"4lex4/scantailor-advanced","role":"dewarp-deskew-binarization-original-background","licenseEvidence":"GPL-3.0"},
+    {"project":"unpaper/unpaper","role":"conservative-scan-cleaning","licenseEvidence":"GPL-2.0"},
+    {"project":"opencv/opencv","role":"custom-image-quality-gates","licenseEvidence":"Apache-2.0"},
+    {"project":"ocrmypdf/OCRmyPDF","role":"searchable-pdf-and-ocr-orchestration","licenseEvidence":"MPL-2.0"},
+    {"project":"qpdf/qpdf","role":"pdf-structure-integrity","licenseEvidence":"Apache-2.0"},
+    {"project":"freedesktop/poppler","role":"pdf-rendering-and-inspection","licenseEvidence":"GPL"},
+    {"project":"djvulibre/djvulibre","role":"djvu-interchange","licenseEvidence":"GPL-2.0"},
+    {"project":"ImageMagick/ImageMagick","role":"image-conversion-and-normalization","licenseEvidence":"ImageMagick-License"},
+    {"project":"myollie/img2pdf","role":"lossless-image-to-pdf-packaging","licenseEvidence":"LGPL-3.0-or-later"}
+  ],
+  "optionalEngines": [
+    {"project":"datalab-to/surya","role":"experimental-ocr-layout-verifier","status":"license-gated","reason":"Model weights have additional licensing restrictions; never treat as an unrestricted free core engine."},
+    {"project":"xinntao/Real-ESRGAN","role":"optional-image-restoration","status":"model-license-gated","reason":"Code license and model-weight terms must be checked separately before use."}
   ],
   "answerPolicy": {
     "extractedAnswerIsAuthoritative": false,
@@ -32,8 +52,10 @@
   "derivedEdition": {
     "canEnhanceScan": true,
     "canImproveContrast": true,
+    "canDewarpWhenQualityGatePasses": true,
     "canCreateSearchableTextLayer": true,
     "canCreateStructuredQuestionAnswerPanels": true,
+    "canMaskBlankMarkersUsingLocalBackground": true,
     "canColorQuranTextForTajweedOnlyWhenVerified": true,
     "canReplaceOriginalPage": false
   },
@@ -42,6 +64,8 @@
     "rightsCheckBeforeRedistribution": true,
     "provenanceRequired": true,
     "unknownOcrConflictFailsClosed": true,
-    "noSilentScholarlyClaims": true
+    "noSilentScholarlyClaims": true,
+    "pageVisualDiffRequired": true,
+    "originalHashMustRemainStable": true
   }
 }
