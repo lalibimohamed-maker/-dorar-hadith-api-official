@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "verifiedAt": "2026-08-31",
   "purpose": "Curated source catalog for evidence-driven Din Allah Encyclopedia video research.",
   "policy": "Sources discover and document knowledge; primary/authoritative evidence outranks secondary interpretation; media reuse requires asset-specific rights verification.",
@@ -31,6 +31,20 @@
     {"id":"al_furqan","name":"Al-Furqan Islamic Heritage Foundation","url":"https://al-furqan.com/","role":"islamic_manuscript_and_heritage_bibliography","tier":"specialized_institution"},
     {"id":"kairawan","name":"Kairawan Global Arabic & Islamic Manuscript Index","url":"https://kairawan.org/","role":"cross_collection_manuscript_discovery","tier":"manuscript_aggregator"},
     {"id":"dorar_sunnah","name":"Dorar Sunnah","url":"https://dorar.net/","role":"hadith_and_islamic_source_verification","tier":"islamic_reference"}
+  ],
+  "scientificEvidence": [
+    {"id":"ant-vibrational-signals-2021","name":"Ants modulate stridulatory signals depending on the behavioural context","url":"https://doi.org/10.1038/s41598-021-84925-z","role":"primary_open_access_study_for_ant_vibrational_signalling","license":"CC BY 4.0"},
+    {"id":"ant-chemical-communication-1978","name":"Ethological Aspects of Chemical Communication in Ants","url":"https://doi.org/10.1016/S0065-3454(08)60132-1","role":"review_on_chemical_and_mechanical_ant_communication"}
+  ],
+  "realMediaCandidates": [
+    {"id":"leafcutter-ants-gails","filename":"Leafcutter Ants video.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Leafcutter_Ants_video.webm","author":"gails_pictures","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"industrious-ants-gails","filename":"Industrious Ants video.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Industrious_Ants_video.webm","author":"gails_pictures","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"ants-larvae-osseous","filename":"Ants and their larvae.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Ants_and_their_larvae.webm","author":"osseous","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"busy-ants-jun-seita","filename":"Busy ants working together after rain.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Busy_ants_working_together_after_rain.webm","author":"Jun Seita","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"large-number-ants-dineen","filename":"Large number of ants.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Large_number_of_ants.webm","author":"Paul L Dineen","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"leafcutter-filogenn","filename":"Leafcutter ants video.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Leafcutter_ants_video.webm","author":"Filo gèn'","license":"CC BY-SA 4.0","mediaType":"video","status":"rights_review_required_before_use"},
+    {"id":"leafcutter-hanness-wilms","filename":"Ants gathering leaves.jpg","sourcePage":"https://commons.wikimedia.org/wiki/File:Ants_gathering_leaves.jpg","author":"Hannes wilms","license":"CC BY-SA 4.0","mediaType":"image","status":"rights_review_required_before_use"},
+    {"id":"colony-ragani-gairshail","filename":"Colony of Ants.jpg","sourcePage":"https://commons.wikimedia.org/wiki/File:Colony_of_Ants.jpg","author":"Rajani Gairshail","license":"CC0 1.0","mediaType":"image","status":"cc0_candidate_after_provenance_record"}
   ],
   "rightsRules": {
     "cc0": "record_asset_license_and_provenance_even when attribution is not legally required",
