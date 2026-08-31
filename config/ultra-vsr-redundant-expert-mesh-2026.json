@@ -1,0 +1,105 @@
+{
+  "schemaVersion":"1.0.0",
+  "name":"ULTRA-VSR Redundant Expert Mesh",
+  "purpose":"Use 2-3 independent expert families per specialization, plus a discovery reserve, instead of relying on a single engine. Routing is evidence-gated and preserves the immutable source.",
+  "policy":{
+    "freeFirst":true,
+    "selfHostedPreferred":true,
+    "noPaidCoreDependency":true,
+    "noAutomaticPromotion":true,
+    "preserveOriginalBitstream":true,
+    "noSilentHallucination":true,
+    "rightsPerEngineModelWeightDataset":true,
+    "twoOrThreeExpertsPerSpecialty":true,
+    "reserveDiscoveryPool":true,
+    "consensusBeforePromotion":true
+  },
+  "specialties":{
+    "diagnostics_motion_alignment":[
+      {"name":"RAFT-family optical flow","role":"primary_motion_estimation","status":"candidate","rights":"verify_per_release"},
+      {"name":"GMFlow","role":"global_local_motion_estimation","status":"candidate","rights":"verify_current_license"},
+      {"name":"FlowFormer","role":"high_accuracy_flow_comparator","status":"candidate","rights":"verify_current_license"}
+    ],
+    "conservative_video_restoration":[
+      {"name":"BasicVSR++","role":"bidirectional_propagation","status":"candidate","rights":"verify_current_release"},
+      {"name":"RealBasicVSR","role":"real_world_baseline","status":"candidate","rights":"verify_current_release"},
+      {"name":"RVRT","role":"recurrent_transformer_restoration","status":"candidate","rights":"license_gated_if_restricted"}
+    ],
+    "transformer_or_state_space_vsr":[
+      {"name":"VRT","role":"transformer_temporal_restoration","status":"license_gated","rights":"CC_BY_NC_in_current_release"},
+      {"name":"VSRM","role":"Mamba_long_sequence_vsr","status":"candidate","rights":"verify_current_license"},
+      {"name":"TS-Mamba","role":"trajectory_aware_online_vsr","status":"candidate","rights":"verify_current_license"}
+    ],
+    "diffusion_video_restoration":[
+      {"name":"SeedVR2","role":"arbitrary_resolution_diffusion_vsr","status":"candidate","rights":"verify_code_model_dataset_separately"},
+      {"name":"FlashVSR","role":"streaming_one_step_diffusion_vsr","status":"candidate","rights":"verify_code_model_dataset_separately"},
+      {"name":"AVSR-Diff","role":"scale_agnostic_diffusion_vsr","status":"candidate","rights":"verify_release_and_checkpoints"},
+      {"name":"STCDiT","role":"anchor_guided_spatiotemporal_diffusion","status":"candidate","rights":"verify_release_and_backbone"},
+      {"name":"DGAF-VSR","role":"dense_aligned_feature_guidance","status":"candidate","rights":"verify_release_and_checkpoints"},
+      {"name":"PS-SR","role":"speculative_diffusion_and_frequency_fusion","status":"candidate","rights":"verify_release_and_checkpoints"},
+      {"name":"UltraVSR","role":"one_step_diffusion_vsr","status":"candidate","rights":"Apache_2_0_code; verify_base_models_and_weights"},
+      {"name":"InstantViR","role":"distilled_video_inverse_solver","status":"candidate","rights":"verify_current_release"}
+    ],
+    "artifact_and_compression_robust_vsr":[
+      {"name":"TSAR","role":"artifact_guided_temporal_sampling","status":"candidate","rights":"verify_current_license"},
+      {"name":"RealBasicVSR","role":"real_world_degradation_baseline","status":"candidate","rights":"verify_current_release"},
+      {"name":"VSRELL","role":"low_light_brightness_consistency","status":"candidate","rights":"verify_current_license"}
+    ],
+    "text_and_glyph_video_sr":[
+      {"name":"TextOVSR","role":"text_guided_real_world_video_sr","status":"candidate","rights":"verify_current_release_and_data"},
+      {"name":"TAIR/TeReDiff","role":"text_aware_restoration","status":"candidate","rights":"Apache_2_0_code; verify_assets"},
+      {"name":"TiGeSR","role":"glyph_first_text_sr","status":"candidate","rights":"Apache_2_0_code; verify_third_party_models_data"},
+      {"name":"TADiSR","role":"text_aware_real_world_sr","status":"candidate","rights":"MIT_code; verify_base_model_and_adapters"},
+      {"name":"RGDiffSR","role":"recognition_guided_sr","status":"candidate","rights":"MIT_code; verify_checkpoints"}
+    ],
+    "training_free_refinement":[
+      {"name":"DTG-Restore","role":"training_free_diffusion_refinement","status":"candidate","rights":"verify_release"},
+      {"name":"CreativeVR","role":"structure_and_motion_refinement","status":"benchmark_reference","rights":"verify_release_and_backbones"}
+    ],
+    "temporal_quality_assessment":[
+      {"name":"TIG-SVQA","role":"temporal_inconsistency_quality_assessment","status":"benchmark_reference","rights":"verify_dataset_and_code"},
+      {"name":"VMAF","role":"general_video_quality_metric","status":"reference","rights":"verify_implementation_license"},
+      {"name":"ITU-T P.910 protocol","role":"subjective_video_quality_observer_protocol","status":"reference_standard","rights":"standard_terms_apply"}
+    ]
+  },
+  "routing":{
+    "mode":"mixture_of_experts_with_cross_engine_validation",
+    "steps":[
+      "diagnose_degradation_and_motion",
+      "select_2_to_3_experts_per_active_specialty",
+      "run_independent_predictions_on_identical_inputs",
+      "align_and_compare_outputs",
+      "compute_structural_temporal_text_and_detail_confidence",
+      "downweight_outliers",
+      "fuse_only_supported_information",
+      "route_low_confidence_regions_to_reserve_experts",
+      "send_archival_candidate_to_human_review"
+    ],
+    "fallback":"If all active experts disagree materially, preserve the source-derived conservative result and mark uncertain regions rather than hallucinating a consensus."
+  },
+  "mesh_edges":[
+    "motion_alignment -> conservative_restoration",
+    "motion_alignment -> diffusion_restoration",
+    "conservative_restoration -> diffusion_restoration",
+    "diffusion_restoration -> text_glyph_sr_when_text_detected",
+    "all_restoration_experts -> temporal_consensus",
+    "all_restoration_experts -> quality_assessment",
+    "quality_assessment -> router_feedback",
+    "rights_gate -> deployment_gate",
+    "provenance -> observer_package",
+    "low_confidence -> reserve_discovery_pool"
+  ],
+  "promotion_gate":{
+    "required":["no_corpus_mutation","no_original_overwrite","rights_pass","temporal_consistency_pass","text_fidelity_pass_when_applicable","hallucinated_detail_rate_within_threshold","reproducible_configuration","human_review_for_archival_master"],
+    "rule":"A single best-looking output cannot override disagreement from independent experts."
+  },
+  "new_research_findings":[
+    {"name":"DGAF-VSR","finding":"CVPR 2026 reports improvements in perceptual quality, fidelity and temporal consistency through aligned feature guidance and optical-guided warping.","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Xu_Rethinking_Diffusion_Model-Based_Video_Super-Resolution_Leveraging_Dense_Guidance_from_Aligned_CVPR_2026_paper.html"},
+    {"name":"STCDiT","finding":"CVPR 2026 uses motion-aware VAE segments and anchor-frame guidance to improve structural fidelity and temporal stability under complex camera motion.","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Chen_STCDiT_Spatio-Temporally_Consistent_Diffusion_Transformer_for_High-Quality_Video_Super-Resolution_CVPR_2026_paper.html"},
+    {"name":"PS-SR","finding":"CVPR 2026 introduces speculative diffusion with a frequency-domain update that limits refinement toward high-frequency detail.","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Wu_PS-SR_Pseudo-Single-Step_Video_Super-Resolution_via_Speculative_Diffusion_CVPR_2026_paper.html"},
+    {"name":"FlashVSR","finding":"CVPR 2026 reports one-step streaming VSR with locality-constrained sparse attention and high-resolution scalability; benchmark extreme-resolution separately.","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Zhuang_FlashVSR_Towards_Real-time_Diffusion-Based_Streaming_Video_Super_Resolution_CVPR_2026_paper.html"},
+    {"name":"VSRM","finding":"ICCV 2025 Mamba-based VSR targets long-range spatio-temporal features with linear-complexity state-space modeling.","source":"https://github.com/PhuTran1005/VSRM"},
+    {"name":"TS-Mamba","finding":"ICLR 2026 online VSR uses trajectory-aware shifted state-space modeling for temporal processing.","source":"https://github.com/QZ1-boy/TS-Mamba"},
+    {"name":"TIG-SVQA","finding":"AAAI 2026 quality assessment emphasizes temporal inconsistency as a key distortion of SR video and explicitly localizes inconsistent regions.","source":"https://ojs.aaai.org/index.php/AAAI/article/view/37599"}
+  ]
+}
