@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-08-31",
+  "name": "Global Geographic Scientific Discovery",
+  "scope": "candidate_benchmark_only",
+  "purpose": "Discover scientific facts and documentary evidence globally, including web pages, scientific papers, institutional archives, documentary channels, independent photographers, and social-video posts, then transform verified knowledge into original Din Allah Encyclopedia productions.",
+  "principles": {
+    "freeFirst": true,
+    "selfHostedPreferred": true,
+    "knowledgeIsSeparableFromMediaRights": true,
+    "thirdPartyVideoMayBeResearchInput": true,
+    "thirdPartyVideoIsNotAutomaticallyEmbeddable": true,
+    "licenseAndPermissionAreAssetSpecific": true,
+    "sourceProvenanceRequired": true,
+    "scientificClaimRequiresPrimaryOrAuthoritativeSupport": true,
+    "religiousClaimRequiresVerifiedIslamicSource": true,
+    "noAutomaticScientificMiracleConclusion": true,
+    "noCorpusMutation": true,
+    "noAutomaticRuntimePromotion": true
+  },
+  "discoverySources": [
+    "scientific_journals",
+    "universities_and_research_labs",
+    "government_science_agencies",
+    "museums_and_natural_history_archives",
+    "documentary_channels",
+    "independent_scientific_filmmakers",
+    "social_video_platforms",
+    "open_media_archives",
+    "public_domain_collections",
+    "creative_commons_collections"
+  ],
+  "mediaDisposition": [
+    {
+      "status": "public_domain_candidate",
+      "action": "eligible_for_rights_review_and_reuse"
+    },
+    {
+      "status": "open_license_candidate",
+      "action": "eligible_only_after_license_terms_and_attribution_are_recorded"
+    },
+    {
+      "status": "explicit_permission_candidate",
+      "action": "eligible_only_after_permission_evidence_is_recorded"
+    },
+    {
+      "status": "reference_only",
+      "action": "extract_claims_and_research_context_but_do_not_embed_or_redistribute_media"
+    },
+    {
+      "status": "original_recreation",
+      "action": "create_new_visual_scene from_verified_knowledge_when_source_media_is_not_cleared"
+    }
+  ],
+  "knowledgeExtraction": {
+    "inputTypes": [
+      "video",
+      "short_video",
+      "article",
+      "paper",
+      "dataset",
+      "institutional_report",
+      "interview",
+      "photograph",
+      "field_observation"
+    ],
+    "extract": [
+      "scientific_claims",
+      "observations",
+      "measurement_context",
+      "species_or_object_identity",
+      "location",
+      "date",
+      "researcher_or_creator",
+      "primary_source",
+      "visual_motifs",
+      "uncertainty_and_limitations"
+    ],
+    "rule": "A social post, short, or documentary clip is treated as a discovery lead until the underlying evidence is independently verified."
+  },
+  "evidenceFusion": {
+    "flow": "discovery -> source_resolution -> independent_verification -> claim_normalization -> quran_hadith_cross_reference -> evidence_graph -> storyboard -> original_or_rights_cleared_media -> final_render",
+    "claimClasses": [
+      "scientific_observation",
+      "scientific_consensus",
+      "scientific_hypothesis",
+      "historical_report",
+      "interpretive_link"
+    ],
+    "religiousLinkRule": "Only present a connection between a scientific finding and Quran or hadith at the strength supported by the Islamic and scientific sources; never upgrade an interpretive link into established scientific fact automatically."
+  },
+  "researchLeadPolicy": {
+    "examples": [
+      "YouTube Short",
+      "Instagram Reel",
+      "TikTok video",
+      "documentary segment",
+      "photographer field film"
+    ],
+    "allowedUse": "The content may reveal a discovery, terminology, researcher, location, experiment, or source that the engine then traces to authoritative evidence.",
+    "notAllowed": "The engine must not assume that public visibility grants copying or redistribution rights."
+  },
+  "technicalCandidates": {
+    "videoUnderstanding": [
+      {
+        "name": "Qwen3-VL",
+        "status": "candidate",
+        "capability": "long_video_understanding_and_fine_grained_video_grounding",
+        "source": "https://github.com/QwenLM/Qwen3-VL",
+        "rightsGate": "verify_current_model_and_weights_license"
+      },
+      {
+        "name": "InternVideo3",
+        "status": "candidate",
+        "capability": "multimodal_video_understanding_and_long_horizon_reasoning",
+        "source": "https://github.com/OpenGVLab/InternVideo",
+        "rightsGate": "verify_current_model_and_weights_license"
+      }
+    ],
+    "generation": [
+      {
+        "name": "Wan2.2",
+        "status": "candidate",
+        "capability": "text_to_video_and_related_generation_workflows",
+        "source": "https://github.com/Wan-Video/Wan2.2",
+        "softwareOrModelLicense": "Apache-2.0_repository_license; verify_weight_and_dataset_terms"
+      },
+      {
+        "name": "LTX-2.x",
+        "status": "license_gated",
+        "capability": "synchronized_audio_video_generation",
+        "source": "https://github.com/Lightricks/LTX-2",
+        "softwareOrModelLicense": "LTX-2.x Community License"
+      }
+    ],
+    "inferenceEfficiency": [
+      {
+        "name": "LightX2V",
+        "status": "candidate",
+        "capability": "video_generation_acceleration_quantization_offloading_frame_interpolation",
+        "source": "https://github.com/ModelTC/LightX2V",
+        "rightsGate": "verify_backend_model_and_weight_terms_individually"
+      }
+    ],
+    "restoration": [
+      {
+        "name": "BasicVSR++",
+        "status": "candidate",
+        "capability": "video_super_resolution_and_temporal_propagation",
+        "source": "https://github.com/ckkelvinchan/BasicVSR_PlusPlus"
+      },
+      {
+        "name": "RealBasicVSR",
+        "status": "candidate",
+        "capability": "real_world_video_restoration",
+        "source": "https://github.com/TencentARC/BasicSR"
+      }
+    ],
+    "speech": [
+      {
+        "name": "Piper",
+        "status": "candidate",
+        "capability": "local_multilingual_text_to_speech_including_ar_JO_voice_models",
+        "source": "https://github.com/rhasspy/piper",
+        "rightsGate": "review_each_voice_model_card_license"
+      }
+    ]
+  },
+  "qualityGates": [
+    "source_identity_verified",
+    "claim_supported_by_independent_evidence",
+    "scientific_uncertainty_recorded",
+    "quran_or_hadith_reference_verified_when_present",
+    "media_rights_verified_before_embedding",
+    "original_visual_used_when_rights_are_unclear",
+    "provenance_manifest_complete",
+    "human_review_before_production"
+  ],
+  "outputRule": "The discovery engine supplies evidence and candidate media to the documentary engine; it never directly publishes third-party media as a Din Allah Encyclopedia production."
+}
