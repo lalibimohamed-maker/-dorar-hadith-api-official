@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - 'config/scientific-religious-video-engine-2026.json'
+      - 'config/video-color-purity-perceptual-fidelity-2026.json'
       - 'docs/scientific-religious-video-engine-48k.md'
       - '.github/workflows/scientific-religious-video-engine.yml'
   push:
     branches: [main]
     paths:
       - 'config/scientific-religious-video-engine-2026.json'
+      - 'config/video-color-purity-perceptual-fidelity-2026.json'
       - 'docs/scientific-religious-video-engine-48k.md'
       - '.github/workflows/scientific-religious-video-engine.yml'
   workflow_dispatch:
@@ -67,6 +69,25 @@ jobs:
           }
           console.log('Scientific-religious video engine registry: PASS');
           console.log(`Pipeline stages: ${x.pipeline.length}; output ceiling: ${out.maxWidth}x${out.maxHeight}.`);
+          NODE
+
+      - name: Validate color purity and perceptual fidelity registry
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const x = JSON.parse(fs.readFileSync('config/video-color-purity-perceptual-fidelity-2026.json', 'utf8'));
+          const p = x.principles;
+          for (const key of ['sourceFaithful','noArtificialColorClaims','preserveScientificLabels','preserveQuranAndHadithText','noCorpusMutation','noAutomaticPromotion','displayAwareOutput','renderingResolutionIndependent']) {
+            if (p[key] !== true) throw new Error(`color policy invariant failed: ${key}`);
+          }
+          if (!Array.isArray(x.pipeline) || x.pipeline.length < 18) throw new Error('color-purity pipeline incomplete');
+          const required = ['input_color_metadata_detection','temporal_chroma_noise_reduction','shot_to_shot_color_matching','wide_gamut_working_space','gamut_mapping','hdr_tone_mapping','source_fidelity_check','vector_text_overlay_at_final_resolution','display_target_transform','final_quality_gate'];
+          for (const stage of required) if (!x.pipeline.includes(stage)) throw new Error(`missing color stage: ${stage}`);
+          if (x.outputPolicy.maximumLandscape !== '46080x25920') throw new Error('color output landscape ceiling drifted');
+          if (x.outputPolicy.maximumPortrait !== '25920x46080') throw new Error('color output portrait ceiling drifted');
+          if (!x.outputPolicy.qualityRequirement && !x.qualityRules) throw new Error('color quality rules missing');
+          console.log('Video color purity/perceptual fidelity registry: PASS');
           NODE
 
       - name: Enforce no runtime or Corpus mutation
