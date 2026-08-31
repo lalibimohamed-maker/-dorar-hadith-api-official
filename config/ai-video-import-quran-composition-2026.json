@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "studioId": "ai-video-import-quran-composition-2026",
   "status": "benchmark",
   "scope": "separate_video_studio_only",
@@ -48,9 +48,82 @@
     "provenance_complete",
     "final_output_ffprobe_verified"
   ],
-  "serviceNotes": {
-    "runway": "Current Runway help states users retain ownership and rights in content they upload and generate, including commercial use; provider attribution is not formally required.",
-    "luma": "Commercial use depends on the active subscription tier; Free/Lite generations are personal-use only, while qualifying paid plans grant commercial usage rights.",
-    "canva": "Canva states users own Output to the extent permitted by law, but Licensed Content and AI-generated audio are subject to specific terms; outputs may not be unique."
+  "providerRegistry": [
+    {
+      "provider": "Runway",
+      "rightsMode": "provider-current-policy",
+      "commercialUse": "allowed_on_generations_under_current_policy",
+      "attribution": "not_formally_required",
+      "status": "preferred_candidate",
+      "notes": "Current official help says users retain ownership and rights to uploads and generations and may use generations commercially. Third-party inputs remain the user's responsibility.",
+      "termsUrl": "https://help.runwayml.com/hc/en-us/articles/18927776141715-Usage-rights"
+    },
+    {
+      "provider": "Luma Dream Machine",
+      "rightsMode": "plan_dependent",
+      "commercialUse": "paid_qualifying_plans_only",
+      "attribution": "check_current_terms",
+      "status": "candidate_with_plan_gate",
+      "notes": "Official licensing page states Free/Lite generations are personal use and commercial use is available on qualifying paid plans. Rights acquired for specific paid generations are described as vested in those assets.",
+      "termsUrl": "https://lumalabs.ai/learning-hub/licensing"
+    },
+    {
+      "provider": "Pika",
+      "rightsMode": "service_and_agreement_dependent",
+      "commercialUse": "verify_active_product_or_api_terms",
+      "attribution": "verify_active_terms",
+      "status": "candidate_requires_terms_snapshot",
+      "notes": "Use only after recording the exact product/API terms that governed generation. Do not generalize from one Pika product to another.",
+      "termsUrl": "https://pika.art/terms-of-service"
+    },
+    {
+      "provider": "PixVerse",
+      "rightsMode": "product_and_terms_dependent",
+      "commercialUse": "verify_current_terms_and_authorization",
+      "attribution": "retain_required_source_or_generation_notices_when_applicable",
+      "status": "candidate_with_rights_gate",
+      "notes": "Current terms state users own outputs to the extent permitted by law, but commercial use can be restricted for some service contexts and platform materials. Record the exact service mode and terms.",
+      "termsUrl": "https://pixverse.ai/en/terms-of-service"
+    },
+    {
+      "provider": "Hailuo AI",
+      "rightsMode": "plan_dependent",
+      "commercialUse": "paid_downloaded_generations_supported_under_current_payment_terms",
+      "attribution": "preserve_any_platform_required_notices",
+      "status": "candidate_with_plan_gate",
+      "notes": "Current payment terms say paid subscribers retain IP rights in content generated and downloaded during paid subscription; free downloads carry a watermark. General terms also impose broad conditions and responsibilities.",
+      "termsUrl": "https://hailuoai.video/doc/payment-policy.html"
+    },
+    {
+      "provider": "Adobe Firefly",
+      "rightsMode": "product_and_model_dependent",
+      "commercialUse": "verify_current_Firefly_and_partner_model_terms",
+      "attribution": "record_content_credentials_when_present",
+      "status": "preferred_candidate_with_model_gate",
+      "notes": "Use only after identifying the exact Firefly model and applicable content terms. Partner models may have different rights rules from Adobe's own models.",
+      "termsUrl": "https://www.adobe.com/legal/terms.html"
+    },
+    {
+      "provider": "Google Veo / Flow",
+      "rightsMode": "Google_terms_and_product_dependent",
+      "commercialUse": "verify_active_product_terms",
+      "attribution": "preserve_provenance_metadata_when_present",
+      "status": "candidate_with_terms_snapshot",
+      "notes": "Do not assume a universal Google AI-output ownership rule across products; record the exact product and terms used at generation time.",
+      "termsUrl": "https://policies.google.com/terms"
+    },
+    {
+      "provider": "Kling AI",
+      "rightsMode": "terms_snapshot_required",
+      "commercialUse": "verify_current_plan_and_terms",
+      "attribution": "verify_current_terms",
+      "status": "candidate_requires_live_terms_review",
+      "notes": "Provider terms should be captured at generation time before the output is labeled clear for redistribution."
+    }
+  ],
+  "governance": {
+    "policyRefresh": "recheck_provider_terms_before_first_public_release_and_when_provider_plan_or_model_changes",
+    "legalStatus": "metadata_gate_not_legal_advice",
+    "noAssumptionRule": "creator-generated does not equal rights-free; the exact provider terms and all inputs must be evaluated"
   }
 }
