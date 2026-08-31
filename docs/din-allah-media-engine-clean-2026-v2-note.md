@@ -1,0 +1,1 @@
+This branch is intentionally based on current `main`. The production-facing clean engine work is kept in the dedicated clean build branch; no retired prototype renderer is reused.
