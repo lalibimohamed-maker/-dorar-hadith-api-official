@@ -75,7 +75,6 @@ jobs:
           mapfile -t recovery_paths < <(
             while IFS= read -r path; do
               status="$(jq -r --arg p "$path" '.[] | select(.filename == $p) | .status' <<<"$files_json")"
-              # Never auto-create a workflow that did not exist on trusted main.
               [ "$status" != 'added' ] || continue
               if gh api "/repos/${REPOSITORY}/contents/${path}?ref=main" >/dev/null 2>&1; then
                 printf '%s\n' "$path"
