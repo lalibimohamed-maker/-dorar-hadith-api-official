@@ -1,0 +1,27 @@
+name: Din Allah Media Engine — Clean Contract
+
+on:
+  pull_request:
+    paths:
+      - 'config/din-allah-media-engine-clean-2026.json'
+      - 'src/din-allah-media-engine-contract.js'
+      - 'test/din-allah-media-engine-clean.test.js'
+      - '.github/workflows/din-allah-media-engine-clean.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-clean-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate clean Media Engine
+        run: node --test test/din-allah-media-engine-clean.test.js
