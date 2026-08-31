@@ -1,0 +1,77 @@
+name: Scientific Religious Video Engine Advanced Registry
+
+on:
+  pull_request:
+    paths:
+      - 'config/scientific-religious-video-engine-advanced-2026.json'
+      - '.github/workflows/scientific-religious-video-engine-advanced.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/scientific-religious-video-engine-advanced-2026.json'
+      - '.github/workflows/scientific-religious-video-engine-advanced.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-advanced-video-engine-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout trusted repository content
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate advanced registry and 48K master policy
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const x = JSON.parse(fs.readFileSync('config/scientific-religious-video-engine-advanced-2026.json','utf8'));
+          const p = x.principles;
+          for (const k of [
+            'originalCreationPreferred','licensedMediaOnly','referenceOnlyMediaIsNotEmbeddable',
+            'scientificClaimsRequireSources','religiousClaimsRequireVerification','quranTextMustRemainVerbatim',
+            'translationIsDistinctFromArabicText','voiceRightsRequired','provenancePerAsset',
+            'noRuntimePromotion','noCorpusMutation','noSilentReplacement','noArtificialResolutionCeiling'
+          ]) if (p[k] !== true) throw new Error(`principle invariant failed: ${k}`);
+          if (!Array.isArray(x.creationArchitecture) || x.creationArchitecture.length < 20) throw new Error('creation architecture incomplete');
+          const required = [
+            'question_understanding','islamic_evidence_retrieval','scientific_evidence_retrieval','claim_verification',
+            'evidence_graph','source_and_rights_resolution','global_media_discovery','original_scene_generation',
+            'scientific_simulation_or_explanatory_graphics','semantic_scene_composition','quran_word_alignment',
+            'multilingual_meanings_translation','voice_and_audio_rights','timeline_composition','documentary_direction',
+            'provenance_manifest','multi_stage_render','mastering_and_delivery'
+          ];
+          for (const s of required) if (!x.creationArchitecture.includes(s)) throw new Error(`missing stage: ${s}`);
+          const out = x.mastering.resolutionPolicy;
+          if (out['48K'] !== '46080x25920') throw new Error('48K landscape profile drifted');
+          if (out['48KPortrait'] !== '25920x46080') throw new Error('48K portrait profile drifted');
+          if (x.mastering.qualityRules.nativeGenerationAt48KNotRequired !== true) throw new Error('native 48K constraint missing');
+          if (x.mastering.qualityRules.preferVectorTextOverUpscaledText !== true) throw new Error('text-safe mastering rule missing');
+          if (x.technicalCandidates.video_super_resolution.length < 4) throw new Error('video super-resolution candidate coverage incomplete');
+          for (const group of Object.values(x.technicalCandidates)) {
+            if (!Array.isArray(group)) throw new Error('technical candidate group must be an array');
+            for (const c of group) if (!c.name || !c.status) throw new Error('candidate record incomplete');
+          }
+          console.log('Advanced scientific-religious video registry: PASS');
+          console.log(`Stages: ${x.creationArchitecture.length}; 48K master: ${out['48K']}; future expansion: ${out.futureExpansion}`);
+          NODE
+
+      - name: Enforce registry-only scope
+        run: |
+          set -euo pipefail
+          BASE_SHA="${GITHUB_BASE_SHA:-}"
+          if [ -n "$BASE_SHA" ] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            changed="$(git diff --name-only "$BASE_SHA" "$GITHUB_SHA")"
+            forbidden='^(corpus/|config/corpus\.json|src/|app/|package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$'
+            if printf '%s\n' "$changed" | grep -E "$forbidden"; then
+              echo 'Forbidden runtime/Corpus mutation detected.'
+              exit 1
+            fi
+          fi
+          echo 'Registry-only scope gate: PASS'
