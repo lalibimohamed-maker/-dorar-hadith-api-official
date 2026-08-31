@@ -3,50 +3,26 @@
   "prototypeId": "ant-communication-27-18-2026",
   "status": "prototype_benchmark_only",
   "question": "ما حقيقة تواصل النمل، وما الصلة التي يمكن بحثها مع قوله تعالى في النمل؟",
+  "discoveryPolicy": "config/global-geographic-scientific-discovery-2026.json",
+  "discoveryMode": "knowledge_first",
+  "discoveryRule": "External videos, shorts, documentaries and social posts may be used as research leads to discover claims, primary sources, researchers, locations and visual evidence. Media itself enters the final film only after asset-specific rights verification.",
   "evidence": [
     {"id":"quran-27-18","type":"quran_text","reference":"Surah An-Naml 27:18","text":"حَتَّىٰٓ إِذَآ أَتَوْا۟ عَلَىٰ وَادِ ٱلنَّمْلِ قَالَتْ نَمْلَةٌۭ يَـٰٓأَيُّهَا ٱلنَّمْلُ ٱدْخُلُوا۟ مَسَـٰكِنَكُمْ لَا يَحْطِمَنَّكُمْ سُلَيْمَـٰنُ وَجُنُودُهُۥ وَهُمْ لَا يَشْعُرُونَ","source":"https://quran.com/27:18","textPolicy":"Preserve the verified Arabic source text verbatim; translation is a separate asset."},
     {"id":"ant-vibroacoustic-2021","type":"scientific_observation","claim":"Ant societies use multiple communication channels; vibroacoustic signalling can vary with behavioural context.","source":"https://www.nature.com/articles/s41598-021-84925-z","status":"source_verified"},
     {"id":"ant-communication-review-2017","type":"scientific_review","claim":"Acoustic signalling is one of several social communication mechanisms described in ants.","source":"https://www.sciencedirect.com/science/article/pii/S0003347216302822","status":"source_verified"}
   ],
-  "globalGeographicScientificDiscovery": {
-    "enabled": true,
-    "purpose": "Search worldwide scientific, documentary and social-media sources for useful factual observations, discovery documentation and visual references before composing an original encyclopedia film.",
-    "sourceClasses": [
-      "scientific_primary_literature",
-      "university_or_research_institute",
-      "government_or_public_agency",
-      "museum_or_natural_history_archive",
-      "professional_documentary_channel",
-      "independent_documentary_filmmaker",
-      "social_media_creator",
-      "open_media_library"
-    ],
-    "harvestModes": [
-      "evidence_only",
-      "reference_visual_only",
-      "rights_cleared_clip_candidate",
-      "explicit_permission_candidate",
-      "public_domain_candidate",
-      "open_license_candidate"
-    ],
-    "selectionRule": "Use the source to discover and verify facts; use a visual clip in the final film only after explicit rights evidence or a compatible public/open license is recorded.",
-    "fallbackRule": "When a high-value source is not reusable, preserve its citation and research value, then recreate the needed visual as an original scene instead of copying the protected footage.",
-    "qualityRule": "Prefer original photography, macro footage, field recordings, institutional documentation and primary scientific material over generic stock visuals when they materially improve factual fidelity.",
-    "rightsRecordRequired": ["sourceUrl","creator","licenseOrPermission","licenseEvidence","retrievedAt","usageScope","attribution"],
-    "discoveryExamples": [
-      {"source":"Pixabay","role":"free/open reusable ant footage discovery","example":"https://pixabay.com/videos/search/ants/","status":"candidate_source_requires_item_level_license_check"},
-      {"source":"Pexels","role":"free reusable ant footage discovery","example":"https://www.pexels.com/search/videos/ants/","status":"candidate_source_requires_item_level_license_check"},
-      {"source":"Wikimedia Commons","role":"openly licensed user-created wildlife documentation","example":"https://commons.wikimedia.org/wiki/File:Garbage_Can_Ants_2026-08-08_1.webm","status":"CC_BY_SA_4_0_candidate"},
-      {"source":"National Geographic","role":"high-value documentary/scientific reference discovery","example":"https://www.nationalgeographic.com/","status":"reference_only_unless_item_specific_permission_or_license_is_cleared"}
-    ]
+  "sourceTraceability": {
+    "externalDiscoveryCanInform": ["claim", "primary_source", "researcher", "location", "visual_concept", "scene_design"],
+    "externalMediaEmbedding": "blocked_until_rights_cleared",
+    "originalRecreationFallback": "enabled"
   },
   "scenes":[
-    {"id":"s1","durationSeconds":4,"purpose":"Question framing","visual":"Original generated/procedural ant-colony scene; source-independent."},
-    {"id":"s2","durationSeconds":4,"purpose":"Communication channels","visual":"Original explanatory visual; may be enriched by rights-cleared macro footage from global discovery."},
-    {"id":"s3","durationSeconds":4,"purpose":"Scientific finding","visual":"Original waveform/context visual plus optional rights-cleared scientific footage linked to the evidence record."},
+    {"id":"s1","durationSeconds":4,"purpose":"Question framing","visual":"Original vector animatic of an ant colony; no third-party footage."},
+    {"id":"s2","durationSeconds":4,"purpose":"Communication channels","visual":"Original diagram showing chemical, tactile and vibrational channels."},
+    {"id":"s3","durationSeconds":4,"purpose":"Scientific finding","visual":"Original waveform/context visual derived from the cited study."},
     {"id":"s4","durationSeconds":4,"purpose":"Quran witness","visual":"Original background with the verified Arabic verse layer."},
     {"id":"s5","durationSeconds":4,"purpose":"Epistemic boundary","visual":"Original evidence ladder distinguishing observation from interpretive link."}
   ],
-  "rights":{"thirdPartyMedia":"discovery_enabled_but_embedding_requires_item_level_clearance","recitation":"not_embedded_until_rights_cleared","generatedVisuals":"original_vector_or_generated_scenes"},
-  "output":{"prototypeResolution":"1280x720","masterTarget":"inherits 48K-class mastering pipeline later","audio":"local explanatory narration in prototype; Quranic recitation remains rights-gated"}
+  "rights":{"thirdPartyMedia":"research_leads_only_until_asset_clearance","recitation":"not_embedded_until_rights_cleared","generatedVisuals":"original_vector_animatic"},
+  "output":{"prototypeResolution":"1280x720","masterTarget":"inherits 48K-class mastering pipeline later","audio":"rights-cleared narration/recitation required for production master"}
 }
