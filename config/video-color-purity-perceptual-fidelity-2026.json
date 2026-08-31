@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Registry-only color-purity and perceptual-fidelity layer for scientific-religious video. Inspired by the functional goal of color filtering/purity systems such as NanoCell, but implemented as source-aware digital processing rather than a hardware display filter.",
+  "scope": "candidate_benchmark_only",
+  "importantDistinction": "NanoCell is display hardware technology using nanoparticles to filter impure portions of the RGB spectrum. This registry does not claim to reproduce that physical mechanism; it defines a software/video pipeline for cleaner, more consistent, source-faithful color.",
+  "principles": {
+    "sourceFaithful": true,
+    "noArtificialColorClaims": true,
+    "preserveScientificLabels": true,
+    "preserveQuranAndHadithText": true,
+    "noCorpusMutation": true,
+    "noAutomaticPromotion": true,
+    "displayAwareOutput": true,
+    "renderingResolutionIndependent": true
+  },
+  "pipeline": [
+    "input_color_metadata_detection",
+    "linearized_high_precision_working_space",
+    "temporal_chroma_noise_reduction",
+    "spatial_chroma_noise_reduction",
+    "debanding",
+    "white_balance_and_neutral_reference",
+    "shot_to_shot_color_matching",
+    "wide_gamut_working_space",
+    "gamut_mapping",
+    "skin_and_natural_subject_guardrails",
+    "saturation_guardrails",
+    "highlight_rolloff",
+    "shadow_detail_preservation",
+    "hdr_tone_mapping",
+    "perceptual_color_consistency_check",
+    "scene_cut_color_continuity_check",
+    "source_fidelity_check",
+    "vector_text_overlay_at_final_resolution",
+    "quran_hadith_scientific_label_integrity_check",
+    "display_target_transform",
+    "final_quality_gate"
+  ],
+  "colorManagementCandidates": {
+    "OpenColorIO": {
+      "status": "candidate",
+      "role": "Color-space management, transforms and display-aware pipeline control.",
+      "source": "https://opencolorio.org/",
+      "licenseGate": "verify exact integrated version/license before production use"
+    },
+    "ACES": {
+      "status": "candidate_standard",
+      "role": "Wide-gamut scene-referred color management and mastering/interchange strategy.",
+      "source": "https://www.acescentral.com/",
+      "licenseGate": "record exact implementation/configuration used"
+    }
+  },
+  "restorationCandidates": {
+    "BasicSR": {
+      "status": "candidate",
+      "role": "Image/video restoration toolbox for denoise, deblur and super-resolution.",
+      "source": "https://github.com/XPixelGroup/BasicSR"
+    },
+    "BasicVSR++": {
+      "status": "candidate",
+      "role": "Video restoration and video super-resolution with temporal propagation/alignment.",
+      "source": "https://github.com/1pikachu/BasicVSR"
+    },
+    "RealBasicVSR": {
+      "status": "candidate",
+      "role": "Real-world video super-resolution/restoration benchmark candidate.",
+      "source": "https://github.com/ckkelvinchan/RealBasicVSR"
+    },
+    "Real-ESRGAN": {
+      "status": "license_gated",
+      "role": "Image restoration/super-resolution candidate for selected frames and assets.",
+      "source": "https://github.com/xinntao/Real-ESRGAN",
+      "rightsGate": "verify current project and each weight license"
+    }
+  },
+  "qualityRules": {
+    "colorPurityMeans": [
+      "reduced unwanted chroma contamination",
+      "stable neutrals and whites",
+      "consistent color between shots",
+      "controlled saturation without clipping",
+      "preserved hue relationships",
+      "recovered detail without hallucinated scientific content"
+    ],
+    "textLayers": "Quran, hadith, citations and scientific labels are rendered from source data/vectors at the final output resolution and are never reconstructed by super-resolution.",
+    "enhancementBoundary": "Enhancement must not invent scientific observations, change source labels, alter Quranic Arabic, alter hadith wording, or create unsupported factual detail."
+  },
+  "outputPolicy": {
+    "profiles": ["720p","1080p","1440p","4K","8K","16K","32K","48K"],
+    "maximumLandscape": "46080x25920",
+    "maximumPortrait": "25920x46080",
+    "masteringStrategy": "generate_or_source -> restore -> color_manage -> compose -> validate -> upscale_as_needed -> text_vector_overlay -> display_transform -> final_master",
+    "48KMeaning": "48K is a supported master/render ceiling. The system must distinguish native detail from restored/upscaled detail and report the provenance of the enhancement path."
+  }
+}
