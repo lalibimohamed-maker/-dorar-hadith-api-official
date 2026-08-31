@@ -11,16 +11,23 @@ The official Wan2.2 project documents TI2V-5B as a text/image-to-video model sup
 ## Procedure
 
 1. Start a clean GPU notebook/runtime (Kaggle or Colab are acceptable for an experiment; availability and quotas vary).
-2. Clone the exact upstream Wan2.2 revision selected for the run.
-3. Install the upstream dependencies in the external runtime only.
-4. Obtain the exact checkpoint from its official distribution endpoint and record its revision/hash.
-5. Use **one prompt from `prompt-suite.json` at a time**. Do not add Quranic text or religious claims to the generation prompt.
-6. Generate a short 16:9 clip at the highest stable setting supported by the available GPU.
-7. Record: model, checkpoint, upstream revision, runtime, GPU type, VRAM, seed, sampler/settings, prompt ID, prompt SHA-256, generation timestamp, and the exact terms URL.
-8. Run `ffprobe` and retain the complete JSON metadata outside Git.
-9. Verify input/reference rights. Generated video remains **illustration**, not evidence.
-10. Run VBench-2.0 against the produced clip where the selected dimension supports custom-video evaluation.
-11. Copy only the compact scorecard/metadata into the repository or PR; do **not** commit large video files or model weights.
+2. Run `run-wan22-ti2v5b-kaggle.sh` from the repository root. The script clones the upstream repository, downloads the exact model repository outside Git, records the upstream/model revisions and hashes, generates one fixed prompt, runs `ffprobe`, and writes run metadata.
+3. Use **one prompt from `prompt-suite.json` at a time**. Do not add Quranic text or religious claims to the generation prompt.
+4. Generate a short 16:9 clip at the highest stable setting supported by the available GPU. For TI2V-5B the upstream documentation uses `1280*704` for 720P. Record the exact generation settings and seed.
+5. Record: model, checkpoint, upstream revision, runtime, GPU type, VRAM, seed, sampler/settings, prompt ID, prompt SHA-256, generation timestamp, and the exact terms URL.
+6. Run `ffprobe` and retain the complete JSON metadata outside Git. Keep model weights and the generated video outside the repository.
+7. Verify input/reference rights. Generated video remains **illustration**, not evidence.
+8. Run VBench-2.0 against the produced clip where the selected dimension supports custom-video evaluation.
+9. Copy only the compact scorecard/metadata into the repository or PR; do **not** commit large video files or model weights.
+
+### Example
+
+```bash
+PROMPT_ID=ant-macro-01 SEED=42 \\
+  bash tools/din-allah-media-engine/gpu-evaluation/run-wan22-ti2v5b-kaggle.sh
+```
+
+The script writes `din-allah-media-run/<prompt-id>/` with the generated clip, `ffprobe.json`, `video.sha256`, model file hashes, and `run-metadata.json`. Do not upload the clip itself to Git unless a separate storage policy explicitly allows it.
 
 ## VBench-2.0
 
