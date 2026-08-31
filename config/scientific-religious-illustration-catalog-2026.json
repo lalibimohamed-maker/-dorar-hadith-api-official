@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.0.1",
   "catalogId": "scientific-religious-illustration-catalog-2026",
   "status": "benchmark",
   "purpose": "Attach relevant, rights-aware scientific images to verified religious/scientific knowledge records in encyclopedia search results.",
@@ -7,6 +7,7 @@
     "enabled": true,
     "returnVideos": false,
     "returnScientificVideoDiscovery": false,
+    "returnAudio": false,
     "attachImagesToKnowledgeCards": true,
     "neverTreatImageAsScientificEvidence": true
   },
@@ -21,7 +22,8 @@
     "asset_specific_rights_recorded",
     "source_page_preserved",
     "provenance_complete",
-    "no_visual_claim_inflation"
+    "no_visual_claim_inflation",
+    "image_url_renderable_or_source_link_preserved"
   ],
   "records": [
     {
@@ -53,7 +55,7 @@
       "illustrations": [
         {
           "assetId": "ant-macro-adi-2018",
-          "assetUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ant%20Macro.jpg",
+          "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Ant_Macro.jpg",
           "sourcePage": "https://commons.wikimedia.org/wiki/File:Ant_Macro.jpg",
           "creator": "Adi 290117",
           "license": "CC BY-SA 4.0",
@@ -63,7 +65,7 @@
         },
         {
           "assetId": "ant-larvae-magomadov-2020",
-          "assetUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ants%20and%20their%20larvae.jpg",
+          "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Ants_and_their_larvae.jpg",
           "sourcePage": "https://commons.wikimedia.org/wiki/File:Ants_and_their_larvae.jpg",
           "creator": "Magomadov Magomed",
           "license": "CC0 1.0",
@@ -83,9 +85,9 @@
         },
         {
           "assetId": "ant-tree-macro-rh",
-          "assetUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ants_on_tree_macro.jpg",
+          "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Ants_on_tree_macro.jpg",
           "sourcePage": "https://commons.wikimedia.org/wiki/File:Ants_on_tree_macro.jpg",
-          "creator": "Rh animal photography",
+          "creator": "Roger Heslop",
           "license": "CC BY 4.0",
           "rightsStatus": "open_license_verified_on_source_page",
           "relevanceReason": "Environmental macro context for ants moving on vegetation; included as an illustrative, not evidentiary, visual.",
