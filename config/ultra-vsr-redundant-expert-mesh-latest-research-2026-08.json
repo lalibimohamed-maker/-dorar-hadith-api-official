@@ -1,0 +1,70 @@
+{
+  "schemaVersion":"1.0.0",
+  "purpose":"Register and interconnect the latest worldwide video super-resolution research so each specialty has multiple independent experts and a reserve pool.",
+  "policy":{
+    "freeFirst":true,
+    "selfHostedPreferred":true,
+    "noPaidCoreDependency":true,
+    "candidateOnlyUntilBenchmarked":true,
+    "noAutomaticPromotion":true,
+    "preserveOriginalBitstream":true,
+    "noSilentHallucination":true,
+    "rightsSeparateForSoftwareModelsWeightsDatasets":true,
+    "redundantExpertsPerSpecialty":true,
+    "minimumIndependentExperts":2,
+    "preferredIndependentExperts":3
+  },
+  "newOrRevalidatedCandidates":[
+    {"name":"SeedVR2","role":"arbitrary_resolution_video_restoration","status":"candidate","source":"https://github.com/IceClear/SeedVR2","evidence":"Official repository describes one-step diffusion-transformer video restoration capable of arbitrary output resolution."},
+    {"name":"FlashVSR","role":"streaming_high_resolution_vsr","status":"candidate","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Zhuang_FlashVSR_Towards_Real-time_Diffusion-Based_Streaming_Video_Super_Resolution_CVPR_2026_paper.html","evidence":"CVPR 2026: one-step streaming diffusion VSR, sparse attention, reported 17 FPS at 768x1408 on one A100 and claims scaling to ultra-high resolutions."},
+    {"name":"PS-SR","role":"speculative_diffusion_frequency_fusion","status":"candidate","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Wu_PS-SR_Pseudo-Single-Step_Video_Super-Resolution_via_Speculative_Diffusion_CVPR_2026_paper.html","evidence":"CVPR 2026: asymmetric speculative sampling plus frequency-domain update to preserve low-frequency structure while refining high-frequency detail."},
+    {"name":"DGAF-VSR","role":"aligned_feature_dense_guidance","status":"candidate","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Xu_Rethinking_Diffusion_Model-Based_Video_Super-Resolution_Leveraging_Dense_Guidance_from_Aligned_CVPR_2026_paper.html","evidence":"CVPR 2026: optical-guided warping and feature-wise temporal conditioning; reports improvements in perceptual quality, fidelity and temporal consistency."},
+    {"name":"STCDiT","role":"spatiotemporal_consistent_diffusion_vsr","status":"candidate","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Chen_STCDiT_Spatio-Temporally_Consistent_Diffusion_Transformer_for_High-Quality_Video_Super-Resolution_CVPR_2026_paper.html","evidence":"CVPR 2026: motion-aware VAE segmentation and anchor-frame guidance to improve structural fidelity and temporal stability."},
+    {"name":"TextOVSR","role":"text_guided_real_world_vsr","status":"candidate","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Chang_TextOVSR_Text-Guided_Real-World_Opera_Video_Super-Resolution_CVPR_2026_paper.html","evidence":"CVPR 2026: degradation-descriptive and content-descriptive text guidance for restoration of degraded performance video."},
+    {"name":"TIGER","role":"glyph_first_text_super_resolution","status":"candidate","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Luo_Restore_Text_First_Enhance_Image_Later_Two-Stage_Scene_Text_Image_CVPR_2026_paper.html","evidence":"CVPR 2026: two-stage text-first/image-later restoration using glyph structure guidance."},
+    {"name":"DTG-Restore","role":"training_free_diffusion_refinement","status":"candidate","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Yesiltepe_DTG-Restore_Training-Free_Diffusion_Refinement_for_Generative_Video_Super-Resolution_CVPR_2026_paper.html","evidence":"CVPR 2026: training-free decoupled time guidance for structure correction and detail refinement, plug-and-play with restoration modules."},
+    {"name":"CreativeVR","role":"structure_and_motion_refinement","status":"candidate","source":"https://openaccess.thecvf.com/content/CVPR2026W/J2A/html/Panambur_CreativeVR_Diffusion-Prior-Guided_Approach_for_Structure_and_Motion_Restoration_in_Generative_CVPRW_2026_paper.html","evidence":"CVPR 2026 workshop: diffusion-prior-guided structure and motion restoration for real and generative video."},
+    {"name":"Time Without Time","role":"space_time_super_resolution_pretraining","status":"benchmark_reference","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Choi_Time_Without_Time_Pseudo-Temporal_Representation_for_Space-Time_Super-Resolution_CVPR_2026_paper.html","evidence":"CVPR 2026: pseudo-temporal pretraining that improves space-time reconstruction and cross-frame aggregation."},
+    {"name":"VSRELL","role":"low_light_vsr_enhancement","status":"candidate","source":"https://openaccess.thecvf.com/content/CVPR2026/html/Hui_VSRELL_A_Simple_Baseline_for_Video_Super-Resolution_and_Enhancement_in_CVPR_2026_paper.html","evidence":"CVPR 2026: illumination-sensitive propagation to reduce flicker and error accumulation while preserving texture fidelity."},
+    {"name":"TS-Mamba","role":"state_space_online_vsr","status":"candidate","source":"https://github.com/QZ1-boy/TS-Mamba","evidence":"ICLR 2026 trajectory-aware shifted state space model for online VSR."},
+    {"name":"VSRM","role":"state_space_long_range_vsr","status":"candidate","source":"https://github.com/PhuTran1005/VSRM","evidence":"State-space video restoration research line; retain as non-authoritative candidate pending license and reproducibility audit."}
+  ],
+  "expertBundles":{
+    "motion_alignment":["RAFT-family","GMFlow","FlowFormer"],
+    "conservative_vsr":["BasicVSR++","RealBasicVSR","RVRT"],
+    "transformer_vsr":["VRT"],
+    "state_space_vsr":["TS-Mamba","VSRM"],
+    "diffusion_vsr":["SeedVR2","FlashVSR","PS-SR","DGAF-VSR","STCDiT","UltraVSR","AVSR-Diff"],
+    "text_glyph_vsr":["TIGER","TextOVSR","TAIR/TeReDiff","TiGeSR","TADiSR","RGDiffSR","TATT","RTSRN"],
+    "refinement":["DTG-Restore","CreativeVR"],
+    "space_time":["Time Without Time"],
+    "low_light":["VSRELL"],
+    "quality_assessment":["VMAF","TIG-SVQA","ITU-T P.910","ITU-R BT.500"]
+  },
+  "meshRules":{
+    "routing":"Select at least two independent experts for each eligible specialty and a third when confidence is low or methods disagree.",
+    "parallelMode":"Run experts independently on identical source windows before fusion.",
+    "fusionSignals":["structural_agreement","temporal_agreement","edge_agreement","ocr_agreement","glyph_agreement","frequency_agreement","confidence_maps"],
+    "fallback":"On material disagreement, prefer the most conservative evidence-preserving result and retain disagreement metadata.",
+    "reservePool":"Enable additional candidates when confidence falls below threshold, motion is complex, text is present, or artifacts are detected.",
+    "neverTreatSingleModelAsTruth":true
+  },
+  "extremeResolutionRules":{
+    "profiles":["8K","16K","24K","36K","48K"],
+    "method":"overlapping spatial-temporal tiles with multi-pass optional processing",
+    "requiredChecks":["tile_seams","temporal_flicker","motion_boundaries","text_integrity","false_detail_rate","hallucinated_detail_rate","source_information_consistency"],
+    "claimRule":"36K/48K is a delivery target only; no claim of recovered factual detail without evidence."
+  },
+  "internationalObservation":{
+    "frameworks":["ITU-T P.910 07/26","ITU-R BT.500-15","FIAF Digital Statement"],
+    "evidencePackage":["source_hash","codec_metadata","model_and_weights_hashes","datasets","configuration","hardware","metrics","blind_comparisons","failure_cases","human_review_log"],
+    "publishUncertainty":true
+  },
+  "researchNotes":[
+    "DGAF-VSR reports a 35.82% DISTS reduction, 0.20 dB PSNR gain and 30.37% tLPIPS reduction against cited baselines; these figures are benchmark-specific and not proof of 36K/48K fidelity.",
+    "STCDiT explicitly targets structural fidelity and temporal stability under complex camera motion.",
+    "PS-SR uses frequency-domain control to preserve low-frequency content while refining high-frequency details.",
+    "FlashVSR emphasizes scalability and speed, while its reported 17 FPS result is tied to a specific 768x1408/A100 setup.",
+    "ITU-T P.910 (07/26) was approved 2026-07-29 and is the current in-force prepublished revision for subjective multimedia video quality assessment."
+  ]
+}
