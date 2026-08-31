@@ -1,0 +1,52 @@
+name: Din Allah Media Engine Evaluation
+
+on:
+  pull_request:
+    paths:
+      - 'config/din-allah-media-engine-2026.json'
+      - 'docs/din-allah-media-engine-evaluation-2026.md'
+      - 'test/din-allah-media-engine-evaluation.test.js'
+      - '.github/workflows/din-allah-media-engine-evaluation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate evaluation manifest
+        run: node --test test/din-allah-media-engine-evaluation.test.js
+
+      - name: Emit candidate scorecard template
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const m = JSON.parse(fs.readFileSync('config/din-allah-media-engine-2026.json', 'utf8'));
+          const scores = m.candidateBackends.map(c => ({
+            id: c.id,
+            name: c.name,
+            status: 'not_generated_in_ci',
+            hardFail: false,
+            totalScore: null,
+            note: 'Real generation requires a model runner and suitable compute; this CI job validates the evaluation contract.'
+          }));
+          fs.mkdirSync('dist/media-evaluation', { recursive: true });
+          fs.writeFileSync('dist/media-evaluation/scorecard-template.json', JSON.stringify({ engineId: m.engineId, benchmark: m.evaluationSuite, candidates: scores }, null, 2));
+          NODE
+
+      - name: Upload evaluation contract
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: din-allah-media-engine-evaluation-contract
+          path: dist/media-evaluation/scorecard-template.json
+          if-no-files-found: error
+          retention-days: 30
