@@ -1,22 +1,22 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "verifiedAt": "2026-08-31",
   "name": "Global Geographic Scientific Discovery",
   "scope": "candidate_benchmark_only",
-  "purpose": "Discover scientific facts, documentary evidence, Islamic primary-source context and rights-cleared media globally, then transform independently verified knowledge into original Din Allah Encyclopedia productions.",
+  "purpose": "Discover scientific facts and source documents globally for encyclopedia research. Video production is a separate studio capability and is not a search result category.",
   "principles": {
     "freeFirst": true,
     "selfHostedPreferred": true,
     "knowledgeIsSeparableFromMediaRights": true,
-    "thirdPartyVideoMayBeResearchInput": true,
-    "thirdPartyVideoIsNotAutomaticallyEmbeddable": true,
-    "licenseAndPermissionAreAssetSpecific": true,
     "sourceProvenanceRequired": true,
     "scientificClaimRequiresPrimaryOrAuthoritativeSupport": true,
     "religiousClaimRequiresVerifiedIslamicSource": true,
     "noAutomaticScientificMiracleConclusion": true,
     "noCorpusMutation": true,
-    "noAutomaticRuntimePromotion": true
+    "noAutomaticRuntimePromotion": true,
+    "videoSearchInEncyclopediaSearch": false,
+    "scientificVideoDiscoveryInEncyclopediaSearch": false,
+    "videoStudioIsSeparate": true
   },
   "discoverySources": [
     "scientific_journals",
@@ -36,10 +36,6 @@
     "Biodiversity_Heritage_Library",
     "GBIF",
     "Encyclopedia_of_Life",
-    "documentary_channels",
-    "independent_scientific_filmmakers",
-    "social_video_platforms",
-    "open_media_archives",
     "public_domain_collections",
     "creative_commons_collections",
     "Wikimedia_Commons",
@@ -86,14 +82,6 @@
       "Biodiversity_Heritage_Library",
       "Encyclopedia_of_Life"
     ],
-    "open_media_and_rights_discovery": [
-      "Smithsonian_Open_Access",
-      "Wikimedia_Commons",
-      "Europeana",
-      "Internet_Archive",
-      "NASA_Image_and_Video_Library",
-      "NOAA_Ocean_Exploration"
-    ],
     "quran_and_islamic_text_verification": [
       "King_Fahd_Quran_Complex",
       "Tanzil",
@@ -104,21 +92,18 @@
       "Kairawan_Arabic_Islamic_Manuscript_Index"
     ]
   },
-  "mediaDisposition": [
-    {"status":"public_domain_candidate","action":"eligible_for_asset_specific_rights_review_and_reuse"},
-    {"status":"cc0_candidate","action":"eligible_after_recording_asset_license_and_provenance"},
-    {"status":"open_license_candidate","action":"eligible_only_after_license_terms_and_attribution_are_recorded"},
-    {"status":"explicit_permission_candidate","action":"eligible_only_after_permission_evidence_is_recorded"},
-    {"status":"reference_only","action":"extract_claims_and_research_context_but_do_not_embed_or_redistribute_media"},
-    {"status":"original_recreation","action":"create_new_visual_scene_from_verified_knowledge_when_source_media_is_not_cleared"}
-  ],
+  "mediaPolicy": {
+    "search": "do_not_return_scientific_video_or_media_results_from_the_encyclopedia_search_box",
+    "studio": "media_sources_remain_available_to_the_separate_video_studio_after_explicit_studio_invocation",
+    "rights": "asset_specific_license_and_provenance_required_for_studio_reuse"
+  },
   "knowledgeExtraction": {
-    "inputTypes":["video","short_video","article","paper","dataset","institutional_report","interview","photograph","field_observation","manuscript"],
-    "extract":["scientific_claims","observations","measurement_context","species_or_object_identity","location","date","researcher_or_creator","primary_source","visual_motifs","uncertainty_and_limitations","citation_identifier","license_evidence"],
-    "rule":"A social post, short, documentary clip, or interpretive article is a discovery lead until the underlying evidence is independently verified."
+    "inputTypes":["article","paper","dataset","institutional_report","interview","field_observation","manuscript","photograph_metadata"],
+    "extract":["scientific_claims","observations","measurement_context","species_or_object_identity","location","date","researcher_or_creator","primary_source","uncertainty_and_limitations","citation_identifier","license_evidence"],
+    "rule":"Search results are for knowledge research. Scientific video discovery is not a category of the encyclopedia search experience."
   },
   "evidenceFusion": {
-    "flow":"discovery -> source_resolution -> independent_verification -> claim_normalization -> quran_hadith_cross_reference -> evidence_graph -> storyboard -> original_or_rights_cleared_media -> final_render",
+    "flow":"discovery -> source_resolution -> independent_verification -> claim_normalization -> quran_hadith_cross_reference -> evidence_graph",
     "claimClasses":["scientific_observation","scientific_consensus","scientific_hypothesis","historical_report","interpretive_link"],
     "religiousLinkRule":"Only present a connection between a scientific finding and Quran or hadith at the strength supported by the Islamic and scientific sources; never upgrade an interpretive link into established scientific fact automatically."
   },
@@ -129,10 +114,8 @@
     "scientific_uncertainty_recorded",
     "quran_or_hadith_reference_verified_when_present",
     "manuscript_or_textual_variant_recorded_when_relevant",
-    "media_rights_verified_before_embedding",
-    "original_visual_used_when_rights_are_unclear",
     "provenance_manifest_complete",
     "human_review_before_production"
   ],
-  "outputRule":"The discovery engine supplies evidence and candidate media to the documentary engine; it never directly publishes third-party media as a Din Allah Encyclopedia production."
+  "outputRule":"The encyclopedia search returns knowledge sources, not a scientific-video discovery feed. Video production remains an explicitly invoked separate studio workflow."
 }
