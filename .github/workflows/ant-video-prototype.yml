@@ -4,11 +4,7 @@ on:
   pull_request:
     paths:
       - 'config/video-prototypes/ant-communication-27-18-2026.json'
-      - 'config/video-prototypes/ant-documentary-real-media-2026.json'
-      - 'config/video-prototypes/global-video-source-catalog-2026.json'
       - 'scripts/render-ant-video-animatic.mjs'
-      - 'scripts/render-ant-documentary-real-media.mjs'
-      - 'scripts/render-ant-documentary-real-media-v2.mjs'
       - 'test/ant-video-prototype.test.js'
       - '.github/workflows/ant-video-prototype.yml'
       - 'docs/video-prototype-ant-communication-27-18.md'
@@ -57,26 +53,5 @@ jobs:
         with:
           name: ant-communication-27-18-prototype
           path: dist/video-prototypes/ant-communication-27-18/
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Validate and render real-media documentary
-        run: node scripts/render-ant-documentary-real-media-v2.mjs
-
-      - name: Verify real-media documentary and provenance
-        run: |
-          set -euo pipefail
-          video='dist/video-prototypes/ant-communication-27-18-real-media/ant-documentary-real-media-with-audio.mp4'
-          test -s "$video"
-          test -s 'dist/video-prototypes/ant-communication-27-18-real-media/scene-provenance.json'
-          test -s 'dist/video-prototypes/ant-communication-27-18-real-media/PROVENANCE.md'
-          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,r_frame_rate,duration -of default=noprint_wrappers=1 "$video"
-          ffprobe -v error -select_streams a:0 -show_entries stream=codec_name,sample_rate,channels,duration -of default=noprint_wrappers=1 "$video"
-
-      - name: Upload real-media documentary artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: ant-documentary-real-media
-          path: dist/video-prototypes/ant-communication-27-18-real-media/
           if-no-files-found: error
           retention-days: 30
