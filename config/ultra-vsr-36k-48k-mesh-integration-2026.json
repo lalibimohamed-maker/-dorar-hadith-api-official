@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "1.0.0",
+  "name": "ULTRA-VSR / 36K-48K Interconnected Research Mesh",
+  "purpose": "Register the current video-restoration research candidates as cooperating specialists in an evidence-gated mesh rather than a flat sequence or a single authoritative model.",
+  "policy": {
+    "freeFirst": true,
+    "selfHostedPreferred": true,
+    "noPaidCoreDependency": true,
+    "preserveOriginalBitstream": true,
+    "noAutomaticPromotion": true,
+    "noSilentHallucination": true,
+    "modelCheckpointDatasetRightsSeparate": true,
+    "observedInferredGeneratedDetailSeparated": true,
+    "36K_48K_is_delivery_target_not_truth_claim": true,
+    "humanReviewRequiredForArchivalMaster": true
+  },
+  "meshNodes": [
+    {
+      "name": "SeedVR2",
+      "role": ["generic_video_restoration", "high_resolution_restoration", "adaptive_window_inference"],
+      "status": "candidate",
+      "coordination": ["AVSR-Diff", "FlashVSR", "UltraVSR", "PS-SR", "text-aware specialists", "quality gates"],
+      "evidence": "Official project describes one-step video restoration at any resolution and adaptive window attention for high-resolution VR.",
+      "source": "https://github.com/IceClear/SeedVR2"
+    },
+    {
+      "name": "AVSR-Diff",
+      "role": ["arbitrary_scale_vsr", "temporal_consistency", "scale_aware_fourier_refinement"],
+      "status": "candidate_research",
+      "coordination": ["SeedVR2", "PS-SR", "FlashVSR", "temporal_consensus"],
+      "evidence": "ECCV 2026 method separates scale-agnostic latent denoising from continuous rendering and uses temporally-gated feature recurrence and scale-aware Fourier refinement; full code/models pending release in the official repository.",
+      "source": "https://github.com/KAIST-VICLab/AVSR-Diff"
+    },
+    {
+      "name": "FlashVSR",
+      "role": ["streaming_vsr", "sparse_attention", "high_resolution_scaling", "efficiency"],
+      "status": "candidate",
+      "coordination": ["SeedVR2", "UltraVSR", "distributed_inference", "throughput_monitor"],
+      "evidence": "CVPR 2026 project reports one-step streaming VSR and an ultra-high-resolution generalization path; official page reports about 17 FPS at 768x1408 on one A100.",
+      "source": "https://zhuang2002.github.io/FlashVSR/"
+    },
+    {
+      "name": "PS-SR",
+      "role": ["speculative_diffusion", "frequency_domain_fusion", "base_draft_refinement"],
+      "status": "candidate",
+      "coordination": ["SeedVR2", "AVSR-Diff", "frequency_quality_gate"],
+      "evidence": "CVPR 2026 method uses speculative diffusion and a frequency-domain update that keeps low-frequency consistency while injecting high-frequency details.",
+      "softwareLicense": "Apache-2.0",
+      "source": "https://github.com/HiDream-ai/PS-SR"
+    },
+    {
+      "name": "UltraVSR",
+      "role": ["one_step_vsr", "temporal_shift", "memory_aware_inference"],
+      "status": "candidate",
+      "coordination": ["FlashVSR", "SeedVR2", "temporal_consensus"],
+      "source": "https://arxiv.org/abs/2505.19958"
+    },
+    {
+      "name": "RealBasicVSR",
+      "role": ["real_world_vsr_baseline", "degradation_robustness"],
+      "status": "benchmark_baseline",
+      "coordination": ["BasicVSR++", "RVRT", "VRT", "diffusion_experts"],
+      "source": "https://github.com/ckkelvinchan/RealBasicVSR"
+    },
+    {
+      "name": "BasicVSR++",
+      "role": ["propagation_based_vsr", "temporal_alignment_baseline"],
+      "status": "benchmark_baseline",
+      "coordination": ["RealBasicVSR", "RVRT", "SeedVR2"],
+      "source": "https://github.com/ckkelvinchan/BasicVSR_PlusPlus"
+    },
+    {
+      "name": "RVRT",
+      "role": ["recurrent_video_restoration", "long_context_baseline"],
+      "status": "license_gated_benchmark",
+      "coordination": ["BasicVSR++", "VRT", "temporal_consensus"],
+      "source": "https://github.com/JingyunLiang/RVRT"
+    },
+    {
+      "name": "VRT",
+      "role": ["transformer_vsr", "temporal_attention_baseline"],
+      "status": "license_gated_benchmark",
+      "coordination": ["RVRT", "BasicVSR++", "quality_gate"],
+      "source": "https://github.com/JingyunLiang/VRT"
+    },
+    {
+      "name": "VEnhancer",
+      "role": ["space_time_enhancement", "spatial_sr", "temporal_sr", "refinement"],
+      "status": "candidate_but_scope_limited",
+      "coordination": ["video_quality_path", "frame_rate_path"],
+      "evidence": "Official implementation supports 1x-8x spatial/temporal enhancement but currently adjusts target resolution to no higher than 2K, so it is not an extreme-resolution engine for 36K/48K by itself.",
+      "source": "https://github.com/Vchitect/VEnhancer"
+    },
+    {
+      "name": "VQD-SR",
+      "role": ["degradation_modeling", "animation_vsr_reference"],
+      "status": "benchmark_reference",
+      "coordination": ["degradation_estimator", "baseline_suite"],
+      "evidence": "ICCV 2023 method models real-world degradation with vector-quantized priors and supports arbitrary outscale at inference.",
+      "source": "https://github.com/researchmm/VQD-SR"
+    },
+    {
+      "name": "DynaVSR",
+      "role": ["dynamic_adaptive_blind_vsr", "degradation_estimation"],
+      "status": "legacy_benchmark_reference",
+      "coordination": ["diagnostics", "degradation_estimation"],
+      "evidence": "WACV 2021 adaptive blind VSR; useful as a degradation-aware baseline, not a state-of-the-art extreme-resolution engine.",
+      "source": "https://github.com/esw0116/DynaVSR"
+    },
+    {
+      "name": "DVSR",
+      "role": ["depth_super_resolution", "multi_view_guidance"],
+      "status": "domain_specific_reference",
+      "coordination": ["3d_guidance_when_available"],
+      "evidence": "CVPR 2023 direct time-of-flight depth SR using high-resolution RGB guidance; not a general RGB archival VSR engine.",
+      "source": "https://github.com/facebookresearch/DVSR"
+    }
+  ],
+  "meshConnections": [
+    {"from":"diagnostics","to":"routing","signal":["motion","blur","noise","compression","text","interlace","information_resolution"]},
+    {"from":"routing","to":"SeedVR2","when":"generic_high_resolution_restoration"},
+    {"from":"routing","to":"AVSR-Diff","when":"arbitrary_scale_and_temporal_stability_research"},
+    {"from":"routing","to":"FlashVSR","when":"streaming_or_high_throughput_path"},
+    {"from":"routing","to":"PS-SR","when":"frequency_consistency_and_speculative_refinement"},
+    {"from":"routing","to":"conservative_baselines","when":"low_hallucination_priority"},
+    {"from":"all_experts","to":"temporal_consensus","signal":["warping_error","flicker","motion_boundaries","occlusion_consistency"]},
+    {"from":"all_experts","to":"cross_engine_consensus","signal":["edge_agreement","structural_agreement","temporal_agreement","detail_confidence"]},
+    {"from":"text_regions","to":"text_aware_experts","signal":["OCR_confidence","glyph_map","subtitle_regions"]},
+    {"from":"quality_assessment","to":"router_feedback","signal":["CER","WER","VMAF_if_appropriate","LPIPS","DISTS","false_detail","hallucination"]},
+    {"from":"rights_gate","to":"deployment_gate","rule":"uncertain_rights => no production adoption"},
+    {"from":"provenance","to":"observer_package","signal":["source_hash","model_hash","weights_hash","dataset_version","config","hardware"]}
+  ],
+  "extremeResolutionStrategy": {
+    "profiles": ["8K","16K","24K","36K","48K"],
+    "method": ["overlapping_tiles","multi_pass_optional","adaptive_windowing","cross_tile_alignment","multi_gpu_context_parallelism_when_supported"],
+    "hard_rule": "Do not infer historical detail solely from output dimensions.",
+    "48K_claim_requires": ["exact_output_dimensions","frame_integrity_check","temporal_integrity_check","text_fidelity_check","reproducibility","failure_cases","independent_observer_review"]
+  },
+  "consensusModel": {
+    "evidenceWeighting": {
+      "independent_multi_engine_agreement": "high",
+      "cross_frame_agreement": "high",
+      "ocr_agreement": "high_for_text_regions",
+      "single_generative_model_only": "low",
+      "visual_preference_only": "insufficient"
+    },
+    "labels": ["observed_detail","inferred_detail","generated_detail","uncertain_detail"],
+    "promotion": "Only details and restoration paths meeting calibrated fidelity thresholds may be presented as faithful restoration."
+  },
+  "internationalObserverLayer": {
+    "references": ["ITU-T P.910","ITU-R BT.500","FIAF Digital Statement"],
+    "requirements": ["controlled subjective tests","expert archival review","documented sampling","blind comparisons","publish failures_and_uncertainty"],
+    "evidencePackage": ["immutable_source_hash","full_pipeline_manifest","metrics","visual_pairs","temporal_examples","known_failures","human_review_log"]
+  },
+  "licensingRule": {
+    "engine": "separate_review",
+    "checkpoint": "separate_review",
+    "base_model": "separate_review",
+    "dataset": "separate_review",
+    "third_party_components": "separate_review",
+    "restricted_candidate": "license_gated",
+    "funding": "cannot_override_license_or_project_independence"
+  }
+}
