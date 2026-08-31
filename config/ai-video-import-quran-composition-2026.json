@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "studioId": "ai-video-import-quran-composition-2026",
+  "status": "benchmark",
+  "scope": "separate_video_studio_only",
+  "purpose": "Import a user-supplied AI-generated video and compose verified Quranic text and rights-cleared recitation without treating the imported video as a search result.",
+  "searchPolicy": {
+    "visibleInEncyclopediaSearch": false,
+    "videoSearchCategory": false
+  },
+  "inputContract": {
+    "required": ["videoFile"],
+    "provenance": [
+      "generatorProvider",
+      "generatorModel",
+      "subscriptionPlanAtGeneration",
+      "generationDate",
+      "termsUrl",
+      "commercialUseStatus",
+      "watermarkStatus"
+    ],
+    "userInputRights": "The user must have the necessary rights to every uploaded input and reference asset."
+  },
+  "composition": {
+    "quranText": "verified_quran_source_required",
+    "quranRecitation": "separate_rights_cleared_recording_required",
+    "synthetic_quran_recitation": false,
+    "narration": "explanatory_voice_only",
+    "captions": "word_or_phrase_sync_when_available",
+    "audioMix": "narration_recitation_and_original_audio_must_be_explicitly_mixed",
+    "visualEdits": ["crop", "scale", "subtitles", "cards", "transitions"]
+  },
+  "rightsRules": {
+    "generatedVideoIsAutomaticallyRightsFree": false,
+    "providerTermsMustBeRecorded": true,
+    "thirdPartyInputMustBeCleared": true,
+    "outputRightsMayContainThirdPartyRights": true,
+    "commercialUseMustMatchProviderTerms": true
+  },
+  "qualityGates": [
+    "video_file_decodable",
+    "video_stream_present",
+    "audio_stream_present_when_audio_required",
+    "quran_text_verified",
+    "recitation_rights_verified_before_embedding",
+    "generator_terms_recorded",
+    "uploaded_inputs_rights_attested",
+    "provenance_complete",
+    "final_output_ffprobe_verified"
+  ],
+  "serviceNotes": {
+    "runway": "Current Runway help states users retain ownership and rights in content they upload and generate, including commercial use; provider attribution is not formally required.",
+    "luma": "Commercial use depends on the active subscription tier; Free/Lite generations are personal-use only, while qualifying paid plans grant commercial usage rights.",
+    "canva": "Canva states users own Output to the extent permitted by law, but Licensed Content and AI-generated audio are subject to specific terms; outputs may not be unique."
+  }
+}
