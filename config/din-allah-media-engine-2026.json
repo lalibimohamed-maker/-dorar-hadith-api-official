@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "1.0.0",
+  "engineId": "din-allah-media-engine-2026",
+  "status": "evaluation_benchmark",
+  "scope": "separate_media_studio",
+  "purpose": "Evaluate self-hosted video-generation foundations and a provenance-first composition pipeline for Din Allah Encyclopedia without coupling generation to encyclopedia search.",
+  "principles": {
+    "selfHostedFirst": true,
+    "freeFirst": true,
+    "noVideoSearchIntegration": true,
+    "quranTextIsImmutable": true,
+    "quranRecitationIsSeparateAsset": true,
+    "rightsAreAssetSpecific": true,
+    "scientificVisualIsNotScientificEvidence": true,
+    "provenanceRequired": true,
+    "humanReviewBeforePublication": true
+  },
+  "candidateBackends": [
+    {
+      "id": "wan-2-2",
+      "name": "Wan 2.2",
+      "role": ["t2v", "i2v"],
+      "licenseReview": "required_per_checkpoint_and_release"
+    },
+    {
+      "id": "cogvideox-2b",
+      "name": "CogVideoX 2B",
+      "role": ["t2v", "i2v"],
+      "licenseReview": "apache_2_0_for_repo_and_2b_model_claimed_by_official_repo"
+    },
+    {
+      "id": "cogvideox-5b",
+      "name": "CogVideoX 5B",
+      "role": ["t2v", "i2v"],
+      "licenseReview": "separate_cogvideox_license"
+    },
+    {
+      "id": "hunyuanvideo-1-5",
+      "name": "HunyuanVideo 1.5",
+      "role": ["t2v", "i2v"],
+      "licenseReview": "tencent_hunyuan_community_license"
+    },
+    {
+      "id": "ltx-2-x",
+      "name": "LTX-2.x",
+      "role": ["audio_video_generation"],
+      "licenseReview": "ltx_community_license_revenue_gate_and_data_separation"
+    }
+  ],
+  "evaluationSuite": {
+    "benchmark": "VBench",
+    "dimensions": [
+      "subject_consistency",
+      "background_consistency",
+      "motion_smoothness",
+      "dynamic_degree",
+      "aesthetic_quality",
+      "imaging_quality",
+      "object_class",
+      "temporal_flickering",
+      "spatial_relationship",
+      "human_action"
+    ],
+    "additionalDinAllahChecks": [
+      "prompt_fidelity_arabic_scientific_terms",
+      "no_unintended_text_in_generated_scene",
+      "religious_text_not_generated_by_video_model",
+      "source_provenance_complete",
+      "rights_status_complete",
+      "quran_layer_immutability",
+      "audio_stream_integrity",
+      "caption_timing_integrity"
+    ],
+    "humanReview": {
+      "required": true,
+      "axes": [
+        "scientific_plausibility_of_visuals",
+        "artifact_severity",
+        "cultural_sensitivity",
+        "religious_text_handling",
+        "overall_editorial_quality"
+      ]
+    }
+  },
+  "promptSuite": [
+    {
+      "id": "ant-natural-history-01",
+      "prompt": "A realistic macro documentary shot of worker ants moving naturally across leaf litter, stable anatomy, coherent legs and antennae, natural daylight, documentary cinematography, no text, no logos.",
+      "purpose": "baseline biological realism"
+    },
+    {
+      "id": "ant-colony-02",
+      "prompt": "A realistic close documentary view of ants moving around a nest entrance and interacting with larvae, biologically plausible motion, natural soil texture, no text, no logos.",
+      "purpose": "social behavior and environment"
+    },
+    {
+      "id": "ant-navigation-03",
+      "prompt": "A realistic scientific visualization of ants following a trail between food and nest, controlled camera, clear spatial continuity, no invented labels, no text, no logos.",
+      "purpose": "spatial continuity"
+    },
+    {
+      "id": "mountain-landscape-04",
+      "prompt": "A realistic geological landscape with layered mountains under changing light, stable terrain geometry, slow controlled camera movement, documentary style, no text.",
+      "purpose": "transfer beyond insects"
+    }
+  ],
+  "compositionPipeline": [
+    "import_or_generate_visual",
+    "decode_and_validate",
+    "attach_generation_provenance",
+    "scientific_claim_reference",
+    "verified_quran_text_layer",
+    "rights_cleared_recitation_layer",
+    "typography_and_layout",
+    "timing_sync",
+    "audio_mix",
+    "final_media_validation",
+    "human_review",
+    "export"
+  ],
+  "failurePolicy": {
+    "missingProvenance": "block_publication",
+    "unknownCommercialRights": "block_publication",
+    "invalidQuranText": "block_export",
+    "missingRequiredAudio": "block_export",
+    "scientificVisualWithoutEvidence": "allow_as_illustration_only",
+    "modelAddsQuranicText": "reject_scene"
+  }
+}
