@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "1.1.0",
+  "verifiedAt": "2026-08-31",
+  "name": "Global Geographic Scientific Discovery",
+  "scope": "candidate_benchmark_only",
+  "purpose": "Discover scientific facts, documentary evidence, Islamic primary-source context and rights-cleared media globally, then transform independently verified knowledge into original Din Allah Encyclopedia productions.",
+  "principles": {
+    "freeFirst": true,
+    "selfHostedPreferred": true,
+    "knowledgeIsSeparableFromMediaRights": true,
+    "thirdPartyVideoMayBeResearchInput": true,
+    "thirdPartyVideoIsNotAutomaticallyEmbeddable": true,
+    "licenseAndPermissionAreAssetSpecific": true,
+    "sourceProvenanceRequired": true,
+    "scientificClaimRequiresPrimaryOrAuthoritativeSupport": true,
+    "religiousClaimRequiresVerifiedIslamicSource": true,
+    "noAutomaticScientificMiracleConclusion": true,
+    "noCorpusMutation": true,
+    "noAutomaticRuntimePromotion": true
+  },
+  "discoverySources": [
+    "scientific_journals",
+    "PubMed",
+    "Crossref",
+    "DOAJ",
+    "OpenAlex",
+    "PLOS",
+    "universities_and_research_labs",
+    "government_science_agencies",
+    "USGS",
+    "NASA",
+    "NASA_Earthdata",
+    "NOAA",
+    "museums_and_natural_history_archives",
+    "Smithsonian_Open_Access",
+    "Biodiversity_Heritage_Library",
+    "GBIF",
+    "Encyclopedia_of_Life",
+    "documentary_channels",
+    "independent_scientific_filmmakers",
+    "social_video_platforms",
+    "open_media_archives",
+    "public_domain_collections",
+    "creative_commons_collections",
+    "Wikimedia_Commons",
+    "Europeana",
+    "Internet_Archive",
+    "Zenodo",
+    "Figshare",
+    "Dryad",
+    "Al_Furqan_Islamic_Heritage_Database",
+    "Corpus_Coranicum",
+    "Quranic_Arabic_Corpus",
+    "Tanzil",
+    "King_Fahd_Quran_Complex",
+    "Dorar_Sunnah",
+    "Islamic_primary_source_collections",
+    "Kairawan_Arabic_Islamic_Manuscript_Index"
+  ],
+  "prioritySourceRoles": {
+    "discovery_and_interpretive_islamic_scientific": [
+      {
+        "name": "Abduldaem_Al_Kaheel_kaheel7",
+        "url": "https://www.kaheel7.com/ar/",
+        "role": "scientific_religious_discovery_and_interpretation",
+        "policy": "Use articles as discovery and interpretive leads; trace cited scientific claims to primary or authoritative sources before scientific classification."
+      }
+    ],
+    "scientific_primary_and_indexing": [
+      "PubMed",
+      "Crossref",
+      "OpenAlex",
+      "DOAJ",
+      "PLOS",
+      "Zenodo",
+      "Figshare",
+      "Dryad"
+    ],
+    "institutional_science_and_media": [
+      "NASA",
+      "NASA_Earthdata",
+      "NOAA",
+      "USGS",
+      "Smithsonian_Open_Access",
+      "GBIF",
+      "Biodiversity_Heritage_Library",
+      "Encyclopedia_of_Life"
+    ],
+    "open_media_and_rights_discovery": [
+      "Smithsonian_Open_Access",
+      "Wikimedia_Commons",
+      "Europeana",
+      "Internet_Archive",
+      "NASA_Image_and_Video_Library",
+      "NOAA_Ocean_Exploration"
+    ],
+    "quran_and_islamic_text_verification": [
+      "King_Fahd_Quran_Complex",
+      "Tanzil",
+      "Quranic_Arabic_Corpus",
+      "Corpus_Coranicum",
+      "Dorar_Sunnah",
+      "Al_Furqan_Islamic_Heritage_Foundation",
+      "Kairawan_Arabic_Islamic_Manuscript_Index"
+    ]
+  },
+  "mediaDisposition": [
+    {"status":"public_domain_candidate","action":"eligible_for_asset_specific_rights_review_and_reuse"},
+    {"status":"cc0_candidate","action":"eligible_after_recording_asset_license_and_provenance"},
+    {"status":"open_license_candidate","action":"eligible_only_after_license_terms_and_attribution_are_recorded"},
+    {"status":"explicit_permission_candidate","action":"eligible_only_after_permission_evidence_is_recorded"},
+    {"status":"reference_only","action":"extract_claims_and_research_context_but_do_not_embed_or_redistribute_media"},
+    {"status":"original_recreation","action":"create_new_visual_scene_from_verified_knowledge_when_source_media_is_not_cleared"}
+  ],
+  "knowledgeExtraction": {
+    "inputTypes":["video","short_video","article","paper","dataset","institutional_report","interview","photograph","field_observation","manuscript"],
+    "extract":["scientific_claims","observations","measurement_context","species_or_object_identity","location","date","researcher_or_creator","primary_source","visual_motifs","uncertainty_and_limitations","citation_identifier","license_evidence"],
+    "rule":"A social post, short, documentary clip, or interpretive article is a discovery lead until the underlying evidence is independently verified."
+  },
+  "evidenceFusion": {
+    "flow":"discovery -> source_resolution -> independent_verification -> claim_normalization -> quran_hadith_cross_reference -> evidence_graph -> storyboard -> original_or_rights_cleared_media -> final_render",
+    "claimClasses":["scientific_observation","scientific_consensus","scientific_hypothesis","historical_report","interpretive_link"],
+    "religiousLinkRule":"Only present a connection between a scientific finding and Quran or hadith at the strength supported by the Islamic and scientific sources; never upgrade an interpretive link into established scientific fact automatically."
+  },
+  "qualityGates":[
+    "source_identity_verified",
+    "claim_supported_by_primary_or_authoritative_evidence",
+    "independent_second_source_checked_when_feasible",
+    "scientific_uncertainty_recorded",
+    "quran_or_hadith_reference_verified_when_present",
+    "manuscript_or_textual_variant_recorded_when_relevant",
+    "media_rights_verified_before_embedding",
+    "original_visual_used_when_rights_are_unclear",
+    "provenance_manifest_complete",
+    "human_review_before_production"
+  ],
+  "outputRule":"The discovery engine supplies evidence and candidate media to the documentary engine; it never directly publishes third-party media as a Din Allah Encyclopedia production."
+}

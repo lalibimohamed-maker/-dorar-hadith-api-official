@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.1.0",
+  "verifiedAt": "2026-08-31",
+  "purpose": "Curated source catalog for evidence-driven Din Allah Encyclopedia video research.",
+  "policy": "Sources discover and document knowledge; primary/authoritative evidence outranks secondary interpretation; media reuse requires asset-specific rights verification.",
+  "sources": [
+    {"id":"kaheel7","name":"عبد الدائم الكحيل - أسرار الإعجاز العلمي","url":"https://www.kaheel7.com/ar/","role":"scientific_religious_discovery_and_interpretation","tier":"secondary_interpretive"},
+    {"id":"pubmed","name":"PubMed","url":"https://pubmed.ncbi.nlm.nih.gov/","role":"biomedical_literature_index","tier":"authoritative_index"},
+    {"id":"crossref","name":"Crossref","url":"https://www.crossref.org/","role":"doi_and_bibliographic_resolution","tier":"metadata_infrastructure"},
+    {"id":"doaj","name":"Directory of Open Access Journals","url":"https://doaj.org/","role":"open_access_journal_discovery","tier":"curated_index"},
+    {"id":"openalex","name":"OpenAlex","url":"https://openalex.org/","role":"scholarly_graph_and_discovery","tier":"scholarly_index"},
+    {"id":"plos","name":"PLOS","url":"https://plos.org/","role":"open_scientific_literature","tier":"publisher"},
+    {"id":"zenodo","name":"Zenodo","url":"https://zenodo.org/","role":"research_data_and_outputs","tier":"repository"},
+    {"id":"figshare","name":"Figshare","url":"https://figshare.com/","role":"research_data_and_supplementary_material","tier":"repository"},
+    {"id":"dryad","name":"Dryad","url":"https://datadryad.org/","role":"research_data_repository","tier":"repository"},
+    {"id":"nasa","name":"NASA Images and Video Library","url":"https://images.nasa.gov/","role":"space_earth_science_media","tier":"institutional"},
+    {"id":"nasa_earthdata","name":"NASA Earthdata","url":"https://www.earthdata.nasa.gov/","role":"earth_science_data","tier":"institutional"},
+    {"id":"noaa","name":"NOAA Ocean Exploration","url":"https://oceanexplorer.noaa.gov/","role":"ocean_exploration_media_and_science","tier":"institutional"},
+    {"id":"usgs","name":"U.S. Geological Survey","url":"https://www.usgs.gov/","role":"earth_and_biodiversity_science","tier":"institutional"},
+    {"id":"smithsonian","name":"Smithsonian Open Access","url":"https://www.si.edu/openaccess","role":"open_collection_media_and_data","tier":"institutional_open_access"},
+    {"id":"gbif","name":"Global Biodiversity Information Facility","url":"https://www.gbif.org/","role":"biodiversity_occurrence_data","tier":"international_data_infrastructure"},
+    {"id":"eol","name":"Encyclopedia of Life","url":"https://www.eol.org/","role":"life_on_earth_taxonomy_and_data","tier":"scientific_aggregator"},
+    {"id":"bhl","name":"Biodiversity Heritage Library","url":"https://www.biodiversitylibrary.org/","role":"historical_biodiversity_literature","tier":"library_consortium"},
+    {"id":"wikimedia_commons","name":"Wikimedia Commons","url":"https://commons.wikimedia.org/","role":"free_media_discovery","tier":"community_repository"},
+    {"id":"europeana","name":"Europeana","url":"https://www.europeana.eu/","role":"heritage_media_and_rights_statements","tier":"cultural_heritage_aggregator"},
+    {"id":"internet_archive","name":"Internet Archive","url":"https://archive.org/","role":"digital_archive_and_public_domain_discovery","tier":"archive"},
+    {"id":"king_fahd_quran_complex","name":"King Fahd Quran Printing Complex","url":"https://qurancomplex.gov.sa/","role":"quran_text_and_quranic_studies_verification","tier":"institutional_islamic"},
+    {"id":"tanzil","name":"Tanzil Project","url":"https://tanzil.net/","role":"verified_digital_quran_text","tier":"quran_text_reference"},
+    {"id":"quranic_arabic_corpus","name":"Quranic Arabic Corpus","url":"https://corpus.quran.com/","role":"quranic_morphology_syntax_ontology","tier":"academic_open_source"},
+    {"id":"corpus_coranicum","name":"Corpus Coranicum","url":"https://corpuscoranicum.org/","role":"quran_manuscripts_variants_intertexts_and_commentary","tier":"academic_project"},
+    {"id":"al_furqan","name":"Al-Furqan Islamic Heritage Foundation","url":"https://al-furqan.com/","role":"islamic_manuscript_and_heritage_bibliography","tier":"specialized_institution"},
+    {"id":"kairawan","name":"Kairawan Global Arabic & Islamic Manuscript Index","url":"https://kairawan.org/","role":"cross_collection_manuscript_discovery","tier":"manuscript_aggregator"},
+    {"id":"dorar_sunnah","name":"Dorar Sunnah","url":"https://dorar.net/","role":"hadith_and_islamic_source_verification","tier":"islamic_reference"}
+  ],
+  "scientificEvidence": [
+    {"id":"ant-vibrational-signals-2021","name":"Ants modulate stridulatory signals depending on the behavioural context","url":"https://doi.org/10.1038/s41598-021-84925-z","role":"primary_open_access_study_for_ant_vibrational_signalling","license":"CC BY 4.0"},
+    {"id":"ant-chemical-communication-1978","name":"Ethological Aspects of Chemical Communication in Ants","url":"https://doi.org/10.1016/S0065-3454(08)60132-1","role":"review_on_chemical_and_mechanical_ant_communication"}
+  ],
+  "realMediaCandidates": [
+    {"id":"leafcutter-ants-gails","filename":"Leafcutter Ants video.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Leafcutter_Ants_video.webm","author":"gails_pictures","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"industrious-ants-gails","filename":"Industrious Ants video.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Industrious_Ants_video.webm","author":"gails_pictures","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"ants-larvae-osseous","filename":"Ants and their larvae.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Ants_and_their_larvae.webm","author":"osseous","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"busy-ants-jun-seita","filename":"Busy ants working together after rain.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Busy_ants_working_together_after_rain.webm","author":"Jun Seita","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"large-number-ants-dineen","filename":"Large number of ants.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Large_number_of_ants.webm","author":"Paul L Dineen","license":"CC BY 2.0","mediaType":"video","status":"cleared_candidate_for_benchmark"},
+    {"id":"leafcutter-filogenn","filename":"Leafcutter ants video.webm","sourcePage":"https://commons.wikimedia.org/wiki/File:Leafcutter_ants_video.webm","author":"Filo gèn'","license":"CC BY-SA 4.0","mediaType":"video","status":"rights_review_required_before_use"},
+    {"id":"leafcutter-hanness-wilms","filename":"Ants gathering leaves.jpg","sourcePage":"https://commons.wikimedia.org/wiki/File:Ants_gathering_leaves.jpg","author":"Hannes wilms","license":"CC BY-SA 4.0","mediaType":"image","status":"rights_review_required_before_use"},
+    {"id":"colony-ragani-gairshail","filename":"Colony of Ants.jpg","sourcePage":"https://commons.wikimedia.org/wiki/File:Colony_of_Ants.jpg","author":"Rajani Gairshail","license":"CC0 1.0","mediaType":"image","status":"cc0_candidate_after_provenance_record"}
+  ],
+  "rightsRules": {
+    "cc0": "record_asset_license_and_provenance_even when attribution is not legally required",
+    "public_domain": "verify jurisdiction and underlying work status",
+    "creative_commons": "record exact license, version, attribution and any NC/ND/SA restrictions",
+    "reference_only": "knowledge extraction permitted; embedding/redistribution blocked",
+    "third_party": "never infer permission from public availability"
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0.0",
+  "engineId": "global-multilingual-voice-engine-2026",
+  "status": "prototype_registry",
+  "purpose": "Quality-gated multilingual narration and translation audio for Din Allah Encyclopedia video production.",
+  "qualityPolicy": {
+    "minimum": "production_grade",
+    "rejectUnintelligibleAudio": true,
+    "rejectObviousMachineArtifacts": true,
+    "requireNativeLanguageEvaluation": true,
+    "requirePronunciationReview": true,
+    "requireProsodyReview": true,
+    "requireAssetLicenseReview": true,
+    "humanFallbackWhenNoModelMeetsThreshold": true
+  },
+  "standards": {
+    "speechMarkup": "SSML 1.1",
+    "pronunciationLexicon": "W3C Pronunciation Lexicon / PLS-compatible layer",
+    "languageTagging": "BCP 47 / xml:lang",
+    "source": "https://www.w3.org/TR/speech-synthesis/"
+  },
+  "engines": [
+    {
+      "id": "chatterbox-multilingual-v3",
+      "role": ["primary_multilingual_tts", "voice_reference", "expressive_narration"],
+      "languages": 23,
+      "languagesListed": ["ar","da","de","el","en","es","fi","fr","he","hi","it","ja","ko","ms","nl","no","pl","pt","ru","sv","sw","tr","zh"],
+      "license": "MIT",
+      "licenseGate": "model_and_voice_asset_review",
+      "source": "https://github.com/resemble-ai/chatterbox",
+      "notes": "Use language-matched reference audio; do not transfer accent from another language. V3 is the current general multilingual release."
+    },
+    {
+      "id": "qwen3-tts",
+      "role": ["multilingual_tts", "custom_voice", "expressive_tts"],
+      "languages": "model_dependent",
+      "license": "Apache-2.0",
+      "licenseGate": "model_checkpoint_and_voice_asset_review",
+      "source": "https://github.com/QwenLM/Qwen3-TTS",
+      "notes": "Do not treat Qwen3-TTS as the Arabic default; route Arabic to a model that passes the Arabic quality gate."
+    },
+    {
+      "id": "piper",
+      "role": ["local_fallback", "offline_tts", "resource_constrained_tts"],
+      "languages": "voice_catalog_dependent",
+      "license": "GPL-3.0-or-later (engine); voice-specific licenses vary",
+      "licenseGate": "mandatory_per_voice_model",
+      "source": "https://github.com/OHF-Voice/piper1-gpl",
+      "notes": "Never infer voice rights from engine rights. Every selected voice must carry its own license record."
+    },
+    {
+      "id": "facebook-mms-tts",
+      "role": ["low_resource_language_coverage", "research_fallback"],
+      "languages": 1100,
+      "license": "CC-BY-NC-4.0",
+      "licenseGate": "noncommercial_only_unless_separately_authorized",
+      "source": "https://huggingface.co/facebook/mms-tts",
+      "notes": "Coverage-first route; not a default production engine where the license is incompatible with intended use."
+    },
+    {
+      "id": "seamlessm4t-v2",
+      "role": ["speech_translation", "multilingual_bridge", "translation_audio"],
+      "languages": "model_dependent",
+      "license": "CC-BY-NC-4.0 for SeamlessM4T models",
+      "licenseGate": "noncommercial_only_unless_separately_authorized",
+      "source": "https://github.com/facebookresearch/seamless_communication",
+      "notes": "Useful for multilingual translation and bridging; not the unrestricted production default."
+    }
+  ],
+  "routing": {
+    "arabic": ["chatterbox-multilingual-v3", "piper", "human_verified_fallback"],
+    "major_supported_languages": ["chatterbox-multilingual-v3", "qwen3-tts", "piper", "human_verified_fallback"],
+    "low_resource_languages": ["facebook-mms-tts", "piper", "seamlessm4t-v2", "human_verified_fallback"],
+    "translation": ["seamlessm4t-v2", "chatterbox-multilingual-v3", "human_verified_fallback"],
+    "rule": "Select the highest-quality route whose language support, voice quality, model license, voice license and intended-use policy all pass."
+  },
+  "prosody": {
+    "controls": ["rate", "pitch", "volume", "break", "emphasis", "style"],
+    "sentencePause": "semantic_boundary",
+    "paragraphPause": "longer_semantic_boundary",
+    "punctuation": "never_read_as_literal_symbols",
+    "dramaticNarration": "bounded_expression_only"
+  },
+  "pronunciation": {
+    "required": true,
+    "lexiconScopes": ["Quranic_terms", "hadith_terms", "scholars", "places", "scientific_terms", "foreign_names", "proper_nouns"],
+    "fallback": "human_verified_pronunciation_entry"
+  },
+  "audioQA": {
+    "automated": ["silence_clipping_check", "loudness_check", "duration_check", "language_id", "transcript_alignment", "pronunciation_lexicon_coverage"],
+    "human": ["native_speaker_intelligibility", "articulation", "prosody", "accent_fit", "semantic_emphasis", "name_pronunciation"],
+    "failAction": "do_not_publish"
+  },
+  "quranPolicy": {
+    "ttsRecitation": "forbidden",
+    "recitationRoute": "licensed_verified_quran_recitation_only",
+    "narratorRoute": "explanatory_text_only",
+    "wordAlignment": "required_when_available",
+    "reciterProvenance": "required"
+  },
+  "provenance": {
+    "requiredFields": ["engine", "engineVersion", "modelCheckpoint", "voiceId", "voiceLanguage", "voiceLicense", "textHash", "ssmlHash", "lexiconVersion", "generationTimestamp", "qaResult"],
+    "storeWithVideo": true
+  },
+  "globalLanguagePolicy": {
+    "scope": "all_languages",
+    "principle": "Every language receives the same quality, pronunciation, prosody, rights and provenance gates; language coverage never overrides quality or licensing.",
+    "noForcedLanguage": true
+  }
+}

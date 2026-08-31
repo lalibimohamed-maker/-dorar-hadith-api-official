@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "1.1.0",
+  "prototypeId": "ant-communication-27-18-2026",
+  "status": "prototype_benchmark_only",
+  "question": "ما حقيقة تواصل النمل، وما الصلة التي يمكن بحثها مع قوله تعالى في النمل؟",
+  "discoveryPolicy": "config/global-geographic-scientific-discovery-2026.json",
+  "discoveryMode": "knowledge_first",
+  "discoveryRule": "External videos, shorts, documentaries and social posts may be used as research leads to discover claims, primary sources, researchers, locations and visual evidence. Media itself enters the final film only after asset-specific rights verification.",
+  "evidence": [
+    {"id":"quran-27-18","type":"quran_text","reference":"Surah An-Naml 27:18","text":"حَتَّىٰٓ إِذَآ أَتَوْا۟ عَلَىٰ وَادِ ٱلنَّمْلِ قَالَتْ نَمْلَةٌۭ يَـٰٓأَيُّهَا ٱلنَّمْلُ ٱدْخُلُوا۟ مَسَـٰكِنَكُمْ لَا يَحْطِمَنَّكُمْ سُلَيْمَـٰنُ وَجُنُودُهُۥ وَهُمْ لَا يَشْعُرُونَ","source":"https://quran.com/27:18","textPolicy":"Preserve the verified Arabic source text verbatim; translation is a separate asset."},
+    {"id":"ant-vibroacoustic-2021","type":"scientific_observation","claim":"Ant societies use multiple communication channels; vibroacoustic signalling can vary with behavioural context.","source":"https://www.nature.com/articles/s41598-021-84925-z","status":"source_verified"},
+    {"id":"ant-communication-review-2017","type":"scientific_review","claim":"Acoustic signalling is one of several social communication mechanisms described in ants.","source":"https://www.sciencedirect.com/science/article/pii/S0003347216302822","status":"source_verified"}
+  ],
+  "sourceTraceability": {
+    "externalDiscoveryCanInform": ["claim", "primary_source", "researcher", "location", "visual_concept", "scene_design"],
+    "externalMediaEmbedding": "blocked_until_rights_cleared",
+    "originalRecreationFallback": "enabled"
+  },
+  "scenes":[
+    {"id":"s1","durationSeconds":4,"purpose":"Question framing","visual":"Original vector animatic of an ant colony; no third-party footage."},
+    {"id":"s2","durationSeconds":4,"purpose":"Communication channels","visual":"Original diagram showing chemical, tactile and vibrational channels."},
+    {"id":"s3","durationSeconds":4,"purpose":"Scientific finding","visual":"Original waveform/context visual derived from the cited study."},
+    {"id":"s4","durationSeconds":4,"purpose":"Quran witness","visual":"Original background with the verified Arabic verse layer."},
+    {"id":"s5","durationSeconds":4,"purpose":"Epistemic boundary","visual":"Original evidence ladder distinguishing observation from interpretive link."}
+  ],
+  "rights":{"thirdPartyMedia":"research_leads_only_until_asset_clearance","recitation":"not_embedded_until_rights_cleared","generatedVisuals":"original_vector_animatic"},
+  "output":{"prototypeResolution":"1280x720","masterTarget":"inherits 48K-class mastering pipeline later","audio":"rights-cleared narration/recitation required for production master"}
+}

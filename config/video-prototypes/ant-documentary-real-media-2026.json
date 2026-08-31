@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0.0",
+  "prototypeId": "ant-documentary-real-media-2026",
+  "status": "real_media_benchmark",
+  "title": "النمل — عالم من التواصل والتنظيم",
+  "discoveryPolicy": "config/global-geographic-scientific-discovery-2026.json",
+  "sourceCatalog": "config/video-prototypes/global-video-source-catalog-2026.json",
+  "evidence": [
+    {
+      "id": "ant-chemical-communication-1978",
+      "type": "scientific_review",
+      "claim": "Ant societies use diverse mechanical and chemical cues, including alarm and recruitment communication.",
+      "source": "https://doi.org/10.1016/S0065-3454(08)60132-1",
+      "status": "source_verified"
+    },
+    {
+      "id": "ant-vibrational-signals-2021",
+      "type": "scientific_open_access_study",
+      "claim": "Stridulatory signals in Crematogaster scutellaris vary with behavioural context, supporting flexible vibrational communication.",
+      "source": "https://doi.org/10.1038/s41598-021-84925-z",
+      "status": "source_verified",
+      "license": "CC BY 4.0"
+    },
+    {
+      "id": "quran-27-18",
+      "type": "quran_text",
+      "reference": "Surah An-Naml 27:18",
+      "text": "حَتَّىٰٓ إِذَآ أَتَوْا۟ عَلَىٰ وَادِ ٱلنَّمْلِ قَالَتْ نَمْلَةٌۭ يَـٰٓأَيُّهَا ٱلنَّمْلُ ٱدْخُلُوا۟ مَسَـٰكِنَكُمْ لَا يَحْطِمَنَّكُمْ سُلَيْمَـٰنُ وَجُنُودُهُۥ وَهُمْ لَا يَشْعُرُونَ",
+      "source": "https://quran.com/27:18",
+      "policy": "Arabic source layer preserved; no synthetic Quranic recitation in this benchmark."
+    }
+  ],
+  "mediaAssets": [
+    {
+      "id": "leafcutter-ants-gails",
+      "filename": "Leafcutter Ants video.webm",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Leafcutter_Ants_video.webm",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Leafcutter%20Ants%20video.webm",
+      "author": "gails_pictures",
+      "license": "CC BY 2.0",
+      "verifiedForReuse": true,
+      "notes": "1920x1080; Panama; 15 s source video"
+    },
+    {
+      "id": "industrious-ants-gails",
+      "filename": "Industrious Ants video.webm",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Industrious_Ants_video.webm",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Industrious%20Ants%20video.webm",
+      "author": "gails_pictures",
+      "license": "CC BY 2.0",
+      "verifiedForReuse": true,
+      "notes": "1920x1080; Panama; 12 s source video"
+    },
+    {
+      "id": "ants-larvae-osseous",
+      "filename": "Ants and their larvae.webm",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ants_and_their_larvae.webm",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ants%20and%20their%20larvae.webm",
+      "author": "osseous",
+      "license": "CC BY 2.0",
+      "verifiedForReuse": true,
+      "notes": "1920x1080; 79 s source video"
+    },
+    {
+      "id": "busy-ants-jun-seita",
+      "filename": "Busy ants working together after rain.webm",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Busy_ants_working_together_after_rain.webm",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Busy%20ants%20working%20together%20after%20rain.webm",
+      "author": "Jun Seita",
+      "license": "CC BY 2.0",
+      "verifiedForReuse": true,
+      "notes": "1280x720; 47 s source video"
+    },
+    {
+      "id": "large-number-ants-dineen",
+      "filename": "Large number of ants.webm",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Large_number_of_ants.webm",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Large%20number%20of%20ants.webm",
+      "author": "Paul L Dineen",
+      "license": "CC BY 2.0",
+      "verifiedForReuse": true,
+      "notes": "Use only the verified Commons file and preserve attribution."
+    }
+  ],
+  "scenes": [
+    {"id":"s0","durationSeconds":4,"type":"title","visual":"Original title card","claim":null},
+    {"id":"s1","durationSeconds":8,"type":"real_footage","mediaAsset":"leafcutter-ants-gails","caption":"سلوك جماعي مرئي عند النمل قاطع الأوراق","sourceCredit":"Footage: gails_pictures / Wikimedia Commons — CC BY 2.0"},
+    {"id":"s2","durationSeconds":8,"type":"real_footage","mediaAsset":"industrious-ants-gails","caption":"النمل يعمل ويتحرك ضمن سياق جماعي","sourceCredit":"Footage: gails_pictures / Wikimedia Commons — CC BY 2.0"},
+    {"id":"s3","durationSeconds":8,"type":"real_footage","mediaAsset":"ants-larvae-osseous","caption":"داخل المستعمرة: النمل واليرقات","sourceCredit":"Footage: osseous / Wikimedia Commons — CC BY 2.0"},
+    {"id":"s4","durationSeconds":8,"type":"real_footage","mediaAsset":"busy-ants-jun-seita","caption":"تجمع كثيف وحركة جماعية","sourceCredit":"Footage: Jun Seita / Wikimedia Commons — CC BY 2.0"},
+    {"id":"s5","durationSeconds":7,"type":"real_footage","mediaAsset":"large-number-ants-dineen","caption":"لقطة واسعة لحركة عدد كبير من النمل","sourceCredit":"Footage: Paul L Dineen / Wikimedia Commons — CC BY 2.0"},
+    {"id":"s6","durationSeconds":7,"type":"evidence","visual":"Original evidence card","caption":"الدراسات تصف قنوات كيميائية وإشارات اهتزازية تختلف بحسب السياق السلوكي.","sourceCredit":"Evidence: Hölldobler 1978 • Masoni et al. 2021 • DOI links in provenance manifest"},
+    {"id":"s7","durationSeconds":7,"type":"quran","visual":"Original Quran card","caption":"﴿حَتَّىٰٓ إِذَآ أَتَوْا۟ عَلَىٰ وَادِ ٱلنَّمْلِ قَالَتْ نَمْلَةٌۭ يَـٰٓأَيُّهَا ٱلنَّمْلُ ٱدْخُلُوا۟ مَسَـٰكِنَكُمْ﴾","sourceCredit":"القرآن الكريم — النمل 27:18 — https://quran.com/27:18"}
+  ],
+  "rendering": {
+    "targetResolution": "1920x1080",
+    "fps": 30,
+    "sourceAudio": "muted_unless_rights_verified",
+    "narration": "local Arabic explanatory TTS only",
+    "quranicRecitation": "not_embedded",
+    "transitions": "subtle cinematic fades",
+    "mastering": "prototype_delivery_only; later 48K-class mastering remains separate"
+  },
+  "rightsPolicy": {
+    "thirdPartyMedia": "only assets listed with asset-specific CC BY 2.0 evidence may enter this benchmark",
+    "attribution": "every real-media scene must carry a source credit and a machine-readable provenance record",
+    "modification": "cropping, resizing and editorial cuts are allowed under CC BY 2.0 with attribution",
+    "referenceOnly": "uncleared footage is excluded from render"
+  }
+}

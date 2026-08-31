@@ -1,0 +1,40 @@
+{
+  "schemaVersion":"1.0.0",
+  "name":"AI Video Import & Quran Composition Policy",
+  "status":"benchmark_policy",
+  "purpose":"Allow an explicitly invoked video-studio workflow to import user-supplied or AI-generated video, then compose verified Quran text, separately sourced/rights-cleared recitation, Arabic captions and provenance without treating the imported video as automatically rights-free.",
+  "searchIntegration":{
+    "enabled":false,
+    "videoResultsInSearch":false,
+    "scientificVideoDiscoveryInSearch":false
+  },
+  "studioIntegration":{
+    "enabled":true,
+    "requiresExplicitInvocation":true,
+    "acceptUserUploadedVideo":true,
+    "acceptExternallyGeneratedAiVideo":true,
+    "compositionActions":["crop","trim","caption","quran_text_overlay","rights_cleared_recitation","narration","subtitles","color_and_audio_mix"],
+    "neverAssumeUserOwnsAllRights":true
+  },
+  "rightsPolicy":{
+    "aiGeneratedOutputIsNotAutomaticallyRightsFree":true,
+    "providerTermsMustBeRecorded":true,
+    "planCommercialRightsMustBeRecorded":true,
+    "inputAssetsMustBeRightsCleared":true,
+    "thirdPartyElementsRemainThirdParty":true,
+    "copyrightProtectionMayVaryByJurisdiction":true,
+    "provenanceRequired":true
+  },
+  "quranLayer":{
+    "textSourceVerified":true,
+    "syntheticQuranRecitationForbidden":true,
+    "recitationRequiresSeparateRightsVerification":true,
+    "wordTimingOptional":true,
+    "textRenderingMustUseVerifiedSource":true
+  },
+  "providerRegistryRules":{
+    "requiredFields":["provider","modelOrService","plan","generationDate","termsUrl","commercialUseStatus","watermarkStatus","outputRightsStatement"],
+    "statusValues":["commercial_use_confirmed","commercial_use_plan_gated","noncommercial_only","unclear_pending_review"]
+  },
+  "qualityGates":["input_provenance_recorded","provider_terms_checked","commercial_rights_checked_when_needed","quran_text_verified","recitation_rights_checked","audio_stream_present_when_audio_expected","human_review_before_publication"]
+}
