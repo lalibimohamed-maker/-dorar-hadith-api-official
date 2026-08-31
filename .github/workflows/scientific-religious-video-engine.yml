@@ -59,7 +59,8 @@ jobs:
           if (x.outputPolicy.maximumHorizontalPixels !== 46080 || x.outputPolicy.maximumVerticalPixels !== 25920) throw new Error('output ceiling drifted');
           if (x.outputPolicy.maximumLandscapeProfile !== '46080x25920') throw new Error('landscape ceiling drifted');
           if (x.outputPolicy.maximumPortraitProfile !== '25920x46080') throw new Error('portrait ceiling drifted');
-          if (x.outputPolicy.importantConstraint.includes('native 48K frames')) throw new Error('registry must not claim universal native 48K generation');
+          if (!x.outputPolicy.importantConstraint.includes('48K is an output/render ceiling')) throw new Error('48K policy clarification missing');
+          if (x.outputPolicy.importantConstraint.includes('every generation model produces native 48K frames')) throw new Error('registry must not claim universal native 48K generation');
           if (x.videoCreationEngines.voice_engine.status !== 'license_gated') throw new Error('voice engine must remain license_gated');
           for (const [groupName, group] of Object.entries(x.technicalCandidates)) {
             if (!Array.isArray(group)) throw new Error(`technical candidate group must be an array: ${groupName}`);
