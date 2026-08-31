@@ -1,0 +1,82 @@
+name: Scientific Religious Video Engine Registry
+
+on:
+  pull_request:
+    paths:
+      - 'config/scientific-religious-video-engine-2026.json'
+      - 'docs/scientific-religious-video-engine-48k.md'
+      - '.github/workflows/scientific-religious-video-engine.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/scientific-religious-video-engine-2026.json'
+      - 'docs/scientific-religious-video-engine-48k.md'
+      - '.github/workflows/scientific-religious-video-engine.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-video-engine-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout trusted repository content
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate registry invariants
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const x = JSON.parse(fs.readFileSync('config/scientific-religious-video-engine-2026.json', 'utf8'));
+          const p = x.principles;
+          const requiredTrue = [
+            'freeFirst','selfHostedPreferred','noPaidCoreDependency','noAutomaticPromotion',
+            'noSilentReplacement','noCorpusMutation','noUnlicensedMediaReuse','noUnverifiedReligiousClaim',
+            'scientificClaimMustBeSourced','quranTextMustRemainVerbatim','quranTranslationIsDistinctFromArabicText',
+            'softwareModelVoiceAssetLicensesRemainSeparate','voiceCloningRequiresExplicitRights','provenanceRequiredPerAsset',
+            'renderResolutionIsIndependentFromGenerationResolution'
+          ];
+          for (const key of requiredTrue) if (p[key] !== true) throw new Error(`policy invariant failed: ${key}`);
+          if (!Array.isArray(x.pipeline) || x.pipeline.length < 20) throw new Error('video synthesis pipeline incomplete');
+          const requiredStages = [
+            'question_understanding','islamic_evidence_retrieval','scientific_evidence_retrieval','claim_verification',
+            'evidence_graph','global_media_discovery','rights_and_license_gate','original_scene_generation',
+            'semantic_scene_composer','quran_word_alignment','multilingual_translation','voice_and_audio_rights_layer',
+            'timeline_composer','documentary_director','provenance_manifest','multi_stage_render_and_delivery'
+          ];
+          for (const stage of requiredStages) if (!x.pipeline.includes(stage)) throw new Error(`missing pipeline stage: ${stage}`);
+          const out = x.outputProfiles['48K'];
+          if (!out || out.maxWidth !== 46080 || out.maxHeight !== 25920) throw new Error('48K landscape output must remain 46080x25920');
+          if (x.outputProfiles['8K'].maxWidth !== 7680) throw new Error('8K profile drifted');
+          if (x.outputPolicy.maximumHorizontalPixels !== 46080 || x.outputPolicy.maximumVerticalPixels !== 25920) throw new Error('output ceiling drifted');
+          if (x.outputPolicy.maximumLandscapeProfile !== '46080x25920') throw new Error('landscape ceiling drifted');
+          if (x.renderStrategy && x.renderStrategy.native48K === true) throw new Error('must not claim universal native 48K generation');
+          if (x.videoCreationEngines.voice_engine.status !== 'license_gated') throw new Error('voice engine must remain license_gated');
+          for (const row of Object.values(x.technicalCandidates).flat()) {
+            for (const candidate of row) {
+              if (!candidate.status || !candidate.name) throw new Error('technical candidate record incomplete');
+            }
+          }
+          console.log('Scientific-religious video engine registry: PASS');
+          console.log(`Pipeline stages: ${x.pipeline.length}; output ceiling: ${out.maxWidth}x${out.maxHeight}.`);
+          NODE
+
+      - name: Enforce no runtime or Corpus mutation
+        run: |
+          set -euo pipefail
+          BASE_SHA="${GITHUB_BASE_SHA:-}"
+          if [ -n "$BASE_SHA" ] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            changed="$(git diff --name-only "$BASE_SHA" "$GITHUB_SHA")"
+            forbidden='^(corpus/|config/corpus\.json|src/|app/|package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$'
+            if printf '%s\n' "$changed" | grep -E "$forbidden"; then
+              echo 'Forbidden runtime/Corpus mutation detected.'
+              exit 1
+            fi
+          fi
+          echo 'No-runtime / no-Corpus mutation gate: PASS'

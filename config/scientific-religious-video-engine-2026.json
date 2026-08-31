@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-08-31",
+  "purpose": "A registry-only blueprint for Din Allah Encyclopedia scientific-religious video synthesis. It generates original documentary videos from evidence, licensed media, and synthetic scenes without changing canonical scholarly content or runtime dependencies.",
+  "scope": "candidate_benchmark_only",
+  "principles": {
+    "freeFirst": true,
+    "selfHostedPreferred": true,
+    "noPaidCoreDependency": true,
+    "noAutomaticPromotion": true,
+    "noSilentReplacement": true,
+    "noCorpusMutation": true,
+    "noUnlicensedMediaReuse": true,
+    "noUnverifiedReligiousClaim": true,
+    "scientificClaimMustBeSourced": true,
+    "quranTextMustRemainVerbatim": true,
+    "quranTranslationIsDistinctFromArabicText": true,
+    "softwareModelVoiceAssetLicensesRemainSeparate": true,
+    "voiceCloningRequiresExplicitRights": true,
+    "provenanceRequiredPerAsset": true,
+    "renderResolutionIsIndependentFromGenerationResolution": true
+  },
+  "pipeline": [
+    "question_understanding",
+    "islamic_evidence_retrieval",
+    "scientific_evidence_retrieval",
+    "claim_verification",
+    "evidence_graph",
+    "story_structure",
+    "global_media_discovery",
+    "rights_and_license_gate",
+    "original_scene_generation",
+    "semantic_scene_composer",
+    "scene_analysis",
+    "quran_text_and_reference_layer",
+    "hadith_reference_and_grading_layer",
+    "quran_word_alignment",
+    "multilingual_translation",
+    "voice_and_audio_rights_layer",
+    "timeline_composer",
+    "documentary_director",
+    "accessibility_captioning",
+    "visual_quality_control",
+    "provenance_manifest",
+    "multi_stage_render_and_delivery"
+  ],
+  "evidencePolicy": {
+    "claimTypes": [
+      "quran_text",
+      "quran_exegesis",
+      "hadith_verified",
+      "hadith_grading",
+      "scientific_observation",
+      "scientific_consensus",
+      "scientific_hypothesis",
+      "historical_report",
+      "interpretive_link"
+    ],
+    "promotionRule": "Never convert an interpretive link into a scientific fact or an Islamic doctrine claim automatically.",
+    "sourceTraceability": "Every factual claim must point to one or more evidence records before entering the final timeline."
+  },
+  "quranAndHadith": {
+    "quranTextSourcePolicy": "Use a verified canonical Quran text source and preserve Arabic text verbatim.",
+    "translationPolicy": "Treat translations of meanings as separate copyrighted/licensed assets and label them as meanings/translations, never as the Arabic Quran text.",
+    "hadithPolicy": "Attach collection, reference, grading/status, and scholarly source metadata before presentation.",
+    "wordHighlighting": "Use word-level alignment only after a rights-cleared recitation is selected."
+  },
+  "videoCreationEngines": {
+    "question_understanding": {"role":"Turn the browser question into explicit sub-questions, claims, visual concepts and evidence needs.","status":"candidate"},
+    "islamic_evidence": {"role":"Retrieve Quran, tafsir, authenticated hadith and scholarly explanations without altering canonical text.","status":"candidate"},
+    "scientific_evidence": {"role":"Retrieve primary literature, institutional sources, datasets and authoritative scientific references.","status":"candidate"},
+    "claim_verification": {"role":"Classify evidence strength and block unsupported miracle/health claims.","status":"candidate"},
+    "evidence_graph": {"role":"Link claim -> source -> quote/observation -> verse/hadith -> scene.","status":"candidate"},
+    "global_media_discovery": {"role":"Find reusable media by explicit license/permission and provenance; non-cleared media remains reference-only.","status":"candidate"},
+    "original_scene_generation": {"role":"Generate new scientific or explanatory visuals when no suitable cleared footage exists.","status":"candidate"},
+    "semantic_scene_composer": {"role":"Map every claim to visual evidence, overlays, references and timing.","status":"candidate"},
+    "scene_analysis": {"role":"Detect cuts, shots, motion and usable segments for lawful source material.","status":"candidate"},
+    "quran_word_alignment": {"role":"Align a rights-cleared recitation to Quran words/characters for synchronized highlighting.","status":"candidate"},
+    "multilingual_translation": {"role":"Render approved translations/subtitles in the browser language while preserving source metadata.","status":"candidate"},
+    "voice_engine": {"role":"Manage narration/recitation assets and licensing; cloning is blocked unless explicit rights are recorded.","status":"license_gated"},
+    "timeline_composer": {"role":"Create a deterministic edit timeline that can be re-rendered when evidence changes.","status":"candidate"},
+    "documentary_director": {"role":"Select pedagogical order, pacing, transitions and conclusion without changing evidence strength.","status":"candidate"},
+    "provenance_manifest": {"role":"Persist source, license, checksum, model, version and timing metadata for every asset.","status":"candidate"},
+    "render_engine": {"role":"Render masters and delivery variants up to the configured 48K-class ceiling.","status":"candidate"}
+  },
+  "technicalCandidates": {
+    "video_generation": [
+      {"name":"Wan2.1","status":"candidate","softwareOrModelLicense":"Apache-2.0","rightsGate":"model_and_dataset_terms_still_required","source":"https://github.com/Wan-Video/Wan2.1"},
+      {"name":"LTX-2.x","status":"license_gated","softwareOrModelLicense":"LTX-2.x Community License","rightsGate":"commercial_entity_and_attachment_terms_must_be_verified_before_use","source":"https://github.com/Lightricks/LTX-2"},
+      {"name":"HunyuanVideo","status":"license_gated","softwareOrModelLicense":"Tencent Hunyuan Community License","rightsGate":"territory_and_use_terms_must_be_verified_before_use","source":"https://github.com/Tencent-Hunyuan/HunyuanVideo"}
+    ],
+    "timeline_and_editing": [
+      {"name":"OpenTimelineIO","status":"candidate","softwareLicense":"Apache-2.0","source":"https://github.com/AcademySoftwareFoundation/OpenTimelineIO"},
+      {"name":"Remotion","status":"license_gated","softwareLicense":"Remotion 5 dual/license policy","rightsGate":"entity_eligibility_and_company_license_must_be_checked","source":"https://github.com/remotion-dev/remotion"}
+    ],
+    "scene_analysis": [
+      {"name":"PySceneDetect","status":"candidate","softwareLicense":"BSD-3-Clause","source":"https://github.com/Breakthrough/PySceneDetect"}
+    ],
+    "alignment": [
+      {"name":"WhisperX","status":"candidate","softwareLicense":"verify_current_repository_and_dependency_terms","capability":"word_level_timestamps_and_forced_alignment","source":"https://github.com/m-bain/whisperX"}
+    ],
+    "rendering_and_transcode": [
+      {"name":"FFmpeg","status":"candidate","softwareLicense":"LGPL/GPL depending on build and enabled components","rightsGate":"record_exact_build_configuration","source":"https://ffmpeg.org/"}
+    ],
+    "image_restoration": [
+      {"name":"Real-ESRGAN","status":"license_gated","softwareOrModelLicense":"verify_current_project_and_each_weight","source":"https://github.com/xinntao/Real-ESRGAN"}
+    ]
+  },
+  "outputProfiles": {
+    "720p": {"maxWidth":1280,"maxHeight":720},
+    "1080p": {"maxWidth":1920,"maxHeight":1080},
+    "1440p": {"maxWidth":2560,"maxHeight":1440},
+    "4K": {"maxWidth":3840,"maxHeight":2160},
+    "8K": {"maxWidth":7680,"maxHeight":4320},
+    "16K": {"maxWidth":15360,"maxHeight":8640},
+    "32K": {"maxWidth":30720,"maxHeight":17280},
+    "48K": {"maxWidth":46080,"maxHeight":25920}
+  },
+  "outputPolicy": {
+    "maximumHorizontalPixels": 46080,
+    "maximumVerticalPixels": 25920,
+    "maximumLandscapeProfile": "46080x25920",
+    "maximumPortraitProfile": "25920x46080",
+    "renderStrategy": "multi_stage_generate_align_compose_restore_upscale_encode",
+    "importantConstraint": "48K is an output/render ceiling, not a claim that every generation model produces native 48K frames.",
+    "qualityRequirement": "Upscaling may not invent or alter Quran text, hadith text, scientific labels, citations, or factual diagrams; text-bearing layers must be rendered from source vectors at final resolution."
+  },
+  "assetPolicy": {
+    "sourceClasses": ["public_domain","compatible_open_license","explicit_permission","original_generated","reference_only_not_embeddable"],
+    "referenceOnlyMeans": "A discovered third-party video may inform research but cannot be embedded, redistributed or transformed unless the rights gate permits it.",
+    "manifestFields": ["assetId","sourceUrl","creator","license","licenseEvidence","retrievedAt","sha256","usageScope","attribution","modelOrTool","modelVersion"]
+  },
+  "promotionPolicy": {
+    "automaticRuntimePromotion": false,
+    "automaticCorpusMutation": false,
+    "productionUseRequires": ["rights_verified","evidence_verified","security_passed","quality_benchmark_passed","human_review","provenance_manifest_complete","CI_passed"]
+  }
+}
