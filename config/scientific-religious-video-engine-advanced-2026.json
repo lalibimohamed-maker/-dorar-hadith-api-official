@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Advanced registry for original scientific-religious video creation, evidence-driven composition, lawful media synthesis, and high-fidelity rendering up to 48K-class masters.",
+  "status": "candidate_benchmark_only",
+  "principles": {
+    "originalCreationPreferred": true,
+    "licensedMediaOnly": true,
+    "referenceOnlyMediaIsNotEmbeddable": true,
+    "scientificClaimsRequireSources": true,
+    "religiousClaimsRequireVerification": true,
+    "quranTextMustRemainVerbatim": true,
+    "translationIsDistinctFromArabicText": true,
+    "voiceRightsRequired": true,
+    "provenancePerAsset": true,
+    "noRuntimePromotion": true,
+    "noCorpusMutation": true,
+    "noSilentReplacement": true,
+    "noArtificialResolutionCeiling": true
+  },
+  "creationArchitecture": [
+    "question_understanding",
+    "subquestion_and_claim_extraction",
+    "islamic_evidence_retrieval",
+    "scientific_evidence_retrieval",
+    "claim_verification",
+    "evidence_graph",
+    "source_and_rights_resolution",
+    "global_media_discovery",
+    "original_scene_generation",
+    "scientific_simulation_or_explanatory_graphics",
+    "semantic_scene_composition",
+    "scene_analysis",
+    "quran_text_layer",
+    "hadith_layer_and_grading",
+    "quran_word_alignment",
+    "multilingual_meanings_translation",
+    "voice_and_audio_rights",
+    "timeline_composition",
+    "documentary_direction",
+    "accessibility",
+    "quality_control",
+    "provenance_manifest",
+    "multi_stage_render",
+    "mastering_and_delivery"
+  ],
+  "technicalCandidates": {
+    "video_generation": [
+      {"name":"Wan2.1","status":"candidate","softwareLicense":"Apache-2.0","modelRights":"verify_dataset_and_weight_terms","source":"https://github.com/Wan-Video/Wan2.1"},
+      {"name":"LTX-2.x","status":"license_gated","softwareLicense":"LTX-2.x Community License","modelRights":"commercial_and_attachment_terms_must_be_verified","source":"https://github.com/Lightricks/LTX-2"},
+      {"name":"HunyuanVideo","status":"license_gated","softwareLicense":"Tencent Hunyuan Community License","modelRights":"territory_and_use_terms_must_be_verified","source":"https://github.com/Tencent-Hunyuan/HunyuanVideo"},
+      {"name":"CogVideoX","status":"candidate","softwareLicense":"Apache-2.0 for selected components; model-specific terms vary","modelRights":"verify_per_model_variant","source":"https://github.com/THUDM/CogVideo"}
+    ],
+    "timeline_and_editing": [
+      {"name":"OpenTimelineIO","status":"candidate","softwareLicense":"Apache-2.0","role":"deterministic editorial timeline interchange","source":"https://github.com/AcademySoftwareFoundation/OpenTimelineIO"},
+      {"name":"FFmpeg","status":"candidate","softwareLicense":"LGPL/GPL depending on build and enabled components","role":"decode_transform_encode_mastering","rightsGate":"record_exact_build_configuration","source":"https://ffmpeg.org/"}
+    ],
+    "scene_analysis": [
+      {"name":"PySceneDetect","status":"candidate","softwareLicense":"BSD-3-Clause","role":"shot_and_scene_boundary_detection","source":"https://github.com/Breakthrough/PySceneDetect"}
+    ],
+    "alignment": [
+      {"name":"WhisperX","status":"candidate","softwareLicense":"verify_current_repository_and_dependency_terms","role":"word_level_timestamps_for_audio_alignment","source":"https://github.com/m-bain/whisperX"}
+    ],
+    "video_super_resolution": [
+      {"name":"BasicVSR++","status":"candidate","softwareLicense":"Apache-2.0","role":"video_super_resolution_and_temporal_propagation","weights":"verify_checkpoint_terms","source":"https://github.com/c-ck/BasicVSR_PlusPlus"},
+      {"name":"RealBasicVSR","status":"candidate","softwareLicense":"verify_current_repository_terms","role":"real_world_video_super_resolution_restoration","weights":"verify_checkpoint_terms","source":"https://github.com/c-ck/RealBasicVSR"},
+      {"name":"Video2X","status":"license_gated","softwareLicense":"AGPL-3.0","role":"video_upscaling_orchestration","weights":"verify_each_backend","source":"https://github.com/k4yt3x/video2x"},
+      {"name":"Video Super Resolution Library","status":"candidate","softwareLicense":"BSD-3-Clause","role":"video_super_resolution_components","weights":"verify_model_terms","source":"https://github.com/OpenVisualCloud/Video-Super-Resolution-Library"},
+      {"name":"Real-ESRGAN","status":"license_gated","softwareOrModelLicense":"verify_project_and_each_weight","role":"image_restoration_and_frame_restoration","source":"https://github.com/xinntao/Real-ESRGAN"}
+    ]
+  },
+  "mastering": {
+    "resolutionPolicy": {
+      "720p": "1280x720",
+      "1080p": "1920x1080",
+      "1440p": "2560x1440",
+      "4K": "3840x2160",
+      "8K": "7680x4320",
+      "16K": "15360x8640",
+      "32K": "30720x17280",
+      "48K": "46080x25920",
+      "48KPortrait": "25920x46080",
+      "futureExpansion": "architecture remains open to higher-than-48K masters"
+    },
+    "renderPipeline": [
+      "source_validation",
+      "scene_generation_or_cleared_media_ingest",
+      "denoise_deblur",
+      "temporal_consistency",
+      "video_super_resolution",
+      "detail_recovery",
+      "text_and_diagram_vector_overlay_at_target_resolution",
+      "artifact_detection",
+      "frame_consistency_check",
+      "final_48k_master_render",
+      "delivery_downscale_variants"
+    ],
+    "qualityRules": {
+      "neverTreatUpscaleAsNewInformation": true,
+      "preserveScientificLabels": true,
+      "preserveQuranText": true,
+      "preserveHadithText": true,
+      "preserveCitations": true,
+      "preferVectorTextOverUpscaledText": true,
+      "masterMayExceedGenerationResolution": true,
+      "nativeGenerationAt48KNotRequired": true
+    }
+  },
+  "rightsPolicy": {
+    "allowedMediaClasses": ["public_domain","compatible_open_license","explicit_permission","original_generated"],
+    "referenceOnlyClass": "reference_only_not_embeddable",
+    "requiredManifestFields": ["assetId","sourceUrl","creator","license","licenseEvidence","retrievedAt","sha256","usageScope","attribution","modelOrTool","modelVersion"],
+    "voice": "No voice cloning or synthetic identity imitation without explicit rights; a licensed original recording may be aligned word-by-word."
+  },
+  "promotion": {
+    "productionUseRequires": ["rights_verified","evidence_verified","security_passed","arabic_quality_benchmark","visual_quality_benchmark","performance_benchmark","provenance_complete","human_review","CI_passed"],
+    "automaticPromotion": false
+  }
+}
