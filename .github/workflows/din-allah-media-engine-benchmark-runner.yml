@@ -1,0 +1,31 @@
+name: Din Allah Media Engine — Benchmark Runner
+
+on:
+  pull_request:
+    paths:
+      - 'src/din-allah-media-engine-benchmark-runner.js'
+      - 'test/din-allah-media-engine-benchmark-runner.test.js'
+      - '.github/workflows/din-allah-media-engine-benchmark-runner.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-runner-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends ffmpeg
+
+      - name: Test benchmark runner
+        run: node --test test/din-allah-media-engine-benchmark-runner.test.js
