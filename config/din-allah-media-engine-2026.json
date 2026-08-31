@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "engineId": "din-allah-media-engine-2026",
   "status": "evaluation_benchmark",
   "scope": "separate_media_studio",
@@ -45,10 +45,17 @@
       "name": "LTX-2.x",
       "role": ["audio_video_generation"],
       "licenseReview": "ltx_community_license_revenue_gate_and_data_separation"
+    },
+    {
+      "id": "mochi-1",
+      "name": "Mochi 1",
+      "role": ["t2v"],
+      "licenseReview": "apache_2_0_per_official_genmo_model_release;verify_current_checkpoint"
     }
   ],
   "evaluationSuite": {
-    "benchmark": "VBench",
+    "primaryBenchmark": "VBench-2.0",
+    "secondaryBenchmark": "VBench",
     "dimensions": [
       "subject_consistency",
       "background_consistency",
@@ -59,7 +66,12 @@
       "object_class",
       "temporal_flickering",
       "spatial_relationship",
-      "human_action"
+      "human_action",
+      "commonsense_physics",
+      "intrinsic_faithfulness",
+      "temporal_reasoning",
+      "motion_quality",
+      "composition"
     ],
     "additionalDinAllahChecks": [
       "prompt_fidelity_arabic_scientific_terms",
@@ -102,6 +114,16 @@
       "id": "mountain-landscape-04",
       "prompt": "A realistic geological landscape with layered mountains under changing light, stable terrain geometry, slow controlled camera movement, documentary style, no text.",
       "purpose": "transfer beyond insects"
+    },
+    {
+      "id": "water-surface-05",
+      "prompt": "A realistic close documentary shot of water flowing around natural stones in a shallow stream, continuous fluid motion, stable geometry, physically plausible reflections, no text.",
+      "purpose": "physics and fluid realism"
+    },
+    {
+      "id": "night-sky-06",
+      "prompt": "A realistic observatory-style night landscape with a stable star field and slow controlled camera movement across a desert horizon, no invented text or labels.",
+      "purpose": "scene consistency and low-light imaging"
     }
   ],
   "compositionPipeline": [
@@ -125,5 +147,9 @@
     "missingRequiredAudio": "block_export",
     "scientificVisualWithoutEvidence": "allow_as_illustration_only",
     "modelAddsQuranicText": "reject_scene"
+  },
+  "researchNotes": {
+    "mochi1": "Official Genmo release describes Mochi 1 as an open video generation model under Apache 2.0; benchmark must still pin and record the exact checkpoint used.",
+    "vbench20": "VBench-2.0 extends evaluation toward intrinsic faithfulness, commonsense reasoning, physics realism, human motion and creative composition; use it as the primary quality benchmark."
   }
 }
