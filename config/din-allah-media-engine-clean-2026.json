@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "1.0.0",
+  "engineId": "din-allah-media-engine-clean-2026",
+  "status": "contract_and_evaluation_only",
+  "scope": "separate_media_studio",
+  "base": "main",
+  "principles": {
+    "selfHostedFirst": true,
+    "freeFirst": true,
+    "searchIndependent": true,
+    "noCorpusMutation": true,
+    "noRuntimeDependency": true,
+    "noAutomaticModelPromotion": true,
+    "quranTextImmutable": true,
+    "quranRecitationSeparateAsset": true,
+    "rightsPerAsset": true,
+    "provenancePerAsset": true,
+    "humanReviewBeforePublication": true
+  },
+  "workflow": [
+    "brief",
+    "evidence_packet",
+    "storyboard",
+    "visual_generation_or_cleared_media",
+    "scene_quality_evaluation",
+    "quran_text_binding",
+    "verified_recitation_binding",
+    "voice_and_caption_sync",
+    "composition",
+    "master_validation",
+    "human_review",
+    "export"
+  ],
+  "benchmarks": {
+    "primary": "VBench-2.0",
+    "secondary": "VBench",
+    "custom": [
+      "scientific_plausibility",
+      "quran_text_integrity",
+      "recitation_asset_integrity",
+      "provenance_completeness",
+      "rights_completeness",
+      "no_unintended_text",
+      "temporal_consistency",
+      "audio_stream_integrity"
+    ]
+  },
+  "candidateBackends": [
+    {"id":"wan2.2","name":"Wan 2.2","mode":"candidate_only","licenseStatus":"review_per_checkpoint"},
+    {"id":"cogvideox-2b","name":"CogVideoX 2B","mode":"candidate_only","licenseStatus":"apache_2_0_claimed_by_official_release"},
+    {"id":"cogvideox-5b","name":"CogVideoX 5B","mode":"candidate_only","licenseStatus":"separate_model_license_review"},
+    {"id":"hunyuanvideo-1.5","name":"HunyuanVideo 1.5","mode":"candidate_only","licenseStatus":"community_license_review"},
+    {"id":"mochi-1","name":"Mochi 1","mode":"candidate_only","licenseStatus":"apache_2_0_release_review"},
+    {"id":"ltx-2.x","name":"LTX-2.x","mode":"candidate_only","licenseStatus":"community_license_and_revenue_gate_review"}
+  ],
+  "importedAiVideo": {
+    "accepted": true,
+    "requiredMetadata": [
+      "provider",
+      "model",
+      "plan",
+      "generationTimestamp",
+      "termsUrl",
+      "commercialUseStatus",
+      "inputRightsAttestation",
+      "contentCredentialsWhenPresent"
+    ],
+    "unknownRights": "block_publication"
+  },
+  "quranPolicy": {
+    "source": "verified_canonical_quran_source",
+    "textHandling": "verbatim_only",
+    "generatedQuranText": "forbidden",
+    "generatedQuranRecitation": "forbidden",
+    "recitation": "separate_rights_cleared_asset"
+  },
+  "outputPolicy": {
+    "resolution": "open_ended",
+    "48K": "render_ceiling_only",
+    "textLayers": "vector_at_final_target",
+    "nativeResolutionClaims": "require_exact_evidence"
+  },
+  "failurePolicy": {
+    "missingEvidence": "block_publication",
+    "missingRights": "block_publication",
+    "missingProvenance": "block_publication",
+    "invalidQuranText": "block_export",
+    "missingRequiredAudio": "block_export",
+    "unintendedGeneratedText": "reject_scene"
+  },
+  "promptSuite": [
+    {"id":"ant-macro-01","intent":"biological realism","prompt":"Realistic macro documentary scene of worker ants moving over natural leaf litter, anatomically stable bodies, coherent legs and antennae, natural daylight, no text, no logos."},
+    {"id":"ant-nest-02","intent":"social behavior","prompt":"Realistic close documentary view of ants around a nest entrance with biologically plausible movement and stable soil geometry, no text, no logos."},
+    {"id":"water-physics-03","intent":"physical consistency","prompt":"Realistic shallow stream flowing around natural stones with continuous fluid motion and stable reflections, documentary cinematography, no text."},
+    {"id":"mountain-04","intent":"scene continuity","prompt":"Realistic layered mountain landscape with slow controlled camera movement and stable terrain geometry, natural lighting, no text."}
+  ]
+}
