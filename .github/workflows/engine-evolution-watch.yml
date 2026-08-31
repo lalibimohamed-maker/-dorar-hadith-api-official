@@ -1,0 +1,83 @@
+name: Engine Evolution Watch
+
+on:
+  pull_request:
+    paths:
+      - 'config/engine-evolution-2026.json'
+      - '.github/workflows/engine-evolution-watch.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/engine-evolution-2026.json'
+      - '.github/workflows/engine-evolution-watch.yml'
+  schedule:
+    - cron: '13 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate evolution registry
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const x = JSON.parse(fs.readFileSync('config/engine-evolution-2026.json', 'utf8'));
+          const p = x.principles;
+          for (const [key, expected] of Object.entries({
+            freeFirst: true,
+            paidApiRequired: false,
+            subscriptionRequired: false,
+            selfHostedPreferred: true,
+            noArtificialApplicationCeiling: true,
+            preserveOriginal: true,
+            preserveCorpusAndProvenance: true,
+            failClosedOnUnknownRights: true,
+            softwareLicenseDistinctFromModelLicense: true,
+            modelLicenseDistinctFromVoiceLicense: true,
+            hostedPricingDistinctFromSoftwareLicense: true
+          })) {
+            if (p[key] !== expected) throw new Error(`${key} policy invariant failed`);
+          }
+          if (!Array.isArray(x.evaluationGates) || x.evaluationGates.length < 10) throw new Error('evaluation gates incomplete');
+          for (const [name, engine] of Object.entries(x.engines)) {
+            if (!engine.primary || !engine.status || !engine.watch) throw new Error(`incomplete engine record: ${name}`);
+            if (!engine.softwareLicense) throw new Error(`software license missing: ${name}`);
+            if (!engine.modelLicense) throw new Error(`model license field missing: ${name}`);
+          }
+          if (x.promotionPolicy.automaticUpgrade !== false) throw new Error('automatic upgrades must remain disabled');
+          if (x.promotionPolicy.silentReplacement !== false) throw new Error('silent replacement must remain disabled');
+          if (x.promotionPolicy.canonicalCorpusMutation !== false) throw new Error('canonical Corpus mutation must remain disabled');
+          console.log(`Validated ${Object.keys(x.engines).length} engine domains.`);
+          NODE
+
+  license-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Assert license-gated candidates remain gated
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const x = require('./config/engine-evolution-2026.json');
+          for (const name of ['text_to_speech','media_download','image_restoration']) {
+            if (x.engines[name].status !== 'license_gated') throw new Error(`${name} must remain license_gated until asset-level review`);
+          }
+          console.log('License-gated candidates are fail-closed.');
+          NODE
