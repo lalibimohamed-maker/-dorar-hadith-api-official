@@ -1,0 +1,15 @@
+{
+  "matrixId":"din-allah-free-first-capability-matrix-2026",
+  "capabilities":{
+    "global_search":{"preferred":"self_hosted_open_search","fallback":"existing_federation","paid_required":false},
+    "web_discovery":{"preferred":"self_hosted_searxng","paid_required":false},
+    "autocomplete":{"preferred":"self_hosted_typesense_or_meilisearch","paid_required":false},
+    "ocr":{"preferred":"tesseract_paddleocr_ocrmypdf_mesh","paid_required":false},
+    "translation":{"preferred":"local_open_models_plus_dictionaries_and_glossaries","paid_required":false},
+    "academic_discovery":{"preferred":"openalex_crossref_semantic_scholar_discovery","paid_required":false},
+    "security":{"preferred":"codeql_dependabot_scorecard_fuzzing_dast_attestation","paid_required":false},
+    "cache":{"preferred":"self_hosted_content_addressed_cache_with_provenance","paid_required":false}
+  },
+  "selectionRules":["open_source_first","self_hosted_first","no_required_paid_api","license_checked_before_distribution","provider_failure_isolated","quality_gate_before_authority"],
+  "architecture":"orchestrator -> specialized engines -> evidence firewall -> provenance/rights -> result"
+}

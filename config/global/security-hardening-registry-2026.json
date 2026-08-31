@@ -1,0 +1,20 @@
+{
+  "registryId":"din-allah-security-hardening-registry-2026",
+  "policy":"free-first",
+  "required":true,
+  "controls":[
+    {"id":"codeql","role":"static_security_analysis","status":"EXISTING"},
+    {"id":"dependabot","role":"dependency_monitoring","status":"EXISTING"},
+    {"id":"secret_scanning","role":"secret_detection","status":"EXISTING_OR_REQUIRED"},
+    {"id":"action_sha_pinning","role":"supply_chain_integrity","status":"EXISTING_OR_REQUIRED"},
+    {"id":"scorecard","role":"repository_supply_chain_posture","status":"REQUIRED"},
+    {"id":"fuzzing","role":"parser_and_input_robustness","status":"REQUIRED"},
+    {"id":"dast","role":"runtime_web_api_security","status":"REQUIRED"},
+    {"id":"artifact_attestation","role":"build_provenance","status":"REQUIRED"},
+    {"id":"rate_limiting","role":"abuse_protection","status":"REQUIRED"},
+    {"id":"source_health","role":"source_integrity_monitoring","status":"REQUIRED"},
+    {"id":"quarantine","role":"unsafe_change_isolation","status":"REQUIRED"}
+  ],
+  "releaseGates":["security","provenance","dependency_integrity","artifact_provenance","runtime_scan","corpus_boundary"],
+  "nonGoals":["bypassing_branch_protection","auto_merging_failed_checks","treating_security_tools_as_content_authority"]
+}

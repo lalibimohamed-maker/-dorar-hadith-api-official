@@ -1,0 +1,10 @@
+{
+  "registryId":"din-allah-encyclopedia-master-section-registry-2026",
+  "purpose":"Single source of truth for all Portal of Knowledge sections, features, engines, sources and infrastructure.",
+  "classification":["section","feature","engine","source","infrastructure"],
+  "status":["IN_MAIN","IN_PR","PARTIAL","CONTRACT_ONLY","MISSING","BLOCKED"],
+  "masterPlan":{"numberedSections":"0-70","count":71,"note":"The numbered master plan is the baseline; later additions must be registered rather than silently counted as sections."},
+  "requiredEvidence":["implementation","tests","ci","provenance","rights"],
+  "globalRules":{"originalPreserved":true,"noSilentOverwrite":true,"derivedContentSeparated":true,"corpusProtected":true,"rightsRequired":true,"provenanceRequired":true,"freeFirst":true,"paidCoreDependency":false},
+  "gates":["registry-complete","implementation-status-reconciled","integration-tests-pass","e2e-pass","security-pass","rights-pass","corpus-boundary-pass","provenance-pass","cache-integrity-pass","translation-integrity-pass","release-readiness-pass"]
+}
