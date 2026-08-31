@@ -1,0 +1,58 @@
+name: Ant Documentary Real Media Composition
+
+on:
+  pull_request:
+    paths:
+      - 'config/video-prototypes/ant-documentary-real-media-2026.json'
+      - 'config/video-prototypes/global-video-source-catalog-2026.json'
+      - 'scripts/render-ant-documentary-real-media.mjs'
+      - '.github/workflows/ant-real-media-documentary.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compose-ant-real-media-documentary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout trusted repository content
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Install open media render dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends curl ffmpeg espeak-ng fonts-noto-core fontconfig
+          curl --version | head -n 1
+          ffmpeg -version | head -n 1
+          espeak-ng --version
+
+      - name: Validate real-media manifest
+        run: |
+          node -e "const fs=require('fs'); const m=JSON.parse(fs.readFileSync('config/video-prototypes/ant-documentary-real-media-2026.json','utf8')); if(m.status!=='real_media_benchmark') throw new Error('Unexpected manifest status'); if(m.mediaAssets.length < 5) throw new Error('Expected at least 5 real media assets'); if(m.scenes.filter(s=>s.type==='real_footage').length < 5) throw new Error('Expected at least 5 real footage scenes'); console.log('Real-media manifest OK');"
+
+      - name: Download, compose and render documentary
+        run: node scripts/render-ant-documentary-real-media.mjs
+
+      - name: Verify documentary media and provenance
+        run: |
+          set -euo pipefail
+          video='dist/video-prototypes/ant-communication-27-18-real-media/ant-documentary-real-media-with-audio.mp4'
+          test -s "$video"
+          test -s 'dist/video-prototypes/ant-communication-27-18-real-media/scene-provenance.json'
+          test -s 'dist/video-prototypes/ant-communication-27-18-real-media/PROVENANCE.md'
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height,r_frame_rate,duration -of default=noprint_wrappers=1 "$video"
+          ffprobe -v error -select_streams a:0 -show_entries stream=codec_name,sample_rate,channels,duration -of default=noprint_wrappers=1 "$video"
+
+      - name: Upload real documentary artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ant-documentary-real-media
+          path: dist/video-prototypes/ant-communication-27-18-real-media/
+          if-no-files-found: error
+          retention-days: 30
