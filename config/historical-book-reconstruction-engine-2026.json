@@ -1,0 +1,78 @@
+{
+  "version": "2026-08-30",
+  "name": "historical-book-reconstruction-engine",
+  "purpose": "إنتاج طبعة رقمية جديدة عالية القراءة من الكتب القديمة أو التالفة بصريًا مع حفظ النص الأصلي ومصدر الصورة وعدم تحويل التخمين إلى حقيقة.",
+  "freeFirst": true,
+  "noPaidDependencyRequired": true,
+  "inputClasses": ["faded-print","damaged-print","stained-scan","warped-scan","bleed-through","low-contrast","historical-arabic-print","manuscript-or-handwriting"],
+  "engines": {
+    "workflow": ["ocr4all", "ocr-d"],
+    "layout": ["eynollah", "laypa"],
+    "historicalOcr": ["kraken", "calamari"],
+    "generalOcr": ["paddleocr", "tesseract"],
+    "documentUnderstanding": ["docling"],
+    "preprocessing": ["scantailor-advanced", "opencv", "unpaper"]
+  },
+  "editionModel": {
+    "preserveDiplomaticImage": true,
+    "preserveDiplomaticTranscription": true,
+    "createReadableDerivedEdition": true,
+    "originalTextContentMustRemainSemanticallyUnchanged": true,
+    "glyphRepairMayOnlyRepairLegibility": true,
+    "uncertainGlyphRepairMustBeMarked": true,
+    "neverInventMissingWords": true,
+    "neverNormalizeAwayMeaningfulDiacritics": true,
+    "parallelSourceCrossCheckRequiredForMaterialRepair": true,
+    "retainPageAndLineCoordinates": true,
+    "retainEditionAndPageProvenance": true
+  },
+  "repairPolicy": {
+    "level1_visual_only": "restore contrast, dewarp, remove stains, reconnect visibly broken ink without changing character identity",
+    "level2_glyph_legibility": "repair a damaged character only when its identity is visually recoverable with high confidence",
+    "level3_textual_reconstruction": "requires independent textual evidence such as another scan/edition or surrounding manuscript evidence; never silently alter the diplomatic text",
+    "ambiguous_result": "preserve original mark and emit uncertainty annotation instead of guessing"
+  },
+  "outputEditions": [
+    "facsimile-preserved-pdf",
+    "readable-yellow-paper-pdf",
+    "searchable-pdf",
+    "docx",
+    "pptx",
+    "epub",
+    "html",
+    "alto-xml",
+    "page-xml",
+    "tei-xml",
+    "txt",
+    "markdown",
+    "ocr-json"
+  ],
+  "yellowPaperEdition": {
+    "enabled": true,
+    "purpose": "راحة القراءة مع إبقاء صورة الأصل منفصلة ومحفوظة",
+    "backgroundPolicy": "warm-light-yellow-neutral-low-saturation",
+    "neverApplyToSourceImages": true,
+    "preserveInkContrast": true,
+    "preserveIllustrationsAndMargins": true,
+    "recordTransformationMetadata": true
+  },
+  "qualityGates": [
+    "source-hash-stable",
+    "page-count-stable",
+    "edition-identity-stable",
+    "layout-cross-check",
+    "multi-engine-consensus",
+    "material-uncertainty-visible",
+    "diplomatic-text-preserved",
+    "derived-text-traceable-to-page-line-region",
+    "visual-diff-review",
+    "rights-check",
+    "output-integrity-check"
+  ],
+  "training": {
+    "groundTruthPreferred": true,
+    "documentSpecificModelsAllowed": true,
+    "trainingDataMustRetainLicenseAndSource": true,
+    "modelPromotionRequiresBenchmark": true
+  }
+}
