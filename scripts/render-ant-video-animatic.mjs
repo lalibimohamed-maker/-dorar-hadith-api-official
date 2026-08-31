@@ -24,8 +24,8 @@ Dialogue: 0,0:00:04.00,0:00:08.00,Arabic,,60,60,55,,التواصل عند الن
 Dialogue: 0,0:00:04.00,0:00:08.00,Small,,60,60,22,,Scientific Reports 2021 • Animal Behaviour review
 Dialogue: 0,0:00:08.00,0:00:12.00,Arabic,,60,60,55,,تتغير بعض الإشارات الاهتزازية بحسب السياق السلوكي
 Dialogue: 0,0:00:08.00,0:00:12.00,Small,,60,60,22,,Claim class: scientific observation • not human speech equivalence
-Dialogue: 0,0:00:12.00,0:00:16.00,Arabic,,60,60,55,,﴿حَتّىٰ إِذا أَتَوا عَلىٰ وادِ النَّملِ قالَت نَملَةٌ يا أَيُّهَا النَّملُ ادخُلوا مَساكِنَكُم لا يَحطِمَنَّكُم سُلَيمانُ وَجُنودُهُ وَهُم لا يَشعُرونَ﴾
-Dialogue: 0,0:00:12.00,0:00:16.00,Small,,60,60,22,,القرآن الكريم • النمل 27:18 • Arabic source layer
+Dialogue: 0,0:00:12.00,0:00:16.00,Arabic,,60,60,55,,﴿حَتَّىٰٓ إِذَآ أَتَوْا۟ عَلَىٰ وَادِ ٱلنَّمْلِ قَالَتْ نَمْلَةٌۭ يَـٰٓأَيُّهَا ٱلنَّمْلُ ٱدْخُلُوا۟ مَسَـٰكِنَكُمْ لَا يَحْطِمَنَّكُمْ سُلَيْمَـٰنُ وَجُنُودُهُۥ وَهُمْ لَا يَشْعُرُونَ﴾
+Dialogue: 0,0:00:12.00,0:00:16.00,Small,,60,60,22,,القرآن الكريم • النمل 27:18 • verified Arabic source layer
 Dialogue: 0,0:00:16.00,0:00:20.00,Arabic,,60,60,55,,قاعدة الموسوعة: الصلة التفسيرية لا تتحول آليًا إلى حقيقة علمية أو دعوى إعجاز
 Dialogue: 0,0:00:16.00,0:00:20.00,Small,,60,60,22,,Next: rights-cleared footage + licensed recitation + word alignment + 48K-class mastering
 `;
@@ -62,7 +62,7 @@ writeFileSync(join(outDir, 'README.txt'), [
   'First Din Allah Encyclopedia evidence-driven video prototype.',
   'Deterministic vector animatic; not the final photorealistic documentary renderer.',
   'No third-party footage and no unlicensed recitation are embedded.',
-  'The Quranic Arabic is displayed from the source layer; production must use the approved canonical text asset.',
+  'The Quranic Arabic is displayed from the verified source layer.',
   'Scientific evidence: Scientific Reports 2021 on ant stridulatory signalling and behavioural context; Animal Behaviour review on ant acoustic signalling.',
   'Next stage: rights-cleared footage or original generated scenes, licensed recitation, word alignment, color-fidelity processing, and 48K-class mastering.'
 ].join('\n'), 'utf8');
