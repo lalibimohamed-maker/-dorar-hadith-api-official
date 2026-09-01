@@ -14,10 +14,23 @@ The current Hugging Face repository listing is about **34.2 GB**. A free noteboo
 
 The official single-GPU recipe requires about **24 GB VRAM** for the documented 720p TI2V-5B path. A runtime with only 16 GB per GPU should not be treated as equivalent merely because it has multiple GPUs; use the official multi-GPU/FSDP path only after a separate validated configuration. citeturn177801search7turn177801search6
 
+## Low-resource Apple Silicon smoke path
+
+When an Apple Silicon Mac is available, use `run-wan21-1.3b-mlx.sh` as a **smoke/evaluation path**, not as the quality winner. The upstream MLX-Video project supports Wan2.1/Wan2.2 on Apple Silicon, and its repository is MIT-licensed. The separate Wan2.1-T2V-1.3B checkpoint is Apache-2.0. citeturn346file0turn343file0turn378792search0turn378792search2
+
+This path is useful for validating the complete media contract on a local Apple Silicon machine without requiring the much larger TI2V-5B checkpoint. Its output must still pass the same `ffprobe`, hash, provenance, rights, and benchmark gates.
+
+Example:
+
+```bash
+PROMPT_ID=ant-macro-01 SEED=42 \
+  bash tools/din-allah-media-engine/gpu-evaluation/run-wan21-1.3b-mlx.sh
+```
+
 ## Procedure
 
 1. Start a clean GPU notebook/runtime (Kaggle or Colab are acceptable for an experiment; availability and quotas vary).
-2. Run `run-wan22-ti2v5b-kaggle.sh`. The script keeps model weights and generated media outside Git, records revisions/hashes, generates one fixed prompt, runs `ffprobe`, and writes run metadata.
+2. For the primary run, execute `run-wan22-ti2v5b-kaggle.sh`. The script keeps model weights and generated media outside Git, records revisions/hashes, generates one fixed prompt, runs `ffprobe`, and writes run metadata.
 3. Use **one prompt from `prompt-suite.json` at a time**. Do not add Quranic text or religious claims to the generation prompt.
 4. Generate a short 16:9 clip. For TI2V-5B, the upstream configuration uses `1280*704` for 720P. `FRAME_NUM=121` targets roughly 5 seconds at 24 FPS. Record the exact generation settings and seed. citeturn177801search0turn177801search5
 5. Record: model, checkpoint, upstream revision, runtime, GPU type, VRAM, seed, generation settings, prompt ID, prompt SHA-256, generation timestamp, and exact terms URL.
