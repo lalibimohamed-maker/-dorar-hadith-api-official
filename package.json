@@ -33,7 +33,7 @@
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
     "test:review-expiry": "node --test test/review-expiry.test.js",
-    "test:rechercher": "node --test test/rechercher-rights-engine.test.js test/rechercher-docx-catalog.test.js",
+    "test:rechercher": "node --test test/rechercher-rights-engine.test.js test/rechercher-docx-catalog.test.js test/rechercher-access-policy.test.js",
     "rechercher:rights-audit": "node scripts/rechercher-rights-audit.mjs",
     "rechercher:waqfeya": "node scripts/rechercher-waqfeya-classify-shard.mjs",
     "rechercher:purge-plan": "node scripts/rechercher-purge-restricted.mjs"
