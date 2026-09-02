@@ -1,6 +1,9 @@
 name: Arab World Free Source Harvest
 
 on:
+  push:
+    branches:
+      - feat/portal-knowledge-v3-2026
   workflow_dispatch:
     inputs:
       start:
