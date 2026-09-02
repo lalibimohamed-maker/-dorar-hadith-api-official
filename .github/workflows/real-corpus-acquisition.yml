@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - feat/real-corpus-acquisition-2026
+    paths-ignore:
+      - 'data/corpus/**'
   workflow_dispatch:
 
 permissions:
@@ -31,7 +33,9 @@ jobs:
           test -s data/corpus/hadith/catalog-2026.json
           test -s data/corpus/acquisition-state-2026.json
           test -d data/corpus/hadith/collections
-          test "$(find data/corpus/hadith/collections -type f -name '*.json' | wc -l)" -ge 6
+          count="$(find data/corpus/hadith/collections -type f -name '*.json' | wc -l)"
+          test "$count" -ge 6
+          echo "Hadith collection files: $count"
           wc -l -c data/corpus/quran/quran-uthmani.txt
           wc -c data/corpus/hadith/collections/*.json
 
