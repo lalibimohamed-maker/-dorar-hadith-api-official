@@ -22,9 +22,9 @@ jobs:
       - id: matrix
         name: Build dynamic shard matrix
         env:
-          OFFSET: 250000
-          CAPACITY: 125000
-          SHARD_SIZE: 500
+          OFFSET: 50000
+          CAPACITY: 25000
+          SHARD_SIZE: 100
         shell: bash
         run: |
           set -euo pipefail
@@ -53,4 +53,4 @@ PY
     with:
       shard_id: century15-${{ matrix.book_start }}
       book_start: ${{ matrix.book_start }}
-      book_count: 500
+      book_count: 100
