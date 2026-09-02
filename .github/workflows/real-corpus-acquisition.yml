@@ -1,0 +1,48 @@
+name: Real Corpus Acquisition
+
+on:
+  push:
+    branches:
+      - feat/real-corpus-acquisition-2026
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true
+
+      - name: Acquire real Quran and Arabic hadith corpus
+        run: node scripts/real-corpus-acquire.mjs
+
+      - name: Verify acquired artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s data/corpus/quran/quran-uthmani.txt
+          test -s data/corpus/hadith/hadith-core-arabic.json
+          test -s data/corpus/acquisition-state-2026.json
+          wc -l -c data/corpus/quran/quran-uthmani.txt
+          wc -c data/corpus/hadith/hadith-core-arabic.json
+
+      - name: Commit acquired corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/corpus
+          if git diff --cached --quiet; then
+            echo 'No corpus changes to commit.'
+            exit 0
+          fi
+          git commit -m 'data(corpus): materialize licensed Quran and Arabic hadith corpus'
+          git push origin HEAD:feat/real-corpus-acquisition-2026
