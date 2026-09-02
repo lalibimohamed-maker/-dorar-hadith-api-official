@@ -1,0 +1,157 @@
+name: Rechercher - Waqfeya Century 15 governed acquisition
+
+on:
+  workflow_dispatch:
+    inputs:
+      snapshot_limit:
+        description: 'Maximum source records to inventory (the Waqfeya count changes over time)'
+        required: false
+        default: '6422'
+  push:
+    branches:
+      - fix/pr367-waqfeya-6422-governed-harvest
+
+permissions:
+  contents: read
+
+jobs:
+  inventory-and-governed-acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build Waqfeya Century 15 inventory
+        shell: bash
+        env:
+          SNAPSHOT_LIMIT: ${{ inputs.snapshot_limit || '6422' }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/waqfeya-century15
+          python3 - <<'PY'
+          import json, re, urllib.request
+          from html.parser import HTMLParser
+
+          URL='https://waqfeya.net/centuries/القرن-15-هـ-426d13bd9086441e84cbb8b7ed9d3a1a'
+          limit=int(__import__('os').environ.get('SNAPSHOT_LIMIT','6422'))
+
+          class P(HTMLParser):
+              def __init__(self):
+                  super().__init__(); self.links=[]
+              def handle_starttag(self, tag, attrs):
+                  if tag=='a':
+                      d=dict(attrs); h=d.get('href','')
+                      if '/books/' in h: self.links.append(h)
+
+          with urllib.request.urlopen(URL, timeout=40) as r:
+              html=r.read().decode('utf-8','replace')
+          count=re.search(r'عدد الكتب:\s*([0-9,]+)', html)
+          source_count=int(count.group(1).replace(',','')) if count else None
+          p=P(); p.feed(html)
+          seen=[]
+          for h in p.links:
+              if h.startswith('/'): h='https://waqfeya.net'+h
+              if h not in seen: seen.append(h)
+          payload={'source':URL,'sourceReportedCount':source_count,'requestedSnapshotLimit':limit,'linksOnFetchedPage':len(seen),'note':'The Waqfeya Century 15 count is a live value and has changed over time; this artifact preserves the observed count. Download eligibility remains item-level and rights-gated.'}
+          json.dump(payload,open('artifacts/waqfeya-century15/source-count.json','w'),ensure_ascii=False,indent=2)
+          open('artifacts/waqfeya-century15/book-pages.txt','w',encoding='utf-8').write('\n'.join(seen[:limit])+'\n')
+          PY
+
+          test -s artifacts/waqfeya-century15/book-pages.txt
+          wc -l artifacts/waqfeya-century15/book-pages.txt
+          cat artifacts/waqfeya-century15/source-count.json
+
+      - name: Inspect item-level rights evidence and build governed download queue
+        shell: bash
+        env:
+          SNAPSHOT_LIMIT: ${{ inputs.snapshot_limit || '6422' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, re, time, urllib.parse, urllib.request
+          from html.parser import HTMLParser
+
+          src=open('artifacts/waqfeya-century15/book-pages.txt',encoding='utf-8').read().splitlines()
+          limit=int(os.environ.get('SNAPSHOT_LIMIT','6422'))
+          queue=[]
+          inventory=[]
+
+          class P(HTMLParser):
+              def __init__(self):
+                  super().__init__(); self.links=[]; self.text=[]
+              def handle_starttag(self, tag, attrs):
+                  d=dict(attrs); h=d.get('href','')
+                  if h: self.links.append(h)
+              def handle_data(self, data): self.text.append(data)
+
+          for idx,url in enumerate(src[:limit],1):
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Rechercher-governed-acquisition'})
+                  html=urllib.request.urlopen(req,timeout=30).read().decode('utf-8','replace')
+                  p=P(); p.feed(html); text=' '.join(p.text)
+                  # Strong gate: only queue when the source page itself contains explicit free/waqf wording.
+                  explicit=bool(re.search(r'وقف لله|وقفٌ لله|وقف لله تعالى|يوزع مجانا|يوزّع مجانا|توزع مجانا|مجانا ولا يجوز بيعه|إتاحة حرة|متاح مجانا',text,re.I))
+                  downloads=[]
+                  for h in p.links:
+                      u=urllib.parse.urljoin(url,h)
+                      if u.lower().endswith('.pdf') and ('waqfeya.net' in u.lower() or 'archive.org' in u.lower()): downloads.append(u)
+                  rec={'sourcePage':url,'explicitWaqfOrFreeEvidence':explicit,'downloadCandidates':downloads[:10]}
+                  inventory.append(rec)
+                  if explicit and downloads:
+                      queue.append(rec)
+              except Exception as e:
+                  inventory.append({'sourcePage':url,'error':str(e)})
+              if idx % 25 == 0: time.sleep(1)
+
+          json.dump(inventory,open('artifacts/waqfeya-century15/inventory.json','w'),ensure_ascii=False)
+          json.dump(queue,open('artifacts/waqfeya-century15/governed-download-queue.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({'inventoried':len(inventory),'governedQueued':len(queue),'requestedLimit':limit},ensure_ascii=False))
+          PY
+
+      - name: Download only the rights-gated queue
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/waqfeya-century15/pdf
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.request
+          q=json.load(open('artifacts/waqfeya-century15/governed-download-queue.json',encoding='utf-8'))
+          out=[]
+          for i,rec in enumerate(q,1):
+              for j,url in enumerate(rec.get('downloadCandidates',[]),1):
+                  try:
+                      req=urllib.request.Request(url,headers={'User-Agent':'Rechercher-governed-acquisition'})
+                      data=urllib.request.urlopen(req,timeout=120).read()
+                      if not data.startswith(b'%PDF-'): continue
+                      sha=hashlib.sha256(data).hexdigest()
+                      path=f'artifacts/waqfeya-century15/pdf/{i:05d}-{j:02d}-{sha[:16]}.pdf'
+                      open(path,'wb').write(data)
+                      out.append({'sourcePage':rec['sourcePage'],'download':url,'bytes':len(data),'sha256':sha,'path':path})
+                      break
+                  except Exception as e:
+                      out.append({'sourcePage':rec['sourcePage'],'download':url,'error':str(e)})
+          json.dump(out,open('artifacts/waqfeya-century15/acquisition-results.json','w'),ensure_ascii=False,indent=2)
+          print(json.dumps({'verifiedPdfCount':sum(1 for x in out if 'sha256' in x),'queueSize':len(q)},ensure_ascii=False))
+          PY
+
+      - name: Hash and publish acquisition ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          find artifacts/waqfeya-century15/pdf -type f -name '*.pdf' -print0 | sort -z | xargs -0 -r sha256sum > artifacts/waqfeya-century15/pdfs.sha256
+          test -s artifacts/waqfeya-century15/source-count.json
+          test -s artifacts/waqfeya-century15/inventory.json
+          test -s artifacts/waqfeya-century15/governed-download-queue.json
+          test -s artifacts/waqfeya-century15/acquisition-results.json
+
+      - name: Upload Waqfeya Century 15 acquisition artifacts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-waqfeya-century15-${{ github.run_id }}
+          path: artifacts/waqfeya-century15
+          if-no-files-found: error
+          retention-days: 30
