@@ -12,7 +12,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write # security-justification: required only to persist the verified PDF via Git LFS on this dedicated branch.
+  # security-justification: required only to persist the verified PDF via Git LFS on this dedicated branch.
+  contents: write
 
 jobs:
   download-pdf:
