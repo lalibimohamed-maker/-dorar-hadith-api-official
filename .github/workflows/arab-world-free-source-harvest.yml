@@ -11,11 +11,11 @@ on:
         required: false
         default: '1'
       batch_size:
-        description: 'Maximum explicit-waqf books per run'
+        description: 'Maximum explicit-rights candidates to download per run'
         required: false
         default: '25'
       book_id_batch:
-        description: 'Maximum Waqfeya book IDs to inspect per run'
+        description: 'Maximum Waqfeya numeric book IDs to inspect per run'
         required: false
         default: '400'
   schedule:
@@ -52,12 +52,29 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Harvest explicit-waqf books from Waqfeya
+
+      - name: Harvest and ACTUALLY DOWNLOAD Waqfeya books
         env:
           WAQFEYA_START: ${{ github.event.inputs.start || '1' }}
           WAQFEYA_BATCH_SIZE: ${{ github.event.inputs.batch_size || '25' }}
           WAQFEYA_BOOK_ID_BATCH: ${{ github.event.inputs.book_id_batch || '400' }}
-        run: node scripts/waqfeya-batch-harvest.mjs
+          # Deterministic proof page. The downloader follows the page's real "تحميل الكتاب" link,
+          # accepts redirect/bridge URLs, verifies the resulting file begins with %PDF-, and hashes it.
+          WAQFEYA_PROOF_URLS: >-
+            https://waqfeya.net/books/%D8%B3%D9%86%D9%86-%D8%A3%D8%A8%D9%8A-%D8%AF%D8%A7%D9%88%D8%AF-%D8%B7-%D8%A7%D9%84%D8%A3%D9%81%D9%83%D8%A7%D8%B1-62b45b4d81704c8794decea85a924b9c
+          WAQFEYA_MAX_DOWNLOAD_MB: '200'
+        run: |
+          set -euo pipefail
+          node scripts/waqfeya-batch-harvest.mjs
+
+      - name: Show real download proof
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s artifacts/waqfeya-books/manifest.json
+          jq '{downloaded, books: [.books[] | {title, bytes, sha256, sourcePage, downloadUrl, proof}]}' artifacts/waqfeya-books/manifest.json
+
       - name: Preserve downloaded books and provenance
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
