@@ -1,0 +1,96 @@
+name: Rechercher Waqfeya 15 Book Harvest
+
+on:
+  push:
+    branches: [feat/real-corpus-acquisition-2026]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  harvest:
+    name: Download and verify the 15 governed Waqfeya books
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Prepare manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/waqfeya-15/pdf
+          cat > artifacts/waqfeya-15/manifest.json <<'JSON'
+          {
+            "source": "Waqfeya",
+            "policy": "Download only the editions explicitly described by the Waqfeya record as waqf/free distribution; preserve source evidence and hashes.",
+            "books": [
+              {"id":"sahih-bukhari-afkar","title":"صحيح البخاري - ط. الأفكار","sourcePage":"https://waqfeya.net/books/صحيح-البخاري-ط-الأفكار-bc1eab2741b746fca5531f69a651bc89","download":"https://archive.org/download/FP54454/54454.pdf","evidence":"طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.","category":"hadith"},
+              {"id":"sunan-abu-dawud-afkar","title":"سنن أبي داود - ط. الأفكار","sourcePage":"https://waqfeya.net/books/سنن-أبي-داود-ط-الأفكار-62b45b4d81704c8794decea85a924b9c","download":"https://archive.org/download/FP54451/54451.pdf","evidence":"طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.","category":"hadith"},
+              {"id":"jami-tirmidhi-afkar","title":"جامع الترمذي = سنن الترمذي - ط. الأفكار","sourcePage":"https://waqfeya.net/books/جامع-الترمذي-سنن-الترمذي-ط-الأفكار-0f02c1074be347a1b5acfdf025268700","download":"https://archive.org/download/FPsutraf/sutraf.pdf","evidence":"طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.","category":"hadith"},
+              {"id":"sunan-ibn-majah-afkar","title":"سنن ابن ماجه = سنن ابن ماجة - ط. الأفكار","sourcePage":"https://waqfeya.net/books/سنن-ابن-ماجه-سنن-ابن-ماجة-ط-الأفكار-13e0aba15694465c9b873e91e5805696","download":"https://archive.org/download/SuibmaafSuibmaaf/suibmaaf.pdf","evidence":"طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.","category":"hadith"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-1","title":"فقه الإسلام شرح بلوغ المرام - ج 1","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm01.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-2","title":"فقه الإسلام شرح بلوغ المرام - ج 2","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm02.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-3","title":"فقه الإسلام شرح بلوغ المرام - ج 3","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm03.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-4","title":"فقه الإسلام شرح بلوغ المرام - ج 4","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm04.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-5","title":"فقه الإسلام شرح بلوغ المرام - ج 5","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm05.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-6","title":"فقه الإسلام شرح بلوغ المرام - ج 6","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm06.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-7","title":"فقه الإسلام شرح بلوغ المرام - ج 7","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm07.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-8","title":"فقه الإسلام شرح بلوغ المرام - ج 8","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm08.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-9","title":"فقه الإسلام شرح بلوغ المرام - ج 9","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm09.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-volume-10","title":"فقه الإسلام شرح بلوغ المرام - ج 10","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm10.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"quran-and-refutation-of-monks","title":"القرآن ونقض مطاعن الرهبان - ط. أوقاف قطر","sourcePage":"https://waqfeya.net/books/القرآن-ونقض-مطاعن-الرهبان-ط-الأوقاف-القطرية-9a836d53472d4e97b96f2bc6c0fb8b40","download":"https://archive.org/download/FP163468/163468.pdf","evidence":"هذا الكتاب وقف لله تعالى، طبع على نفقة وزارة الأوقاف والشؤون الإسلامية بدولة قطر، وهو يوزع مجانا ولا يجوز بيعه.","category":"quran"}
+            ]
+          }
+          JSON
+          jq empty artifacts/waqfeya-15/manifest.json
+
+      - name: Download and verify all 15 PDFs
+        shell: bash
+        run: |
+          set -u
+          tmp='artifacts/waqfeya-15/manifest.tmp.json'
+          cp artifacts/waqfeya-15/manifest.json "$tmp"
+          jq -c '.books[]' artifacts/waqfeya-15/manifest.json | while IFS= read -r book; do
+            id="$(jq -r '.id' <<<"$book")"
+            url="$(jq -r '.download' <<<"$book")"
+            out="artifacts/waqfeya-15/pdf/${id}.pdf"
+            echo "=== $id ==="
+            if curl --fail --location --silent --show-error --retry 5 --connect-timeout 30 --max-time 900 "$url" -o "$out" && test -s "$out" && file "$out" | grep -qi 'PDF'; then
+              bytes="$(wc -c < "$out" | tr -d ' ')"
+              sha256="$(sha256sum "$out" | awk '{print $1}')"
+              jq --arg id "$id" --argjson bytes "$bytes" --arg sha256 "$sha256" '.books |= map(if .id == $id then . + {verified:true,bytes:$bytes,sha256:$sha256} else . end)' "$tmp" > "$tmp.next" && mv "$tmp.next" "$tmp"
+              echo "VERIFIED $id bytes=$bytes sha256=$sha256"
+            else
+              rm -f "$out"
+              jq --arg id "$id" '.books |= map(if .id == $id then . + {verified:false,error:"download-or-pdf-validation-failed"} else . end)' "$tmp" > "$tmp.next" && mv "$tmp.next" "$tmp"
+              echo "FAILED $id"
+            fi
+          done
+          mv "$tmp" artifacts/waqfeya-15/manifest.json
+          verified="$(jq '[.books[] | select(.verified == true)] | length' artifacts/waqfeya-15/manifest.json)"
+          failed="$(jq '[.books[] | select(.verified == false)] | length' artifacts/waqfeya-15/manifest.json)"
+          echo "Verified PDFs: $verified"
+          echo "Failed PDFs: $failed"
+          test "$verified" -eq 15
+
+      - name: Write hash register
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -r '.books[] | select(.verified == true) | [.id,.bytes,.sha256,.sourcePage,.download] | @tsv' artifacts/waqfeya-15/manifest.json > artifacts/waqfeya-15/verified.tsv
+          find artifacts/waqfeya-15/pdf -type f -print0 | sort -z | xargs -0 sha256sum > artifacts/waqfeya-15/pdfs.sha256
+          test "$(wc -l < artifacts/waqfeya-15/verified.tsv | tr -d ' ')" -eq 15
+
+      - name: Upload verified Waqfeya books
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: waqfeya-15-verified-books-${{ github.run_id }}
+          path: artifacts/waqfeya-15
+          if-no-files-found: error
+          retention-days: 30
