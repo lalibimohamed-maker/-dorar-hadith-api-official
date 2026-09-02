@@ -33,10 +33,11 @@
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
     "test:review-expiry": "node --test test/review-expiry.test.js",
-    "test:rechercher": "node --test test/rechercher-rights-engine.test.js test/rechercher-docx-catalog.test.js test/rechercher-access-policy.test.js test/rechercher-alternative-policy.test.js",
+    "test:rechercher": "node --test test/rechercher-rights-engine.test.js test/rechercher-docx-catalog.test.js test/rechercher-access-policy.test.js test/rechercher-alternative-policy.test.js test/rechercher-auto-acquisition.test.js",
     "rechercher:rights-audit": "node scripts/rechercher-rights-audit.mjs",
     "rechercher:waqfeya": "node scripts/rechercher-waqfeya-classify-shard.mjs",
     "rechercher:acquisition-router": "node scripts/rechercher-acquisition-router.mjs",
+    "rechercher:auto-acquire-plan": "node -e \"import('./src/rechercher-auto-acquisition.js').then(async m=>{const fs=await import('node:fs/promises'); const input=process.env.INPUT_PATH ?? 'data/corpus/rechercher/discovered-books.jsonl'; const output=process.env.OUTPUT_PATH ?? 'data/corpus/rechercher/auto-acquisition-plan.jsonl'; const rows=(await fs.readFile(input,'utf8')).split(/\\r?\\n/).filter(Boolean).map(JSON.parse); await fs.mkdir(output.slice(0,output.lastIndexOf('/'))||'.',{recursive:true}); const plan=m.buildAutoAcquisitionPlan(rows); await fs.writeFile(output,plan.map(JSON.stringify).join('\\n')+(plan.length?'\\n':'')); console.log(JSON.stringify({total:plan.length,autoDownload:plan.filter(x=>x.outcome.startsWith('AUTO_DOWNLOAD')).length,readOnly:plan.filter(x=>x.outcome==='READ_ONLY_OR_LINK_ONLY').length,output},null,2));})\"",
     "rechercher:purge-plan": "node scripts/rechercher-purge-restricted.mjs"
   },
   "engines": {
