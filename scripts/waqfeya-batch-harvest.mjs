@@ -11,12 +11,19 @@ const batchSize = Math.max(1, Number(process.env.WAQFEYA_BATCH_SIZE || 25));
 const start = Math.max(1, Number(process.env.WAQFEYA_START || 1));
 const pages = Math.max(1, Number(process.env.WAQFEYA_PAGES || 8));
 const bookIdBatch = Math.max(batchSize, Number(process.env.WAQFEYA_BOOK_ID_BATCH || pages * 50));
+const proofUrls = String(process.env.WAQFEYA_PROOF_URLS || '').split(/\s+/u).filter(Boolean);
+const maxDownloadBytes = Math.max(1, Number(process.env.WAQFEYA_MAX_DOWNLOAD_MB || 200)) * 1024 * 1024;
 
-function curl(url, output = null) {
-  const args = ['-L', '--fail', '--silent', '--show-error', '--retry', '4', '--connect-timeout', '30', '-A', 'Mozilla/5.0 (compatible; DeenAllahEncyclopedia/2026; +https://github.com/lalibimohamed-maker/-dorar-hadith-api-official)'];
-  if (output) args.push('-o', output, url);
-  else args.push(url);
+const USER_AGENT = 'Mozilla/5.0 (compatible; DeenAllahEncyclopedia/2026; +https://github.com/lalibimohamed-maker/-dorar-hadith-api-official)';
+
+function curlText(url) {
+  const args = ['-L', '--fail', '--silent', '--show-error', '--retry', '4', '--connect-timeout', '30', '--max-time', '90', '-A', USER_AGENT, url];
   return execFileSync('curl', args, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 });
+}
+
+function curlFile(url, output) {
+  const args = ['-L', '--fail', '--silent', '--show-error', '--retry', '4', '--connect-timeout', '30', '--max-time', '180', '--max-filesize', String(maxDownloadBytes), '-A', USER_AGENT, '-o', output, url];
+  execFileSync('curl', args, { encoding: 'utf8', maxBuffer: 2 * 1024 * 1024 });
 }
 
 function safeName(value) {
@@ -31,6 +38,15 @@ function absolute(base, href) {
   try { return new URL(href, base).href; } catch { return null; }
 }
 
+function htmlDecode(value) {
+  return String(value)
+    .replaceAll('&amp;', '&')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&nbsp;', ' ')
+    .trim();
+}
+
 function titleFromHtml(html, fallback) {
   const patterns = [
     /<h1[^>]*>([\s\S]*?)<\/h1>/i,
@@ -40,90 +56,147 @@ function titleFromHtml(html, fallback) {
   for (const re of patterns) {
     const m = html.match(re);
     if (m?.[1]) {
-      const text = m[1].replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ').replace(/\s+/g, ' ').trim();
-      if (text) return text.replace(/\s*[-|–—]\s*المكتبة الوقفية.*$/u, '').trim();
+      const text = m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      if (text) return htmlDecode(text).replace(/\s*[-|–—]\s*المكتبة الوقفية.*$/u, '').trim();
     }
   }
   return fallback;
 }
 
-function extractPdfUrls(html, base) {
-  const urls = new Set();
-  const add = (value) => {
-    if (!value) return;
-    const normalized = String(value).replaceAll('\\/', '/').replaceAll('&amp;', '&');
-    const resolved = absolute(base, normalized);
-    if (resolved) urls.add(resolved);
+function extractDownloadUrls(html, base) {
+  const urls = [];
+  const add = (href, label = '') => {
+    if (!href) return;
+    const decoded = htmlDecode(String(href).replaceAll('\\/', '/'));
+    const resolved = absolute(base, decoded);
+    if (!resolved || !/^https?:\/\//iu.test(resolved)) return;
+    const signal = `${resolved} ${label}`;
+    if (/\.pdf(?:$|[?#])/iu.test(resolved) || /تحميل\s+الكتاب|تحميل|download|pdf|مجلد/iu.test(signal)) urls.push(resolved);
   };
+
+  for (const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+    const attrs = m[1] || '';
+    const label = (m[2] || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const href = (attrs.match(/\bhref=["']([^"']+)["']/i) || [])[1];
+    add(href, label);
+  }
 
   for (const m of html.matchAll(/(?:href|src|url|downloadUrl|download_url|file)=["']([^"']+)["']/gi)) add(m[1]);
   for (const m of html.matchAll(/["'](https?:\/\/archive\.org\/(?:download|details)\/[^"']+)["']/gi)) add(m[1]);
 
-  return [...urls].filter((u) => /\.pdf(?:$|[?#])/i.test(u));
+  return [...new Set(urls)];
+}
+
+function isPdfFile(file) {
+  if (!fs.existsSync(file)) return false;
+  const stat = fs.statSync(file);
+  if (stat.size < 5) return false;
+  const fd = fs.openSync(file, 'r');
+  try {
+    const buf = Buffer.alloc(5);
+    fs.readSync(fd, buf, 0, 5, 0);
+    return buf.toString('ascii') === '%PDF-';
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+function canonicalFromHtml(html, fallback) {
+  const m = html.match(/https?:\/\/waqfeya\.net\/books\/[^"'\s<]+/iu);
+  return m?.[0] || fallback;
+}
+
+async function fetchBookUrl(url, forcedBookId = null) {
+  let html;
+  try {
+    html = curlText(url);
+  } catch (error) {
+    return { bookId: forcedBookId, status: 'unavailable', sourcePage: url, reason: `book-fetch:${error.message}` };
+  }
+
+  if (!/المكتبة الوقفية|waqfeya/iu.test(html)) {
+    return { bookId: forcedBookId, status: 'not-a-waqfeya-page', sourcePage: url };
+  }
+
+  const sourcePage = canonicalFromHtml(html, url);
+  const fallbackTitle = forcedBookId ? `Waqfeya book ${forcedBookId}` : 'Waqfeya book';
+  const title = titleFromHtml(html, fallbackTitle);
+  const rights = html.match(/(وقف\s+لله(?:\s+تعالى)?|وقف\s+على\s+طلبة\s+العلم|متاح\s+للتوزيع\s+بحرية|توزيع\s+حر)/u);
+  const downloadUrls = extractDownloadUrls(html, sourcePage);
+
+  if (!rights) return { bookId: forcedBookId, status: 'rights-not-explicit', title, sourcePage, downloadUrls };
+  if (!downloadUrls.length) return { bookId: forcedBookId, status: 'rights-ok-no-download-link', title, sourcePage, rightsEvidence: rights[1] };
+
+  return { bookId: forcedBookId, status: 'candidate', title, sourcePage, rightsEvidence: rights[1], downloadUrls };
 }
 
 async function fetchBook(bookId) {
-  const legacy = `https://waqfeya.net/book.php?bid=${bookId}`;
-  let html;
-  try { html = curl(legacy); } catch (error) {
-    return { bookId, status: 'unavailable', reason: `book-fetch:${error.message}` };
-  }
-
-  if (!/المكتبة الوقفية|waqfeya/i.test(html)) {
-    return { bookId, status: 'not-a-waqfeya-page' };
-  }
-
-  const canonical = (html.match(/https:\/\/waqfeya\.net\/books\/[^"'\\s<]+/i) || [])[0] || legacy;
-  const fallbackTitle = `Waqfeya book ${bookId}`;
-  const title = titleFromHtml(html, fallbackTitle);
-
-  const rights = html.match(/(وقف\s+لله(?:\s+تعالى)?|وقف\s+على\s+طلبة\s+العلم|متاح\s+للتوزيع\s+بحرية|توزيع\s+حر)/u);
-  if (!rights) return { bookId, status: 'rights-not-explicit', title, sourcePage: canonical };
-
-  const pdfUrls = extractPdfUrls(html, canonical);
-  if (!pdfUrls.length) {
-    return { bookId, status: 'rights-ok-no-pdf-link', title, sourcePage: canonical, rightsEvidence: rights[1] };
-  }
-
-  return { bookId, status: 'candidate', title, sourcePage: canonical, rightsEvidence: rights[1], pdfUrls };
+  return fetchBookUrl(`https://waqfeya.net/book.php?bid=${bookId}`, bookId);
 }
 
 const discovered = [];
 const skipped = [];
 let existingPagesFetched = 0;
 let rightsChecked = 0;
-let pdfLinksFound = 0;
+let downloadLinksFound = 0;
 let downloaded = 0;
+let proofCandidates = 0;
 
-for (let offset = 0; offset < bookIdBatch; offset += 1) {
-  const result = await fetchBook(start + offset);
-  if (['candidate', 'rights-ok-no-pdf-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
+// 1) Deterministic proof: known real book page(s), independent of numeric book IDs.
+for (const url of proofUrls) {
+  const result = await fetchBookUrl(url);
+  proofCandidates += 1;
+  if (['candidate', 'rights-ok-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
   if (result.status === 'candidate') {
     rightsChecked += 1;
-    pdfLinksFound += result.pdfUrls.length;
-    discovered.push(result);
-  } else if (result.status !== 'not-a-waqfeya-page') {
-    skipped.push(result);
+    downloadLinksFound += result.downloadUrls.length;
+    discovered.push({ ...result, proof: true });
+  } else {
+    skipped.push({ ...result, proof: true });
   }
-  if (discovered.length >= batchSize) break;
+}
+
+// 2) Bulk scan: keep probing numeric IDs so one broken/empty range does not stop the campaign.
+if (discovered.filter((x) => x.proof).length < batchSize) {
+  for (let offset = 0; offset < bookIdBatch; offset += 1) {
+    const result = await fetchBook(start + offset);
+    if (['candidate', 'rights-ok-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
+    if (result.status === 'candidate') {
+      rightsChecked += 1;
+      downloadLinksFound += result.downloadUrls.length;
+      discovered.push(result);
+    } else if (result.status !== 'not-a-waqfeya-page') {
+      skipped.push(result);
+    }
+    if (discovered.length >= batchSize) break;
+  }
 }
 
 const manifest = [];
 for (const book of discovered) {
-  const pdfUrl = book.pdfUrls.find((u) => /\.pdf(?:$|[?#])/i.test(u));
-  if (!pdfUrl) continue;
-
   const id = `${safeName(book.title)}-${crypto.createHash('sha1').update(book.sourcePage).digest('hex').slice(0, 10)}`;
   const pdf = path.join(out, `${id}.pdf`);
-  try {
-    curl(pdfUrl, pdf);
-  } catch (error) {
-    skipped.push({ ...book, status: 'pdf-download-failed', reason: error.message, pdfUrl });
-    continue;
+  let downloadedFrom = null;
+  let lastError = null;
+
+  for (const candidateUrl of book.downloadUrls) {
+    try {
+      curlFile(candidateUrl, pdf);
+      if (!isPdfFile(pdf)) {
+        lastError = `downloaded-content-is-not-pdf:${candidateUrl}`;
+        fs.rmSync(pdf, { force: true });
+        continue;
+      }
+      downloadedFrom = candidateUrl;
+      break;
+    } catch (error) {
+      lastError = `pdf-download-failed:${error.message}`;
+      fs.rmSync(pdf, { force: true });
+    }
   }
 
-  if (!fs.existsSync(pdf) || fs.statSync(pdf).size === 0) {
-    skipped.push({ ...book, status: 'empty-download', pdfUrl });
+  if (!downloadedFrom) {
+    skipped.push({ ...book, status: 'pdf-download-failed', reason: lastError || 'no-working-download-url' });
     continue;
   }
 
@@ -133,11 +206,12 @@ for (const book of discovered) {
     title: book.title,
     source: 'Waqfeya',
     sourcePage: book.sourcePage,
-    downloadUrl: pdfUrl,
-    rightsStatus: 'waqf-explicit',
+    downloadUrl: downloadedFrom,
+    rightsStatus: 'explicit-waqf-or-free-distribution-signal',
     rightsEvidence: book.rightsEvidence,
     bytes,
-    sha256: sha256(pdf)
+    sha256: sha256(pdf),
+    proof: Boolean(book.proof)
   });
   downloaded += 1;
 }
@@ -147,17 +221,17 @@ const result = {
   start,
   requestedBatchSize: batchSize,
   bookIdBatch,
+  proofUrls,
+  proofCandidates,
   existingPagesFetched,
   discoveredCandidates: discovered.length,
   rightsChecked,
-  pdfLinksFound,
+  downloadLinksFound,
   downloaded,
   books: manifest,
   skipped
 };
 
 fs.writeFileSync(path.join(out, 'manifest.json'), `${JSON.stringify(result, null, 2)}\n`);
-console.log(JSON.stringify({ existingPagesFetched, discoveredCandidates: discovered.length, rightsChecked, pdfLinksFound, downloaded }, null, 2));
-
-// A zero-download scan is diagnostic, not a workflow failure. This keeps the crawler moving to the next ID range.
-process.exitCode = 0;
+console.log(JSON.stringify({ existingPagesFetched, discoveredCandidates: discovered.length, rightsChecked, downloadLinksFound, downloaded }, null, 2));
+process.exitCode = downloaded > 0 ? 0 : 2;
