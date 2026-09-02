@@ -7,10 +7,10 @@ import { spawn } from 'node:child_process';
 
 const INDEX_PATH = process.env.INDEX_PATH ?? 'data/corpus/waqfeya/century-15/index.jsonl';
 const START = Number(process.env.BOOK_START ?? '0');
-const COUNT = Number(process.env.BOOK_COUNT ?? '100');
+const COUNT = Number(process.env.BOOK_COUNT ?? '500');
 const SHARD_ID = String(process.env.SHARD_ID ?? `start-${START}`);
 const OUT_DIR = `artifacts/waqfeya/${SHARD_ID}`;
-const PDF_DIR = `${OUT_DIR}/pdf`; // PDFs remain runner-local unless an explicitly configured publisher is added later.
+const PDF_DIR = `${OUT_DIR}/pdf`;
 const USER_AGENT = 'Deen-Allah-Encyclopedia-Waqfeya-Harvester/2026';
 const ALLOWED_DOWNLOAD_HOSTS = new Set(['waqfeya.net', 'www.waqfeya.net', 'archive.org', 'www.archive.org']);
 
@@ -136,8 +136,8 @@ async function pLimit(items, limit, fn) {
 }
 
 async function main() {
-  if (!Number.isInteger(START) || START < 0 || !Number.isInteger(COUNT) || COUNT < 1 || COUNT > 100) {
-    throw new Error('BOOK_START must be >= 0 and BOOK_COUNT must be between 1 and 100');
+  if (!Number.isInteger(START) || START < 0 || !Number.isInteger(COUNT) || COUNT < 1 || COUNT > 500) {
+    throw new Error('BOOK_START must be >= 0 and BOOK_COUNT must be between 1 and 500');
   }
   const raw = await readFile(INDEX_PATH, 'utf8');
   const records = raw.split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
@@ -222,7 +222,7 @@ async function main() {
     rightsNotProvenCount: results.filter((r) => r.status === 'rights-not-proven').length,
     failedCount: results.filter((r) => r.status.includes('failed')).length,
     generatedAt: new Date().toISOString(),
-    persistence: 'PDFs are intentionally runner-local; this job persists only metadata and cryptographic evidence unless a separately configured storage publisher is approved.',
+    persistence: 'PDFs are runner-local; metadata and cryptographic evidence are preserved as workflow artifacts. Permanent corpus storage requires an approved persistent storage publisher.',
   };
   await writeFile(`${OUT_DIR}/manifest.json`, `${JSON.stringify({ shard: summary, books: results }, null, 2)}\n`, 'utf8');
   await writeFile(`${OUT_DIR}/summary.json`, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
