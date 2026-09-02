@@ -1,0 +1,57 @@
+name: @Rechercher Rights Discovery Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_sources:
+        description: 'Maximum source pages to inspect'
+        required: false
+        default: '100'
+        type: string
+      concurrency:
+        description: 'Concurrent source fetches'
+        required: false
+        default: '4'
+        type: string
+  schedule:
+    - cron: '17 2 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Test @Rechercher
+        run: npm run test:rechercher
+      - name: Audit source catalog
+        env:
+          MAX_SOURCES: ${{ inputs.max_sources || '100' }}
+          CONCURRENCY: ${{ inputs.concurrency || '4' }}
+        run: npm run rechercher:rights-audit
+      - name: Validate audit artifact
+        run: |
+          set -euo pipefail
+          test -s data/corpus/rechercher/source-audit-2026.json
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const data = JSON.parse(fs.readFileSync('data/corpus/rechercher/source-audit-2026.json','utf8'));
+          if (data.engine !== '@Rechercher') throw new Error('Wrong engine marker');
+          if (!Number.isInteger(data.sourceCount) || data.sourceCount < 1) throw new Error('No source audit results');
+          for (const row of data.results) {
+            if (!row.sourceUrl) throw new Error('Missing source URL');
+            if (!row.rightsDecision) throw new Error(`Missing rights decision for ${row.sourceUrl}`);
+          }
+          console.log(`Audited sources: ${data.sourceCount}`);
+          NODE
