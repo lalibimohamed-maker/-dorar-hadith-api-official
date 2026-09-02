@@ -1,0 +1,52 @@
+{
+  "version": "2026.09.02",
+  "name": "Deen Allah Encyclopedia — Book Acquisition & Licensing Campaign",
+  "purpose": "Build a global multilingual book library by acquiring every legally redistributable edition and registering protected works for permission requests without publishing unauthorized full-text copies.",
+  "operatingModes": {
+    "redistributable": {
+      "action": "download-and-store",
+      "formats": ["pdf", "epub", "txt", "json", "html"],
+      "evidenceRequired": ["public-domain", "explicit-redistribution-permission", "compatible-open-license", "waqf-with-explicit-redistribution-allowance"],
+      "provenanceRequired": ["source", "sourceUrl", "sourceType", "author", "edition", "rightsEvidence", "retrievedAt", "sha256"]
+    },
+    "protected": {
+      "action": "register-and-request-permission",
+      "publicStorage": "metadata-and-official-link-only",
+      "localFullText": "only-after-documented-permission-or-other-verified-legal-basis",
+      "requestedPermissionLevels": ["online-reading-inside-encyclopedia", "search-and-citation", "offline-download", "multilingual-conversion", "OCR-derived-accessible-edition"],
+      "defaultDownload": false
+    },
+    "rights-unclear": {
+      "action": "do-not-mirror",
+      "publicStorage": "metadata-and-source-link-only",
+      "nextStep": "contact-rights-holder-or-source"
+    }
+  },
+  "sourcesAlreadyIdentified": [
+    {"name":"Waqfeya","url":"https://waqfeya.net/","priority":"high","role":"discover-and-acquire-explicitly-permitted/waqf editions"},
+    {"name":"Qatar Digital Library","url":"https://www.qdl.qa/","priority":"high","role":"item-level rights classification; acquire only Public Domain/compatible licensed reuse"},
+    {"name":"Qatar National Library","url":"https://www.qnl.qa/","priority":"high","role":"heritage discovery and rights review"},
+    {"name":"Quran Foundation","url":"https://quran.foundation/","priority":"high","role":"API/display and approved Content Sync resources under current developer terms"},
+    {"name":"King Fahd Quran Complex","url":"https://qurancomplex.gov.sa/","priority":"high","role":"official Quran editions/recitations; verify item-specific reuse"},
+    {"name":"UAE MBRF Digital Library","url":"https://ddl.ae/","priority":"medium","role":"discovery; verify rights per title/edition before acquisition"},
+    {"name":"King Abdullah documentation center","url":"https://kacnd.org/","priority":"medium","role":"discovery; verify item-level intellectual-property terms"},
+    {"name":"National and heritage libraries of the Arab world","url":"config/arab-world-source-registry-2026.json","priority":"high","role":"federated discovery and rights classification"},
+    {"name":"Internet Archive","url":"https://archive.org/","priority":"high","role":"open/public-domain item discovery; verify the rights attached to each item"},
+    {"name":"Maktaba Shamela","url":"https://shamela.ws/","priority":"medium","role":"research/discovery; do not infer mirroring permission from availability alone"}
+  ],
+  "knownProtectedOrPermissionRequired": [
+    {"title":"جامع الترمذي — ط. الأفكار","source":"Waqfeya","sourceUrl":"https://waqfeya.net/books/جامع-الترمذي-سنن-الترمذي-ط-الأفكار-0f02c1074be347a1b5acfdf025268700","status":"permission-review","note":"Waqfeya page states the edition was printed at the expense of Sheikh Muhammad bin Salih Al-Rajhi as waqf; waqf wording alone is not treated as an automatic republication license."},
+    {"title":"سنن أبي داود — ط. الأفكار","source":"Waqfeya","sourceUrl":"https://waqfeya.net/books/سنن-أبي-داود-ط-الأفكار-62b45b4d81704c8794decea85a924b9c","status":"permission-review","note":"Edition carries an explicit waqf statement; redistribution allowance still requires item/source evidence."},
+    {"title":"سنن النسائي — ط. الأفكار","source":"Waqfeya","sourceUrl":"https://waqfeya.net/books/سنن-النسائي-ط-الأفكار-218dcf651984455a98ec2c452e24f3a2","status":"permission-review","note":"Edition carries an explicit waqf statement; redistribution allowance still requires item/source evidence."},
+    {"title":"صحيح البخاري — ط. الأفكار","source":"Waqfeya","sourceUrl":"https://waqfeya.net/books/صحيح-البخاري-ط-الأفكار-bc1eab2741b746fca5531f69a651bc89","status":"permission-review","note":"Edition carries an explicit waqf statement; the edition includes modern editorial and publishing work, so rights must be verified before mirroring."}
+  ],
+  "campaignRules": [
+    "Never treat a download button, free reading access, or a waqf statement by itself as a blanket republication license.",
+    "Every acquired file must carry source URL, rights evidence, retrieval timestamp, SHA-256, and edition metadata.",
+    "Protected books are registered now so they are not forgotten; their full text is not published until permission is documented.",
+    "When a rights holder grants permission, update the same record and promote it to redistributable mode without changing the bibliographic identity.",
+    "Where only online reading is granted, enable the in-app reader and citation workflow while keeping download/export disabled.",
+    "For translations, each language/edition is tracked independently because translation rights can differ from the Arabic original.",
+    "The final downloadable encyclopedia bundle contains only works whose redistribution status is verified."
+  ]
+}
