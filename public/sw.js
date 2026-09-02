@@ -18,7 +18,6 @@ self.addEventListener("fetch", (event) => {
   const accept = request.headers.get("accept") || "";
   const pathname = new URL(request.url).pathname.toLowerCase();
   const isPdf = accept.includes("application/pdf") || pathname.endsWith(".pdf");
-
   if (!isPdf) return;
 
   event.respondWith((async () => {
@@ -26,18 +25,15 @@ self.addEventListener("fetch", (event) => {
     const cached = await cache.match(request.url);
     if (cached) return cached;
 
-    if (!self.navigator?.onLine) {
-      return new Response("Offline PDF is not downloaded on this device.", {
-        status: 504,
-        headers: { "Content-Type": "text/plain; charset=utf-8" }
-      });
-    }
+    // Unknown PDFs are never cached here. Only downloadPdfForOffline(),
+    // after governance + byte-size + SHA-256 verification, may populate
+    // the PDF cache.
+    if (self.navigator?.onLine) return fetch(request);
 
-    const response = await fetch(request);
-    if (response.ok && response.type !== "opaque") {
-      await cache.put(request.url, response.clone());
-    }
-    return response;
+    return new Response("Offline PDF is not downloaded on this device.", {
+      status: 504,
+      headers: { "Content-Type": "text/plain; charset=utf-8" }
+    });
   })().catch(() => new Response("PDF unavailable offline.", {
     status: 504,
     headers: { "Content-Type": "text/plain; charset=utf-8" }
