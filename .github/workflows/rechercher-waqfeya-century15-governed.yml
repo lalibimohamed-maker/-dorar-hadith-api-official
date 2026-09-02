@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   inventory:
@@ -16,76 +17,89 @@ jobs:
     timeout-minutes: 45
     outputs:
       total: ${{ steps.inventory.outputs.total }}
+      matrix: ${{ steps.inventory.outputs.matrix }}
     steps:
       - id: inventory
-        name: Crawl all catalog pages with curl
+        name: Crawl the live Century-15 page
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts/waqfeya-century15/pages
-          first='https://waqfeya.net/centuries/%D8%A7%D9%84%D9%82%D8%B1%D9%86-15-%D9%87%D9%80-426d13bd9086441e84cbb8b7ed9d3a1a'
-          curl --fail --location --silent --show-error --retry 6 --retry-all-errors --connect-timeout 20 --max-time 60 \
-            -A 'Rechercher-governed-acquisition/1.0' "$first" -o artifacts/waqfeya-century15/pages/century.html
-          total=$(python3 - <<'PY'
-          import re
-          html=open('artifacts/waqfeya-century15/pages/century.html',encoding='utf-8',errors='replace').read()
-          matches=re.findall(r'عدد الكتب\s*[:：]\s*([0-9,٬]+)',html)
-          if not matches:
-              raise SystemExit('Could not parse Waqfeya Century-15 live count')
-          print(int(matches[0].replace(',','').replace('٬','')))
-          PY
-          )
-          echo "Live reported count: $total"
-          echo "total=$total" >> "$GITHUB_OUTPUT"
-          : > artifacts/waqfeya-century15/inventory.jsonl
-          base='https://waqfeya.com/top.php?st='
-          page_size=50
-          for offset in $(seq 0 50 $(( ((total-1)/50)*50 )) ); do
-            url="${base}${offset}"
-            out="artifacts/waqfeya-century15/pages/top-${offset}.html"
-            curl --fail --location --silent --show-error --retry 6 --retry-all-errors --connect-timeout 20 --max-time 60 \
-              -A 'Rechercher-governed-acquisition/1.0' "$url" -o "$out"
-            OFFSET="$offset" python3 - <<'PY' >> /tmp/waqfeya-rows.jsonl
-          import json,os,urllib.parse
+          first='https://www.waqfeya.net/centuries/%D8%A7%D9%84%D9%82%D8%B1%D9%86-15-%D9%87%D9%80-426d13bd9086441e84cbb8b7ed9d3a1a'
+          curl --fail --location --silent --show-error --retry 6 --retry-all-errors --connect-timeout 20 --max-time 90 \
+            -A 'Mozilla/5.0 (compatible; Rechercher-governed-acquisition/1.0)' \
+            -H 'Accept: text/html,application/xhtml+xml' \
+            "$first" -o artifacts/waqfeya-century15/pages/century.html
+
+          python3 - <<'PY'
+          import html as htmlmod
+          import json, os, re, urllib.parse
           from html.parser import HTMLParser
-          path=f"artifacts/waqfeya-century15/pages/top-{os.environ['OFFSET']}.html"
+
+          path='artifacts/waqfeya-century15/pages/century.html'
+          raw=open(path,encoding='utf-8',errors='replace').read()
+          decoded=htmlmod.unescape(raw).replace('\\/','/')
+          if '<title' not in decoded.lower() and len(decoded) < 1000:
+              raise SystemExit('Waqfeya response is unexpectedly small; refusing to build an incomplete inventory')
+
           class P(HTMLParser):
               def __init__(self): super().__init__(); self.hrefs=[]
-              def handle_starttag(self,tag,attrs):
+              def handle_starttag(self, tag, attrs):
                   h=dict(attrs).get('href')
                   if h: self.hrefs.append(h)
-          p=P(); p.feed(open(path,encoding='utf-8',errors='replace').read())
+
+          p=P(); p.feed(decoded)
+          found=[]
           seen=set()
           for h in p.hrefs:
-              u=urllib.parse.urljoin('https://waqfeya.net',h)
-              if '/books/' not in u or u in seen: continue
-              seen.add(u); print(json.dumps({'sourcePage':u,'catalogOffset':int(os.environ['OFFSET'])},ensure_ascii=False))
-          PY
-          done
-          python3 - <<'PY'
-          import json
-          seen=set(); rows=[]
-          for line in open('/tmp/waqfeya-rows.jsonl',encoding='utf-8'):
-              r=json.loads(line)
-              if r['sourcePage'] in seen: continue
-              seen.add(r['sourcePage']); r['ordinal']=len(rows)+1; rows.append(r)
+              u=urllib.parse.urljoin('https://www.waqfeya.net',h)
+              if '/books/' not in u: continue
+              u=u.split('#',1)[0]
+              if u in seen: continue
+              seen.add(u); found.append(u)
+
+          # Also catch JSON/JS-escaped book URLs in framework-rendered responses.
+          for m in re.finditer(r'https?://(?:www\\.)?waqfeya\\.net/books/[^"\\s<>]+|/books/[^"\\s<>]+', decoded):
+              u=urllib.parse.urljoin('https://www.waqfeya.net',m.group(0))
+              if u not in seen:
+                  seen.add(u); found.append(u)
+
+          if not found:
+              raise SystemExit('No /books/ links found in the live Century-15 response; refusing to fall back to a guessed offset/count')
+
+          count_match=re.search(r'عدد الكتب\\s*[:：]\\s*([0-9,٬\\s]+)', decoded)
+          reported=int(re.sub(r'[^0-9]','',count_match.group(1))) if count_match else None
+          records=[{'ordinal':i+1,'sourcePage':u,'catalogPage':first} for i,u in enumerate(found)]
+
           with open('artifacts/waqfeya-century15/inventory.jsonl','w',encoding='utf-8') as f:
-              for r in rows: f.write(json.dumps(r,ensure_ascii=False)+'\n')
-          json.dump({'source':'https://waqfeya.net/centuries/القرن-15-هـ-426d13bd9086441e84cbb8b7ed9d3a1a','reportedCount':int(open('artifacts/waqfeya-century15/pages/century.html',encoding='utf-8',errors='replace').read() and 0)},open('/tmp/unused','w'))
-          print(f'Observed unique book pages: {len(rows)}')
-          if len(rows) < int(__import__('os').environ.get('MIN_EXPECTED','1')): raise SystemExit('No book pages were discovered')
+              for r in records: f.write(json.dumps(r,ensure_ascii=False)+'\\n')
+
+          observed=len(records)
+          metadata={
+              'source':first,
+              'reportedCount':reported,
+              'observedUniqueBookPages':observed,
+              'countDelta': (observed-reported) if reported is not None else None,
+              'generatedAt':__import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(),
+              'policy':'Inventory is source-discovery only; acquisition remains rights-gated per edition.'
+          }
+          json.dump(metadata,open('artifacts/waqfeya-century15/source-count.json','w'),ensure_ascii=False,indent=2)
+
+          shard_size=100
+          matrix={'include':[{'start':s} for s in range(0,observed,shard_size)]}
+          open('matrix.json','w',encoding='utf-8').write(json.dumps(matrix,separators=(',',':')))
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as out:
+              out.write(f'total={observed}\\n')
+              out.write(f'matrix={json.dumps(matrix,separators=(",",":"))}\\n')
+          print(json.dumps(metadata,ensure_ascii=False))
+          print(f'Built {len(found)} Century-15 book records; reported site count={reported!r}')
           PY
-          python3 - <<'PY'
-          import json,re
-          html=open('artifacts/waqfeya-century15/pages/century.html',encoding='utf-8',errors='replace').read()
-          total=int(re.findall(r'عدد الكتب\s*[:：]\s*([0-9,٬]+)',html)[0].replace(',','').replace('٬',''))
-          rows=sum(1 for _ in open('artifacts/waqfeya-century15/inventory.jsonl',encoding='utf-8'))
-          json.dump({'source':'https://waqfeya.net/centuries/القرن-15-هـ-426d13bd9086441e84cbb8b7ed9d3a1a','reportedCount':total,'pageSize':50,'observedUniqueBookPages':rows},open('artifacts/waqfeya-century15/source-count.json','w'),ensure_ascii=False,indent=2)
-          PY
+
           test -s artifacts/waqfeya-century15/inventory.jsonl
           cat artifacts/waqfeya-century15/source-count.json
 
       - name: Publish complete inventory
+        if: success()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: rechercher-waqfeya-century15-inventory-${{ github.run_id }}
@@ -99,8 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 12
-      matrix:
-        start: [0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,3300,3400,3500,3600,3700,3800,3900,4000,4100,4200,4300,4400,4500,4600,4700,4800,4900,5000,5100,5200,5300,5400,5500,5600,5700,5800,5900,6000,6100,6200,6300,6400,6500,6600]
+      matrix: ${{ fromJSON(needs.inventory.outputs.matrix) }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -145,8 +158,9 @@ jobs:
           from html.parser import HTMLParser
 
           START=int(os.environ['START']); COUNT=100
-          rows=open('artifacts/waqfeya-century15/inventory.jsonl',encoding='utf-8').read().splitlines()[START:START+COUNT]
-          out='artifacts/waqfeya-century15/shard-%05d' % START
+          lines=open('artifacts/waqfeya-century15/inventory.jsonl',encoding='utf-8').read().splitlines()
+          rows=[json.loads(x) for x in lines[START:START+COUNT]]
+          out=f'artifacts/waqfeya-century15/shard-{START:05d}'
           os.makedirs(out+'/pdf',exist_ok=True)
 
           class P(HTMLParser):
@@ -157,42 +171,53 @@ jobs:
               def handle_data(self,d): self.text.append(d)
 
           def fetch(url):
-              req=urllib.request.Request(url,headers={'User-Agent':'Rechercher-governed-acquisition/1.0'})
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (compatible; Rechercher-governed-acquisition/1.0)'})
               return urllib.request.urlopen(req,timeout=45).read().decode('utf-8','replace')
 
-          results=[]; eligible=0; downloaded=0
-          for line in rows:
-              rec=json.loads(line); url=rec['sourcePage']
+          results=[]; cleared=0; downloaded=0
+          for rec in rows:
+              url=rec['sourcePage']
               try:
                   p=P(); p.feed(fetch(url)); text=' '.join(p.text)
-                  explicit=bool(re.search(r'وقف لله|وقفٌ لله|وقف لله تعالى|يوزع مجانا|يوزّع مجانا|مجانا ولا يجوز بيعه|إتاحة حرة|متاح مجانا',text,re.I))
+                  explicit=bool(re.search(r'وقف لله|وقف\\s*لله\\s*تعالى|يوزع\\s*مجانا|يوزّع\\s*مجانا|مجانا\\s*ولا\\s*يجوز\\s*بيعه|إتاحة\\s*حرة|متاح\\s*مجانا',text,re.I))
                   candidates=[]
                   for h in p.links:
                       u=urllib.parse.urljoin(url,h)
-                      if u.lower().endswith('.pdf') and ('waqfeya.net' in u.lower() or 'archive.org' in u.lower()): candidates.append(u)
-                  item={'ordinal':rec['ordinal'],'sourcePage':url,'explicitWaqfOrFreeEvidence':explicit,'downloadCandidates':candidates[:10]}
+                      if not u.lower().endswith('.pdf'): continue
+                      host=urllib.parse.urlsplit(u).hostname or ''
+                      if host not in {'waqfeya.net','www.waqfeya.net','archive.org','www.archive.org'}: continue
+                      candidates.append(u)
+                  item={'ordinal':rec['ordinal'],'sourcePage':url,'explicitWaqfOrFreeEvidence':explicit,'downloadCandidates':list(dict.fromkeys(candidates))[:10]}
                   if explicit and candidates:
-                      eligible += 1
-                      for u in candidates[:10]:
+                      cleared += 1
+                      for u in item['downloadCandidates']:
                           try:
-                              req=urllib.request.Request(u,headers={'User-Agent':'Rechercher-governed-acquisition/1.0'})
+                              req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0 (compatible; Rechercher-governed-acquisition/1.0)'})
                               data=urllib.request.urlopen(req,timeout=180).read()
                               if not data.startswith(b'%PDF-'): continue
-                              sha=hashlib.sha256(data).hexdigest(); path=f'{out}/pdf/{rec["ordinal"]:05d}-{sha[:16]}.pdf'
+                              sha=hashlib.sha256(data).hexdigest()
+                              path=f'{out}/pdf/{rec["ordinal"]:05d}-{sha[:16]}.pdf'
                               open(path,'wb').write(data)
-                              item.update(download=u,bytes=len(data),sha256=sha,localPath=path,status='VERIFIED_PDF'); downloaded += 1; break
-                          except Exception as e: item['downloadError']=str(e)
-                  else: item['status']='READ_ONLY_OR_UNCLEARED'
+                              item.update(downloadUrl=u,bytes=len(data),sha256=sha,localPath=path,status='VERIFIED_PDF'); downloaded += 1
+                              break
+                          except Exception as e:
+                              item['downloadError']=str(e)
+                      if 'status' not in item: item['status']='RIGHTS_CLEARED_NO_VERIFIED_PDF'
+                  else:
+                      item['status']='READ_ONLY_OR_UNCLEARED'
                   results.append(item)
-              except Exception as e: results.append({'ordinal':rec['ordinal'],'sourcePage':url,'status':'ERROR','error':str(e)})
+              except Exception as e:
+                  results.append({'ordinal':rec['ordinal'],'sourcePage':url,'status':'ERROR','error':str(e)})
 
           json.dump(results,open(out+'/results.json','w'),ensure_ascii=False,indent=2)
-          json.dump({'start':START,'countRequested':COUNT,'recordsProcessed':len(results),'rightsClearedCandidates':eligible,'verifiedPdfs':downloaded},open(out+'/summary.json','w'),ensure_ascii=False,indent=2)
+          summary={'start':START,'countRequested':COUNT,'recordsProcessed':len(results),'rightsClearedCandidates':cleared,'verifiedPdfs':downloaded,'policy':'Rights are evaluated per edition; catalog inventory does not itself authorize mirroring.'}
+          json.dump(summary,open(out+'/summary.json','w'),ensure_ascii=False,indent=2)
           with open(out+'/pdfs.sha256','w') as f:
-              for root,_,files in os.walk(out+'/pdf'):
-                  for name in sorted(files):
-                      p=os.path.join(root,name); f.write(hashlib.sha256(open(p,'rb').read()).hexdigest()+'  '+p+'\n')
-          print(json.dumps({'start':START,'processed':len(results),'rightsCleared':eligible,'verifiedPdfs':downloaded},ensure_ascii=False))
+              for name in sorted(os.listdir(out+'/pdf')):
+                  p=os.path.join(out+'/pdf',name)
+                  f.write(hashlib.sha256(open(p,'rb').read()).hexdigest()+'  '+p+'\\n')
+          print(json.dumps(summary,ensure_ascii=False))
+          PY
 
       - name: Publish shard ledger and verified PDFs
         if: always()
