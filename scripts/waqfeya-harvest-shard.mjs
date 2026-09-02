@@ -4,10 +4,11 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
+import { classifyRightsEvidence, RIGHTS_DECISIONS } from '../src/rechercher-rights-engine.js';
 
 const INDEX_PATH = process.env.INDEX_PATH ?? 'data/corpus/waqfeya/century-15/index.jsonl';
 const START = Number(process.env.BOOK_START ?? '0');
-const COUNT = Number(process.env.BOOK_COUNT ?? '500');
+const COUNT = Number(process.env.BOOK_COUNT ?? '100');
 const SHARD_ID = String(process.env.SHARD_ID ?? `start-${START}`);
 const OUT_DIR = `artifacts/waqfeya/${SHARD_ID}`;
 const PDF_DIR = `${OUT_DIR}/pdf`;
@@ -53,34 +54,27 @@ function extractDirectPdfLinks(html, pageUrl) {
   return [...new Set(links)];
 }
 
-function extractRightsEvidence(text) {
+function extractRightsEvidence(text, source) {
   const normalized = text.replace(/\s+/g, ' ');
-  const positivePatterns = [
-    /وقف\s*(لله|لله تعالى|الله تعالى|خيرى)/u,
-    /وقف(?:ية)?/u,
-    /يوزّع\s+مجان(?:ا|اً)/u,
-    /يوزع\s+مجانا/u,
-    /متاح\s+للتوزيع\s+المجان(?:ي|ة)/u,
-    /public\s+domain/i,
-    /creative\s+commons/i,
-    /creativecommons/i,
-    /ترخيص\s+مفتوح/u,
-    /إذن\s+بالنشر/u,
-    /إتاحة\s+حرة/u,
-  ];
-  const restrictivePatterns = [
-    /جميع\s+الحقوق\s+محفوظة/u,
-    /all\s+rights\s+reserved/i,
-    /لا\s+يجوز\s+إعادة\s+النشر/u,
-    /يمنع\s+إعادة\s+النشر/u,
-  ];
-  const positives = positivePatterns.filter((re) => re.test(normalized)).map((re) => re.source);
-  const restrictions = restrictivePatterns.filter((re) => re.test(normalized)).map((re) => re.source);
-  return {
-    eligible: positives.length > 0 && restrictions.length === 0,
-    positiveSignals: positives,
-    restrictiveSignals: restrictions,
+  const evidence = [];
+  const context = (needle) => {
+    const index = normalized.search(needle);
+    return index >= 0 ? normalized.slice(Math.max(0, index - 160), index + 420) : '';
   };
+
+  if (/(public\s+domain|public-domain|ملكية عامة)/iu.test(normalized)) {
+    evidence.push({ source, kind: 'public-domain', text: context(/public\s+domain|public-domain|ملكية عامة/iu) });
+  }
+  if (/(creative\s+commons|creativecommons|cc0|cc[- ]by|cc[- ]by[- ]sa|ترخيص\s+مفتوح|إذن\s+بالنشر|إذن\s+بإعادة\s+النشر|يجوز\s+(?:نشر|إعادة نشر|إعادة توزيع))/iu.test(normalized)) {
+    evidence.push({ source, kind: 'explicit-redistribution-permission', text: context(/creative\s+commons|creativecommons|cc0|cc[- ]by|cc[- ]by[- ]sa|ترخيص\s+مفتوح|إذن\s+بالنشر|إذن\s+بإعادة\s+النشر|يجوز\s+(?:نشر|إعادة نشر|إعادة توزيع)/iu) });
+  }
+  if (/(وقف\s+لله|وقف\s+لله\s+تعالى|وقفية)/iu.test(normalized)) {
+    evidence.push({ source, kind: 'waqf', text: context(/وقف\s+لله|وقف\s+لله\s+تعالى|وقفية/iu) });
+  }
+  if (/(جميع\s+الحقوق\s+محفوظة|all\s+rights\s+reserved|لا\s+يجوز\s+إعادة\s+النشر|يمنع\s+إعادة\s+النشر)/iu.test(normalized)) {
+    evidence.push({ source, kind: 'copyright-reservation', text: context(/جميع\s+الحقوق\s+محفوظة|all\s+rights\s+reserved|لا\s+يجوز\s+إعادة\s+النشر|يمنع\s+إعادة\s+النشر/iu) });
+  }
+  return { evidence, decision: classifyRightsEvidence(evidence), rawText: normalized };
 }
 
 async function fetchHtml(url) {
@@ -136,8 +130,8 @@ async function pLimit(items, limit, fn) {
 }
 
 async function main() {
-  if (!Number.isInteger(START) || START < 0 || !Number.isInteger(COUNT) || COUNT < 1 || COUNT > 500) {
-    throw new Error('BOOK_START must be >= 0 and BOOK_COUNT must be between 1 and 500');
+  if (!Number.isInteger(START) || START < 0 || !Number.isInteger(COUNT) || COUNT < 1 || COUNT > 100) {
+    throw new Error('BOOK_START must be >= 0 and BOOK_COUNT must be between 1 and 100');
   }
   const raw = await readFile(INDEX_PATH, 'utf8');
   const records = raw.split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
@@ -162,9 +156,10 @@ async function main() {
       if (!pageUrl) throw new Error('invalid Waqfeya source URL');
       const html = await fetchHtml(pageUrl);
       const text = htmlToText(html);
-      const rights = extractRightsEvidence(text);
-      result.rights = rights;
-      if (!rights.eligible) {
+      const rights = extractRightsEvidence(text, pageUrl);
+      result.rightsEvidence = rights.evidence;
+      result.rightsDecision = rights.decision;
+      if (rights.decision.decision !== RIGHTS_DECISIONS.REDISTRIBUTABLE) {
         result.status = 'rights-not-proven';
         result.finishedAt = new Date().toISOString();
         results.push(result);
