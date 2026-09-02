@@ -7,13 +7,17 @@ on:
   workflow_dispatch:
     inputs:
       start:
-        description: 'Waqfeya pagination offset'
+        description: 'Starting Waqfeya book ID to scan'
         required: false
-        default: '0'
+        default: '1'
       batch_size:
         description: 'Maximum explicit-waqf books per run'
         required: false
         default: '25'
+      book_id_batch:
+        description: 'Maximum Waqfeya book IDs to inspect per run'
+        required: false
+        default: '400'
   schedule:
     - cron: '17 2 * * *'
 
@@ -50,9 +54,9 @@ jobs:
           persist-credentials: false
       - name: Harvest explicit-waqf books from Waqfeya
         env:
-          WAQFEYA_START: ${{ github.event.inputs.start || '0' }}
+          WAQFEYA_START: ${{ github.event.inputs.start || '1' }}
           WAQFEYA_BATCH_SIZE: ${{ github.event.inputs.batch_size || '25' }}
-          WAQFEYA_PAGES: '8'
+          WAQFEYA_BOOK_ID_BATCH: ${{ github.event.inputs.book_id_batch || '400' }}
         run: node scripts/waqfeya-batch-harvest.mjs
       - name: Preserve downloaded books and provenance
         if: always()
