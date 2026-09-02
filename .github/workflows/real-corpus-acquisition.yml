@@ -118,7 +118,7 @@ jobs:
   waqfeya-books:
     name: Download source books explicitly described as waqf
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     permissions:
       contents: read
     steps:
@@ -129,7 +129,7 @@ jobs:
           mkdir -p artifacts/waqfeya-books
           cat > artifacts/waqfeya-books/manifest.json <<'JSON'
           {
-            "policy": "Download source files only where the source record itself states waqf/free distribution; preserve provenance and do not infer a broader copyright license.",
+            "policy": "Download source files only where the Waqfeya source record explicitly describes the work as waqf/free distribution. Preserve provenance; do not infer an unrestricted copyright license from the word waqf alone.",
             "books": [
               {
                 "id": "sahih-bukhari-afkar",
@@ -143,7 +143,7 @@ jobs:
                 "id": "sunan-abu-dawud-afkar",
                 "title": "سنن أبي داود - ط. الأفكار",
                 "sourcePage": "https://waqfeya.net/books/سنن-أبي-داود-ط-الأفكار-62b45b4d81704c8794decea85a924b9c",
-                "download": "https://archive.org/download/FPabudawud/abudawud.pdf",
+                "download": "https://archive.org/download/FP54451/54451.pdf",
                 "waqfEvidence": "طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.",
                 "category": "hadith"
               },
@@ -151,7 +151,7 @@ jobs:
                 "id": "jami-tirmidhi-afkar",
                 "title": "جامع الترمذي = سنن الترمذي - ط. الأفكار",
                 "sourcePage": "https://waqfeya.net/books/جامع-الترمذي-سنن-الترمذي-ط-الأفكار-0f02c1074be347a1b5acfdf025268700",
-                "download": "https://archive.org/download/FPtrtmzy/FPtrtmzy.pdf",
+                "download": "https://archive.org/download/FPsutraf/sutraf.pdf",
                 "waqfEvidence": "طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.",
                 "category": "hadith"
               },
@@ -164,14 +164,6 @@ jobs:
                 "category": "hadith"
               },
               {
-                "id": "al-rahiq-al-makhtum-awqaf-qatar",
-                "title": "الرحيق المختوم - ط. أوقاف قطر",
-                "sourcePage": "https://waqfeya.net/books/الرحيق-المختوم-ط-أوقاف-قطر-d3f363f40b0d4fd7a312ef833ed5f93e",
-                "download": "https://www.archive.org/download/waq94123/94123.pdf",
-                "waqfEvidence": "طبعة أوقاف قطر، والنسخة منشورة للتحميل من المكتبة الوقفية.",
-                "category": "sirah"
-              },
-              {
                 "id": "fiqh-islam-bulugh-al-maram-volume-1",
                 "title": "فقه الإسلام شرح بلوغ المرام - ج 1",
                 "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
@@ -180,10 +172,74 @@ jobs:
                 "category": "fiqh"
               },
               {
+                "id": "fiqh-islam-bulugh-al-maram-volume-2",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 2",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm02.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
+                "id": "fiqh-islam-bulugh-al-maram-volume-3",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 3",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm03.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
+                "id": "fiqh-islam-bulugh-al-maram-volume-4",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 4",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm04.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
+                "id": "fiqh-islam-bulugh-al-maram-volume-5",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 5",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm05.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
+                "id": "fiqh-islam-bulugh-al-maram-volume-6",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 6",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm06.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
                 "id": "fiqh-islam-bulugh-al-maram-volume-7",
                 "title": "فقه الإسلام شرح بلوغ المرام - ج 7",
                 "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
                 "download": "https://archive.org/download/FPfisbmfisbm/fisbm07.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
+                "id": "fiqh-islam-bulugh-al-maram-volume-8",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 8",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm08.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
+                "id": "fiqh-islam-bulugh-al-maram-volume-9",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 9",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm09.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
+                "id": "fiqh-islam-bulugh-al-maram-volume-10",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 10",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm10.pdf",
                 "waqfEvidence": "وقف لله تعالى على طلبة العلم",
                 "category": "fiqh"
               },
