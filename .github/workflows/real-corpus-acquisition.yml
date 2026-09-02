@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - feat/real-corpus-acquisition-2026
-    paths-ignore:
-      - 'data/corpus/**'
   workflow_dispatch:
 
 permissions:
@@ -25,19 +23,21 @@ jobs:
       - name: Acquire real Quran and Arabic hadith corpus
         run: node scripts/real-corpus-acquire.mjs
 
-      - name: Verify acquired artifacts
+      - name: Verify acquired corpus artifacts
         shell: bash
         run: |
           set -euo pipefail
           test -s data/corpus/quran/quran-uthmani.txt
-          test -s data/corpus/hadith/catalog-2026.json
           test -s data/corpus/acquisition-state-2026.json
+          test -s data/corpus/hadith/catalog-2026.json
           test -d data/corpus/hadith/collections
-          count="$(find data/corpus/hadith/collections -type f -name '*.json' | wc -l)"
-          test "$count" -ge 6
-          echo "Hadith collection files: $count"
+          collection_count="$(find data/corpus/hadith/collections -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$collection_count" -ge 10
+          echo "Quran text:"
           wc -l -c data/corpus/quran/quran-uthmani.txt
-          wc -c data/corpus/hadith/collections/*.json
+          echo "Hadith collection files: $collection_count"
+          echo "Hadith catalog:"
+          wc -c data/corpus/hadith/catalog-2026.json
 
       - name: Commit acquired corpus
         shell: bash
@@ -52,3 +52,65 @@ jobs:
           fi
           git commit -m 'data(corpus): materialize licensed Quran and Arabic hadith corpus'
           git push origin HEAD:feat/real-corpus-acquisition-2026
+
+  quran-manuscripts:
+    name: Acquire public-domain Quran manuscript images
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Discover public-domain Quran manuscripts from The Met Open Access API
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/quran-manuscripts
+          curl --fail --silent --show-error --retry 4 \
+            'https://collectionapi.metmuseum.org/public/collection/v1/search?q=Qur%27an%20Manuscript&hasImages=true' \
+            -o artifacts/quran-manuscripts/search.json
+          jq -r '.objectIDs[]?' artifacts/quran-manuscripts/search.json | head -n 250 > artifacts/quran-manuscripts/object-ids.txt
+          : > artifacts/quran-manuscripts/manifest.jsonl
+          while IFS= read -r object_id; do
+            curl --fail --silent --show-error --retry 4 \
+              "https://collectionapi.metmuseum.org/public/collection/v1/objects/${object_id}" \
+              -o "artifacts/quran-manuscripts/object-${object_id}.json"
+            jq -c 'select(.isPublicDomain == true and (.primaryImage != "" or ((.additionalImages // []) | length > 0))) | {objectID,accessionNumber,title,objectDate,culture,department,isPublicDomain,primaryImage,additionalImages,objectURL}' \
+              "artifacts/quran-manuscripts/object-${object_id}.json" >> artifacts/quran-manuscripts/manifest.jsonl || true
+          done < artifacts/quran-manuscripts/object-ids.txt
+          test -s artifacts/quran-manuscripts/manifest.jsonl
+          jq -s '.' artifacts/quran-manuscripts/manifest.jsonl > artifacts/quran-manuscripts/manifest.json
+          jq '[.[].objectID] | length' artifacts/quran-manuscripts/manifest.json
+
+      - name: Download public-domain manuscript images
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/quran-manuscripts/images
+          count=0
+          while IFS= read -r url; do
+            count=$((count + 1))
+            base="$(basename "${url%%\?*}")"
+            curl --fail --silent --show-error --retry 4 --location "$url" \
+              -o "artifacts/quran-manuscripts/images/${count}-${base}"
+            test -s "artifacts/quran-manuscripts/images/${count}-${base}"
+          done < <(
+            jq -r '.[].primaryImage, .[].additionalImages[]?' artifacts/quran-manuscripts/manifest.json | head -n 100
+          )
+          echo "Downloaded public-domain Quran manuscript images: $count"
+          test "$count" -gt 0
+
+      - name: Hash downloaded manuscript evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          find artifacts/quran-manuscripts/images -type f -print0 | sort -z | xargs -0 sha256sum \
+            > artifacts/quran-manuscripts/images.sha256
+
+      - name: Preserve Quran manuscript evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: quran-manuscripts-public-domain-${{ github.run_id }}
+          path: artifacts/quran-manuscripts
+          if-no-files-found: error
+          retention-days: 30
