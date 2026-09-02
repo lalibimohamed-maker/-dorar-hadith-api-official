@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
           test -s config/arab-world-source-registry-2026.json
-          jq -e '.countries | length == 22' config/arab-world-source-registry-2026.json >/dev/null
+          jq -e '.countries | length == 23' config/arab-world-source-registry-2026.json >/dev/null
           jq -e '([.countries[].country] | length) >= 20' config/arab-world-source-registry-2026.json >/dev/null
           echo 'Arab-world source registry validated.'
 
