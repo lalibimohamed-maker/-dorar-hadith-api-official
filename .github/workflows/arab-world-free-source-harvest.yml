@@ -1,0 +1,84 @@
+name: Arab World Free Source Harvest
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: 'Waqfeya pagination offset'
+        required: false
+        default: '0'
+      batch_size:
+        description: 'Maximum explicit-waqf books per run'
+        required: false
+        default: '25'
+  schedule:
+    - cron: '17 2 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  registry-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate Arab-world source registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s config/arab-world-source-registry-2026.json
+          jq -e '.countries | length == 22' config/arab-world-source-registry-2026.json >/dev/null
+          jq -e '([.countries[].country] | length) >= 20' config/arab-world-source-registry-2026.json >/dev/null
+          echo 'Arab-world source registry validated.'
+
+  waqfeya-harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: registry-check
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Harvest explicit-waqf books from Waqfeya
+        env:
+          WAQFEYA_START: ${{ github.event.inputs.start || '0' }}
+          WAQFEYA_BATCH_SIZE: ${{ github.event.inputs.batch_size || '25' }}
+          WAQFEYA_PAGES: '8'
+        run: node scripts/waqfeya-batch-harvest.mjs
+      - name: Preserve downloaded books and provenance
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: arab-world-waqfeya-books-${{ github.run_id }}
+          path: artifacts/waqfeya-books
+          if-no-files-found: warn
+          retention-days: 90
+
+  official-source-register:
+    runs-on: ubuntu-latest
+    needs: registry-check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Generate official-source snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/arab-world-registry
+          cp config/arab-world-source-registry-2026.json artifacts/arab-world-registry/
+          printf '%s\n' 'This snapshot records official Arabic-world discovery sources. It does not equate free reading/downloading with republication permission.' > artifacts/arab-world-registry/RIGHTS.txt
+          jq -r '.countries[] | [.country,.source,.url,.status,.reuse] | @tsv' config/arab-world-source-registry-2026.json > artifacts/arab-world-registry/countries.tsv
+      - name: Preserve registry snapshot
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: arab-world-source-registry-${{ github.run_id }}
+          path: artifacts/arab-world-registry
+          retention-days: 90
