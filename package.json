@@ -36,8 +36,8 @@
     "test:rechercher": "node --test test/rechercher-rights-engine.test.js test/rechercher-docx-catalog.test.js test/rechercher-access-policy.test.js test/rechercher-alternative-policy.test.js test/rechercher-alternative-discovery.test.js test/rechercher-global-search.test.js",
     "rechercher:rights-audit": "node scripts/rechercher-rights-audit.mjs",
     "rechercher:waqfeya": "node scripts/rechercher-waqfeya-classify-shard.mjs",
-    "rechercher:acquisition-router": "node scripts/rechercher-acquisition-router.mjs",
-    "rechercher:global-search": "node --input-type=module -e \"import('./src/rechercher-global-search.js').then(async m=>console.log(JSON.stringify(await m.globalSearchAnalysts({title:process.argv[1],author:process.argv[2]}),null,2)))\"",
+    "rechercher:acquisition-router": "node scripts/rechercher-global-acquisition-router.mjs",
+    "rechercher:global-search": "node scripts/rechercher-global-search.mjs",
     "rechercher:purge-plan": "node scripts/rechercher-purge-restricted.mjs"
   },
   "engines": {"node": ">=20"}
