@@ -32,7 +32,7 @@ jobs:
             -H 'Accept: text/html,application/xhtml+xml' \
             "$WAQFEYA_CENTURY_URL" -o artifacts/waqfeya-century15/pages/century.html
 
-          python3 - <<'PY'
+          WAQFEYA_CENTURY_URL="$WAQFEYA_CENTURY_URL" python3 - <<'PY'
           import html as htmlmod
           import json, os, re, urllib.parse
           from html.parser import HTMLParser
@@ -51,8 +51,7 @@ jobs:
                   if h: self.hrefs.append(h)
 
           p=P(); p.feed(decoded)
-          found=[]
-          seen=set()
+          found=[]; seen=set()
           for h in p.hrefs:
               u=urllib.parse.urljoin('https://www.waqfeya.net',h)
               if '/books/' not in u: continue
@@ -60,14 +59,13 @@ jobs:
               if u in seen: continue
               seen.add(u); found.append(u)
 
-          # Also catch JSON/JS-escaped book URLs in framework-rendered responses.
           for m in re.finditer(r'https?://(?:www\\.)?waqfeya\\.net/books/[^"\\s<>]+|/books/[^"\\s<>]+', decoded):
-              u=urllib.parse.urljoin('https://www.waqfeya.net',m.group(0))
+              u=urllib.parse.urljoin('https://www.waqfeya.net',m.group(0)).split('#',1)[0]
               if u not in seen:
                   seen.add(u); found.append(u)
 
           if not found:
-              raise SystemExit('No /books/ links found in the live Century-15 response; refusing to fall back to a guessed offset/count')
+              raise SystemExit('No /books/ links found in the live Century-15 response; refusing guessed offsets/counts')
 
           count_match=re.search(r'عدد الكتب\\s*[:：]?\\s*([0-9,٬\\s]+)', decoded)
           reported=int(re.sub(r'[^0-9]','',count_match.group(1))) if count_match else None
@@ -122,7 +120,6 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-
       - name: Fetch the live inventory artifact from this workflow run
         shell: bash
         run: |
@@ -135,8 +132,7 @@ jobs:
             -o /tmp/artifacts.json
           artifact_url=$(python3 - <<'PY'
           import json
-          d=json.load(open('/tmp/artifacts.json'))
-          a=d.get('artifacts') or []
+          d=json.load(open('/tmp/artifacts.json')); a=d.get('artifacts') or []
           if not a: raise SystemExit('inventory artifact not found')
           print(a[0]['archive_download_url'])
           PY
@@ -147,7 +143,6 @@ jobs:
           unzip -q /tmp/inventory.zip -d /tmp/inventory
           cp /tmp/inventory/source-count.json artifacts/waqfeya-century15/source-count.json
           cp /tmp/inventory/inventory.jsonl artifacts/waqfeya-century15/inventory.jsonl
-
       - name: Govern and acquire this shard
         env:
           START: ${{ matrix.start }}
@@ -157,25 +152,21 @@ jobs:
           python3 - <<'PY'
           import hashlib, json, os, re, urllib.parse, urllib.request
           from html.parser import HTMLParser
-
           START=int(os.environ['START']); COUNT=100
           lines=open('artifacts/waqfeya-century15/inventory.jsonl',encoding='utf-8').read().splitlines()
           rows=[json.loads(x) for x in lines[START:START+COUNT]]
           out=f'artifacts/waqfeya-century15/shard-{START:05d}'
           os.makedirs(out+'/pdf',exist_ok=True)
-
           class P(HTMLParser):
               def __init__(self): super().__init__(); self.links=[]; self.text=[]
               def handle_starttag(self,tag,attrs):
                   h=dict(attrs).get('href')
                   if h: self.links.append(h)
               def handle_data(self,d): self.text.append(d)
-
           def fetch(url):
               req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (compatible; Rechercher-governed-acquisition/1.0)'})
               return urllib.request.urlopen(req,timeout=45).read().decode('utf-8','replace')
-
-          results=[]; cleared=0; downloaded=0
+          results=[]; cleared=downloaded=0
           for rec in rows:
               url=rec['sourcePage']
               try:
@@ -186,8 +177,7 @@ jobs:
                       u=urllib.parse.urljoin(url,h)
                       if not u.lower().endswith('.pdf'): continue
                       host=urllib.parse.urlsplit(u).hostname or ''
-                      if host not in {'waqfeya.net','www.waqfeya.net','archive.org','www.archive.org'}: continue
-                      candidates.append(u)
+                      if host in {'waqfeya.net','www.waqfeya.net','archive.org','www.archive.org'}: candidates.append(u)
                   item={'ordinal':rec['ordinal'],'sourcePage':url,'explicitWaqfOrFreeEvidence':explicit,'downloadCandidates':list(dict.fromkeys(candidates))[:10]}
                   if explicit and candidates:
                       cleared += 1
@@ -196,30 +186,21 @@ jobs:
                               req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0 (compatible; Rechercher-governed-acquisition/1.0)'})
                               data=urllib.request.urlopen(req,timeout=180).read()
                               if not data.startswith(b'%PDF-'): continue
-                              sha=hashlib.sha256(data).hexdigest()
-                              path=f'{out}/pdf/{rec["ordinal"]:05d}-{sha[:16]}.pdf'
-                              open(path,'wb').write(data)
-                              item.update(downloadUrl=u,bytes=len(data),sha256=sha,localPath=path,status='VERIFIED_PDF'); downloaded += 1
-                              break
-                          except Exception as e:
-                              item['downloadError']=str(e)
+                              sha=hashlib.sha256(data).hexdigest(); path=f'{out}/pdf/{rec["ordinal"]:05d}-{sha[:16]}.pdf'
+                              open(path,'wb').write(data); item.update(downloadUrl=u,bytes=len(data),sha256=sha,localPath=path,status='VERIFIED_PDF'); downloaded += 1; break
+                          except Exception as e: item['downloadError']=str(e)
                       if 'status' not in item: item['status']='RIGHTS_CLEARED_NO_VERIFIED_PDF'
-                  else:
-                      item['status']='READ_ONLY_OR_UNCLEARED'
+                  else: item['status']='READ_ONLY_OR_UNCLEARED'
                   results.append(item)
-              except Exception as e:
-                  results.append({'ordinal':rec['ordinal'],'sourcePage':url,'status':'ERROR','error':str(e)})
-
+              except Exception as e: results.append({'ordinal':rec['ordinal'],'sourcePage':url,'status':'ERROR','error':str(e)})
           json.dump(results,open(out+'/results.json','w'),ensure_ascii=False,indent=2)
           summary={'start':START,'countRequested':COUNT,'recordsProcessed':len(results),'rightsClearedCandidates':cleared,'verifiedPdfs':downloaded,'policy':'Rights are evaluated per edition; catalog inventory does not itself authorize mirroring.'}
           json.dump(summary,open(out+'/summary.json','w'),ensure_ascii=False,indent=2)
           with open(out+'/pdfs.sha256','w') as f:
               for name in sorted(os.listdir(out+'/pdf')):
-                  p=os.path.join(out+'/pdf',name)
-                  f.write(hashlib.sha256(open(p,'rb').read()).hexdigest()+'  '+p+'\n')
+                  p=os.path.join(out+'/pdf',name); f.write(hashlib.sha256(open(p,'rb').read()).hexdigest()+'  '+p+'\n')
           print(json.dumps(summary,ensure_ascii=False))
           PY
-
       - name: Publish shard ledger and verified PDFs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
