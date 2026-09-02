@@ -1,6 +1,8 @@
 name: Rechercher - Waqfeya PDF download 01
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches:
       - rechercher/waqfeya-pdf-download-01
