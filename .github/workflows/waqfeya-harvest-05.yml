@@ -1,0 +1,19 @@
+name: Waqfeya Harvest 05
+on:
+  push:
+    branches: [feat/real-corpus-acquisition-2026]
+    paths: [data/corpus/waqfeya/century-15/index.jsonl]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  shard:
+    strategy:
+      fail-fast: false
+      matrix:
+        book_start: [3200,3300,3400,3500,3600,3700,3800,3900]
+    uses: ./.github/workflows/waqfeya-harvest-reusable.yml
+    with:
+      shard_id: century15-${{ matrix.book_start }}
+      book_start: ${{ matrix.book_start }}
+      book_count: 100
