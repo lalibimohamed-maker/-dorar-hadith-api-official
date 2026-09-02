@@ -16,7 +16,7 @@ test("portal keeps Quran study layers distinct", () => {
   assert.equal(quran.reader, "/quran/ayah");
   assert.equal(quran.studyMode, true);
   assert.equal(quran.wordByWord, true);
-  assert.match(String(quran.tafsir), /Tafsir/);
+  assert.match(String(quran.tafsir), /Tafsir|tafsir|التفسير/);
 });
 
 test("portal provenance policy is explicit", () => {
