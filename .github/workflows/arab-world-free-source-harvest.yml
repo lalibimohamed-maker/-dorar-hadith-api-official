@@ -7,17 +7,21 @@ on:
   workflow_dispatch:
     inputs:
       start:
-        description: 'Starting Waqfeya book ID to scan'
+        description: 'Starting Waqfeya numeric book ID to scan'
         required: false
         default: '1'
       batch_size:
-        description: 'Maximum explicit-rights candidates to download per run'
+        description: 'Maximum candidate books downloaded per run'
         required: false
         default: '25'
       book_id_batch:
-        description: 'Maximum Waqfeya numeric book IDs to inspect per run'
+        description: 'Maximum legacy numeric IDs to inspect per run'
         required: false
         default: '400'
+      catalog_pages:
+        description: 'Maximum /books catalog offset pages to inspect per run'
+        required: false
+        default: '20'
   schedule:
     - cron: '17 2 * * *'
 
@@ -53,35 +57,38 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Harvest and ACTUALLY DOWNLOAD Waqfeya books
+      - name: ACTUAL DOWNLOAD — fetch book, follow download link, verify PDF, hash SHA-256
         env:
           WAQFEYA_START: ${{ github.event.inputs.start || '1' }}
           WAQFEYA_BATCH_SIZE: ${{ github.event.inputs.batch_size || '25' }}
           WAQFEYA_BOOK_ID_BATCH: ${{ github.event.inputs.book_id_batch || '400' }}
-          # Deterministic proof page. The downloader follows the page's real "تحميل الكتاب" link,
-          # accepts redirect/bridge URLs, verifies the resulting file begins with %PDF-, and hashes it.
+          WAQFEYA_CATALOG_PAGES: ${{ github.event.inputs.catalog_pages || '20' }}
+          # Waqfeya currently lists this as a free-distribution/waqf publication.
+          # The workflow downloads it to the runner for technical proof, verifies %PDF-, and hashes it.
+          # It does NOT publish the PDF artifact unless WAQFEYA_KEEP_FILES is explicitly enabled after rights review.
           WAQFEYA_PROOF_URLS: >-
-            https://waqfeya.net/books/%D8%B3%D9%86%D9%86-%D8%A3%D8%A8%D9%8A-%D8%AF%D8%A7%D9%88%D8%AF-%D8%B7-%D8%A7%D9%84%D8%A3%D9%81%D9%83%D8%A7%D8%B1-62b45b4d81704c8794decea85a924b9c
+            https://waqfeya.net/books/%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86-%D9%88%D9%86%D9%82%D8%B6-%D9%85%D8%B7%D8%A7%D8%B9%D9%86-%D8%A7%D9%84%D8%B1%D9%87%D8%A8%D8%A7%D9%86-%D8%B7-%D8%A7%D9%84%D8%A3%D9%88%D9%82%D8%A7%D9%81-%D8%A7%D9%84%D9%82%D8%B7%D8%B1%D9%8A%D8%A9/9a836d53472d4e97b96f2bc6c0fb8b40
           WAQFEYA_MAX_DOWNLOAD_MB: '200'
+          WAQFEYA_KEEP_FILES: 'false'
         run: |
           set -euo pipefail
           node scripts/waqfeya-batch-harvest.mjs
 
-      - name: Show real download proof
+      - name: Show HARD DOWNLOAD PROOF (bytes + SHA-256)
         if: always()
         shell: bash
         run: |
           set -euo pipefail
           test -s artifacts/waqfeya-books/manifest.json
-          jq '{downloaded, books: [.books[] | {title, bytes, sha256, sourcePage, downloadUrl, proof}]}' artifacts/waqfeya-books/manifest.json
+          jq '{downloaded, keepDownloadedFiles, books: [.books[] | {title, bytes, sha256, sourcePage, downloadUrl, proof, fileStoredInArtifact}]}' artifacts/waqfeya-books/manifest.json
 
-      - name: Preserve downloaded books and provenance
+      - name: Preserve manifest/provenance (PDFs are not published by default)
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: arab-world-waqfeya-books-${{ github.run_id }}
-          path: artifacts/waqfeya-books
-          if-no-files-found: warn
+          name: arab-world-waqfeya-download-proof-${{ github.run_id }}
+          path: artifacts/waqfeya-books/manifest.json
+          if-no-files-found: error
           retention-days: 90
 
   official-source-register:
