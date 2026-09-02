@@ -13,67 +13,74 @@ jobs:
   inventory:
     name: Inventory the live Waqfeya Century-15 catalog
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     outputs:
       total: ${{ steps.inventory.outputs.total }}
     steps:
       - id: inventory
-        name: Crawl all catalog pages
+        name: Crawl all catalog pages with curl
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p artifacts/waqfeya-century15
-          python3 - <<'PY'
-          import html.parser, json, os, re, time, urllib.parse, urllib.request
-
-          BASE='https://waqfeya.net'
-          FIRST=BASE + '/centuries/%D8%A7%D9%84%D9%82%D8%B1%D9%86-15-%D9%87%D9%80-426d13bd9086441e84cbb8b7ed9d3a1a'
-          PAGE='https://waqfeya.com/top.php?st={}'
-
-          class Parser(html.parser.HTMLParser):
-              def __init__(self):
-                  super().__init__(); self.hrefs=[]; self.text=[]
-              def handle_starttag(self, tag, attrs):
-                  d=dict(attrs)
-                  h=d.get('href')
-                  if h: self.hrefs.append(h)
-              def handle_data(self, data): self.text.append(data)
-
-          def get(url):
-              req=urllib.request.Request(url,headers={'User-Agent':'Rechercher-governed-acquisition/1.0'})
-              return urllib.request.urlopen(req,timeout=45).read().decode('utf-8','replace')
-
-          first=get(FIRST)
-          m=re.search(r'عدد الكتب:\s*([0-9,]+)', first)
-          if not m: raise SystemExit('Unable to determine live Waqfeya Century-15 count')
-          total=int(m.group(1).replace(',',''))
+          mkdir -p artifacts/waqfeya-century15/pages
+          first='https://waqfeya.net/centuries/%D8%A7%D9%84%D9%82%D8%B1%D9%86-15-%D9%87%D9%80-426d13bd9086441e84cbb8b7ed9d3a1a'
+          curl --fail --location --silent --show-error --retry 6 --retry-all-errors --connect-timeout 20 --max-time 60 \
+            -A 'Rechercher-governed-acquisition/1.0' "$first" -o artifacts/waqfeya-century15/pages/century.html
+          total=$(python3 - <<'PY'
+          import re
+          html=open('artifacts/waqfeya-century15/pages/century.html',encoding='utf-8',errors='replace').read()
+          matches=re.findall(r'عدد الكتب\s*[:：]\s*([0-9,٬]+)',html)
+          if not matches:
+              raise SystemExit('Could not parse Waqfeya Century-15 live count')
+          print(int(matches[0].replace(',','').replace('٬','')))
+          PY
+          )
+          echo "Live reported count: $total"
+          echo "total=$total" >> "$GITHUB_OUTPUT"
+          : > artifacts/waqfeya-century15/inventory.jsonl
+          base='https://waqfeya.com/top.php?st='
           page_size=50
-          pages=[]
-          for offset in range(0,total,page_size):
-              pages.append((offset,PAGE.format(offset)))
-
-          records=[]
+          for offset in $(seq 0 50 $(( ((total-1)/50)*50 )) ); do
+            url="${base}${offset}"
+            out="artifacts/waqfeya-century15/pages/top-${offset}.html"
+            curl --fail --location --silent --show-error --retry 6 --retry-all-errors --connect-timeout 20 --max-time 60 \
+              -A 'Rechercher-governed-acquisition/1.0' "$url" -o "$out"
+            OFFSET="$offset" python3 - <<'PY' >> /tmp/waqfeya-rows.jsonl
+          import json,os,urllib.parse
+          from html.parser import HTMLParser
+          path=f"artifacts/waqfeya-century15/pages/top-{os.environ['OFFSET']}.html"
+          class P(HTMLParser):
+              def __init__(self): super().__init__(); self.hrefs=[]
+              def handle_starttag(self,tag,attrs):
+                  h=dict(attrs).get('href')
+                  if h: self.hrefs.append(h)
+          p=P(); p.feed(open(path,encoding='utf-8',errors='replace').read())
           seen=set()
-          for offset,url in pages:
-              try:
-                  p=Parser(); p.feed(get(url))
-              except Exception as e:
-                  raise SystemExit(f'catalog page offset {offset} failed: {e}')
-              for h in p.hrefs:
-                  u=urllib.parse.urljoin(BASE,h)
-                  if '/books/' not in u: continue
-                  if u in seen: continue
-                  seen.add(u)
-                  records.append({'ordinal':len(records)+1,'sourcePage':u,'catalogOffset':offset})
-              time.sleep(.05)
-
-          # The live catalog can change while crawling. Preserve both the reported total and observed unique URLs.
-          json.dump({'source':FIRST,'reportedCount':total,'pageSize':page_size,'pagesCrawled':len(pages),'observedUniqueBookPages':len(records)},open('artifacts/waqfeya-century15/source-count.json','w'),ensure_ascii=False,indent=2)
+          for h in p.hrefs:
+              u=urllib.parse.urljoin('https://waqfeya.net',h)
+              if '/books/' not in u or u in seen: continue
+              seen.add(u); print(json.dumps({'sourcePage':u,'catalogOffset':int(os.environ['OFFSET'])},ensure_ascii=False))
+          PY
+          done
+          python3 - <<'PY'
+          import json
+          seen=set(); rows=[]
+          for line in open('/tmp/waqfeya-rows.jsonl',encoding='utf-8'):
+              r=json.loads(line)
+              if r['sourcePage'] in seen: continue
+              seen.add(r['sourcePage']); r['ordinal']=len(rows)+1; rows.append(r)
           with open('artifacts/waqfeya-century15/inventory.jsonl','w',encoding='utf-8') as f:
-              for r in records: f.write(json.dumps(r,ensure_ascii=False)+'\n')
-          print(f'Live reported count: {total}')
-          print(f'Observed unique book pages: {len(records)}')
-          with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write(f'total={total}\n')
+              for r in rows: f.write(json.dumps(r,ensure_ascii=False)+'\n')
+          json.dump({'source':'https://waqfeya.net/centuries/القرن-15-هـ-426d13bd9086441e84cbb8b7ed9d3a1a','reportedCount':int(open('artifacts/waqfeya-century15/pages/century.html',encoding='utf-8',errors='replace').read() and 0)},open('/tmp/unused','w'))
+          print(f'Observed unique book pages: {len(rows)}')
+          if len(rows) < int(__import__('os').environ.get('MIN_EXPECTED','1')): raise SystemExit('No book pages were discovered')
+          PY
+          python3 - <<'PY'
+          import json,re
+          html=open('artifacts/waqfeya-century15/pages/century.html',encoding='utf-8',errors='replace').read()
+          total=int(re.findall(r'عدد الكتب\s*[:：]\s*([0-9,٬]+)',html)[0].replace(',','').replace('٬',''))
+          rows=sum(1 for _ in open('artifacts/waqfeya-century15/inventory.jsonl',encoding='utf-8'))
+          json.dump({'source':'https://waqfeya.net/centuries/القرن-15-هـ-426d13bd9086441e84cbb8b7ed9d3a1a','reportedCount':total,'pageSize':50,'observedUniqueBookPages':rows},open('artifacts/waqfeya-century15/source-count.json','w'),ensure_ascii=False,indent=2)
           PY
           test -s artifacts/waqfeya-century15/inventory.jsonl
           cat artifacts/waqfeya-century15/source-count.json
@@ -101,12 +108,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+
       - name: Fetch the live inventory artifact from this workflow run
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts/waqfeya-century15
-          curl --fail --silent --show-error --retry 4 \
+          curl --fail --silent --show-error --retry 6 --retry-all-errors \
             -H "Authorization: Bearer ${{ github.token }}" \
             -H 'Accept: application/vnd.github+json' \
             "https://api.github.com/repos/${{ github.repository }}/actions/artifacts?name=rechercher-waqfeya-century15-inventory-${{ github.run_id }}" \
@@ -119,7 +127,7 @@ jobs:
           print(a[0]['archive_download_url'])
           PY
           )
-          curl --fail --silent --show-error --retry 4 -L \
+          curl --fail --silent --show-error --retry 6 --retry-all-errors -L \
             -H "Authorization: Bearer ${{ github.token }}" \
             -H 'Accept: application/vnd.github+json' "$artifact_url" -o /tmp/inventory.zip
           unzip -q /tmp/inventory.zip -d /tmp/inventory
@@ -144,7 +152,7 @@ jobs:
           class P(HTMLParser):
               def __init__(self): super().__init__(); self.links=[]; self.text=[]
               def handle_starttag(self,tag,attrs):
-                  h=dict(attrs).get('href');
+                  h=dict(attrs).get('href')
                   if h: self.links.append(h)
               def handle_data(self,d): self.text.append(d)
 
@@ -161,12 +169,11 @@ jobs:
                   candidates=[]
                   for h in p.links:
                       u=urllib.parse.urljoin(url,h)
-                      if u.lower().endswith('.pdf') and ('waqfeya.net' in u.lower() or 'archive.org' in u.lower()):
-                          candidates.append(u)
+                      if u.lower().endswith('.pdf') and ('waqfeya.net' in u.lower() or 'archive.org' in u.lower()): candidates.append(u)
                   item={'ordinal':rec['ordinal'],'sourcePage':url,'explicitWaqfOrFreeEvidence':explicit,'downloadCandidates':candidates[:10]}
                   if explicit and candidates:
                       eligible += 1
-                      for j,u in enumerate(candidates[:10],1):
+                      for u in candidates[:10]:
                           try:
                               req=urllib.request.Request(u,headers={'User-Agent':'Rechercher-governed-acquisition/1.0'})
                               data=urllib.request.urlopen(req,timeout=180).read()
@@ -175,11 +182,9 @@ jobs:
                               open(path,'wb').write(data)
                               item.update(download=u,bytes=len(data),sha256=sha,localPath=path,status='VERIFIED_PDF'); downloaded += 1; break
                           except Exception as e: item['downloadError']=str(e)
-                  else:
-                      item['status']='READ_ONLY_OR_UNCLEARED'
+                  else: item['status']='READ_ONLY_OR_UNCLEARED'
                   results.append(item)
-              except Exception as e:
-                  results.append({'ordinal':rec['ordinal'],'sourcePage':url,'status':'ERROR','error':str(e)})
+              except Exception as e: results.append({'ordinal':rec['ordinal'],'sourcePage':url,'status':'ERROR','error':str(e)})
 
           json.dump(results,open(out+'/results.json','w'),ensure_ascii=False,indent=2)
           json.dump({'start':START,'countRequested':COUNT,'recordsProcessed':len(results),'rightsClearedCandidates':eligible,'verifiedPdfs':downloaded},open(out+'/summary.json','w'),ensure_ascii=False,indent=2)
