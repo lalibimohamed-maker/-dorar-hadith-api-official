@@ -20,16 +20,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
           package-manager-cache: false
-
       - name: Acquire real Quran and Arabic hadith corpus
         run: node scripts/real-corpus-acquire.mjs
-
       - name: Verify acquired corpus artifacts
         shell: bash
         run: |
@@ -40,11 +37,9 @@ jobs:
           test -d data/corpus/hadith/collections
           collection_count="$(find data/corpus/hadith/collections -type f -name '*.json' | wc -l | tr -d ' ')"
           test "$collection_count" -ge 10
-          echo "Quran text:"
           wc -l -c data/corpus/quran/quran-uthmani.txt
           echo "Hadith collection files: $collection_count"
           wc -c data/corpus/hadith/catalog-2026.json
-
       - name: Commit acquired corpus
         shell: bash
         run: |
@@ -52,10 +47,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/corpus
-          if git diff --cached --quiet; then
-            echo 'No corpus changes to commit.'
-            exit 0
-          fi
+          if git diff --cached --quiet; then echo 'No corpus changes to commit.'; exit 0; fi
           git commit -m 'data(corpus): materialize licensed Quran and Arabic hadith corpus'
           git push origin HEAD:feat/real-corpus-acquisition-2026
 
@@ -71,21 +63,15 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts/quran-manuscripts
-          curl --fail --silent --show-error --retry 4 \
-            'https://collectionapi.metmuseum.org/public/collection/v1/search?q=Qur%27an%20Manuscript&hasImages=true' \
-            -o artifacts/quran-manuscripts/search.json
+          curl --fail --silent --show-error --retry 4 'https://collectionapi.metmuseum.org/public/collection/v1/search?q=Qur%27an%20Manuscript&hasImages=true' -o artifacts/quran-manuscripts/search.json
           jq -r '.objectIDs[]?' artifacts/quran-manuscripts/search.json | head -n 250 > artifacts/quran-manuscripts/object-ids.txt
           : > artifacts/quran-manuscripts/manifest.jsonl
           while IFS= read -r object_id; do
-            curl --fail --silent --show-error --retry 4 \
-              "https://collectionapi.metmuseum.org/public/collection/v1/objects/${object_id}" \
-              -o "artifacts/quran-manuscripts/object-${object_id}.json"
-            jq -c 'select(.isPublicDomain == true and (.primaryImage != "" or ((.additionalImages // []) | length > 0))) | {objectID,accessionNumber,title,objectDate,culture,department,isPublicDomain,primaryImage,additionalImages,objectURL}' \
-              "artifacts/quran-manuscripts/object-${object_id}.json" >> artifacts/quran-manuscripts/manifest.jsonl || true
+            curl --fail --silent --show-error --retry 4 "https://collectionapi.metmuseum.org/public/collection/v1/objects/${object_id}" -o "artifacts/quran-manuscripts/object-${object_id}.json"
+            jq -c 'select(.isPublicDomain == true and (.primaryImage != "" or ((.additionalImages // []) | length > 0))) | {objectID,accessionNumber,title,objectDate,culture,department,isPublicDomain,primaryImage,additionalImages,objectURL}' "artifacts/quran-manuscripts/object-${object_id}.json" >> artifacts/quran-manuscripts/manifest.jsonl || true
           done < artifacts/quran-manuscripts/object-ids.txt
           test -s artifacts/quran-manuscripts/manifest.jsonl
           jq -s '.' artifacts/quran-manuscripts/manifest.jsonl > artifacts/quran-manuscripts/manifest.json
-
       - name: Download public-domain manuscript images
         shell: bash
         run: |
@@ -93,20 +79,16 @@ jobs:
           mkdir -p artifacts/quran-manuscripts/images
           count=0
           while IFS= read -r url; do
-            count=$((count + 1))
-            base="$(basename "${url%%\?*}")"
-            curl --fail --silent --show-error --retry 4 --location "$url" \
-              -o "artifacts/quran-manuscripts/images/${count}-${base}"
+            count=$((count + 1)); base="$(basename "${url%%\?*}")"
+            curl --fail --silent --show-error --retry 4 --location "$url" -o "artifacts/quran-manuscripts/images/${count}-${base}"
             test -s "artifacts/quran-manuscripts/images/${count}-${base}"
           done < <(jq -r '.[].primaryImage, .[].additionalImages[]?' artifacts/quran-manuscripts/manifest.json | head -n 100)
           test "$count" -gt 0
-
       - name: Hash downloaded manuscript evidence
         shell: bash
         run: |
           set -euo pipefail
           find artifacts/quran-manuscripts/images -type f -print0 | sort -z | xargs -0 sha256sum > artifacts/quran-manuscripts/images.sha256
-
       - name: Preserve Quran manuscript evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -127,7 +109,6 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
       - name: Build verified Waqfeya manifest
         shell: bash
         run: |
@@ -157,52 +138,38 @@ jobs:
           }
           JSON
           jq empty artifacts/waqfeya-books/manifest.json
-
       - name: Download and verify each eligible PDF without stopping the harvest
         shell: bash
         run: |
           set -u
           tmp='artifacts/waqfeya-books/manifest.tmp.json'
           cp artifacts/waqfeya-books/manifest.json "$tmp"
-          jq '.["books"]' artifacts/waqfeya-books/manifest.json >/dev/null
+          jq empty "$tmp"
           jq -c '.books[]' artifacts/waqfeya-books/manifest.json | while IFS= read -r book; do
-            id="$(jq -r '.id' <<<"$book")"
-            url="$(jq -r '.download' <<<"$book")"
-            out="artifacts/waqfeya-books/pdf/${id}.pdf"
+            id="$(jq -r '.id' <<<"$book")"; url="$(jq -r '.download' <<<"$book")"; out="artifacts/waqfeya-books/pdf/${id}.pdf"
             echo "=== $id ==="
-            if curl --fail --location --silent --show-error --retry 5 --connect-timeout 30 --max-time 900 "$url" -o "$out" \
-              && test -s "$out" \
-              && file "$out" | grep -qi 'PDF'; then
-              bytes="$(wc -c < "$out" | tr -d ' ')"
-              sha256="$(sha256sum "$out" | awk '{print $1}')"
-              jq --arg id "$id" --argjson bytes "$bytes" --arg sha256 "$sha256" \
-                '.books |= map(if .id == $id then . + {verified:true,bytes:$bytes,sha256:$sha256} else . end)' \
-                "$tmp" > "$tmp.next" && mv "$tmp.next" "$tmp"
+            if curl --fail --location --silent --show-error --retry 5 --connect-timeout 30 --max-time 900 "$url" -o "$out" && test -s "$out" && file "$out" | grep -qi 'PDF'; then
+              bytes="$(wc -c < "$out" | tr -d ' ')"; sha256="$(sha256sum "$out" | awk '{print $1}')"
+              jq --arg id "$id" --argjson bytes "$bytes" --arg sha256 "$sha256" '.books |= map(if .id == $id then . + {verified:true,bytes:$bytes,sha256:$sha256} else . end)' "$tmp" > "$tmp.next" && mv "$tmp.next" "$tmp"
               echo "VERIFIED $id bytes=$bytes sha256=$sha256"
             else
               rm -f "$out"
-              jq --arg id "$id" '.books |= map(if .id == $id then . + {verified:false,error:"download-or-pdf-validation-failed"} else . end)' \
-                "$tmp" > "$tmp.next" && mv "$tmp.next" "$tmp"
+              jq --arg id "$id" '.books |= map(if .id == $id then . + {verified:false,error:"download-or-pdf-validation-failed"} else . end)' "$tmp" > "$tmp.next" && mv "$tmp.next" "$tmp"
               echo "FAILED $id (harvest continues)"
             fi
           done
           mv "$tmp" artifacts/waqfeya-books/manifest.json
-
           verified="$(jq '[.books[] | select(.verified == true)] | length' artifacts/waqfeya-books/manifest.json)"
           failed="$(jq '[.books[] | select(.verified == false)] | length' artifacts/waqfeya-books/manifest.json)"
-          echo "Verified PDFs: $verified"
-          echo "Failed PDFs: $failed"
+          echo "Verified PDFs: $verified"; echo "Failed PDFs: $failed"
           test "$verified" -ge 1
-
       - name: Write verified PDF hash register
         shell: bash
         run: |
           set -euo pipefail
-          jq -r '.books[] | select(.verified == true) | [.id,.bytes,.sha256,.sourcePage,.download] | @tsv' \
-            artifacts/waqfeya-books/manifest.json > artifacts/waqfeya-books/verified.tsv
+          jq -r '.books[] | select(.verified == true) | [.id,.bytes,.sha256,.sourcePage,.download] | @tsv' artifacts/waqfeya-books/manifest.json > artifacts/waqfeya-books/verified.tsv
           find artifacts/waqfeya-books/pdf -type f -print0 | sort -z | xargs -0 sha256sum > artifacts/waqfeya-books/pdfs.sha256
           test -s artifacts/waqfeya-books/pdfs.sha256
-
       - name: Preserve Waqfeya source evidence and PDFs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
