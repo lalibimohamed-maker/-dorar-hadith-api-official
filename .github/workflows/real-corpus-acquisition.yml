@@ -114,3 +114,119 @@ jobs:
           path: artifacts/quran-manuscripts
           if-no-files-found: error
           retention-days: 30
+
+  waqfeya-books:
+    name: Download source books explicitly described as waqf
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Create verified waqf book manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/waqfeya-books
+          cat > artifacts/waqfeya-books/manifest.json <<'JSON'
+          {
+            "policy": "Download source files only where the source record itself states waqf/free distribution; preserve provenance and do not infer a broader copyright license.",
+            "books": [
+              {
+                "id": "sahih-bukhari-afkar",
+                "title": "صحيح البخاري - ط. الأفكار",
+                "sourcePage": "https://www.waqfeya.net/books/صحيح-البخاري-ط-الأفكار-bc1eab2741b746fca5531f69a651bc89",
+                "download": "https://archive.org/download/FP54454/54454.pdf",
+                "waqfEvidence": "طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.",
+                "category": "hadith"
+              },
+              {
+                "id": "sunan-abu-dawud-afkar",
+                "title": "سنن أبي داود - ط. الأفكار",
+                "sourcePage": "https://waqfeya.net/books/سنن-أبي-داود-ط-الأفكار-62b45b4d81704c8794decea85a924b9c",
+                "download": "https://archive.org/download/FPabudawud/abudawud.pdf",
+                "waqfEvidence": "طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.",
+                "category": "hadith"
+              },
+              {
+                "id": "jami-tirmidhi-afkar",
+                "title": "جامع الترمذي = سنن الترمذي - ط. الأفكار",
+                "sourcePage": "https://waqfeya.net/books/جامع-الترمذي-سنن-الترمذي-ط-الأفكار-0f02c1074be347a1b5acfdf025268700",
+                "download": "https://archive.org/download/FPtrtmzy/FPtrtmzy.pdf",
+                "waqfEvidence": "طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.",
+                "category": "hadith"
+              },
+              {
+                "id": "sunan-ibn-majah-afkar",
+                "title": "سنن ابن ماجه = سنن ابن ماجة - ط. الأفكار",
+                "sourcePage": "https://waqfeya.net/books/سنن-ابن-ماجه-سنن-ابن-ماجة-ط-الأفكار-13e0aba15694465c9b873e91e5805696",
+                "download": "https://archive.org/download/SuibmaafSuibmaaf/suibmaaf.pdf",
+                "waqfEvidence": "طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.",
+                "category": "hadith"
+              },
+              {
+                "id": "al-rahiq-al-makhtum-awqaf-qatar",
+                "title": "الرحيق المختوم - ط. أوقاف قطر",
+                "sourcePage": "https://waqfeya.net/books/الرحيق-المختوم-ط-أوقاف-قطر-d3f363f40b0d4fd7a312ef833ed5f93e",
+                "download": "https://www.archive.org/download/waq94123/94123.pdf",
+                "waqfEvidence": "طبعة أوقاف قطر، والنسخة منشورة للتحميل من المكتبة الوقفية.",
+                "category": "sirah"
+              },
+              {
+                "id": "fiqh-islam-bulugh-al-maram-volume-1",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 1",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm01.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
+                "id": "fiqh-islam-bulugh-al-maram-volume-7",
+                "title": "فقه الإسلام شرح بلوغ المرام - ج 7",
+                "sourcePage": "https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85",
+                "download": "https://archive.org/download/FPfisbmfisbm/fisbm07.pdf",
+                "waqfEvidence": "وقف لله تعالى على طلبة العلم",
+                "category": "fiqh"
+              },
+              {
+                "id": "quran-and-refutation-of-monks",
+                "title": "القرآن ونقض مطاعن الرهبان - ط. أوقاف قطر",
+                "sourcePage": "https://waqfeya.net/books/القرآن-ونقض-مطاعن-الرهبان-ط-الأوقاف-القطرية-9a836d53472d4e97b96f2bc6c0fb8b40",
+                "download": "",
+                "waqfEvidence": "هذا الكتاب وقف لله تعالى، طبع على نفقة وزارة الأوقاف والشؤون الإسلامية بدولة قطر، وهو يوزع مجانا ولا يجوز بيعه.",
+                "category": "quran"
+              }
+            ]
+          }
+          JSON
+          jq empty artifacts/waqfeya-books/manifest.json
+
+      - name: Download waqf source PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/waqfeya-books/pdf
+          jq -c '.books[] | select(.download != "")' artifacts/waqfeya-books/manifest.json | while read -r book; do
+            id="$(jq -r '.id' <<<"$book")"
+            url="$(jq -r '.download' <<<"$book")"
+            echo "Downloading $id"
+            curl --fail --location --silent --show-error --retry 5 --connect-timeout 30 --max-time 900 "$url" \
+              -o "artifacts/waqfeya-books/pdf/${id}.pdf"
+            test -s "artifacts/waqfeya-books/pdf/${id}.pdf"
+          done
+          find artifacts/waqfeya-books/pdf -type f -printf '%f %s bytes\n' | sort
+
+      - name: Hash source PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          find artifacts/waqfeya-books/pdf -type f -print0 | sort -z | xargs -0 sha256sum \
+            > artifacts/waqfeya-books/pdfs.sha256
+
+      - name: Preserve downloaded waqf source books
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: waqfeya-source-books-${{ github.run_id }}
+          path: artifacts/waqfeya-books
+          if-no-files-found: error
+          retention-days: 30
