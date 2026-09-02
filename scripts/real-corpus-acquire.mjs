@@ -10,23 +10,24 @@ const tmp = fs.mkdtempSync(path.join('/tmp/', 'deen-allah-corpus-'));
 const statePath = path.join(root, 'data/corpus/acquisition-state-2026.json');
 
 fs.mkdirSync(path.join(root, 'data/corpus/quran'), { recursive: true });
-fs.mkdirSync(path.join(root, 'data/corpus/hadith'), { recursive: true });
+fs.mkdirSync(path.join(root, 'data/corpus/hadith/collections'), { recursive: true });
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 }
 function download(url, out) {
-  execFileSync('curl', ['-L', '--fail', '--silent', '--show-error', '--retry', '3', '--connect-timeout', '30', url, '-o', out], { stdio: 'inherit' });
+  execFileSync('curl', ['-L', '--fail', '--silent', '--show-error', '--retry', '4', '--connect-timeout', '30', url, '-o', out], { stdio: 'inherit' });
 }
 function writeIfChanged(file, content) {
   if (fs.existsSync(file) && fs.readFileSync(file, 'utf8') === content) return false;
+  fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, content);
   return true;
 }
 
 const acquired = [];
 
-// Quran: Tanzil explicitly permits verbatim redistribution with attribution/link.
+// Quran text: Tanzil permits verbatim redistribution with attribution and source link.
 const q = manifest.sources.quranTanzil;
 const qTmp = path.join(tmp, 'quran-uthmani.txt');
 download(q.sourceMirror, qTmp);
@@ -53,7 +54,7 @@ acquired.push({
   retrievedAt: stamp
 });
 
-// Hadith: the repository explicitly dedicates its structured data to CC0.
+// Open Hadith Data release: structured data is CC0; English translations are not copied.
 const h = manifest.sources.openHadithData;
 const apiUrl = 'https://api.github.com/repos/Jaguar16/open-hadith-data/releases/tags/v1.1.0';
 const releaseJson = path.join(tmp, 'release.json');
@@ -63,9 +64,28 @@ const asset = release.assets?.find((a) => a.name === 'collections-json.zip');
 if (!asset?.browser_download_url) throw new Error('collections-json.zip release asset not found');
 const zip = path.join(tmp, 'collections-json.zip');
 download(asset.browser_download_url, zip);
-execFileSync('unzip', ['-q', '-o', zip, '-d', path.join(tmp, 'hadith')], { stdio: 'inherit' });
+const extractDir = path.join(tmp, 'hadith');
+fs.mkdirSync(extractDir, { recursive: true });
+execFileSync('unzip', ['-q', '-o', zip, '-d', extractDir], { stdio: 'inherit' });
 
-const wanted = new Set(h.collections);
+const aliases = {
+  'bukhari': ['bukhari', 'sahih-al-bukhari', 'sahih-bukhari'],
+  'muslim': ['muslim', 'sahih-muslim'],
+  'abu-dawud': ['abu-dawud', 'abudawud', 'abu-daud'],
+  'tirmidhi': ['tirmidhi', 'jami-at-tirmidhi', 'jami-tirmidhi'],
+  'nasai': ['nasai', 'nasa-i', 'sunan-an-nasai', 'sunan-nasai'],
+  'ibn-majah': ['ibn-majah', 'ibnmajah'],
+  'malik': ['malik', 'muwatta'],
+  'ahmad': ['ahmad', 'musnad-ahmad'],
+  'darimi': ['darimi', 'sunan-ad-darimi', 'sunan-darimi'],
+  'adab-al-mufrad': ['adab-al-mufrad', 'adabalmufrad'],
+  'riyad-as-salihin': ['riyad-as-salihin', 'riyad-assalihin'],
+  'bulugh-al-maram': ['bulugh-al-maram', 'bulugh-almaram'],
+  'shamail': ['shamail', 'ash-shamail', 'shama-il'],
+  'mishkat-al-masabih': ['mishkat-al-masabih', 'mishkat-almasabih']
+};
+const wanted = h.collections;
+const normalizedName = (value) => String(value).toLowerCase().replace(/\.json$/, '').replace(/[^a-z0-9]+/g, '-');
 const inputFiles = [];
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -74,19 +94,7 @@ function walk(dir) {
     else if (entry.isFile() && entry.name.endsWith('.json')) inputFiles.push(full);
   }
 }
-walk(path.join(tmp, 'hadith'));
-
-const collections = [];
-for (const file of inputFiles) {
-  let value;
-  try { value = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { continue; }
-  const id = String(value?.id ?? value?.collection_id ?? value?.collection ?? value?.name_en ?? '').toLowerCase();
-  const normalized = id.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const hit = [...wanted].find((x) => normalized === x || normalized.includes(x));
-  if (!hit) continue;
-  collections.push({ id: hit, data: value });
-}
-if (collections.length < 6) throw new Error(`Hadith acquisition found only ${collections.length} target collections`);
+walk(extractDir);
 
 const stripEnglish = (v) => {
   if (Array.isArray(v)) return v.map(stripEnglish);
@@ -98,24 +106,43 @@ const stripEnglish = (v) => {
   }
   return out;
 };
-const hadithOut = path.join(root, h.artifact);
-const hadithDoc = {
-  source: h.source,
-  license: h.license,
-  note: 'Arabic structured hadith data materialized from the CC0 structured-data portion; English translation fields are intentionally omitted.',
-  retrievedAt: stamp,
-  collections: collections.map(({ id, data }) => ({ id, data: stripEnglish(data) }))
-};
-writeIfChanged(hadithOut, `${JSON.stringify(hadithDoc, null, 2)}\n`);
+
+const selected = [];
+const missing = [];
+for (const wantedId of wanted) {
+  const names = aliases[wantedId] ?? [wantedId];
+  const match = inputFiles.find((file) => {
+    const base = normalizedName(path.basename(file));
+    return names.some((alias) => base === alias || base.startsWith(`${alias}-`) || base.endsWith(`-${alias}`));
+  });
+  if (!match) {
+    missing.push(wantedId);
+    continue;
+  }
+  const out = path.join(root, 'data/corpus/hadith/collections', `${wantedId}.json`);
+  const data = stripEnglish(JSON.parse(fs.readFileSync(match, 'utf8')));
+  writeIfChanged(out, `${JSON.stringify(data, null, 2)}\n`);
+  selected.push({
+    id: wantedId,
+    sourceFile: path.basename(match),
+    artifact: `data/corpus/hadith/collections/${wantedId}.json`,
+    sha256: sha256(out),
+    bytes: fs.statSync(out).size
+  });
+}
+if (selected.length < 6) throw new Error(`Hadith acquisition found only ${selected.length} target collections; missing: ${missing.join(', ')}`);
+
+const catalogOut = path.join(root, 'data/corpus/hadith/catalog-2026.json');
+writeIfChanged(catalogOut, `${JSON.stringify({ source: h.source, license: h.license, retrievedAt: stamp, collections: selected, missing }, null, 2)}\n`);
 acquired.push({
   id: 'hadith-core-arabic',
   kind: h.kind,
-  artifact: h.artifact,
+  artifact: 'data/corpus/hadith/collections/',
+  catalog: 'data/corpus/hadith/catalog-2026.json',
   source: h.source,
   license: h.license,
-  collections: collections.map((x) => x.id),
-  sha256: sha256(hadithOut),
-  bytes: fs.statSync(hadithOut).size,
+  collections: selected.map((x) => x.id),
+  missingCollections: missing,
   retrievedAt: stamp
 });
 
