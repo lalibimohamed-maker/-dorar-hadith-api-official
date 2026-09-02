@@ -1,6 +1,15 @@
 name: @Rechercher Rights Discovery Audit
 
 on:
+  push:
+    branches: [feat/real-corpus-acquisition-2026]
+    paths:
+      - 'src/rechercher-rights-engine.js'
+      - 'scripts/rechercher-rights-audit.mjs'
+      - 'scripts/rechercher-waqfeya-classify-shard.mjs'
+      - 'test/rechercher-rights-engine.test.js'
+      - 'config/rechercher-source-catalog-2026.json'
+      - 'data/corpus/rechercher/docx-links-2026.json'
   workflow_dispatch:
     inputs:
       max_sources:
