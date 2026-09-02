@@ -30,13 +30,19 @@ jobs:
           set -euo pipefail
           total=$(wc -l < data/corpus/waqfeya/century-15/index.jsonl)
           remaining=$((total - OFFSET))
-          if (( remaining <= 0 )); then echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"; exit 0; fi
+          if (( remaining <= 0 )); then
+            echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           if (( remaining > CAPACITY )); then remaining=$CAPACITY; fi
           python3 - "$OFFSET" "$remaining" "$SHARD_SIZE" <<'PY' > matrix.json
-import json,sys
-o,r,s=map(int,sys.argv[1:]); print(json.dumps({"include":[{"book_start":x} for x in range(o,o+r,s)]},separators=(",",":")))
-PY
+          import json, sys
+          offset, remaining, size = map(int, sys.argv[1:])
+          starts = list(range(offset, offset + remaining, size))
+          print(json.dumps({"include": [{"book_start": x} for x in starts]}, separators=(",", ":")))
+          PY
           echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
+
   shard:
     needs: prepare
     strategy:
