@@ -1,0 +1,45 @@
+{
+  "version": "2026.09.02",
+  "purpose": "Acquire real, machine-readable religious corpus content rather than catalog-only records.",
+  "policy": {
+    "primaryGoal": "materialize source content where redistribution rights are explicit",
+    "copyright": "Never copy a copyrighted edition merely because it is publicly viewable.",
+    "derivatives": "Generate search/index/HTML/JSON derivatives only from material whose source terms permit it.",
+    "manuscripts": "Download manuscript page images only where the digitization record explicitly states public-domain or a compatible reuse license.",
+    "verification": "Preserve source URL, upstream revision, retrieval time and SHA-256 for every acquired object.",
+    "noSilentOverwrite": true
+  },
+  "sources": {
+    "quranTanzil": {
+      "kind": "quran-text",
+      "rights": "CC-BY-3.0-compatible-with-verbatim-redistribution",
+      "source": "https://tanzil.net/download/",
+      "sourceMirror": "https://raw.githubusercontent.com/gptforjoomla/Tanzil/master/Packages/com_tanzil/site/resources/quran/quran-uthmani.txt",
+      "license": "https://tanzil.net/docs/Text_License",
+      "artifact": "data/corpus/quran/quran-uthmani.txt"
+    },
+    "openHadithData": {
+      "kind": "hadith-arabic",
+      "rights": "CC0-for-structured-data-portion",
+      "source": "https://github.com/Jaguar16/open-hadith-data/releases/tag/v1.1.0",
+      "license": "https://github.com/Jaguar16/open-hadith-data/blob/main/DATA_LICENSE.md",
+      "artifact": "data/corpus/hadith/hadith-core-arabic.json",
+      "collections": [
+        "bukhari",
+        "muslim",
+        "abu-dawud",
+        "tirmidhi",
+        "nasai",
+        "ibn-majah",
+        "malik",
+        "ahmad",
+        "darimi",
+        "adab-al-mufrad",
+        "riyad-as-salihin",
+        "bulugh-al-maram",
+        "shamail",
+        "mishkat-al-masabih"
+      ]
+    }
+  }
+}
