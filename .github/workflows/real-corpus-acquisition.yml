@@ -1,5 +1,6 @@
 name: Real Corpus Acquisition
 # security-justification: contents: write is required only to commit verified machine-readable corpus artifacts back to this dedicated feature branch; the protected main branch is never updated by this workflow.
+# rechercher-trigger: re-run governed Waqfeya harvest without changing the verified 15-book manifest.
 
 on:
   push:
@@ -172,7 +173,7 @@ jobs:
           test -s artifacts/waqfeya-books/pdfs.sha256
       - name: Preserve Waqfeya source evidence and PDFs
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a0 # v7.0.1
         with:
           name: waqfeya-source-books-${{ github.run_id }}
           path: artifacts/waqfeya-books
