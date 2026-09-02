@@ -1,12 +1,16 @@
+import { isBookCacheSafe } from "./book-cache-policy.js";
+
 const DB_NAME = "deen-allah-offline-library";
 const DB_VERSION = 1;
 const BOOKS_STORE = "books";
+const PDF_CACHE = "deen-allah-pdf-v1";
 
 function requireBook(book) {
   if (!book || typeof book !== "object") throw new TypeError("book is required");
   if (!book.id || !book.url) throw new TypeError("book.id and book.url are required");
   if (!book.sha256) throw new TypeError("book.sha256 is required for integrity verification");
   if (!Number.isInteger(book.sizeBytes) || book.sizeBytes < 1) throw new TypeError("book.sizeBytes must be a positive integer");
+  if (!isBookCacheSafe(book)) throw new Error("Book is not approved for offline caching by the governed rights/provenance policy");
 }
 
 function openDatabase() {
@@ -67,11 +71,13 @@ export async function listOfflineBooks() {
 }
 
 export async function removeOfflineBook(id) {
+  const record = await getOfflineBook(id);
   const db = await openDatabase();
   try {
-    const cache = await caches.open("deen-allah-pdf-v1");
-    const record = await getOfflineBook(id);
-    if (record?.url) await cache.delete(record.url);
+    if (record?.url && globalThis.caches) {
+      const cache = await caches.open(PDF_CACHE);
+      await cache.delete(record.url);
+    }
     await new Promise((resolve, reject) => {
       const tx = db.transaction(BOOKS_STORE, "readwrite");
       tx.objectStore(BOOKS_STORE).delete(id);
@@ -137,7 +143,7 @@ export async function downloadPdfForOffline(book, { onProgress } = {}) {
   if (blob.size !== book.sizeBytes) throw new Error(`PDF size mismatch: expected ${book.sizeBytes}, received ${blob.size}`);
   if (!(await verifySha256(blob, book.sha256))) throw new Error("PDF SHA-256 verification failed");
 
-  const cache = await caches.open("deen-allah-pdf-v1");
+  const cache = await caches.open(PDF_CACHE);
   await cache.put(book.url, new Response(blob, {
     status: 200,
     headers: { "Content-Type": "application/pdf", "Content-Length": String(blob.size), "X-Offline-SHA256": book.sha256 }
@@ -156,7 +162,7 @@ export async function downloadPdfForOffline(book, { onProgress } = {}) {
 export async function openOfflinePdf(id) {
   const book = await getOfflineBook(id);
   if (!book || book.state !== "cached") return null;
-  const cache = await caches.open("deen-allah-pdf-v1");
+  const cache = await caches.open(PDF_CACHE);
   const response = await cache.match(book.url);
   if (!response) return null;
   return { book, response };
