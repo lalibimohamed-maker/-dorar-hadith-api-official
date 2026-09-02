@@ -22,8 +22,6 @@
     "rijal:batch": "node scripts/run-rijal-ingestion-batch.js",
     "rijal:extract": "node src/rijal-ingestion.js",
     "rijal:validate": "node scripts/validate-rijal-corpus.js",
-    "rechercher:rights-audit": "node scripts/rechercher-rights-audit.mjs",
-    "test:rechercher": "node --test test/rechercher-rights-engine.test.js",
     "test:orchestration": "node test/orchestration-kernel.test.js && node test/orchestration-runtime.test.js",
     "test:search-discovery": "node --test test/search-discovery-federation.test.js",
     "test:rights": "node --test test/book-rights-resolver.test.js",
@@ -34,7 +32,11 @@
     "test:corpus-boundary": "node --test test/corpus-write-boundary.test.js",
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
-    "test:review-expiry": "node --test test/review-expiry.test.js"
+    "test:review-expiry": "node --test test/review-expiry.test.js",
+    "test:rechercher": "node --test test/rechercher-rights-engine.test.js test/rechercher-docx-catalog.test.js",
+    "rechercher:rights-audit": "node scripts/rechercher-rights-audit.mjs",
+    "rechercher:waqfeya": "node scripts/rechercher-waqfeya-classify-shard.mjs",
+    "rechercher:purge-plan": "node scripts/rechercher-purge-restricted.mjs"
   },
   "engines": {
     "node": ">=20"

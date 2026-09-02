@@ -1,99 +1,50 @@
 #!/usr/bin/env node
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import {
-  JURISDICTIONS,
-  RIGHTS_DECISIONS,
-  buildSearchRecord,
-  inspectSourceUrl,
-  searchAuthorDeath
-} from '../src/rechercher-rights-engine.js';
+import { buildSearchRecord, inspectSourceUrl, searchAuthorDeath, RIGHTS_DECISIONS } from '../src/rechercher-rights-engine.js';
 
-const INDEX = process.env.INDEX || 'data/corpus/waqfeya/century-15/index.jsonl';
-const START = Math.max(0, Number(process.env.START || '0'));
-const COUNT = Math.max(1, Number(process.env.COUNT || '100'));
-const OUT = process.env.OUT || `data/corpus/rechercher/waqfeya-${START}-${COUNT}.jsonl`;
-const JURISDICTION = JURISDICTIONS[process.env.JURISDICTION || 'DZ'] || JURISDICTIONS.DZ;
+const INDEX='data/corpus/waqfeya/century-15/index.jsonl';
+const OUT='data/corpus/waqfeya/century-15/rechercher-eligibility';
+const START=Number(process.env.BOOK_START ?? '0');
+const COUNT=Number(process.env.BOOK_COUNT ?? '100');
+const CONCURRENCY=Math.max(1,Number(process.env.CONCURRENCY ?? '4'));
 
-function clean(value) {
-  return String(value || '').replace(/\s+/gu, ' ').trim();
+function text(html){return html.replace(/<script[\s\S]*?<\/script>/giu,' ').replace(/<style[\s\S]*?<\/style>/giu,' ').replace(/<[^>]+>/gu,' ').replace(/&nbsp;|&#160;/giu,' ').replace(/&amp;/giu,'&').replace(/&quot;/giu,'"').replace(/&#39;|&apos;/giu,"'").replace(/\s+/gu,' ').trim();}
+function field(t, labels){ for(const label of labels){ const m=t.match(new RegExp(`${label}\\s*[:：-]?\\s*([^|؛;,.]{2,160})`,'iu')); if(m)return m[1].trim(); } return null; }
+function year(t){const m=t.match(/(?:سنة|عام|تاريخ)\s*(?:النشر|الطبع)?\s*[:：-]?\s*(1[2-4]\d{2}|19\d{2}|20\d{2})/u);return m?Number(m[1]):null;}
+async function run(items, fn){let i=0;await Promise.all(Array.from({length:Math.min(CONCURRENCY,items.length)},async()=>{while(true){const n=i++;if(n>=items.length)return;await fn(items[n]);}}));}
+async function main(){
+ const rows=(await readFile(INDEX,'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse).slice(START,START+COUNT);
+ const results=[]; const deathCache=new Map();
+ await run(rows,async book=>{
+  const base={...book,sourceUrl:book.sourcePage,source:'Waqfeya',sourceClass:'book'};
+  try{
+   const inspected=await inspectSourceUrl(book.sourcePage);
+   const t=inspected.metadata.text;
+   const author=inspected.metadata.author||field(t,['المؤلف','تأليف','بقلم']);
+   const editor=field(t,['تحقيق','المحقق','إعداد','جمع']);
+   const publisher=inspected.metadata.publisher||field(t,['الناشر','الناشر:','الطبعة عن','دار']);
+   const rights=inspected.metadata.rights;
+   let authorDeathYear=null; let deathEvidence=null;
+   if(author){
+    if(!deathCache.has(author)) deathCache.set(author,searchAuthorDeath(author).catch(()=>({found:false})));
+    const d=await deathCache.get(author); if(d?.found){authorDeathYear=d.deathYear;deathEvidence=d;}
+   }
+   const record=buildSearchRecord({...base,author,editor,publisher,editionYear:year(t),authorDeathYear,license:rights},inspected.metadata);
+   const evidence=(record.rightsEvidence||[]).map(e=>e.kind);
+   const conservative=(record.rightsDecision===RIGHTS_DECISIONS.LICENSED||record.rightsDecision===RIGHTS_DECISIONS.REDISTRIBUTABLE)&&!record.editionNeedsReview;
+   results.push({...record,editor,authorDeathEvidence:deathEvidence,evidenceKinds:evidence,eligibleForMirror:conservative,httpStatus:inspected.httpStatus,finalUrl:inspected.finalUrl});
+  }catch(error){results.push({...base,rightsDecision:'unreachable',eligibleForMirror:false,editionNeedsReview:true,error:String(error?.message||error)});}
+ });
+ results.sort((a,b)=>a.index-b.index);
+ const eligible=results.filter(x=>x.eligibleForMirror); const quarantine=results.filter(x=>!x.eligibleForMirror);
+ const payload={version:'2026.09.02',engine:'@Rechercher',indexStart:START,indexCount:COUNT,actualCount:rows.length,eligibleCount:eligible.length,quarantineCount:quarantine.length,generatedAt:new Date().toISOString(),policy:'Only explicit reusable rights or a verified public-domain work with no edition barrier may enter the mirroring pipeline. All other records remain discoverable but are excluded/quarantined.'};
+ await mkdir(OUT,{recursive:true});
+ await writeFile(`${OUT}/results.jsonl`,results.map(x=>JSON.stringify(x)).join('\n')+'\n');
+ await writeFile(`${OUT}/eligible-index.jsonl`,eligible.map(x=>JSON.stringify(x)).join('\n')+(eligible.length?'\n':''));
+ await writeFile(`${OUT}/quarantine.jsonl`,quarantine.map(x=>JSON.stringify(x)).join('\n')+(quarantine.length?'\n':''));
+ payload.sha256=createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+ await writeFile(`${OUT}/state.json`,JSON.stringify(payload,null,2)+'\n');
+ console.log(JSON.stringify(payload,null,2));
 }
-function field(text, label, nextLabels) {
-  const stop = nextLabels.join('|');
-  const re = new RegExp(`${label}\\s*([\\s\\S]*?)(?=${stop}|$)`, 'iu');
-  return clean(text.match(re)?.[1]);
-}
-function yearFrom(value) {
-  const western = String(value || '').match(/[12]\\d{3}/u)?.[0];
-  if (western) return Number(western);
-  const hijri = String(value || '').match(/(1[23]|14|15)\\d{2}/u)?.[0];
-  if (hijri) return null;
-  return null;
-}
-
-function parseWaqfeya(text, titleHint) {
-  const labels = ['المؤلف', 'تفاصيل النسخة', 'تاريخ النشر', 'حجم الملف', 'أُضيف للمكتبة', 'عدد المجلدات', 'حالة الفهرسة', 'المشاهدات', 'الناشر', 'عدد الصفحات', 'نبذة عن الكتاب', 'روابط التحميل المباشرة', 'تصفح الكتاب', 'نص الكتاب'];
-  const author = field(text, 'المؤلف', labels.slice(1));
-  const publication = field(text, 'تاريخ النشر', labels.slice(2));
-  const publisher = field(text, 'الناشر', labels.slice(9));
-  const notes = field(text, 'نبذة عن الكتاب', labels.slice(11));
-  return {
-    title: titleHint || field(text, '#', labels),
-    author,
-    publisher,
-    editionYear: yearFrom(publication),
-    publicationRaw: publication,
-    notes,
-    rightsText: notes
-  };
-}
-
-async function main() {
-  const lines = (await readFile(INDEX, 'utf8')).trim().split(/\r?\n/).filter(Boolean);
-  const slice = lines.slice(START, START + COUNT).map(JSON.parse);
-  const output = [];
-  for (const row of slice) {
-    try {
-      const inspected = await inspectSourceUrl(row.sourcePage);
-      const meta = parseWaqfeya(inspected.metadata.text, row.titleHint);
-      const death = meta.author ? await searchAuthorDeath(meta.author) : { found: false, reason: 'author-missing' };
-      const evidence = [];
-      if (/وقف لله|وقف لله تعالى/u.test(meta.notes || '')) evidence.push({ source: row.sourcePage, kind: 'waqf', text: meta.notes });
-      if (/جميع الحقوق محفوظة|لا يسمح بإعادة|يمنع إعادة النشر/iu.test(meta.notes || '')) evidence.push({ source: row.sourcePage, kind: 'copyright-reservation', text: meta.notes });
-      const record = buildSearchRecord({
-        source: 'المكتبة الوقفية',
-        sourceUrl: row.sourcePage,
-        title: meta.title,
-        author: meta.author,
-        publisher: meta.publisher,
-        editionYear: meta.editionYear,
-        notes: meta.notes,
-        evidence,
-        jurisdiction: JURISDICTION
-      }, { title: meta.title, author: meta.author, publisher: meta.publisher, rights: meta.rightsText, rightsSignals: [] });
-      if (death.found) {
-        record.authorDeathYear = death.deathYear;
-        record.authorWikidata = { qid: death.qid, label: death.label, source: death.source };
-        const reclassified = buildSearchRecord({ ...record, authorDeathYear: death.deathYear }, { rightsSignals: record.rightsEvidence });
-        record.rightsDecision = reclassified.rightsDecision;
-        record.workStatus = reclassified.workStatus;
-        record.editionNeedsReview = reclassified.editionNeedsReview;
-        record.classificationReason = reclassified.classificationReason;
-      } else {
-        record.authorDeathLookup = death;
-        record.rightsDecision = RIGHTS_DECISIONS.UNCLEAR;
-        record.editionNeedsReview = true;
-      }
-      output.push({ ...record, index: row.index, sourceIndex: row.sourceIndex, titleHint: row.titleHint, httpStatus: inspected.httpStatus, finalUrl: inspected.finalUrl, contentType: inspected.contentType });
-    } catch (error) {
-      output.push({ index: row.index, sourcePage: row.sourcePage, titleHint: row.titleHint, rightsDecision: 'unreachable', editionNeedsReview: true, error: String(error?.message || error) });
-    }
-  }
-  output.sort((a, b) => a.index - b.index);
-  await mkdir('data/corpus/rechercher', { recursive: true });
-  const payload = output.map(x => JSON.stringify(x)).join('\n') + (output.length ? '\n' : '');
-  await writeFile(OUT, payload, 'utf8');
-  console.log(JSON.stringify({ output: OUT, start: START, count: output.length, sha256: createHash('sha256').update(payload).digest('hex') }, null, 2));
-}
-
-main().catch(error => { console.error(error.stack || error.message || error); process.exitCode = 1; });
+main().catch(e=>{console.error(e.stack||e);process.exitCode=1});
