@@ -1,0 +1,52 @@
+{
+  "version": "2026.09.02",
+  "generatedAt": "2026-09-02T09:32:43.483Z",
+  "policy": {
+    "primaryGoal": "materialize source content where redistribution rights are explicit",
+    "copyright": "Never copy a copyrighted edition merely because it is publicly viewable.",
+    "derivatives": "Generate search/index/HTML/JSON derivatives only from material whose source terms permit it.",
+    "manuscripts": "Download manuscript page images only where the digitization record explicitly states public-domain or a compatible reuse license.",
+    "verification": "Preserve source URL, upstream revision, retrieval time and SHA-256 for every acquired object.",
+    "noSilentOverwrite": true
+  },
+  "acquired": [
+    {
+      "id": "quran-uthmani",
+      "kind": "quran-text",
+      "artifact": "data/corpus/quran/quran-uthmani.txt",
+      "source": "https://tanzil.net/download/",
+      "sourceMirror": "https://raw.githubusercontent.com/gptforjoomla/Tanzil/master/Packages/com_tanzil/site/resources/quran/quran-uthmani.txt",
+      "license": "https://tanzil.net/docs/Text_License",
+      "sha256": "aecf2904cade4c24faebc18edcf8f8a15553c764cd00212d0b5df86c2eb01914",
+      "bytes": 1354306,
+      "retrievedAt": "2026-09-02T09:32:43.483Z"
+    },
+    {
+      "id": "hadith-core-arabic",
+      "kind": "hadith-arabic",
+      "artifact": "data/corpus/hadith/collections/",
+      "catalog": "data/corpus/hadith/catalog-2026.json",
+      "source": "https://github.com/Jaguar16/open-hadith-data/releases/tag/v1.1.0",
+      "license": "https://github.com/Jaguar16/open-hadith-data/blob/main/DATA_LICENSE.md",
+      "collections": [
+        "bukhari",
+        "muslim",
+        "abu-dawud",
+        "tirmidhi",
+        "nasai",
+        "ibn-majah",
+        "malik",
+        "ahmad",
+        "darimi",
+        "shamail"
+      ],
+      "missingCollections": [
+        "adab-al-mufrad",
+        "riyad-as-salihin",
+        "bulugh-al-maram",
+        "mishkat-al-masabih"
+      ],
+      "retrievedAt": "2026-09-02T09:32:43.483Z"
+    }
+  ]
+}
