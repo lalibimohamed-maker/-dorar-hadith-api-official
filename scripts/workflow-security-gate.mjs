@@ -19,11 +19,13 @@ for (const file of files) {
     const m = line.match(/^\s*uses:\s*([^\s#]+)\s*(?:#.*)?$/);
     if (m) {
       const ref = m[1].split("@")[1];
+      // Local reusable workflows are versioned with the repository commit and cannot use an external action SHA.
+      if (m[1].startsWith("./.github/workflows/")) continue;
       if (!ref || !sha40.test(ref)) add(file, `Action is not pinned to a full 40-character SHA: ${m[1]}`);
     }
   }
 
-  if (/^\s*permissions:\s*read-all\s*$/m.test(text)) add(file, "workflow-level permissions: read-all is prohibited");
+  if (/^\s*permissions\s*:\s*read-all\s*$/m.test(text)) add(file, "workflow-level permissions: read-all is prohibited");
   if (/^\s*actions:\s*write\s*$/m.test(text) && !/actions-write-justification:/i.test(text)) add(file, "actions: write requires a reviewed actions-write-justification marker");
   if (/^\s*contents:\s*write\s*$/m.test(text) && !/security-justification:/i.test(text)) add(file, "contents: write requires a security-justification marker");
   if (/^\s*id-token:\s*write\s*$/m.test(text) && !/oidc|scorecard|provenance|attestation/i.test(text)) add(file, "id-token: write requires an OIDC/provenance purpose");
@@ -48,7 +50,7 @@ for (const file of files) {
     add(file, "network write requires a network-write-justification marker");
   }
 
-  if (!/^\s*permissions:\s*$/m.test(text)) add(file, "workflow must declare top-level permissions");
+  if (!/^\s*permissions\s*:/m.test(text)) add(file, "workflow must declare top-level permissions");
 
   if (/(?:rm|cp|mv|tar)\s+[^\n]*\$\{\{\s*github\.event\./.test(text)) {
     add(file, "event-derived path used directly in filesystem command");

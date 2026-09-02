@@ -2,8 +2,10 @@ name: Waqfeya Harvest Wave 5
 
 on:
   push:
-    branches: [feat/real-corpus-acquisition-2026]
-    paths: [data/corpus/waqfeya/century-15/index.jsonl]
+    branches:
+      - feat/real-corpus-acquisition-2026
+    paths:
+      - data/corpus/waqfeya/century-15/index.jsonl
   workflow_dispatch:
 
 permissions:
@@ -22,20 +24,20 @@ jobs:
       - id: matrix
         name: Build dynamic shard matrix
         env:
-          OFFSET: 100000
-          CAPACITY: 25000
-          SHARD_SIZE: 100
+          OFFSET: '100000'
+          CAPACITY: '25000'
+          SHARD_SIZE: '100'
         shell: bash
         run: |
           set -euo pipefail
           total=$(wc -l < data/corpus/waqfeya/century-15/index.jsonl)
           remaining=$((total - OFFSET))
-          if (( remaining <= 0 )); then echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"; exit 0; fi
+          if (( remaining <= 0 )); then
+            echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           if (( remaining > CAPACITY )); then remaining=$CAPACITY; fi
-          python3 - "$OFFSET" "$remaining" "$SHARD_SIZE" <<'PY' > matrix.json
-import json,sys
-o,r,s=map(int,sys.argv[1:]); print(json.dumps({"include":[{"book_start":x} for x in range(o,o+r,s)]},separators=(",",":")))
-PY
+          python3 -c 'import json,sys; offset,remaining,size=map(int,sys.argv[1:]); starts=list(range(offset,offset+remaining,size)); print(json.dumps({"include":[{"book_start":x} for x in starts]},separators=(",",":")))' "$OFFSET" "$remaining" "$SHARD_SIZE" > matrix.json
           echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
   shard:
     needs: prepare

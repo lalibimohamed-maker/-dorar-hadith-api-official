@@ -1,33 +1,49 @@
 name: Waqfeya Harvest Wave 10
 on:
   push:
-    branches: [feat/real-corpus-acquisition-2026]
-    paths: [data/corpus/waqfeya/century-15/index.jsonl]
+    branches:
+      - feat/real-corpus-acquisition-2026
+    paths:
+      - data/corpus/waqfeya/century-15/index.jsonl
   workflow_dispatch:
-permissions: {contents: read}
+permissions:
+  contents: read
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    outputs: {matrix: ${{ steps.matrix.outputs.matrix }}}
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
       - name: Checkout index
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with: {persist-credentials: false}
+        with:
+          persist-credentials: false
       - id: matrix
-        env: {OFFSET: 225000, CAPACITY: 25000, SHARD_SIZE: 100}
+        env:
+          OFFSET: '225000'
+          CAPACITY: '25000'
+          SHARD_SIZE: '100'
         shell: bash
         run: |
           set -euo pipefail
-          total=$(wc -l < data/corpus/waqfeya/century-15/index.jsonl); remaining=$((total - OFFSET))
+          total=$(wc -l < data/corpus/waqfeya/century-15/index.jsonl)
+          remaining=$((total - OFFSET))
           if (( remaining <= 0 )); then echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"; exit 0; fi
           if (( remaining > CAPACITY )); then remaining=$CAPACITY; fi
           python3 - "$OFFSET" "$remaining" "$SHARD_SIZE" <<'PY' > matrix.json
-import json,sys
-o,r,s=map(int,sys.argv[1:]); print(json.dumps({"include":[{"book_start":x} for x in range(o,o+r,s)]},separators=(",",":")))
-PY
+          import json,sys
+          o,r,s=map(int,sys.argv[1:])
+          print(json.dumps({"include":[{"book_start":x} for x in range(o,o+r,s)]},separators=(",",":")))
+          PY
           echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
   shard:
     needs: prepare
-    strategy: {fail-fast: false, max-parallel: 20, matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}}
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
     uses: ./.github/workflows/waqfeya-harvest-reusable.yml
-    with: {shard_id: century15-${{ matrix.book_start }}, book_start: ${{ matrix.book_start }}, book_count: 100}
+    with:
+      shard_id: century15-${{ matrix.book_start }}
+      book_start: ${{ matrix.book_start }}
+      book_count: 100
