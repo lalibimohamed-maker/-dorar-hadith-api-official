@@ -15,7 +15,7 @@ for (const record of rows) {
   let candidates = Array.isArray(record.alternativeSources) ? record.alternativeSources : [];
   if (DISCOVER && initial.outcome !== 'use-alternative') {
     try {
-      candidates = [...candidates, ...(await governedAlternativeDiscovery(record))];
+      candidates = [...candidates, ...(await governedAlternativeDiscovery(record, { verify: true }))];
     } catch (error) {
       record.discoveryError = error instanceof Error ? error.message : String(error);
     }
@@ -30,6 +30,7 @@ for (const record of rows) {
     selectedAlternative: result.selected ?? null,
     alternativeCandidates: result.candidatesConsidered,
     discoveryAttempted: DISCOVER && initial.outcome !== 'use-alternative',
+    discoveryVerificationMode: DISCOVER && initial.outcome !== 'use-alternative' ? 'rights-engine-and-source-metadata' : 'not-needed',
     discoveryError: record.discoveryError ?? null,
     originalRemainsDiscoverable: true,
     readOnlyFallback: result.outcome !== 'use-alternative'
