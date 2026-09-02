@@ -22,14 +22,15 @@ jobs:
       - id: inventory
         name: Crawl the live Century-15 page
         shell: bash
+        env:
+          WAQFEYA_CENTURY_URL: https://www.waqfeya.net/centuries/%D8%A7%D9%84%D9%82%D8%B1%D9%86-15-%D9%87%D9%80-426d13bd9086441e84cbb8b7ed9d3a1a
         run: |
           set -euo pipefail
           mkdir -p artifacts/waqfeya-century15/pages
-          first='https://www.waqfeya.net/centuries/%D8%A7%D9%84%D9%82%D8%B1%D9%86-15-%D9%87%D9%80-426d13bd9086441e84cbb8b7ed9d3a1a'
           curl --fail --location --silent --show-error --retry 6 --retry-all-errors --connect-timeout 20 --max-time 90 \
             -A 'Mozilla/5.0 (compatible; Rechercher-governed-acquisition/1.0)' \
             -H 'Accept: text/html,application/xhtml+xml' \
-            "$first" -o artifacts/waqfeya-century15/pages/century.html
+            "$WAQFEYA_CENTURY_URL" -o artifacts/waqfeya-century15/pages/century.html
 
           python3 - <<'PY'
           import html as htmlmod
@@ -37,6 +38,7 @@ jobs:
           from html.parser import HTMLParser
 
           path='artifacts/waqfeya-century15/pages/century.html'
+          source=os.environ['WAQFEYA_CENTURY_URL']
           raw=open(path,encoding='utf-8',errors='replace').read()
           decoded=htmlmod.unescape(raw).replace('\\/','/')
           if '<title' not in decoded.lower() and len(decoded) < 1000:
@@ -67,16 +69,16 @@ jobs:
           if not found:
               raise SystemExit('No /books/ links found in the live Century-15 response; refusing to fall back to a guessed offset/count')
 
-          count_match=re.search(r'عدد الكتب\\s*[:：]\\s*([0-9,٬\\s]+)', decoded)
+          count_match=re.search(r'عدد الكتب\\s*[:：]?\\s*([0-9,٬\\s]+)', decoded)
           reported=int(re.sub(r'[^0-9]','',count_match.group(1))) if count_match else None
-          records=[{'ordinal':i+1,'sourcePage':u,'catalogPage':first} for i,u in enumerate(found)]
+          records=[{'ordinal':i+1,'sourcePage':u,'catalogPage':source} for i,u in enumerate(found)]
 
           with open('artifacts/waqfeya-century15/inventory.jsonl','w',encoding='utf-8') as f:
               for r in records: f.write(json.dumps(r,ensure_ascii=False)+'\\n')
 
           observed=len(records)
           metadata={
-              'source':first,
+              'source':source,
               'reportedCount':reported,
               'observedUniqueBookPages':observed,
               'countDelta': (observed-reported) if reported is not None else None,
@@ -87,7 +89,6 @@ jobs:
 
           shard_size=100
           matrix={'include':[{'start':s} for s in range(0,observed,shard_size)]}
-          open('matrix.json','w',encoding='utf-8').write(json.dumps(matrix,separators=(',',':')))
           with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as out:
               out.write(f'total={observed}\\n')
               out.write(f'matrix={json.dumps(matrix,separators=(",",":"))}\\n')
@@ -215,7 +216,7 @@ jobs:
           with open(out+'/pdfs.sha256','w') as f:
               for name in sorted(os.listdir(out+'/pdf')):
                   p=os.path.join(out+'/pdf',name)
-                  f.write(hashlib.sha256(open(p,'rb').read()).hexdigest()+'  '+p+'\\n')
+                  f.write(hashlib.sha256(open(p,'rb').read()).hexdigest()+'  '+p+'\n')
           print(json.dumps(summary,ensure_ascii=False))
           PY
 
