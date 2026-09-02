@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import { mkdir, writeFile, rename } from 'node:fs/promises';
+import { mkdir, writeFile, rename, readFile, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createWriteStream } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
-import { Readable } from 'node:stream';
+import { Transform } from 'node:stream';
 import { buildAutoAcquisitionPlan } from '../src/rechercher-auto-acquisition.js';
 
 const INPUT_PATH = process.env.INPUT_PATH ?? 'data/corpus/rechercher/discovered-books.jsonl';
@@ -12,8 +12,7 @@ const PLAN_PATH = process.env.PLAN_PATH ?? 'data/corpus/rechercher/auto-acquisit
 const CONCURRENCY = Math.max(1, Number.parseInt(process.env.CONCURRENCY ?? '2', 10) || 2);
 const USER_AGENT = process.env.USER_AGENT ?? 'DeenAllah-Rechercher/1.0 (+source-aware-acquisition)';
 
-const rows = (await (await import('node:fs/promises')).readFile(INPUT_PATH, 'utf8'))
-  .split(/\r?\n/).filter(Boolean).map(JSON.parse);
+const rows = (await readFile(INPUT_PATH, 'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
 const plan = buildAutoAcquisitionPlan(rows);
 await mkdir(OUTPUT_DIR, { recursive: true });
 await mkdir(PLAN_PATH.slice(0, PLAN_PATH.lastIndexOf('/')) || '.', { recursive: true });
@@ -45,23 +44,13 @@ async function worker() {
       if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
 
       const hash = createHash('sha256');
-      const hashingStream = new Readable({
-        async read() {
-          const reader = response.body.getReader();
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              hash.update(value);
-              this.push(value);
-            }
-            this.push(null);
-          } catch (error) {
-            this.destroy(error);
-          }
+      const hasher = new Transform({
+        transform(chunk, encoding, callback) {
+          hash.update(chunk);
+          callback(null, chunk);
         }
       });
-      await pipeline(hashingStream, createWriteStream(tempPath));
+      await pipeline(Transform.fromWeb(response.body), hasher, createWriteStream(tempPath));
       const sha256 = hash.digest('hex');
 
       if (original.sha256 && String(original.sha256).toLowerCase() !== sha256) {
@@ -71,7 +60,7 @@ async function worker() {
       await rename(tempPath, finalPath);
       results[index] = { ...item, status: 'DOWNLOADED', path: finalPath, sha256 };
     } catch (error) {
-      try { await (await import('node:fs/promises')).rm(tempPath, { force: true }); } catch {}
+      await rm(tempPath, { force: true }).catch(() => {});
       results[index] = { ...item, status: 'FAILED', error: error instanceof Error ? error.message : String(error) };
     }
   }
