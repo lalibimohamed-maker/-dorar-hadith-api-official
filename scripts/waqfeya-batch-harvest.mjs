@@ -14,6 +14,7 @@ const catalogPages = Math.max(1, Number(process.env.WAQFEYA_CATALOG_PAGES || 20)
 const catalogStep = Math.max(1, Number(process.env.WAQFEYA_CATALOG_STEP || 30));
 const proofUrls = String(process.env.WAQFEYA_PROOF_URLS || '').split(/\s+/u).filter(Boolean);
 const maxDownloadBytes = Math.max(1, Number(process.env.WAQFEYA_MAX_DOWNLOAD_MB || 200)) * 1024 * 1024;
+const keepDownloadedFiles = /^(1|true|yes)$/iu.test(String(process.env.WAQFEYA_KEEP_FILES || 'false'));
 
 const USER_AGENT = 'Mozilla/5.0 (compatible; DeenAllahEncyclopedia/2026; +https://github.com/lalibimohamed-maker/-dorar-hadith-api-official)';
 
@@ -127,11 +128,12 @@ async function fetchBookUrl(url, proof = false) {
 
   const sourcePage = canonicalFromHtml(html, url);
   const title = titleFromHtml(html, 'Waqfeya book');
-  const rights = html.match(/(وقف\s+لله(?:\s+تعالى)?|وقف\s+على\s+طلبة\s+العلم|متاح\s+للتوزيع\s+بحرية|توزيع\s+حر)/u);
+  // A free/waqf signal is a discovery signal only. It is NOT treated as blanket republication permission.
+  const rights = html.match(/(وقف\s+لله(?:\s+تعالى)?|وقف\s+على\s+طلبة\s+العلم|متاح\s+للتوزيع\s+بحرية|توزيع\s+حر|يوزع\s+مجانا(?:\s+ولا\s+يجوز\s+بيعه)?)/u);
   const downloadUrls = extractDownloadUrls(html, sourcePage);
 
   if (!rights) return { status: 'rights-not-explicit', title, sourcePage, downloadUrls, proof };
-  if (!downloadUrls.length) return { status: 'rights-ok-no-download-link', title, sourcePage, rightsEvidence: rights[1], proof };
+  if (!downloadUrls.length) return { status: 'rights-signal-no-download-link', title, sourcePage, rightsEvidence: rights[1], proof };
   return { status: 'candidate', title, sourcePage, rightsEvidence: rights[1], downloadUrls, proof };
 }
 
@@ -150,11 +152,10 @@ let downloaded = 0;
 let catalogCandidates = 0;
 let proofCandidates = 0;
 
-// 1) Deterministic proof: known real book page, independent of numeric ID discovery.
 for (const url of proofUrls) {
   const result = await fetchBookUrl(url, true);
   proofCandidates += 1;
-  if (['candidate', 'rights-ok-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
+  if (['candidate', 'rights-signal-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
   if (result.status === 'candidate') {
     rightsChecked += 1;
     downloadLinksFound += result.downloadUrls.length;
@@ -162,7 +163,6 @@ for (const url of proofUrls) {
   } else skipped.push(result);
 }
 
-// 2) Current catalog discovery. The Waqfeya site exposes a /books catalog; crawl offset pages first.
 for (let page = 0; page < catalogPages; page += 1) {
   const offset = page * catalogStep;
   const url = `https://waqfeya.net/books?st=${offset}`;
@@ -177,7 +177,7 @@ for (let page = 0; page < catalogPages; page += 1) {
   for (const link of links) {
     if (discovered.length >= batchSize) break;
     const result = await fetchBookUrl(link);
-    if (['candidate', 'rights-ok-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
+    if (['candidate', 'rights-signal-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
     if (result.status === 'candidate') {
       rightsChecked += 1;
       downloadLinksFound += result.downloadUrls.length;
@@ -187,12 +187,11 @@ for (let page = 0; page < catalogPages; page += 1) {
   if (discovered.length >= batchSize) break;
 }
 
-// 3) Legacy numeric-ID fallback to catch books not exposed by the catalog pages.
 if (discovered.length < batchSize) {
   for (let offset = 0; offset < bookIdBatch; offset += 1) {
     const result = await fetchBook(start + offset);
     if (result.sourcePage && !seenPages.has(result.sourcePage)) seenPages.add(result.sourcePage);
-    if (['candidate', 'rights-ok-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
+    if (['candidate', 'rights-signal-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
     if (result.status === 'candidate') {
       rightsChecked += 1;
       downloadLinksFound += result.downloadUrls.length;
@@ -237,13 +236,16 @@ for (const book of discovered) {
     source: 'Waqfeya',
     sourcePage: book.sourcePage,
     downloadUrl: downloadedFrom,
-    rightsStatus: 'explicit-waqf-or-free-distribution-signal',
     rightsEvidence: book.rightsEvidence,
+    rightsStatus: 'discovery-signal-only',
     bytes,
     sha256: sha256(pdf),
-    proof: Boolean(book.proof)
+    proof: Boolean(book.proof),
+    fileStoredInArtifact: keepDownloadedFiles
   });
   downloaded += 1;
+
+  if (!keepDownloadedFiles) fs.rmSync(pdf, { force: true });
 }
 
 const result = {
@@ -262,10 +264,11 @@ const result = {
   rightsChecked,
   downloadLinksFound,
   downloaded,
+  keepDownloadedFiles,
   books: manifest,
   skipped
 };
 
 fs.writeFileSync(path.join(out, 'manifest.json'), `${JSON.stringify(result, null, 2)}\n`);
-console.log(JSON.stringify({ catalogPagesFetched, catalogCandidates, existingPagesFetched, discoveredCandidates: discovered.length, rightsChecked, downloadLinksFound, downloaded }, null, 2));
+console.log(JSON.stringify({ catalogPagesFetched, catalogCandidates, existingPagesFetched, discoveredCandidates: discovered.length, rightsChecked, downloadLinksFound, downloaded, keepDownloadedFiles }, null, 2));
 process.exitCode = downloaded > 0 ? 0 : 2;
