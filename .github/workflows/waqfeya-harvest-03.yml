@@ -21,7 +21,6 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-
       - id: matrix
         name: Build dynamic shard matrix
         env:
@@ -38,16 +37,8 @@ jobs:
             exit 0
           fi
           if (( remaining > CAPACITY )); then remaining=$CAPACITY; fi
-          python3 - "$OFFSET" "$remaining" "$SHARD_SIZE" <<'PY' > matrix.json
-import json
-import sys
-
-offset, remaining, size = map(int, sys.argv[1:])
-starts = list(range(offset, offset + remaining, size))
-print(json.dumps({"include": [{"book_start": x} for x in starts]}, separators=(",", ":")))
-PY
+          python3 -c 'import json,sys; offset,remaining,size=map(int,sys.argv[1:]); starts=list(range(offset,offset+remaining,size)); print(json.dumps({"include":[{"book_start":x} for x in starts]},separators=(",",":")))' "$OFFSET" "$remaining" "$SHARD_SIZE" > matrix.json
           echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
-
   shard:
     needs: prepare
     strategy:
