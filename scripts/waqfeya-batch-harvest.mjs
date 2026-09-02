@@ -9,8 +9,9 @@ fs.mkdirSync(out, { recursive: true });
 
 const batchSize = Math.max(1, Number(process.env.WAQFEYA_BATCH_SIZE || 25));
 const start = Math.max(1, Number(process.env.WAQFEYA_START || 1));
-const pages = Math.max(1, Number(process.env.WAQFEYA_PAGES || 8));
-const bookIdBatch = Math.max(batchSize, Number(process.env.WAQFEYA_BOOK_ID_BATCH || pages * 50));
+const bookIdBatch = Math.max(batchSize, Number(process.env.WAQFEYA_BOOK_ID_BATCH || 400));
+const catalogPages = Math.max(1, Number(process.env.WAQFEYA_CATALOG_PAGES || 20));
+const catalogStep = Math.max(1, Number(process.env.WAQFEYA_CATALOG_STEP || 30));
 const proofUrls = String(process.env.WAQFEYA_PROOF_URLS || '').split(/\s+/u).filter(Boolean);
 const maxDownloadBytes = Math.max(1, Number(process.env.WAQFEYA_MAX_DOWNLOAD_MB || 200)) * 1024 * 1024;
 
@@ -63,6 +64,20 @@ function titleFromHtml(html, fallback) {
   return fallback;
 }
 
+function extractBookLinks(html, base) {
+  const links = new Set();
+  const add = (href) => {
+    if (!href) return;
+    const resolved = absolute(base, htmlDecode(String(href).replaceAll('\\/', '/')));
+    if (resolved && /^https?:\/\/waqfeya\.net\/books\//iu.test(resolved)) links.add(resolved);
+  };
+  for (const m of html.matchAll(/<a\b([^>]*)>/gi)) {
+    const href = (m[1].match(/\bhref=["']([^"']+)["']/i) || [])[1];
+    add(href);
+  }
+  return [...links];
+}
+
 function extractDownloadUrls(html, base) {
   const urls = [];
   const add = (href, label = '') => {
@@ -80,7 +95,6 @@ function extractDownloadUrls(html, base) {
     const href = (attrs.match(/\bhref=["']([^"']+)["']/i) || [])[1];
     add(href, label);
   }
-
   for (const m of html.matchAll(/(?:href|src|url|downloadUrl|download_url|file)=["']([^"']+)["']/gi)) add(m[1]);
   for (const m of html.matchAll(/["'](https?:\/\/archive\.org\/(?:download|details)\/[^"']+)["']/gi)) add(m[1]);
 
@@ -88,9 +102,7 @@ function extractDownloadUrls(html, base) {
 }
 
 function isPdfFile(file) {
-  if (!fs.existsSync(file)) return false;
-  const stat = fs.statSync(file);
-  if (stat.size < 5) return false;
+  if (!fs.existsSync(file) || fs.statSync(file).size < 5) return false;
   const fd = fs.openSync(file, 'r');
   try {
     const buf = Buffer.alloc(5);
@@ -106,68 +118,86 @@ function canonicalFromHtml(html, fallback) {
   return m?.[0] || fallback;
 }
 
-async function fetchBookUrl(url, forcedBookId = null) {
+async function fetchBookUrl(url, proof = false) {
   let html;
-  try {
-    html = curlText(url);
-  } catch (error) {
-    return { bookId: forcedBookId, status: 'unavailable', sourcePage: url, reason: `book-fetch:${error.message}` };
-  }
+  try { html = curlText(url); }
+  catch (error) { return { status: 'unavailable', sourcePage: url, reason: `book-fetch:${error.message}`, proof }; }
 
-  if (!/المكتبة الوقفية|waqfeya/iu.test(html)) {
-    return { bookId: forcedBookId, status: 'not-a-waqfeya-page', sourcePage: url };
-  }
+  if (!/المكتبة الوقفية|waqfeya/iu.test(html)) return { status: 'not-a-waqfeya-page', sourcePage: url, proof };
 
   const sourcePage = canonicalFromHtml(html, url);
-  const fallbackTitle = forcedBookId ? `Waqfeya book ${forcedBookId}` : 'Waqfeya book';
-  const title = titleFromHtml(html, fallbackTitle);
+  const title = titleFromHtml(html, 'Waqfeya book');
   const rights = html.match(/(وقف\s+لله(?:\s+تعالى)?|وقف\s+على\s+طلبة\s+العلم|متاح\s+للتوزيع\s+بحرية|توزيع\s+حر)/u);
   const downloadUrls = extractDownloadUrls(html, sourcePage);
 
-  if (!rights) return { bookId: forcedBookId, status: 'rights-not-explicit', title, sourcePage, downloadUrls };
-  if (!downloadUrls.length) return { bookId: forcedBookId, status: 'rights-ok-no-download-link', title, sourcePage, rightsEvidence: rights[1] };
-
-  return { bookId: forcedBookId, status: 'candidate', title, sourcePage, rightsEvidence: rights[1], downloadUrls };
+  if (!rights) return { status: 'rights-not-explicit', title, sourcePage, downloadUrls, proof };
+  if (!downloadUrls.length) return { status: 'rights-ok-no-download-link', title, sourcePage, rightsEvidence: rights[1], proof };
+  return { status: 'candidate', title, sourcePage, rightsEvidence: rights[1], downloadUrls, proof };
 }
 
 async function fetchBook(bookId) {
-  return fetchBookUrl(`https://waqfeya.net/book.php?bid=${bookId}`, bookId);
+  return fetchBookUrl(`https://waqfeya.net/book.php?bid=${bookId}`);
 }
 
 const discovered = [];
 const skipped = [];
+const seenPages = new Set();
+let catalogPagesFetched = 0;
 let existingPagesFetched = 0;
 let rightsChecked = 0;
 let downloadLinksFound = 0;
 let downloaded = 0;
+let catalogCandidates = 0;
 let proofCandidates = 0;
 
-// 1) Deterministic proof: known real book page(s), independent of numeric book IDs.
+// 1) Deterministic proof: known real book page, independent of numeric ID discovery.
 for (const url of proofUrls) {
-  const result = await fetchBookUrl(url);
+  const result = await fetchBookUrl(url, true);
   proofCandidates += 1;
   if (['candidate', 'rights-ok-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
   if (result.status === 'candidate') {
     rightsChecked += 1;
     downloadLinksFound += result.downloadUrls.length;
-    discovered.push({ ...result, proof: true });
-  } else {
-    skipped.push({ ...result, proof: true });
-  }
+    discovered.push(result);
+  } else skipped.push(result);
 }
 
-// 2) Bulk scan: keep probing numeric IDs so one broken/empty range does not stop the campaign.
-if (discovered.filter((x) => x.proof).length < batchSize) {
-  for (let offset = 0; offset < bookIdBatch; offset += 1) {
-    const result = await fetchBook(start + offset);
+// 2) Current catalog discovery. The Waqfeya site exposes a /books catalog; crawl offset pages first.
+for (let page = 0; page < catalogPages; page += 1) {
+  const offset = page * catalogStep;
+  const url = `https://waqfeya.net/books?st=${offset}`;
+  let html;
+  try { html = curlText(url); catalogPagesFetched += 1; }
+  catch (error) { skipped.push({ status: 'catalog-fetch-failed', sourcePage: url, reason: error.message }); continue; }
+
+  const links = extractBookLinks(html, url).filter((u) => !seenPages.has(u));
+  for (const link of links) { seenPages.add(link); catalogCandidates += 1; }
+  if (!links.length && page > 2) break;
+
+  for (const link of links) {
+    if (discovered.length >= batchSize) break;
+    const result = await fetchBookUrl(link);
     if (['candidate', 'rights-ok-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
     if (result.status === 'candidate') {
       rightsChecked += 1;
       downloadLinksFound += result.downloadUrls.length;
       discovered.push(result);
-    } else if (result.status !== 'not-a-waqfeya-page') {
-      skipped.push(result);
-    }
+    } else if (result.status !== 'not-a-waqfeya-page') skipped.push(result);
+  }
+  if (discovered.length >= batchSize) break;
+}
+
+// 3) Legacy numeric-ID fallback to catch books not exposed by the catalog pages.
+if (discovered.length < batchSize) {
+  for (let offset = 0; offset < bookIdBatch; offset += 1) {
+    const result = await fetchBook(start + offset);
+    if (result.sourcePage && !seenPages.has(result.sourcePage)) seenPages.add(result.sourcePage);
+    if (['candidate', 'rights-ok-no-download-link', 'rights-not-explicit'].includes(result.status)) existingPagesFetched += 1;
+    if (result.status === 'candidate') {
+      rightsChecked += 1;
+      downloadLinksFound += result.downloadUrls.length;
+      discovered.push(result);
+    } else if (result.status !== 'not-a-waqfeya-page') skipped.push(result);
     if (discovered.length >= batchSize) break;
   }
 }
@@ -221,8 +251,12 @@ const result = {
   start,
   requestedBatchSize: batchSize,
   bookIdBatch,
+  catalogPages,
+  catalogStep,
   proofUrls,
   proofCandidates,
+  catalogPagesFetched,
+  catalogCandidates,
   existingPagesFetched,
   discoveredCandidates: discovered.length,
   rightsChecked,
@@ -233,5 +267,5 @@ const result = {
 };
 
 fs.writeFileSync(path.join(out, 'manifest.json'), `${JSON.stringify(result, null, 2)}\n`);
-console.log(JSON.stringify({ existingPagesFetched, discoveredCandidates: discovered.length, rightsChecked, downloadLinksFound, downloaded }, null, 2));
+console.log(JSON.stringify({ catalogPagesFetched, catalogCandidates, existingPagesFetched, discoveredCandidates: discovered.length, rightsChecked, downloadLinksFound, downloaded }, null, 2));
 process.exitCode = downloaded > 0 ? 0 : 2;
