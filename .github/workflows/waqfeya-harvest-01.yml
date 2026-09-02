@@ -1,4 +1,5 @@
-name: Waqfeya Harvest 01
+name: Waqfeya Harvest Wave 1
+
 on:
   push:
     branches: [feat/real-corpus-acquisition-2026]
@@ -9,13 +10,47 @@ permissions:
   contents: read
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout index
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - id: matrix
+        name: Build dynamic shard matrix
+        env:
+          OFFSET: 0
+          CAPACITY: 125000
+          SHARD_SIZE: 500
+        shell: bash
+        run: |
+          set -euo pipefail
+          total=$(wc -l < data/corpus/waqfeya/century-15/index.jsonl)
+          remaining=$((total - OFFSET))
+          if (( remaining <= 0 )); then
+            echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if (( remaining > CAPACITY )); then remaining=$CAPACITY; fi
+          python3 - "$OFFSET" "$remaining" "$SHARD_SIZE" <<'PY' > matrix.json
+import json, sys
+offset, remaining, size = map(int, sys.argv[1:])
+starts = list(range(offset, offset + remaining, size))
+print(json.dumps({"include": [{"book_start": x} for x in starts]}, separators=(",", ":")))
+PY
+          echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
+
   shard:
+    needs: prepare
     strategy:
       fail-fast: false
-      matrix:
-        book_start: [0,100,200,300,400,500,600,700]
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
     uses: ./.github/workflows/waqfeya-harvest-reusable.yml
     with:
       shard_id: century15-${{ matrix.book_start }}
       book_start: ${{ matrix.book_start }}
-      book_count: 100
+      book_count: 500
