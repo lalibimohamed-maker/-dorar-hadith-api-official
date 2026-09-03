@@ -1,17 +1,28 @@
 name: Rechercher - Waqfeya Fatawa 15-volume unified download
 
 on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened]
   push:
     branches:
       - rechercher/waqfeya-fatawa-15-volumes-unified
+    paths-ignore:
+      - artifacts/waqfeya-fatawa-committee-15-volumes.pdf
+      - artifacts/waqfeya-fatawa-15-volumes-manifest.txt
+      - artifacts/waqfeya-fatawa-committee-collection.pdf
+      - artifacts/sha256.txt
+      - artifacts/size.txt
+      - .gitattributes
   workflow_dispatch:
 
 permissions:
-  # security-justification: required only to persist the verified unified Waqfeya PDF and manifest via Git LFS on this dedicated branch.
+  # security-justification: required only to persist the verified unified Waqfeya PDF and manifest via Git LFS on this dedicated same-repository PR branch.
   contents: write
 
 jobs:
   build-unified-book:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -21,12 +32,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          branch="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          test -n "$branch"
           workdir="${RUNNER_TEMP}/waqfeya-fatawa-15"
           rm -rf "$workdir"
           git lfs version || (sudo apt-get update && sudo apt-get install -y git-lfs)
           sudo apt-get update
           sudo apt-get install -y qpdf
-          git clone --branch "${GITHUB_REF_NAME}" --single-branch "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$workdir"
+          git clone --branch "$branch" --single-branch "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$workdir"
           cd "$workdir"
           git lfs install --local
           mkdir -p source-pdfs artifacts
@@ -53,6 +66,7 @@ jobs:
           echo '# Source: Waqfeya — فتاوى اللجنة الدائمة للبحوث العلمية والإفتاء - المجموعتان الأولي والثانية' >> artifacts/waqfeya-fatawa-15-volumes-manifest.txt
           echo '# Waqfeya page: https://www.waqfeya.net/books/فتاوى-اللجنة-الدائمة-للبحوث-العلمية-والإفتاء-المجموعتان-الأولي-والثانية-e86cd2074e934dfbaa7e21796e395492' >> artifacts/waqfeya-fatawa-15-volumes-manifest.txt
           echo '# Verified Waqfeya scope: 15 volumes; item marked وقف لله تعالى.' >> artifacts/waqfeya-fatawa-15-volumes-manifest.txt
+          echo '# Independent cross-check: المجموعة الثانية has 11 volumes; combined edition is 15 volumes total.' >> artifacts/waqfeya-fatawa-15-volumes-manifest.txt
           echo >> artifacts/waqfeya-fatawa-15-volumes-manifest.txt
 
           for idx in $(seq 1 15); do
@@ -75,9 +89,14 @@ jobs:
           printf '\nunified_bytes=%s\nunified_sha256=%s\nvolume_count=15\n' "$final_bytes" "$final_sha" >> artifacts/waqfeya-fatawa-15-volumes-manifest.txt
 
           git lfs track 'artifacts/waqfeya-fatawa-committee-15-volumes.pdf'
-          git lfs track 'artifacts/waqfeya-fatawa-15-volumes-manifest.txt'
           rm -f artifacts/waqfeya-fatawa-committee-collection.pdf artifacts/sha256.txt artifacts/size.txt
           git add .gitattributes artifacts/waqfeya-fatawa-committee-15-volumes.pdf artifacts/waqfeya-fatawa-15-volumes-manifest.txt
           git add -u
+          if git diff --cached --quiet; then
+            echo 'No persistent changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -m 'data(waqfeya): persist all 15 volumes as one unified PDF [skip ci]'
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:$branch"
