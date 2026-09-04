@@ -1,0 +1,14 @@
+name: Rechercher — governed book batch acquisition
+
+on:
+  push:
+    branches:
+      - 'rechercher/books-batch-03-hadith-fiqh-history'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  acquire:
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main
