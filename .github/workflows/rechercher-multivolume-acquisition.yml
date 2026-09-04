@@ -1,60 +1,16 @@
-name: Rechercher - governed multi-volume book acquisition
+name: Rechercher — governed multi-volume acquisition
 
 on:
-  # Acquisition is a branch-side producer, not a PR check. Using push here
-  # avoids the GITHUB_TOKEN -> pull_request synchronize approval gate.
   push:
     branches:
       - 'rechercher/**'
   workflow_dispatch:
 
-concurrency:
-  group: rechercher-acquisition-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
-
 permissions:
-  # security-justification: contents:write is required to persist verified PDF
-  # artifacts/manifests to the working rechercher branch only; main is never
-  # written and branch updates use rebase plus a normal non-force push.
   contents: write
 
 jobs:
   acquire:
-    runs-on: ubuntu-latest
-    timeout-minutes: 180
-    steps:
-      - name: Acquire and unify approved multi-volume records
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y qpdf
-          git lfs install
-          TARGET_BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-          test -n "${TARGET_BRANCH}"
-          git clone --branch "${TARGET_BRANCH}" --single-branch "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" repo
-          cd repo
-          git lfs track 'artifacts/*.pdf'
-          python3 scripts/rechercher_waqfeya_acquire.py
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add books-batches scripts artifacts .gitattributes
-          if git diff --cached --quiet; then
-            echo 'No changes to persist.'
-            exit 0
-          fi
-          git commit -m 'data(rechercher): acquire verified multi-volume books'
-          for attempt in 1 2 3 4 5; do
-            git fetch origin "${TARGET_BRANCH}"
-            git rebase "origin/${TARGET_BRANCH}"
-            if git push origin "HEAD:${TARGET_BRANCH}"; then
-              echo "Push succeeded on attempt ${attempt}."
-              exit 0
-            fi
-            echo "Push race detected; retrying (${attempt}/5)."
-            sleep $((attempt * 3))
-          done
-          echo 'Unable to update the branch without overwriting newer work.'
-          exit 1
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main
+    permissions:
+      contents: write
