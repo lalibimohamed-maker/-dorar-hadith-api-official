@@ -1,10 +1,11 @@
 name: Rechercher — Central governed multi-volume acquisition
 
-on:
-  workflow_call:
-
+# security-justification: this reusable workflow writes verified book artifacts and manifests to the governed acquisition branch.
 permissions:
   contents: write
+
+on:
+  workflow_call:
 
 jobs:
   acquire:
@@ -13,14 +14,14 @@ jobs:
     timeout-minutes: 180
     steps:
       - name: Checkout target branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
 
       - name: Checkout central acquisition implementation
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: lalibimohamed-maker/-dorar-hadith-api-official
           ref: main
@@ -29,6 +30,8 @@ jobs:
           persist-credentials: false
 
       - name: Acquire, validate, repair, and unify
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
@@ -38,6 +41,7 @@ jobs:
           python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
           git lfs track 'artifacts/*.pdf'
+          gh auth setup-git
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add books-batches scripts artifacts .gitattributes
