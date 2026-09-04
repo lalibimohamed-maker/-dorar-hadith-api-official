@@ -1,116 +1,234 @@
 #!/usr/bin/env python3
-import html, json, re, subprocess
+import html, json, re, shutil, subprocess
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit, urlunsplit, quote
 from urllib.request import Request, urlopen
 
-ROOT=Path(__file__).resolve().parents[1]
-CATALOG=ROOT/'books-batches'/'catalog.json'
-ART=ROOT/'artifacts'; ART.mkdir(exist_ok=True)
+ROOT = Path(__file__).resolve().parents[1]
+CATALOG = ROOT / 'books-batches' / 'catalog.json'
+ART = ROOT / 'artifacts'
+ART.mkdir(exist_ok=True)
+
+USER_AGENT = 'DinAllah-Encyclopedia/1.1'
+DOWNLOAD_TIMEOUT = 120
+MAX_SOURCE_ATTEMPTS = 12
+
 
 def normalize_url(url):
-    p=urlsplit(url)
-    return urlunsplit((p.scheme,p.netloc,quote(p.path, safe='/%:@-._~'),p.query,p.fragment))
+    p = urlsplit(url)
+    return urlunsplit((p.scheme, p.netloc, quote(p.path, safe='/%:@-._~'), p.query, p.fragment))
+
 
 def fetch(url):
-    req=Request(normalize_url(url),headers={'User-Agent':'DinAllah-Encyclopedia/1.0'})
-    with urlopen(req,timeout=60) as r:
-        return r.read().decode('utf-8','replace')
+    req = Request(normalize_url(url), headers={'User-Agent': USER_AGENT})
+    with urlopen(req, timeout=60) as r:
+        return r.read().decode('utf-8', 'replace')
 
-def pdf_links(page,base):
-    out=[]; seen=set()
-    for m in re.finditer(r'href=["\\\']([^"\\\']+)["\\\']',page,re.I):
-        u=urljoin(base,html.unescape(m.group(1))); u=normalize_url(u)
-        if re.search(r'\.pdf(?:\?|$)',u,re.I) and u not in seen:
-            seen.add(u); out.append(u)
+
+def pdf_links(page, base):
+    out, seen = [], set()
+    for m in re.finditer(r'href=["\\\']([^"\\\']+)["\\\']', page, re.I):
+        u = normalize_url(urljoin(base, html.unescape(m.group(1))))
+        if re.search(r'\.pdf(?:\?|$)', u, re.I) and u not in seen:
+            seen.add(u)
+            out.append(u)
     return out
 
+
 def qpdf_check(path):
-    """Return (status, output). qpdf status 3 means warnings-only, not fatal errors."""
-    p=subprocess.run(['qpdf','--check',str(path)],text=True,capture_output=True)
+    p = subprocess.run(['qpdf', '--check', str(path)], text=True, capture_output=True)
     return p.returncode, (p.stdout + p.stderr).strip()
 
-def validate_and_repair(path):
-    """Validate a PDF before ingest; repair recoverable qpdf warnings, then re-check strictly."""
-    status, output=qpdf_check(path)
-    if status == 0:
-        return {'status':'valid','repaired':False,'initial_check':output,'repair_check':None}
-    if status == 2:
-        raise SystemExit(f'{path}: qpdf reported PDF errors:\n{output}')
-    if status != 3:
-        raise SystemExit(f'{path}: qpdf check failed with unexpected exit {status}:\n{output}')
 
-    # qpdf documents exit 3 as warnings without errors. Rewrite through qpdf so
-    # recoverable structural defects are repaired before anything is committed.
-    original=path.with_name(path.name + '.pre-repair')
-    path.rename(original)
+def validate_and_repair(path):
+    """Return a result; never abort the whole book so the caller can try a fallback source."""
+    status, output = qpdf_check(path)
+    if status == 0:
+        return {'status': 'valid', 'repaired': False, 'initial_check': output, 'repair_check': None}
+    if status == 2:
+        return {'status': 'invalid', 'repaired': False, 'initial_check': output, 'repair_check': None,
+                'reason': 'qpdf_errors'}
+    if status != 3:
+        return {'status': 'invalid', 'repaired': False, 'initial_check': output, 'repair_check': None,
+                'reason': f'qpdf_exit_{status}'}
+
+    # qpdf documents exit 3 as warnings without errors. Rewrite the candidate and
+    # then require a clean exit-0 validation before accepting it.
+    original = path.with_name(path.name + '.pre-repair')
     try:
-        repair=subprocess.run(
-            ['qpdf',str(original),'--replace-input'],
-            text=True,capture_output=True
+        path.rename(original)
+        repair = subprocess.run(
+            ['qpdf', str(original), '--replace-input'], text=True, capture_output=True
         )
-        if repair.returncode not in (0,3):
-            raise SystemExit(f'{path}: qpdf repair failed with exit {repair.returncode}:\n{repair.stdout}\n{repair.stderr}')
-        # qpdf --replace-input keeps the repaired file at the original filename.
-        status2, output2=qpdf_check(original)
+        if repair.returncode not in (0, 3):
+            return {'status': 'invalid', 'repaired': False, 'initial_check': output,
+                    'repair_check': (repair.stdout + repair.stderr).strip(),
+                    'reason': f'repair_exit_{repair.returncode}'}
+        status2, output2 = qpdf_check(original)
         if status2 == 0:
-            # Move the repaired file back to its canonical path.
             original.rename(path)
-            return {'status':'repaired','repaired':True,'initial_check':output,'repair_check':output2}
-        # If qpdf still reports warnings/errors after repair, do not ingest it.
-        raise SystemExit(f'{path}: PDF remains structurally non-clean after repair (exit {status2}):\n{output2}')
-    except Exception:
+            return {'status': 'repaired', 'repaired': True, 'initial_check': output,
+                    'repair_check': output2}
+        return {'status': 'invalid', 'repaired': False, 'initial_check': output,
+                'repair_check': output2, 'reason': f'post_repair_exit_{status2}'}
+    finally:
+        # If repair failed before producing a usable candidate, restore it only for
+        # diagnostics; it is never copied into the accepted artifact set.
         if not path.exists() and original.exists():
             original.rename(path)
-        raise
+
 
 def sha256(path):
-    return subprocess.check_output(['sha256sum',str(path)],text=True).split()[0]
+    return subprocess.check_output(['sha256sum', str(path)], text=True).split()[0]
+
 
 def run(cmd):
-    subprocess.run(cmd,check=True)
+    return subprocess.run(cmd, check=True)
 
-def acquire(b):
-    if b.get('rights_status')!='verified-redistributable':
-        print(f"[HOLD] {b['id']}: rights not verified; metadata only")
-        return
-    exp=int(b['expected_volumes']); page=b['waqfeya_url']; found=pdf_links(fetch(page),page)
-    if len(found)<exp:
-        raise SystemExit(f"{b['id']}: found {len(found)} PDFs, expected {exp}")
-    found=found[:exp]
-    safe=re.sub(r'[^a-z0-9._-]+','-',b['id'].lower()).strip('-')
-    work=ART/safe; work.mkdir(parents=True,exist_ok=True); vols=[]
-    for n,u in enumerate(found,1):
-        p=work/f'{n:03d}.pdf'
-        print(f'Downloading {b["id"]} {n}/{exp}')
-        run(['curl','-L','--fail','--retry','5','--retry-delay','2','-o',str(p),u])
-        if p.read_bytes()[:4]!=b'%PDF':
-            raise SystemExit(f'{p}: invalid PDF signature')
-        validation=validate_and_repair(p)
-        vols.append({
-            'volume':n,
-            'url':u,
-            'bytes':p.stat().st_size,
-            'sha256':sha256(p),
-            'validation':validation,
-        })
 
-    unified=ART/f'{safe}.pdf'
-    pages=[str(work/f'{n:03d}.pdf') for n in range(1,exp+1)]
-    run(['qpdf','--empty','--pages',*pages,'--',str(unified)])
-    unified_validation=validate_and_repair(unified)
-    final_sha=sha256(unified)
-    manifest={
-        'id':b['id'],'title':b['title'],'author':b['author'],'edition':b.get('edition'),
-        'waqfeya_url':page,'expected_volumes':exp,'downloaded_volumes':len(vols),
-        'volumes':vols,'unified_file':str(unified.relative_to(ROOT)),
-        'unified_bytes':unified.stat().st_size,'unified_sha256':final_sha,
-        'unified_validation':unified_validation,
-        'ingest_policy':'validate each PDF; repair recoverable qpdf warnings; reject errors; unify only after all volumes pass',
-    }
-    (ART/f'{safe}.manifest.json').write_text(
-        json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'
+def source_candidates(book):
+    """Return ordered, edition-scoped sources. Alternatives must be explicitly catalogued."""
+    candidates = []
+    for source in book.get('sources', []):
+        if isinstance(source, str):
+            candidates.append({'url': source, 'label': 'catalogued-fallback'})
+        elif isinstance(source, dict) and source.get('url'):
+            candidates.append(dict(source))
+    if book.get('waqfeya_url'):
+        candidates.insert(0, {'url': book['waqfeya_url'], 'label': 'primary-waqfeya', 'discover_pdfs': True})
+    # Preserve order while removing duplicate URLs.
+    unique, seen = [], set()
+    for c in candidates:
+        u = normalize_url(c['url'])
+        if u not in seen:
+            seen.add(u)
+            c['url'] = u
+            unique.append(c)
+    return unique
+
+
+def candidate_urls(source):
+    if source.get('pdf_url'):
+        return [normalize_url(source['pdf_url'])]
+    page = source['url']
+    return pdf_links(fetch(page), page) if source.get('discover_pdfs') else [normalize_url(page)]
+
+
+def download(url, path):
+    subprocess.run([
+        'curl', '-L', '--fail', '--retry', '5', '--retry-delay', '2', '--connect-timeout', '30',
+        '--max-time', str(DOWNLOAD_TIMEOUT), '-o', str(path), url
+    ], check=True)
+
+
+def acquire_volume(book, volume, expected, work):
+    attempts = []
+    sources = source_candidates(book)
+    if not sources:
+        raise SystemExit(f"{book['id']} volume {volume}: no catalogued source exists")
+
+    # A source page can expose multiple PDFs. We map them by their ordered PDF link
+    # sequence only for a source explicitly declared to be the exact edition.
+    for source_index, source in enumerate(sources, 1):
+        try:
+            urls = candidate_urls(source)
+        except Exception as exc:
+            attempts.append({'source': source['url'], 'status': 'source_error', 'error': str(exc)})
+            continue
+        if source.get('volume') is not None and int(source['volume']) != volume:
+            continue
+        if source.get('volume_url_map'):
+            mapped = source['volume_url_map'].get(str(volume)) or source['volume_url_map'].get(volume)
+            urls = [mapped] if mapped else []
+        elif source.get('discover_pdfs'):
+            if len(urls) < expected:
+                attempts.append({'source': source['url'], 'status': 'incomplete_source',
+                                 'found_pdfs': len(urls), 'expected': expected})
+                continue
+            urls = [urls[volume - 1]]
+        else:
+            urls = urls[:1]
+
+        for url in urls[:MAX_SOURCE_ATTEMPTS]:
+            candidate = work / f'{volume:03d}.candidate.pdf'
+            try:
+                print(f'Downloading {book["id"]} volume {volume}/{expected} from {url}')
+                download(url, candidate)
+                if candidate.read_bytes()[:4] != b'%PDF':
+                    attempts.append({'source': url, 'status': 'invalid_signature'})
+                    candidate.unlink(missing_ok=True)
+                    continue
+                validation = validate_and_repair(candidate)
+                if validation['status'] in ('valid', 'repaired'):
+                    final = work / f'{volume:03d}.pdf'
+                    candidate.replace(final)
+                    return final, {
+                        'volume': volume,
+                        'url': url,
+                        'source_label': source.get('label'),
+                        'bytes': final.stat().st_size,
+                        'sha256': sha256(final),
+                        'validation': validation,
+                        'attempts': attempts,
+                    }
+                attempts.append({'source': url, 'status': validation['status'],
+                                 'reason': validation.get('reason'),
+                                 'initial_check': validation.get('initial_check'),
+                                 'repair_check': validation.get('repair_check')})
+            except Exception as exc:
+                attempts.append({'source': url, 'status': 'download_or_validation_error', 'error': str(exc)})
+            finally:
+                candidate.unlink(missing_ok=True)
+
+    raise SystemExit(
+        f"{book['id']} volume {volume}: all catalogued sources failed; no unverified/different edition was accepted.\n"
+        + json.dumps(attempts, ensure_ascii=False, indent=2)
     )
 
-for b in json.loads(CATALOG.read_text(encoding='utf-8'))['books']:
-    acquire(b)
+
+def acquire(book):
+    if book.get('rights_status') != 'verified-redistributable':
+        print(f"[HOLD] {book['id']}: rights not verified; metadata only")
+        return
+
+    expected = int(book['expected_volumes'])
+    safe = re.sub(r'[^a-z0-9._-]+', '-', book['id'].lower()).strip('-')
+    work = ART / safe
+    if work.exists():
+        shutil.rmtree(work)
+    work.mkdir(parents=True, exist_ok=True)
+    vols = []
+
+    for volume in range(1, expected + 1):
+        _, record = acquire_volume(book, volume, expected, work)
+        vols.append(record)
+
+    if len(vols) != expected or [v['volume'] for v in vols] != list(range(1, expected + 1)):
+        raise SystemExit(f"{book['id']}: completeness gate failed; refusing to unify incomplete volumes")
+
+    unified = ART / f'{safe}.pdf'
+    pages = [str(work / f'{n:03d}.pdf') for n in range(1, expected + 1)]
+    run(['qpdf', '--empty', '--pages', *pages, '--', str(unified)])
+    unified_validation = validate_and_repair(unified)
+    if unified_validation['status'] not in ('valid', 'repaired'):
+        raise SystemExit(f"{book['id']}: unified PDF failed validation")
+
+    manifest = {
+        'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'),
+        'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols,
+        'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size,
+        'unified_sha256': sha256(unified), 'unified_validation': unified_validation,
+        'ingest_policy': (
+            'primary source -> strict PDF validation -> qpdf repair for warnings -> strict recheck -> '
+            'catalogued same-edition fallback sources -> per-volume SHA-256 -> complete ordered unification -> '
+            'strict unified validation; reject only after all matching catalogued sources fail'
+        ),
+        'fallback_policy': 'Never substitute a different edition merely because the title matches; fallback sources must be edition-scoped.',
+    }
+    (ART / f'{safe}.manifest.json').write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
+    )
+
+
+for book in json.loads(CATALOG.read_text(encoding='utf-8'))['books']:
+    acquire(book)
