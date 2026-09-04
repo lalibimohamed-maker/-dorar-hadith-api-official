@@ -1,0 +1,35 @@
+{
+  "id": "al-sunnah-abdullah-ahmad-1349-waqf",
+  "title": "السنة",
+  "author": "عبد الله بن أحمد بن حنبل",
+  "edition": "المطبعة السلفية، 1349هـ، تحقيق عبد الله بن حسن آل الشيخ",
+  "expected_volumes": 1,
+  "downloaded_volumes": 1,
+  "volumes": [
+    {
+      "volume": 1,
+      "url": "https://archive.org/download/2604121745FP/sunnaa.pdf",
+      "source_label": "primary-waqfeya",
+      "bytes": 5257111,
+      "sha256": "b60083d09d64796aca6959559169f2c2ee4ea2501b1ecb94f6fc5bc94ec6a2f9",
+      "validation": {
+        "status": "valid",
+        "repaired": false,
+        "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/al-sunnah-abdullah-ahmad-1349-waqf/001.candidate.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+        "repair_check": null
+      },
+      "attempts": []
+    }
+  ],
+  "unified_file": "artifacts/al-sunnah-abdullah-ahmad-1349-waqf.pdf",
+  "unified_bytes": 4786075,
+  "unified_sha256": "1866c47f11cb4ca595dadb1839db2e4936e346eb99e5c992f736999eec0cc1e0",
+  "unified_validation": {
+    "status": "valid",
+    "repaired": false,
+    "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/al-sunnah-abdullah-ahmad-1349-waqf.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+    "repair_check": null
+  },
+  "ingest_policy": "primary source -> strict PDF validation -> qpdf repair for warnings -> strict recheck -> catalogued same-edition fallback sources -> per-volume SHA-256 -> complete ordered unification -> strict unified validation; reject only after all matching catalogued sources fail",
+  "fallback_policy": "Never substitute a different edition merely because the title matches; fallback sources must be edition-scoped."
+}
