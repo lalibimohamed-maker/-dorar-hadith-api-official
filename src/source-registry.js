@@ -64,5 +64,5 @@ export function getTranslationPolicy() { return mergedRegistry.translation; }
 export function getIngestionPipeline() { return mergedRegistry.ingestionPipeline; }
 export function getTranslationCorpusPlan() { return mergedRegistry.translationCorpusPlan; }
 export function getGlobalFatwaAuditPlan() { return mergedRegistry.globalFatwaAuditPlan; }
-export function listRussianSources({ role, downloadable = false } = {}) { return mergedRegistry.sources.filter((source) => source.category === "russian" && (!role || source.role === role) && (!downloadable || ["official_russian_download", "licensed_republication", "download_and_ingest_after_item_level_rights_and_integrity_check", "link_or_republish_if_explicitly_permitted"].includes(source.downloadPolicy))); }
+export function listRussianSources({ role, downloadable = false } = {}) { return mergedRegistry.sources.filter((source) => source.category === "russian" && (!role || source.role === role) && (!downloadable || ["official_russian_download", "licensed_republication", "download_and_ingest_after_item_level_rights_and_integrity_check", "link_or_republish_if_explicitly_permitted", "prefer_official_download_link_unless_republication_rights_are_explicit", "prefer_official_service_or_download_and_verify_rights"].includes(source.downloadPolicy))); }
 export function getRussianRouting() { return mergedRegistry.russian; }
