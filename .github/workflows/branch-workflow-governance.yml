@@ -59,7 +59,7 @@ jobs:
             echo "=== auditing $branch @ $before_sha ==="
             git worktree add --detach "$worktree" "$before_sha" >/dev/null
 
-            if ! (cd "$worktree" && python3 scripts/enforce_branch_workflow_policy.py); then
+            if ! (cd "$worktree" && python3 scripts/enforce_all_branch_governance.py); then
               echo "POLICY_ERROR $branch"
               git worktree remove --force "$worktree"
               continue
@@ -71,8 +71,7 @@ jobs:
               continue
             fi
 
-            # main is protected and is never rewritten by the self-healing job.
-            # Any main drift is surfaced for a normal reviewed PR.
+            # main is protected: it is audited with the same rules, but repaired only through a reviewed PR.
             if [ "$branch" = "main" ]; then
               echo "PROTECTED_MAIN_DRIFT $branch"
               git -C "$worktree" diff -- .github/workflows scripts
