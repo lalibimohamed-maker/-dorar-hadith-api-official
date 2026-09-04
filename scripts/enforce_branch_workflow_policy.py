@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-"""Deterministically repair only the repository's known workflow-policy drift.
+"""Deterministically repair known workflow-policy drift.
 
-Safety boundary: this script never force-pushes and never edits content/data files.
-It is intentionally conservative: ambiguous workflow differences are reported,
-not rewritten.
+Safety boundary: this script never force-pushes and never edits corpus/content data.
+Governed acquisition workflows are reduced to callers of the central reusable
+workflow; the acquisition implementation lives only in the central workflow/source.
 """
 from __future__ import annotations
 
 import pathlib
-import re
-import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -19,35 +17,39 @@ ACQUISITION_NAMES = {
     "rechercher-multivolume-acquisition.yml",
     "rechercher-governed-multivolume-book-acquisition.yml",
 }
+CENTRAL_REUSABLE = "lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main"
 SKIP_MARKERS = ("[skip ci]", "[ci skip]", "[no ci]", "[skip actions]", "[actions skip]")
 
+CALLER_TEMPLATE = """name: Rechercher — governed multi-volume acquisition
 
-def git(*args: str) -> str:
-    return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
+on:
+  push:
+    branches:
+      - 'rechercher/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  acquire:
+    uses: {central}
+    permissions:
+      contents: write
+""".format(central=CENTRAL_REUSABLE)
 
 
 def repair_file(path: pathlib.Path) -> bool:
     original = path.read_text(encoding="utf-8")
-    updated = original
+    if path.name in ACQUISITION_NAMES:
+        if original != CALLER_TEMPLATE:
+            path.write_text(CALLER_TEMPLATE, encoding="utf-8")
+            return True
+        return False
 
-    # Remove CI-suppressing markers only from workflow source. This does not
-    # touch ordinary documentation or content.
+    updated = original
     for marker in SKIP_MARKERS:
         updated = updated.replace(marker, "")
-
-    # Acquisition producers must be push/manual producers, not PR producers.
-    # We only rewrite the exact governed acquisition workflow names.
-    if path.name in ACQUISITION_NAMES:
-        updated = re.sub(
-            r"(?ms)^\s*pull_request:\n(?:^[ \t]+.*\n)*?(?=^\s*workflow_dispatch:|^\s*permissions:|^\s*jobs:)",
-            "",
-            updated,
-        )
-        if "\npush:\n" not in updated and "\npush:" not in updated:
-            updated = updated.replace("on:\n", "on:\n  push:\n    branches:\n      - 'rechercher/**'\n", 1)
-        elif "branches:" not in updated.split("push:", 1)[1].split("permissions:", 1)[0]:
-            updated = updated.replace("  push:\n", "  push:\n    branches:\n      - 'rechercher/**'\n", 1)
-
     if updated != original:
         path.write_text(updated, encoding="utf-8")
         return True
@@ -60,8 +62,6 @@ def main() -> int:
         return 0
 
     changed: list[str] = []
-
-    # Known obsolete producer: remove it wherever this policy is enforced.
     if BANNED_SINGLE_VOLUME.exists():
         BANNED_SINGLE_VOLUME.unlink()
         changed.append(str(BANNED_SINGLE_VOLUME.relative_to(ROOT)))
@@ -76,7 +76,6 @@ def main() -> int:
             print(item)
     else:
         print("POLICY_COMPLIANT")
-
     return 0
 
 
