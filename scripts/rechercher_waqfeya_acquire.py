@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 import html, json, re, subprocess
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit, urlunsplit, quote
 from urllib.request import Request, urlopen
 ROOT=Path(__file__).resolve().parents[1]
 CATALOG=ROOT/'books-batches'/'catalog.json'
 ART=ROOT/'artifacts'; ART.mkdir(exist_ok=True)
+def normalize_url(url):
+ p=urlsplit(url)
+ return urlunsplit((p.scheme,p.netloc,quote(p.path, safe='/%:@-._~'),p.query,p.fragment))
 def fetch(url):
- req=Request(url,headers={'User-Agent':'DinAllah-Encyclopedia/1.0'})
+ req=Request(normalize_url(url),headers={'User-Agent':'DinAllah-Encyclopedia/1.0'})
  with urlopen(req,timeout=60) as r: return r.read().decode('utf-8','replace')
 def pdf_links(page,base):
  out=[]; seen=set()
  for m in re.finditer(r'href=["\\\']([^"\\\']+)["\\\']',page,re.I):
-  u=urljoin(base,html.unescape(m.group(1)))
+  u=urljoin(base,html.unescape(m.group(1))); u=normalize_url(u)
   if re.search(r'\.pdf(?:\?|$)',u,re.I) and u not in seen:
    seen.add(u); out.append(u)
  return out
