@@ -2,44 +2,48 @@
   "id": "ghayat-al-amani",
   "title": "غاية الأماني في الرد على النبهاني",
   "author": "محمود شكري الآلوسي",
-  "edition": "1391 هـ",
-  "waqfeya_url": "https://waqfeya.net/books/غاية-الأماني-في-الرد-على-النبهاني/b786ab41564942c8bd20c712dde72b24",
+  "edition": "1391 هـ / الطبعة الثانية",
   "expected_volumes": 2,
   "downloaded_volumes": 2,
   "volumes": [
     {
       "volume": 1,
       "url": "http://www.archive.org/download/sewsdsewsd/garn0.pdf",
+      "source_label": "primary-waqfeya",
       "bytes": 29359,
       "sha256": "247facd29e340b4927fc1e346dcb90e3759a2277c273e4099da84f60ee66277c",
       "validation": {
         "status": "valid",
         "repaired": false,
-        "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/001.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+        "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/001.candidate.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
         "repair_check": null
-      }
+      },
+      "attempts": []
     },
     {
       "volume": 2,
       "url": "http://www.archive.org/download/sewsdsewsd/garn2.pdf",
+      "source_label": "primary-waqfeya",
       "bytes": 9785787,
-      "sha256": "af7d8ceaf0ea4e256f96e37635591d809ad6ca6f4470785f7f652e74213ef3ff",
+      "sha256": "1e5ee2c8d2df90e9d18db029f1ec7f262a4f6a814d247396b8e6e34dfeaae436",
       "validation": {
         "status": "repaired",
         "repaired": true,
-        "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is linearized\nWARNING: /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.pdf: object count mismatch for page 0: hint table = 3; computed = 13\nWARNING: /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.pdf: page length mismatch for page 0: hint table = 7874; computed length = 7033 (offset = 2188)\nqpdf: operation succeeded with warnings",
-        "repair_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.pdf.pre-repair\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
-      }
+        "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.candidate.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is linearized\nWARNING: /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.candidate.pdf: object count mismatch for page 0: hint table = 3; computed = 13\nWARNING: /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.candidate.pdf: page length mismatch for page 0: hint table = 7874; computed length = 7033 (offset = 2188)\nqpdf: operation succeeded with warnings",
+        "repair_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.candidate.pdf.pre-repair\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "attempts": []
     }
   ],
   "unified_file": "artifacts/ghayat-al-amani.pdf",
   "unified_bytes": 9211302,
-  "unified_sha256": "2099b1323757d7511de69b0e7bc41e74408bb7627577ee078d9fdf705ae4a635",
+  "unified_sha256": "fc5c4b7bb664b79c2fab4df87f4be5a71e2ecf7c6bca26f8ea3e122d93d26660",
   "unified_validation": {
     "status": "valid",
     "repaired": false,
     "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
     "repair_check": null
   },
-  "ingest_policy": "validate each PDF; repair recoverable qpdf warnings; reject errors; unify only after all volumes pass"
+  "ingest_policy": "primary source -> strict PDF validation -> qpdf repair for warnings -> strict recheck -> catalogued same-edition fallback sources -> per-volume SHA-256 -> complete ordered unification -> strict unified validation; reject only after all matching catalogued sources fail",
+  "fallback_policy": "Never substitute a different edition merely because the title matches; fallback sources must be edition-scoped."
 }
