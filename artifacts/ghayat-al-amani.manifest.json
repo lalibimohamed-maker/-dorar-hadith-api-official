@@ -15,7 +15,7 @@
       "validation": {
         "status": "valid",
         "repaired": false,
-        "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/001.candidate.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+        "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/ghayat-al-amani/001.candidate.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
         "repair_check": null
       },
       "attempts": []
@@ -25,23 +25,23 @@
       "url": "http://www.archive.org/download/sewsdsewsd/garn2.pdf",
       "source_label": "primary-waqfeya",
       "bytes": 9785787,
-      "sha256": "b75a0bdd624287b674e49786c832e5a096f01c4f882529677ee710cc602162de",
+      "sha256": "9f83533ec93aedc3f1c62d0e779881686b6793167be24da09bf2de94643fcc85",
       "validation": {
         "status": "repaired",
         "repaired": true,
-        "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.candidate.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is linearized\nWARNING: /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.candidate.pdf: object count mismatch for page 0: hint table = 3; computed = 13\nWARNING: /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.candidate.pdf: page length mismatch for page 0: hint table = 7874; computed length = 7033 (offset = 2188)\nqpdf: operation succeeded with warnings",
-        "repair_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani/002.candidate.pdf.pre-repair\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+        "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/ghayat-al-amani/002.candidate.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is linearized\nWARNING: /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/ghayat-al-amani/002.candidate.pdf: object count mismatch for page 0: hint table = 3; computed = 13\nWARNING: /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/ghayat-al-amani/002.candidate.pdf: page length mismatch for page 0: hint table = 7874; computed length = 7033 (offset = 2188)\nqpdf: operation succeeded with warnings",
+        "repair_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/ghayat-al-amani/002.candidate.pdf.pre-repair\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
       },
       "attempts": []
     }
   ],
   "unified_file": "artifacts/ghayat-al-amani.pdf",
   "unified_bytes": 9211302,
-  "unified_sha256": "65f45c317299fc9ae9df03a2e5169159c7644edd5d3460097f55ba77364d8ccf",
+  "unified_sha256": "b65ed3982e388987f61f6be85a5a8e2448e709e14dd9e8c5b108d68f96e0f0af",
   "unified_validation": {
     "status": "valid",
     "repaired": false,
-    "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/repo/artifacts/ghayat-al-amani.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+    "initial_check": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/ghayat-al-amani.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
     "repair_check": null
   },
   "ingest_policy": "primary source -> strict PDF validation -> qpdf repair for warnings -> strict recheck -> catalogued same-edition fallback sources -> per-volume SHA-256 -> complete ordered unification -> strict unified validation; reject only after all matching catalogued sources fail",
