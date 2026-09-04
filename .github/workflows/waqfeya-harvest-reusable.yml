@@ -1,0 +1,54 @@
+name: Waqfeya Harvest Shard (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      shard_id:
+        required: true
+        type: string
+      book_start:
+        required: true
+        type: number
+      book_count:
+        required: true
+        type: number
+
+permissions:
+  contents: read
+
+jobs:
+  harvest:
+    name: ${{ inputs.shard_id }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Verify index is present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s data/corpus/waqfeya/century-15/index.jsonl
+      - name: Harvest up to 100 books with per-book failure isolation
+        env:
+          SHARD_ID: ${{ inputs.shard_id }}
+          BOOK_START: ${{ inputs.book_start }}
+          BOOK_COUNT: ${{ inputs.book_count }}
+        run: node scripts/waqfeya-harvest-shard.mjs
+      - name: Preserve shard evidence (metadata + SHA-256 register, not bulk PDFs)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: waqfeya-${{ inputs.shard_id }}-${{ github.run_id }}
+          path: artifacts/waqfeya/${{ inputs.shard_id }}
+          if-no-files-found: error
+          retention-days: 30
