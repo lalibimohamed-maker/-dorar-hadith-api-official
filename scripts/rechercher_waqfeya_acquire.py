@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--root', default=None, help='repository worktree to mutate')
 ARGS = parser.parse_args()
 ROOT = Path(ARGS.root).resolve() if ARGS.root else Path(__file__).resolve().parents[1]
-CATALOG = ROOT / 'books-batches' / 'catalog.json'
+CATALOGS = sorted((ROOT / 'books-batches').glob('**/catalog.json')) if (ROOT / 'books-batches').exists() else []
 ART = ROOT / 'artifacts'
 ART.mkdir(exist_ok=True)
 USER_AGENT = 'DinAllah-Encyclopedia/1.1'
@@ -153,5 +153,7 @@ def acquire(book):
     manifest = {'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'), 'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols, 'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size, 'unified_sha256': sha256(unified), 'unified_validation': unified_validation, 'ingest_policy': 'primary source -> strict PDF validation -> qpdf repair for warnings -> strict recheck -> catalogued same-edition fallback sources -> per-volume SHA-256 -> complete ordered unification -> strict unified validation; reject only after all matching catalogued sources fail', 'fallback_policy': 'Never substitute a different edition merely because the title matches; fallback sources must be edition-scoped.'}
     (ART / f'{safe}.manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
-for book in json.loads(CATALOG.read_text(encoding='utf-8'))['books']:
-    acquire(book)
+for catalog_path in CATALOGS:
+    print(f'=== Processing catalog: {catalog_path.relative_to(ROOT)} ===')
+    for book in json.loads(catalog_path.read_text(encoding='utf-8'))['books']:
+        acquire(book)
