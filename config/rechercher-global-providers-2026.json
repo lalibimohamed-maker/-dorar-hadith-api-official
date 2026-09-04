@@ -1,0 +1,15 @@
+{
+  "name": "@Rechercher Global Search Analysts",
+  "pipeline": ["discovery", "bibliographic-identity", "rights", "access", "provenance", "acquisition-ranking"],
+  "providers": [
+    {"id":"internet-archive","role":"search-and-file-discovery","access":"public"},
+    {"id":"open-library","role":"work-edition-and-availability-discovery","access":"public-low-volume","bulk":"use-data-dumps-not-api"},
+    {"id":"google-books","role":"volume-and-country-specific-access-discovery","access":"public-api-key-or-oauth"},
+    {"id":"europeana","role":"heritage-record-and-media-discovery","access":"api-key-required"},
+    {"id":"gallica","role":"bibliographic-and-iiif-discovery","access":"public-sru-and-iiif"},
+    {"id":"dpla","role":"heritage-and-rights-category-discovery","access":"api-key-required"},
+    {"id":"worldcat","role":"global-bibliographic-and-holding-discovery","access":"subscription-api"},
+    {"id":"qatar-digital-library","role":"iiif-and-reference-source","access":"public-records","automatedSearch":"reference-only-unless-discovery-endpoint-is-configured"}
+  ],
+  "rightsRule": "Discovery is not permission. Only rights-cleared, download-verified candidates may become acquisition alternatives."
+}

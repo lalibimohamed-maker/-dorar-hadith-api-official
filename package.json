@@ -32,9 +32,13 @@
     "test:corpus-boundary": "node --test test/corpus-write-boundary.test.js",
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
-    "test:review-expiry": "node --test test/review-expiry.test.js"
+    "test:review-expiry": "node --test test/review-expiry.test.js",
+    "test:rechercher": "node --test test/rechercher-rights-engine.test.js test/rechercher-docx-catalog.test.js test/rechercher-access-policy.test.js test/rechercher-alternative-policy.test.js test/rechercher-alternative-discovery.test.js test/rechercher-global-search.test.js",
+    "rechercher:rights-audit": "node scripts/rechercher-rights-audit.mjs",
+    "rechercher:waqfeya": "node scripts/rechercher-waqfeya-classify-shard.mjs",
+    "rechercher:acquisition-router": "node scripts/rechercher-global-acquisition-router.mjs",
+    "rechercher:global-search": "node scripts/rechercher-global-search.mjs",
+    "rechercher:purge-plan": "node scripts/rechercher-purge-restricted.mjs"
   },
-  "engines": {
-    "node": ">=20"
-  }
+  "engines": {"node": ">=20"}
 }
