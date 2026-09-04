@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This is the canonical branch-level policy for workflow governance and self-healing. Branches must not carry independent copies of acquisition implementation that can drift from the repository authority.
+This is the canonical branch-level policy for workflow governance and self-healing. It applies to existing, currently open, and future branches. Branches must not carry independent copies of acquisition implementation that can drift from the repository authority.
 
 ## Architecture
 
@@ -21,6 +21,8 @@ The reusable acquisition implementation is `.github/workflows/rechercher-governe
 7. Before pushing a repair, the repair job must fetch the current remote branch and verify that its expected old SHA is still the branch tip. If the branch moved, it must skip that branch rather than overwrite newer work.
 8. The central policy and reusable workflow are maintained on `main`. Individual branches are callers/data holders, not independent workflow-policy authorities.
 9. A new workflow-policy correction is implemented once in the central source; the Drift Guard detects non-conforming callers and repairs them to the canonical contract.
+10. This policy covers the currently open historical Rechercher branches, including the pending acquisition batches, and any future branch matching the governed workflow patterns. A branch does not need to be manually revisited after every central correction.
+11. If a historical branch still contains the prohibited legacy single-volume producer, the Drift Guard removes it. Where that branch is an active acquisition branch, its caller is restored to the canonical reusable-workflow contract rather than leaving the branch without a governed producer.
 
 ## Self-healing boundary
 
