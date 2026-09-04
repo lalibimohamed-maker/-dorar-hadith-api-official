@@ -8,6 +8,7 @@ on:
     - cron: '17,47 * * * *'
   workflow_dispatch:
 
+# security-justification: this workflow repairs governed workflow drift on branches and therefore needs contents: write.
 permissions:
   contents: write
 
@@ -22,15 +23,18 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout governance source
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
 
-      - name: Configure Git
+      - name: Configure Git authentication
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          gh auth setup-git
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
