@@ -1,18 +1,25 @@
 name: Rechercher - governed multi-volume book acquisition
+
 on:
   pull_request:
     branches: [main]
     types: [opened, reopened, synchronize]
   workflow_dispatch:
+
+concurrency:
+  group: rechercher-acquisition-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
+
 jobs:
   acquire:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
-      - name: Acquire and unify approved Waqfeya records
+      - name: Acquire and unify approved multi-volume records
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -28,6 +35,24 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add books-batches scripts artifacts .gitattributes
-          if git diff --cached --quiet; then echo 'No changes to persist.'; exit 0; fi
+          if git diff --cached --quiet; then
+            echo 'No changes to persist.'
+            exit 0
+          fi
           git commit -m 'data(rechercher): acquire verified multi-volume books'
-          git push origin "HEAD:${GITHUB_HEAD_REF}"
+
+          # Never overwrite newer branch work. If another update moved the head
+          # while downloads were running, rebase the generated commit onto the
+          # live remote head and retry a normal fast-forward push.
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "${GITHUB_HEAD_REF}"
+            git rebase "origin/${GITHUB_HEAD_REF}"
+            if git push origin "HEAD:${GITHUB_HEAD_REF}"; then
+              echo "Push succeeded on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Push race detected; retrying (${attempt}/5)."
+            sleep $((attempt * 3))
+          done
+          echo 'Unable to update the branch without overwriting newer work.'
+          exit 1
