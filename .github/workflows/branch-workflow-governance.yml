@@ -1,0 +1,98 @@
+name: Branch Workflow Governance — Self-Heal
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+
+# security-justification: this workflow repairs governed workflow drift on branches and therefore needs contents: write.
+permissions:
+  contents: write
+
+concurrency:
+  group: branch-workflow-governance
+  cancel-in-progress: true
+
+jobs:
+  enforce:
+    name: Enforce branch workflow policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout governance source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure Git authentication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Repair drifted branch workflows safely
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          mkdir -p /tmp/governance-worktrees
+
+          while read -r branch; do
+            [ -n "$branch" ] || continue
+            case "$branch" in
+              main|chore/central-branch-governance-self-heal-2026) continue ;;
+              dependabot/*) continue ;;
+            esac
+
+            remote_ref="origin/$branch"
+            before_sha="$(git rev-parse "$remote_ref")"
+            safe_name="$(printf '%s' "$branch" | tr '/ ' '__')"
+            worktree="/tmp/governance-worktrees/$safe_name"
+            rm -rf "$worktree"
+
+            echo "=== auditing $branch @ $before_sha ==="
+            git worktree add --detach "$worktree" "$before_sha" >/dev/null
+
+            if ! (cd "$worktree" && python3 scripts/enforce_branch_workflow_policy.py); then
+              echo "POLICY_ERROR $branch"
+              git worktree remove --force "$worktree"
+              continue
+            fi
+
+            if git -C "$worktree" diff --quiet -- .github/workflows scripts; then
+              echo "COMPLIANT $branch"
+              git worktree remove --force "$worktree"
+              continue
+            fi
+
+            current_sha="$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')"
+            if [ "$current_sha" != "$before_sha" ]; then
+              echo "DRIFT_RACE $branch expected=$before_sha actual=$current_sha"
+              git worktree remove --force "$worktree"
+              continue
+            fi
+
+            git -C "$worktree" add .github/workflows scripts
+            git -C "$worktree" commit -m 'chore(governance): repair branch workflow policy'
+
+            current_sha="$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')"
+            if [ "$current_sha" != "$before_sha" ]; then
+              echo "DRIFT_RACE_AFTER_REPAIR $branch expected=$before_sha actual=$current_sha"
+              git worktree remove --force "$worktree"
+              continue
+            fi
+
+            git -C "$worktree" push origin "HEAD:refs/heads/$branch"
+            echo "REPAIRED $branch"
+            git worktree remove --force "$worktree"
+          done < <(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin/ | sort -u)
