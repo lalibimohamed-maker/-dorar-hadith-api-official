@@ -8,7 +8,7 @@ on:
     - cron: '17,47 * * * *'
   workflow_dispatch:
 
-# security-justification: this workflow repairs governed workflow drift on branches and therefore needs contents: write.
+# security-justification: this workflow audits every branch and repairs governed policy drift; it needs contents: write for non-protected branches.
 permissions:
   contents: write
 
@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   enforce:
-    name: Enforce branch workflow policy
+    name: Enforce branch workflow policy on every branch
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -38,7 +38,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-      - name: Repair drifted branch workflows safely
+      - name: Audit and repair every branch safely
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -46,14 +46,10 @@ jobs:
           set -euo pipefail
           git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
           mkdir -p /tmp/governance-worktrees
+          main_drift=0
 
           while read -r branch; do
             [ -n "$branch" ] || continue
-            case "$branch" in
-              main|chore/central-branch-governance-self-heal-2026) continue ;;
-              dependabot/*) continue ;;
-            esac
-
             remote_ref="origin/$branch"
             before_sha="$(git rev-parse "$remote_ref")"
             safe_name="$(printf '%s' "$branch" | tr '/ ' '__')"
@@ -71,6 +67,16 @@ jobs:
 
             if git -C "$worktree" diff --quiet -- .github/workflows scripts; then
               echo "COMPLIANT $branch"
+              git worktree remove --force "$worktree"
+              continue
+            fi
+
+            # main is protected and is never rewritten by the self-healing job.
+            # Any main drift is surfaced for a normal reviewed PR.
+            if [ "$branch" = "main" ]; then
+              echo "PROTECTED_MAIN_DRIFT $branch"
+              git -C "$worktree" diff -- .github/workflows scripts
+              main_drift=1
               git worktree remove --force "$worktree"
               continue
             fi
@@ -96,3 +102,8 @@ jobs:
             echo "REPAIRED $branch"
             git worktree remove --force "$worktree"
           done < <(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin/ | sort -u)
+
+          if [ "$main_drift" -ne 0 ]; then
+            echo 'main requires a reviewed PR repair; no protected-branch bypass was attempted.'
+            exit 1
+          fi
