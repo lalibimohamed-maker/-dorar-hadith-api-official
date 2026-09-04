@@ -4,6 +4,8 @@
 Safety boundary: this script never force-pushes and never edits corpus/content data.
 Governed acquisition workflows are reduced to callers of the central reusable
 workflow; the acquisition implementation lives only in the central workflow/source.
+Historical branches carrying the obsolete single-volume producer are migrated to
+the canonical multi-volume caller instead of being left without a producer.
 """
 from __future__ import annotations
 
@@ -13,6 +15,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github" / "workflows"
 BANNED_SINGLE_VOLUME = WORKFLOWS / "rechercher-waqfeya-pdf-download-01.yml"
+CANONICAL_CALLER = WORKFLOWS / "rechercher-multivolume-acquisition.yml"
 ACQUISITION_NAMES = {
     "rechercher-multivolume-acquisition.yml",
     "rechercher-governed-multivolume-book-acquisition.yml",
@@ -62,9 +65,16 @@ def main() -> int:
         return 0
 
     changed: list[str] = []
-    if BANNED_SINGLE_VOLUME.exists():
+    legacy_found = BANNED_SINGLE_VOLUME.exists()
+    if legacy_found:
         BANNED_SINGLE_VOLUME.unlink()
         changed.append(str(BANNED_SINGLE_VOLUME.relative_to(ROOT)))
+
+    # A branch that carried the old dedicated single-volume producer is an
+    # acquisition branch. Migrate it to the canonical caller before returning.
+    if legacy_found and not any((WORKFLOWS / name).exists() for name in ACQUISITION_NAMES):
+        CANONICAL_CALLER.write_text(CALLER_TEMPLATE, encoding="utf-8")
+        changed.append(str(CANONICAL_CALLER.relative_to(ROOT)))
 
     for path in sorted(WORKFLOWS.glob("rechercher*.yml")) + sorted(WORKFLOWS.glob("rechercher*.yaml")):
         if path.exists() and repair_file(path):
