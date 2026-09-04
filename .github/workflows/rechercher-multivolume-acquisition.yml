@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  # security-justification: required because this governed acquisition workflow must persist verified PDF artifacts and manifests to its PR branch; it never writes to main and uses normal non-force pushes after rebasing onto the live branch head.
   contents: write
 
 jobs:
