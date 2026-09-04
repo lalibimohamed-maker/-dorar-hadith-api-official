@@ -14,9 +14,9 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  # Required because this governed acquisition workflow persists verified PDF
-  # artifacts and manifests to its working branch only. It never writes main
-  # and it never force-pushes or overwrites newer branch work.
+  # security-justification: contents:write is required to persist verified PDF
+  # artifacts/manifests to the working rechercher branch only; main is never
+  # written and branch updates use rebase plus a normal non-force push.
   contents: write
 
 jobs:
@@ -33,9 +33,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf
           git lfs install
-
-          # push events expose GITHUB_REF_NAME; workflow_dispatch does too.
-          # GITHUB_HEAD_REF is retained for compatibility with any future PR use.
           TARGET_BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
           test -n "${TARGET_BRANCH}"
           git clone --branch "${TARGET_BRANCH}" --single-branch "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" repo
@@ -50,10 +47,6 @@ jobs:
             exit 0
           fi
           git commit -m 'data(rechercher): acquire verified multi-volume books'
-
-          # Never overwrite newer branch work. If another update moved the head
-          # while downloads were running, rebase the generated commit onto the
-          # live remote head and retry a normal fast-forward push.
           for attempt in 1 2 3 4 5; do
             git fetch origin "${TARGET_BRANCH}"
             git rebase "origin/${TARGET_BRANCH}"
