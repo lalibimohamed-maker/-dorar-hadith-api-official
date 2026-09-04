@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: '17,47 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -79,8 +81,6 @@ jobs:
             git -C "$worktree" add .github/workflows scripts
             git -C "$worktree" commit -m 'chore(governance): repair branch workflow policy'
 
-            # Re-check immediately before the normal non-force push. Never
-            # overwrite a branch that moved while this repair was running.
             current_sha="$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')"
             if [ "$current_sha" != "$before_sha" ]; then
               echo "DRIFT_RACE_AFTER_REPAIR $branch expected=$before_sha actual=$current_sha"
