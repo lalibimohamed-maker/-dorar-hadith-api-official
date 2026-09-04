@@ -1,0 +1,16 @@
+name: Rechercher — Salaf 01-400H chronological acquisition
+
+on:
+  push:
+    branches:
+      - 'rechercher/salaf-01-400h-chronological-acquisition'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  acquire:
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main
+    permissions:
+      contents: write
