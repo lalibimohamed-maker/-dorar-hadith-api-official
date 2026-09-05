@@ -26,6 +26,7 @@ jobs:
 
       - name: Install validators and LFS
         run: |
+          set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y qpdf git-lfs
           git lfs install --local
@@ -43,6 +44,14 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE"
+          test -s books-batches/salaf-01-400h/developer-review-manifest.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('books-batches/salaf-01-400h/developer-review-manifest.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          print('ACQUISITION_COUNTS', json.dumps(d.get('counts',{}), ensure_ascii=False, sort_keys=True))
+          PY
 
       - name: Encrypt retained copies
         env:
@@ -61,11 +70,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          test -f books-batches/salaf-01-400h/developer-review-manifest.json
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add .gitattributes artifacts/developer-review-vault books-batches/salaf-01-400h/developer-review-manifest.json
-          if git diff --cached --quiet; then echo 'No acquisition changes.'; exit 0; fi
+          echo '--- staged acquisition state ---'
+          git status --short
+          if git diff --cached --quiet; then
+            echo 'ERROR: acquisition produced no persistable change; manifest was not persisted.'
+            exit 1
+          fi
           git commit -m 'data(rechercher): retain encrypted developer review copies'
+          ACQ_COMMIT=$(git rev-parse HEAD)
           git fetch origin "$REVIEW_BRANCH"
-          git rebase "origin/$REVIEW_BRANCH"
+          git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
+          git cherry-pick "$ACQ_COMMIT"
           git -c "http.extraheader=AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
+          echo "PERSISTED_COMMIT=$ACQ_COMMIT"
