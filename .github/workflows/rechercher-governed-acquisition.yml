@@ -37,6 +37,7 @@ jobs:
       - name: Acquire, validate, repair, and unify
         env:
           GH_TOKEN: ${{ github.token }}
+          TARGET_BRANCH: ${{ inputs.target_branch }}
         shell: bash
         run: |
           set -euo pipefail
@@ -55,6 +56,6 @@ jobs:
             exit 0
           fi
           git commit -m 'data(rechercher): acquire verified multi-volume books'
-          git fetch origin "${{ inputs.target_branch }}"
-          git rebase "origin/${{ inputs.target_branch }}"
-          git push origin "HEAD:refs/heads/${{ inputs.target_branch }}"
+          git fetch origin "$TARGET_BRANCH"
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
