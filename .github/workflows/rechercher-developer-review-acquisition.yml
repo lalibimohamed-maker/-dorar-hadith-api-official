@@ -9,6 +9,7 @@ permissions:
 
 env:
   GIT_TERMINAL_PROMPT: '0'
+  REVIEW_BRANCH: 'rechercher/salaf-01-400h-developer-review-acquisition'
 
 jobs:
   acquire:
@@ -63,6 +64,6 @@ jobs:
           git add .gitattributes artifacts/developer-review-vault books-batches/salaf-01-400h/developer-review-manifest.json
           if git diff --cached --quiet; then echo 'No acquisition changes.'; exit 0; fi
           git commit -m 'data(rechercher): retain encrypted developer review copies'
-          git fetch origin "${GITHUB_REF_NAME}"
-          git rebase "origin/${GITHUB_REF_NAME}"
-          git -c "http.extraheader=AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+          git fetch origin "$REVIEW_BRANCH"
+          git rebase "origin/$REVIEW_BRANCH"
+          git -c "http.extraheader=AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
