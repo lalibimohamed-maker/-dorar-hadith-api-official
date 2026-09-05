@@ -37,6 +37,7 @@ jobs:
       - name: Acquire, validate, repair, and unify
         env:
           GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
           TARGET_BRANCH: ${{ inputs.target_branch }}
         shell: bash
         run: |
@@ -47,9 +48,15 @@ jobs:
           python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
           git lfs track 'artifacts/*.pdf'
-          gh auth setup-git
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          # Checkout deliberately disables credential persistence. Configure the
+          # repository's HTTPS transport explicitly from the workflow token so
+          # fetch/rebase/push cannot fall back to an interactive username prompt.
+          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+          gh auth setup-git
+
           git add books-batches scripts artifacts .gitattributes
           if git diff --cached --quiet; then
             echo 'No changes to persist.'
