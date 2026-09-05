@@ -9,14 +9,15 @@ on:
 permissions:
   contents: write
 
+# Keep scheduled and manual acquisition runs in one queue because both write the same governed branch.
 concurrency:
-  group: rechercher-salaf-01-400h-automatic-acquisition
+  group: rechercher-salaf-01-400h-acquisition
   cancel-in-progress: false
 
 jobs:
   acquire:
     name: Automatic governed Salaf 01–400H acquisition
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@bb4b80cdc98d0bc46899947efc2f2097c65e2d75 # governed target-branch input
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@02af0f5e01e1ec97a960bb49a21177e551c61843 # hardened target-branch handling
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     # security-justification: the reusable acquisition workflow persists verified artifacts/manifests only to the governed acquisition branch.
