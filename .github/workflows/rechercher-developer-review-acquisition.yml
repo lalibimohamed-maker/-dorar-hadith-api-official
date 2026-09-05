@@ -2,9 +2,6 @@ name: Rechercher — Developer review acquisition
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 'rechercher/salaf-01-400h-developer-review-acquisition'
 
 # security-justification: the workflow downloads catalogued research copies for developer review, encrypts retained copies with a GitHub secret, and never publishes plaintext restricted copies.
 permissions:
@@ -37,8 +34,6 @@ jobs:
           test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
 
       - name: Acquire and validate copies
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
           python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE"
@@ -54,7 +49,6 @@ jobs:
               -pass env:REVIEW_VAULT_KEY -in "$f" -out "$f.enc"
             rm -f -- "$f"
           done
-          test -n "$(find artifacts/developer-review-vault -type f -name '*.enc' -print -quit)" || true
 
       - name: Persist encrypted vault and manifest
         run: |
