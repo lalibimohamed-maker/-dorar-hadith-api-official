@@ -6,6 +6,11 @@ permissions:
 
 on:
   workflow_call:
+    inputs:
+      target_branch:
+        description: 'Governed branch where verified acquisition artifacts and manifests are persisted.'
+        required: true
+        type: string
 
 jobs:
   acquire:
@@ -16,7 +21,7 @@ jobs:
       - name: Checkout target branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ inputs.target_branch }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -32,6 +37,7 @@ jobs:
       - name: Acquire, validate, repair, and unify
         env:
           GH_TOKEN: ${{ github.token }}
+          TARGET_BRANCH: ${{ inputs.target_branch }}
         shell: bash
         run: |
           set -euo pipefail
@@ -50,6 +56,6 @@ jobs:
             exit 0
           fi
           git commit -m 'data(rechercher): acquire verified multi-volume books'
-          git fetch origin "${GITHUB_REF_NAME}"
-          git rebase "origin/${GITHUB_REF_NAME}"
-          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+          git fetch origin "$TARGET_BRANCH"
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"

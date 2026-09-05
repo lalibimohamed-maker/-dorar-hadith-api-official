@@ -1,18 +1,21 @@
 name: Rechercher — Salaf 01-400H chronological acquisition
 
 on:
-  push:
-    branches:
-      - 'rechercher/salaf-01-400h-chronological-acquisition'
   workflow_dispatch:
 
 # security-justification: the acquisition workflow must write verified book artifacts and manifests to this governed acquisition branch.
 permissions:
   contents: write
 
+concurrency:
+  group: rechercher-salaf-01-400h-acquisition
+  cancel-in-progress: false
+
 jobs:
   acquire:
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@e2604c76fcd1851f8a8d3d0927de829b55854f8c # main at verified commit
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@02af0f5e01e1ec97a960bb49a21177e551c61843 # hardened target-branch handling
+    with:
+      target_branch: rechercher/salaf-01-400h-chronological-acquisition
     # security-justification: the reusable acquisition workflow persists verified artifacts/manifests to the governed acquisition branch.
     permissions:
       contents: write

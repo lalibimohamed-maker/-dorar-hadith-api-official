@@ -1,0 +1,25 @@
+name: Rechercher — Salaf 01-400H automatic acquisition
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+# security-justification: the scheduled acquisition must write verified book artifacts and manifests to the governed acquisition branch.
+permissions:
+  contents: write
+
+# Keep scheduled and manual acquisition runs in one queue because both write the same governed branch.
+concurrency:
+  group: rechercher-salaf-01-400h-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquire:
+    name: Automatic governed Salaf 01–400H acquisition
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@02af0f5e01e1ec97a960bb49a21177e551c61843 # hardened target-branch handling
+    with:
+      target_branch: rechercher/salaf-01-400h-chronological-acquisition
+    # security-justification: the reusable acquisition workflow persists verified artifacts/manifests only to the governed acquisition branch.
+    permissions:
+      contents: write
