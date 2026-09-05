@@ -51,11 +51,10 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-          # Checkout deliberately disables credential persistence. Configure the
-          # repository's HTTPS transport explicitly from the workflow token so
-          # fetch/rebase/push cannot fall back to an interactive username prompt.
-          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-          gh auth setup-git
+          # Checkout deliberately disables credential persistence. Authenticate
+          # each Git HTTPS operation explicitly with the workflow token, without
+          # changing global Git configuration or relying on interactive prompts.
+          GIT_AUTH_HEADER="AUTHORIZATION: bearer ${GITHUB_TOKEN}"
 
           git add books-batches scripts artifacts .gitattributes
           if git diff --cached --quiet; then
@@ -63,6 +62,6 @@ jobs:
             exit 0
           fi
           git commit -m 'data(rechercher): acquire verified multi-volume books'
-          git fetch origin "$TARGET_BRANCH"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$TARGET_BRANCH"
           git rebase "origin/$TARGET_BRANCH"
-          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$TARGET_BRANCH"
