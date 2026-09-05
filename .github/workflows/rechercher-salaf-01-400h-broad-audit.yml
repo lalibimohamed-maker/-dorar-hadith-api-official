@@ -1,0 +1,49 @@
+name: Rechercher — Salaf 01-400H broad acquisition audit
+
+on:
+  push:
+    branches:
+      - 'rechercher/salaf-01-400h-broad-acquisition'
+  workflow_dispatch:
+
+# security-justification: the audit writes only acquisition metadata and hashes to the governed research branch; uncertain PDFs are ephemeral and are deleted after validation.
+permissions:
+  contents: write
+
+jobs:
+  broad-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install PDF validator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qpdf
+
+      - name: Probe, validate, hash and classify candidates
+        run: |
+          python3 scripts/rechercher_broad_acquisition_audit.py \
+            --root "$GITHUB_WORKSPACE"
+
+      - name: Persist audit manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add books-batches/salaf-01-400h/broad-acquisition-audit.json
+          if git diff --cached --quiet; then
+            echo 'No audit changes to persist.'
+            exit 0
+          fi
+          git commit -m 'data(rechercher): record broad acquisition candidates'
+          git fetch origin "${GITHUB_REF_NAME}"
+          git rebase "origin/${GITHUB_REF_NAME}"
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
