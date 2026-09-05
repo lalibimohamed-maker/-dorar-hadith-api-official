@@ -1,14 +1,15 @@
 name: Rechercher — Salaf 01-400H chronological acquisition
 
 on:
-  push:
-    branches:
-      - 'rechercher/salaf-01-400h-chronological-acquisition'
   workflow_dispatch:
 
 # security-justification: the acquisition workflow must write verified book artifacts and manifests to this governed acquisition branch.
 permissions:
   contents: write
+
+concurrency:
+  group: rechercher-salaf-01-400h-acquisition
+  cancel-in-progress: false
 
 jobs:
   acquire:
