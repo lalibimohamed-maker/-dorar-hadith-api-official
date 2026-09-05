@@ -13,7 +13,9 @@ concurrency:
 
 jobs:
   acquire:
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@e2604c76fcd1851f8a8d3d0927de829b55854f8c # main at verified commit
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@bb4b80cdc98d0bc46899947efc2f2097c65e2d75 # governed target-branch input
+    with:
+      target_branch: rechercher/salaf-01-400h-chronological-acquisition
     # security-justification: the reusable acquisition workflow persists verified artifacts/manifests to the governed acquisition branch.
     permissions:
       contents: write
