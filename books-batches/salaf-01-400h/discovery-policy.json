@@ -1,0 +1,34 @@
+{
+  "batch": "salaf-01-400h-chronological",
+  "historical_scope": {"from_hijri": 1, "to_hijri": 400},
+  "ordering": {
+    "historical": "author_death_hijri_then_title",
+    "acquisition": "gregorian_year_month_then_sequence",
+    "note": "Acquisition numbering is project chronology and must never be presented as historical authorship chronology."
+  },
+  "coverage_model": [
+    "surviving_complete_work",
+    "surviving_fragment_or_partial_work",
+    "transmitted_compilation",
+    "manuscript_only",
+    "lost_work_attested_by_sources"
+  ],
+  "rights_gate": "Only acquire/rehost an exact edition when redistribution rights are verified. Discovery records may be retained without acquisition.",
+  "source_priority": [
+    "official_or_rightsholder",
+    "institutional_repository",
+    "verified_waqf_or_public_domain_record",
+    "open_academic_corpus",
+    "bibliographic_discovery_source"
+  ],
+  "required_provenance": [
+    "work_id",
+    "author",
+    "author_death_hijri_or_composition_date",
+    "edition_if_known",
+    "source_url",
+    "rights_status",
+    "acquisition_status",
+    "sha256_when_acquired"
+  ]
+}
