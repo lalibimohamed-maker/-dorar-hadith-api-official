@@ -2,6 +2,8 @@ name: Rechercher — Developer review acquisition
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
 
 # security-justification: the workflow downloads catalogued research copies for developer review, encrypts retained copies with a GitHub secret, and never publishes plaintext restricted copies.
 permissions:
