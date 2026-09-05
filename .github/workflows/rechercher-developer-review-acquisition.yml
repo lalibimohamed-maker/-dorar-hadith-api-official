@@ -1,0 +1,69 @@
+name: Rechercher — Developer review acquisition
+
+on:
+  workflow_dispatch:
+
+# security-justification: the workflow downloads catalogued research copies for developer review, encrypts retained copies with a GitHub secret, and never publishes plaintext restricted copies.
+permissions:
+  contents: write
+
+env:
+  GIT_TERMINAL_PROMPT: '0'
+  REVIEW_BRANCH: 'rechercher/salaf-01-400h-developer-review-acquisition'
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install validators and LFS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qpdf git-lfs
+          git lfs install --local
+          git lfs track 'artifacts/developer-review-vault/*.enc'
+          git add .gitattributes
+
+      - name: Require vault key
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
+
+      - name: Acquire and validate copies
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE"
+
+      - name: Encrypt retained copies
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for f in artifacts/developer-review-vault/*.pdf; do
+            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
+              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$f.enc"
+            rm -f -- "$f"
+          done
+
+      - name: Persist encrypted vault and manifest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .gitattributes artifacts/developer-review-vault books-batches/salaf-01-400h/developer-review-manifest.json
+          if git diff --cached --quiet; then echo 'No acquisition changes.'; exit 0; fi
+          git commit -m 'data(rechercher): retain encrypted developer review copies'
+          git fetch origin "$REVIEW_BRANCH"
+          git rebase "origin/$REVIEW_BRANCH"
+          git -c "http.extraheader=AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
