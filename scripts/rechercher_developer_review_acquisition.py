@@ -17,17 +17,32 @@ p.add_argument('--out', default='books-batches/salaf-01-400h/developer-review-ma
 p.add_argument('--vault', default='artifacts/developer-review-vault')
 a = p.parse_args()
 root = Path(a.root).resolve(); catalog_path = root/a.catalog; out = root/a.out; vault = root/a.vault
-UA='DinAllah-Encyclopedia/developer-review-acquisition/1.0'
+UA='DinAllah-Encyclopedia/developer-review-acquisition/1.1'
 
 def norm(u): return u.split('#',1)[0]
-def text(u):
-    with urlopen(Request(norm(u), headers={'User-Agent':UA}), timeout=90) as r:
-        return r.read().decode('utf-8','replace')
+
+def fetch(u):
+    req=Request(norm(u), headers={'User-Agent':UA})
+    with urlopen(req, timeout=120) as r:
+        data=r.read()
+        ctype=(r.headers.get('Content-Type') or '').lower()
+        return data, ctype, r.geturl()
+
+def page_text(u):
+    data, ctype, final_url=fetch(u)
+    if 'pdf' in ctype or data[:5] == b'%PDF-':
+        return None, ctype, final_url
+    return data.decode('utf-8','replace'), ctype, final_url
+
 def links(page, base):
     seen=[]
     for m in re.finditer(r'href=["\']([^"\']+)["\']', page, re.I):
         u=norm(urljoin(base, html.unescape(m.group(1))))
-        if re.search(r'\.pdf(?:\?|$)',u,re.I) and u not in seen: seen.append(u)
+        # Waqfeya commonly exposes direct PDFs through archive.org/download URLs
+        # whose href itself does not end in .pdf. Accept both forms.
+        if (re.search(r'\.pdf(?:\?|$)',u,re.I)
+                or 'archive.org/download/' in u.lower()):
+            if u not in seen: seen.append(u)
     return seen
 
 def sources(book):
@@ -48,31 +63,50 @@ def valid(path):
     r=subprocess.run(['qpdf','--check',str(path)],text=True,capture_output=True)
     return r.returncode==0, (r.stdout+r.stderr).strip()
 
+def candidate_urls(source):
+    """Return direct-PDF candidates from either a PDF URL or a source page."""
+    page, ctype, final_url=page_text(source)
+    if page is None:
+        return [final_url]
+    return links(page, final_url)
+
 def main():
     cat=json.loads(catalog_path.read_text(encoding='utf-8'))
     vault.mkdir(parents=True,exist_ok=True); records=[]
     for book in cat['books']:
         rec={'id':book['id'],'title':book['title'],'author':book.get('author'),'author_death_hijri':book.get('author_death_hijri'),'edition':book.get('edition'),'catalog_rights_status':book.get('rights_status'),'candidates':[]}
-        found=False
+        acquired_items=[]
+        target=book.get('expected_volumes') or 1
         for source,discover in sources(book):
-            try: urls=links(text(source),source) if discover else [source]
+            try:
+                urls=candidate_urls(source)
             except Exception as e:
                 rec['candidates'].append({'source':source,'status':'source_error','error':str(e)}); continue
-            for u in urls[:20]:
-                name=hashlib.sha256(u.encode()).hexdigest()+'.pdf'; dest=vault/(book['id']+'--'+name)
+            for u in urls[:60]:
+                if any(x.get('url') == u and x.get('status') == 'acquired_for_review' for x in rec['candidates']):
+                    continue
+                suffix=hashlib.sha256(u.encode()).hexdigest()[:20]
+                dest=vault/(book['id']+'--'+suffix+'.pdf')
                 try:
-                    with urlopen(Request(u,headers={'User-Agent':UA}),timeout=120) as r: dest.write_bytes(r.read())
+                    data, ctype, final_url=fetch(u)
+                    dest.write_bytes(data)
                     ok,msg=valid(dest)
-                    item={'source':source,'url':u,'bytes':dest.stat().st_size,'sha256':sha(dest),'validation':{'ok':ok,'output':msg}}
-                    if not ok: dest.unlink(missing_ok=True); item['status']='invalid_pdf'; rec['candidates'].append(item); continue
-                    item['status']='acquired_for_review'; item['local_path']=str(dest.relative_to(root)); rec['candidates'].append(item); rec['acquired']=item; found=True; break
+                    item={'source':source,'url':final_url,'bytes':dest.stat().st_size,'sha256':sha(dest),'validation':{'ok':ok,'output':msg}}
+                    if not ok:
+                        dest.unlink(missing_ok=True); item['status']='invalid_pdf'; rec['candidates'].append(item); continue
+                    item['status']='acquired_for_review'; item['local_path']=str(dest.relative_to(root)); rec['candidates'].append(item); acquired_items.append(item)
+                    if len(acquired_items) >= target:
+                        break
                 except Exception as e:
                     dest.unlink(missing_ok=True); rec['candidates'].append({'source':source,'url':u,'status':'download_error','error':str(e)})
-            if found: break
-        rec['availability']='copy-acquired' if found else 'not-acquired'
-        rec['rights_action']='public-eligible' if found and book.get('rights_status')=='verified-redistributable' else ('developer-vault-encrypt' if found else 'none')
+            if len(acquired_items) >= target:
+                break
+        rec['availability']='copy-acquired' if acquired_items else 'not-acquired'
+        rec['acquired']=acquired_items
+        rec['acquired_count']=len(acquired_items)
+        rec['rights_action']='public-eligible' if acquired_items and book.get('rights_status')=='verified-redistributable' else ('developer-vault-encrypt' if acquired_items else 'none')
         records.append(rec)
-    summary={'schema':'developer-review-acquisition/v1','scope':cat['scope'],'principle':'catalog completeness is independent from redistribution rights; acquired copies are retained for review and are never deleted by this acquisition step','records':records,'counts':{'books':len(records),'acquired':sum(r['availability']=='copy-acquired' for r in records)}}
+    summary={'schema':'developer-review-acquisition/v2','scope':cat['scope'],'principle':'catalog completeness is independent from redistribution rights; acquired copies are retained for review and are never deleted by this acquisition step','records':records,'counts':{'books':len(records),'acquired_books':sum(r['availability']=='copy-acquired' for r in records),'acquired_files':sum(r['acquired_count'] for r in records)}}
     out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(summary['counts'],ensure_ascii=False))
 if __name__=='__main__': main()
