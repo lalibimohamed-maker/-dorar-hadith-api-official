@@ -37,6 +37,7 @@ jobs:
       - name: Acquire, validate, repair, and unify
         env:
           GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
           TARGET_BRANCH: ${{ inputs.target_branch }}
         shell: bash
         run: |
@@ -47,15 +48,20 @@ jobs:
           python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
           git lfs track 'artifacts/*.pdf'
-          gh auth setup-git
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          # Checkout deliberately disables credential persistence. Authenticate
+          # each Git HTTPS operation explicitly with the workflow token, without
+          # changing global Git configuration or relying on interactive prompts.
+          GIT_AUTH_HEADER="AUTHORIZATION: bearer ${GITHUB_TOKEN}"
+
           git add books-batches scripts artifacts .gitattributes
           if git diff --cached --quiet; then
             echo 'No changes to persist.'
             exit 0
           fi
           git commit -m 'data(rechercher): acquire verified multi-volume books'
-          git fetch origin "$TARGET_BRANCH"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$TARGET_BRANCH"
           git rebase "origin/$TARGET_BRANCH"
-          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$TARGET_BRANCH"
