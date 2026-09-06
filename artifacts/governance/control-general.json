@@ -1,0 +1,113 @@
+{
+  "schema": "developer-review-acquisition/global-control/v2",
+  "generated_at": "2026-09-06T23:44:45.093770+00:00",
+  "scope": "1-400H",
+  "status": "PASS",
+  "counts": {
+    "checks": 16,
+    "passed": 16,
+    "gaps": 0,
+    "encrypted_artifacts": 0
+  },
+  "checks": [
+    {
+      "name": "catalog-present",
+      "status": "PASS",
+      "severity": "CRITICAL",
+      "detail": "books=45"
+    },
+    {
+      "name": "overlay-present",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "entries=215"
+    },
+    {
+      "name": "governance-coverage",
+      "status": "PASS",
+      "severity": "CRITICAL",
+      "detail": "catalog=45 governance=45"
+    },
+    {
+      "name": "governance-identity-separation",
+      "status": "PASS",
+      "severity": "CRITICAL",
+      "detail": "Work and Edition IDs are distinct; missing edition remains HOLD"
+    },
+    {
+      "name": "quality-score-present",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "records=45"
+    },
+    {
+      "name": "six-core-source-health",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "{\"waqfeya\": \"up\", \"internet_archive\": \"up\", \"openlibrary\": \"up\", \"library_of_congress\": \"up\", \"google_books\": \"down\", \"crossref\": \"up\"}"
+    },
+    {
+      "name": "deep-worldwide-layer",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "sources=12 works=212"
+    },
+    {
+      "name": "page-integrity-report",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "page integrity report required"
+    },
+    {
+      "name": "publication-gate-report",
+      "status": "PASS",
+      "severity": "CRITICAL",
+      "detail": "status=HOLD"
+    },
+    {
+      "name": "backup-recovery-policy",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "recovery policy exists"
+    },
+    {
+      "name": "audit-engine",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "scripts/rechercher_audit_event.py"
+    },
+    {
+      "name": "ocr-engine",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "scripts/rechercher_ocr_verify.py"
+    },
+    {
+      "name": "collation-engine",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "scripts/rechercher_text_collation.py"
+    },
+    {
+      "name": "delta-engine",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "scripts/rechercher_source_delta.py"
+    },
+    {
+      "name": "publication-gate-engine",
+      "status": "PASS",
+      "severity": "HIGH",
+      "detail": "scripts/rechercher_publication_gate.py"
+    },
+    {
+      "name": "no-rights-inference",
+      "status": "PASS",
+      "severity": "CRITICAL",
+      "detail": "records claiming redistribution without verified rights=0"
+    }
+  ],
+  "gaps": [],
+  "artifact_hashes": [],
+  "policy": "Fail closed; discovery, identity evidence and bibliographic evidence never grant redistribution rights."
+}
