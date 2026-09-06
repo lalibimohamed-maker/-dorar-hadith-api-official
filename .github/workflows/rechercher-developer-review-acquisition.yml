@@ -24,14 +24,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Install validators and LFS
+      - name: Install validators
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y qpdf poppler-utils git-lfs
-          git lfs install --local
-          git lfs track 'artifacts/developer-review-vault/*.enc'
-          git add .gitattributes
+          sudo apt-get install -y qpdf poppler-utils
 
       - name: Require vault key
         env:
@@ -171,7 +168,37 @@ jobs:
             rm -f -- "$f"
           done
 
-      - name: Persist encrypted vault, manifests and governance evidence
+      - name: Persist encrypted vault as release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(artifacts/developer-review-vault/*.enc)
+          test "${#files[@]}" -gt 0 || { echo 'ERROR: no encrypted vault files were produced.'; exit 1; }
+          VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
+          gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Rechercher encrypted vault ${GITHUB_RUN_ID}" \
+            --notes "Encrypted developer-review acquisition vault for workflow run ${GITHUB_RUN_ID}. Files are AES-256-CBC encrypted with the repository REVIEW_VAULT_KEY secret."
+          : > artifacts/governance/vault-release.jsonl
+          for f in "${files[@]}"; do
+            gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
+            sha256sum "$f" >> artifacts/governance/vault-release.jsonl
+          done
+          python3 - "$VAULT_TAG" <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          tag=sys.argv[1]
+          lines=[]
+          for raw in Path('artifacts/governance/vault-release.jsonl').read_text(encoding='utf-8').splitlines():
+              digest, path=raw.split(None, 1)
+              lines.append({'sha256':digest,'file':path})
+          release=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo',os.environ['GITHUB_REPOSITORY'],'--json','url,tagName'], text=True))
+          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v1','release':release,'assets':lines}, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+          PY
+          rm -f artifacts/governance/vault-release.jsonl
+
+      - name: Persist manifests and governance evidence
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -179,18 +206,18 @@ jobs:
           test -f books-batches/salaf-01-400h/developer-review-manifest.json
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .gitattributes artifacts/developer-review-vault artifacts/governance books-batches/salaf-01-400h/developer-review-manifest.json books-batches/salaf-01-400h/engine-source-overlay.json
+          git add artifacts/governance books-batches/salaf-01-400h/developer-review-manifest.json books-batches/salaf-01-400h/engine-source-overlay.json
           echo '--- staged acquisition/governance state ---'
           git status --short
           if git diff --cached --quiet; then
             echo 'ERROR: acquisition/governance produced no persistable change; nothing was persisted.'
             exit 1
           fi
-          git commit -m 'data(rechercher): retain encrypted copies and governance evidence'
+          git commit -m 'data(rechercher): retain encrypted vault release and governance evidence'
           ACQ_COMMIT=$(git rev-parse HEAD)
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
-          git checkout "$ACQ_COMMIT" -- .gitattributes artifacts/developer-review-vault artifacts/governance books-batches/salaf-01-400h/engine-source-overlay.json
+          git checkout "$ACQ_COMMIT" -- artifacts/governance books-batches/salaf-01-400h/engine-source-overlay.json
           python3 - "$ACQ_COMMIT" <<'PY'
           import json, subprocess, sys
           from pathlib import Path
