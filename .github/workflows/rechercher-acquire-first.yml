@@ -8,6 +8,8 @@ on:
 permissions:
   contents: write
 
+# security-justification: this workflow requires contents: write only to persist encrypted, verified acquisition evidence and release assets; plaintext book copies are never committed.
+
 env:
   GIT_TERMINAL_PROMPT: '0'
   REVIEW_BRANCH: 'rechercher/salaf-01-400h-developer-review-acquisition'
