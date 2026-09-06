@@ -23,7 +23,7 @@ def main():
     check('catalog-present',bool(books),f'books={len(books)}','CRITICAL')
     check('overlay-present',bool(overlay.get('entries')),f'entries={len(overlay.get("entries",[]))}','HIGH')
     check('governance-coverage',len(records)>=len(books),f'catalog={len(books)} governance={len(records)}','CRITICAL')
-    check('governance-identity-separation',all(r.get('work_id') and r.get('edition_id') or not r.get('edition_id_ready') for r in records), 'Work and Edition IDs are distinct; missing edition remains HOLD','CRITICAL')
+    check('governance-identity-separation',all(r.get('work_id') and (r.get('edition_id') or not r.get('edition_id_ready')) for r in records),'Work and Edition IDs are distinct; missing edition remains HOLD','CRITICAL')
     check('quality-score-present',all(r.get('quality_score') is not None for r in records),f'records={len(records)}','HIGH')
     health=overlay.get('engine_health',{}); core={'waqfeya','internet_archive','openlibrary','library_of_congress','google_books','crossref'}
     check('six-core-source-health',not core-set(health),json.dumps({k:v.get('status') for k,v in health.items()},ensure_ascii=False),'HIGH')
@@ -34,9 +34,12 @@ def main():
     hashes=[{'name':p.name,'bytes':p.stat().st_size,'sha256':sha256(p)} for p in encrypted]
     check('backup-recovery-policy',(root/'docs/backup-recovery-v1.md').exists(),'recovery policy exists','HIGH')
     for path,name in [('scripts/rechercher_audit_event.py','audit'),('scripts/rechercher_ocr_verify.py','ocr'),('scripts/rechercher_text_collation.py','collation'),('scripts/rechercher_source_delta.py','delta'),('scripts/rechercher_publication_gate.py','publication-gate')]: check(f'{name}-engine',(root/path).exists(),path,'HIGH')
-    # Critical rights rule: an acquired candidate may not be promoted merely because a source URL exists.
-    inferred=[e.get('id') or e.get('title') for e in overlay.get('entries',[]) if e.get('source_url') and e.get('rights_status') not in {'verified-redistributable','public-domain','source-permitted'}]
-    check('no-rights-inference',not inferred,f'candidate URLs without explicit redistributable status={len(inferred)}','CRITICAL')
+    # A candidate URL is discovery evidence, not permission. Only explicit rights evidence may set redistribution_allowed=true.
+    unsafe=[]
+    for r in records:
+        if r.get('redistribution_allowed') is True and not r.get('rights_verified'):
+            unsafe.append(r.get('work_id'))
+    check('no-rights-inference',not unsafe,f'records claiming redistribution without verified rights={len(unsafe)}','CRITICAL')
     result={'schema':'developer-review-acquisition/global-control/v2','generated_at':datetime.now(timezone.utc).isoformat(),'scope':'1-400H','status':'PASS' if not gaps else 'HOLD','counts':{'checks':len(checks),'passed':sum(c['status']=='PASS' for c in checks),'gaps':len(gaps),'encrypted_artifacts':len(encrypted)},'checks':checks,'gaps':gaps,'artifact_hashes':hashes,'policy':'Fail closed; discovery, identity evidence and bibliographic evidence never grant redistribution rights.'}
     out=root/a.out; out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'); print(json.dumps(result['counts'],ensure_ascii=False,sort_keys=True))
     raise SystemExit(1 if any(g['severity']=='CRITICAL' for g in gaps) else 0)
