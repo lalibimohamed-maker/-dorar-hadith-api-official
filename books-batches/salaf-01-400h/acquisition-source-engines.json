@@ -1,0 +1,59 @@
+{
+  "schema": "developer-review-acquisition/source-engines/v1",
+  "scope": "1-400H",
+  "policy": "discovery_engines_never_imply_redistribution_rights",
+  "engines": [
+    {
+      "id": "waqfeya",
+      "role": "primary_pdf_acquisition",
+      "base": "https://waqfeya.net/",
+      "priority": 1,
+      "notes": "Prefer exact book/edition pages with explicit PDF download links; preserve edition metadata and rights evidence."
+    },
+    {
+      "id": "internet_archive",
+      "role": "pdf_acquisition_fallback",
+      "base": "https://archive.org/",
+      "priority": 2,
+      "notes": "Search title+author, resolve concrete PDF files through item metadata, then validate with qpdf."
+    },
+    {
+      "id": "openlibrary",
+      "role": "edition_and_archive_identifier_resolver",
+      "base": "https://openlibrary.org/",
+      "priority": 3,
+      "notes": "Use edition/work metadata and availability to locate Internet Archive identifiers; do not bulk-download Open Library data."
+    },
+    {
+      "id": "library_of_congress",
+      "role": "manuscript_discovery_and_provenance",
+      "base": "https://www.loc.gov/",
+      "priority": 4,
+      "notes": "Use manuscript records, IIIF manifests and provenance as discovery/evidence; acquire only where the record permits it."
+    },
+    {
+      "id": "google_books",
+      "role": "bibliographic_discovery",
+      "base": "https://books.google.com/",
+      "priority": 5,
+      "notes": "Use volume metadata and access status to improve edition matching; do not treat search results as redistribution permission."
+    },
+    {
+      "id": "crossref",
+      "role": "bibliographic_identity_crosscheck",
+      "base": "https://api.crossref.org/",
+      "priority": 6,
+      "notes": "Metadata cross-check only; especially useful for modern editions and identifiers, not as a primary Arabic heritage PDF source."
+    }
+  ],
+  "acquisition_gate": [
+    "exact_title_author_match",
+    "edition_or_copy_identity_check",
+    "source_permission_check",
+    "download_concrete_pdf_only",
+    "qpdf_validation",
+    "sha256_record",
+    "encrypt_before_persistence"
+  ],
+  "forbidden_shortcut": "Never persist a discovery URL as an acquired book. An acquired record requires an actual validated PDF file."
+}
