@@ -127,6 +127,16 @@ jobs:
             --governance artifacts/governance/governance-report.json \
             --out artifacts/governance/publication-gate.json
 
+      - name: Record audit event
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_audit_event.py \
+            --who 'github-actions[bot]' \
+            --what 'developer-review-acquisition-and-governance-audit' \
+            --source 'Rechercher workflow' \
+            --reason 'multi-engine source resolution, acquisition validation, governance and publication-readiness audit' \
+            --commit "$(git rev-parse HEAD)"
+
       - name: Encrypt retained copies
         env:
           REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
