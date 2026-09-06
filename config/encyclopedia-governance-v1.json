@@ -1,0 +1,48 @@
+{
+  "schema": "din-allah-encyclopedia/governance/v1",
+  "principle": "discovery != identity != edition != digital_copy != rights != publication",
+  "identity": {
+    "work_id": ["title", "author", "historical_attribution"],
+    "edition_id": ["work_id", "publisher", "publication_year", "edition_statement", "editor", "volumes"],
+    "digital_copy_id": ["edition_id", "source_url", "retrieved_at", "sha256"]
+  },
+  "rights": {
+    "required": ["rights_source", "rights_evidence", "rights_checked_at", "rights_checked_by", "license", "territory", "expiry", "redistribution_allowed", "derivative_allowed"],
+    "states": ["unknown", "discovery-only", "review-only", "source-permitted", "verified-redistributable", "restricted", "public-domain"],
+    "publication_requires": ["verified-redistributable", "public-domain", "source-permitted"]
+  },
+  "quality_score": {
+    "weights": {"identity": 20, "source": 20, "scan_quality": 15, "completeness": 15, "ocr_quality": 15, "metadata": 10, "rights": 5},
+    "grades": {"A": 90, "B": 80, "C": 70, "D": 60},
+    "publication_minimum": 80
+  },
+  "page_integrity": ["page_count", "missing_pages", "duplicate_pages", "blank_pages", "orientation_anomalies", "corrupt_pages", "volume_completeness"],
+  "ocr": {
+    "required_artifacts": ["ocr_manifest", "page_confidence", "sidecar_text", "engine_version", "language_model", "source_sha256"],
+    "human_review_threshold": 0.90,
+    "publication_threshold": 0.97,
+    "ocr_is_authoritative": false
+  },
+  "collation": {
+    "compare": ["edition_vs_edition", "ocr_vs_page_image", "verified_text_vs_ocr"],
+    "blocking_findings": ["missing_text", "unexpected_insertions", "page_shift", "duplicate_page", "unresolved_high_confidence_difference"]
+  },
+  "graphs": {
+    "edition": ["WORK", "EDITION", "DIGITAL_COPY", "SOURCE", "RIGHTS_EVIDENCE"],
+    "citation": ["WORK", "EDITION", "VOLUME", "PAGE", "PASSAGE", "CLAIM"],
+    "knowledge": ["PERSON", "WORK", "EDITION", "TOPIC", "VERSE", "HADITH", "NARRATOR", "PLACE", "DATE", "CLAIM"]
+  },
+  "source_engines": {
+    "waqfeya": {"role": "acquisition-and-bibliographic", "dynamic_search": true, "rights_auto_grant": false},
+    "internet_archive": {"role": "acquisition-and-archive", "dynamic_search": true, "rights_auto_grant": false},
+    "openlibrary": {"role": "identity-and-edition-resolution", "dynamic_search": true, "rights_auto_grant": false},
+    "library_of_congress": {"role": "identity-provenance", "dynamic_search": true, "rights_auto_grant": false},
+    "google_books": {"role": "identity-edition-access-evidence", "dynamic_search": true, "rights_auto_grant": false},
+    "crossref": {"role": "bibliographic-license-evidence", "dynamic_search": true, "rights_auto_grant": false}
+  },
+  "delta_detection": {"required": true, "compare_fields": ["title", "author", "edition", "source_url", "rights", "sha256", "page_count", "ocr_quality"], "reacquire_on": ["new_exact_edition", "source_replacement", "rights_change", "integrity_failure"]},
+  "publication_gate": ["DISCOVERED", "IDENTIFIED", "SOURCE_VERIFIED", "RIGHTS_VERIFIED", "ACQUIRED", "VALIDATED", "PAGE_INTEGRITY_PASSED", "OCR", "TEXT_VERIFIED", "QUALITY_PASSED", "PUBLICATION_APPROVED"],
+  "observability": {"required_metrics": ["engine_latency", "engine_success_rate", "candidate_rate", "acquisition_rate", "validation_failure_rate", "rights_hold_rate", "ocr_low_confidence_pages", "collation_conflicts", "publication_rejections", "backup_last_success", "recovery_last_test"]},
+  "backup": {"minimum_copies": 2, "encrypted": true, "offsite": true, "recovery_test_required": true, "rpo_hours": 24, "rto_hours": 24},
+  "audit_log": {"required": ["who", "what", "when", "source", "old_value", "new_value", "reason", "commit", "hash"]}
+}
