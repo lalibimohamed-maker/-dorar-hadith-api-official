@@ -65,6 +65,15 @@ jobs:
           print('ENGINE_OVERLAY_COUNTS', json.dumps({'entries':len(d.get('entries',[])),'concrete_pdf_candidates':sum(bool(x.get('source_url')) for x in d.get('entries',[]))}, ensure_ascii=False, sort_keys=True))
           PY
 
+      - name: Global Deep Worldwide federation
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_deep_worldwide.py --root "$GITHUB_WORKSPACE" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json \
+            --out artifacts/governance/deep-worldwide-report.json
+          test -s artifacts/governance/deep-worldwide-report.json
+
       - name: Detect source and edition deltas
         run: |
           set -euo pipefail
@@ -127,14 +136,27 @@ jobs:
             --governance artifacts/governance/governance-report.json \
             --out artifacts/governance/publication-gate.json
 
+      - name: Control General — global fail-closed audit
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_control_general.py \
+            --root "$GITHUB_WORKSPACE" \
+            --catalog books-batches/salaf-01-400h/catalog.json \
+            --overlay books-batches/salaf-01-400h/engine-source-overlay.json \
+            --governance artifacts/governance/governance-report.json \
+            --page-integrity artifacts/governance/page-integrity.json \
+            --publication-gate artifacts/governance/publication-gate.json \
+            --deep-worldwide artifacts/governance/deep-worldwide-report.json \
+            --out artifacts/governance/control-general.json
+
       - name: Record audit event
         run: |
           set -euo pipefail
           python3 scripts/rechercher_audit_event.py \
             --who 'github-actions[bot]' \
-            --what 'developer-review-acquisition-and-governance-audit' \
+            --what 'developer-review-acquisition-and-global-control' \
             --source 'Rechercher workflow' \
-            --reason 'multi-engine source resolution, acquisition validation, governance and publication-readiness audit' \
+            --reason 'multi-engine resolution, deep worldwide federation, acquisition validation, governance and fail-closed global control' \
             --commit "$(git rev-parse HEAD)"
 
       - name: Encrypt retained copies
