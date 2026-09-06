@@ -85,5 +85,6 @@ jobs:
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
           git cherry-pick "$ACQ_COMMIT"
-          git -c "http.extraheader=AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
+          GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           echo "PERSISTED_COMMIT=$ACQ_COMMIT"
