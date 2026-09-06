@@ -84,7 +84,17 @@ jobs:
           ACQ_COMMIT=$(git rev-parse HEAD)
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
-          git cherry-pick "$ACQ_COMMIT"
+          if git cherry-pick "$ACQ_COMMIT"; then
+            echo "Cherry-picked acquisition commit $ACQ_COMMIT."
+          else
+            if git diff --name-only --diff-filter=U | grep -q .; then
+              echo 'ERROR: cherry-pick produced a merge conflict; refusing to treat it as already applied.'
+              git cherry-pick --abort
+              exit 1
+            fi
+            echo 'Acquisition changes are already present on REVIEW_BRANCH; skipping empty cherry-pick.'
+            git cherry-pick --skip
+          fi
           GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
           git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           echo "PERSISTED_COMMIT=$ACQ_COMMIT"
