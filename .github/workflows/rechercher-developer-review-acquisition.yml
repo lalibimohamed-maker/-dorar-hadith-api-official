@@ -40,10 +40,28 @@ jobs:
           set -euo pipefail
           test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
 
+      - name: Resolve multi-engine sources
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_source_engines.py --root "$GITHUB_WORKSPACE" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          test -s books-batches/salaf-01-400h/engine-source-overlay.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('books-batches/salaf-01-400h/engine-source-overlay.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          print('ENGINE_OVERLAY_COUNTS', json.dumps({'entries':len(d.get('entries',[])),'concrete_pdf_candidates':sum(bool(x.get('source_url')) for x in d.get('entries',[]))}, ensure_ascii=False, sort_keys=True))
+          PY
+
       - name: Acquire and validate copies
         run: |
           set -euo pipefail
-          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE"
+          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json \
+            --discovery books-batches/salaf-01-400h/engine-source-overlay.json
           test -s books-batches/salaf-01-400h/developer-review-manifest.json
           python3 - <<'PY'
           import json
