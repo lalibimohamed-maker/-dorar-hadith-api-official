@@ -1,0 +1,51 @@
+name: Rechercher — Master Census 1–400H
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Build uncapped census
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_master_census_1_400h.py --root "$GITHUB_WORKSPACE"
+
+      - name: Validate census
+        run: |
+          set -euo pipefail
+          test -s books-batches/salaf-01-400h/master-census-1-400h.json
+          test -s books-batches/salaf-01-400h/master-census-1-400h.tsv
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('books-batches/salaf-01-400h/master-census-1-400h.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          c=d['counts']
+          assert d['uncapped'] is True
+          assert c['unique_work_identity_records'] >= 1
+          print('MASTER_CENSUS_COUNTS', json.dumps(c, ensure_ascii=False, sort_keys=True))
+          PY
+
+      - name: Persist census evidence
+        run: |
+          set -euo pipefail
+          git config user.name 'rechercher-bot'
+          git config user.email 'rechercher-bot@users.noreply.github.com'
+          git add books-batches/salaf-01-400h/master-census-1-400h.json books-batches/salaf-01-400h/master-census-1-400h.tsv
+          if git diff --cached --quiet; then
+            echo 'No census changes to commit.'
+          else
+            git commit -m 'chore(rechercher): persist 1-400H master census evidence'
+            git push
+          fi
