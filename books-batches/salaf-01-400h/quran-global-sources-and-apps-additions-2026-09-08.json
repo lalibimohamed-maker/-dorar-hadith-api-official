@@ -1,0 +1,38 @@
+{
+  "registry_version": "2026-09-08",
+  "purpose": "Permanent source-memory additions for @Rechercher: Quran text, translations, tafsir, linguistic resources, recitation, APIs, and multilingual Islamic apps/platforms.",
+  "policy": {
+    "persist_every_discovered_source": true,
+    "search_saved_sources_before_generic_discovery": true,
+    "language_is_independent_search_lane": true,
+    "rights_are_item_level": true,
+    "do_not_infer_redistribution_rights": true,
+    "quran_text_translation_tafsir_recitation_are_distinct_assets": true
+  },
+  "verified_additions": [
+    {"source_id":"quranenc","name":"موسوعة القرآن الكريم QuranEnc","url":"https://quranenc.com/","role":["quran_translations","tafsir","multilingual","PDF","EPUB","XML","CSV","SQLite","API"],"languages":"80+","rights":"VERIFY_PER_ASSET","verification":"official site currently lists 80+ languages and downloadable/API formats"},
+    {"source_id":"quranic_arabic_corpus","name":"Quranic Arabic Corpus","url":"https://corpus.quran.com/","role":["quran_text","morphology","syntax","treebank","ontology","linguistic_search"],"rights":"GPL_FOR_DATA_RELEASE_PER_TERMS","verification":"official documentation describes morphological, syntactic and semantic annotation and downloadable data"},
+    {"source_id":"quranic_arabic_corpus_download","name":"Quranic Arabic Corpus Data Download","url":"https://corpus.quran.com/download/","role":["quran_linguistic_data","download"],"rights":"GPL_FOR_DATA_RELEASE_PER_TERMS","verification":"official download page"},
+    {"source_id":"ksu_ayat","name":"King Saud University Electronic Moshaf / Ayat","url":"https://quran.ksu.edu.sa/","role":["quran_text","mushaf_images","translations","tafsir","recitations","Warsh","apps"],"languages":"multilingual","rights":"VERIFY_PER_ASSET","verification":"official KSU project lists multilingual interfaces, tafsir, recitations and Warsh"},
+    {"source_id":"alquran_cloud","name":"AlQuran Cloud API","url":"https://alquran.cloud/","role":["quran_api","text","editions","translations","search","metadata"],"rights":"VERIFY_API_EDITION","verification":"official API documentation exposes Quran, ayah, edition, language, juz, page, ruku and related endpoints"},
+    {"source_id":"tanzil_translations","name":"Tanzil Quran Translations","url":"https://tanzil.net/trans/","role":["translations","multilingual","download"],"rights":"NONCOMMERCIAL_UNLESS_PERMISSION","verification":"official page states translation terms and provides multilingual translation downloads"},
+    {"source_id":"islamhouse_apps","name":"IslamHouse Apps / دار الإسلام","url":"https://islamhouse.com/apps/","role":["multilingual_books","quran","hadith","audio","video","apps","discovery"],"languages":"120+ claimed; verify current catalogue per language","rights":"VERIFY_PER_ASSET","verification":"official app catalogue; item-level terms required"},
+    {"source_id":"hadeethenc","name":"HadeethEnc / موسوعة الأحاديث النبوية","url":"https://hadeethenc.com/","role":["hadith","translations","multilingual","PDF","app/discovery"],"languages":"30+ claimed; verify current catalogue","rights":"VERIFY_PER_ASSET","verification":"official project; translations/download permissions vary by content"},
+    {"source_id":"darussalam_ebooks","name":"Darussalam Islamic E-Books","url":"https://darussalam.com/","role":["publisher","ebooks","quran","tafsir","hadith","multilingual"],"languages":["English","Urdu","French","Spanish","South Asian languages"],"rights":"PUBLISHER_CONTROLLED_VERIFY_PER_TITLE","verification":"publisher source; acquisition must respect title-level rights"},
+    {"source_id":"eurosunnah_candidate","name":"EuroSunnah / European Islamic apps and publishers","url":"","role":["discovery","European_languages","books"],"languages":["Dutch","German","English"],"rights":"VERIFY_IDENTITY_AND_ITEM","verification":"kept as discovery candidate because the name can refer to multiple entities"},
+    {"source_id":"shamela_multilingual_candidates","name":"Multilingual/companion platforms related to Shamela","url":"https://shamela.ws/","role":["classical_books","discovery","Arabic"],"rights":"VERIFY_PER_PLATFORM_AND_ITEM","verification":"do not attribute third-party translated apps to Shamela without identity verification"}
+  ],
+  "new_global_search_targets": [
+    {"source_id":"corpus_coranicum","name":"Corpus Coranicum","url":"https://corpuscoranicum.de/","role":["quran_manuscripts","textual_history","translations","research"],"rights":"VERIFY_PER_DATASET","verification":"research repository target; preserve scholarly provenance"},
+    {"source_id":"quran_ksu_multilingual","name":"KSU Ayat multilingual interfaces","url":"https://quran.ksu.edu.sa/index.php?l=en","role":["multilingual_quran","translations","recitation","tafsir"],"rights":"VERIFY_PER_ASSET","verification":"official KSU interface exposes multiple language options"},
+    {"source_id":"king_fahd_quran_complex","name":"King Fahd Glorious Quran Printing Complex","url":"https://qurancomplex.gov.sa/","role":["official_mushaf","translations","quran_resources"],"rights":"VERIFY_PER_ASSET","verification":"institutional Quran source; prioritize official editions and permissions"},
+    {"source_id":"quran_search_multilingual","name":"Multilingual Quran search/translation discovery lane","url":"https://tanzil.net/","role":["quran_text","translations","search"],"rights":"VERIFY_PER_ASSET","verification":"route through Tanzil terms and translator/publisher rights"}
+  ],
+  "research_notes": {
+    "quranenc": "Official site currently reports 80+ languages, 100M+ beneficiaries, translations, tafsir, audio and downloadable/API formats.",
+    "quranic_arabic_corpus": "Useful for machine-readable morphology, syntax and ontology; never replace the authoritative Quran text with generated/OCR text.",
+    "ksu": "Useful as a primary institutional discovery lane for Arabic, translations, tafsir, recitations and Warsh; the project itself identifies source relationships including King Fahd Complex and Tanzil.",
+    "apps": "Applications are source/discovery surfaces, not automatic redistribution licences. Resolve the underlying publisher/source and item-level terms before storing or republishing files.",
+    "manuscripts": "For Quran manuscripts, complete digital surrogates/images are authoritative acquisition targets; OCR is search/index assistance only."
+  }
+}
