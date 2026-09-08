@@ -1,0 +1,28 @@
+{
+  "schema": "din-allah-encyclopedia/rechercher-continuous-pdf-download-scope/v1",
+  "purpose": "Permanent PDF download scope for the whole encyclopedia, not only 1-400H.",
+  "eras": [
+    "Prophet era",
+    "Companions",
+    "Followers",
+    "1-400H",
+    "401-800H",
+    "801-1200H",
+    "1201H",
+    "Modern era"
+  ],
+  "future_books": "any new book appearing in any saved source/catalog",
+  "catalog_glob": "books-batches/**/catalog.json",
+  "output_format": ".pdf",
+  "acquisition_behavior": {
+    "direct_pdf_only": true,
+    "verify_pdf": true,
+    "sha256": true,
+    "parallel_books": true,
+    "source_failover": true,
+    "book_failure_does_not_stop_queue": true,
+    "retry_failed_books": true,
+    "continuous_monitoring": true
+  },
+  "rights_rule": "Only acquire and persist copies whose source/edition rights permit the intended use; otherwise retain metadata and retry/hold according to the existing governance policy."
+}
