@@ -22,8 +22,10 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@9c66f80e4e8983233be3d9b950e4528d4a74359b
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@ad35eb0dca57a390979ad7b3040b330acc9c71a2
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
+    secrets:
+      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
     permissions:
       contents: write
