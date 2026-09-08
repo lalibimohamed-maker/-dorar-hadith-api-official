@@ -1,11 +1,10 @@
-name: Rechercher — Salaf 01-400H continuous acquisition
+name: Rechercher — Encyclopedia continuous PDF downloader
 
 on:
-  # Start immediately when this workflow reaches main, and whenever main changes.
+  # Start immediately when the corrected downloader reaches main.
   push:
     branches: [main]
-  # Keep working continuously across runner lifetimes. Each run resumes from
-  # the governed acquisition branch and retries failures recorded by the script.
+  # Continue automatically and retry incomplete/failed books.
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
@@ -13,16 +12,14 @@ on:
 permissions:
   contents: write
 
-# Never cancel an active acquisition. At most one pending run is kept so the
-# next available runner continues from the persisted acquisition state.
 concurrency:
-  group: rechercher-salaf-01-400h-acquisition
+  group: rechercher-encyclopedia-pdf-download
   cancel-in-progress: false
 
 jobs:
-  acquire:
-    name: Continuous governed Salaf 01–400H acquisition
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@38ed044dffbcb4957909d10e9c55b383a2fc9225
+  download:
+    name: Continuous encyclopedia PDF download
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@a96005bb64fd4d6deca73ab125e6de17ee770abb
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     permissions:
