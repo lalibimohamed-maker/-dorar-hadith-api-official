@@ -11,7 +11,7 @@ ROOT = Path(ARGS.root).resolve() if ARGS.root else Path(__file__).resolve().pare
 CATALOGS = sorted((ROOT / 'books-batches').glob('**/catalog.json')) if (ROOT / 'books-batches').exists() else []
 ART = ROOT / 'artifacts'
 ART.mkdir(exist_ok=True)
-USER_AGENT = 'DinAllah-Encyclopedia/1.1'
+USER_AGENT = 'DinAllah-Encyclopedia/1.2'
 DOWNLOAD_TIMEOUT = 120
 MAX_SOURCE_ATTEMPTS = 12
 
@@ -94,7 +94,7 @@ def acquire_volume(book, volume, expected, work):
     attempts = []
     sources = source_candidates(book)
     if not sources:
-        raise SystemExit(f"{book['id']} volume {volume}: no catalogued source exists")
+        return None, {'volume': volume, 'status': 'no_catalogued_source'}
     for source in sources:
         try:
             urls = candidate_urls(source)
@@ -129,31 +129,51 @@ def acquire_volume(book, volume, expected, work):
                 attempts.append({'source': url, 'status': 'download_or_validation_error', 'error': str(exc)})
             finally:
                 candidate.unlink(missing_ok=True)
-    raise SystemExit(f"{book['id']} volume {volume}: all catalogued sources failed; no unverified/different edition was accepted.\n" + json.dumps(attempts, ensure_ascii=False, indent=2))
+    return None, {'volume': volume, 'status': 'failed', 'attempts': attempts}
 
 def acquire(book):
     if book.get('rights_status') != 'verified-redistributable':
-        print(f"[HOLD] {book['id']}: rights not verified; metadata only"); return
+        print(f"[HOLD] {book['id']}: rights not verified; metadata only")
+        return {'id': book['id'], 'status': 'held-rights'}
     expected = int(book['expected_volumes'])
     safe = re.sub(r'[^a-z0-9._-]+', '-', book['id'].lower()).strip('-')
     work = ART / safe
-    if work.exists(): shutil.rmtree(work)
     work.mkdir(parents=True, exist_ok=True)
     vols = []
+    failed = []
     for volume in range(1, expected + 1):
-        _, record = acquire_volume(book, volume, expected, work); vols.append(record)
-    if len(vols) != expected or [v['volume'] for v in vols] != list(range(1, expected + 1)):
-        raise SystemExit(f"{book['id']}: completeness gate failed; refusing to unify incomplete volumes")
+        final = work / f'{volume:03d}.pdf'
+        if final.exists():
+            vols.append({'volume': volume, 'status': 'already-present', 'bytes': final.stat().st_size, 'sha256': sha256(final)})
+            continue
+        _, record = acquire_volume(book, volume, expected, work)
+        if record.get('status') in ('failed', 'no_catalogued_source'):
+            failed.append(record)
+        else:
+            vols.append(record)
+    if failed:
+        (work / 'retry.json').write_text(json.dumps({'id': book['id'], 'failed_volumes': failed}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        print(f"[RETRY] {book['id']}: {len(failed)} volume(s) failed; recorded for the next run")
+        return {'id': book['id'], 'status': 'partial', 'failed_volumes': failed}
     unified = ART / f'{safe}.pdf'
     pages = [str(work / f'{n:03d}.pdf') for n in range(1, expected + 1)]
     run(['qpdf', '--empty', '--pages', *pages, '--', str(unified)])
     unified_validation = validate_and_repair(unified)
     if unified_validation['status'] not in ('valid', 'repaired'):
-        raise SystemExit(f"{book['id']}: unified PDF failed validation")
-    manifest = {'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'), 'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols, 'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size, 'unified_sha256': sha256(unified), 'unified_validation': unified_validation, 'ingest_policy': 'primary source -> strict PDF validation -> qpdf repair for warnings -> strict recheck -> catalogued same-edition fallback sources -> per-volume SHA-256 -> complete ordered unification -> strict unified validation; reject only after all matching catalogued sources fail', 'fallback_policy': 'Never substitute a different edition merely because the title matches; fallback sources must be edition-scoped.'}
+        print(f"[RETRY] {book['id']}: unified PDF failed validation")
+        return {'id': book['id'], 'status': 'unified-validation-failed'}
+    manifest = {'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'), 'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols, 'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size, 'unified_sha256': sha256(unified), 'unified_validation': unified_validation}
     (ART / f'{safe}.manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    return {'id': book['id'], 'status': 'acquired', 'manifest': str((ART / f'{safe}.manifest.json').relative_to(ROOT))}
 
+summary = []
 for catalog_path in CATALOGS:
     print(f'=== Processing catalog: {catalog_path.relative_to(ROOT)} ===')
     for book in json.loads(catalog_path.read_text(encoding='utf-8'))['books']:
-        acquire(book)
+        try:
+            summary.append(acquire(book))
+        except Exception as exc:
+            print(f'[RETRY] {book.get("id")}: unexpected error: {exc}')
+            summary.append({'id': book.get('id'), 'status': 'unexpected-error', 'error': str(exc)})
+
+(ART / 'acquisition-run-summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
