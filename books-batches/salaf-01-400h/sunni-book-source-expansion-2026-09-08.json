@@ -1,0 +1,31 @@
+{
+  "registry_version":"2026-09-08",
+  "purpose":"Permanent additive registry of user-supplied Sunni and Islamic book, fatwa, manuscript, university and digital-library sources for Rechercher.",
+  "rules":["Never delete or replace an existing source.","Search saved sources before rediscovery.","Record source role and rights separately; availability does not imply redistribution permission.","Use official/source URLs where possible and retain unresolved candidates for discovery rather than guessing.","Deduplicate identical URLs without losing provenance or source roles."],
+  "user_supplied_sources":[
+    "https://islamic-books-index.com","https://www.alifta.net/","https://apps.apple.com/dz/app/%D8%AC%D8%A7%D9%85%D8%B9-%D8%A7%D9%84%D9%85%D9%84%D9%83-%D8%B9%D8%A8%D8%AF%D8%A7%D9%84%D9%84%D9%87/id1637888723?l=fr-FR","http://pn2016.blogspot.com/2016/05/blog-post.html?m=1","https://ddl.ae/","https://alilmia.com/","https://sunna.alifta.gov.sa/","https://uqu.edu.sa/","https://tadween.sa/","https://maqraa.prh.gov.sa/ar","https://alquran.islam.gov.qa/droos/Sections.html","https://www.guidetosunnah.com/ar/","https://www.alukah.net/library","https://arablib.com","https://www.aswajabooks.com","https://ketabonline.com/","https://feqhbook.com/","https://maktabatalsalaf.com/","https://kastntinya.com/","https://daralsalam.com/","https://almohadith.com/","https://alsunna.org/","https://alameenbookstore.com/","https://www.sunnaonline.org/books/","https://binothaimeen.net/","https://www.alsalafiyah-library.com","https://www.noor-book.com","https://dsbook.dd-sunnah.net/","https://saaid.org/","https://maktabate.com/","https://foulabook.com/","https://ebook.univeyes.com","https://a-alqasim.com","https://binbaz.org.sa/","https://midad.com/books","https://books-library.website/islam-library","https://books.islam-db.com/books"
+  ],
+  "high_value_verified_or_strong_targets":[
+    {"name":"جامع الكتب الإسلامية","url":"https://ketabonline.com/ar","roles":["digital_books","hadith","tafsir","quran_sciences","aqidah","author_index","text_search"],"status":"verified"},
+    {"name":"مكتبة الألوكة","url":"https://www.alukah.net/library/","roles":["books","manuscripts","audio","visual","articles","PDF","WORD"],"status":"verified"},
+    {"name":"دار السلام","url":"https://daralsalam.com/","roles":["publisher","books","digital_content"],"status":"verified_target"},
+    {"name":"مركز المعرفة الرقمي","url":"https://ddl.ae/","roles":["books","articles","journals","manuscripts","images","video"],"status":"user_supplied_target"},
+    {"name":"رئاسة البحوث العلمية والإفتاء","url":"https://www.alifta.net/","roles":["fatwas","scholarly_content","official_reference"],"status":"user_supplied_target"},
+    {"name":"السنة النبوية وعلومها - الرئاسة العامة للبحوث العلمية والإفتاء","url":"https://sunna.alifta.gov.sa/","roles":["hadith","sunnah","scholarly_reference"],"status":"user_supplied_target"},
+    {"name":"جامعة أم القرى","url":"https://uqu.edu.sa/","roles":["university","theses","research","library"],"status":"user_supplied_target"},
+    {"name":"جامع الكتب الإسلامية / التطبيق","url":"https://apps.apple.com/dz/app/%D8%AC%D8%A7%D9%85%D8%B9-%D8%A7%D9%84%D9%85%D9%84%D9%83-%D8%B9%D8%A8%D8%AF%D8%A7%D9%84%D9%84%D9%87/id1637888723?l=fr-FR","roles":["mobile_app","book_discovery"],"status":"user_supplied_target"},
+    {"name":"موقع ابن عثيمين","url":"https://binothaimeen.net/","roles":["scholarly_books","fatwas","audio","lessons"],"status":"user_supplied_target"},
+    {"name":"موقع ابن باز","url":"https://binbaz.org.sa/","roles":["scholarly_books","fatwas","articles","audio"],"status":"user_supplied_target"},
+    {"name":"مداد","url":"https://midad.com/books","roles":["books","audio","quran","lessons"],"status":"verified_target"},
+    {"name":"Islam-DB Books","url":"https://books.islam-db.com/books","roles":["books","authors","hadith","aqidah","fiqh","tafsir","fatwas"],"status":"verified_target"},
+    {"name":"مكتبة الألوكة","url":"https://www.alukah.net/library","roles":["books","manuscripts","audio","visual"],"status":"verified"}
+  ],
+  "deep_search_additions":[
+    {"name":"إسلام ويب - المكتبة الإسلامية","url":"https://www.islamweb.net/ar/library/","roles":["digital_library","books","fatwas","research"],"status":"discovery_target"},
+    {"name":"المكتبة الشاملة","url":"https://shamela.ws/","roles":["digital_books","heritage_texts","search"],"status":"existing_global_registry_source"},
+    {"name":"الوقفية","url":"https://waqfeya.net/","roles":["PDF","scanned_books","heritage","manuscripts"],"status":"existing_global_registry_source"},
+    {"name":"مكتبة نور","url":"https://www.noor-book.com/","roles":["book_discovery","ebooks"],"status":"user_supplied_target"},
+    {"name":"مكتبة الفقه","url":"https://feqhbook.com/","roles":["fiqh_books","book_discovery"],"status":"user_supplied_target"}
+  ],
+  "rights_note":"Each source is an acquisition/discovery candidate only. Rechercher must inspect item-level license, public-domain status, publisher permission, or explicit redistribution terms before storing or redistributing bytes."
+}
