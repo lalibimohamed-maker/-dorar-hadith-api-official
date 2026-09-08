@@ -1,31 +1,44 @@
-name: Rechercher — Central governed multi-volume acquisition
+name: Rechercher — Central governed PDF acquisition
 
-# security-justification: this reusable workflow writes verified book artifacts and manifests to the governed acquisition branch.
+# Persistent PDF downloader for the WHOLE encyclopedia, not only 1-400H.
+# Scope: Prophet era -> Companions -> Followers -> 1-400H -> 401-800H ->
+# 801-1200H -> 1201H -> Modern era -> any new book appearing in saved sources.
+# It consumes every books-batches/**/catalog.json present on main and persists verified PDFs.
+# security-justification: reviewed; contents: write is required only to persist verified PDF artifacts/manifests to the governed acquisition branch.
 permissions:
   contents: write
+
+env:
+  RECHERCHER_MAX_BOOK_WORKERS: 12
+  RECHERCHER_CATALOG_GLOB: books-batches/**/catalog.json
+  RECHERCHER_SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
 
 on:
   workflow_call:
     inputs:
       target_branch:
-        description: 'Governed branch where verified acquisition artifacts and manifests are persisted.'
+        description: 'Governed branch where verified PDF artifacts and manifests are persisted.'
         required: true
         type: string
+    secrets:
+      RECHERCHER_SECONDARY_STORAGE_TOKEN:
+        description: 'Optional write token owned by the secondary GitHub account for the separate PDF storage repository.'
+        required: false
 
 jobs:
   acquire:
-    name: Acquire and unify verified multi-volume books
+    name: Continuous whole-encyclopedia PDF download and verification
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
     steps:
-      - name: Checkout target branch
+      - name: Checkout governed acquisition state
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Checkout central acquisition implementation
+      - name: Checkout latest main catalogs and acquisition implementation
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: lalibimohamed-maker/-dorar-hadith-api-official
@@ -34,7 +47,26 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Acquire, validate, repair, and unify
+      - name: Synchronize the whole encyclopedia scope
+        run: |
+          set -euo pipefail
+          test -s .governance-source/config/rechercher-encyclopedia-download-scope.json
+          mkdir -p books-batches
+          cp -a .governance-source/books-batches/. books-batches/
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('.governance-source/config/rechercher-encyclopedia-download-scope.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          expected=['Prophet era','Companions','Followers','1-400H','401-800H','801-1200H','1201H','Modern era']
+          if d.get('eras') != expected:
+              raise SystemExit('Encyclopedia era scope is incomplete or reordered.')
+          if d.get('catalog_glob') != 'books-batches/**/catalog.json':
+              raise SystemExit('Whole-encyclopedia catalog scope is not enabled.')
+          print('Whole encyclopedia PDF scope enabled:', ' -> '.join(d['eras']), ' -> future books')
+          PY
+
+      - name: Download real PDFs, verify, hash, and record failures
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
@@ -45,23 +77,45 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf
           git lfs install
+          echo "Whole-encyclopedia PDF scope: ${RECHERCHER_CATALOG_GLOB}"
+          echo "Parallel PDF workers: ${RECHERCHER_MAX_BOOK_WORKERS}"
           python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
           git lfs track 'artifacts/*.pdf'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-
-          # Checkout deliberately disables credential persistence. Authenticate
-          # each Git HTTPS operation explicitly with the workflow token, without
-          # changing global Git configuration or relying on interactive prompts.
           GIT_AUTH_HEADER="AUTHORIZATION: bearer ${GITHUB_TOKEN}"
-
           git add books-batches scripts artifacts .gitattributes
           if git diff --cached --quiet; then
-            echo 'No changes to persist.'
+            echo 'No new PDF changes; saved failures will be retried on the next cycle.'
+          else
+            git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
+            git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$TARGET_BRANCH"
+            git rebase "origin/$TARGET_BRANCH"
+            git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$TARGET_BRANCH"
+          fi
+
+      - name: Mirror verified PDFs to secondary storage account
+        if: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN != '' }}
+        env:
+          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          SECONDARY_STORAGE_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SECONDARY_STORAGE_TOKEN"
+          GIT_LFS_SKIP_SMUDGE=1 git clone "https://x-access-token:${SECONDARY_STORAGE_TOKEN}@github.com/${SECONDARY_STORAGE_REPO}.git" .secondary-storage
+          cd .secondary-storage
+          git lfs install
+          git lfs track 'artifacts/*.pdf'
+          mkdir -p artifacts
+          cp -a ../artifacts/. artifacts/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add artifacts .gitattributes
+          if git diff --cached --quiet; then
+            echo 'Secondary PDF storage is already synchronized.'
             exit 0
           fi
-          git commit -m 'data(rechercher): acquire verified multi-volume books'
-          git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$TARGET_BRANCH"
-          git rebase "origin/$TARGET_BRANCH"
-          git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$TARGET_BRANCH"
+          git commit -m 'data(rechercher): mirror verified encyclopedia PDFs'
+          git push origin HEAD

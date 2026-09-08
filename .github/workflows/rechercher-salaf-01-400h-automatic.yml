@@ -1,25 +1,31 @@
-name: Rechercher — Salaf 01-400H automatic acquisition
+name: Rechercher — Encyclopedia continuous PDF downloader
 
+# security-justification: reviewed; contents: write is required only so the governed acquisition workflow can persist verified PDF artifacts/manifests.
+# Scope is the whole encyclopedia: Prophet era -> Companions -> Followers ->
+# 1-400H -> 401-800H -> 801-1200H -> 1201H -> Modern era -> future books.
 on:
+  # Start immediately when the corrected whole-encyclopedia downloader reaches main.
+  push:
+    branches: [main]
+  # Keep watching saved catalogs, acquire new books, and retry incomplete books.
   schedule:
-    - cron: '17 */6 * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
-# security-justification: the scheduled acquisition must write verified book artifacts and manifests to the governed acquisition branch.
 permissions:
   contents: write
 
-# Keep scheduled and manual acquisition runs in one queue because both write the same governed branch.
 concurrency:
-  group: rechercher-salaf-01-400h-acquisition
+  group: rechercher-encyclopedia-pdf-download
   cancel-in-progress: false
 
 jobs:
-  acquire:
-    name: Automatic governed Salaf 01–400H acquisition
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@02af0f5e01e1ec97a960bb49a21177e551c61843 # hardened target-branch handling
+  download:
+    name: Continuous whole-encyclopedia PDF download
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@ad35eb0dca57a390979ad7b3040b330acc9c71a2
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
-    # security-justification: the reusable acquisition workflow persists verified artifacts/manifests only to the governed acquisition branch.
+    secrets:
+      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
     permissions:
       contents: write
