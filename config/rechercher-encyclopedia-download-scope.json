@@ -1,6 +1,6 @@
 {
   "schema": "din-allah-encyclopedia/rechercher-continuous-pdf-download-scope/v1",
-  "purpose": "Permanent PDF download scope for the whole encyclopedia, not only 1-400H.",
+  "purpose": "Permanent additive PDF download scope for the whole encyclopedia; never limited to 1-400H.",
   "eras": [
     "Prophet era",
     "Companions",
@@ -11,6 +11,7 @@
     "1201H",
     "Modern era"
   ],
+  "scope_policy": "Additive and permanent: these eras remain in scope and the downloader must not remove or replace an era from the scope.",
   "future_books": "any new book appearing in any saved source/catalog",
   "catalog_glob": "books-batches/**/catalog.json",
   "output_format": ".pdf",
@@ -22,7 +23,8 @@
     "source_failover": true,
     "book_failure_does_not_stop_queue": true,
     "retry_failed_books": true,
-    "continuous_monitoring": true
+    "continuous_monitoring": true,
+    "scope_is_not_a_failure_gate": true
   },
   "rights_rule": "Only acquire and persist copies whose source/edition rights permit the intended use; otherwise retain metadata and retry/hold according to the existing governance policy."
 }
