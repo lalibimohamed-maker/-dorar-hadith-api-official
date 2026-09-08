@@ -1,11 +1,13 @@
 name: Rechercher — Encyclopedia continuous PDF downloader
 
 # security-justification: reviewed; contents: write is required only so the governed acquisition workflow can persist verified PDF artifacts/manifests.
+# Scope is the whole encyclopedia: Prophet era -> Companions -> Followers ->
+# 1-400H -> 401-800H -> 801-1200H -> 1201H -> Modern era -> future books.
 on:
-  # Start immediately when the corrected downloader reaches main.
+  # Start immediately when the corrected whole-encyclopedia downloader reaches main.
   push:
     branches: [main]
-  # Continue automatically and retry incomplete/failed books.
+  # Keep watching saved catalogs, acquire new books, and retry incomplete books.
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
@@ -19,8 +21,8 @@ concurrency:
 
 jobs:
   download:
-    name: Continuous encyclopedia PDF download
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@a96005bb64fd4d6deca73ab125e6de17ee770abb
+    name: Continuous whole-encyclopedia PDF download
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@9c66f80e4e8983233be3d9b950e4528d4a74359b
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     permissions:
