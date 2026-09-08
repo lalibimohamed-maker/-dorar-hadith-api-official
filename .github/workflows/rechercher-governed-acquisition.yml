@@ -16,7 +16,7 @@ jobs:
   acquire:
     name: Acquire and unify verified multi-volume books
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
     steps:
       - name: Checkout target branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: lalibimohamed-maker/-dorar-hadith-api-official
-          ref: main
+          ref: ${{ github.sha }}
           path: .governance-source
           fetch-depth: 1
           persist-credentials: false
@@ -50,12 +50,7 @@ jobs:
           git lfs track 'artifacts/*.pdf'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-
-          # Checkout deliberately disables credential persistence. Authenticate
-          # each Git HTTPS operation explicitly with the workflow token, without
-          # changing global Git configuration or relying on interactive prompts.
           GIT_AUTH_HEADER="AUTHORIZATION: bearer ${GITHUB_TOKEN}"
-
           git add books-batches scripts artifacts .gitattributes
           if git diff --cached --quiet; then
             echo 'No changes to persist.'
