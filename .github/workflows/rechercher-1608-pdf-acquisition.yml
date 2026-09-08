@@ -1,18 +1,29 @@
 name: Rechercher — 1-400H PDF acquisition queue
+
 on:
   workflow_dispatch:
+
 permissions:
   contents: write
+
 jobs:
   acquire:
     runs-on: ubuntu-latest
     timeout-minutes: 240
+
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with: {fetch-depth: 0, persist-credentials: false}
-      - name: Validators
-        run: sudo apt-get update && sudo apt-get install -y qpdf poppler-utils
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install validators and text tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils
+
       - name: Build 1-400H census
         run: |
           set -euo pipefail
@@ -20,39 +31,85 @@ jobs:
           python3 - <<'PY'
           import json
           from pathlib import Path
-          d=json.loads(Path('books-batches/salaf-01-400h/master-census-1-400h.json').read_text())
-          n=d['counts']['unique_work_identity_records']
-          print('MASTER_CENSUS_RECORDS=',n)
-          if n < 1608: raise SystemExit(f'Only {n} records; target 1608 not established.')
+          p = Path('books-batches/salaf-01-400h/master-census-1-400h.json')
+          d = json.loads(p.read_text(encoding='utf-8'))
+          n = d['counts']['unique_work_identity_records']
+          print(f'MASTER_CENSUS_RECORDS={n}')
+          if n < 1608:
+              raise SystemExit(f'Only {n} records; target 1608 not established.')
           PY
-      - name: Download from saved acquisition engines
-        env: {REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}}
+
+      - name: Require review vault key
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
           test -n "$REVIEW_VAULT_KEY"
-          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
-      - name: Validate PDFs
+
+      - name: Download from saved acquisition engines
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_developer_review_acquisition.py \
+            --root "$GITHUB_WORKSPACE" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+
+      - name: Run Acquisition Engine v2
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          python3 scripts/rechercher_acquisition_engine_v2.py \
+            --root "$GITHUB_WORKSPACE" \
+            --vault artifacts/developer-review-vault \
+            --out artifacts/governance/acquisition-engine-v2-manifest.json
+
+      - name: Validate acquired PDFs
         run: |
           set -euo pipefail
           shopt -s nullglob
           files=(artifacts/developer-review-vault/*.pdf)
-          test "${#files[@]}" -gt 0
-          for f in "${files[@]}"; do head -c 5 "$f" | grep -qx '%PDF-'; qpdf --check "$f"; sha256sum "$f"; done
-      - name: Persist encrypted PDFs and manifest
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo 'No PDF files were acquired; preserving manifest evidence and failing closed.'
+            exit 1
+          fi
+          for f in "${files[@]}"; do
+            head -c 5 "$f" | grep -qx '%PDF-'
+            qpdf --check "$f"
+            sha256sum "$f"
+          done
+
+      - name: Persist encrypted PDFs and evidence
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
-          shopt -s nullglob
           mkdir -p artifacts/governance
-          for f in artifacts/developer-review-vault/*.pdf; do openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "$f.enc"; rm -f "$f"; done
-          enc=(artifacts/developer-review-vault/*.enc); test "${#enc[@]}" -gt 0
+          shopt -s nullglob
+          enc=()
+          for f in artifacts/developer-review-vault/*.pdf; do
+            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
+              -pass env:REVIEW_VAULT_KEY \
+              -in "$f" -out "$f.enc"
+            rm -f "$f"
+            enc+=("$f.enc")
+          done
+          test "${#enc[@]}" -gt 0
           tag="rechercher-1608-pdf-${GITHUB_RUN_ID}"
-          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher 1-400H acquired PDF vault ${GITHUB_RUN_ID}" --notes "Validated PDF acquisition evidence; redistribution rights remain separately governed."
-          for f in "${enc[@]}"; do gh release upload "$tag" "$f" --repo "$GITHUB_REPOSITORY" --clobber; done
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Rechercher 1-400H acquired PDF vault ${GITHUB_RUN_ID}" \
+            --notes "Validated PDF acquisition evidence; redistribution rights remain separately governed."
+          for f in "${enc[@]}"; do
+            gh release upload "$tag" "$f" --repo "$GITHUB_REPOSITORY" --clobber
+          done
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add books-batches/salaf-01-400h/master-census-1-400h.json books-batches/salaf-01-400h/master-census-1-400h.tsv books-batches/salaf-01-400h/developer-review-manifest.json
+          git add \
+            books-batches/salaf-01-400h/master-census-1-400h.json \
+            books-batches/salaf-01-400h/master-census-1-400h.tsv \
+            books-batches/salaf-01-400h/developer-review-manifest.json \
+            artifacts/governance/acquisition-engine-v2-manifest.json
           git commit -m 'data(rechercher): persist 1-400H PDF acquisition evidence' || true
           git push origin HEAD:refs/heads/rechercher/salaf-01-400h-developer-review-acquisition
