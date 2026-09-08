@@ -25,6 +25,14 @@ DOWNLOAD_TIMEOUT = 120
 MAX_SOURCE_ATTEMPTS = 12
 MAX_BOOK_WORKERS = max(1, min(int(os.environ.get('RECHERCHER_MAX_BOOK_WORKERS', '12')), 32))
 
+# A catalog may distinguish lawful acquisition/research access from redistribution.
+# Legacy catalogs remain compatible: verified-redistributable is valid for both.
+def acquisition_is_lawful(book):
+    return book.get('acquisition_status') in ('verified-lawful-copy', 'verified-redistributable') or book.get('rights_status') == 'verified-redistributable'
+
+def redistribution_is_allowed(book):
+    return book.get('redistribution_status') == 'verified-redistributable' or book.get('rights_status') == 'verified-redistributable'
+
 def normalize_url(url):
     p = urlsplit(url)
     return urlunsplit((p.scheme, p.netloc, quote(p.path, safe='/%:@-._~'), p.query, p.fragment))
@@ -155,9 +163,9 @@ def acquire_volume(book, volume, expected, work):
     return None, {'volume': volume, 'status': 'failed', 'attempts': attempts}
 
 def acquire(book):
-    if book.get('rights_status') != 'verified-redistributable':
-        print(f"[HOLD] {book['id']}: browser redistribution not verified; metadata/source only", flush=True)
-        return {'id': book['id'], 'status': 'held-rights'}
+    if not acquisition_is_lawful(book):
+        print(f"[HOLD] {book['id']}: no verified lawful acquisition basis; metadata/source only", flush=True)
+        return {'id': book['id'], 'status': 'held-acquisition'}
     expected = int(book['expected_volumes'])
     safe = re.sub(r'[^a-z0-9._-]+', '-', book['id'].lower()).strip('-')
     work = ART / safe
@@ -185,7 +193,7 @@ def acquire(book):
     if unified_validation['status'] not in ('valid', 'repaired'):
         print(f"[RETRY] {book['id']}: unified PDF failed validation", flush=True)
         return {'id': book['id'], 'status': 'unified-validation-failed'}
-    manifest = {'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'), 'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols, 'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size, 'unified_sha256': sha256(unified), 'unified_validation': unified_validation}
+    manifest = {'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'), 'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols, 'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size, 'unified_sha256': sha256(unified), 'unified_validation': unified_validation, 'acquisition_basis': book.get('acquisition_status') or book.get('rights_status'), 'browser_redistribution': redistribution_is_allowed(book)}
     (ART / f'{safe}.manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return {'id': book['id'], 'status': 'acquired', 'manifest': str((ART / f'{safe}.manifest.json').relative_to(ROOT))}
 
