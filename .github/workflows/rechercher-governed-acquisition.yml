@@ -30,6 +30,8 @@ jobs:
     name: Continuous whole-encyclopedia PDF download and verification
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    env:
+      SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
     steps:
       - name: Checkout governed acquisition state
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -96,9 +98,8 @@ jobs:
           fi
 
       - name: Mirror verified PDFs to secondary storage account
-        if: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN != '' }}
+        if: ${{ env.SECONDARY_STORAGE_TOKEN != '' }}
         env:
-          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
           SECONDARY_STORAGE_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
         shell: bash
         run: |
