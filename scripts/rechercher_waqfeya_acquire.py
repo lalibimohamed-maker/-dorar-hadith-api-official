@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import argparse, html, json, re, shutil, subprocess
+import argparse, html, json, re, shutil, subprocess, os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit, urlunsplit, quote
 from urllib.request import Request, urlopen
@@ -11,9 +12,10 @@ ROOT = Path(ARGS.root).resolve() if ARGS.root else Path(__file__).resolve().pare
 CATALOGS = sorted((ROOT / 'books-batches').glob('**/catalog.json')) if (ROOT / 'books-batches').exists() else []
 ART = ROOT / 'artifacts'
 ART.mkdir(exist_ok=True)
-USER_AGENT = 'DinAllah-Encyclopedia/1.2'
+USER_AGENT = 'DinAllah-Encyclopedia/1.3'
 DOWNLOAD_TIMEOUT = 120
 MAX_SOURCE_ATTEMPTS = 12
+MAX_BOOK_WORKERS = max(1, min(int(os.environ.get('RECHERCHER_MAX_BOOK_WORKERS', '12')), 32))
 
 def normalize_url(url):
     p = urlsplit(url)
@@ -87,9 +89,6 @@ def candidate_urls(source):
     page = source['url']
     if re.search(r'\.pdf(?:\?|$)', page, re.I):
         return [normalize_url(page)]
-    # Fail over through every saved source page: a source does not need a
-    # discover_pdfs flag for us to look for an actual PDF link. A source is
-    # considered exhausted only after its page and all concrete PDF links fail.
     try:
         discovered = pdf_links(fetch(page), page)
     except Exception:
@@ -111,7 +110,7 @@ def acquire_volume(book, volume, expected, work):
             urls = candidate_urls(source)
         except Exception as exc:
             attempts.append({'source': source['url'], 'status': 'source_error', 'error': str(exc)})
-            print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} unavailable; trying next source')
+            print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} unavailable; trying next source', flush=True)
             continue
         if source.get('volume') is not None and int(source['volume']) != volume:
             continue
@@ -121,7 +120,7 @@ def acquire_volume(book, volume, expected, work):
         elif source.get('discover_pdfs'):
             if len(urls) < expected:
                 attempts.append({'source': source['url'], 'status': 'incomplete_source', 'found_pdfs': len(urls), 'expected': expected})
-                print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} has {len(urls)}/{expected} PDFs; trying next source')
+                print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} has {len(urls)}/{expected} PDFs; trying next source', flush=True)
                 continue
             urls = [urls[volume - 1]]
         else:
@@ -129,7 +128,7 @@ def acquire_volume(book, volume, expected, work):
         for url in urls[:MAX_SOURCE_ATTEMPTS]:
             candidate = work / f'{volume:03d}.candidate.pdf'
             try:
-                print(f'Downloading {book["id"]} volume {volume}/{expected} from source {source_index}/{len(sources)}: {url}')
+                print(f'Downloading {book["id"]} volume {volume}/{expected} from source {source_index}/{len(sources)}: {url}', flush=True)
                 download(url, candidate)
                 if candidate.read_bytes()[:4] != b'%PDF':
                     attempts.append({'source': url, 'status': 'invalid_signature'}); candidate.unlink(missing_ok=True); continue
@@ -142,12 +141,12 @@ def acquire_volume(book, volume, expected, work):
                 attempts.append({'source': url, 'status': 'download_or_validation_error', 'error': str(exc)})
             finally:
                 candidate.unlink(missing_ok=True)
-        print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} exhausted; trying next source')
+        print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} exhausted; trying next source', flush=True)
     return None, {'volume': volume, 'status': 'failed', 'attempts': attempts}
 
 def acquire(book):
     if book.get('rights_status') != 'verified-redistributable':
-        print(f"[HOLD] {book['id']}: rights not verified; metadata only")
+        print(f"[HOLD] {book['id']}: rights not verified; metadata only", flush=True)
         return {'id': book['id'], 'status': 'held-rights'}
     expected = int(book['expected_volumes'])
     safe = re.sub(r'[^a-z0-9._-]+', '-', book['id'].lower()).strip('-')
@@ -167,27 +166,43 @@ def acquire(book):
             vols.append(record)
     if failed:
         (work / 'retry.json').write_text(json.dumps({'id': book['id'], 'failed_volumes': failed}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-        print(f"[RETRY] {book['id']}: {len(failed)} volume(s) failed across all saved sources; recorded for the next run")
+        print(f"[RETRY] {book['id']}: {len(failed)} volume(s) failed across all saved sources; recorded for the next run", flush=True)
         return {'id': book['id'], 'status': 'partial', 'failed_volumes': failed}
     unified = ART / f'{safe}.pdf'
     pages = [str(work / f'{n:03d}.pdf') for n in range(1, expected + 1)]
     run(['qpdf', '--empty', '--pages', *pages, '--', str(unified)])
     unified_validation = validate_and_repair(unified)
     if unified_validation['status'] not in ('valid', 'repaired'):
-        print(f"[RETRY] {book['id']}: unified PDF failed validation")
+        print(f"[RETRY] {book['id']}: unified PDF failed validation", flush=True)
         return {'id': book['id'], 'status': 'unified-validation-failed'}
     manifest = {'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'), 'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols, 'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size, 'unified_sha256': sha256(unified), 'unified_validation': unified_validation}
     (ART / f'{safe}.manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return {'id': book['id'], 'status': 'acquired', 'manifest': str((ART / f'{safe}.manifest.json').relative_to(ROOT))}
 
-summary = []
-for catalog_path in CATALOGS:
-    print(f'=== Processing catalog: {catalog_path.relative_to(ROOT)} ===')
-    for book in json.loads(catalog_path.read_text(encoding='utf-8'))['books']:
-        try:
-            summary.append(acquire(book))
-        except Exception as exc:
-            print(f'[RETRY] {book.get("id")}: unexpected error: {exc}')
-            summary.append({'id': book.get('id'), 'status': 'unexpected-error', 'error': str(exc)})
+def load_books():
+    books = {}
+    for catalog_path in CATALOGS:
+        print(f'=== Loading catalog: {catalog_path.relative_to(ROOT)} ===', flush=True)
+        for book in json.loads(catalog_path.read_text(encoding='utf-8'))['books']:
+            key = str(book.get('id') or '').strip()
+            if key and key not in books:
+                books[key] = book
+    return list(books.values())
 
-(ART / 'acquisition-run-summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+def main():
+    books = load_books()
+    print(f'=== Parallel PDF acquisition: {len(books)} unique books, {MAX_BOOK_WORKERS} workers ===', flush=True)
+    summary = []
+    with ThreadPoolExecutor(max_workers=MAX_BOOK_WORKERS, thread_name_prefix='rechercher-pdf') as pool:
+        futures = {pool.submit(acquire, book): book for book in books}
+        for future in as_completed(futures):
+            book = futures[future]
+            try:
+                summary.append(future.result())
+            except Exception as exc:
+                print(f'[RETRY] {book.get("id")}: unexpected error: {exc}', flush=True)
+                summary.append({'id': book.get('id'), 'status': 'unexpected-error', 'error': str(exc)})
+    (ART / 'acquisition-run-summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+if __name__ == '__main__':
+    main()
