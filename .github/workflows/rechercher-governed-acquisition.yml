@@ -1,14 +1,16 @@
 name: Rechercher — Central governed PDF acquisition
 
-# Persistent PDF downloader for the encyclopedia. It consumes every
-# books-batches/**/catalog.json present on main and persists verified PDFs on
-# the governed acquisition branch.
+# Persistent PDF downloader for the WHOLE encyclopedia, not only 1-400H.
+# Scope: Prophet era -> Companions -> Followers -> 1-400H -> 401-800H ->
+# 801-1200H -> 1201H -> Modern era -> any new book appearing in saved sources.
+# It consumes every books-batches/**/catalog.json present on main and persists verified PDFs.
 # security-justification: reviewed; contents: write is required only to persist verified PDF artifacts/manifests to the governed acquisition branch.
 permissions:
   contents: write
 
 env:
   RECHERCHER_MAX_BOOK_WORKERS: 12
+  RECHERCHER_CATALOG_GLOB: books-batches/**/catalog.json
 
 on:
   workflow_call:
@@ -20,7 +22,7 @@ on:
 
 jobs:
   acquire:
-    name: Continuous encyclopedia PDF download and verification
+    name: Continuous whole-encyclopedia PDF download and verification
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -40,11 +42,24 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Synchronize all saved book catalogs
+      - name: Synchronize the whole encyclopedia scope
         run: |
           set -euo pipefail
+          test -s .governance-source/config/rechercher-encyclopedia-download-scope.json
           mkdir -p books-batches
           cp -a .governance-source/books-batches/. books-batches/
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('.governance-source/config/rechercher-encyclopedia-download-scope.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          expected=['Prophet era','Companions','Followers','1-400H','401-800H','801-1200H','1201H','Modern era']
+          if d.get('eras') != expected:
+              raise SystemExit('Encyclopedia era scope is incomplete or reordered.')
+          if d.get('catalog_glob') != 'books-batches/**/catalog.json':
+              raise SystemExit('Whole-encyclopedia catalog scope is not enabled.')
+          print('Whole encyclopedia PDF scope enabled:', ' -> '.join(d['eras']), ' -> future books')
+          PY
 
       - name: Download real PDFs, verify, hash, and record failures
         env:
@@ -57,6 +72,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf
           git lfs install
+          echo "Whole-encyclopedia PDF scope: ${RECHERCHER_CATALOG_GLOB}"
           echo "Parallel PDF workers: ${RECHERCHER_MAX_BOOK_WORKERS}"
           python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
@@ -69,7 +85,7 @@ jobs:
             echo 'No new PDF changes; saved failures will be retried on the next cycle.'
             exit 0
           fi
-          git commit -m 'data(rechercher): download and verify encyclopedia PDFs in parallel'
+          git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
           git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$TARGET_BRANCH"
           git rebase "origin/$TARGET_BRANCH"
           git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$TARGET_BRANCH"
