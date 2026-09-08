@@ -5,6 +5,14 @@ from pathlib import Path
 from urllib.parse import urljoin, urlsplit, urlunsplit, quote
 from urllib.request import Request, urlopen
 
+# Rechercher acquisition contract:
+# - seek a real .pdf before any other representation; never treat .pdf.enc as a PDF;
+# - try saved sources in order and fail over automatically;
+# - preserve verified completed PDFs and resume incomplete books;
+# - acquire books concurrently; one failure never stops other workers;
+# - acquisition/research retention and browser redistribution are separate policy decisions;
+# - never bypass access controls or protections. A source must lawfully provide the copy.
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--root', default=None, help='repository worktree to mutate')
 ARGS = parser.parse_args()
@@ -16,6 +24,14 @@ USER_AGENT = 'DinAllah-Encyclopedia/1.3'
 DOWNLOAD_TIMEOUT = 120
 MAX_SOURCE_ATTEMPTS = 12
 MAX_BOOK_WORKERS = max(1, min(int(os.environ.get('RECHERCHER_MAX_BOOK_WORKERS', '12')), 32))
+
+# A catalog may distinguish lawful acquisition/research access from redistribution.
+# Legacy catalogs remain compatible: verified-redistributable is valid for both.
+def acquisition_is_lawful(book):
+    return book.get('acquisition_status') in ('verified-lawful-copy', 'verified-redistributable') or book.get('rights_status') == 'verified-redistributable'
+
+def redistribution_is_allowed(book):
+    return book.get('redistribution_status') == 'verified-redistributable' or book.get('rights_status') == 'verified-redistributable'
 
 def normalize_url(url):
     p = urlsplit(url)
@@ -30,7 +46,7 @@ def pdf_links(page, base):
     out, seen = [], set()
     for m in re.finditer(r'href=["\']([^"\']+)["\']', page, re.I):
         u = normalize_url(urljoin(base, html.unescape(m.group(1))))
-        if re.search(r'\.pdf(?:\?|$)', u, re.I) and u not in seen:
+        if re.search(r'\.pdf(?:\?|$)', u, re.I) and not re.search(r'\.pdf\.enc(?:\?|$)', u, re.I) and u not in seen:
             seen.add(u); out.append(u)
     return out
 
@@ -84,10 +100,10 @@ def source_candidates(book):
     return unique
 
 def candidate_urls(source):
-    if source.get('pdf_url'):
+    if source.get('pdf_url') and not re.search(r'\.pdf\.enc(?:\?|$)', source['pdf_url'], re.I):
         return [normalize_url(source['pdf_url'])]
     page = source['url']
-    if re.search(r'\.pdf(?:\?|$)', page, re.I):
+    if re.search(r'\.pdf(?:\?|$)', page, re.I) and not re.search(r'\.pdf\.enc(?:\?|$)', page, re.I):
         return [normalize_url(page)]
     try:
         discovered = pdf_links(fetch(page), page)
@@ -98,6 +114,8 @@ def candidate_urls(source):
     return [normalize_url(page)]
 
 def download(url, path):
+    if re.search(r'\.pdf\.enc(?:\?|$)', url, re.I):
+        raise ValueError('encrypted .pdf.enc candidate rejected; Rechercher requires a real .pdf')
     subprocess.run(['curl', '-L', '--fail', '--retry', '5', '--retry-delay', '2', '--connect-timeout', '30', '--max-time', str(DOWNLOAD_TIMEOUT), '-o', str(path), url], check=True)
 
 def acquire_volume(book, volume, expected, work):
@@ -145,9 +163,9 @@ def acquire_volume(book, volume, expected, work):
     return None, {'volume': volume, 'status': 'failed', 'attempts': attempts}
 
 def acquire(book):
-    if book.get('rights_status') != 'verified-redistributable':
-        print(f"[HOLD] {book['id']}: rights not verified; metadata only", flush=True)
-        return {'id': book['id'], 'status': 'held-rights'}
+    if not acquisition_is_lawful(book):
+        print(f"[HOLD] {book['id']}: no verified lawful acquisition basis; metadata/source only", flush=True)
+        return {'id': book['id'], 'status': 'held-acquisition'}
     expected = int(book['expected_volumes'])
     safe = re.sub(r'[^a-z0-9._-]+', '-', book['id'].lower()).strip('-')
     work = ART / safe
@@ -175,7 +193,7 @@ def acquire(book):
     if unified_validation['status'] not in ('valid', 'repaired'):
         print(f"[RETRY] {book['id']}: unified PDF failed validation", flush=True)
         return {'id': book['id'], 'status': 'unified-validation-failed'}
-    manifest = {'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'), 'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols, 'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size, 'unified_sha256': sha256(unified), 'unified_validation': unified_validation}
+    manifest = {'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'), 'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols, 'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size, 'unified_sha256': sha256(unified), 'unified_validation': unified_validation, 'acquisition_basis': book.get('acquisition_status') or book.get('rights_status'), 'browser_redistribution': redistribution_is_allowed(book)}
     (ART / f'{safe}.manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return {'id': book['id'], 'status': 'acquired', 'manifest': str((ART / f'{safe}.manifest.json').relative_to(ROOT))}
 
