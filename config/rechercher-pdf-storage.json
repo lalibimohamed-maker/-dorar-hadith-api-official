@@ -1,0 +1,22 @@
+{
+  "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v1",
+  "primary_repository": "lalibimohamed-maker/-dorar-hadith-api-official",
+  "secondary_storage_repository": "lalibimohamed82-coder/rechercher-pdf-storage",
+  "purpose": "Use the separately owned GitHub account as an additional Git LFS PDF storage pool without merging repositories or changing the canonical catalog/index.",
+  "format": ".pdf",
+  "content_addressing": "sha256",
+  "mirror_policy": {
+    "verified_pdfs_only": true,
+    "preserve_primary_manifest": true,
+    "no_source_rewrite": true,
+    "no_encryption_layer": true,
+    "additive_only": true
+  },
+  "activation": {
+    "repository_must_exist": true,
+    "write_secret_name": "RECHERCHER_SECONDARY_STORAGE_TOKEN",
+    "secret_owner": "secondary GitHub account",
+    "write_scope": "repository contents read/write for the secondary storage repository"
+  },
+  "fallback": "Until the secondary repository and write secret are configured, the governed downloader continues using its current primary acquisition branch and does not fail the encyclopedia queue because the mirror is unavailable."
+}
