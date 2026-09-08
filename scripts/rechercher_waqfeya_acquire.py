@@ -5,6 +5,14 @@ from pathlib import Path
 from urllib.parse import urljoin, urlsplit, urlunsplit, quote
 from urllib.request import Request, urlopen
 
+# Rechercher acquisition contract:
+# - seek a real .pdf before any other representation; never treat .pdf.enc as a PDF;
+# - try saved sources in order and fail over automatically;
+# - preserve verified completed PDFs and resume incomplete books;
+# - acquire books concurrently; one failure never stops other workers;
+# - acquisition/research retention and browser redistribution are separate policy decisions;
+# - never bypass access controls or protections. A source must lawfully provide the copy.
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--root', default=None, help='repository worktree to mutate')
 ARGS = parser.parse_args()
@@ -30,7 +38,7 @@ def pdf_links(page, base):
     out, seen = [], set()
     for m in re.finditer(r'href=["\']([^"\']+)["\']', page, re.I):
         u = normalize_url(urljoin(base, html.unescape(m.group(1))))
-        if re.search(r'\.pdf(?:\?|$)', u, re.I) and u not in seen:
+        if re.search(r'\.pdf(?:\?|$)', u, re.I) and not re.search(r'\.pdf\.enc(?:\?|$)', u, re.I) and u not in seen:
             seen.add(u); out.append(u)
     return out
 
@@ -84,10 +92,10 @@ def source_candidates(book):
     return unique
 
 def candidate_urls(source):
-    if source.get('pdf_url'):
+    if source.get('pdf_url') and not re.search(r'\.pdf\.enc(?:\?|$)', source['pdf_url'], re.I):
         return [normalize_url(source['pdf_url'])]
     page = source['url']
-    if re.search(r'\.pdf(?:\?|$)', page, re.I):
+    if re.search(r'\.pdf(?:\?|$)', page, re.I) and not re.search(r'\.pdf\.enc(?:\?|$)', page, re.I):
         return [normalize_url(page)]
     try:
         discovered = pdf_links(fetch(page), page)
@@ -98,6 +106,8 @@ def candidate_urls(source):
     return [normalize_url(page)]
 
 def download(url, path):
+    if re.search(r'\.pdf\.enc(?:\?|$)', url, re.I):
+        raise ValueError('encrypted .pdf.enc candidate rejected; Rechercher requires a real .pdf')
     subprocess.run(['curl', '-L', '--fail', '--retry', '5', '--retry-delay', '2', '--connect-timeout', '30', '--max-time', str(DOWNLOAD_TIMEOUT), '-o', str(path), url], check=True)
 
 def acquire_volume(book, volume, expected, work):
@@ -146,7 +156,7 @@ def acquire_volume(book, volume, expected, work):
 
 def acquire(book):
     if book.get('rights_status') != 'verified-redistributable':
-        print(f"[HOLD] {book['id']}: rights not verified; metadata only", flush=True)
+        print(f"[HOLD] {book['id']}: browser redistribution not verified; metadata/source only", flush=True)
         return {'id': book['id'], 'status': 'held-rights'}
     expected = int(book['expected_volumes'])
     safe = re.sub(r'[^a-z0-9._-]+', '-', book['id'].lower()).strip('-')
