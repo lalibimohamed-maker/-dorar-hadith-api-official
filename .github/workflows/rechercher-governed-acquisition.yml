@@ -1,6 +1,8 @@
-name: Rechercher — Central governed multi-volume acquisition
+name: Rechercher — Central governed PDF acquisition
 
-# security-justification: this reusable workflow writes verified book artifacts and manifests to the governed acquisition branch.
+# Persistent PDF downloader for the encyclopedia. It consumes every
+# books-batches/**/catalog.json present on main and persists verified PDFs on
+# the governed acquisition branch.
 permissions:
   contents: write
 
@@ -8,33 +10,39 @@ on:
   workflow_call:
     inputs:
       target_branch:
-        description: 'Governed branch where verified acquisition artifacts and manifests are persisted.'
+        description: 'Governed branch where verified PDF artifacts and manifests are persisted.'
         required: true
         type: string
 
 jobs:
   acquire:
-    name: Acquire and unify verified multi-volume books
+    name: Continuous encyclopedia PDF download and verification
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-      - name: Checkout target branch
+      - name: Checkout governed acquisition state
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Checkout central acquisition implementation
+      - name: Checkout latest main catalogs and acquisition implementation
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: lalibimohamed-maker/-dorar-hadith-api-official
-          ref: ${{ github.sha }}
+          ref: main
           path: .governance-source
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Acquire, validate, repair, and unify
+      - name: Synchronize all saved book catalogs
+        run: |
+          set -euo pipefail
+          mkdir -p books-batches
+          cp -a .governance-source/books-batches/. books-batches/
+
+      - name: Download real PDFs, verify, hash, and record failures
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
@@ -53,10 +61,10 @@ jobs:
           GIT_AUTH_HEADER="AUTHORIZATION: bearer ${GITHUB_TOKEN}"
           git add books-batches scripts artifacts .gitattributes
           if git diff --cached --quiet; then
-            echo 'No changes to persist.'
+            echo 'No new PDF changes; saved failures will be retried on the next cycle.'
             exit 0
           fi
-          git commit -m 'data(rechercher): acquire verified multi-volume books'
+          git commit -m 'data(rechercher): download and verify encyclopedia PDFs'
           git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$TARGET_BRANCH"
           git rebase "origin/$TARGET_BRANCH"
           git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$TARGET_BRANCH"
