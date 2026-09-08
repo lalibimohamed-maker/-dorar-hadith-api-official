@@ -3,6 +3,7 @@ name: Rechercher — Central governed PDF acquisition
 # Persistent PDF downloader for the encyclopedia. It consumes every
 # books-batches/**/catalog.json present on main and persists verified PDFs on
 # the governed acquisition branch.
+# security-justification: reviewed; contents: write is required only to persist verified PDF artifacts/manifests to the governed acquisition branch.
 permissions:
   contents: write
 
