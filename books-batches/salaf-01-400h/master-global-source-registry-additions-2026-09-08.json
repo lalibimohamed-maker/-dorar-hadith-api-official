@@ -1,0 +1,32 @@
+{
+  "schema": "rechercher/master-global-source-registry/additions/v1",
+  "date": "2026-09-08",
+  "purpose": "Permanent preservation of the Russian-language and additional Islamic discovery sources identified during source expansion. These entries are additive to the master registry seed.",
+  "sources": [
+    {"id":"minhadj","name":"Minhadj","url":"https://minhadj.com/","region":"Russian-language / global","languages":["ru","multi"],"role":"Islamic content discovery; Russian-language source","rights":"VERIFY item/source-level"},
+    {"id":"alhadis_ru","name":"AlHadis.ru","url":"https://alhadis.ru/","region":"Russia / Russian-language","languages":["ru"],"role":"Hadith and Islamic content discovery","rights":"VERIFY item/source-level"},
+    {"id":"sunnaportal","name":"SunnaPortal","url":"https://sunnaportal.com/","region":"Russian-language / global","languages":["ru","multi"],"role":"Sunnah and Islamic content discovery","rights":"VERIFY item/source-level"},
+    {"id":"asar_forum","name":"Asar Forum","url":"https://asar-forum.com/","region":"Russian-language / global","languages":["ru"],"role":"Islamic forum, hadith, athar and book/source discovery","rights":"Discovery only unless item rights verified"},
+    {"id":"toislam","name":"ToIslam","url":"https://toislam.ws/","region":"Russian-language / global","languages":["ru"],"role":"Islamic content discovery","rights":"VERIFY item/source-level"},
+    {"id":"islamqa_ru","name":"IslamQA — Russian","url":"https://islamqa.info/ru","region":"Russian-language / global","languages":["ru"],"role":"Fatwa, Islamic Q&A and source discovery","rights":"Site/source-level; do not infer redistribution"},
+    {"id":"islamhouse_ru","name":"IslamHouse — Russian","url":"https://islamhouse.com/ru/","region":"Russian-language / global","languages":["ru","multi"],"role":"Islamic books, articles, fatwas, audio/video and links","rights":"Item/source-level; verify reuse terms"},
+    {"id":"quran_islamhouse_ru","name":"IslamHouse Quran — Russian","url":"https://quran.islamhouse.com/ru/","region":"Russian-language / global","languages":["ru"],"role":"Quran and recitation resource","rights":"VERIFY item-level"},
+    {"id":"qatar_main_alquran","name":"Qatar Ministry — Main AlQuran","url":"https://mainalquran.islam.gov.qa/","region":"Qatar / Russian-capable Islamic source","languages":["ar","ru","multi"],"role":"Quran resource; preserve as official institutional source","rights":"Government/site-level; verify item"},
+    {"id":"qatar_droos","name":"Qatar Ministry — Droos","url":"https://www.islam.gov.qa/droos/list.html","region":"Qatar / multilingual Islamic education","languages":["ar","multi"],"role":"Islamic lessons and educational source discovery","rights":"Government/site-level; verify item"},
+    {"id":"hadeethenc_ru","name":"HadeethEnc — Russian","url":"https://hadeethenc.com/ru/","region":"global / Russian-language","languages":["ru","multi"],"role":"Hadith translations and explanations; downloadable Russian PDF/Excel","rights":"Republication allowed under stated terms: no modification, attribution, version retention, source notice and updates"},
+    {"id":"darulfikr_ru","name":"Darul Fikr — Russian Islamic publisher","url":"https://darulfikr.ru/","region":"Russia / Russian-language","languages":["ru"],"role":"Russian Islamic books and publisher catalogue","rights":"Copyrighted/publisher-controlled; acquisition or redistribution requires item-level permission"}
+  ],
+  "verified_notes": [
+    "IslamHouse Russian exposes separate categories for books, articles, fatwas, audio, video and selected links; its Russian area is an active discovery source.",
+    "HadeethEnc has a Russian section with nine downloadable PDF parts and explicitly states conditions for downloading and republishing translations.",
+    "Asar Forum is an active Russian-language Islamic forum with hadith/athar and book-related discussions; treat it as discovery/provenance, not an automatic redistribution source.",
+    "Darul Fikr is a Russian Islamic publisher with a catalogue of Islamic books; publisher rights must be preserved.",
+    "The user-provided URLs minhadj.com, alhadis.ru, sunnaportal.com, asar-forum.com, toislam.ws, islamqa.info/ru, islamhouse.com/ru, mainalquran.islam.gov.qa and islam.gov.qa/droos/list.html are preserved verbatim as requested; entries whose live ownership/reuse terms were not independently confirmed remain marked VERIFY."
+  ],
+  "required_behavior": [
+    "Do not delete or replace previously saved sources when new sources are found.",
+    "Search these saved sources before generic Russian-language web discovery.",
+    "Treat Russian-language sources as a distinct search lane, not merely a translation layer.",
+    "Preserve provenance and item-level rights for every acquired book or document."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "rechercher/master-global-source-registry/additions/v1",
+  "date": "2026-09-08",
+  "purpose": "Permanent preservation of additional global Sunni publishers, digital libraries and multilingual hadith/book sources supplied by the project owner, with verified additions. Discovery does not imply redistribution rights.",
+  "sources": [
+    {"id":"kalamullah","name":"Kalamullah","url":"https://www.kalamullah.com/","region":"UK / global","languages":["en","ar","multi"],"role":"Islamic book/PDF discovery; classical Sunni works and translations","rights":"Item/source-level; verify before redistribution"},
+    {"id":"kitaabun","name":"Kitaabun","url":"https://kitaabun.com/","region":"UK / global","languages":["en","ar","multi"],"role":"Islamic books and publisher/book discovery","rights":"Commercial/publisher-controlled; verify item"},
+    {"id":"dar_us_salam","name":"Dar-us-Salam Publications","url":"https://darussalam.com/","region":"global","languages":["en","ar","ur","fr","es","multi"],"role":"Sunni publisher and multilingual Islamic book catalogue","rights":"Publisher-controlled; redistribution requires permission unless otherwise licensed"},
+    {"id":"sunni_publications","name":"Sunni Publications","url":"https://sunnipubs.com/","region":"Netherlands / Europe / global","languages":["en","ar","multi"],"role":"Sunni publishing house; theology, spirituality, legal theory and classical works","rights":"Publisher-controlled; commercial editions"},
+    {"id":"islamic_publishing","name":"Islamic Publishing","url":"https://islamicpublishing.org/","region":"Turkey / Europe / global","languages":["multi"],"role":"Multilingual Islamic publishing/distribution discovery","rights":"VERIFY item/source-level"},
+    {"id":"islamenc","name":"IslamEnc — Encyclopedia of Islamic Content","url":"https://islamenc.com/","region":"global","languages":["ar","en","ur","id","fr","es","tr","ug","bn","multi"],"role":"Multilingual Islamic content and translated Islamic books/content discovery","rights":"Item/source-level; verify reuse terms"},
+    {"id":"sunnah_com","name":"Sunnah.com","url":"https://sunnah.com/","region":"global","languages":["en","ar","ur","bn"],"role":"Hadith collections, translations and hadith research/search","rights":"Site/content-level; translation rights vary; do not infer PDF redistribution"},
+    {"id":"jakim","name":"JAKIM — Department of Islamic Development Malaysia","url":"https://www.islam.gov.my/","region":"Malaysia","languages":["ms","ar","en","multi"],"role":"Official Malaysian Islamic publications and institutional discovery","rights":"Government/item-level; verify reuse"},
+    {"id":"darul_uloom_islamia","name":"Darul Uloom Islamia Library","url":"https://www.darululoomislamia.org/bookslibrary","region":"South Asia / Pakistan","languages":["ur","ar","en","multi"],"role":"Islamic library and book collection discovery","rights":"Library/item-level; verify access and reproduction"},
+    {"id":"darul_uloom_zakariya","name":"Darul Uloom Zakariya Library","url":"https://duz.co.za/","region":"South Africa / global","languages":["ur","ar","en"],"role":"Islamic library with substantial Urdu/Arabic collection","rights":"Physical/library access; digital reuse not inferred"}
+  ],
+  "verified_notes": [
+    "Kalamullah is retained as a discovery/PDF source as requested; individual files still require rights checks.",
+    "Sunni Publications states that it publishes traditional Islamic scholarship and has published English and Arabic titles plus projects in other languages.",
+    "Sunnah.com exposes the nine major hadith books plus other primary and secondary collections and currently supports English, Arabic, Urdu and Bangla.",
+    "Darul Uloom Zakariya states that its library houses about 16,000 Islamic books, predominantly Urdu and Arabic with some English.",
+    "The owner-supplied sources are preserved as registry candidates even where the exact claim (such as number of languages or distribution footprint) still requires item-level verification."
+  ],
+  "required_behavior": [
+    "Search saved publisher/library sources before generic multilingual web discovery.",
+    "Keep publisher-owned editions separate from public-domain scans.",
+    "Never infer redistribution rights merely because a PDF or book is downloadable or viewable.",
+    "Use local-language source lanes for Arabic, English, Urdu, Malay/Indonesian, Turkish, Bengali and other languages.",
+    "Append future national libraries, Islamic publishers and specialized digital libraries instead of replacing existing entries."
+  ]
+}
