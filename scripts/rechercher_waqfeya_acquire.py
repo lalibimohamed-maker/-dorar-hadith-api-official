@@ -85,7 +85,18 @@ def candidate_urls(source):
     if source.get('pdf_url'):
         return [normalize_url(source['pdf_url'])]
     page = source['url']
-    return pdf_links(fetch(page), page) if source.get('discover_pdfs') else [normalize_url(page)]
+    if re.search(r'\.pdf(?:\?|$)', page, re.I):
+        return [normalize_url(page)]
+    # Fail over through every saved source page: a source does not need a
+    # discover_pdfs flag for us to look for an actual PDF link. A source is
+    # considered exhausted only after its page and all concrete PDF links fail.
+    try:
+        discovered = pdf_links(fetch(page), page)
+    except Exception:
+        discovered = []
+    if discovered:
+        return discovered
+    return [normalize_url(page)]
 
 def download(url, path):
     subprocess.run(['curl', '-L', '--fail', '--retry', '5', '--retry-delay', '2', '--connect-timeout', '30', '--max-time', str(DOWNLOAD_TIMEOUT), '-o', str(path), url], check=True)
@@ -95,11 +106,12 @@ def acquire_volume(book, volume, expected, work):
     sources = source_candidates(book)
     if not sources:
         return None, {'volume': volume, 'status': 'no_catalogued_source'}
-    for source in sources:
+    for source_index, source in enumerate(sources, 1):
         try:
             urls = candidate_urls(source)
         except Exception as exc:
             attempts.append({'source': source['url'], 'status': 'source_error', 'error': str(exc)})
+            print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} unavailable; trying next source')
             continue
         if source.get('volume') is not None and int(source['volume']) != volume:
             continue
@@ -109,26 +121,28 @@ def acquire_volume(book, volume, expected, work):
         elif source.get('discover_pdfs'):
             if len(urls) < expected:
                 attempts.append({'source': source['url'], 'status': 'incomplete_source', 'found_pdfs': len(urls), 'expected': expected})
+                print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} has {len(urls)}/{expected} PDFs; trying next source')
                 continue
             urls = [urls[volume - 1]]
         else:
-            urls = urls[:1]
+            urls = urls[:MAX_SOURCE_ATTEMPTS]
         for url in urls[:MAX_SOURCE_ATTEMPTS]:
             candidate = work / f'{volume:03d}.candidate.pdf'
             try:
-                print(f'Downloading {book["id"]} volume {volume}/{expected} from {url}')
+                print(f'Downloading {book["id"]} volume {volume}/{expected} from source {source_index}/{len(sources)}: {url}')
                 download(url, candidate)
                 if candidate.read_bytes()[:4] != b'%PDF':
                     attempts.append({'source': url, 'status': 'invalid_signature'}); candidate.unlink(missing_ok=True); continue
                 validation = validate_and_repair(candidate)
                 if validation['status'] in ('valid', 'repaired'):
                     final = work / f'{volume:03d}.pdf'; candidate.replace(final)
-                    return final, {'volume': volume, 'url': url, 'source_label': source.get('label'), 'bytes': final.stat().st_size, 'sha256': sha256(final), 'validation': validation, 'attempts': attempts}
+                    return final, {'volume': volume, 'url': url, 'source_label': source.get('label'), 'source_index': source_index, 'bytes': final.stat().st_size, 'sha256': sha256(final), 'validation': validation, 'attempts': attempts}
                 attempts.append({'source': url, 'status': validation['status'], 'reason': validation.get('reason'), 'initial_check': validation.get('initial_check'), 'repair_check': validation.get('repair_check')})
             except Exception as exc:
                 attempts.append({'source': url, 'status': 'download_or_validation_error', 'error': str(exc)})
             finally:
                 candidate.unlink(missing_ok=True)
+        print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} exhausted; trying next source')
     return None, {'volume': volume, 'status': 'failed', 'attempts': attempts}
 
 def acquire(book):
@@ -153,7 +167,7 @@ def acquire(book):
             vols.append(record)
     if failed:
         (work / 'retry.json').write_text(json.dumps({'id': book['id'], 'failed_volumes': failed}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-        print(f"[RETRY] {book['id']}: {len(failed)} volume(s) failed; recorded for the next run")
+        print(f"[RETRY] {book['id']}: {len(failed)} volume(s) failed across all saved sources; recorded for the next run")
         return {'id': book['id'], 'status': 'partial', 'failed_volumes': failed}
     unified = ART / f'{safe}.pdf'
     pages = [str(work / f'{n:03d}.pdf') for n in range(1, expected + 1)]
