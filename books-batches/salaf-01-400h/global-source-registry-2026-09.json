@@ -1,0 +1,31 @@
+{
+  "schema":"rechercher/global-source-registry/v1",
+  "scope":"1-400H",
+  "purpose":"Worldwide source registry for identifying complete PDFs, digitized manuscripts, and public-domain/open copies of works within the 1-400 AH target. Discovery never implies redistribution rights.",
+  "sources":[
+    {"id":"waqfeya","name":"مكتبة الوقفية","url":"https://waqfeya.net/","class":"heritage_books","use":"PDF discovery/acquisition","rights_rule":"verify item/edition evidence"},
+    {"id":"internet_archive","name":"Internet Archive","url":"https://archive.org/","class":"digital_library","use":"PDF/scan acquisition and fallback","rights_rule":"verify item-level rights/access restrictions"},
+    {"id":"nyu_aco","name":"Arabic Collections Online","url":"https://aco.dlib.nyu.edu/","class":"public_domain_arabic_library","use":"public-domain Arabic PDF acquisition","rights_rule":"ACO states its Arabic content is public domain; retain item metadata and verify exact edition"},
+    {"id":"smithsonian","name":"Smithsonian Libraries Digital Library","url":"https://library.si.edu/digital-library/","class":"manuscripts","use":"Arabic/Islamic manuscript PDF and image acquisition","rights_rule":"use only item records explicitly marked CC0/Public Domain or otherwise permitted"},
+    {"id":"wikimedia_commons","name":"Wikimedia Commons","url":"https://commons.wikimedia.org/","class":"open_media","use":"public-domain/open scans and manuscripts","rights_rule":"preserve file-level license"},
+    {"id":"wikisource","name":"Arabic Wikisource","url":"https://ar.wikisource.org/","class":"public_domain_text_and_scans","use":"public-domain scans/text and PDF file discovery","rights_rule":"preserve file-level license/public-domain evidence"},
+    {"id":"princeton","name":"Princeton University Library — Manuscripts of the Islamic World","url":"https://digital-collections.princeton.edu/collections/islamicmss","class":"manuscripts","use":"manuscript discovery/provenance/digital surrogates","rights_rule":"Princeton describes the digital resource as free/open for academic and research use; check item-specific terms before redistribution"},
+    {"id":"kairawan","name":"Kairawan Global Arabic & Islamic Manuscript Index","url":"https://kairawan.org/","class":"global_manuscript_index","use":"cross-library manuscript discovery and source resolution","rights_rule":"follow record to holding institution and apply its rights"},
+    {"id":"british_library","name":"British Library","url":"https://www.bl.uk/","class":"manuscripts_and_archives","use":"Arabic manuscript/digital archive discovery","rights_rule":"item-level rights"},
+    {"id":"gallica","name":"BnF Gallica","url":"https://gallica.bnf.fr/","class":"digital_library","use":"Arabic manuscripts and heritage print discovery","rights_rule":"item-level rights"},
+    {"id":"fihrist","name":"Fihrist / Bodleian","url":"https://fihrist.org.uk/","class":"manuscript_catalogue","use":"Arabic manuscript discovery and holding-library resolution","rights_rule":"holding-library rights"},
+    {"id":"cambridge_cudl","name":"Cambridge Digital Library","url":"https://cudl.lib.cam.ac.uk/","class":"manuscripts","use":"Islamic/Arabic manuscript discovery","rights_rule":"item-level rights"},
+    {"id":"vatican","name":"Vatican Library Digital Collections","url":"https://digi.vatlib.it/","class":"manuscripts","use":"Arabic/Islamic manuscript discovery","rights_rule":"item-level rights"},
+    {"id":"al_furqan","name":"Al-Furqan Digital Library","url":"https://digitallibrary.al-furqan.com/","class":"islamic_heritage_library","use":"Islamic books/manuscripts discovery and provenance","rights_rule":"do not infer redistribution rights from access"},
+    {"id":"loc","name":"Library of Congress","url":"https://www.loc.gov/","class":"library_catalogue","use":"manuscript/provenance/IIIF discovery","rights_rule":"record-specific"},
+    {"id":"google_books","name":"Google Books","url":"https://books.google.com/","class":"bibliographic_discovery","use":"edition matching and full-view discovery","rights_rule":"only acquire files when access/rights permit"},
+    {"id":"openlibrary","name":"Open Library","url":"https://openlibrary.org/","class":"bibliographic_resolver","use":"edition/work and Internet Archive identifier resolution","rights_rule":"do not treat metadata as download permission"}
+  ],
+  "confirmed_global_facts":{
+    "nyu_aco":"ACO currently exposes 17,698 volumes and states its Arabic content is public domain; individual pages provide low/high-resolution PDF downloads.",
+    "kairawan":"Kairawan reports 241,236 searchable Arabic/Islamic manuscripts across major international collections as of 2026-09-04 and links records to the holding library.",
+    "smithsonian":"Qualifying Smithsonian Arabic manuscript records explicitly marked CC0/Public Domain provide PDF/ePub/image downloads.",
+    "princeton":"Princeton's Manuscripts of the Islamic World collection contains digitized Islamic manuscripts and states the digital resource is free/open for academic and research purposes."
+  },
+  "required_workflow":"For every catalogued work in 1-400H: search all applicable global sources, resolve exact title/author/work identity, prefer complete digital surrogate, download actual bytes when permitted, validate PDF, hash, encrypt for review, and publish only when redistribution rights are verified."
+}
