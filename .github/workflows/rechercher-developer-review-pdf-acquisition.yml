@@ -1,0 +1,246 @@
+name: Rechercher — Developer review PDF acquisition
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
+
+permissions:
+  contents: write
+
+env:
+  REVIEW_BRANCH: rechercher/salaf-01-400h-developer-review-acquisition
+  GIT_TERMINAL_PROMPT: '0'
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils
+
+      - name: Require vault key
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required.'; exit 1; }
+
+      - name: Recover latest encrypted vault as PDFs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/developer-review-vault artifacts/recovered-vault
+          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt --jq '[.[] | select(.tagName | startswith("rechercher-vault-"))] | sort_by(.createdAt) | last | .tagName')
+          if [ -n "${tag:-}" ] && [ "$tag" != "null" ]; then
+            echo "Recovering $tag"
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern '*.enc' --dir artifacts/recovered-vault
+            shopt -s nullglob
+            for f in artifacts/recovered-vault/*.enc; do
+              out="artifacts/developer-review-vault/$(basename "${f%.enc}")"
+              openssl enc -d -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
+              test "$(head -c 5 "$out")" = '%PDF-'
+              qpdf --check "$out"
+            done
+          else
+            echo 'No previous vault release exists; starting a fresh acquisition.'
+          fi
+
+      - name: Recover previous engine snapshot
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          if git fetch origin "$REVIEW_BRANCH" >/dev/null 2>&1 && git show "origin/$REVIEW_BRANCH:books-batches/salaf-01-400h/engine-source-overlay.json" > artifacts/governance/previous-engine-source-overlay.json 2>/dev/null; then
+            echo 'Previous engine snapshot recovered.'
+          else
+            echo '{"entries":[]}' > artifacts/governance/previous-engine-source-overlay.json
+          fi
+
+      - name: Resolve multi-engine sources
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_source_engines.py --root "$GITHUB_WORKSPACE" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          test -s books-batches/salaf-01-400h/engine-source-overlay.json
+
+      - name: Global Deep Worldwide federation
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_deep_worldwide.py --root "$GITHUB_WORKSPACE" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json \
+            --out artifacts/governance/deep-worldwide-report.json
+          test -s artifacts/governance/deep-worldwide-report.json
+
+      - name: Detect source and edition deltas
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_source_delta.py \
+            --old artifacts/governance/previous-engine-source-overlay.json \
+            --new books-batches/salaf-01-400h/engine-source-overlay.json \
+            --out artifacts/governance/source-delta.json
+
+      - name: Acquire and validate copies
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json \
+            --discovery books-batches/salaf-01-400h/engine-source-overlay.json
+          test -s books-batches/salaf-01-400h/developer-review-manifest.json
+
+      - name: Audit PDF page integrity
+        run: |
+          set -euo pipefail
+          if compgen -G 'artifacts/developer-review-vault/*.pdf' > /dev/null; then
+            python3 scripts/rechercher_page_integrity.py --vault artifacts/developer-review-vault --out artifacts/governance/page-integrity.json
+          else
+            printf '%s\n' '{"schema":"din-allah-encyclopedia/page-integrity/v1","files":[],"counts":{"files":0,"passed":0,"hold":0}}' > artifacts/governance/page-integrity.json
+          fi
+
+      - name: Build knowledge graph
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_graph_build.py --catalog books-batches/salaf-01-400h/catalog.json --out artifacts/governance/knowledge-graph.json
+
+      - name: Run governance audit
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_governance_audit.py --root "$GITHUB_WORKSPACE" \
+            --catalog books-batches/salaf-01-400h/catalog.json \
+            --overlay books-batches/salaf-01-400h/engine-source-overlay.json \
+            --out artifacts/governance/governance-report.json
+          test -s artifacts/governance/governance-report.json
+
+      - name: Enforce publication gate
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_publication_gate.py \
+            --governance artifacts/governance/governance-report.json \
+            --out artifacts/governance/publication-gate.json
+
+      - name: Global fail-closed control
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_control_general.py \
+            --root "$GITHUB_WORKSPACE" \
+            --catalog books-batches/salaf-01-400h/catalog.json \
+            --overlay books-batches/salaf-01-400h/engine-source-overlay.json \
+            --governance artifacts/governance/governance-report.json \
+            --page-integrity artifacts/governance/page-integrity.json \
+            --publication-gate artifacts/governance/publication-gate.json \
+            --deep-worldwide artifacts/governance/deep-worldwide-report.json \
+            --out artifacts/governance/control-general.json
+
+      - name: Preserve plaintext PDFs — never delete them
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/developer-review-pdfs
+          find artifacts/developer-review-vault -type f -name '*.pdf' -print0 | while IFS= read -r -d '' f; do
+            cp -f "$f" "artifacts/developer-review-pdfs/$(basename "$f")"
+            test "$(head -c 5 "artifacts/developer-review-pdfs/$(basename "$f")")" = '%PDF-'
+            qpdf --check "artifacts/developer-review-pdfs/$(basename "$f")"
+          done
+          find artifacts/developer-review-pdfs -type f -name '*.pdf' -print | sort > artifacts/governance/plaintext-pdf-inventory.txt
+          sha256sum artifacts/developer-review-pdfs/*.pdf > artifacts/governance/plaintext-pdf-sha256.txt
+
+      - name: Upload validated PDFs as developer-review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rechercher-validated-pdfs-${{ github.run_id }}
+          path: artifacts/developer-review-pdfs/*.pdf
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Create encrypted retention copies without deleting PDFs
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/developer-review-encrypted
+          shopt -s nullglob
+          for f in artifacts/developer-review-pdfs/*.pdf; do
+            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
+              -pass env:REVIEW_VAULT_KEY -in "$f" -out "artifacts/developer-review-encrypted/$(basename "$f").enc"
+          done
+          test -n "$(find artifacts/developer-review-encrypted -name '*.enc' -type f -print -quit)"
+
+      - name: Publish only verified-redistributable PDFs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/redistributable-pdfs
+          python3 - <<'PY'
+          import json, shutil
+          from pathlib import Path
+          d=json.loads(Path('books-batches/salaf-01-400h/developer-review-manifest.json').read_text(encoding='utf-8'))
+          out=Path('artifacts/redistributable-pdfs')
+          for rec in d.get('records',[]):
+              if rec.get('catalog_rights_status') != 'verified-redistributable':
+                  continue
+              for item in rec.get('acquired',[]):
+                  p=Path(item.get('local_path',''))
+                  if p.is_file() and p.suffix.lower()=='.pdf':
+                      shutil.copy2(p, out/p.name)
+          pdfs=sorted(out.glob('*.pdf'))
+          print('VERIFIED_REDISTRIBUTABLE_PDFS', len(pdfs))
+          PY
+          if compgen -G 'artifacts/redistributable-pdfs/*.pdf' > /dev/null; then
+            tag="rechercher-pdf-${GITHUB_RUN_ID}"
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "Rechercher verified PDFs ${GITHUB_RUN_ID}" \
+              --notes 'Only catalogued copies explicitly marked verified-redistributable are published as plaintext PDF assets.'
+            gh release upload "$tag" artifacts/redistributable-pdfs/*.pdf --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            echo 'No verified-redistributable PDFs; no plaintext public release is created.'
+          fi
+
+      - name: Record audit event
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_audit_event.py \
+            --who 'github-actions[bot]' \
+            --what 'developer-review-pdf-acquisition-preserve-and-recover' \
+            --source 'Rechercher workflow' \
+            --reason 'recover prior vault, preserve validated PDFs, encrypt retention copies without deleting plaintext, publish only verified-redistributable PDFs' \
+            --commit "$(git rev-parse HEAD)"
+
+      - name: Persist manifests and governance evidence
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add artifacts/governance books-batches/salaf-01-400h/developer-review-manifest.json books-batches/salaf-01-400h/engine-source-overlay.json
+          if git diff --cached --quiet; then
+            echo 'No manifest/governance change to persist.'
+            exit 0
+          fi
+          git commit -m 'data(rechercher): persist PDF acquisition and governance evidence'
+          ACQ_COMMIT=$(git rev-parse HEAD)
+          git fetch origin "$REVIEW_BRANCH"
+          git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
+          git checkout "$ACQ_COMMIT" -- artifacts/governance books-batches/salaf-01-400h/engine-source-overlay.json books-batches/salaf-01-400h/developer-review-manifest.json
+          git add artifacts/governance books-batches/salaf-01-400h/engine-source-overlay.json books-batches/salaf-01-400h/developer-review-manifest.json
+          if git diff --cached --quiet; then
+            echo 'No reconciled state change.'
+            exit 0
+          fi
+          git commit -m 'data(rechercher): reconcile PDF acquisition state'
+          GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
