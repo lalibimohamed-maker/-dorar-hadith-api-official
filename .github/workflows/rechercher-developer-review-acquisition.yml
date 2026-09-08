@@ -95,6 +95,19 @@ jobs:
           print('ACQUISITION_COUNTS', json.dumps(d.get('counts',{}), ensure_ascii=False, sort_keys=True))
           PY
 
+      - name: Rechercher Acquisition Engine v2 — inspect existing PDFs
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          python3 scripts/rechercher_acquisition_engine_v2.py \
+            --root "$GITHUB_WORKSPACE" \
+            --pdf-root artifacts/developer-review-vault \
+            --out artifacts/governance/acquisition-engine-v2-manifest.json
+          rc=$?
+          echo "ACQUISITION_ENGINE_V2_EXIT=$rc"
+          test -s artifacts/governance/acquisition-engine-v2-manifest.json || true
+          exit 0
+
       - name: Audit PDF page integrity
         run: |
           set -euo pipefail
