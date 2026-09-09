@@ -68,6 +68,11 @@ jobs:
           print('Whole encyclopedia PDF scope enabled:', ' -> '.join(d['eras']), ' -> future books')
           PY
 
+      - name: Sync Dorar book index for discovery and catalog matching
+        run: |
+          set -euo pipefail
+          python3 .governance-source/scripts/rechercher_dorar_book_index.py --root "$GITHUB_WORKSPACE"
+
       - name: Download real PDFs, verify, hash, and record failures
         env:
           GH_TOKEN: ${{ github.token }}
@@ -90,7 +95,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-          git add books-batches scripts .gitattributes
+          git add books-batches scripts .gitattributes artifacts/governance
           while IFS= read -r -d '' f; do
             if head -c 5 "$f" | grep -qx '%PDF-' && test -s "$f"; then
               git add -- "$f"
