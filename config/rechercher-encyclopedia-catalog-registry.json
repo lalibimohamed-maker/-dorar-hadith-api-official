@@ -1,0 +1,60 @@
+{
+  "schema": "din-allah-encyclopedia/rechercher-catalog-registry/v1",
+  "purpose": "Central registry of book-catalog sources spanning the prophetic era, early generations, historical eras, modern works, and future additions. This registry governs discovery/census only; rights and PDF acquisition remain separate gates.",
+  "eras": [
+    {
+      "id": "prophet-era",
+      "label": "Prophet era",
+      "sources": ["data/seerah-catalog-2026.json"],
+      "note": "Prophetic-life/event source works; historical scope is topic-oriented and must not be mistaken for author death chronology."
+    },
+    {
+      "id": "companions-followers",
+      "label": "Companions and Followers",
+      "sources": ["books-batches/**/catalog.json", "config/book-catalog.json", "config/fiqh-classical-fatwa-books.json"],
+      "note": "Mixed source catalogs are retained; precise generation/era classification is accepted only when explicit evidence exists."
+    },
+    {
+      "id": "1-400h",
+      "label": "1-400H",
+      "sources": ["books-batches/salaf-01-400h/catalog.json"],
+      "note": "Chronological early-source acquisition catalog; author death year is preferred for ordering."
+    },
+    {
+      "id": "401-800h",
+      "label": "401-800H",
+      "sources": ["books-batches/**/catalog.json"],
+      "note": "Open for all current and future catalog batches covering this era."
+    },
+    {
+      "id": "801-1200h",
+      "label": "801-1200H",
+      "sources": ["books-batches/**/catalog.json"],
+      "note": "Open for all current and future catalog batches covering this era."
+    },
+    {
+      "id": "1201h",
+      "label": "1201H onward",
+      "sources": ["books-batches/**/catalog.json", "config/book-catalog.json"],
+      "note": "Modern-era records remain in discovery until edition and rights are verified."
+    },
+    {
+      "id": "modern-era",
+      "label": "Modern era",
+      "sources": ["config/book-catalog.json", "data/seerah-catalog-2026.json", "config/fiqh-classical-fatwa-books.json", "books-batches/**/catalog.json"],
+      "note": "Modern books are included for census and source matching; publication rights remain edition-specific."
+    },
+    {
+      "id": "future",
+      "label": "Future books",
+      "sources": ["books-batches/**/catalog.json", "any-new-saved-catalog-source"],
+      "note": "Additive and permanent: any newly saved governed catalog/source becomes eligible for the next census without redesigning the engine."
+    }
+  ],
+  "dorar": {
+    "role": "supplementary discovery and bibliographic matching only",
+    "endpoint": "https://dorar-hadith-api-1.onrender.com/v1/data/book",
+    "rights": "never inferred from Dorar index presence",
+    "pdf": "never downloaded from the Dorar index endpoint"
+  }
+}
