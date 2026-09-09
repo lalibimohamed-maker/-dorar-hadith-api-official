@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
-"""Audit a PDF corpus and remove only provably redundant exact duplicates.
+"""Audit the recovered encyclopedia PDF corpus and quarantine only exact duplicates.
 
-Rules:
-- SHA-256 equality is the only automatic deletion criterion.
-- A duplicate is deleted only when its hash is already represented by an earlier
-  file with the same normalized catalog identity, or when the manifest maps both
-  files to the same book identity.
-- Same title/author but different bytes are reported, never deleted.
-- Different catalog identities sharing identical bytes are reported as a
-  possible catalog duplication and are NOT deleted automatically.
+Safety rules:
+- SHA-256 equality is mandatory for automatic duplicate handling.
+- Automatic quarantine is allowed only when all matching files resolve to the
+  same catalog/book identity through the authoritative acquisition manifest.
+- Same title/author with different bytes is never deleted.
+- Identical bytes mapped to different catalog identities are reported only.
+- Quarantine is reversible and auditable; files are never irreversibly erased.
 """
 from __future__ import annotations
-import argparse, hashlib, json, re, shutil
+
+import argparse
+import hashlib
+import json
+import re
+import shutil
 from pathlib import Path
 
 
@@ -45,87 +49,125 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", required=True)
     ap.add_argument("--manifest", required=True)
+    ap.add_argument("--pdf-root", default="artifacts/developer-review-vault")
     ap.add_argument("--out", required=True)
     ap.add_argument("--quarantine", required=True)
     args = ap.parse_args()
 
     root = Path(args.root)
-    pdf_root = root / "artifacts/developer-review-vault"
+    pdf_root = root / args.pdf_root
     manifest = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
     records = manifest.get("records", [])
 
-    by_path = {}
-    by_id = {}
+    by_path: dict[str, str] = {}
     for rec in records:
         rid = identity(rec)
-        if rid:
-            by_id[rid] = rec
+        if not rid:
+            continue
         for item in rec.get("acquired", []):
-            p = Path(item.get("local_path", ""))
-            by_path[p.name] = rid
-            by_path[p.as_posix()] = rid
+            raw = str(item.get("local_path", ""))
+            if raw:
+                p = Path(raw)
+                by_path[p.name] = rid
+                by_path[p.as_posix()] = rid
             if item.get("sha256"):
                 by_path[f"sha:{item['sha256']}"] = rid
 
-    files = sorted(pdf_root.glob("*.pdf"))
-    groups = {}
+    files = sorted(p for p in pdf_root.rglob("*.pdf") if p.is_file())
+    groups: dict[str, list[Path]] = {}
+    invalid_pdf_files: list[str] = []
     for p in files:
-        if p.read_bytes()[:5] != b"%PDF-":
+        with p.open("rb") as f:
+            signature = f.read(5)
+        if signature != b"%PDF-":
+            invalid_pdf_files.append(p.relative_to(pdf_root).as_posix())
             continue
         groups.setdefault(sha256(p), []).append(p)
 
     exact_duplicate_groups = []
-    deleted = []
+    quarantined = []
     ambiguous = []
-    kept = []
+    untracked = []
     qroot = Path(args.quarantine)
     qroot.mkdir(parents=True, exist_ok=True)
 
     for digest, paths in sorted(groups.items()):
         if len(paths) == 1:
-            kept.append(paths[0].name)
+            p = paths[0]
+            if not (by_path.get(p.name) or by_path.get(p.as_posix()) or by_path.get(f"sha:{digest}")):
+                untracked.append(p.relative_to(pdf_root).as_posix())
             continue
-        ids = {by_path.get(p.name) or by_path.get(p.as_posix()) or by_path.get(f"sha:{digest}") for p in paths}
+
+        ids = {
+            by_path.get(p.name)
+            or by_path.get(p.as_posix())
+            or by_path.get(f"sha:{digest}")
+            for p in paths
+        }
         ids.discard(None)
-        group = {"sha256": digest, "files": [p.name for p in paths], "catalog_identities": sorted(ids)}
+        group = {
+            "sha256": digest,
+            "files": [p.relative_to(pdf_root).as_posix() for p in paths],
+            "catalog_identities": sorted(ids),
+        }
         exact_duplicate_groups.append(group)
+
+        # Only one catalog identity means these are provably redundant copies.
         if len(ids) == 1:
             canonical = paths[0]
             for p in paths[1:]:
-                # Move redundant copy out of the active corpus; preserve an auditable record.
-                target = qroot / p.name
+                relative = p.relative_to(pdf_root)
+                target = qroot / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
                 if target.exists():
-                    target = qroot / f"{p.stem}.{digest[:12]}{p.suffix}"
+                    target = target.with_name(f"{target.stem}.{digest[:12]}{target.suffix}")
                 shutil.move(str(p), str(target))
-                deleted.append({"file": p.name, "canonical": canonical.name, "sha256": digest, "quarantine": str(target)})
-            kept.append(canonical.name)
+                quarantined.append({
+                    "file": relative.as_posix(),
+                    "canonical": canonical.relative_to(pdf_root).as_posix(),
+                    "sha256": digest,
+                    "quarantine": str(target),
+                })
         else:
             ambiguous.append(group)
-            kept.extend(p.name for p in paths)
 
+    remaining = sorted(p.relative_to(pdf_root).as_posix() for p in pdf_root.rglob("*.pdf") if p.is_file())
     report = {
-        "schema": "din-allah-encyclopedia/pdf-hygiene/v1",
+        "schema": "din-allah-encyclopedia/pdf-hygiene/v2",
+        "scope": {
+            "pdf_root": args.pdf_root,
+            "recursive": True,
+            "whole_recovered_encyclopedia_vault": True,
+        },
         "policy": {
-            "automatic_delete": "exact_sha256_duplicate_same_catalog_identity_only",
+            "automatic_delete": "none",
+            "safe_duplicate_action": "quarantine_exact_sha256_duplicate_same_catalog_identity_only",
             "near_duplicates": "report_only",
             "same_bytes_different_catalog_identity": "report_only",
-            "quarantine": "redundant copies are moved, not irreversibly erased"
+            "untracked_pdfs": "report_only",
+            "quarantine": "reversible_and_auditable",
         },
         "counts": {
             "pdf_files_scanned": len(files),
+            "valid_pdf_files": len(files) - len(invalid_pdf_files),
+            "invalid_pdf_signatures": len(invalid_pdf_files),
             "unique_sha256_groups": len(groups),
             "exact_duplicate_groups": len(exact_duplicate_groups),
-            "safe_redundant_copies_quarantined": len(deleted),
+            "safe_redundant_copies_quarantined": len(quarantined),
             "ambiguous_duplicate_groups": len(ambiguous),
-            "remaining_active_pdfs": len(list(pdf_root.glob("*.pdf")))
+            "untracked_pdf_files": len(untracked),
+            "remaining_active_pdfs": len(remaining),
         },
+        "invalid_pdf_files": invalid_pdf_files,
         "exact_duplicate_groups": exact_duplicate_groups,
-        "quarantined": deleted,
+        "quarantined": quarantined,
         "ambiguous": ambiguous,
+        "untracked_pdf_files": untracked,
+        "remaining_active_pdfs": remaining,
     }
     Path(args.out).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(report["counts"], ensure_ascii=False))
-    return 0
+    return 0 if not invalid_pdf_files else 1
 
 
 if __name__ == "__main__":
