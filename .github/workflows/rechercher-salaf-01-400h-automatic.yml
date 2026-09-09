@@ -5,8 +5,8 @@ name: Rechercher — Encyclopedia continuous PDF downloader
 # 1-400H -> 401-800H -> 801-1200H -> 1201H -> Modern era -> future books.
 # Operating contract: acquire multiple books concurrently; for each book fail over
 # through every saved source; seek a real .pdf first (never .pdf.enc); validate it;
-# preserve completed PDFs; resume incomplete books automatically without requiring a
-# manual Run workflow action; a failed source/book must not stop other workers.
+# preserve completed PDFs; resume incomplete books automatically; a failed source/book
+# must not stop other workers.
 # Acquisition and user distribution are separate decisions: a book may be retained
 # for governed developer/research review only when its acquisition is lawful, while
 # browser download is exposed only when redistribution/download permission is verified.
@@ -15,6 +15,7 @@ name: Rechercher — Encyclopedia continuous PDF downloader
 on:
   push:
     branches: [main]
+  workflow_dispatch:
   schedule:
     - cron: '*/5 * * * *'
 
