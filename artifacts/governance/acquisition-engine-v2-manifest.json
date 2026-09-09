@@ -1,0 +1,1875 @@
+{
+  "schema": "din-allah-encyclopedia/rechercher-acquisition-engine-v2/v1",
+  "generated_at": "2026-09-09T04:32:20.789612+00:00",
+  "policy": {
+    "acquisition_is_primary": true,
+    "originals_are_immutable": true,
+    "ocr_is_authoritative": false,
+    "processing_failure_is_non_blocking": true
+  },
+  "root": "artifacts/developer-review-vault",
+  "tools": {
+    "qpdf": "/usr/bin/qpdf",
+    "pdfinfo": "/usr/bin/pdfinfo",
+    "pdftotext": "/usr/bin/pdftotext",
+    "ocrmypdf": null,
+    "tesseract": null
+  },
+  "counts": {
+    "text-pdf": 17,
+    "scanned-pdf": 71
+  },
+  "ocr_counts": {
+    "not-run": 88
+  },
+  "records": [
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/ahkam-quran-jassas--ded37106839f8ae845c9.pdf",
+      "bytes": 1359587,
+      "sha256": "19b3d13b0da18dd9d153f9f99b44c84ec12845e613dc096876337c245556f6e3",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/ahkam-quran-jassas--ded37106839f8ae845c9.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         PDFsam Basic v4.2.10\nProducer:        SAMBox 2.3.4\nModDate:         Fri Oct 21 11:03:30 2022 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           151\nEncrypted:       no\nPage size:       567 x 708.72 pts\nPage rot:        0\nFile size:       1359587 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 151,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-kharaj-yahya-adam--5bb627b06f2ff7cc426c.pdf",
+      "bytes": 26679597,
+      "sha256": "a4e1c53b37d2703362adaad4adc97e59268b3cf242a59b62aa9442123166f175",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-kharaj-yahya-adam--5bb627b06f2ff7cc426c.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        iTextSharp™ 5.5.6 ©2000-2014 iText Group NV (AGPL-version)\nCreationDate:    Wed Dec 27 13:43:10 2017 UTC\nModDate:         Wed Dec 27 13:43:10 2017 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           200\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       26679597 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 200,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-radd-ala-al-jahmiyyah-darimi--f68f34083cfc38086ed2.pdf",
+      "bytes": 10478460,
+      "sha256": "37c88651cd77c36fce62682f1d442f89bdf83eda73e6694d6c152af48911ad2b",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-radd-ala-al-jahmiyyah-darimi--f68f34083cfc38086ed2.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         Adobe Acrobat Pro 10.0.0\nProducer:        Adobe Acrobat Pro 10.0.0\nCreationDate:    Tue Jan 28 11:41:37 2025 UTC\nModDate:         Tue Jan 28 15:04:32 2025 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           320\nEncrypted:       no\nPage size:       459.252 x 671.52 pts\nPage rot:        0\nFile size:       10478460 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 320,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-risala-shafii--4dbb0a9fcd8cbfaa1f0f.pdf",
+      "bytes": 11163286,
+      "sha256": "cb96ab4106631e98a3487e82d9c9a7a679bc5d957e92e4d25d16d3020f4ad55d",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-risala-shafii--4dbb0a9fcd8cbfaa1f0f.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Subject:         www.al-mostafa.com\nKeywords:        www.al-mostafa.com\nCreator:         www.al-mostafa.com\nProducer:        PDFlib V0.6 (C) Thomas Merz 1997-98\nCreationDate:    Wed Sep  5 12:53:55 2007 UTC\nModDate:         Sat Sep 16 08:12:03 2017 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           787\nEncrypted:       no\nPage size:       612 x 792 pts (letter)\nPage rot:        0\nFile size:       11163286 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 787,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-sunnah-abdullah-ahmad-1349-waqf--7007ab5a3e936cc7e228.pdf",
+      "bytes": 17154382,
+      "sha256": "81cacdb5dca77441b86817ce589510afea717d64b7eccda18eb182ad36e1563f",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-sunnah-abdullah-ahmad-1349-waqf--7007ab5a3e936cc7e228.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           ACDSeePrint Job\nAuthor:          hp\nCreator:         Bullzip PDF Printer (11.7.0.2716)\nProducer:        PDF Printer / www.bullzip.com / FG / Freeware Edition (max 10 users)\nCreationDate:    Tue Feb  2 20:33:58 2021 UTC\nModDate:         Tue Feb  2 21:02:29 2021 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           813\nEncrypted:       no\nPage size:       451 x 698 pts\nPage rot:        0\nFile size:       17154382 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 813,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-umm-shafii--e3792cdb397ca8a4b32e.pdf",
+      "bytes": 17704984,
+      "sha256": "c5e8cfab083a0e7a992b84ac32553f096e89a032b40ab9b20aa1d5f836330fab",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/al-umm-shafii--e3792cdb397ca8a4b32e.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           الأم - ج 8\nCreator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0 Image Conversion Plug-in\nCreationDate:    Sun Dec 17 04:31:37 2006 UTC\nModDate:         Wed Jan 10 07:05:55 2007 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           788\nEncrypted:       no\nPage size:       459.632 x 662.432 pts\nPage rot:        0\nFile size:       17704984 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 788,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/aqida-tahawiyya--4f4334b73fb31b1b4d67.pdf",
+      "bytes": 1154864,
+      "sha256": "6bbdc2444d1e59fb92e05a63da7b55e04bfbc620ba7fd13fd4b091c31ecfa70c",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/aqida-tahawiyya--4f4334b73fb31b1b4d67.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        iTextSharp™ 5.5.6 ©2000-2014 iText Group NV (AGPL-version)\nCreationDate:    Mon Jul  9 14:45:12 2018 UTC\nModDate:         Mon Jul  9 14:45:12 2018 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           32\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       1154864 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 32,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/jami-bayan-tabari--47593d8051db30d2250c.pdf",
+      "bytes": 23517943,
+      "sha256": "e101b202126304819343bd467cea4ff8912152c5493a5daae2c9bfad55bc923e",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/jami-bayan-tabari--47593d8051db30d2250c.pdf\nPDF Version: 1.7 extension level 8\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         Adobe Acrobat 11.0\nProducer:        Adobe Acrobat 11.0 Image Conversion Plug-in\nCreationDate:    Sat Jan 19 17:07:37 2019 UTC\nModDate:         Thu Jan 24 07:10:22 2019 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           920\nEncrypted:       no\nPage size:       456.102 x 686.095 pts\nPage rot:        0\nFile size:       23517943 bytes\nOptimized:       no\nPDF version:     1.7"
+      },
+      "pages": 920,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/khasa-is-nasai--bb200ed8b10e76011cc0.pdf",
+      "bytes": 10019557,
+      "sha256": "99446c80a1a41fc5c59aa2caaf2c02cd88afc94034519255243b1bdd3188fc3c",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/khasa-is-nasai--bb200ed8b10e76011cc0.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           ACDSeePrint Job\nAuthor:          ali\nCreator:         PScript5.dll Version 5.2.2\nProducer:        Acrobat Distiller 9.0.0 (Windows)\nCreationDate:    Sat Dec  8 06:42:06 2012 UTC\nModDate:         Sun Dec  9 09:24:40 2012 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           476\nEncrypted:       no\nPage size:       595.22 x 842 pts (A4)\nPage rot:        0\nFile size:       10019557 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 476,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/musnad-ahmad--a1302bafd82463db3a03.pdf",
+      "bytes": 16985065,
+      "sha256": "f93c1b49d03f807e7fe5b6115879d5a951b5d47a1b666b8db92a7dc0a28d6a45",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/musnad-ahmad--a1302bafd82463db3a03.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           المسند للإمام أحمد بن محمد بن حنبل - ج 1 : أبو بكر الصديق - عثمان بن عفان * 1 - 527\nKeywords:        \nAuthor:          أحمد بن محمد بن حنبل\nCreator:         Adobe Acrobat 7.05\nProducer:        Adobe Acrobat 7.05 Image Conversion Plug-in\nCreationDate:    Fri Mar 20 05:10:37 2009 UTC\nModDate:         Fri Aug 28 17:12:26 2009 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           413\nEncrypted:       no\nPage size:       420.512 x 622.352 pts\nPage rot:        0\nFile size:       16985065 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 413,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/muwatta-malik--82d2e1ed27f009fca499.pdf",
+      "bytes": 94115392,
+      "sha256": "188884fa9ecddefdba484157c6b84e138b43cc0e7235e682c91ac27b6d1b8445",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/muwatta-malik--82d2e1ed27f009fca499.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        img2pdf 0.4.0\nCreationDate:    Sun Sep  1 14:35:15 2024 UTC\nModDate:         Sun Sep  1 14:35:15 2024 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           392\nEncrypted:       no\nPage size:       288 x 398.4 pts\nPage rot:        0\nFile size:       94115392 bytes\nOptimized:       yes\nPDF version:     1.3"
+      },
+      "pages": 392,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/qut-al-qulub--54ea9716ff29f643095c.pdf",
+      "bytes": 38541845,
+      "sha256": "2c126f172d9c0103e772c09c4b6edbd44be7b025e072c91a211f6e3238e823c0",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/qut-al-qulub--54ea9716ff29f643095c.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        img2pdf 0.4.0\nCreationDate:    Sat Aug 31 20:55:46 2024 UTC\nModDate:         Sat Aug 31 20:55:46 2024 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           414\nEncrypted:       no\nPage size:       1608 x 2286 pts\nPage rot:        0\nFile size:       38541845 bytes\nOptimized:       yes\nPDF version:     1.3"
+      },
+      "pages": 414,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sahih-ibn-khuzaymah--a5f035475e0e7d63db5b.pdf",
+      "bytes": 14312994,
+      "sha256": "ecfbcaef63a89714b4b42a881573a323101e0431a8df217bfd9d06bfd06b550e",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sahih-ibn-khuzaymah--a5f035475e0e7d63db5b.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        PlotSoft PDFill 12.0\nCreationDate:    Fri Apr 12 12:34:59 2019 UTC\nModDate:         Fri Apr 12 12:34:59 2019 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           593\nEncrypted:       no\nPage size:       470.88 x 697.68 pts\nPage rot:        0\nFile size:       14312994 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 593,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sarih-sunna-tabari--456069b3afd722788f15.pdf",
+      "bytes": 822315,
+      "sha256": "d524926102227656127816290f1c32a356eda27258240c478e0704edb492ed0b",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sarih-sunna-tabari--456069b3afd722788f15.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           صريح السنة\nAuthor:          محمد بن جرير الطبري أبو جعفر\nCreator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0 Image Conversion Plug-in\nCreationDate:    Mon Oct 29 06:09:56 2007 UTC\nModDate:         Wed Nov 21 15:00:09 2018 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           56\nEncrypted:       no\nPage size:       439.952 x 657.152 pts\nPage rot:        0\nFile size:       822315 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 56,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sunan-abi-dawud--bf50c14a30130b888f49.pdf",
+      "bytes": 2198236,
+      "sha256": "9705bb1a5f216eeac9907516eabd144ee85053ff83418007969e4bc7cb78c877",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sunan-abi-dawud--bf50c14a30130b888f49.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           سنن أبي داود  - ج 1 : المقدمة\nAuthor:          سليمان بن الاشعث الازدي السجستاني ابو داود\nCreator:         Adobe Acrobat 7.05\nProducer:        Adobe Acrobat 7.05 Image Conversion Plug-in\nCreationDate:    Thu Jan 14 08:32:35 2010 UTC\nModDate:         Wed Apr  6 04:53:09 2011 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           132\nEncrypted:       no\nPage size:       450.272 x 661.232 pts\nPage rot:        0\nFile size:       2198236 bytes\nOptimized:       yes\nPDF version:     1.6"
+      },
+      "pages": 132,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sunan-al-kubra-nasai--94691e4256773250291d.pdf",
+      "bytes": 72837,
+      "sha256": "9d05055f5e06c8f8d138af77b3180c565464205767e1639a53ecf6eaa8cb2c22",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sunan-al-kubra-nasai--94691e4256773250291d.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           السنن الكبرى\nAuthor:          أحمد بن شعيب النسائي أبو عبد الرحمن\nCreator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0 Image Conversion Plug-in\nCreationDate:    Wed Jun  7 06:59:58 2006 UTC\nModDate:         Thu Dec 15 12:19:40 2011 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           1\nEncrypted:       no\nPage size:       454.832 x 653.552 pts\nPage rot:        0\nFile size:       72837 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 1,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sunan-al-nasai--24d3ec502915c75e6eaa.pdf",
+      "bytes": 239500267,
+      "sha256": "708ab01eb2dcc3fe8221a693dae6a83f6707338ae4f956350d314c6794c5bb2b",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sunan-al-nasai--24d3ec502915c75e6eaa.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0\nCreationDate:    Thu Oct 10 08:21:42 2019 UTC\nModDate:         Thu Oct 10 08:28:28 2019 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           1958\nEncrypted:       no\nPage size:       244 x 1384 pts\nPage rot:        0\nFile size:       239500267 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 1958,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sunan-khallal--d9a839de82c5f49a0cde.pdf",
+      "bytes": 21640807,
+      "sha256": "4b378c0dbad87cab2d4263d4dfec20f1435f0c84fc01e07a8e0811a003cf6a53",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/sunan-khallal--d9a839de82c5f49a0cde.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           صورة ممسوحة ضوئياً\nSubject:         صورة ممسوحة ضوئياً\nKeywords:        \nAuthor:          NAPS2\nCreator:         NAPS2\nProducer:        PDFsharp 1.50.4000-netstandard (https://github.com/ststeiger/PdfSharpCore)\nCreationDate:    Sat Jun 27 21:36:10 2026 UTC\nModDate:         Sat Jun 27 21:36:10 2026 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           736\nEncrypted:       no\nPage size:       582.96 x 841.92 pts\nPage rot:        0\nFile size:       21640807 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 736,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/tahdhib-lugha-azhari--60a1459e7d873240c1cf.pdf",
+      "bytes": 14114765,
+      "sha256": "e189eeb25ab8cb3424a48048f12db1beb8c531c50a891f7dc2e269abef8018ca",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/tahdhib-lugha-azhari--60a1459e7d873240c1cf.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         Adobe Acrobat 8.0\nProducer:        Adobe Acrobat 8.0 Image Conversion Plug-in\nCreationDate:    Wed Apr 30 14:23:26 2008 UTC\nModDate:         Wed Apr 30 14:23:29 2008 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           428\nEncrypted:       no\nPage size:       595.2 x 840.96 pts (A4)\nPage rot:        0\nFile size:       14114765 bytes\nOptimized:       yes\nPDF version:     1.6"
+      },
+      "pages": 428,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/tawhid-ibn-khuzaymah--2d01ba04b200ab7cb2d4.pdf",
+      "bytes": 19034729,
+      "sha256": "b10d8af6197a0aee9486fc34e5f6792fabc60e0af3b7d93bba77688e35232f2d",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/tawhid-ibn-khuzaymah--2d01ba04b200ab7cb2d4.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         ABBYY FineReader PDF 15\nProducer:        ABBYY FineReader PDF 15\nCreationDate:    Mon Feb 12 07:05:22 2024 UTC\nModDate:         Mon Feb 12 07:07:18 2024 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          yes\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           658\nEncrypted:       no\nPage size:       595.276 x 841.89 pts (A4)\nPage rot:        0\nFile size:       19034729 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 658,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/usul-al-sunnah-al-humaydi--0680c77533f3461acc49.pdf",
+      "bytes": 921400,
+      "sha256": "0b14499f3ba8b801cb3b1280decb7c366bf0510a7339b3c8052f7079c3f099dd",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/usul-al-sunnah-al-humaydi--0680c77533f3461acc49.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           أصول السنة\nAuthor:          عبد الله بن الزبير الحميدي أبو بكر\nCreator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0 Image Conversion Plug-in\nCreationDate:    Sat Sep 15 19:06:45 2007 UTC\nModDate:         Sat Sep 15 19:11:25 2007 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           56\nEncrypted:       no\nPage size:       448.352 x 657.872 pts\nPage rot:        0\nFile size:       921400 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 56,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/احاديث-يزيد-بن-ابي-حبيب--48df77fdae14--e2e08ce17968ee32a51f.pdf",
+      "bytes": 23999401,
+      "sha256": "20cceed94642db10c641e42473edc55a798abe9c82ce7e6ad6e2c7767d7ba341",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/احاديث-يزيد-بن-ابي-حبيب--48df77fdae14--e2e08ce17968ee32a51f.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           Das Leben Muhammed's nach Muhammed Ibn Ishâk;\nSubject:         Muammad, Prophet, d. 632; Arabic language\nKeywords:        https://archive.org/details/daslebenmuhammed02ibnhuoft\nAuthor:          Ibn Hishm, 'Abd al-Malik; Muammad ibn Isk, Ra's Ahl al-maghzi; Wüstenfeld, Ferdinand, 1808-1899\nCreator:         Internet Archive\nProducer:        Internet Archive PDF 1.4.22; including mupdf and pymupdf/skimage\nCreationDate:    Wed Nov  8 15:36:21 2023 UTC\nModDate:         Wed Nov  8 15:36:21 2023 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          yes\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           368\nEncrypted:       no\nPage size:       420.66 x 653.9 pts\nPage rot:        0\nFile size:       23999401 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 368,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/اختلاف-ابي-حنيفة-وابن-ابي-ليلى--66e7e4ae62b8--51d6acd668eafd620f05.pdf",
+      "bytes": 68635711,
+      "sha256": "d606bb49ecb80f5e810c37b19b25dea9677919cd4db205e0958f7d236884c9c6",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/اختلاف-ابي-حنيفة-وابن-ابي-ليلى--66e7e4ae62b8--51d6acd668eafd620f05.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         wkhtmltopdf 0.12.3-dev-79ff51e\nProducer:        Qt 4.8.7\nCreationDate:    Sat Jul 28 01:26:54 2018 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           234\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       68635711 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 234,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/اخلاق-العلماء--54b4777425f0--2ee59ce4a585add68768.pdf",
+      "bytes": 2879226,
+      "sha256": "1827caf4697ecf8f5bbf510ca1bf0030a4eff99826d8c6be003f5b71d8c8b83e",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/اخلاق-العلماء--54b4777425f0--2ee59ce4a585add68768.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nSubject:         \nKeywords:        \nAuthor:          \nCreator:         Image2PDF Command Line Software\nProducer:        ORPALIS PDF Reducer 1.1.3 Free - http://www.orpalis.com\nCreationDate:    Fri Jan 31 08:02:31 2014 UTC\nModDate:         Sun Jan 21 11:26:40 2024 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           152\nEncrypted:       no\nPage size:       481.89 x 680.315 pts\nPage rot:        0\nFile size:       2879226 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 152,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/اصول-السنة--41aabfe8528a--ae7876413dea0947f85f.pdf",
+      "bytes": 7264495,
+      "sha256": "2d57e4b0a5b042f0a616e9d9d47a04a03c435713a7ba2a9a19852f104e8c1833",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/اصول-السنة--41aabfe8528a--ae7876413dea0947f85f.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           Full page photo print\nAuthor:          adeel\nCreator:         PScript5.dll Version 5.2\nProducer:        GPL Ghostscript 8.15\nCreationDate:    Wed Feb 22 17:19:50 2006 UTC\nModDate:         Wed Feb 22 17:19:50 2006 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           365\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       7264495 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 365,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الاثار--2f1146e3762b--6f14c2b624195b7cc936.pdf",
+      "bytes": 23813191,
+      "sha256": "93a0c1ca8113ca6f4f29d740174b9bf12de5a597634a673d22d02230298bea5d",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الاثار--2f1146e3762b--6f14c2b624195b7cc936.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           untitled\nCreator:         Adobe Acrobat 8.0\nProducer:        Acrobat Distiller 8.0.0 (Windows)\nCreationDate:    Sat Jun  2 22:42:17 2007 UTC\nModDate:         Sat Jun  2 23:20:57 2007 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           714\nEncrypted:       no\nPage size:       595.22 x 842 pts (A4)\nPage rot:        0\nFile size:       23813191 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 714,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الاجماع--77ac651193df--caff43a3abfcef9cddee.pdf",
+      "bytes": 14060587,
+      "sha256": "fdd4fe97758c655f1f6dc209ab2bad4f46abd4e761f15479c8846c4c6db48010",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الاجماع--77ac651193df--caff43a3abfcef9cddee.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        iTextSharp™ 5.5.6 ©2000-2014 iText Group NV (AGPL-version)\nCreationDate:    Sun Oct 22 20:28:22 2017 UTC\nModDate:         Sun Oct 22 20:28:22 2017 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           184\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       14060587 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 184,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الادب-المفرد--9abb22099fa5--0bbb61a1e17627f776a0.pdf",
+      "bytes": 8150798,
+      "sha256": "04c394f678bc0a6e94d83b8be8e4cabcfceacd00131080f28296e16e7dbd528b",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الادب-المفرد--9abb22099fa5--0bbb61a1e17627f776a0.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           1- بَابٌ: قَولُ اللهِ تَعَالَى:\nAuthor:          Elmohandes\nCreator:         Microsoft® Word 2010\nProducer:        Microsoft® Word 2010\nCreationDate:    Sun Jan 12 00:18:29 2020 UTC\nModDate:         Sun Jan 12 13:21:01 2020 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           432\nEncrypted:       no\nPage size:       481.89 x 680.315 pts\nPage rot:        0\nFile size:       8150798 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 432,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الاصل--96069568cb10--da382a9bb351e40a186a.pdf",
+      "bytes": 10714068,
+      "sha256": "5f83e328e5a3a4d3810cd3eba1724488fee30fec41dfc47434b974e0850830e3",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الاصل--96069568cb10--da382a9bb351e40a186a.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           الأصل - ج 8: تابع الدعوى والبينات - العبد المأذون له في التجارة\nSubject:         217.1 ش ي أ\nKeywords:        137319\nAuthor:          محمد بن الحسن الشيباني\nCreator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0 Image Conversion Plug-in\nCreationDate:    Sat Apr 20 08:18:28 2013 UTC\nModDate:         Fri Sep 19 19:13:38 2014 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           591\nEncrypted:       no\nPage size:       453.152 x 671.552 pts\nPage rot:        0\nFile size:       10714068 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 591,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الايمان--c6ed82217d88--7ba5b3ba9267d4f05fdf.pdf",
+      "bytes": 1143026,
+      "sha256": "f231bc60cc0fdef7802a56560231cb90649ab655611052e0489e018cb55d62f6",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الايمان--c6ed82217d88--7ba5b3ba9267d4f05fdf.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           001215\nSubject:         \nKeywords:        \nAuthor:          ah\nCreator:         A-PDF Watermark 2.4.1 \nProducer:        LEAD Technologies, Inc. - ePrint\nCreationDate:    Tue May  9 19:54:22 2006 UTC\nModDate:         Sun May 27 18:19:32 2012 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           159\nEncrypted:       no\nPage size:       612 x 792 pts (letter)\nPage rot:        0\nFile size:       1143026 bytes\nOptimized:       no\nPDF version:     1.3"
+      },
+      "pages": 159,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الايمان--fd3572795ab3--baeb3c6427d92a45c3bb.pdf",
+      "bytes": 18208824,
+      "sha256": "fdcebb586cab4b497b44b41dda5d54ade1229bb7775c849113f2eadcdf2e47b8",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الايمان--fd3572795ab3--baeb3c6427d92a45c3bb.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        iLovePDF\nModDate:         Sun Mar 28 12:49:25 2021 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           1114\nEncrypted:       no\nPage size:       547.2 x 778.56 pts\nPage rot:        0\nFile size:       18208824 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 1114,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/التاريخ-الكبير--d7fb1ffa4750--53fa6eba922d1ebe9480.pdf",
+      "bytes": 30478100,
+      "sha256": "3370968146cb4ddea8f405990a03961708331b2dfdc6677b1ef2f64ea04b5870",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/التاريخ-الكبير--d7fb1ffa4750--53fa6eba922d1ebe9480.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         Adobe Acrobat 10.0\nProducer:        Adobe Acrobat 10.0 Image Conversion Plug-in\nCreationDate:    Tue Aug 20 13:50:13 2019 UTC\nModDate:         Wed May 11 11:00:44 2022 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           828\nEncrypted:       no\nPage size:       499 x 709 pts\nPage rot:        0\nFile size:       30478100 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 828,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الثقات--2b2ed1f3b4e0--d848dc71344d0da84688.pdf",
+      "bytes": 591613,
+      "sha256": "c85f52b2066ada8d33d0f08fdad2b8d75f5687523c2f269f176a11ab88aae1cf",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الثقات--2b2ed1f3b4e0--d848dc71344d0da84688.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         PDFsam Basic v4.2.10\nProducer:        SAMBox 2.3.4\nModDate:         Thu Oct 20 07:06:43 2022 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           20\nEncrypted:       no\nPage size:       567 x 708.72 pts\nPage rot:        0\nFile size:       591613 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 20,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الجرح-والتعديل--7539433bc02b--9a801fc035ac227b4738.pdf",
+      "bytes": 27876480,
+      "sha256": "6fa49317512366715a1986dfb66444984781ca45f6ae6f43ec884e34cdd2d211",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الجرح-والتعديل--7539433bc02b--9a801fc035ac227b4738.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        img2pdf 0.4.0\nCreationDate:    Sat Aug 31 21:24:55 2024 UTC\nModDate:         Sat Aug 31 21:24:55 2024 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           490\nEncrypted:       no\nPage size:       1608 x 2586 pts\nPage rot:        0\nFile size:       27876480 bytes\nOptimized:       yes\nPDF version:     1.3"
+      },
+      "pages": 490,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الجهاد--dbce39b81e7f--4e0a258c335fb35974d1.pdf",
+      "bytes": 3348226,
+      "sha256": "d249a2231e7f291526b76ea5651e2404942709f3c65513d20a3bfdc290da06d4",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الجهاد--dbce39b81e7f--4e0a258c335fb35974d1.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           كتاب الجهاد\nSubject:         213.7 م ب ج\nKeywords:        8979\nAuthor:          ابن المبارك\nCreator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0 Image Conversion Plug-in\nCreationDate:    Wed May 28 08:02:07 2008 UTC\nModDate:         Sun Apr 12 08:18:30 2026 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           256\nEncrypted:       no\nPage size:       439.232 x 658.112 pts\nPage rot:        0\nFile size:       3348226 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 256,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الحجة-على-اهل-المدينة--7f6a86e225de--5fbbcce683686701b851.pdf",
+      "bytes": 15803272,
+      "sha256": "8c241008ccb2c0d74bf8d280b8c153b6070f99c1b89b611480b0228be917fd76",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الحجة-على-اهل-المدينة--7f6a86e225de--5fbbcce683686701b851.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           الحجة على أهل المدينة - ج 2 : المناسك - البيوع\nAuthor:          محمد بن الحسن الشيباني أبو عبد الله\nCreator:         Adobe Acrobat 7.05\nProducer:        Adobe Acrobat 7.05 Image Conversion Plug-in\nCreationDate:    Sat Apr  4 10:58:52 2009 UTC\nModDate:         Sat Apr  4 17:09:24 2009 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           816\nEncrypted:       no\nPage size:       444.694 x 699.814 pts\nPage rot:        0\nFile size:       15803272 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 816,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الخراج--ab1734bca50d--7c0aabc54630ed06252f.pdf",
+      "bytes": 41683333,
+      "sha256": "2d06543e13251944edbe2e58c32a3f897848ef438b1029ea89f876313e96f7cd",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الخراج--ab1734bca50d--7c0aabc54630ed06252f.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         wkhtmltopdf 0.12.3-dev-79ff51e\nProducer:        Qt 4.8.7\nCreationDate:    Mon Mar 25 14:48:54 2019 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           280\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       41683333 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 280,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الدعاء--f504843be2d5--0408cfe6ed253e193e8b.pdf",
+      "bytes": 17129945,
+      "sha256": "be3e47c69eef189bbee43a45f8b1954146453200045f62133109b9fd4ae9290a",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الدعاء--f504843be2d5--0408cfe6ed253e193e8b.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        iTextSharp™ 5.5.6 ©2000-2014 iText Group NV (AGPL-version)\nCreationDate:    Thu Feb  2 19:33:32 2017 UTC\nModDate:         Thu Feb  2 19:33:32 2017 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           160\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       17129945 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 160,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الرد-على-الجهمية--56a91e52d14a--73423a677d1ace90a828.pdf",
+      "bytes": 4714266,
+      "sha256": "9f7f32655e58077007a9625659cd84d4c7b4c4173334d8a3be4cf09eade68ca7",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الرد-على-الجهمية--56a91e52d14a--73423a677d1ace90a828.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Author:          Abed Gafar\nCreator:         Microsoft® Word LTSC\nProducer:        Microsoft® Word LTSC\nCreationDate:    Fri Jun 14 10:25:19 2024 UTC\nModDate:         Sat Jun 15 08:03:18 2024 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          yes\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           238\nEncrypted:       no\nPage size:       595.32 x 841.92 pts (A4)\nPage rot:        0\nFile size:       4714266 bytes\nOptimized:       no\nPDF version:     1.7"
+      },
+      "pages": 238,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الزهد--b7367c5ffce5--c05bd319b59e91d7701f.pdf",
+      "bytes": 14595526,
+      "sha256": "86842a494ace78cd43cabd5500b79ae68b81b78849c61982258bbf76c2ab547a",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الزهد--b7367c5ffce5--c05bd319b59e91d7701f.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           كتاب الزهد\nSubject:         218.1 و ك ز\nKeywords:        16875\nAuthor:          وكيع بن الجراح\nCreator:         Adobe Acrobat 7.05\nProducer:        Adobe Acrobat 7.05 Image Conversion Plug-in\nCreationDate:    Sun Jun 21 06:17:01 2009 UTC\nModDate:         Sun Sep  9 10:36:42 2018 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           943\nEncrypted:       no\nPage size:       416.49 x 692.64 pts\nPage rot:        0\nFile size:       14595526 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 943,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الزهد--d713d525b047--4a7d0bd61a573a8076dd.pdf",
+      "bytes": 57169414,
+      "sha256": "2ec3777fe9e691c9816cbc3a57ae0e158f51eed2d4cbe253899d8d9fe54a908a",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الزهد--d713d525b047--4a7d0bd61a573a8076dd.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           كتاب الزهد\nAuthor:          CamScanner\nProducer:        GPL Ghostscript 10.05.1\nCreationDate:    Thu Jan 22 19:14:50 2026 UTC\nModDate:         Thu Jan 22 19:14:50 2026 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           612\nEncrypted:       no\nPage size:       566.654 x 842 pts\nPage rot:        0\nFile size:       57169414 bytes\nOptimized:       no\nPDF version:     1.7"
+      },
+      "pages": 612,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الزهد--feb963f6afe8--9d786101b8bcc1efbebb.pdf",
+      "bytes": 42629988,
+      "sha256": "b38831bafe7c3a7aa505701e7adf363900289a20467fa5b4070dab032b14c28e",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الزهد--feb963f6afe8--9d786101b8bcc1efbebb.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         wkhtmltopdf 0.12.3-dev-79ff51e\nProducer:        Qt 4.8.7\nCreationDate:    Sat Jul 28 07:59:14 2018 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           288\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       42629988 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 288,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الزهد-وصفة-الزاهدين--e75eb2dd5b9f--00434ba1abc868c0bc57.pdf",
+      "bytes": 3241136,
+      "sha256": "80fb6d8ce824d108c35659e2798eca6f0ff43334539d5ffdb0ec52df6c88582a",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الزهد-وصفة-الزاهدين--e75eb2dd5b9f--00434ba1abc868c0bc57.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         Image2PDF Command Line Software\nProducer:        Image2PDF (http://www.verypdf.com)\nCreationDate:    Tue May 13 10:41:58 2008 UTC\nModDate:         Tue May 13 10:41:58 2008 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           100\nEncrypted:       no\nPage size:       514.56 x 725.76 pts\nPage rot:        0\nFile size:       3241136 bytes\nOptimized:       no\nPDF version:     1.3"
+      },
+      "pages": 100,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنة--070b79c9cd34--d7e64d035fed06478c35.pdf",
+      "bytes": 755611,
+      "sha256": "ee7de8ef932ed910962048f5925f648d2b80413b9231a927ca498ac9454224a8",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنة--070b79c9cd34--d7e64d035fed06478c35.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         PDFsam Basic v4.2.10\nProducer:        SAMBox 2.3.4\nModDate:         Thu Oct 20 07:07:11 2022 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           62\nEncrypted:       no\nPage size:       567 x 708.72 pts\nPage rot:        0\nFile size:       755611 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 62,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنة--59e74f098568--3e640e59d7e88638e7d2.pdf",
+      "bytes": 18668536,
+      "sha256": "e8436341cddc89be0f5fee73e914537a26891ad22419d24fd977b590673f5d8d",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنة--59e74f098568--3e640e59d7e88638e7d2.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        iLovePDF\nModDate:         Wed Feb 17 15:16:54 2021 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           1429\nEncrypted:       no\nPage size:       75.6 x 111.6 pts\nPage rot:        0\nFile size:       18668536 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 1429,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنة--da25c500642a--f9046b105f9a82fb12e7.pdf",
+      "bytes": 16757204,
+      "sha256": "b37b7c6366a0bbbf8539d85222572a705250820d13619a309b315d363e10ac8e",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنة--da25c500642a--f9046b105f9a82fb12e7.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           ACDSeePrint Job\nAuthor:          BM\nCreator:         PScript5.dll Version 5.2\nProducer:        Acrobat Distiller 7.0 (Windows)\nCreationDate:    Fri Aug 19 20:55:19 2016 UTC\nModDate:         Fri Aug 19 21:17:40 2016 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           797\nEncrypted:       no\nPage size:       451.22 x 698 pts\nPage rot:        0\nFile size:       16757204 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 797,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنن-الصغرى-المجتبى--dd12acf1477a--24d3ec502915c75e6eaa.pdf",
+      "bytes": 239500267,
+      "sha256": "708ab01eb2dcc3fe8221a693dae6a83f6707338ae4f956350d314c6794c5bb2b",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنن-الصغرى-المجتبى--dd12acf1477a--24d3ec502915c75e6eaa.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0\nCreationDate:    Thu Oct 10 08:21:42 2019 UTC\nModDate:         Thu Oct 10 08:28:28 2019 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           1958\nEncrypted:       no\nPage size:       244 x 1384 pts\nPage rot:        0\nFile size:       239500267 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 1958,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنن-الكبرى--e7f61c1cb5c0--9ef84008dd279ac89c46.pdf",
+      "bytes": 38907219,
+      "sha256": "1003389be62145fd71e82ca1a2e10a7ffa11c9c3f689f8e7e8a55c03c328ad2e",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنن-الكبرى--e7f61c1cb5c0--9ef84008dd279ac89c46.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           السنن الكبرى للنسائي\nSubject:         سنن النسائي الكبرى\nAuthor:          النسائي\nCreator:         Adobe Acrobat 9.0\nProducer:        Adobe Acrobat 9.0 Image Conversion Plug-in\nCreationDate:    Sun Dec 12 00:36:32 2010 UTC\nModDate:         Sun Jun 26 14:25:53 2011 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           322\nEncrypted:       no\nPage size:       1198.08 x 1693.44 pts\nPage rot:        0\nFile size:       38907219 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 322,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السير-الكبير--270eead88c3a--35725bb561da0d1fbe81.pdf",
+      "bytes": 10766047,
+      "sha256": "0c12e91e088da4a525e102e7d080215a1eae0cd441b42ce16f1ff8c06ae01fd8",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السير-الكبير--270eead88c3a--35725bb561da0d1fbe81.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           شرح كتاب السير الكبير لمحمد بن الحسن 5\nAuthor:          السرخسي\nCreator:         PScript5.dll Version 5.2\nProducer:        Acrobat Distiller 7.0 (Windows)\nCreationDate:    Sun Jul  1 11:36:11 2007 UTC\nModDate:         Mon Jul  2 13:29:32 2007 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           392\nEncrypted:       no\nPage size:       595.22 x 842 pts (A4)\nPage rot:        0\nFile size:       10766047 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 392,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الشريعة--4bd4efb0e687--9747905f898677ded06e.pdf",
+      "bytes": 300277172,
+      "sha256": "27ba14da761dc5a6b4c35cb47572ba6bf834999079c0d647b79fb99df4e1950b",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الشريعة--4bd4efb0e687--9747905f898677ded06e.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        iText® 5.5.13 ©2000-2018 iText Group NV (AGPL-version)\nCreationDate:    Wed Jan 17 11:41:45 2024 UTC\nModDate:         Wed Jan 17 11:41:45 2024 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           472\nEncrypted:       no\nPage size:       1245 x 1529 pts\nPage rot:        0\nFile size:       300277172 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 472,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الشريعة--fb30e366c56c--062633782664e879d809.pdf",
+      "bytes": 101148422,
+      "sha256": "80a54230d1564f0795144e34e63636bbb7059bf4c0c406e8ee356a71aad7f4f0",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الشريعة--fb30e366c56c--062633782664e879d809.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Author:          ahmad jag\nCreator:         Microsoft® Word 2019\nProducer:        Microsoft® Word 2019\nCreationDate:    Mon Aug 15 10:11:17 2022 UTC\nModDate:         Mon Aug 15 10:11:17 2022 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          yes\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           801\nEncrypted:       no\nPage size:       595.32 x 841.92 pts (A4)\nPage rot:        0\nFile size:       101148422 bytes\nOptimized:       no\nPDF version:     1.7"
+      },
+      "pages": 801,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الصمت-واداب-اللسان--c8f8ba317182--1d83d0c095ccaf71d3d4.pdf",
+      "bytes": 4300995,
+      "sha256": "8f2d8c4b985811deaa41a8da7c928cff6aeea619db84ba17f1e5a5ccb76357b3",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الصمت-واداب-اللسان--c8f8ba317182--1d83d0c095ccaf71d3d4.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           www.maktbah.net\nSubject:         www.maktbah.net\nKeywords:          موقع المكتبة.نت www.maktbah.net\nAuthor:          www.maktbah.net\nCreator:         \nProducer:        \nCreationDate:    Tue Oct 31 21:07:53 2006 UTC\nModDate:         Sun May  9 13:27:19 2021 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           326\nEncrypted:       no\nPage size:       454.654 x 699.654 pts\nPage rot:        0\nFile size:       4300995 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 326,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الطبقات-الكبرى--6a76180e74a2--f81082fde3d22551fc87.pdf",
+      "bytes": 15949075,
+      "sha256": "8de6257d732ee1fb67a8dd6023990197158750c89c604cb59ee5f6ceb1ab1df8",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الطبقات-الكبرى--6a76180e74a2--f81082fde3d22551fc87.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         Adobe Acrobat 8.12\nProducer:        Adobe Acrobat 8.12 Image Conversion Plug-in\nCreationDate:    Tue Apr 15 09:31:35 2008 UTC\nModDate:         Tue Apr 15 09:31:46 2008 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           528\nEncrypted:       no\nPage size:       514.56 x 725.76 pts\nPage rot:        0\nFile size:       15949075 bytes\nOptimized:       yes\nPDF version:     1.6"
+      },
+      "pages": 528,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/العقيدة-الطحاوية--c24bdd6bc88c--0d85bb3a9cf7bb145e68.pdf",
+      "bytes": 12631994,
+      "sha256": "c2f7fc11ebc074f0645f9ea69180888b3f762a53ac51f00eca4a65d94224da96",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/العقيدة-الطحاوية--c24bdd6bc88c--0d85bb3a9cf7bb145e68.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           متن العقيدة الطحاوية\nAuthor:          الإمام أبي جعفر الطحاوي\nCreator:         Adobe Acrobat 22.1\nProducer:        Acrobat Distiller 22.0 (Windows)\nCreationDate:    Sat Feb 21 20:05:10 2026 UTC\nModDate:         Sat Feb 21 20:08:30 2026 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           32\nEncrypted:       no\nPage size:       595.22 x 842 pts (A4)\nPage rot:        0\nFile size:       12631994 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 32,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الفتن--2aabe3466ffc--add9868cfee55896b2d3.pdf",
+      "bytes": 35220981,
+      "sha256": "57c506998ef979f2d03e52261fc6ab1ca9cf6868f4b8546dc5ab833b2200b95f",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الفتن--2aabe3466ffc--add9868cfee55896b2d3.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        img2pdf 0.4.0\nCreationDate:    Sun Sep  1 00:47:24 2024 UTC\nModDate:         Sun Sep  1 00:47:24 2024 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           536\nEncrypted:       no\nPage size:       1608 x 2305.5 pts\nPage rot:        0\nFile size:       35220981 bytes\nOptimized:       yes\nPDF version:     1.3"
+      },
+      "pages": 536,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الفرايض--edcbfab054ff--bf4f345df13ece7ade56.pdf",
+      "bytes": 24622443,
+      "sha256": "0e2a91adf07833b9bdda35e3125987bc448bdf5e542c018bbbba4c4181e87b6c",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الفرايض--edcbfab054ff--bf4f345df13ece7ade56.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           Complementum libri Assilah (dictionarium biographicum); partem, quae superest\nSubject:         Arabic language\nKeywords:        https://archive.org/details/complementumlibr09muam\nAuthor:          Muammad ibn 'Abd Allah, called Ibn Al-Abbr\nCreator:         Internet Archive\nProducer:        Internet Archive PDF 1.4.9; including mupdf and pymupdf/skimage\nCreationDate:    Wed Dec 15 08:09:47 2021 UTC\nModDate:         Wed Dec 15 08:09:47 2021 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          yes\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           610\nEncrypted:       no\nPage size:       389.88 x 580.68 pts\nPage rot:        0\nFile size:       24622443 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 610,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الكامل-في-ضعفاء-الرجال--4db95e07da8a--f84fdd79d7dc339fa7ff.pdf",
+      "bytes": 29629595,
+      "sha256": "624fa115ff689278cf1b0e876196ca2b06435fe8566bd96e74b83e00599453fe",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الكامل-في-ضعفاء-الرجال--4db95e07da8a--f84fdd79d7dc339fa7ff.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         Adobe Acrobat 11.0\nProducer:        Adobe Acrobat 11.0 Image Conversion Plug-in\nCreationDate:    Wed Nov 12 11:01:04 2025 UTC\nModDate:         Wed Nov 12 14:16:35 2025 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           713\nEncrypted:       no\nPage size:       434.88 x 655.79 pts\nPage rot:        0\nFile size:       29629595 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 713,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الكسب--9f55cd1f42bf--2035b151964cd72c599d.pdf",
+      "bytes": 6812615,
+      "sha256": "d81837d25eb6167eef52cb5e16069a7f8bb63573803d4e5d200f905ebeff5c35",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الكسب--9f55cd1f42bf--2035b151964cd72c599d.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           كتاب الكسب للامام محمد بن الحسن الشيباني و رسالة الحلال و الحرام للامام ابن تيمية\nKeywords:        جزى الله من صور هذا الكتاب و رفعه على الشبكة و كذا من خدمه- أمين\nCreator:         pdftk 1.44 - www.pdftk.com\nProducer:        itext-paulo-155 (itextpdf.sf.net-lowagie.com)\nCreationDate:    Tue Aug 20 07:27:33 2013 UTC\nModDate:         Thu Dec 14 22:44:03 2017 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           346\nEncrypted:       no\nPage size:       1060.54 x 1477.55 pts\nPage rot:        0\nFile size:       6812615 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 346,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المحدث-الفاصل-بين-الراوي-والواعي--9ec07faa9b42--8c515c6162f51b3b25bc.pdf",
+      "bytes": 16473623,
+      "sha256": "5202eab90ba0ba1df69b60c9e272eceb85a7de5f2cb8a931857a3a6ef40b1cc0",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المحدث-الفاصل-بين-الراوي-والواعي--9ec07faa9b42--8c515c6162f51b3b25bc.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           ACDSeePrint Job\nAuthor:          hp\nCreator:         Bullzip PDF Printer (11.7.0.2716)\nProducer:        PDF Printer / www.bullzip.com / FG / Freeware Edition (max 10 users)\nCreationDate:    Sat Feb  6 20:15:35 2021 UTC\nModDate:         Sat Feb  6 21:58:49 2021 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           832\nEncrypted:       no\nPage size:       451 x 698 pts\nPage rot:        0\nFile size:       16473623 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 832,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المخارج-في-الحيل--6ade30fe9c61--254203e0066434a32cc9.pdf",
+      "bytes": 4147107,
+      "sha256": "d2d2b8845006e31488e7405485688e9e9d9d1806b055a00563004e02e1d8de6d",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المخارج-في-الحيل--6ade30fe9c61--254203e0066434a32cc9.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         Image2PDF Command Line Software\nProducer:        Image2PDF (http://www.verypdf.com)\nCreationDate:    Mon May 19 02:33:10 2008 UTC\nModDate:         Mon May 19 02:33:10 2008 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           148\nEncrypted:       no\nPage size:       514.56 x 725.76 pts\nPage rot:        0\nFile size:       4147107 bytes\nOptimized:       no\nPDF version:     1.3"
+      },
+      "pages": 148,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المصنف--b4cb6529fe3c--b1828ba2f37a929dd590.pdf",
+      "bytes": 51301960,
+      "sha256": "baeca9f9d1a0b1c7382c78adb2f27a0d123ff16fc8c730290d61d1cdd54eda33",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المصنف--b4cb6529fe3c--b1828ba2f37a929dd590.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        img2pdf 0.4.0\nCreationDate:    Fri Aug 30 15:08:38 2024 UTC\nModDate:         Fri Aug 30 15:08:38 2024 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           574\nEncrypted:       no\nPage size:       288 x 478.56 pts\nPage rot:        0\nFile size:       51301960 bytes\nOptimized:       yes\nPDF version:     1.3"
+      },
+      "pages": 574,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المعجم--9218ac59ba3c--f2dd65451be321212d9b.pdf",
+      "bytes": 10481193,
+      "sha256": "db2760f626e40c5b67c50ef3195ccef0e5cd5add1c4bae9a069a856b3abac06b",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المعجم--9218ac59ba3c--f2dd65451be321212d9b.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           المعجم لابن المقرئ\nCreator:         Adobe Acrobat 7.08\nProducer:        Adobe Acrobat 7.08 Image Conversion Plug-in\nCreationDate:    Sat Aug 12 09:04:07 2006 UTC\nModDate:         Sat Aug 12 09:04:30 2006 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           607\nEncrypted:       no\nPage size:       466.92 x 674.64 pts\nPage rot:        0\nFile size:       10481193 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 607,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المعجم-الصغير--60841c2d96a9--5571aea4f3df81a5299d.pdf",
+      "bytes": 52738866,
+      "sha256": "cae3917a110d7c5d2df14e34d0590a9238f5d968177197a5312925189d2ed9c4",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المعجم-الصغير--60841c2d96a9--5571aea4f3df81a5299d.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        img2pdf 0.4.0\nCreationDate:    Sat Aug 31 02:56:07 2024 UTC\nModDate:         Sat Aug 31 02:56:07 2024 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           292\nEncrypted:       no\nPage size:       288 x 411.84 pts\nPage rot:        0\nFile size:       52738866 bytes\nOptimized:       yes\nPDF version:     1.3"
+      },
+      "pages": 292,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المعجم-الكبير--4b6d982d1ee5--c48aba3fb9844e6c9d0a.pdf",
+      "bytes": 31614543,
+      "sha256": "fe474ef3189e7e0a9f0aadeb8ccfb691aaadaf4f49d6620eb999dbd0eb7e89e5",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المعجم-الكبير--4b6d982d1ee5--c48aba3fb9844e6c9d0a.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         Adobe Acrobat 11.0\nProducer:        Adobe Acrobat 11.0 Image Conversion Plug-in\nCreationDate:    Tue Oct  3 15:04:25 2023 UTC\nModDate:         Wed Oct  4 02:09:13 2023 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           817\nEncrypted:       no\nPage size:       448.32 x 708.24 pts\nPage rot:        0\nFile size:       31614543 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 817,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المنتخب-من-مسند-عبد-بن-حميد--8b38a7b27f4c--0a1fd0ef289aa90efd08.pdf",
+      "bytes": 6460207,
+      "sha256": "295c75ca13488f626628636e15649002c1c7a1af1d94395b67fc27b99186524f",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المنتخب-من-مسند-عبد-بن-حميد--8b38a7b27f4c--0a1fd0ef289aa90efd08.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           المنتخب من مسند عبد بن حميد\nKeywords:        من المحجة www.mahaja.com\nAuthor:          عبد بن حميد\nCreator:         Adobe Acrobat 9.0\nProducer:        Adobe Acrobat 9.0 Image Conversion Plug-in\nCreationDate:    Tue Dec  7 12:14:33 2010 UTC\nModDate:         Sat Jun 25 16:36:18 2011 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           191\nEncrypted:       no\nPage size:       191.62 x 256.01 pts\nPage rot:        0\nFile size:       6460207 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 191,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تاويل-مختلف-الحديث--7a9bf7e59325--9dce1bbcdec0a37df02e.pdf",
+      "bytes": 9342354,
+      "sha256": "0e39e6f80b706b8a6f9f177e13984f1f2375c1d4a23c19420169427df550fc2d",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تاويل-مختلف-الحديث--7a9bf7e59325--9dce1bbcdec0a37df02e.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         PDF24\nProducer:        GPL Ghostscript 10.05.1\nCreationDate:    Tue Feb 17 21:10:32 2026 UTC\nModDate:         Tue Feb 17 21:10:32 2026 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           733\nEncrypted:       no\nPage size:       456 x 649 pts\nPage rot:        0\nFile size:       9342354 bytes\nOptimized:       no\nPDF version:     1.7"
+      },
+      "pages": 733,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تصحيفات-المحدثين--d822a4268ca3--f4c27a9ac6e3a9e6ec6c.pdf",
+      "bytes": 18967201,
+      "sha256": "1c0fd0713dc3df08c5fc9b9c8abb49408fb80795d8694190a34f324a8aaa6974",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تصحيفات-المحدثين--d822a4268ca3--f4c27a9ac6e3a9e6ec6c.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        img2pdf 0.4.0\nCreationDate:    Sat Aug 31 20:31:44 2024 UTC\nModDate:         Sat Aug 31 20:31:44 2024 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           360\nEncrypted:       no\nPage size:       1608 x 2298.75 pts\nPage rot:        0\nFile size:       18967201 bytes\nOptimized:       yes\nPDF version:     1.3"
+      },
+      "pages": 360,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تفسير-ابن-ابي-حاتم--f9fee0e52281--cf506aa3b5e75f7f4bd0.pdf",
+      "bytes": 61417230,
+      "sha256": "b1a40d91c8fb2f2d9a38ce919816ca0256fc179a50ebfe37533d3bb25db8aaee",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تفسير-ابن-ابي-حاتم--f9fee0e52281--cf506aa3b5e75f7f4bd0.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           تفسير القرآن العظيم مسنداً عن رسول الله صلى الله عليه وسلم والصحابة والتابعين\nAuthor:          ابن أ بي حاتم\nCreator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0 Image Conversion Plug-in\nCreationDate:    Tue May  8 17:17:54 2007 UTC\nModDate:         Fri Oct 23 10:28:45 2015 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           3480\nEncrypted:       no\nPage size:       470.64 x 672.72 pts\nPage rot:        0\nFile size:       61417230 bytes\nOptimized:       yes\nPDF version:     1.5"
+      },
+      "pages": 3480,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تفسير-الحسن-البصري--bfd03a7d1f02--bf4f345df13ece7ade56.pdf",
+      "bytes": 24622443,
+      "sha256": "0e2a91adf07833b9bdda35e3125987bc448bdf5e542c018bbbba4c4181e87b6c",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تفسير-الحسن-البصري--bfd03a7d1f02--bf4f345df13ece7ade56.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           Complementum libri Assilah (dictionarium biographicum); partem, quae superest\nSubject:         Arabic language\nKeywords:        https://archive.org/details/complementumlibr09muam\nAuthor:          Muammad ibn 'Abd Allah, called Ibn Al-Abbr\nCreator:         Internet Archive\nProducer:        Internet Archive PDF 1.4.9; including mupdf and pymupdf/skimage\nCreationDate:    Wed Dec 15 08:09:47 2021 UTC\nModDate:         Wed Dec 15 08:09:47 2021 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          yes\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           610\nEncrypted:       no\nPage size:       389.88 x 580.68 pts\nPage rot:        0\nFile size:       24622443 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 610,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/جماع-العلم--53ecfaae3852--17334a531d2d85d0ddc7.pdf",
+      "bytes": 16084528,
+      "sha256": "58c80f7c82e8f0c510e1988f42b326e0d537dd79abd7603255b29aab3e6e6507",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/جماع-العلم--53ecfaae3852--17334a531d2d85d0ddc7.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        iTextSharp™ 5.5.6 ©2000-2014 iText Group NV (AGPL-version)\nCreationDate:    Wed Dec 27 13:21:16 2017 UTC\nModDate:         Wed Dec 27 13:21:16 2017 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           144\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       16084528 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 144,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/خلق-افعال-العباد--e0f9e4f5749f--dfc88accf0a37225339f.pdf",
+      "bytes": 2350498,
+      "sha256": "39495ede91c3c584d2144387402a6b6f9649bc280619e78248037c81f5b54fd6",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/خلق-افعال-العباد--e0f9e4f5749f--dfc88accf0a37225339f.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           خلق أفعال العباد\nSubject:         215 ب خ خ \nKeywords:        22313\nAuthor:          محمد بن إسماعيل البخاري\nCreator:         Adobe Acrobat 7.05\nProducer:        Adobe Acrobat 7.05 Image Conversion Plug-in\nCreationDate:    Fri Apr 24 08:03:36 2009 UTC\nModDate:         Wed Jun 10 06:45:59 2015 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           126\nEncrypted:       no\nPage size:       450.512 x 642.616 pts\nPage rot:        0\nFile size:       2350498 bytes\nOptimized:       yes\nPDF version:     1.5"
+      },
+      "pages": 126,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/سنن-الدارمي--14ba4e30b1d1--46f3cfea21ec6dc22b8c.pdf",
+      "bytes": 929314,
+      "sha256": "1483f4592b91c185c7942cf0125b7fdb7461519fde53b803af53fff7eb8b2123",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/سنن-الدارمي--14ba4e30b1d1--46f3cfea21ec6dc22b8c.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Author:          flying eagle\nCreator:         Microsoft® Word 2016\nProducer:        Microsoft® Word 2016\nCreationDate:    Sat Nov 19 15:42:01 2022 UTC\nModDate:         Sat Nov 19 15:42:01 2022 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          yes\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           10\nEncrypted:       no\nPage size:       612 x 792 pts (letter)\nPage rot:        0\nFile size:       929314 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 10,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/سنن-سعيد-بن-منصور--a557907b3f37--121e139beb2746b4562b.pdf",
+      "bytes": 133754893,
+      "sha256": "6f9fc9ad876b36061c95683d57f032a547b717dac7643c0b4c5280f3e4f99e8a",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/سنن-سعيد-بن-منصور--a557907b3f37--121e139beb2746b4562b.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           CamScanner 02-03-2022 17.25\nSubject:         CamScanner 02-03-2022 17.25\nKeywords:        \nAuthor:          CamScanner\nProducer:        CamScanner\nModDate:         D:٢٠٢٢٠٢١١١٥٢٦٥٩-00'00'\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           334\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       133754893 bytes\nOptimized:       no\nPDF version:     1.7"
+      },
+      "pages": 334,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/شرح-مشكل-الاثار--49f1926f546c--7d3f4586315c1d052e60.pdf",
+      "bytes": 8863380,
+      "sha256": "587a9c5fb6016421fc61ea8c2706242e4abf8ec64d843ae4dad0217462b0743b",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/شرح-مشكل-الاثار--49f1926f546c--7d3f4586315c1d052e60.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nSubject:         \nKeywords:        \nAuthor:          \nCreator:         Adobe Acrobat 7.0\nProducer:        Adobe Acrobat 7.0 Image Conversion Plug-in\nCreationDate:    Fri Feb 16 14:20:27 2018 UTC\nModDate:         Fri Feb 16 14:45:42 2018 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           586\nEncrypted:       no\nPage size:       474.72 x 674.64 pts\nPage rot:        0\nFile size:       8863380 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 586,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/شرح-معاني-الاثار--3d162e0d6b26--3b172b9ea6c448bc3325.pdf",
+      "bytes": 7979629,
+      "sha256": "e8ffc1c86a5a3ce08d01765ef0ec014725ef5f503bcd42b3c8e5eec2dd5486c3",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/شرح-معاني-الاثار--3d162e0d6b26--3b172b9ea6c448bc3325.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        PDFium\nCreationDate:    Mon Jan  9 20:12:00 2023 UTC\nModDate:         Mon Sep 30 12:05:45 2024 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           480\nEncrypted:       no\nPage size:       451.44 x 635.321 pts\nPage rot:        0\nFile size:       7979629 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 480,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/صحيح-ابن-حبان--14e3927ff5ea--c6331bd64ffc81d9ff56.pdf",
+      "bytes": 660220,
+      "sha256": "85fe45a2da211a7ae6e8f6ac637434e90f296d171c7511c8ab95c911601bd6b4",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/صحيح-ابن-حبان--14e3927ff5ea--c6331bd64ffc81d9ff56.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         PDFsam Basic v4.2.10\nProducer:        SAMBox 2.3.4\nModDate:         Thu Oct 20 07:06:19 2022 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           19\nEncrypted:       no\nPage size:       567 x 708.72 pts\nPage rot:        0\nFile size:       660220 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 19,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/غريب-الحديث--1244964b7f8f--900b22313ea70c42aee4.pdf",
+      "bytes": 10164788,
+      "sha256": "993859f69de01449fb34dee371681cedc33565720b93af2e42f2a6159889e0aa",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/غريب-الحديث--1244964b7f8f--900b22313ea70c42aee4.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           الدلائل في شرح ما أغفله أبو عبيد وابن قتيبة من غريب الحديث\nKeywords:        من المحجة www.mahaja.com\nAuthor:          أبو القاسم ثابث بن حزم السرقسطي\nCreator:         Adobe Acrobat 9.0\nProducer:        Adobe Acrobat 9.0 Image Conversion Plug-in\nCreationDate:    Sun Dec 12 00:49:29 2010 UTC\nModDate:         Sat Jun 25 16:09:24 2011 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            AcroForm\nJavaScript:      no\nPages:           159\nEncrypted:       no\nPage size:       1233.72 x 803.16 pts\nPage rot:        0\nFile size:       10164788 bytes\nOptimized:       no\nPDF version:     1.6"
+      },
+      "pages": 159,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/غريب-الحديث--22025b2889bf--b4defae7ae07c42d071d.pdf",
+      "bytes": 84678928,
+      "sha256": "514a6faba2a3dbd1054f96390d3edb7e377710c9b519ce482d4f76de0dad1bce",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/غريب-الحديث--22025b2889bf--b4defae7ae07c42d071d.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         wkhtmltopdf 0.12.3-dev-79ff51e\nProducer:        Qt 4.8.7\nCreationDate:    Tue Mar 26 08:47:17 2019 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           656\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       84678928 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 656,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/فضايل-القران--7f3b94579a26--6fd91c5c98147b4517d8.pdf",
+      "bytes": 11022258,
+      "sha256": "be29eee4bbd8629d3b2962e3faf0b18838bf0a1dc70732ae8c5071488cb6d566",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/فضايل-القران--7f3b94579a26--6fd91c5c98147b4517d8.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        iLovePDF\nModDate:         Sat Oct  1 18:45:40 2022 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           804\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       11022258 bytes\nOptimized:       no\nPDF version:     1.7"
+      },
+      "pages": 804,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-ابن-ابي-ذيب--0d540f75cd23--7ba5b3ba9267d4f05fdf.pdf",
+      "bytes": 1143026,
+      "sha256": "f231bc60cc0fdef7802a56560231cb90649ab655611052e0489e018cb55d62f6",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-ابن-ابي-ذيب--0d540f75cd23--7ba5b3ba9267d4f05fdf.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           001215\nSubject:         \nKeywords:        \nAuthor:          ah\nCreator:         A-PDF Watermark 2.4.1 \nProducer:        LEAD Technologies, Inc. - ePrint\nCreationDate:    Tue May  9 19:54:22 2006 UTC\nModDate:         Sun May 27 18:19:32 2012 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           159\nEncrypted:       no\nPage size:       612 x 792 pts (letter)\nPage rot:        0\nFile size:       1143026 bytes\nOptimized:       no\nPDF version:     1.3"
+      },
+      "pages": 159,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-الاثار--0c4db25de8d1--0f9835bdbf866804ba11.pdf",
+      "bytes": 33411605,
+      "sha256": "25c5a21091fb3a46b7180adf6ff682407f0f8926b7eeedea972466dbeb97fe5f",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-الاثار--0c4db25de8d1--0f9835bdbf866804ba11.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        PlotSoft PDFill 12.0\nCreationDate:    Sun Aug  5 06:39:40 2018 UTC\nModDate:         Sun Aug  5 06:39:40 2018 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           545\nEncrypted:       no\nPage size:       307.44 x 448.32 pts\nPage rot:        0\nFile size:       33411605 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 545,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-التوحيد--2174c4404563--832d34700d9793fc7989.pdf",
+      "bytes": 18006034,
+      "sha256": "f90963df8a587f42c4aa89322c2c8281c3294bc6ad81d9f36c77f94c0e9c1edc",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-التوحيد--2174c4404563--832d34700d9793fc7989.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         PDFium\nProducer:        PDFium\nCreationDate:    \nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           940\nEncrypted:       no\nPage size:       459 x 666 pts\nPage rot:        0\nFile size:       18006034 bytes\nOptimized:       no\nPDF version:     1.7"
+      },
+      "pages": 940,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-التوحيد--a6f800f1c34c--c5f29bc9e90630e169f9.pdf",
+      "bytes": 629828,
+      "sha256": "f2d00c3188ceea5e47980e3e38401a3ca44077c90f0f3e9d55ad361b3f3ce504",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-التوحيد--a6f800f1c34c--c5f29bc9e90630e169f9.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         PDFsam Basic v4.2.10\nProducer:        SAMBox 2.3.4\nModDate:         Fri Oct 21 11:02:09 2022 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           30\nEncrypted:       no\nPage size:       567 x 708.72 pts\nPage rot:        0\nFile size:       629828 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 30,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-العلم--c049cefbb1d3--e9f4cefd186bb02f05b3.pdf",
+      "bytes": 21502764,
+      "sha256": "4048dcade4ded4bee4324252ea2bfbcaca00d3a929772aab350d101ef29c442a",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-العلم--c049cefbb1d3--e9f4cefd186bb02f05b3.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           \nCreator:         wkhtmltopdf 0.12.3-dev-79ff51e\nProducer:        Qt 4.8.7\nCreationDate:    Sat Jul 28 02:26:30 2018 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           184\nEncrypted:       no\nPage size:       595 x 842 pts (A4)\nPage rot:        0\nFile size:       21502764 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 184,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/معالم-السنن--771739b67c4d--8671cdcaa54e6ee65eb7.pdf",
+      "bytes": 172012104,
+      "sha256": "ab5d1a9dc8fee12ffdcfb5e7a46d162fa228a7216afaf0530fa58eaf7c10990b",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/معالم-السنن--771739b67c4d--8671cdcaa54e6ee65eb7.pdf\nPDF Version: 1.2\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Creator:         pdftk 2.02 - www.pdftk.com\nProducer:        itext-paulo-155 (itextpdf.sf.net-lowagie.com)\nCreationDate:    Fri Aug 19 08:09:14 2016 UTC\nModDate:         Fri Aug 19 08:09:14 2016 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           374\nEncrypted:       no\nPage size:       529.92 x 764.28 pts\nPage rot:        0\nFile size:       172012104 bytes\nOptimized:       no\nPDF version:     1.2"
+      },
+      "pages": 374,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/معجم-الصحابة--9981cac55a5a--ede8537ba8701c1f3873.pdf",
+      "bytes": 5126813,
+      "sha256": "a6634d748aa93032c5bdc4791665277a273526ec619e1eb812fd7464ce2928a3",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/معجم-الصحابة--9981cac55a5a--ede8537ba8701c1f3873.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Producer:        PDFill PDF Editor 15.0\nCreationDate:    Sat Aug 31 21:41:44 2024 UTC\nModDate:         Sat Aug 31 21:41:44 2024 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           426\nEncrypted:       no\nPage size:       453.872 x 658.712 pts\nPage rot:        0\nFile size:       5126813 bytes\nOptimized:       no\nPDF version:     1.4"
+      },
+      "pages": 426,
+      "has_text": false,
+      "classification": "scanned-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/مغازي-عروة--e51d1c995cb2--e2e08ce17968ee32a51f.pdf",
+      "bytes": 23999401,
+      "sha256": "20cceed94642db10c641e42473edc55a798abe9c82ce7e6ad6e2c7767d7ba341",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/مغازي-عروة--e51d1c995cb2--e2e08ce17968ee32a51f.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Title:           Das Leben Muhammed's nach Muhammed Ibn Ishâk;\nSubject:         Muammad, Prophet, d. 632; Arabic language\nKeywords:        https://archive.org/details/daslebenmuhammed02ibnhuoft\nAuthor:          Ibn Hishm, 'Abd al-Malik; Muammad ibn Isk, Ra's Ahl al-maghzi; Wüstenfeld, Ferdinand, 1808-1899\nCreator:         Internet Archive\nProducer:        Internet Archive PDF 1.4.22; including mupdf and pymupdf/skimage\nCreationDate:    Wed Nov  8 15:36:21 2023 UTC\nModDate:         Wed Nov  8 15:36:21 2023 UTC\nCustom Metadata: no\nMetadata Stream: yes\nTagged:          yes\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           368\nEncrypted:       no\nPage size:       420.66 x 653.9 pts\nPage rot:        0\nFile size:       23999401 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 368,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    },
+    {
+      "path": "/home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/نسخة-ابن-ابي-صالح-عن-ابيه-عن-ابي-هريرة--e8847822c1ca--46f3cfea21ec6dc22b8c.pdf",
+      "bytes": 929314,
+      "sha256": "1483f4592b91c185c7942cf0125b7fdb7461519fde53b803af53fff7eb8b2123",
+      "signature": true,
+      "qpdf": {
+        "exit": 0,
+        "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/نسخة-ابن-ابي-صالح-عن-ابيه-عن-ابي-هريرة--e8847822c1ca--46f3cfea21ec6dc22b8c.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+      },
+      "pdfinfo": {
+        "exit": 0,
+        "output": "Author:          flying eagle\nCreator:         Microsoft® Word 2016\nProducer:        Microsoft® Word 2016\nCreationDate:    Sat Nov 19 15:42:01 2022 UTC\nModDate:         Sat Nov 19 15:42:01 2022 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          yes\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           10\nEncrypted:       no\nPage size:       612 x 792 pts (letter)\nPage rot:        0\nFile size:       929314 bytes\nOptimized:       no\nPDF version:     1.5"
+      },
+      "pages": 10,
+      "has_text": true,
+      "classification": "text-pdf",
+      "ocr": {
+        "status": "not-run",
+        "authoritative": false
+      }
+    }
+  ]
+}
