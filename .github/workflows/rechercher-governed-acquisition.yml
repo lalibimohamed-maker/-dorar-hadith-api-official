@@ -79,9 +79,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf
           git lfs install
-
-          # Hydrate any existing LFS objects before acquisition/staging. A missing
-          # object must never be turned into a new PDF pointer by this workflow.
           git lfs fetch origin --all || true
           git lfs checkout || true
 
@@ -93,8 +90,6 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-          # Stage metadata/code first. PDFs are staged individually only after the
-          # workspace proves they contain real PDF bytes, never an LFS pointer.
           git add books-batches scripts .gitattributes
           while IFS= read -r -d '' f; do
             if head -c 5 "$f" | grep -qx '%PDF-' && test -s "$f"; then
@@ -111,8 +106,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No new verified PDF changes; saved failures will be retried on the next cycle.'
           else
-            # Fail closed: validate ONLY PDFs that are actually staged. A stale
-            # unhydrated worktree pointer can no longer poison an otherwise valid run.
             while IFS= read -r -d '' f; do
               case "$f" in
                 *.pdf)
@@ -122,16 +115,10 @@ jobs:
               esac
             done < <(git diff --cached --name-only -z)
 
-            # Integrity check remains mandatory; never suppress a real LFS corruption.
-            git lfs fsck --objects
             git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
+            git lfs fsck --objects
             gh auth setup-git
-
-            # The acquisition script can legitimately leave retry/manifest state in
-            # the worktree. Autostash preserves that state while synchronizing the
-            # persistence branch, instead of aborting on harmless unstaged changes.
             git pull --rebase --autostash origin "$TARGET_BRANCH"
-
             git lfs fsck --objects
             git push origin "HEAD:refs/heads/$TARGET_BRANCH"
           fi
@@ -149,8 +136,7 @@ jobs:
           git lfs install
 
           # The secondary repository may be completely empty on first use.
-          # In that case there is no HEAD/ref for git-lfs to resolve, so initialize
-          # a normal main branch before tracking or checking out any PDF objects.
+          # Initialize its main branch before any LFS operation that requires HEAD.
           if git rev-parse --verify HEAD >/dev/null 2>&1; then
             git lfs fetch --all origin || true
             git lfs checkout || true
@@ -162,8 +148,6 @@ jobs:
           git lfs track 'artifacts/*.pdf'
           mkdir -p artifacts
 
-          # Never copy a pointer as if it were a PDF. Existing pointers are hydrated
-          # from secondary LFS first; newly acquired files must contain real PDF bytes.
           while IFS= read -r -d '' f; do
             head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: secondary source is not real PDF bytes: $f"; exit 1; }
             test -s "$f"
@@ -182,7 +166,10 @@ jobs:
             head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged secondary PDF is a pointer/non-PDF: $f"; exit 1; }
             test -s "$f"
           done < <(find artifacts -type f -name '*.pdf' -print0)
-          git lfs fsck --objects
+
+          # A brand-new orphan branch has no HEAD yet. LFS fsck must run only
+          # after the first commit creates a resolvable ref; otherwise it fails
+          # with: Git can't resolve ref: "HEAD".
           git commit -m 'data(rechercher): mirror verified encyclopedia PDFs'
           git lfs fsck --objects
           git push origin HEAD
