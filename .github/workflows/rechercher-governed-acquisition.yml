@@ -79,6 +79,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf
           git lfs install
+
+          # Hydrate any existing LFS objects before acquisition/staging. A missing
+          # object must never be turned into a new PDF pointer by this workflow.
+          git lfs fetch origin --all || true
+          git lfs checkout || true
+
           echo "Whole-encyclopedia PDF scope: ${RECHERCHER_CATALOG_GLOB}"
           echo "Parallel PDF workers: ${RECHERCHER_MAX_BOOK_WORKERS}"
           python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
@@ -86,22 +92,39 @@ jobs:
           git lfs track 'artifacts/*.pdf'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add books-batches scripts artifacts .gitattributes
+
+          # Stage metadata/code first. PDFs are staged individually only after the
+          # workspace proves they contain real PDF bytes, never an LFS pointer.
+          git add books-batches scripts .gitattributes
+          while IFS= read -r -d '' f; do
+            if head -c 5 "$f" | grep -qx '%PDF-' && test -s "$f"; then
+              git add -- "$f"
+            else
+              echo "[SKIP] non-PDF artifact (pointer/missing LFS object): $f"
+              git reset -- "$f" >/dev/null 2>&1 || true
+              if ! git ls-files --error-unmatch -- "$f" >/dev/null 2>&1; then
+                rm -f -- "$f"
+              fi
+            fi
+          done < <(find artifacts -type f -name '*.pdf' -print0)
+
           if git diff --cached --quiet; then
-            echo 'No new PDF changes; saved failures will be retried on the next cycle.'
+            echo 'No new verified PDF changes; saved failures will be retried on the next cycle.'
           else
-            # Fail closed before creating/pushing a pointer whose LFS object is absent.
-            # This also catches a workspace that accidentally contains a Git-LFS pointer
-            # instead of the verified PDF bytes.
+            # Fail closed: validate ONLY PDFs that are actually staged. A stale
+            # unhydrated worktree pointer can no longer poison an otherwise valid run.
             while IFS= read -r -d '' f; do
-              head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged PDF is not real PDF bytes: $f"; exit 1; }
-              test -s "$f"
-            done < <(find artifacts -type f -name '*.pdf' -print0)
+              case "$f" in
+                *.pdf)
+                  head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged PDF is not real PDF bytes: $f"; exit 1; }
+                  test -s "$f"
+                  ;;
+              esac
+            done < <(git diff --cached --name-only -z)
+
+            # Integrity check remains mandatory; never suppress a real LFS corruption.
             git lfs fsck --objects
             git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
-            # actions/checkout intentionally uses persist-credentials=false. Configure
-            # Git's credential helper explicitly from the ephemeral workflow token so
-            # fetch/rebase/push (and Git LFS) cannot fall back to an interactive prompt.
             gh auth setup-git
             git fetch origin "$TARGET_BRANCH"
             git rebase "origin/$TARGET_BRANCH"
@@ -141,9 +164,6 @@ jobs:
             exit 0
           fi
 
-          # Verify the local LFS object database before any push. If an object is
-          # missing, stop here instead of pushing a dangling pointer. Successful files
-          # already committed to this storage repository remain untouched.
           while IFS= read -r -d '' f; do
             head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged secondary PDF is a pointer/non-PDF: $f"; exit 1; }
             test -s "$f"
