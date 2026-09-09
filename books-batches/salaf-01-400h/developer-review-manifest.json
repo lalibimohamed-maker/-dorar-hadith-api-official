@@ -271,6 +271,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -515,6 +519,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -578,6 +586,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -825,6 +837,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -844,6 +860,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -1380,6 +1400,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -1394,12 +1418,38 @@
       "discovery_registries": [
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
-      "availability": "not-acquired",
-      "acquisition_state": "global-search-no-match",
-      "acquired": [],
-      "acquired_count": 0,
-      "rights_action": "none",
+      "candidates": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/%D8%B3%D9%84%D8%B3%D9%84%D8%A9_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_-_45_-_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_%D9%81%D9%8A_%D8%A3%D8%B3%D8%A7%D9%86%D9%8A%D8%AF_%D9%88%D8%AA%D8%B5%D8%AD%D9%8A%D8%AD_%D8%AD%D8%AF%D9%8A%D8%AB_%D9%85%D9%86_%D8%AD%D9%81%D8%B8_%D8%B9%D9%84%D9%8A_%D8%A3%D9%85%D8%AA%D9%8A_%D8%A3%D8%B1%D8%A8%D8%B9%D9%8A%D9%86_%D8%AD%D8%AF%D9%8A%D8%AB%D8%A7_%D9%88%D9%85%D9%86_%D8%AD%D8%B3%D9%91%D9%86%D9%87_%D9%88%D8%B9%D9%85%D9%84_%D8%A8%D9%87_%D9%85%D9%86_%D8%A7%D9%84%D8%A3%D8%A6%D9%85%D8%A9.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 629828,
+          "sha256": "f2d00c3188ceea5e47980e3e38401a3ca44077c90f0f3e9d55ad361b3f3ce504",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/تفسير-نافع-بن-ابي-نعيم--0c7b9fb5a5e7--retry-1dd540696df408d6e13f.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/تفسير-نافع-بن-ابي-نعيم--0c7b9fb5a5e7--retry-1dd540696df408d6e13f.pdf"
+        }
+      ],
+      "availability": "copy-acquired",
+      "acquisition_state": "acquired",
+      "acquired": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/%D8%B3%D9%84%D8%B3%D9%84%D8%A9_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_-_45_-_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_%D9%81%D9%8A_%D8%A3%D8%B3%D8%A7%D9%86%D9%8A%D8%AF_%D9%88%D8%AA%D8%B5%D8%AD%D9%8A%D8%AD_%D8%AD%D8%AF%D9%8A%D8%AB_%D9%85%D9%86_%D8%AD%D9%81%D8%B8_%D8%B9%D9%84%D9%8A_%D8%A3%D9%85%D8%AA%D9%8A_%D8%A3%D8%B1%D8%A8%D8%B9%D9%8A%D9%86_%D8%AD%D8%AF%D9%8A%D8%AB%D8%A7_%D9%88%D9%85%D9%86_%D8%AD%D8%B3%D9%91%D9%86%D9%87_%D9%88%D8%B9%D9%85%D9%84_%D8%A8%D9%87_%D9%85%D9%86_%D8%A7%D9%84%D8%A3%D8%A6%D9%85%D8%A9.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 629828,
+          "sha256": "f2d00c3188ceea5e47980e3e38401a3ca44077c90f0f3e9d55ad361b3f3ce504",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/تفسير-نافع-بن-ابي-نعيم--0c7b9fb5a5e7--retry-1dd540696df408d6e13f.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/تفسير-نافع-بن-ابي-نعيم--0c7b9fb5a5e7--retry-1dd540696df408d6e13f.pdf"
+        }
+      ],
+      "acquired_count": 1,
+      "rights_action": "developer-vault-encrypt",
       "retry_history": [
         {
           "pass": "multi-pass-v1",
@@ -1418,12 +1468,38 @@
       "discovery_registries": [
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
-      "availability": "not-acquired",
-      "acquisition_state": "global-search-no-match",
-      "acquired": [],
-      "acquired_count": 0,
-      "rights_action": "none",
+      "candidates": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/%D8%B3%D9%84%D8%B3%D9%84%D8%A9_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_-_16_-_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_%D9%81%D9%8A_%D8%AA%D9%88%D8%A7%D8%AA%D8%B1_%D8%AD%D8%AF%D9%8A%D8%AB_%D8%A7%D9%84%D9%85%D9%87%D8%AF%D9%8A_%D9%85%D9%86_30_%D8%B7%D8%B1%D9%8A%D9%82%D8%A7_%D9%85%D8%AE%D8%AA%D9%84%D9%81%D8%A7_%D8%A5%D9%84%D9%8A_%D8%A7%D9%84%D9%86%D8%A8%D9%8A.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 755611,
+          "sha256": "ee7de8ef932ed910962048f5925f648d2b80413b9231a927ca498ac9454224a8",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/فوايد-الليث-بن-سعد--fa7f10752321--retry-d0272c150a3d66268dff.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/فوايد-الليث-بن-سعد--fa7f10752321--retry-d0272c150a3d66268dff.pdf"
+        }
+      ],
+      "availability": "copy-acquired",
+      "acquisition_state": "acquired",
+      "acquired": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/%D8%B3%D9%84%D8%B3%D9%84%D8%A9_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_-_16_-_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_%D9%81%D9%8A_%D8%AA%D9%88%D8%A7%D8%AA%D8%B1_%D8%AD%D8%AF%D9%8A%D8%AB_%D8%A7%D9%84%D9%85%D9%87%D8%AF%D9%8A_%D9%85%D9%86_30_%D8%B7%D8%B1%D9%8A%D9%82%D8%A7_%D9%85%D8%AE%D8%AA%D9%84%D9%81%D8%A7_%D8%A5%D9%84%D9%8A_%D8%A7%D9%84%D9%86%D8%A8%D9%8A.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 755611,
+          "sha256": "ee7de8ef932ed910962048f5925f648d2b80413b9231a927ca498ac9454224a8",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/فوايد-الليث-بن-سعد--fa7f10752321--retry-d0272c150a3d66268dff.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/فوايد-الليث-بن-سعد--fa7f10752321--retry-d0272c150a3d66268dff.pdf"
+        }
+      ],
+      "acquired_count": 1,
+      "rights_action": "developer-vault-encrypt",
       "retry_history": [
         {
           "pass": "multi-pass-v1",
@@ -1449,6 +1525,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -1562,6 +1642,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -2273,6 +2357,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -2820,6 +2908,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -3361,6 +3453,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -4492,6 +4588,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -4513,6 +4613,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -5866,6 +5970,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -8116,6 +8224,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -9007,6 +9119,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -9028,6 +9144,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -11723,8 +11843,8 @@
   ],
   "counts": {
     "books": 247,
-    "acquired_books": 228,
-    "acquired_files": 228,
-    "global_search_no_match": 19
+    "acquired_books": 230,
+    "acquired_files": 230,
+    "global_search_no_match": 17
   }
 }
