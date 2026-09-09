@@ -29,8 +29,8 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    # Pin to the merged main commit containing PR #426's LFS persistence fix.
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@1a2be3cbc02a4fe2f7aa607857050b1029cf7f8e
+    # Pin to the merged main commit containing the LFS persistence fix.
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@8a9d72ec49c4159a56a324a156b97e1889740068
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     secrets:
