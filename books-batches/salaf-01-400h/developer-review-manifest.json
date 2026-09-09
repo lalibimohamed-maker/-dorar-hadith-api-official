@@ -311,6 +311,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -595,6 +599,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -658,6 +666,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -1902,6 +1914,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -3286,6 +3302,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -3827,6 +3847,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -4988,12 +5012,38 @@
       "discovery_registries": [
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
-      "availability": "not-acquired",
-      "acquisition_state": "global-search-no-match",
-      "acquired": [],
-      "acquired_count": 0,
-      "rights_action": "none",
+      "candidates": [
+        {
+          "source": "global:wikisource",
+          "url": "https://upload.wikimedia.org/wikisource/ar/d/d1/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%A3%D8%B0%D9%83%D9%8A%D8%A7%D8%A1.pdf?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 1143026,
+          "sha256": "f231bc60cc0fdef7802a56560231cb90649ab655611052e0489e018cb55d62f6",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/التاريخ--d2576b5ce61e--retry-7ba5b3ba9267d4f05fdf.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/التاريخ--d2576b5ce61e--retry-7ba5b3ba9267d4f05fdf.pdf"
+        }
+      ],
+      "availability": "copy-acquired",
+      "acquisition_state": "acquired",
+      "acquired": [
+        {
+          "source": "global:wikisource",
+          "url": "https://upload.wikimedia.org/wikisource/ar/d/d1/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%A3%D8%B0%D9%83%D9%8A%D8%A7%D8%A1.pdf?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 1143026,
+          "sha256": "f231bc60cc0fdef7802a56560231cb90649ab655611052e0489e018cb55d62f6",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/التاريخ--d2576b5ce61e--retry-7ba5b3ba9267d4f05fdf.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/التاريخ--d2576b5ce61e--retry-7ba5b3ba9267d4f05fdf.pdf"
+        }
+      ],
+      "acquired_count": 1,
+      "rights_action": "developer-vault-encrypt",
       "retry_history": [
         {
           "pass": "multi-pass-v1",
@@ -5059,6 +5109,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -6452,6 +6506,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -8782,6 +8840,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -9670,6 +9732,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -12483,8 +12549,8 @@
   ],
   "counts": {
     "books": 247,
-    "acquired_books": 236,
-    "acquired_files": 236,
-    "global_search_no_match": 11
+    "acquired_books": 237,
+    "acquired_files": 237,
+    "global_search_no_match": 10
   }
 }
