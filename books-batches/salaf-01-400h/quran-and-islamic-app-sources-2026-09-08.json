@@ -1,0 +1,51 @@
+{
+  "registry_type": "rechercher_quran_and_apps_source_registry",
+  "date": "2026-09-08",
+  "purpose": "Permanent discovery and acquisition-source memory for Quran text, Quran translations, tafsir resources, hadith translations, and Islamic e-book applications.",
+  "rules": [
+    "Keep every source permanently; append rather than replace.",
+    "Search saved sources before generic rediscovery.",
+    "Treat Arabic Quran text, translations of meanings, tafsir, recitations, and books as distinct content types.",
+    "Never infer redistribution rights from discoverability or downloadability; verify rights per item/source.",
+    "Prefer authoritative Quran text and preserve exact provenance/version/license metadata.",
+    "For translations, preserve translator, language, publisher/rightsholder, source and permission status.",
+    "Applications are discovery/indexing sources; acquisition must still resolve to the underlying official content and rights.",
+    "Each language remains an independent search lane."
+  ],
+  "quran_primary_and_text_sources": [
+    {"source_id":"quran_com","name":"Quran.com / Quran.Foundation","url":"https://quran.com/","role":"Quran reading, search, translations, tafsir, recitations, word-by-word resources and developer APIs","rights":"VERIFY per dataset/API/content"},
+    {"source_id":"tanzil","name":"Tanzil Quran Project","url":"https://tanzil.net/","role":"Highly verified digital Quran text, translations and metadata; downloadable text resources","rights":"Quran text permits verbatim copying/distribution with attribution and no alteration under stated terms; translations have individual provenance/rights"},
+    {"source_id":"tanzil_download","name":"Tanzil Downloads","url":"https://tanzil.net/download/","role":"Downloadable Quran text resources","rights":"See Tanzil terms; preserve notice and source link"},
+    {"source_id":"tanzil_translations","name":"Tanzil Translation Repository","url":"https://tanzil.net/docs/translations_resources","role":"Multilingual Quran translations and translation provenance","rights":"VERIFY per translation"},
+    {"source_id":"king_fahd_quran_complex","name":"King Fahd Quran Printing Complex / Quran Research","url":"https://qurancomplex.gov.sa/","role":"Authoritative Quran printing, translations of meanings, Quran studies and digital Quran resources","rights":"VERIFY per resource/license"},
+    {"source_id":"quranenc","name":"QuranEnc","url":"https://quranenc.com/","role":"Multilingual Quran translations and meanings","rights":"VERIFY per translation and reuse terms"}
+  ],
+  "quran_multilingual_lanes": [
+    "English","French","Spanish","Portuguese","Russian","Bosnian","Albanian","Dutch","German","Turkish","Urdu","Bengali","Hindi","Malay","Indonesian","Swahili","Hausa","Wolof","Yoruba","Amharic","Persian","Pashto","Tamil","Malayalam","Thai","Chinese","Japanese","Korean","Tagalog","Maranao"
+  ],
+  "islamic_app_and_platform_sources": [
+    {"source_id":"islamhouse_apps","name":"Dar Al-Islam / IslamHouse Apps","url":"https://islamhouse.com/apps/","role":"Multilingual Islamic books, articles, audio/video and applications; major discovery source across many languages","rights":"VERIFY per item; platform may provide free downloads but reuse rights remain item-specific"},
+    {"source_id":"hadeethenc","name":"HadeethEnc / Encyclopedia of Translated Prophetic Hadiths","url":"https://hadeethenc.com/","role":"Multilingual translated hadith corpus and downloadable resources","rights":"VERIFY per item and stated republication conditions"},
+    {"source_id":"darussalam","name":"Darussalam Publications","url":"https://darussalam.com/","role":"Publisher catalogue and Islamic e-book discovery across multiple languages","rights":"Publisher-controlled; acquisition/re-hosting only when expressly permitted"},
+    {"source_id":"sunnah_com","name":"Sunnah.com","url":"https://sunnah.com/","role":"Primary hadith collection discovery, Arabic/English and related resources","rights":"VERIFY per collection/resource; do not infer book redistribution rights"},
+    {"source_id":"sunni_publications","name":"Sunni Publications","url":"https://sunnipublications.net/","role":"English Islamic book publisher/library discovery","rights":"Publisher-controlled; VERIFY per title"},
+    {"source_id":"as_sunnah_nl","name":"As-Sunnah Netherlands","url":"https://www.as-sunnah.nl/","role":"Dutch Islamic/Sunnah content and publication discovery","rights":"VERIFY per item"},
+    {"source_id":"shamela","name":"المكتبة الشاملة / Shamela","url":"https://shamela.ws/","role":"Arabic Islamic book and heritage-text discovery; metadata and full-text research source","rights":"VERIFY per book/rightsholder; availability does not imply redistribution permission"}
+  ],
+  "user_proposed_apps": [
+    {"name":"IslamHouse App / دار الإسلام","status":"CONFIRMED_PLATFORM","note":"Official IslamHouse apps page lists many language-specific applications, including Arabic, Akan, Albanian, Amharic, Bosnian, Luganda, Hausa, Hindi, Indonesian, Malayalam, Nepali, Persian, Portuguese, Russian, Serbian, Sinhala, Spanish, Swahili, Urdu, Wollof, Yoruba and Afar."},
+    {"name":"HadithEnc app / موسوعة الأحاديث النبوية المترجمة","status":"CONFIRMED_PLATFORM","note":"Track as an independent multilingual hadith lane; resolve official web/app resource and verify item-level download/republication terms."},
+    {"name":"Darussalam Islamic E-Books","status":"CONFIRMED_PUBLISHER_PLATFORM","note":"Track official publisher catalogue/app as a discovery lane; publisher rights apply unless a title explicitly permits reuse."},
+    {"name":"EuroSunnah / European Islamic apps","status":"DISCOVERY_CANDIDATE","note":"Keep as a category of regional app/source discovery, but do not treat the name as one confirmed official platform without identifying the exact application/operator."},
+    {"name":"Multilingual Shamela / companion platforms","status":"DISCOVERY_CANDIDATE","note":"Search for language-specific or companion interfaces, while retaining Shamela itself as the Arabic heritage-book discovery source."}
+  ],
+  "required_rechercher_behavior": [
+    "For Quran queries, search Quran-specific sources before generic web discovery.",
+    "For Quran translations, search by language + translator + source, not language alone.",
+    "For Quran PDFs/mushaf scans, prefer official Quran institutions and verified digital surrogates.",
+    "For hadith translations, search HadeethEnc and relevant official language lanes before generic search.",
+    "For books advertised through an app, resolve the underlying publisher/library URL and store item-level provenance.",
+    "Do not classify a mobile application as an acquisition source unless the underlying content can be legally and technically acquired.",
+    "Record source version/date and checksum for authoritative Quran text assets where technically applicable."
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "registry_type": "terminology_and_islamic_glossary_sources",
+  "updated": "2026-09-08",
+  "purpose": "Permanent discovery and priority registry for Islamic terminology, multilingual definitions, transliteration, glossary, and concept-reference sources used by @Rechercher.",
+  "required_behavior": [
+    "Persist every discovered terminology/glossary source; never silently discard prior entries.",
+    "Search this registry before generic rediscovery for terminology, glossary, translation, concept, and definition requests.",
+    "Treat each language as an independent search lane and preserve source language and target-language coverage.",
+    "Keep provenance at term/entry level where possible.",
+    "Do not infer redistribution rights from public visibility; verify rights per source and per asset.",
+    "Prefer authoritative institutional or specialist encyclopedic sources over generic glossaries when ranking evidence.",
+    "Do not merge definitions from different sources into one authoritative definition without preserving attribution."
+  ],
+  "sources": [
+    {
+      "source_id": "terminologyenc",
+      "name": "Encyclopedia of Translated Islamic Terms",
+      "url": "https://terminologyenc.com/",
+      "role": ["primary_multilingual_islamic_terminology", "definitions", "translations", "thematic_taxonomy", "persons", "places", "sects_and_religions"],
+      "languages": ["Arabic", "English", "French", "Spanish", "Turkish", "Urdu", "Indonesian", "Bosnian", "Russian", "Chinese", "Portuguese", "Bengali", "Persian", "Tagalog", "Hindi", "Malayalam", "Telugu", "Thai"],
+      "coverage": ["Quran_and_Quranic_sciences", "Hadith_and_Hadith_sciences", "Creed", "Fiqh_and_usul", "Virtues_and_manners", "Dawah", "Seerah_and_history", "other", "sects_and_religions", "places", "persons"],
+      "rights": "VERIFY_PER_ASSET_AND_API_OR_EXPORT_TERMS",
+      "priority": "VERY_HIGH",
+      "verification": "verified_2026-09-08",
+      "notes": "Core source requested by user. The site describes itself as a free electronic reference for translated Islamic terminology with definitions and multiple electronic formats. French and English interfaces were verified; multilingual term pages demonstrate broad language coverage."
+    },
+    {
+      "source_id": "islamenc",
+      "name": "Islamic Content Encyclopedia / IslamEnc",
+      "url": "https://islamenc.com/",
+      "role": ["multilingual_islamic_encyclopedia", "Quran", "tafsir", "books", "hadith", "rulings", "encyclopedic_content", "terminology_discovery"],
+      "languages": ["100+ languages claimed by the platform; maintain current language list from live catalogue"],
+      "rights": "VERIFY_PER_ASSET",
+      "priority": "VERY_HIGH",
+      "verification": "verified_2026-09-08",
+      "notes": "Strong companion source to terminologyenc: multilingual Islamic encyclopedia with Quran, documents, encyclopedias, verified sources, and an API for developers."
+    },
+    {
+      "source_id": "azan_islamic_glossary",
+      "name": "AZAN Islamic Glossary",
+      "url": "https://azan.net/en/glossary",
+      "role": ["islamic_glossary", "definitions", "Arabic_English_French_Turkish_terminology", "Quran", "Hadith", "Fiqh", "Aqeedah", "Names_of_Allah", "Islamic_history"],
+      "languages": ["English", "Turkish", "French", "Arabic"],
+      "coverage": ["691 entries reported", "21 categories reported"],
+      "rights": "VERIFY_PER_ASSET",
+      "priority": "HIGH",
+      "verification": "verified_2026-09-08",
+      "notes": "Useful multilingual glossary with structured categories and hundreds of entries; retain as a terminology discovery/reference lane, not as a replacement for higher-authority sources."
+    },
+    {
+      "source_id": "iman_nz_islamic_glossary",
+      "name": "Iman New Zealand — Glossary of Islamic Terms in Arabic",
+      "url": "https://www.iman.co.nz/glossary_of_islamic_terms_in_arabic.php",
+      "role": ["Islamic_glossary", "Arabic_terms", "English_definitions", "terminology_discovery"],
+      "languages": ["Arabic", "English"],
+      "coverage": ["478 technical terms reported by the page"],
+      "rights": "VERIFY_PER_ASSET",
+      "priority": "MEDIUM",
+      "verification": "verified_2026-09-08",
+      "notes": "Useful supplementary terminology index; definitions and reuse rights must be checked at source level."
+    },
+    {
+      "source_id": "muslimwiki_islamic_terms",
+      "name": "MuslimWiki — Glossary of Islamic Terms in Arabic",
+      "url": "https://muslim.wiki/wiki/Glossary_of_Islamic_terms_in_Arabic",
+      "role": ["Islamic_glossary", "Arabic_terms", "spelling_variants", "concept_disambiguation", "terminology_discovery"],
+      "languages": ["Arabic", "English"],
+      "rights": "VERIFY_PER_ASSET_AND_WIKI_LICENSE",
+      "priority": "MEDIUM",
+      "verification": "verified_2026-09-08",
+      "notes": "Useful for spelling variants, transliteration variants, and concept disambiguation. Treat as a secondary discovery/reference source and preserve attribution/license metadata."
+    },
+    {
+      "source_id": "waqfeya_foreign_dictionaries",
+      "name": "Waqfeya — Foreign Dictionaries / Islamic Dictionaries Collection",
+      "url": "https://waqfeya.net/categories/413-%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D8%AC%D9%85-%D9%88%D8%A7%D9%84%D9%82%D9%88%D8%A7%D9%85%D9%8A%D8%B3-%D8%A7%D9%84%D8%A3%D8%AC%D9%86%D8%A8%D9%8A%D8%A9-dddbfbe2aa3e42d8af58386e1834a743",
+      "role": ["scanned_dictionary_catalogue", "Arabic_English_dictionaries", "French_Arabic_dictionaries", "Islamic_terminology_books", "bibliographic_discovery"],
+      "languages": ["Arabic", "English", "French", "other_as_available"],
+      "rights": "VERIFY_PER_BOOK",
+      "priority": "HIGH",
+      "verification": "verified_2026-09-08",
+      "notes": "Important book-level companion to live terminology encyclopedias. The collection includes Islamic-term dictionaries and Arabic-English/French-Arabic dictionaries. Use for bibliographic discovery and acquisition only after item-level rights verification."
+    }
+  ],
+  "already_registered_companion_sources": [
+    "quranic_arabic_corpus",
+    "quranenc",
+    "hadeethenc",
+    "shamela",
+    "qurancom",
+    "tanzil",
+    "ksu_ayat",
+    "darussalam_ebooks"
+  ],
+  "ranking_rule": "For terminology questions, search terminologyenc and IslamEnc first; then specialist multilingual glossaries and institutional dictionaries; then book/catalogue sources. Always preserve the original source and language for each definition/translation."
+}

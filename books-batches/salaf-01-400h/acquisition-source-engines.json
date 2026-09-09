@@ -1,0 +1,37 @@
+{
+  "schema": "developer-review-acquisition/source-engines/v2",
+  "scope": "1-400H",
+  "policy": "discovery_engines_never_imply_redistribution_rights",
+  "engines": [
+    {"id":"waqfeya","role":"primary_pdf_acquisition","base":"https://waqfeya.net/","priority":1,"notes":"Prefer exact book/edition pages with explicit PDF download links; preserve edition metadata and rights evidence."},
+    {"id":"internet_archive","role":"pdf_acquisition_fallback","base":"https://archive.org/","priority":2,"notes":"Search title+author, resolve concrete PDF files through item metadata, then validate with qpdf."},
+    {"id":"openlibrary","role":"edition_and_archive_identifier_resolver","base":"https://openlibrary.org/","priority":3,"notes":"Use edition/work metadata and availability to locate Internet Archive identifiers; do not bulk-download Open Library data."},
+    {"id":"nyu_aco","role":"public_domain_pdf_acquisition","base":"https://aco.dlib.nyu.edu/","priority":4,"notes":"Arabic Collections Online explicitly describes its collection as public-domain Arabic content and provides low/high-resolution PDF downloads; verify exact work/edition before acquisition."},
+    {"id":"smithsonian_digital_library","role":"public_domain_manuscript_pdf_acquisition","base":"https://library.si.edu/digital-library/","priority":5,"notes":"Use digitized Arabic/Islamic manuscripts where the individual record explicitly states CC0/Public Domain or equivalent permission; PDF and image downloads are available on qualifying records."},
+    {"id":"wikimedia_commons","role":"public_domain_or_open_manuscript_acquisition","base":"https://commons.wikimedia.org/","priority":6,"notes":"Use only file records with an explicit compatible/public-domain license; preserve the file page and license evidence."},
+    {"id":"wikisource","role":"public_domain_text_and_scan_discovery","base":"https://ar.wikisource.org/","priority":7,"notes":"Use scanned editions and PDF files only when the file record provides an explicit public-domain/open-license basis."},
+    {"id":"princeton_islamic_manuscripts","role":"manuscript_discovery_and_review","base":"https://digital-collections.princeton.edu/collections/islamicmss","priority":8,"notes":"Use as manuscript provenance/discovery. Princeton states its digital resource is free/open for academic and research use; redistribution rights remain record-specific."},
+    {"id":"kairawan","role":"global_manuscript_discovery_and_source_resolution","base":"https://kairawan.org/","priority":9,"notes":"Global index spanning major Arabic/Islamic manuscript collections; follow each record to the holding library and acquire only where the holding source permits download/use."},
+    {"id":"library_of_congress","role":"manuscript_discovery_and_provenance","base":"https://www.loc.gov/","priority":10,"notes":"Use manuscript records, IIIF manifests and provenance as discovery/evidence; acquire only where the record permits it."},
+    {"id":"british_library","role":"manuscript_discovery_and_digital_source","base":"https://www.bl.uk/","priority":11,"notes":"Search Arabic manuscripts and Endangered Archives digital records; acquire only files explicitly exposed by the holding record under applicable terms."},
+    {"id":"gallica_bnf","role":"manuscript_and_printed_heritage_discovery","base":"https://gallica.bnf.fr/","priority":12,"notes":"Search BnF digital collections for Arabic manuscripts and heritage print; preserve item-level rights/provenance."},
+    {"id":"bodleian_fihrist","role":"manuscript_discovery","base":"https://fihrist.org.uk/","priority":13,"notes":"Use Fihrist/Bodleian records to locate Arabic manuscripts and digital surrogates; follow the holding institution's rights."},
+    {"id":"cambridge_digital_collections","role":"manuscript_discovery","base":"https://cudl.lib.cam.ac.uk/","priority":14,"notes":"Search digitized Islamic/Arabic manuscripts; acquire only where the item record permits it."},
+    {"id":"vatican_digital_collections","role":"manuscript_discovery","base":"https://digi.vatlib.it/","priority":15,"notes":"Search Arabic/Islamic manuscript records and digitized surrogates; rights are item-specific."},
+    {"id":"al_furqan_digital_library","role":"heritage_manuscript_and_book_discovery","base":"https://digitallibrary.al-furqan.com/","priority":16,"notes":"Use for Islamic heritage book/manuscript discovery and provenance; do not infer redistribution permission from discoverability."},
+    {"id":"google_books","role":"bibliographic_discovery","base":"https://books.google.com/","priority":17,"notes":"Use volume metadata and access status to improve edition matching; do not treat search results as redistribution permission."},
+    {"id":"crossref","role":"bibliographic_identity_crosscheck","base":"https://api.crossref.org/","priority":18,"notes":"Metadata cross-check only; especially useful for modern editions and identifiers, not as a primary Arabic heritage PDF source."}
+  ],
+  "acquisition_gate": [
+    "exact_title_author_match",
+    "edition_or_copy_identity_check",
+    "source_permission_check",
+    "download_concrete_pdf_or_complete_manuscript_scan",
+    "qpdf_validation_for_pdf",
+    "sha256_record",
+    "encrypt_before_persistence"
+  ],
+  "manuscript_policy": "A digitized manuscript is acquired as a book-level review object when a complete or materially complete digital surrogate is available. OCR may be generated for search, but OCR never replaces the manuscript images as the authoritative witness.",
+  "public_policy": "Only records with explicit verified redistribution permission may become public downloadable PDFs. Review-only or rights-unclear copies remain encrypted and source-linked.",
+  "forbidden_shortcut": "Never persist a discovery URL as an acquired book. An acquired record requires an actual validated PDF or complete permitted scan."
+}

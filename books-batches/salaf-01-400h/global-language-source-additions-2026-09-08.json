@@ -1,0 +1,37 @@
+{
+  "schema":"rechercher/master-global-source-registry/additions/v1",
+  "date":"2026-09-08",
+  "purpose":"Permanent source-memory additions for African, Asian, European and Latin-American local-language Islamic book discovery.",
+  "sources":[
+    {"id":"muslim_library_swahili","name":"Muslim Library — Swahili","url":"https://www.muslim-library.com/?lang=Swahili","region":"East Africa / global","languages":["sw"],"role":"Swahili Islamic books and translations; Sunnah-oriented discovery","rights":"item/source-level; verify reuse"},
+    {"id":"archive_63_madani_inamat","name":"Internet Archive — 63 Madani Inamat","url":"https://archive.org/details/63MadaniInamat_201801","region":"global","languages":["sw","multi"],"role":"digital Islamic book/audio/document discovery","rights":"item-level"},
+    {"id":"alislam_wolof_quran","name":"AlIslam — Quran Wolof","url":"https://new.alislam.org/library/books/quran-wolof/info","region":"West Africa / global","languages":["wo"],"role":"Wolof Quran/book discovery","rights":"item/source-level; verify reuse"},
+    {"id":"google_books_senegal","name":"Google Books — Senegal/West Africa holdings","url":"https://books.google.com/","region":"West Africa / global","languages":["wo","fr","multi"],"role":"bibliographic and digitized-book discovery","rights":"item/access-level"},
+    {"id":"academia_bambara_islam","name":"Academia — Écrire L'Islam en Bambara","url":"https://www.academia.edu/55379899/%C3%89crire_L_Islam_en_Bambara","region":"West Africa","languages":["bm","fr"],"role":"Bambara Islamic literature research/discovery","rights":"platform/item-level; verify reuse"},
+    {"id":"islamic_foundation_bangladesh","name":"Islamic Foundation Bangladesh","url":"https://islamicfoundation.gov.bd/","region":"Bangladesh","languages":["bn","ar"],"role":"official Islamic publications, Quran, tafsir, hadith and encyclopedia in Bengali","rights":"government/item-level; verify reuse"},
+    {"id":"islamic_foundation_bd_publications","name":"Islamic Foundation Bangladesh — Publications catalogue","url":"https://islamicfoundation.gov.bd/pages/static-pages/6922dd7a933eb65569e152e4","region":"Bangladesh","languages":["bn"],"role":"official published-book catalogue","rights":"catalogue/item-level"},
+    {"id":"islamic_publishing_global","name":"Islamic Publishing","url":"https://islamicpublishing.org/","region":"global / Europe-Asia","languages":["multi"],"role":"multilingual Islamic publishing/distribution discovery","rights":"publisher/item-level"},
+    {"id":"el_kalem_candidate","name":"El-Kalem — Islamic Community in Bosnia and Herzegovina publishing","url":"https://islamskazajednica.ba/","region":"Bosnia and Herzegovina / Balkans","languages":["bs","ar"],"role":"Bosnian Islamic publishing and heritage discovery","rights":"publisher/institution-level; verify item"},
+    {"id":"as_sunnah_maastricht","name":"As-Sunnah — Maastricht","url":"https://www.as-sunnah.nl/","region":"Netherlands / Belgium region","languages":["nl","ar"],"role":"Dutch Sunnah-oriented Islamic content discovery","rights":"site/item-level; verify reuse"},
+    {"id":"japan_islamic_trust","name":"Japan Islamic Trust","url":"https://islam.or.jp/","region":"Japan","languages":["ja","en","ar"],"role":"Japanese Muslim education, Quran/Hadith classes and multilingual Islamic library discovery","rights":"organization/item-level; verify reuse"},
+    {"id":"japan_islamic_association","name":"Japan Islamic Association — Publications","url":"https://www.islamkyokai.org/publication","region":"Japan","languages":["ja","multi"],"role":"Japanese Islamic publications and bibliographic discovery","rights":"publication-level"},
+    {"id":"korea_muslim_federation","name":"Korea Muslim Federation","url":"https://www.koreaislam.org/","region":"South Korea","languages":["ko","ar","en"],"role":"Korean Islamic literature, translation and publication discovery","rights":"organization/item-level; verify reuse"},
+    {"id":"clear_publishing","name":"The Clear Publishing","url":"https://theclearpublishing.com/","region":"USA / Latin America / global","languages":["es","en","ar"],"role":"Spanish and multilingual Quran/book publishing","rights":"publisher/item-level"},
+    {"id":"clear_publishing_spanish","name":"The Clear Publishing — Spanish Editions","url":"https://theclearpublishing.com/product-category/the-clear-quran-series/spanish-editions/","region":"Latin America / global","languages":["es"],"role":"Spanish Quran editions and book discovery","rights":"publisher/item-level"}
+  ],
+  "verification_notes":[
+    "Muslim Library currently exposes a dedicated Swahili catalogue with thousands of multilingual Islamic books and numerous Swahili titles.",
+    "Islamic Foundation Bangladesh has an official publications catalogue covering Quran/tafsir, hadith, seerah and Islamic encyclopedia subjects.",
+    "Japan Islamic Trust is a registered Japanese organization and its site documents a multilingual Islamic library at Otsuka Mosque plus Quran/Hadith education.",
+    "Japan Islamic Association maintains a publications page for Japanese Islamic scholarship and books.",
+    "The Clear Publishing has a dedicated Spanish Editions catalogue for Quran publications.",
+    "Korea Muslim Federation is retained as a discovery source; independent official-domain verification should precede acquisition automation.",
+    "User-supplied claims about local-language Sunni publishing are preserved as discovery leads, while religious/sectarian characterization is not treated as an automatic legal or editorial certification."
+  ],
+  "required_behavior":[
+    "Search saved local-language sources before generic web rediscovery.",
+    "Keep each language as an independent search lane: Swahili, Wolof, Bambara, Bengali, Maranao/Tagalog, Bosnian, Albanian, Dutch, Japanese, Korean, Spanish and Portuguese.",
+    "Preserve provenance and item-level rights; discoverability does not imply redistribution permission.",
+    "Append future national, university, mosque, publisher and Islamic-library sources rather than replacing prior entries."
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "rechercher/master-global-source-registry/additions/v1",
+  "date": "2026-09-08",
+  "purpose": "Permanent preservation of additional regional, local-language and Islamic publishing/library discovery sources supplied by the user, with verified additions where possible.",
+  "sources": [
+    {"id":"muslim_library_swahili","name":"Muslim Library — Swahili","url":"https://www.muslim-library.com/?lang=Swahili","region":"East Africa / global","languages":["sw"],"role":"Swahili Islamic books and translation discovery; large multilingual e-library","rights":"VERIFY item-level"},
+    {"id":"islamic_foundation_bangladesh","name":"Islamic Foundation Bangladesh","url":"https://islamicfoundation.gov.bd/","region":"Bangladesh","languages":["bn","ar","en","ur"],"role":"Government Islamic research, library and publishing source; Quran, hadith, fiqh, seerah and Islamic studies","rights":"Institution/item-level; verify reuse"},
+    {"id":"islamic_foundation_bd_library","name":"Islamic Foundation Bangladesh Central Library","url":"https://islamicfoundation.gov.bd/pages/static-pages/6922dc3a933eb65569e0f1ca","region":"Bangladesh","languages":["bn","ar","en","ur","multi"],"role":"Islamic library and research discovery; manuscripts, Quran, tafsir, hadith, encyclopedias and Islamic literature","rights":"Discovery/catalogue; verify item rights"},
+    {"id":"hadeeth_foundation_bangladesh_library","name":"Hadeeth Foundation Bangladesh Library","url":"https://library.hadeethfoundationbd.com/","region":"Bangladesh","languages":["bn","en","ar"],"role":"Hadith, aqeedah, tafsir, seerah and Islamic books; online reading/catalogue","rights":"Publisher/item-level; verify reuse"},
+    {"id":"elkalem_bih","name":"El-Kalem — Islamic Community in Bosnia and Herzegovina Publishing Center","url":"https://elkalem.ba/","region":"Bosnia and Herzegovina / Balkans","languages":["bs","ar","multi"],"role":"Islamic publishing; Quran/tafsir, hadith/seerah, aqidah, sharia law and Islamic studies","rights":"Publisher-controlled; verify item-level"},
+    {"id":"as_sunnah_nl","name":"As-Sunnah Publications / As-Sunnah.nl","url":"https://www.as-sunnah.nl/","region":"Netherlands / Belgium / Dutch-speaking Europe","languages":["nl","ar"],"role":"Dutch-language Sunni/Salafi Islamic content discovery and publications","rights":"VERIFY item/source-level"},
+    {"id":"japan_islamic_trust","name":"Japan Islamic Trust","url":"https://islam.or.jp/","region":"Japan","languages":["ja","ar","en","multi"],"role":"Japanese Islamic education, Quran, hadith and community resources","rights":"Institution/item-level; verify reuse"},
+    {"id":"japan_islamic_association","name":"Japan Islamic Association","url":"https://www.islamkyokai.org/","region":"Japan","languages":["ja","ar","en"],"role":"Japanese Islamic publications and educational resources","rights":"Institution/item-level; verify reuse"},
+    {"id":"korea_muslim_federation","name":"Korea Muslim Federation","url":"https://www.koreaislam.org/","region":"South Korea","languages":["ko","ar","en"],"role":"Korean Islamic community and educational/publishing source","rights":"Institution/item-level; verify reuse"},
+    {"id":"the_clear_publishing","name":"The Clear Publishing","url":"https://theclearpublishing.com/","region":"Latin America / global Spanish-language","languages":["es","en","pt"],"role":"Islamic publishing and Quran translations/resources, including Spanish editions","rights":"Publisher-controlled; verify item-level"},
+    {"id":"alislam_wolof","name":"AlIslam — Quran Wolof","url":"https://new.alislam.org/library/books/quran-wolof/info","region":"West Africa / Wolof","languages":["wo","ar","en"],"role":"Wolof Quran/book discovery","rights":"Verify item/source-level"}
+  ],
+  "verified_notes": [
+    "Muslim Library's current Swahili page lists 10,447 books and includes multiple Swahili Islamic titles, making it a concrete Swahili search lane.",
+    "Islamic Foundation Bangladesh officially describes a central library with about 130,000 books and pamphlets, including Quran, tafsir, hadith, encyclopedias, Islamic law, history and related subjects.",
+    "Islamic Foundation Bangladesh publishes an official 2025 book list and its research department reports publication of research books on Quran, hadith, fiqh and Islamic subjects.",
+    "Hadeeth Foundation Bangladesh has an active online library with books in Bengali and other languages and online-reading entries.",
+    "El-Kalem is the publishing center of the Islamic Community in Bosnia and Herzegovina and has dedicated categories for Quran/tafsir, hadith/seerah, aqidah and sharia law.",
+    "As-Sunnah.nl, Japan Islamic Trust, Japan Islamic Association and Korea Muslim Federation are preserved as regional discovery lanes; item-level rights must be verified before redistribution.",
+    "The Clear Publishing is preserved as a Spanish-language publishing lane; publisher-controlled works must not be assumed freely redistributable.",
+    "Wolof, Bambara, Maranao, Tagalog, Albanian, Bosnian, Dutch, Japanese, Korean, Spanish and Portuguese are treated as independent search-language lanes rather than merely translation metadata."
+  ],
+  "required_behavior": [
+    "Do not delete or replace previously saved sources when these regional sources are added.",
+    "Search saved regional/language sources before generic web discovery for matching language and subject queries.",
+    "Preserve provenance, edition, language and item-level rights for every acquired work.",
+    "Do not infer public redistribution rights from online availability or from an institution being governmental/nonprofit.",
+    "For manuscripts, preserve the complete digital surrogate when legally obtainable; OCR remains a search aid and not the authoritative surrogate."
+  ]
+}

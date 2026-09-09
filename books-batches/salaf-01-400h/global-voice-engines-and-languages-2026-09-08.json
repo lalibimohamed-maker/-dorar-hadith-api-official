@@ -1,0 +1,30 @@
+{
+  "registry_type": "rechercher_global_voice_source_registry",
+  "date": "2026-09-08",
+  "purpose": "Permanent source-memory for multilingual text-to-speech, speech synthesis and voice infrastructure relevant to @Rechercher and the encyclopedia.",
+  "user_named_source": {
+    "name": "بوابة العلم / Bawabat Al-Ilm — global voice engine",
+    "url": null,
+    "status": "USER_IDENTIFIED_NEEDS_EXACT_URL_VERIFICATION",
+    "role": ["voice_engine", "text_to_speech", "multilingual_voice"],
+    "note": "Preserved as a named discovery target because the exact service/domain was not uniquely identified in current web results. Do not substitute similarly named educational sites. Resolve the exact URL before technical integration or rights assumptions."
+  },
+  "verified_global_voice_targets": [
+    {"source_id":"google_cloud_text_to_speech","name":"Google Cloud Text-to-Speech","url":"https://cloud.google.com/text-to-speech","role":["text_to_speech","multilingual","voice_api"],"rights":"API/service terms; verify current quotas and commercial terms"},
+    {"source_id":"azure_ai_speech","name":"Microsoft Azure AI Speech","url":"https://azure.microsoft.com/products/ai-services/ai-speech","role":["text_to_speech","speech_recognition","multilingual","voice_api"],"rights":"Service terms; verify per voice/model"},
+    {"source_id":"amazon_polly","name":"Amazon Polly","url":"https://aws.amazon.com/polly/","role":["text_to_speech","multilingual","voice_api"],"languages":"Official documentation currently lists Arabic, Chinese variants, European languages, Hindi, Japanese, Korean, Russian, Spanish, Turkish and others.","rights":"AWS service terms"},
+    {"source_id":"elevenlabs","name":"ElevenLabs","url":"https://elevenlabs.io/","role":["text_to_speech","multilingual","voice_cloning","narration"],"languages":"Eleven v3 currently supports 74 languages according to official documentation.","rights":"Service/voice/model terms; verify voice cloning and publishing rights per asset"},
+    {"source_id":"espeak_ng","name":"eSpeak NG","url":"https://github.com/espeak-ng/espeak-ng","role":["open_source_tts","multilingual","offline_voice"],"languages":"Development documentation currently lists 127 languages and accents.","rights":"GPL-3.0-or-later software; individual voice/data licensing and attribution must still be checked"},
+    {"source_id":"piper_tts","name":"Piper TTS ecosystem","url":"https://github.com/rhasspy/piper","role":["local_neural_tts","multilingual","offline_voice"],"languages":"Multiple community voice models; each MODEL_CARD must be checked because voice licenses can differ.","rights":"Software/model licenses are separate; verify every voice model before redistribution"}
+  ],
+  "design_rules": [
+    "Keep the user-named Bawabat Al-Ilm target permanently even while its exact URL is unresolved.",
+    "Search saved voice engines before generic TTS discovery.",
+    "Treat every language as an independent voice lane, including dialect and locale variants.",
+    "Track voice gender/style/age/accent only when the provider actually documents it.",
+    "Separate TTS, speech-to-text, voice cloning and audio libraries; they are not interchangeable capabilities.",
+    "Prefer open/offline engines as fallback options where quality and language coverage are adequate.",
+    "Never infer permission to redistribute generated voices, voice models or cloned voices from API availability alone.",
+    "For Islamic/Arabic content, preserve pronunciation, diacritics, Quranic recitation and hadith-specific pronunciation as separate quality tracks rather than treating generic TTS as authoritative recitation."
+  ]
+}

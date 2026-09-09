@@ -1,0 +1,47 @@
+{
+  "registry_version": "2026-09-08",
+  "purpose": "Permanent preservation of the global voice, audio, image, manuscript and Quran-media discovery lanes requested for Rechercher.",
+  "rules": [
+    "Preserve every discovered source permanently; never replace or discard a prior source.",
+    "Search the saved registry before generic rediscovery.",
+    "Keep each language as an independent acquisition/search lane.",
+    "Track rights at item/source level; discoverability or API availability is not redistribution permission.",
+    "Keep authoritative Quran text, translations, tafsir, recitation audio, manuscript images and OCR/search derivatives as distinct assets.",
+    "OCR is a search/readability aid and must not silently replace authoritative source text.",
+    "User-named Bawabat Al-Ilm is retained exactly as a discovery target until its exact URL is verified; do not substitute similarly named sites."
+  ],
+  "voice_engines": [
+    {"name":"بوابة العلم / Bawabat Al-Ilm","url":null,"status":"USER_IDENTIFIED_NEEDS_EXACT_URL_VERIFICATION","roles":["voice_engine","text_to_speech","multilingual_voice"]},
+    {"name":"Google Cloud Text-to-Speech","url":"https://cloud.google.com/text-to-speech","status":"verified_global_target","roles":["text_to_speech","multilingual_voice"]},
+    {"name":"Microsoft Azure AI Speech","url":"https://azure.microsoft.com/products/ai-services/ai-speech","status":"verified_global_target","roles":["text_to_speech","speech","multilingual_voice"]},
+    {"name":"Amazon Polly","url":"https://aws.amazon.com/polly/","status":"verified_global_target","roles":["text_to_speech","multilingual_voice"]},
+    {"name":"ElevenLabs","url":"https://elevenlabs.io/","status":"verified_global_target","roles":["text_to_speech","multilingual_voice"]},
+    {"name":"eSpeak NG","url":"https://github.com/espeak-ng/espeak-ng","status":"verified_open_source_target","roles":["offline_tts","multilingual_voice"]},
+    {"name":"Piper TTS","url":"https://github.com/rhasspy/piper","status":"verified_open_source_target","roles":["offline_tts","multilingual_voice"]}
+  ],
+  "quran_audio_and_media": [
+    {"name":"Quran.com / Quran Foundation","url":"https://quran.com/","status":"verified","roles":["quran_text","translations","tafsir","audio","recitations","study"]},
+    {"name":"Quran.is","url":"https://quran.is/","status":"verified","roles":["quran_reading","audio","multilingual","recitation_discovery"]},
+    {"name":"EveryAyah","url":"https://everyayah.com/","status":"verified_target","roles":["quran_recitation_audio","audio_discovery"]},
+    {"name":"Quranic Universal Library (QUL)","url":null,"status":"DISCOVERY_TARGET_NEEDS_EXACT_OFFICIAL_URL_VERIFICATION","roles":["quran_audio","quran_data","recitation_discovery"]},
+    {"name":"QuranEnc","url":"https://quranenc.com/","status":"verified","roles":["quran_translations","tafsir","pdf","epub","xml","csv","sqlite","api"]},
+    {"name":"Tanzil","url":"https://tanzil.net/","status":"verified","roles":["quran_text","translations","search","download"]},
+    {"name":"King Fahd Quran Complex","url":"https://qurancomplex.gov.sa/","status":"verified_target","roles":["quran_text","mushaf_images","quran_media"]},
+    {"name":"KSU Ayat","url":"https://quran.ksu.edu.sa/","status":"verified","roles":["quran_text","mushaf_images","translations","tafsir","recitations","Warsh","apps"]}
+  ],
+  "image_and_manuscript_sources": [
+    {"name":"Wikimedia Commons","url":"https://commons.wikimedia.org/","status":"verified","roles":["images","scans","manuscripts","media"]},
+    {"name":"Internet Archive","url":"https://archive.org/","status":"verified","roles":["books","scans","pdf","audio","images","metadata"]},
+    {"name":"NYU Arabic Collections Online","url":"https://aco.nyu.edu/","status":"verified","roles":["arabic_books","scans","manuscripts","images"]},
+    {"name":"Princeton Islamic Manuscripts","url":"https://dpul.princeton.edu/islamic-manuscripts","status":"verified_target","roles":["manuscripts","images","digital_surrogates"]},
+    {"name":"Al-Furqan Islamic Heritage Foundation","url":"https://www.al-furqan.com/","status":"verified","roles":["islamic_manuscripts","manuscript_catalogue","digital_library","images"]},
+    {"name":"British Library","url":"https://www.bl.uk/","status":"verified","roles":["manuscripts","arabic_collections","images","digital_library"]},
+    {"name":"Gallica / Bibliothèque nationale de France","url":"https://gallica.bnf.fr/","status":"verified","roles":["manuscripts","books","scans","images"]},
+    {"name":"Fihrist / Bodleian Islamic Manuscripts","url":"https://www.fihrist.org.uk/","status":"verified","roles":["manuscript_catalogue","islamic_manuscripts","discovery"]},
+    {"name":"Cambridge Digital Library","url":"https://cudl.lib.cam.ac.uk/","status":"verified_target","roles":["manuscripts","scans","images"]},
+    {"name":"Vatican Library","url":"https://digi.vatlib.it/","status":"verified_target","roles":["manuscripts","scans","images"]},
+    {"name":"Library of Congress","url":"https://www.loc.gov/","status":"verified_target","roles":["arabic_books","manuscripts","images","metadata"]},
+    {"name":"Smithsonian Libraries and Archives","url":"https://library.si.edu/","status":"verified_target","roles":["books","manuscripts","images"]}
+  ],
+  "implementation_note": "This file is an additive registry. Existing global, Russian, Quran, terminology and source-registry files remain authoritative alongside this expansion. Exact unresolved URLs remain explicitly unresolved rather than guessed."
+}
