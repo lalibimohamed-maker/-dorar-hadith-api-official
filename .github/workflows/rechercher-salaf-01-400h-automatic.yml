@@ -5,6 +5,7 @@ on:
   schedule:
     - cron: '*/5 * * * *'
 
+# security-justification: contents: write is required only to invoke the governed acquisition workflow with permission to persist verified PDF artifacts/manifests; the caller itself does not publish unverified content.
 permissions:
   contents: write
 
