@@ -1,0 +1,174 @@
+name: Rechercher — Acquire first, store first (reusable)
+
+on:
+  workflow_call:
+    secrets:
+      REVIEW_VAULT_KEY:
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  GIT_TERMINAL_PROMPT: '0'
+  REVIEW_BRANCH: 'rechercher/salaf-01-400h-developer-review-acquisition'
+
+concurrency:
+  group: rechercher-acquire-first
+  cancel-in-progress: false
+
+jobs:
+  acquire-and-store:
+    name: Acquire actual PDFs into protected review vault
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils
+
+      - name: Require vault key
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
+
+      - name: Acquire copies — first persistence boundary
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          test -s books-batches/salaf-01-400h/developer-review-manifest.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('books-batches/salaf-01-400h/developer-review-manifest.json').read_text(encoding='utf-8'))
+          c=d.get('counts',{})
+          print('ACQUIRE_FIRST_COUNTS', json.dumps(c, ensure_ascii=False, sort_keys=True))
+          if c.get('acquired_files',0) < 1:
+              raise SystemExit('ERROR: zero files acquired; nothing will be persisted.')
+          PY
+
+      - name: Emit explicit acquisition evidence
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('books-batches/salaf-01-400h/developer-review-manifest.json').read_text(encoding='utf-8'))
+          total=0
+          for r in d.get('records',[]):
+              for a in r.get('acquired',[]):
+                  total += 1
+                  print(f"[DOWNLOADED+VERIFIED] {r.get('id')} bytes={a.get('bytes')} sha256={a.get('sha256')} source={a.get('url')}")
+          print(f"[DOWNLOADED+VERIFIED:COUNT] {total}")
+          PY
+
+      - name: Verify acquired PDFs before storage
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(artifacts/developer-review-vault/*.pdf)
+          test "${#files[@]}" -gt 0 || { echo 'ERROR: no acquired PDFs found.'; exit 1; }
+          for f in "${files[@]}"; do
+            head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: not a PDF: $f"; exit 1; }
+            test -s "$f"
+            qpdf --check "$f"
+            sha256sum "$f"
+          done
+
+      - name: Encrypt and persist acquired copies immediately
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(artifacts/developer-review-vault/*.pdf)
+          test "${#files[@]}" -gt 0 || exit 1
+          mkdir -p artifacts/governance
+          for f in "${files[@]}"; do
+            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
+              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$f.enc"
+            rm -f -- "$f"
+          done
+          enc=(artifacts/developer-review-vault/*.enc)
+          test "${#enc[@]}" -gt 0 || exit 1
+          VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
+          gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Rechercher acquired vault ${GITHUB_RUN_ID}" \
+            --notes "Acquire-first persistence boundary. Every asset was downloaded, checked as PDF, hashed, then encrypted before storage."
+          : > artifacts/governance/vault-release.jsonl
+          for f in "${enc[@]}"; do
+            gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
+            sha256sum "$f" >> artifacts/governance/vault-release.jsonl
+          done
+          python3 - "$VAULT_TAG" <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          tag=sys.argv[1]
+          assets=[]
+          for raw in Path('artifacts/governance/vault-release.jsonl').read_text(encoding='utf-8').splitlines():
+              digest, path=raw.split(None,1)
+              assets.append({'sha256':digest,'file':path})
+          release=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo',os.environ['GITHUB_REPOSITORY'],'--json','url,tagName'],text=True))
+          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v1','persistence_boundary':'acquire-first','release':release,'assets':assets},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          rm -f artifacts/governance/vault-release.jsonl
+
+      - name: Persist manifest and release evidence to review branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add artifacts/governance/vault-release.json books-batches/salaf-01-400h/developer-review-manifest.json
+          git commit -m 'data(rechercher): persist acquired copies before downstream audits'
+          ACQ_COMMIT=$(git rev-parse HEAD)
+          git fetch origin "$REVIEW_BRANCH"
+          git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
+          git checkout "$ACQ_COMMIT" -- artifacts/governance/vault-release.json
+          python3 - "$ACQ_COMMIT" <<'PY'
+          import json, subprocess, sys
+          from pathlib import Path
+          path='books-batches/salaf-01-400h/developer-review-manifest.json'
+          incoming=json.loads(subprocess.check_output(['git','show',f'{sys.argv[1]}:{path}'],text=True))
+          try: existing=json.loads(subprocess.check_output(['git','show',f'HEAD:{path}'],text=True))
+          except subprocess.CalledProcessError: existing=None
+          if not existing:
+              merged=incoming
+          else:
+              old={r.get('id'):r for r in existing.get('records',[]) if r.get('id')}
+              for rec in incoming.get('records',[]):
+                  rid=rec.get('id')
+                  if not rid: continue
+                  if rid not in old:
+                      old[rid]=rec; continue
+                  cur=old[rid]
+                  for key in ('discovery_registries','candidates','acquired'):
+                      vals=[]
+                      for src in (cur.get(key,[]),rec.get(key,[])):
+                          for v in src:
+                              if v not in vals: vals.append(v)
+                      if vals: cur[key]=vals
+                  if rec.get('acquired_count',0) > cur.get('acquired_count',0):
+                      cur.update({k:v for k,v in rec.items() if k not in ('discovery_registries','candidates','acquired')})
+              merged=dict(existing); merged['records']=list(old.values()); merged['counts']=incoming.get('counts',merged.get('counts',{}))
+          Path(path).write_text(json.dumps(merged,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          git add books-batches/salaf-01-400h/developer-review-manifest.json
+          git commit -m 'data(rechercher): reconcile acquire-first manifest'
+          GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
+          echo "ACQUIRE_FIRST_PERSISTED=$ACQ_COMMIT"
