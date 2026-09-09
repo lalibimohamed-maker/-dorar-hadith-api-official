@@ -1,0 +1,77 @@
+name: PR Auto-Heal and Gated Auto-Merge
+
+# security-justification: this trusted control-plane workflow never checks out or executes PR code.
+# It only reads PR metadata and uses GitHub's protected merge gate after required review/checks.
+# No untrusted event value is executed as shell code; event-derived values are captured once at job scope
+# and then passed through environment variables. Automatic repair is limited to deterministic merge blockers;
+# arbitrary source/content changes are never guessed or silently rewritten.
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: pr-auto-heal-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  heal-and-arm:
+    name: Heal deterministic blockers and arm auto-merge
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      REPOSITORY: ${{ github.repository }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Inspect PR state
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          pr_json="$(gh api "/repos/${REPOSITORY}/pulls/${PR_NUMBER}")"
+          echo "state=$(jq -r '.state' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
+          echo "mergeable=$(jq -r '.mergeable' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
+          echo "mergeable_state=$(jq -r '.mergeable_state' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
+          echo "draft=$(jq -r '.draft' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
+          echo "head_repo=$(jq -r '.head.repo.full_name // empty' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
+          echo "base=$(jq -r '.base.ref' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
+
+      - name: Update branch when GitHub reports it is behind
+        if: >-
+          steps.pr.outputs.state == 'open' &&
+          steps.pr.outputs.head_repo == github.repository &&
+          steps.pr.outputs.base == 'main' &&
+          steps.pr.outputs.draft != 'true' &&
+          steps.pr.outputs.mergeable_state == 'behind'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api --method PUT \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${REPOSITORY}/pulls/${PR_NUMBER}/update-branch" \
+            -f update_method=merge >/dev/null
+          echo 'PR branch was automatically synchronized with main.'
+
+      - name: Arm protected auto-merge
+        if: >-
+          steps.pr.outputs.state == 'open' &&
+          steps.pr.outputs.head_repo == github.repository &&
+          steps.pr.outputs.base == 'main' &&
+          steps.pr.outputs.draft != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh pr merge "$PR_NUMBER" --repo "$REPOSITORY" --auto --merge
+          echo 'Auto-merge armed. GitHub will merge only after every protected requirement, including the required secondary-account approval and required checks, is satisfied.'
