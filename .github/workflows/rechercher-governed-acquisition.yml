@@ -90,6 +90,14 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No new PDF changes; saved failures will be retried on the next cycle.'
           else
+            # Fail closed before creating/pushing a pointer whose LFS object is absent.
+            # This also catches a workspace that accidentally contains a Git-LFS pointer
+            # instead of the verified PDF bytes.
+            while IFS= read -r -d '' f; do
+              head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged PDF is not real PDF bytes: $f"; exit 1; }
+              test -s "$f"
+            done < <(find artifacts -type f -name '*.pdf' -print0)
+            git lfs fsck --objects
             git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
             # actions/checkout intentionally uses persist-credentials=false. Configure
             # Git's credential helper explicitly from the ephemeral workflow token so
@@ -97,6 +105,7 @@ jobs:
             gh auth setup-git
             git fetch origin "$TARGET_BRANCH"
             git rebase "origin/$TARGET_BRANCH"
+            git lfs fsck --objects
             git push origin "HEAD:refs/heads/$TARGET_BRANCH"
           fi
 
@@ -111,8 +120,18 @@ jobs:
           GIT_LFS_SKIP_SMUDGE=1 git clone "https://x-access-token:${SECONDARY_STORAGE_TOKEN}@github.com/${SECONDARY_STORAGE_REPO}.git" .secondary-storage
           cd .secondary-storage
           git lfs install
+          git lfs fetch --all origin
+          git lfs checkout || true
           git lfs track 'artifacts/*.pdf'
           mkdir -p artifacts
+
+          # Never copy a pointer as if it were a PDF. Existing pointers are hydrated
+          # from secondary LFS first; newly acquired files must contain real PDF bytes.
+          while IFS= read -r -d '' f; do
+            head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: secondary source is not real PDF bytes: $f"; exit 1; }
+            test -s "$f"
+          done < <(find ../artifacts -type f -name '*.pdf' -print0)
+
           cp -a ../artifacts/. artifacts/
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -121,5 +140,15 @@ jobs:
             echo 'Secondary PDF storage is already synchronized.'
             exit 0
           fi
+
+          # Verify the local LFS object database before any push. If an object is
+          # missing, stop here instead of pushing a dangling pointer. Successful files
+          # already committed to this storage repository remain untouched.
+          while IFS= read -r -d '' f; do
+            head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged secondary PDF is a pointer/non-PDF: $f"; exit 1; }
+            test -s "$f"
+          done < <(find artifacts -type f -name '*.pdf' -print0)
+          git lfs fsck --objects
           git commit -m 'data(rechercher): mirror verified encyclopedia PDFs'
+          git lfs fsck --objects
           git push origin HEAD
