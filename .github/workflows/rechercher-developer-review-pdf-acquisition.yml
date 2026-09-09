@@ -158,6 +158,28 @@ jobs:
           find artifacts/developer-review-pdfs -type f -name '*.pdf' -print | sort > artifacts/governance/plaintext-pdf-inventory.txt
           sha256sum artifacts/developer-review-pdfs/*.pdf > artifacts/governance/plaintext-pdf-sha256.txt
 
+      - name: Build compact PDF acquisition report
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_pdf_acquisition_report.py \
+            --manifest books-batches/salaf-01-400h/developer-review-manifest.json \
+            --pdf-root artifacts/developer-review-pdfs \
+            --inventory artifacts/governance/plaintext-pdf-inventory.txt \
+            --sha256-list artifacts/governance/plaintext-pdf-sha256.txt \
+            --out artifacts/governance/pdf-acquisition-report.json
+
+      - name: Upload compact acquisition report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-pdf-acquisition-report-${{ github.run_id }}
+          path: |
+            artifacts/governance/pdf-acquisition-report.json
+            artifacts/governance/plaintext-pdf-inventory.txt
+            artifacts/governance/plaintext-pdf-sha256.txt
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Upload validated PDFs as developer-review artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
