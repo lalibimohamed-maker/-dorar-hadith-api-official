@@ -1,0 +1,1 @@
+Final check: the registry is additive across all defined eras and future catalog additions; no fabricated records are introduced.
