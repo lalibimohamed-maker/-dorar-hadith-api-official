@@ -126,8 +126,12 @@ jobs:
             git lfs fsck --objects
             git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
             gh auth setup-git
-            git fetch origin "$TARGET_BRANCH"
-            git rebase "origin/$TARGET_BRANCH"
+
+            # The acquisition script can legitimately leave retry/manifest state in
+            # the worktree. Autostash preserves that state while synchronizing the
+            # persistence branch, instead of aborting on harmless unstaged changes.
+            git pull --rebase --autostash origin "$TARGET_BRANCH"
+
             git lfs fsck --objects
             git push origin "HEAD:refs/heads/$TARGET_BRANCH"
           fi
