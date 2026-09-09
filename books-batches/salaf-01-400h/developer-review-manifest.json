@@ -283,6 +283,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -539,6 +543,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -602,6 +610,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -873,6 +885,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -892,6 +908,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -1430,12 +1450,38 @@
       "discovery_registries": [
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
-      "availability": "not-acquired",
-      "acquisition_state": "global-search-no-match",
-      "acquired": [],
-      "acquired_count": 0,
-      "rights_action": "none",
+      "candidates": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/%D8%B3%D9%84%D8%B3%D9%84%D8%A9_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_-_42_-_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_%D9%81%D9%8A_%D8%AA%D9%88%D8%A7%D8%AA%D8%B1_%D8%AD%D8%AF%D9%8A%D8%AB_%D9%86%D8%B2%D9%88%D9%84_%D8%B9%D9%8A%D8%B3%D9%8A_%D8%A2%D8%AE%D8%B1_%D8%A7%D9%84%D8%B2%D9%85%D8%A7%D9%86_%D9%85%D9%86_%28_35_%29_%D8%B7%D8%B1%D9%8A%D9%82%D8%A7_%D9%85%D8%AE%D8%AA%D9%84%D9%81%D8%A7_%D8%A5%D9%84%D9%8A_%D8%A7%D9%84%D9%86%D8%A8%D9%8A.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 808271,
+          "sha256": "1095cc588d12c0cfe559c1a819f19acb75f17dada06373e61507fff6f6ff5920",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/مشيخة-ابن-طهمان--d7ed23a8acd9--retry-e1c31e1e5e13ccc8b713.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/مشيخة-ابن-طهمان--d7ed23a8acd9--retry-e1c31e1e5e13ccc8b713.pdf"
+        }
+      ],
+      "availability": "copy-acquired",
+      "acquisition_state": "acquired",
+      "acquired": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/%D8%B3%D9%84%D8%B3%D9%84%D8%A9_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_-_42_-_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_%D9%81%D9%8A_%D8%AA%D9%88%D8%A7%D8%AA%D8%B1_%D8%AD%D8%AF%D9%8A%D8%AB_%D9%86%D8%B2%D9%88%D9%84_%D8%B9%D9%8A%D8%B3%D9%8A_%D8%A2%D8%AE%D8%B1_%D8%A7%D9%84%D8%B2%D9%85%D8%A7%D9%86_%D9%85%D9%86_%28_35_%29_%D8%B7%D8%B1%D9%8A%D9%82%D8%A7_%D9%85%D8%AE%D8%AA%D9%84%D9%81%D8%A7_%D8%A5%D9%84%D9%8A_%D8%A7%D9%84%D9%86%D8%A8%D9%8A.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 808271,
+          "sha256": "1095cc588d12c0cfe559c1a819f19acb75f17dada06373e61507fff6f6ff5920",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/مشيخة-ابن-طهمان--d7ed23a8acd9--retry-e1c31e1e5e13ccc8b713.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/مشيخة-ابن-طهمان--d7ed23a8acd9--retry-e1c31e1e5e13ccc8b713.pdf"
+        }
+      ],
+      "acquired_count": 1,
+      "rights_action": "developer-vault-encrypt",
       "retry_history": [
         {
           "pass": "multi-pass-v1",
@@ -1716,6 +1762,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -2451,6 +2501,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -3010,6 +3064,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -3551,6 +3609,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -4706,6 +4768,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -4727,6 +4793,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -6092,6 +6162,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -8366,6 +8440,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -9269,6 +9347,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -9290,6 +9372,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -11997,8 +12083,8 @@
   ],
   "counts": {
     "books": 247,
-    "acquired_books": 231,
-    "acquired_files": 231,
-    "global_search_no_match": 16
+    "acquired_books": 232,
+    "acquired_files": 232,
+    "global_search_no_match": 15
   }
 }
