@@ -5,7 +5,9 @@ on:
   schedule:
     - cron: '*/5 * * * *'
 
-# security-justification: contents: write is required only to invoke the governed acquisition workflow with permission to persist verified PDF artifacts/manifests; the caller itself does not publish unverified content.
+# security-justification: contents: write is required only to invoke the
+# acquire-first workflow, which persists encrypted review-vault evidence;
+# the caller itself never publishes unverified content.
 permissions:
   contents: write
 
@@ -16,12 +18,8 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    # Pin to the current governed acquisition implementation, including the
-    # whole-encyclopedia census and the latest PDF acquisition/verification code.
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@65465cbb50ed481a7232022aae029efca9a749a4
-    with:
-      target_branch: rechercher/salaf-01-400h-chronological-acquisition
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-acquire-first-reusable.yml@main
     secrets:
-      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+      REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
     permissions:
       contents: write
