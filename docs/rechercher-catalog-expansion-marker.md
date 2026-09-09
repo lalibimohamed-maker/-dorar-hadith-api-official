@@ -1,1 +1,0 @@
-See central registry for all eras and future additions.
