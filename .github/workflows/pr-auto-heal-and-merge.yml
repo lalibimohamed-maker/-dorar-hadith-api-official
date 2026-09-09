@@ -1,13 +1,12 @@
 name: PR Auto-Heal and Gated Auto-Merge
 
-# Trusted control-plane workflow: it never checks out or executes PR code.
-# It only operates on same-repository PR metadata and GitHub's protected merge gate.
-# Automatic repair is limited to deterministic merge blockers; arbitrary source/content
-# changes are never guessed or silently rewritten.
+# security-justification: this trusted control-plane workflow never checks out or executes PR code.
+# It only reads PR metadata and uses GitHub's protected merge gate after required review/checks.
+# No untrusted event value is executed as shell code; values are passed through environment variables.
+# Automatic repair is limited to deterministic merge blockers; arbitrary source/content changes are
+# never guessed or silently rewritten.
 
 on:
-  pull_request_target:
-    types: [opened, reopened, synchronize, ready_for_review]
   pull_request_review:
     types: [submitted]
 
@@ -17,15 +16,15 @@ permissions:
   actions: read
 
 concurrency:
-  group: pr-auto-heal-${{ github.event.pull_request.number || github.event.pull_request_review.pull_request.number }}
+  group: pr-auto-heal-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   heal-and-arm:
     name: Heal deterministic blockers and arm auto-merge
     if: >-
-      github.event.pull_request.head.repo.full_name == github.repository ||
-      github.event.pull_request_review.pull_request.head.repo.full_name == github.repository
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -34,7 +33,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number || github.event.pull_request_review.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         shell: bash
         run: |
           set -euo pipefail
@@ -56,7 +55,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number || github.event.pull_request_review.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
           gh api --method PUT \
@@ -74,7 +73,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number || github.event.pull_request_review.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
           gh pr merge "$PR_NUMBER" --repo "$REPOSITORY" --auto --merge
