@@ -1,1 +1,0 @@
-Catalog registry expansion is intentionally conservative: existing saved catalogs are ingested; no fabricated era books are introduced; future governed catalogs are picked up automatically.
