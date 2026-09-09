@@ -147,8 +147,18 @@ jobs:
           GIT_LFS_SKIP_SMUDGE=1 git clone "https://x-access-token:${SECONDARY_STORAGE_TOKEN}@github.com/${SECONDARY_STORAGE_REPO}.git" .secondary-storage
           cd .secondary-storage
           git lfs install
-          git lfs fetch --all origin
-          git lfs checkout || true
+
+          # The secondary repository may be completely empty on first use.
+          # In that case there is no HEAD/ref for git-lfs to resolve, so initialize
+          # a normal main branch before tracking or checking out any PDF objects.
+          if git rev-parse --verify HEAD >/dev/null 2>&1; then
+            git lfs fetch --all origin || true
+            git lfs checkout || true
+          else
+            echo 'Secondary PDF storage repository is empty; initializing main.'
+            git switch --orphan main
+          fi
+
           git lfs track 'artifacts/*.pdf'
           mkdir -p artifacts
 
