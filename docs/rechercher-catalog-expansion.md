@@ -1,1 +1,0 @@
-Whole-encyclopedia Rechercher coverage includes the prophetic era, Companions and Followers, 1-400H, 401-800H, 801-1200H, 1201H onward, modern works, and future books. New governed catalog files under books-batches/**/catalog.json enter future cycles automatically. Dorar is a supplementary bibliographic discovery source only.
