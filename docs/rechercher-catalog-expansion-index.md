@@ -1,1 +1,0 @@
-Rechercher catalog expansion: all historical eras and future additions are covered by the central catalog registry. Dorar remains supplementary discovery.
