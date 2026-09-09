@@ -16,8 +16,9 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    # Pin to the commit containing the Dorar supplementary book-index integration.
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@324a598f31eba827c13b5ce8d469e83833fa9c2c
+    # Pin to the current governed acquisition implementation, including the
+    # whole-encyclopedia census and the latest PDF acquisition/verification code.
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@65465cbb50ed481a7232022aae029efca9a749a4
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     secrets:
