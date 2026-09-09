@@ -29,9 +29,8 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    # Pin to the merged main commit that contains the authenticated Git
-    # persistence fix (gh auth setup-git) in the reusable workflow.
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@0028dec5463f1b24322284ed7f90699366d358a1
+    # Pin to the merged main commit containing PR #426's LFS persistence fix.
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@1a2be3cbc02a4fe2f7aa607857050b1029cf7f8e
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     secrets:
