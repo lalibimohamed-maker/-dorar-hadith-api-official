@@ -29,10 +29,9 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    # Pin the caller to the verified main commit that contains the current
-    # reusable workflow contract, including workflow_call secret declaration
-    # and the env-based secret conditional required by GitHub Actions.
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@3be6dcf193afd99c5bc0ae0d47172e173721002e
+    # Pin to the merged main commit that contains the authenticated Git
+    # persistence fix (gh auth setup-git) in the reusable workflow.
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@0028dec5463f1b24322284ed7f90699366d358a1
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     secrets:
