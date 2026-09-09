@@ -1,0 +1,1 @@
+The registry covers Prophet era, Companions/Followers, 1-400H, 401-800H, 801-1200H, 1201H+, Modern era, and future additions. Dorar is discovery-only.
