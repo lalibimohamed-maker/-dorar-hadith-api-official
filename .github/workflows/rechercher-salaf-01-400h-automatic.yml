@@ -29,8 +29,9 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    # Pin to the merged main commit containing the LFS persistence/autostash fix.
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@75fa60fb7e06ce63990cd9d390bbbd6b6ae0cbe3
+    # Pin to the merged main commit containing both acquisition persistence and
+    # empty-secondary-repository initialization fixes.
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@f34bfd95bbe7602f769e1b91c9785d89fb276121
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     secrets:
