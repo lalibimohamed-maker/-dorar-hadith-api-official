@@ -327,6 +327,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -627,6 +631,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -690,6 +698,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -1950,6 +1962,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -3366,6 +3382,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -3907,6 +3927,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -5181,6 +5205,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -6590,6 +6618,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -8886,12 +8918,38 @@
       "discovery_registries": [
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
-      "availability": "not-acquired",
-      "acquisition_state": "global-search-no-match",
-      "acquired": [],
-      "acquired_count": 0,
-      "rights_action": "none",
+      "candidates": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/%D8%A7%D9%84%D9%82%D8%B2%D9%88%D9%8A%D9%86%D9%8A_%D8%A8%D9%87%D8%A7%D8%A1_%D8%A7%D9%84%D8%AF%D9%8A%D9%86_%D8%A5%D8%AB%D8%A8%D8%A7%D8%AA_%D8%A7%D9%84%D9%85%D8%B9%D8%B1%D9%81%D8%A9_%D8%A7%D9%84%D9%85%D8%B3%D9%85%D9%91%D9%89_%D9%86%D9%88%D8%B1_%D8%A7%D9%84%D8%AD%D9%82%D9%8A%D9%82%D8%A9_%D9%88%D9%86%D9%8E%D9%88%D9%92%D8%B1_%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D9%82%D8%A9.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 5394332,
+          "sha256": "2e7c470bf46d14e52806b45a7cb1ac1db37b6d7c1d0027798f5728655bd057c5",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/المعجم-الكبير-في-اسماء-الصحابة-ومن-روى-عنهم--9883e0ac74f2--retry-0fa15824f9042c93fbde.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/المعجم-الكبير-في-اسماء-الصحابة-ومن-روى-عنهم--9883e0ac74f2--retry-0fa15824f9042c93fbde.pdf"
+        }
+      ],
+      "availability": "copy-acquired",
+      "acquisition_state": "acquired",
+      "acquired": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/%D8%A7%D9%84%D9%82%D8%B2%D9%88%D9%8A%D9%86%D9%8A_%D8%A8%D9%87%D8%A7%D8%A1_%D8%A7%D9%84%D8%AF%D9%8A%D9%86_%D8%A5%D8%AB%D8%A8%D8%A7%D8%AA_%D8%A7%D9%84%D9%85%D8%B9%D8%B1%D9%81%D8%A9_%D8%A7%D9%84%D9%85%D8%B3%D9%85%D9%91%D9%89_%D9%86%D9%88%D8%B1_%D8%A7%D9%84%D8%AD%D9%82%D9%8A%D9%82%D8%A9_%D9%88%D9%86%D9%8E%D9%88%D9%92%D8%B1_%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D9%82%D8%A9.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 5394332,
+          "sha256": "2e7c470bf46d14e52806b45a7cb1ac1db37b6d7c1d0027798f5728655bd057c5",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/المعجم-الكبير-في-اسماء-الصحابة-ومن-روى-عنهم--9883e0ac74f2--retry-0fa15824f9042c93fbde.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/المعجم-الكبير-في-اسماء-الصحابة-ومن-روى-عنهم--9883e0ac74f2--retry-0fa15824f9042c93fbde.pdf"
+        }
+      ],
+      "acquired_count": 1,
+      "rights_action": "developer-vault-encrypt",
       "retry_history": [
         {
           "pass": "multi-pass-v1",
@@ -9840,6 +9898,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -12669,8 +12731,8 @@
   ],
   "counts": {
     "books": 247,
-    "acquired_books": 237,
-    "acquired_files": 237,
-    "global_search_no_match": 10
+    "acquired_books": 238,
+    "acquired_files": 238,
+    "global_search_no_match": 9
   }
 }
