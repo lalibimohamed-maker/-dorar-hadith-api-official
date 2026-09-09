@@ -86,15 +86,18 @@ jobs:
           git lfs track 'artifacts/*.pdf'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          GIT_AUTH_HEADER="AUTHORIZATION: bearer ${GITHUB_TOKEN}"
           git add books-batches scripts artifacts .gitattributes
           if git diff --cached --quiet; then
             echo 'No new PDF changes; saved failures will be retried on the next cycle.'
           else
             git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
-            git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$TARGET_BRANCH"
+            # actions/checkout intentionally uses persist-credentials=false. Configure
+            # Git's credential helper explicitly from the ephemeral workflow token so
+            # fetch/rebase/push (and Git LFS) cannot fall back to an interactive prompt.
+            gh auth setup-git
+            git fetch origin "$TARGET_BRANCH"
             git rebase "origin/$TARGET_BRANCH"
-            git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$TARGET_BRANCH"
+            git push origin "HEAD:refs/heads/$TARGET_BRANCH"
           fi
 
       - name: Mirror verified PDFs to secondary storage account
