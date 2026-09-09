@@ -1,1 +1,0 @@
-The central Rechercher catalog registry is the source-of-truth map for discovery coverage across all encyclopedia eras and future catalog additions. Dorar is supplementary discovery only.
