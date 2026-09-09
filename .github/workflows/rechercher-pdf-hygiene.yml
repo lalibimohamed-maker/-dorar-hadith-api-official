@@ -1,0 +1,112 @@
+name: Rechercher — PDF corpus hygiene
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 */2 * * *'
+
+# security-justification: trusted default-branch code only; no pull-request code is executed.
+permissions:
+  contents: write
+
+env:
+  REVIEW_BRANCH: rechercher/salaf-01-400h-developer-review-acquisition
+  GIT_TERMINAL_PROMPT: '0'
+
+jobs:
+  hygiene:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils
+
+      - name: Require vault key
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required.'; exit 1; }
+
+      - name: Recover latest encrypted vault
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/recovered-vault artifacts/developer-review-vault artifacts/governance
+          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt --jq '[.[] | select(.tagName | startswith("rechercher-vault-"))] | sort_by(.createdAt) | last | .tagName')
+          if [ -z "${tag:-}" ] || [ "$tag" = "null" ]; then
+            echo 'No vault release exists; hygiene has nothing to inspect.'
+            printf '%s\n' '{"schema":"din-allah-encyclopedia/pdf-hygiene/v1","counts":{"pdf_files_scanned":0,"safe_redundant_copies_quarantined":0}}' > artifacts/governance/pdf-hygiene-report.json
+            exit 0
+          fi
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern '*.enc' --dir artifacts/recovered-vault
+          shopt -s nullglob
+          for f in artifacts/recovered-vault/*.enc; do
+            out="artifacts/developer-review-vault/$(basename "${f%.enc}")"
+            openssl enc -d -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
+            test "$(head -c 5 "$out")" = '%PDF-'
+            qpdf --check "$out"
+          done
+
+      - name: Recover authoritative acquisition manifest
+        run: |
+          set -euo pipefail
+          git fetch origin "$REVIEW_BRANCH"
+          git show "origin/$REVIEW_BRANCH:books-batches/salaf-01-400h/developer-review-manifest.json" > books-batches/salaf-01-400h/developer-review-manifest.json
+          test -s books-batches/salaf-01-400h/developer-review-manifest.json
+
+      - name: Audit and quarantine only exact redundant duplicates
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_pdf_hygiene.py \
+            --root "$GITHUB_WORKSPACE" \
+            --manifest books-batches/salaf-01-400h/developer-review-manifest.json \
+            --out artifacts/governance/pdf-hygiene-report.json \
+            --quarantine artifacts/developer-review-quarantine
+          cat artifacts/governance/pdf-hygiene-report.json
+
+      - name: Validate remaining PDFs
+        run: |
+          set -euo pipefail
+          for f in artifacts/developer-review-vault/*.pdf; do
+            test "$(head -c 5 "$f")" = '%PDF-'
+            qpdf --check "$f"
+          done
+
+      - name: Persist hygiene report and reconciled state
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add artifacts/governance/pdf-hygiene-report.json
+          git diff --cached --quiet || git commit -m 'data(rechercher): persist PDF corpus hygiene report'
+          STATE_COMMIT=$(git rev-parse HEAD)
+          git fetch origin "$REVIEW_BRANCH"
+          git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
+          git checkout "$STATE_COMMIT" -- artifacts/governance/pdf-hygiene-report.json
+          git add artifacts/governance/pdf-hygiene-report.json
+          git diff --cached --quiet || git commit -m 'data(rechercher): reconcile PDF hygiene state'
+          GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
+
+      - name: Upload compact hygiene report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-pdf-hygiene-${{ github.run_id }}
+          path: artifacts/governance/pdf-hygiene-report.json
+          if-no-files-found: error
+          retention-days: 90
