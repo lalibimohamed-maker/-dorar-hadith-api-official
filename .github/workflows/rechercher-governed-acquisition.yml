@@ -53,6 +53,7 @@ jobs:
         run: |
           set -euo pipefail
           test -s .governance-source/config/rechercher-encyclopedia-download-scope.json
+          test -s .governance-source/config/rechercher-encyclopedia-catalog-registry.json
           mkdir -p books-batches
           cp -a .governance-source/books-batches/. books-batches/
           python3 - <<'PY'
@@ -67,6 +68,11 @@ jobs:
               raise SystemExit('Whole-encyclopedia catalog scope is not enabled.')
           print('Whole encyclopedia PDF scope enabled:', ' -> '.join(d['eras']), ' -> future books')
           PY
+
+      - name: Build whole-encyclopedia catalog census
+        run: |
+          set -euo pipefail
+          python3 .governance-source/scripts/rechercher_encyclopedia_catalog_census.py
 
       - name: Sync Dorar book index for discovery and catalog matching
         run: |
