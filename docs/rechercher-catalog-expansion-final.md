@@ -1,1 +1,0 @@
-The whole-encyclopedia catalog registry is additive across all eras and future books; Dorar remains supplementary discovery only.
