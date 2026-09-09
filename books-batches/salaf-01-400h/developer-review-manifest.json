@@ -413,6 +413,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -793,6 +797,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -856,6 +864,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -2196,6 +2208,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -3868,6 +3884,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -4486,6 +4506,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -5905,12 +5929,38 @@
       "discovery_registries": [
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
-      "availability": "not-acquired",
-      "acquisition_state": "global-search-no-match",
-      "acquired": [],
-      "acquired_count": 0,
-      "rights_action": "none",
+      "candidates": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/1/14/Jondi_Shapour_Magazine%2C_no._3.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 2523974,
+          "sha256": "2ccd1464774c810d04ffe9d2a4487f7fe011f4bdf612d7b41cebb0e7dbd12b1a",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/جزء-حديث-يحيى-بن-معين--a941966c5444--retry-91178321e08a1be81f75.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/جزء-حديث-يحيى-بن-معين--a941966c5444--retry-91178321e08a1be81f75.pdf"
+        }
+      ],
+      "availability": "copy-acquired",
+      "acquisition_state": "acquired",
+      "acquired": [
+        {
+          "source": "global:wikimedia_commons",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/1/14/Jondi_Shapour_Magazine%2C_no._3.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 2523974,
+          "sha256": "2ccd1464774c810d04ffe9d2a4487f7fe011f4bdf612d7b41cebb0e7dbd12b1a",
+          "validation": {
+            "ok": true,
+            "output": "checking artifacts/developer-review-vault/جزء-حديث-يحيى-بن-معين--a941966c5444--retry-91178321e08a1be81f75.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/جزء-حديث-يحيى-بن-معين--a941966c5444--retry-91178321e08a1be81f75.pdf"
+        }
+      ],
+      "acquired_count": 1,
+      "rights_action": "developer-vault-encrypt",
       "retry_history": [
         {
           "pass": "multi-pass-v1",
@@ -7527,6 +7577,10 @@
       "acquired_count": 0,
       "rights_action": "none",
       "retry_history": [
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
+        },
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
@@ -11646,6 +11700,10 @@
         {
           "pass": "multi-pass-v1",
           "result": "no-match"
+        },
+        {
+          "pass": "multi-pass-v1",
+          "result": "no-match"
         }
       ]
     },
@@ -14811,8 +14869,8 @@
   ],
   "counts": {
     "books": 247,
-    "acquired_books": 238,
-    "acquired_files": 238,
-    "global_search_no_match": 9
+    "acquired_books": 239,
+    "acquired_files": 239,
+    "global_search_no_match": 8
   }
 }
