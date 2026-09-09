@@ -2,6 +2,8 @@ name: Rechercher — Acquire first, store first
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
 
 # Acquire-first pipeline: a successfully acquired copy is stored before any
 # downstream research/governance stage can block persistence.
@@ -14,8 +16,13 @@ env:
   GIT_TERMINAL_PROMPT: '0'
   REVIEW_BRANCH: 'rechercher/salaf-01-400h-developer-review-acquisition'
 
+concurrency:
+  group: rechercher-acquire-first
+  cancel-in-progress: false
+
 jobs:
   acquire-and-store:
+    name: Acquire actual PDFs into protected review vault
     runs-on: ubuntu-latest
     timeout-minutes: 240
     steps:
@@ -134,7 +141,8 @@ jobs:
               for rec in incoming.get('records',[]):
                   rid=rec.get('id')
                   if not rid: continue
-                  if rid not in old: old[rid]=rec; continue
+                  if rid not in old:
+                      old[rid]=rec; continue
                   cur=old[rid]
                   for key in ('discovery_registries','candidates','acquired'):
                       vals=[]

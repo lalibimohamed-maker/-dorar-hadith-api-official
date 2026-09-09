@@ -13,7 +13,7 @@ from urllib.request import Request, urlopen
 
 p=argparse.ArgumentParser(); p.add_argument('--root',required=True); p.add_argument('--catalog',default='books-batches/salaf-01-400h/catalog.json'); p.add_argument('--discovery',action='append',default=None); p.add_argument('--out',default='books-batches/salaf-01-400h/developer-review-manifest.json'); p.add_argument('--vault',default='artifacts/developer-review-vault'); a=p.parse_args()
 root=Path(a.root).resolve(); catalog_path=root/a.catalog; out=root/a.out; vault=root/a.vault
-UA='DinAllah-Encyclopedia/developer-review-acquisition/2.0'
+UA='DinAllah-Encyclopedia/developer-review-acquisition/2.1'
 DEFAULT_DISCOVERY=['books-batches/salaf-01-400h/master-discovery-additions-2026.json','books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json']
 
 def norm(u): return u.split('#',1)[0]
@@ -154,6 +154,7 @@ def build_books():
 
 def main():
     cat,books,loaded=build_books(); vault.mkdir(parents=True,exist_ok=True); records=[]
+    print(f'ACQUISITION_INPUT_BOOKS={len(books)} DISCOVERY_REGISTRIES={len(loaded)}')
     for book in books:
         rec={'id':book['id'],'title':book['title'],'author':book.get('author'),'author_death_hijri':book.get('author_death_hijri',book.get('death_hijri')),'edition':book.get('edition'),'catalog_rights_status':book.get('rights_status'),'status':book.get('status'),'discovery_registries':book.get('discovery_registries',[]),'candidates':[]}; acquired=[]; target=book.get('expected_volumes') or 1
         explicit=sources(book)
@@ -169,15 +170,18 @@ def main():
                 if any(x.get('url')==url and x.get('status')=='acquired_for_review' for x in rec['candidates']): continue
                 dest=vault/(book['id']+'--'+hashlib.sha256(url.encode()).hexdigest()[:20]+'.pdf')
                 try:
-                    data,ctype,final=fetch(url); dest.write_bytes(data)
+                    print(f'[TRY] {book["id"]} <- {source} {url}', flush=True)
+                    data,ctype,final=fetch(url)
+                    dest.write_bytes(data)
                     ok,msg=valid(dest); item={'source':source,'url':final,'bytes':dest.stat().st_size,'sha256':sha(dest),'validation':{'ok':ok,'output':msg}}
                     if not ok: dest.unlink(missing_ok=True); item['status']='invalid_pdf'; rec['candidates'].append(item); continue
                     item['status']='acquired_for_review'; item['local_path']=str(dest.relative_to(root)); rec['candidates'].append(item); acquired.append(item)
+                    print(f'[DOWNLOADED+VERIFIED] {book["id"]} bytes={item["bytes"]} sha256={item["sha256"]} source={source}', flush=True)
                     if len(acquired)>=target: break
                 except Exception as e:
                     dest.unlink(missing_ok=True); rec['candidates'].append({'source':source,'url':url,'status':'download_error','error':str(e)})
             if len(acquired)>=target: break
         rec['availability']='copy-acquired' if acquired else 'not-acquired'; rec['acquisition_state']='acquired' if acquired else 'global-search-no-match'; rec['acquired']=acquired; rec['acquired_count']=len(acquired); rec['rights_action']='public-eligible' if acquired and book.get('rights_status')=='verified-redistributable' else ('developer-vault-encrypt' if acquired else 'none'); records.append(rec)
-    summary={'schema':'developer-review-acquisition/v5','scope':cat['scope'],'discovery_registries_loaded':loaded,'principle':'catalog/discovery completeness is independent from redistribution rights; acquired copies are retained for review and never published by this acquisition step','global_engines':['internet_archive','nyu_aco','wikimedia_commons','wikisource'],'records':records,'counts':{'books':len(records),'acquired_books':sum(r['availability']=='copy-acquired' for r in records),'acquired_files':sum(r['acquired_count'] for r in records),'global_search_no_match':sum(r['acquisition_state']=='global-search-no-match' for r in records)}}
-    out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'); print(json.dumps(summary['counts'],ensure_ascii=False,sort_keys=True))
+    summary={'schema':'developer-review-acquisition/v5.1','scope':cat['scope'],'discovery_registries_loaded':loaded,'principle':'catalog/discovery completeness is independent from redistribution rights; acquired copies are retained for review and never published by this acquisition step','global_engines':['internet_archive','nyu_aco','wikimedia_commons','wikisource'],'records':records,'counts':{'books':len(records),'acquired_books':sum(r['availability']=='copy-acquired' for r in records),'acquired_files':sum(r['acquired_count'] for r in records),'global_search_no_match':sum(r['acquisition_state']=='global-search-no-match' for r in records)}}
+    out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'); print('ACQUIRE_COUNTS '+json.dumps(summary['counts'],ensure_ascii=False,sort_keys=True))
 if __name__=='__main__': main()
