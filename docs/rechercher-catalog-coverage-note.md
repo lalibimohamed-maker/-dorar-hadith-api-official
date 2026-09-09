@@ -1,0 +1,1 @@
+Rechercher's central catalog registry covers Prophet era, Companions/Followers, 1-400H, 401-800H, 801-1200H, 1201H onward, modern works, and future books. Dorar remains discovery-only.
