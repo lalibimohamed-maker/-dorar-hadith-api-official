@@ -1,0 +1,16 @@
+{
+  "schema": "din-allah-encyclopedia/rechercher-continuous-hijri-chronological/v2",
+  "mode": "unbounded_continuous_chronological",
+  "chronology": "Prophet era -> Hijri chronology -> present day -> future catalog additions",
+  "finite_book_count_targets": false,
+  "book_count_targets": [],
+  "catalog_glob": "books-batches/**/catalog.json",
+  "output_format": ".pdf",
+  "provider_policy": "provider-neutral catalogued-source failover; no source is privileged or mandatory",
+  "storage_policy": "one physical PDF copy per book across complementary primary/secondary shards",
+  "quality_policy": "technical quality and completeness gate before persistence; source PDF is never rewritten",
+  "rights_policy": "acquisition is separate from public redistribution; rights-unknown remains protected/private",
+  "resume_policy": "persistent chronological queue; every run resumes pending books and preserves per-book attempt state",
+  "chronology_policy": "explicit Hijri chronology metadata first; author death Hijri fallback; future additions always remain after present-day material",
+  "hosted_runtime_policy": "each hosted job is a resumable execution slice; automatic continuation is required and the queue itself never ends because of a book-count target"
+}

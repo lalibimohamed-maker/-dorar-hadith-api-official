@@ -1,22 +1,31 @@
 {
-  "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v1",
+  "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v3",
   "primary_repository": "lalibimohamed-maker/-dorar-hadith-api-official",
   "secondary_storage_repository": "lalibimohamed82-coder/rechercher-pdf-storage",
-  "purpose": "Use the separately owned GitHub account as an additional Git LFS PDF storage pool without merging repositories or changing the canonical catalog/index.",
+  "purpose": "Two connected Git LFS storage pools with one physical PDF copy per book. The pools are complementary, not mirrored.",
   "format": ".pdf",
-  "content_addressing": "sha256",
-  "mirror_policy": {
+  "content_addressing": "sha256-for-integrity-only",
+  "storage_contract": {
+    "primary": "artifacts/*.pdf",
+    "secondary": "artifacts/*.pdf",
+    "one_copy_only": true,
+    "distribution": "Each verified PDF is assigned deterministically to exactly one pool from its SHA-256; it is never copied to the other pool.",
     "verified_pdfs_only": true,
-    "preserve_primary_manifest": true,
-    "no_source_rewrite": true,
-    "no_encryption_layer": true,
-    "additive_only": true
+    "real_pdf_signature_required": true,
+    "qpdf_validation_required": true,
+    "encrypted_files_forbidden": true,
+    "storage_content_only_pdf": true,
+    "sha256_is_not_a_storage_path": true,
+    "source_provider_not_fixed": true,
+    "source_failover": "immediate next independent catalogued source on restriction/failure",
+    "no_source_quota": "the engine does not stop after a provider-specific book count"
   },
   "activation": {
     "repository_must_exist": true,
     "write_secret_name": "RECHERCHER_SECONDARY_STORAGE_TOKEN",
     "secret_owner": "secondary GitHub account",
-    "write_scope": "repository contents read/write for the secondary storage repository"
+    "write_scope": "repository contents read/write for the secondary storage repository",
+    "mandatory": true
   },
-  "fallback": "Until the secondary repository and write secret are configured, the governed downloader continues using its current primary acquisition branch and does not fail the encyclopedia queue because the mirror is unavailable."
+  "failure_policy": "If a verified PDF cannot be persisted to its assigned pool, the acquisition cycle fails closed. A second PDF copy is never created as a fallback; the book is retried from its sources instead."
 }

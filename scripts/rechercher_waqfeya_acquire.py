@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""Live-progress wrapper for the persistent Waqfeya/whole-encyclopedia PDF downloader.
+"""Live-progress entry point for the central Rechercher PDF engine.
 
-The original downloader remains in rechercher_waqfeya_acquire_original.py. We
-intercept only curl-based PDF downloads so the existing acquisition, validation,
-rights, volume and LFS behavior stays unchanged while logs expose real byte
-progress and 15-second wait heartbeats.
+The central acquisition path now executes one ordered queue:
+Prophet era -> Quran -> Seerah -> Companions -> Followers -> 1-400H ->
+401-800H -> 801-1200H -> 1201H -> Modern era -> Future books.
+
+The existing downloader remains the worker for each stage, so source failover,
+PDF validation, hashing, manifests, retry records and LFS handling are reused.
+Set RECHERCHER_SEQUENTIAL=0 only for controlled debugging of the legacy worker.
 """
 from __future__ import annotations
 
+import os
 import pathlib
 import re
 import subprocess
@@ -19,6 +23,7 @@ import runpy
 
 HERE = pathlib.Path(__file__).resolve().parent
 ORIGINAL = HERE / "rechercher_waqfeya_acquire_original.py"
+SEQUENTIAL = HERE / "rechercher_sequential_acquisition.py"
 MIB = 1024 * 1024
 REAL_RUN = subprocess.run
 
@@ -103,6 +108,13 @@ def _intercepted_run(cmd, *args, **kwargs):
 subprocess.run = _intercepted_run
 
 if __name__ == "__main__":
-    print("[RECHERCHER LIVE] persistent PDF acquisition progress instrumentation enabled", flush=True)
-    sys.argv = [str(ORIGINAL)] + sys.argv[1:]
-    runpy.run_path(str(ORIGINAL), run_name="__main__")
+    sequential = os.environ.get("RECHERCHER_SEQUENTIAL", "1") != "0"
+    if sequential:
+        print("[RECHERCHER CENTRAL] ordered whole-encyclopedia queue enabled", flush=True)
+        sys.argv = [str(SEQUENTIAL)] + sys.argv[1:]
+        runpy.run_path(str(SEQUENTIAL), run_name="__main__")
+    else:
+        print("[RECHERCHER LEGACY DEBUG] sequential queue disabled explicitly", flush=True)
+        print("[RECHERCHER LIVE] persistent PDF acquisition progress instrumentation enabled", flush=True)
+        sys.argv = [str(ORIGINAL)] + sys.argv[1:]
+        runpy.run_path(str(ORIGINAL), run_name="__main__")
