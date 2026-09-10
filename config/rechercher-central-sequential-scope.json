@@ -1,0 +1,24 @@
+{
+  "schema": "din-allah-encyclopedia/rechercher-central-sequential-scope/v1",
+  "order": [
+    "Prophet era",
+    "Quran",
+    "Seerah",
+    "Companions",
+    "Followers",
+    "1-400H",
+    "401-800H",
+    "801-1200H",
+    "1201H",
+    "Modern era",
+    "Future books"
+  ],
+  "catalog_glob": "books-batches/**/catalog.json",
+  "output_format": ".pdf",
+  "provider_policy": "provider-neutral catalogued-source failover; no source is privileged or mandatory",
+  "storage_policy": "one physical PDF copy per book across complementary primary/secondary shards",
+  "quality_policy": "technical quality and completeness gate before persistence; source PDF is never rewritten",
+  "rights_policy": "acquisition is separate from public redistribution; rights-unknown remains protected/private",
+  "resume_policy": "re-runs resume from existing verified state and re-evaluate existing PDFs when quality policy changes",
+  "six_hour_policy": "each hosted job is a resumable slice; the chronological queue is not required to finish in one job"
+}
