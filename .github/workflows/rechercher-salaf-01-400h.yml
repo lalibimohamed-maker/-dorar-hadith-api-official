@@ -3,7 +3,7 @@ name: Rechercher — Salaf 01-400H chronological acquisition
 on:
   workflow_dispatch:
 
-# security-justification: the acquisition workflow must write verified book artifacts and manifests to this governed acquisition branch, then persist every verified real PDF to the permanent secondary LFS repository.
+# security-justification: the acquisition workflow must write verified book artifacts and manifests to this governed acquisition branch.
 permissions:
   contents: write
 
@@ -13,11 +13,11 @@ concurrency:
 
 jobs:
   acquire:
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@a78a910b3ad3e6d01549b8ab77eb5ee478c99b2e # mandatory real-PDF persistence + end-to-end storage proof
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@6b9b6a76aa7907c6cd54cf6f921413c7fb34d4c2 # secondary LFS + missing-object preflight
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     secrets:
       RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
-    # security-justification: verified PDFs are not considered acquired for this workflow until their SHA-256-addressed real PDF bytes exist in the permanent secondary LFS storage repository and pass post-write verification.
+    # security-justification: the reusable acquisition workflow persists verified artifacts/manifests to the governed acquisition branch and mirrors verified PDFs to the separately owned LFS storage repository.
     permissions:
       contents: write
