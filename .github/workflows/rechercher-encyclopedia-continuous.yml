@@ -5,7 +5,7 @@ on:
   schedule:
     # Automatic continuation. The persistent queue decides what remains;
     # there is no finite book-count target.
-    - cron: '7 * * * *'
+    - cron: '*/5 * * * *'
 
 # security-justification: trusted default-branch caller only; it invokes the
 # reviewed central reusable acquisition workflow and persists only verified
