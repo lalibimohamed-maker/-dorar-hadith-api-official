@@ -5,6 +5,7 @@ on:
   schedule:
     - cron: '30 4 * * *'
 
+# security-justification: contents: write is required only to persist the generated, SHA-256-deduplicated inventory evidence onto the protected developer-review acquisition branch; no PDF rights are granted or published by this workflow.
 permissions:
   contents: write
 
