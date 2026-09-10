@@ -1,0 +1,60 @@
+{
+  "schema": "din-allah-encyclopedia/permanent-storage-pool/v1",
+  "policy": "append-only; real .pdf only; SHA-256 identity; never delete, overwrite, replace, or rename an existing permanent PDF",
+  "free_operation_policy": {
+    "included_lfs_storage_gb": 10,
+    "included_lfs_bandwidth_gb_month": 10,
+    "max_single_file_gb": 2,
+    "safe_storage_threshold_gb": 8.5,
+    "hard_stop_before_overage": true,
+    "account_level_quota": true,
+    "note": "Additional repositories do not multiply the included account-level Git LFS quota. Sharding is for repository-size and operational partitioning, not quota multiplication."
+  },
+  "primary": {
+    "id": "storage-01",
+    "repository": "lalibimohamed82-coder/rechercher-pdf-storage",
+    "status": "active",
+    "role": "primary-permanent-real-pdf-storage"
+  },
+  "future_shards": [
+    {
+      "id": "storage-02",
+      "repository": null,
+      "status": "reserved",
+      "activation": "automatic_when_primary_safe_storage_threshold_is_reached_and_a_configured_secondary_repository_is_available"
+    },
+    {
+      "id": "storage-03",
+      "repository": null,
+      "status": "reserved",
+      "activation": "automatic_when_active_shard_reaches_its_safe_storage_threshold_and_a_configured_next_repository_is_available"
+    }
+  ],
+  "routing": {
+    "identity": "sha256",
+    "same_sha": "keep-existing",
+    "different_sha": "append-new-independent-pdf",
+    "rights_unclear": "protected-private-only",
+    "start_with_one_repository": true,
+    "never_route_before_threshold": true,
+    "fail_closed_if_next_repository_is_not_configured": true,
+    "never_delete_or_move_existing_pdfs": true
+  },
+  "central_index": {
+    "required": true,
+    "record_fields": [
+      "sha256",
+      "storage_id",
+      "storage_repository",
+      "path",
+      "bytes",
+      "validation",
+      "acquisition_date",
+      "acquisition_run",
+      "book_id",
+      "work_id",
+      "edition_id",
+      "rights_status"
+    ]
+  }
+}
