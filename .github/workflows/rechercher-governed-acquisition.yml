@@ -78,9 +78,8 @@ jobs:
           cd .secondary-storage
           git lfs install
           if git rev-parse --verify HEAD >/dev/null 2>&1; then
-            # Do not download every historical LFS object. Existing working-tree
-            # PDFs are enough for resume; missing/corrupt books are reacquired.
-            git lfs checkout || true
+            # Fetch only current tracked PDFs needed for resume, not every historical LFS object.
+            git lfs pull --include='artifacts/*.pdf' --exclude='' || true
           else
             git switch --orphan main
           fi
@@ -109,7 +108,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
           git lfs install
-          git lfs checkout || true
+          # Fetch only current primary PDF objects; never pull the entire LFS history.
+          git lfs pull --include='artifacts/*.pdf' --exclude='' || true
           python3 scripts/rechercher_sequential_acquisition.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
 
