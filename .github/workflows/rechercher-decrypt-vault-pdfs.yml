@@ -172,11 +172,23 @@ jobs:
       - name: Permanently append real PDFs to the routed permanent Git LFS corpus
         env:
           SECONDARY_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
-          STORAGE_REPO: ${{ env.RECHERCHER_STORAGE_REPO }}
-          STORAGE_ID: ${{ env.RECHERCHER_STORAGE_ID }}
         run: |
           set -euo pipefail
           test -n "$SECONDARY_TOKEN" || { echo 'ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required.'; exit 1; }
+          test -s artifacts/governance/storage-pool-route.json || { echo 'ERROR: Storage Pool route is missing.'; exit 1; }
+          STORAGE_REPO="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('artifacts/governance/storage-pool-route.json').read_text(encoding='utf-8'))['repository'])
+          PY
+          )"
+          STORAGE_ID="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('artifacts/governance/storage-pool-route.json').read_text(encoding='utf-8'))['storage_id'])
+          PY
+          )"
+          export STORAGE_REPO STORAGE_ID
           test -n "$STORAGE_REPO" || { echo 'ERROR: Storage Pool did not resolve a repository.'; exit 1; }
           test -n "$STORAGE_ID" || { echo 'ERROR: Storage Pool did not resolve a storage ID.'; exit 1; }
           test -d secondary/.git
@@ -185,11 +197,10 @@ jobs:
           cd ..
 
           python3 - <<'PY'
-          import hashlib, json, shutil
+          import hashlib, json, os, shutil
           from pathlib import Path
           src=Path('artifacts/verified-real-pdfs')
           dst=Path('secondary/artifacts/permanent-pdfs/by-sha256')
-          storage_id=Path('/tmp/rechercher-storage-id').read_text(encoding='utf-8').strip() if Path('/tmp/rechercher-storage-id').exists() else None
           entries=[]
           already_present=0
           newly_persisted=0
@@ -207,14 +218,14 @@ jobs:
               else:
                   shutil.copy2(pdf,target)
                   newly_persisted += 1
-              entries.append({'sha256':sha,'storage_id':storage_id,'storage_repository':__import__('os').environ['STORAGE_REPO'],'file':f'artifacts/permanent-pdfs/by-sha256/{sha}.pdf','bytes':len(data),'validation':'%PDF- + qpdf --check: ok','storage_policy':'permanent-append-only-real-pdf'})
+              entries.append({'sha256':sha,'storage_id':os.environ['STORAGE_ID'],'storage_repository':os.environ['STORAGE_REPO'],'file':f'artifacts/permanent-pdfs/by-sha256/{sha}.pdf','bytes':len(data),'validation':'%PDF- + qpdf --check: ok','storage_policy':'permanent-append-only-real-pdf'})
           index=Path('secondary/artifacts/permanent-pdfs/index.json')
           old=json.loads(index.read_text(encoding='utf-8')) if index.exists() else {'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1','records':[]}
           by_sha={r.get('sha256'):r for r in old.get('records',[]) if r.get('sha256')}
           for item in entries:
               by_sha.setdefault(item['sha256'],item)
           index.write_text(json.dumps({'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1','policy':'append-only; existing real .pdf files are never deleted, overwritten, replaced, renamed, or replaced by .pdf.enc','records':sorted(by_sha.values(),key=lambda r:r['sha256'])},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          Path('artifacts/permanent-persistence-summary.json').write_text(json.dumps({'storage_id':__import__('os').environ['STORAGE_ID'],'storage_repository':__import__('os').environ['STORAGE_REPO'],'already_present':already_present,'newly_persisted':newly_persisted,'verified_candidates':len(entries)},indent=2)+'\n',encoding='utf-8')
+          Path('artifacts/permanent-persistence-summary.json').write_text(json.dumps({'storage_id':os.environ['STORAGE_ID'],'storage_repository':os.environ['STORAGE_REPO'],'already_present':already_present,'newly_persisted':newly_persisted,'verified_candidates':len(entries)},indent=2)+'\n',encoding='utf-8')
           print(f'ALREADY_PRESENT={already_present}')
           print(f'NEWLY_PERSISTED={newly_persisted}')
           PY
