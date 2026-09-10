@@ -2,19 +2,22 @@
 """Live-progress wrapper for the deep-worldwide PDF gap retry engine.
 
 The original acquisition logic is preserved byte-for-byte in
-rechercher_no_match_retry_original.py. This wrapper only adds observability:
-engine start/result, source numbering, 15s wait heartbeats, and 1 MiB PDF
-progress milestones through the final PDF size (for example 1 MB ... 18.7 MB).
+rechercher_no_match_retry_original.py. This wrapper adds observability and a
+scan-quality gate so a technically valid but badly scanned PDF is not accepted
+as the first successful match.
 """
 from __future__ import annotations
 
 import importlib.util
 import io
+import json
 import pathlib
 import re
 import threading
 import time
 from urllib.request import Request, urlopen
+
+from rechercher_pdf_quality import MIN_ACCEPT_SCORE, quality_gate
 
 HERE = pathlib.Path(__file__).resolve().parent
 ORIGINAL = HERE / "rechercher_no_match_retry_original.py"
@@ -124,6 +127,35 @@ def live_fetch(url: str):
 
 mod.fetch = live_fetch
 
+_original_valid = mod.valid
+
+
+def quality_valid(path):
+    ok, validation = _original_valid(path)
+    if not ok:
+        return False, validation
+    accepted, quality_json = quality_gate(path)
+    try:
+        quality = json.loads(quality_json).get("quality_gate", {})
+        print(
+            f"[PDF QUALITY] book={LIVE['book']} engine={LIVE['engine']} "
+            f"score={quality.get('score', 'unknown')} grade={quality.get('grade', 'unknown')} "
+            f"accepted={accepted} threshold={MIN_ACCEPT_SCORE}",
+            flush=True,
+        )
+    except Exception:
+        print(
+            f"[PDF QUALITY] book={LIVE['book']} engine={LIVE['engine']} "
+            f"accepted={accepted} details={quality_json}",
+            flush=True,
+        )
+    if not accepted:
+        return False, quality_json
+    return True, quality_json
+
+
+mod.valid = quality_valid
+
 
 def _wrap_engine(name: str):
     original = getattr(mod, name, None)
@@ -181,5 +213,5 @@ def live_candidates(rec):
 mod.candidates = live_candidates
 
 if __name__ == "__main__":
-    print("[RECHERCHER LIVE] deep-worldwide acquisition progress instrumentation enabled", flush=True)
+    print("[RECHERCHER LIVE] deep-worldwide acquisition progress + quality gate enabled", flush=True)
     mod.main()
