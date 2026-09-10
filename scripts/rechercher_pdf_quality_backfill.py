@@ -115,6 +115,7 @@ def process_book(rec: dict, vault: Path) -> dict:
         source = first.get("source", "existing") if isinstance(first, dict) else "existing"
         source_url = first.get("url", "") if isinstance(first, dict) else ""
         _replace_manifest_item(rec, current_path, source, source_url, current_quality, json.dumps(current_quality, ensure_ascii=False))
+        rec["quality_backfill_attempts"] = int(rec.get("quality_backfill_attempts", 0) or 0) + 1
         row["result"] = "already-acceptable"
         return row
 
