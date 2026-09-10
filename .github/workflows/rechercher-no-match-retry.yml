@@ -122,6 +122,10 @@ jobs:
         run: |
           set -euo pipefail
           GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          # The retry report is generated on trusted main and is untracked there.
+          # Remove only this exact generated path before switching to the review branch;
+          # the canonical copy is already snapshotted under /tmp.
+          rm -f artifacts/governance/no-match-retry-report.json
           git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
           cp /tmp/generated-manifest.json books-batches/salaf-01-400h/developer-review-manifest.json
