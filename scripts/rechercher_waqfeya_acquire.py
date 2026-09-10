@@ -6,7 +6,7 @@ from urllib.parse import urljoin, urlsplit, urlunsplit, quote
 from urllib.request import Request, urlopen
 
 # Rechercher acquisition contract:
-# - acquire a real .pdf first; never treat .pdf.enc as a PDF;
+# - obtain a real .pdf first; never treat .pdf.enc as a PDF;
 # - preserve acquired PDFs permanently and resume incomplete books;
 # - rights/redistribution is reviewed AFTER acquisition, not used as an acquisition gate;
 # - rights-unclear copies are retained as protected/private research material;
