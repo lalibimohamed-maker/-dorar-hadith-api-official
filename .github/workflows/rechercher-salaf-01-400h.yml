@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   acquire:
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@6b9b6a76aa7907c6cd54cf6f921413c7fb34d4c2 # secondary LFS + missing-object preflight
     with:
       target_branch: rechercher/salaf-01-400h-chronological-acquisition
     secrets:
