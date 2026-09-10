@@ -97,6 +97,12 @@ def _replace_manifest_item(rec: dict, path: Path, source: str, final_url: str, q
     rec["quality_score"] = quality.get("score")
 
 
+def _record_current_quality(rec: dict, current_quality: dict) -> None:
+    rec["quality_status"] = current_quality.get("grade")
+    rec["quality_score"] = current_quality.get("score")
+    rec["quality_backfill_attempts"] = int(rec.get("quality_backfill_attempts", 0) or 0) + 1
+
+
 def process_book(rec: dict, vault: Path) -> dict:
     book_id = str(rec.get("id", ""))
     existing = _best_existing(vault, book_id)
@@ -158,6 +164,7 @@ def process_book(rec: dict, vault: Path) -> dict:
                 continue
 
     if best is None:
+        _record_current_quality(rec, current_quality)
         row["result"] = "no-better-copy"
         row["attempts"] = attempts
         return row
@@ -168,6 +175,7 @@ def process_book(rec: dict, vault: Path) -> dict:
     finally:
         temp_path.unlink(missing_ok=True)
     _replace_manifest_item(rec, current_path, f"quality-backfill:{engine}", final_url, quality, validation)
+    rec["quality_backfill_attempts"] = int(rec.get("quality_backfill_attempts", 0) or 0) + 1
     row["result"] = "upgraded"
     row["new"] = {"file": current_path.name, "score": quality.get("score"), "grade": quality.get("grade"), "pages": quality.get("pages"), "source": engine, "url": final_url}
     row["attempts"] = attempts
@@ -187,9 +195,9 @@ def main() -> None:
     data = json.loads(manifest.read_text(encoding="utf-8"))
     records = data.get("records", [])
     acquired = [r for r in records if r.get("availability") == "copy-acquired" and int(r.get("acquired_count", 0) or 0) > 0]
-    # Unknown/low quality first, so repeated scheduled runs progress through the
-    # whole corpus instead of rescoring the same already-good first books.
-    acquired.sort(key=lambda r: (float(r.get("quality_score", 0) or 0), str(r.get("id", ""))))
+    # Process never-reviewed books first; afterwards rotate books that failed
+    # to find a better copy so the corpus is not blocked on the first few IDs.
+    acquired.sort(key=lambda r: (1 if int(r.get("quality_backfill_attempts", 0) or 0) else 0, float(r.get("quality_score", 0) or 0), str(r.get("id", ""))))
     targets = acquired[:max(0, args.max_books)]
     stats = {"schema": "rechercher-pdf-quality-backfill/v1", "input_acquired": len(targets), "min_accept_score": MIN_ACCEPT_SCORE, "upgraded": 0, "already_acceptable": 0, "no_better_copy": 0, "no_local_pdf": 0, "results": []}
     for rec in targets:
