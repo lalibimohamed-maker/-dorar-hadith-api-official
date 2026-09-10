@@ -106,11 +106,11 @@ jobs:
       - name: Clean primary PDF working storage
         run: python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
 
-      - name: Acquire real PDFs through the central sequential engine
+      - name: Acquire real PDFs through the central sequential engine with quality selection
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y qpdf
+          sudo apt-get install -y qpdf poppler-utils
           git lfs install
           git lfs fetch origin --all || true
           git lfs checkout || true
@@ -142,7 +142,6 @@ jobs:
               if not data.startswith(b'%PDF-') or not data:
                   raise SystemExit(f'not a real PDF: {pdf}')
               sha=hashlib.sha256(data).hexdigest()
-              # Even first hex digit -> primary; odd -> secondary.
               assigned='primary' if int(sha[0],16) % 2 == 0 else 'secondary'
               target=(primary/pdf.name) if assigned=='primary' else (secondary/pdf.name)
               if assigned=='secondary':
@@ -151,14 +150,12 @@ jobs:
                   shutil.copy2(pdf,target)
                   pdf.unlink()
               records.append({'filename':pdf.name if assigned=='primary' else target.name,'sha256':sha,'pool':assigned,'bytes':len(data)})
-          # Remove any stale secondary PDF whose deterministic assignment is primary.
           for pdf in sorted(secondary.glob('*.pdf')):
               data=pdf.read_bytes()
               if not data.startswith(b'%PDF-'):
                   pdf.unlink(); continue
               sha=hashlib.sha256(data).hexdigest()
               if int(sha[0],16) % 2 == 0:
-                  # It belongs in primary; restore only if the primary copy is absent.
                   target=primary/pdf.name
                   if target.exists() and hashlib.sha256(target.read_bytes()).hexdigest()!=sha:
                       raise SystemExit(f'cross-pool filename collision: {pdf.name}')
@@ -207,7 +204,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import hashlib, json, subprocess
+          import hashlib, json
           from pathlib import Path
           primary=Path('artifacts')
           secondary=Path('.secondary-storage/artifacts')
@@ -220,13 +217,9 @@ jobs:
                   if sha in seen: raise SystemExit(f'DUPLICATE_PDF_COPY: {pdf.name} already stored in {seen[sha]}')
                   seen[sha]=f'{pool}/{pdf.name}'
           Path('artifacts/governance/storage-end-to-end-proof.json').write_text(json.dumps({
-              'status':'VERIFIED',
-              'storage_model':'ONE_COPY_ONLY',
-              'verified_real_pdfs':len(seen),
-              'primary':'artifacts/*.pdf',
-              'secondary':'artifacts/*.pdf',
-              'sha256':'integrity_only_not_storage_path',
-              'encrypted_final_artifacts':False,
+              'status':'VERIFIED','storage_model':'ONE_COPY_ONLY','verified_real_pdfs':len(seen),
+              'primary':'artifacts/*.pdf','secondary':'artifacts/*.pdf',
+              'sha256':'integrity_only_not_storage_path','encrypted_final_artifacts':False,
               'duplicate_pdf_copies':0
           },indent=2)+'\n',encoding='utf-8')
           print(f'ONE_COPY_STORAGE=VERIFIED count={len(seen)}')
