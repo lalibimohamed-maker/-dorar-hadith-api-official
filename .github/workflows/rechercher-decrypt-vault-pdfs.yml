@@ -3,28 +3,35 @@ name: Rechercher — Recover encrypted vault PDFs
 on:
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: 'Vault release tag to recover (blank = latest rechercher-vault release)'
+      vault_tag:
+        description: 'Optional rechercher-vault-* release tag; defaults to latest'
         required: false
         type: string
-        default: ''
 
 permissions:
   contents: read
-
-# security-justification: this workflow reads existing encrypted vault release assets and
-# decrypts them only inside an ephemeral runner; recovered PDFs are uploaded only as a
-# private-to-repository workflow artifact and are never published as release assets.
 
 env:
   GIT_TERMINAL_PROMPT: '0'
 
 jobs:
   recover:
-    name: Recover encrypted books as verified PDFs
+    name: Recover encrypted vault copies as verified PDFs
     runs-on: ubuntu-latest
     timeout-minutes: 240
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf
+
       - name: Require vault key
         env:
           REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
@@ -34,70 +41,64 @@ jobs:
 
       - name: Select vault release
         env:
-          GH_TOKEN: ${{ github.token }}
-          INPUT_TAG: ${{ inputs.release_tag }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VAULT_TAG: ${{ inputs.vault_tag }}
         run: |
           set -euo pipefail
-          if [ -n "$INPUT_TAG" ]; then
-            TAG="$INPUT_TAG"
+          if [ -n "$INPUT_VAULT_TAG" ]; then
+            TAG="$INPUT_VAULT_TAG"
           else
-            TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName --jq '[.[] | select(.tagName | startswith("rechercher-vault-"))][0].tagName')
+            TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,isDraft,isPrerelease,createdAt \
+              --jq '[.[] | select(.tagName | startswith("rechercher-vault-")) | select(.isDraft == false) | select(.isPrerelease == false)] | sort_by(.createdAt) | last | .tagName')
           fi
-          test -n "$TAG" || { echo 'No rechercher-vault release found.'; exit 1; }
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null
-          printf '%s\n' "$TAG" > /tmp/vault-tag
-          echo "Recovering vault release: $TAG"
+          test -n "$TAG" && [ "$TAG" != "null" ] || { echo 'ERROR: no rechercher-vault release found.'; exit 1; }
+          echo "VAULT_TAG=$TAG" >> "$GITHUB_ENV"
+          echo "Selected vault release: $TAG"
 
-      - name: Download encrypted vault assets
+      - name: Download and decrypt vault PDFs
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          TAG=$(cat /tmp/vault-tag)
-          mkdir -p recovered encrypted
-          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.pdf.enc' --dir encrypted --clobber
-          shopt -s nullglob
-          files=(encrypted/*.pdf.enc)
-          test "${#files[@]}" -gt 0 || { echo 'No encrypted PDF assets found in selected release.'; exit 1; }
-          echo "Encrypted assets: ${#files[@]}"
-
-      - name: Decrypt and verify every PDF
-        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
-          mkdir -p recovered
+          rm -rf recovered encrypted
+          mkdir -p recovered encrypted
+          gh release download "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.pdf.enc' --dir encrypted
           shopt -s nullglob
-          count=0
-          for enc in encrypted/*.pdf.enc; do
-            base=$(basename "$enc" .enc)
-            pdf="recovered/$base"
+          enc=(encrypted/*.pdf.enc)
+          test "${#enc[@]}" -gt 0 || { echo 'ERROR: selected vault release contains no encrypted PDFs.'; exit 1; }
+          for f in "${enc[@]}"; do
+            out="recovered/$(basename "${f%.enc}")"
             openssl enc -d -aes-256-cbc -pbkdf2 -md sha256 \
-              -pass env:REVIEW_VAULT_KEY -in "$enc" -out "$pdf"
-            test -s "$pdf"
-            head -c 5 "$pdf" | grep -qx '%PDF-' || { echo "ERROR: invalid PDF header: $pdf"; exit 1; }
-            qpdf --check "$pdf"
-            sha256sum "$pdf"
-            count=$((count + 1))
+              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
+            head -c 5 "$out" | grep -qx '%PDF-' || { echo "ERROR: not a PDF: $out"; exit 1; }
+            test -s "$out"
+            qpdf --check "$out"
           done
-          echo "RECOVERED_VERIFIED_PDFS=$count" >> "$GITHUB_ENV"
 
       - name: Write recovery manifest
         run: |
           set -euo pipefail
-          TAG=$(cat /tmp/vault-tag)
-          {
-            echo '{'
-            printf '  "schema": "din-allah-encyclopedia/rechercher-vault-pdf-recovery/v1",\n'
-            printf '  "release_tag": %s,\n' "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$TAG")"
-            printf '  "verified_pdf_count": %s,\n' "$RECOVERED_VERIFIED_PDFS"
-            printf '  "public_release": false,\n'
-            echo '  "note": "Recovered PDFs are for authenticated repository-owner review only; no plaintext PDF is published as a release asset."'
-            echo '}'
-          } > recovered/recovery-manifest.json
+          python3 - "$VAULT_TAG" <<'PY'
+          import hashlib, json, sys
+          from pathlib import Path
+          tag=sys.argv[1]
+          records=[]
+          for p in sorted(Path('recovered').glob('*.pdf')):
+              h=hashlib.sha256(p.read_bytes()).hexdigest()
+              records.append({'file':p.name,'bytes':p.stat().st_size,'sha256':h,'validation':'qpdf --check: ok','pdf_header':'%PDF-'})
+          Path('recovered/recovery-manifest.json').write_text(json.dumps({
+              'schema':'din-allah-encyclopedia/rechercher-vault-pdf-recovery/v1',
+              'release_tag':tag,
+              'verified_pdf_count':len(records),
+              'public_release':False,
+              'records':records,
+              'note':'Recovered PDFs are for authenticated repository-owner review only; no plaintext PDF is published as a release asset.'
+          },ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
 
       - name: Upload verified PDFs as protected workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: rechercher-recovered-pdfs-${{ github.run_id }}
           path: recovered/
