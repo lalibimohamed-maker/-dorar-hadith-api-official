@@ -17,7 +17,7 @@ import tempfile
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-from rechercher_pdf_quality import MIN_ACCEPT_SCORE, quality_gate, score_pdf
+from rechercher_pdf_quality import MIN_ACCEPT_SCORE, score_pdf
 
 HERE = pathlib.Path(__file__).resolve().parent
 ORIGINAL = HERE / "rechercher_no_match_retry_original.py"
@@ -105,7 +105,10 @@ def process_book(rec: dict, vault: Path) -> dict:
     current_score, current_pages, current_path, current_quality = existing
     row = {"id": book_id, "title": rec.get("title"), "current": {"file": current_path.name, "score": current_score, "grade": current_quality.get("grade"), "pages": current_pages}}
     if current_score >= MIN_ACCEPT_SCORE:
-        _replace_manifest_item(rec, current_path, (rec.get("acquired") or [{}])[0].get("source", "existing") if isinstance((rec.get("acquired") or [{}])[0], dict) else "existing", (rec.get("acquired") or [{}])[0].get("url", "") if isinstance((rec.get("acquired") or [{}])[0], dict) else "", current_quality, json.dumps(current_quality, ensure_ascii=False))
+        first = (rec.get("acquired") or [{}])[0]
+        source = first.get("source", "existing") if isinstance(first, dict) else "existing"
+        source_url = first.get("url", "") if isinstance(first, dict) else ""
+        _replace_manifest_item(rec, current_path, source, source_url, current_quality, json.dumps(current_quality, ensure_ascii=False))
         row["result"] = "already-acceptable"
         return row
 
@@ -127,39 +130,43 @@ def process_book(rec: dict, vault: Path) -> dict:
             if pdf_url in seen_urls:
                 continue
             seen_urls.add(pdf_url)
+            temp_path: Path | None = None
             try:
-                raw, content_type, final_url = cached_fetch(pdf_url)
+                raw, _content_type, final_url = cached_fetch(pdf_url)
                 with tempfile.NamedTemporaryFile(prefix="rechercher-quality-candidate-", suffix=".pdf", delete=False) as tmp:
                     temp_path = Path(tmp.name)
                     temp_path.write_bytes(raw)
-                try:
-                    ok, validation = mod.valid(temp_path)
-                    if not ok:
-                        continue
-                    quality = score_pdf(temp_path)
-                    candidate_key = (float(quality.get("score", 0.0)), int(quality.get("pages", 0)))
-                    if candidate_key[0] < MIN_ACCEPT_SCORE:
-                        continue
-                    if best is None or candidate_key > best[0]:
-                        best = (candidate_key, temp_path, engine, final_url, quality, validation, content_type)
-                    elif temp_path.exists():
-                        temp_path.unlink()
-                except Exception:
-                    if temp_path.exists():
-                        temp_path.unlink()
+                ok, validation = mod.valid(temp_path)
+                if not ok:
+                    temp_path.unlink(missing_ok=True)
+                    continue
+                quality = score_pdf(temp_path)
+                candidate_key = (float(quality.get("score", 0.0)), int(quality.get("pages", 0)))
+                if candidate_key[0] < MIN_ACCEPT_SCORE:
+                    temp_path.unlink(missing_ok=True)
+                    continue
+                if best is None or candidate_key > best[0]:
+                    if best is not None:
+                        best[1].unlink(missing_ok=True)
+                    best = (candidate_key, temp_path, engine, final_url, quality, validation)
+                    temp_path = None
+                if temp_path is not None:
+                    temp_path.unlink(missing_ok=True)
             except Exception:
+                if temp_path is not None:
+                    temp_path.unlink(missing_ok=True)
                 continue
+
     if best is None:
         row["result"] = "no-better-copy"
         row["attempts"] = attempts
         return row
 
-    _, temp_path, engine, final_url, quality, validation, _ = best
+    _, temp_path, engine, final_url, quality, validation = best
     try:
         temp_path.replace(current_path)
     finally:
-        if temp_path.exists():
-            temp_path.unlink()
+        temp_path.unlink(missing_ok=True)
     _replace_manifest_item(rec, current_path, f"quality-backfill:{engine}", final_url, quality, validation)
     row["result"] = "upgraded"
     row["new"] = {"file": current_path.name, "score": quality.get("score"), "grade": quality.get("grade"), "pages": quality.get("pages"), "source": engine, "url": final_url}
@@ -179,7 +186,11 @@ def main() -> None:
     report = Path(args.report)
     data = json.loads(manifest.read_text(encoding="utf-8"))
     records = data.get("records", [])
-    targets = [r for r in records if r.get("availability") == "copy-acquired" and int(r.get("acquired_count", 0) or 0) > 0][:max(0, args.max_books)]
+    acquired = [r for r in records if r.get("availability") == "copy-acquired" and int(r.get("acquired_count", 0) or 0) > 0]
+    # Unknown/low quality first, so repeated scheduled runs progress through the
+    # whole corpus instead of rescoring the same already-good first books.
+    acquired.sort(key=lambda r: (float(r.get("quality_score", 0) or 0), str(r.get("id", ""))))
+    targets = acquired[:max(0, args.max_books)]
     stats = {"schema": "rechercher-pdf-quality-backfill/v1", "input_acquired": len(targets), "min_accept_score": MIN_ACCEPT_SCORE, "upgraded": 0, "already_acceptable": 0, "no_better_copy": 0, "no_local_pdf": 0, "results": []}
     for rec in targets:
         result = process_book(rec, vault)
