@@ -45,6 +45,7 @@ jobs:
       - name: Recover persistent plaintext PDF vault
         env:
           SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
@@ -77,6 +78,7 @@ jobs:
 
           shopt -s nullglob
           files=(artifacts/developer-review-vault/*.pdf)
+          test "${#files[@]}" -gt 0 || echo 'No persistent PDFs found yet; acquisition will start from the current manifest.'
           for f in "${files[@]}"; do
             test "$(head -c 5 "$f")" = '%PDF-'
             qpdf --check "$f"
@@ -91,8 +93,6 @@ jobs:
           test -s /tmp/developer-review-manifest.json
 
       - name: Run multi-pass gap retry
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
           python3 scripts/rechercher_no_match_retry.py \
