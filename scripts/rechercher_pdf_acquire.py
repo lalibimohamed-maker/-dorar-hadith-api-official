@@ -18,7 +18,6 @@ import importlib.util
 import math
 import os
 import re
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -43,14 +42,12 @@ def provider_neutral_sources(book):
 worker.source_candidates=provider_neutral_sources
 worker.MAX_SOURCE_ATTEMPTS=max(12,int(os.environ.get('RECHERCHER_MAX_SOURCE_ATTEMPTS','24')))
 
-
 def _run_text(cmd):
     try:
         p=subprocess.run(cmd,text=True,capture_output=True,check=False)
         return p.returncode,p.stdout,p.stderr
     except Exception:
         return 127,'',''
-
 
 def quality_score(path):
     """Return a deterministic, non-destructive PDF quality score (0..100)."""
@@ -61,7 +58,6 @@ def quality_score(path):
         m=re.search(r'^Pages:\s*(\d+)',out,re.M)
         if m: pages=int(m.group(1))
 
-    # Text layer is useful, but it must never outweigh scan readability.
     text_chars=0
     rc,out,_=_run_text(['pdftotext','-f','1','-l',str(max(1,pages or 1)),str(path),'-'])
     if rc==0:
@@ -69,7 +65,7 @@ def quality_score(path):
     chars_per_page=text_chars/max(1,pages)
     text_score=min(100.0, chars_per_page/8.0) if text_chars else 0.0
 
-    # For scanned books, image resolution is the main quality signal.
+    # pdfimages -list columns place x-ppi/y-ppi at indexes 12/13.
     dpi=[]
     rc,out,_=_run_text(['pdfimages','-list',str(path)])
     if rc==0:
@@ -77,9 +73,8 @@ def quality_score(path):
             s=line.strip()
             if not s or not re.match(r'^\d+\s+\d+\s+',s): continue
             cols=s.split()
-            # pdfimages columns: page num type width height color comp bpc enc interp object ID x-ppi y-ppi size ratio
-            if len(cols)>=13:
-                for idx in (11,12):
+            if len(cols)>=14:
+                for idx in (12,13):
                     try:
                         v=float(cols[idx])
                         if 10 <= v <= 2400: dpi.append(v)
@@ -93,29 +88,24 @@ def quality_score(path):
     else:
         dpi_score=35.0 if text_chars else 15.0
 
-    # Size is only a weak signal: larger is not automatically better.
     size_mb=size/(1024*1024)
-    size_score=min(100.0, 35.0 + 12.0*math.log1p(max(0.0,size_mb)))
-
-    # More pages generally indicates completeness when comparing candidates for the same volume.
-    page_score=min(100.0, pages/800.0*100.0) if pages else 0.0
-    score=0.50*dpi_score + 0.20*text_score + 0.15*page_score + 0.15*size_score
+    size_score=min(100.0,35.0+12.0*math.log1p(max(0.0,size_mb)))
+    page_score=min(100.0,pages/800.0*100.0) if pages else 0.0
+    score=0.50*dpi_score+0.20*text_score+0.15*page_score+0.15*size_score
     return {
-        'score':round(score,3), 'pages':pages, 'bytes':size,
-        'size_mb':round(size_mb,3), 'text_chars':text_chars,
+        'score':round(score,3),'pages':pages,'bytes':size,
+        'size_mb':round(size_mb,3),'text_chars':text_chars,
         'chars_per_page':round(chars_per_page,2),
         'median_image_dpi':round(sorted(dpi)[len(dpi)//2],2) if dpi else None,
         'quality_basis':'dpi>text-layer>page-completeness>weak-size-signal'
     }
 
-
-def acquire_volume_quality(book, volume, expected, work):
+def acquire_volume_quality(book,volume,expected,work):
     attempts=[]
     sources=provider_neutral_sources(book)
     if not sources:
-        return None, {'volume':volume,'status':'no_catalogued_source'}
+        return None,{'volume':volume,'status':'no_catalogued_source'}
     best=None
-    candidate_paths=[]
     try:
         for source_index,source in enumerate(sources,1):
             try: urls=worker.candidate_urls(source)
@@ -155,10 +145,10 @@ def acquire_volume_quality(book, volume, expected, work):
                     attempts.append({'source':url,'status':'download_or_quality_error','error':str(exc)})
                     candidate.unlink(missing_ok=True)
         if best is None:
-            return None, {'volume':volume,'status':'failed','attempts':attempts}
+            return None,{'volume':volume,'status':'failed','attempts':attempts}
         final=work/f'{volume:03d}.pdf'
         Path(best['path']).replace(final)
-        return final, {
+        return final,{
             'volume':volume,'status':'selected-best-quality','url':best['source'],
             'source_label':best.get('source_label'),'source_index':best.get('source_index'),
             'bytes':final.stat().st_size,'sha256':worker.sha256(final),
