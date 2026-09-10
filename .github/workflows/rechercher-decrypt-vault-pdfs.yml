@@ -49,6 +49,26 @@ jobs:
           sudo apt-get install -y qpdf poppler-utils git-lfs
           git lfs install --local
 
+      - name: Record permanent scope policy before any audit upload
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          Path('artifacts/governance/permanent-pdf-policy.json').write_text(json.dumps({
+            'scope':['Prophet era','Companions','Followers','1-400H','401-800H','801-1200H','1201H','Modern era','future catalogued books'],
+            'catalog_glob':'books-batches/**/catalog.json',
+            'required_format':'.pdf',
+            'forbidden_as_primary_storage':'.pdf.enc',
+            'permanent_storage':'governed Storage Pool via Git LFS',
+            'retention':'permanent append-only; never delete/overwrite/rename/replace existing real PDFs',
+            'validation':['%PDF-','qpdf --check','SHA-256'],
+            'rights':'rights-unclear copies remain protected/private and are not publicly released'
+          },ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          test -s artifacts/governance/permanent-pdf-policy.json
+
       - name: Build whole-encyclopedia catalog census
         run: |
           set -euo pipefail
@@ -276,25 +296,6 @@ jobs:
             artifacts/governance/storage-pool-route.json
           if-no-files-found: warn
           retention-days: 90
-
-      - name: Record permanent scope policy
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/governance
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          Path('artifacts/governance/permanent-pdf-policy.json').write_text(json.dumps({
-            'scope':['Prophet era','Companions','Followers','1-400H','401-800H','801-1200H','1201H','Modern era','future catalogued books'],
-            'catalog_glob':'books-batches/**/catalog.json',
-            'required_format':'.pdf',
-            'forbidden_as_primary_storage':'.pdf.enc',
-            'permanent_storage':'governed Storage Pool via Git LFS',
-            'retention':'permanent append-only; never delete/overwrite/rename/replace existing real PDFs',
-            'validation':['%PDF-','qpdf --check','SHA-256'],
-            'rights':'rights-unclear copies remain protected/private and are not publicly released'
-          },ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          PY
 
       - name: Upload policy audit metadata only
         if: always()
