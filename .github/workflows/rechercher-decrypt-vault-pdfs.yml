@@ -13,31 +13,47 @@ permissions:
 # - Temporary GitHub Actions artifacts are only transport/audit copies (90 days).
 # - Permanent retention is the secondary Git LFS repository.
 # - Permanent PDF paths are SHA-256 based and append-only: never delete, overwrite,
-#   replace, or encrypt-away an existing real PDF.
-# - The acquisition scope is continuous: every book represented by the maintained
-#   corpus/catalog/discovery sources is a target, from the earliest Islamic works
-#   through the present; newly discovered future works are picked up by later runs.
-# - Rights-unclear material may remain protected/private and must not be published
-#   as a public release.
+#   replace, rename, or encrypt-away an existing real PDF.
+# - Scope is the WHOLE encyclopedia: Prophet era -> Companions -> Followers ->
+#   1-400H -> 401-800H -> 801-1200H -> 1201H -> Modern era -> future catalogued books.
+# - Every books-batches/**/catalog.json is an acquisition target; future books are
+#   picked up automatically when their catalog/source records are added.
+# - Rights-unclear material may remain protected/private and must not be publicized.
 
 env:
-  REVIEW_BRANCH: rechercher/salaf-01-400h-developer-review-acquisition
   SECONDARY_REPO: lalibimohamed82-coder/rechercher-pdf-storage
-  CATALOG: books-batches/salaf-01-400h/catalog.json
-  DISCOVERY_1: books-batches/salaf-01-400h/master-discovery-additions-2026.json
-  DISCOVERY_2: books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+  RECHERCHER_CATALOG_GLOB: books-batches/**/catalog.json
+  RECHERCHER_MAX_BOOK_WORKERS: 12
 
 jobs:
   acquire:
-    name: Acquire, verify and permanently retain real PDF books
+    name: Whole-encyclopedia continuous real-PDF acquisition and permanent retention
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-      - name: Checkout trusted main
+      - name: Checkout current governed corpus
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
           persist-credentials: false
+
+      - name: Verify whole-encyclopedia scope
+        run: |
+          set -euo pipefail
+          test -s config/rechercher-encyclopedia-download-scope.json
+          test -s config/rechercher-encyclopedia-catalog-registry.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          scope=json.loads(Path('config/rechercher-encyclopedia-download-scope.json').read_text(encoding='utf-8'))
+          expected=['Prophet era','Companions','Followers','1-400H','401-800H','801-1200H','1201H','Modern era']
+          if scope.get('eras') != expected:
+              raise SystemExit('ERROR: whole-encyclopedia era scope is incomplete or reordered')
+          if scope.get('catalog_glob') != 'books-batches/**/catalog.json':
+              raise SystemExit('ERROR: whole-encyclopedia catalog glob is not enabled')
+          print('WHOLE_ENCYCLOPEDIA_SCOPE=ENABLED')
+          print('ERAS=', ' -> '.join(expected), ' -> FUTURE CATALOGUED BOOKS')
+          PY
 
       - name: Install PDF and LFS validators
         run: |
@@ -46,67 +62,53 @@ jobs:
           sudo apt-get install -y qpdf poppler-utils git-lfs
           git lfs install --local
 
-      - name: Recover authoritative acquisition state
-        env:
-          REVIEW_BRANCH: ${{ env.REVIEW_BRANCH }}
+      - name: Build whole-encyclopedia catalog census
         run: |
           set -euo pipefail
-          git fetch --no-tags origin "refs/heads/$REVIEW_BRANCH:refs/remotes/origin/$REVIEW_BRANCH"
-          git show "origin/$REVIEW_BRANCH:$CATALOG" > catalog.json
-          git show "origin/$REVIEW_BRANCH:books-batches/salaf-01-400h/developer-review-manifest.json" > developer-review-manifest.json
-          test -s catalog.json
-          test -s developer-review-manifest.json
+          python3 scripts/rechercher_encyclopedia_catalog_census.py
 
-      - name: Run the full Rechercher source federation and acquisition engine
+      - name: Run global saved-source federation
         run: |
           set -euo pipefail
-          mkdir -p artifacts/developer-review-vault
           python3 scripts/rechercher_source_engines.py --root "$GITHUB_WORKSPACE" \
-            --discovery "$DISCOVERY_1" \
-            --discovery "$DISCOVERY_2"
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
           python3 scripts/rechercher_deep_worldwide.py --root "$GITHUB_WORKSPACE" \
-            --discovery "$DISCOVERY_1" \
-            --discovery "$DISCOVERY_2" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json \
             --out artifacts/deep-worldwide-report.json
-          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" \
-            --catalog "$CATALOG" \
-            --discovery "$DISCOVERY_1" \
-            --discovery "$DISCOVERY_2" \
-            --discovery books-batches/salaf-01-400h/engine-source-overlay.json \
-            --out books-batches/salaf-01-400h/developer-review-manifest.json \
-            --vault artifacts/developer-review-vault
-          test -s books-batches/salaf-01-400h/developer-review-manifest.json
 
-      - name: Validate every real PDF produced by acquisition
+      - name: Download every catalogued book as a real PDF
+        env:
+          RECHERCHER_MAX_BOOK_WORKERS: ${{ env.RECHERCHER_MAX_BOOK_WORKERS }}
         run: |
           set -euo pipefail
+          python3 scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
           mkdir -p artifacts/verified-real-pdfs
+          : > artifacts/verified-real-pdfs/sha256.txt
           count=0
-          shopt -s nullglob
-          for f in artifacts/developer-review-vault/*.pdf; do
-            test -f "$f"
+          while IFS= read -r -d '' f; do
             test "$(head -c 5 "$f")" = '%PDF-'
             qpdf --check "$f"
             sha256sum "$f" >> artifacts/verified-real-pdfs/sha256.txt
             cp -n "$f" "artifacts/verified-real-pdfs/$(basename "$f")"
             count=$((count+1))
-          done
-          test "$count" -gt 0 || { echo 'ERROR: acquisition produced zero real PDF files.'; exit 1; }
+          done < <(find artifacts -type f -name '*.pdf' -not -path 'artifacts/verified-real-pdfs/*' -print0)
+          test "$count" -gt 0 || { echo 'ERROR: zero real PDF files acquired.'; exit 1; }
           echo "VERIFIED_REAL_PDFS=$count"
 
-      - name: Upload temporary protected workflow copy for audit only
+      - name: Upload temporary protected audit copy only
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: rechercher-real-pdfs-audit-${{ github.run_id }}
+          name: rechercher-real-pdf-audit-${{ github.run_id }}
           path: |
             artifacts/verified-real-pdfs/*.pdf
             artifacts/verified-real-pdfs/sha256.txt
             artifacts/deep-worldwide-report.json
-            books-batches/salaf-01-400h/developer-review-manifest.json
           if-no-files-found: error
           retention-days: 90
 
-      - name: Permanently append verified real PDFs to secondary Git LFS storage
+      - name: Permanently append real PDFs to the permanent Git LFS corpus
         env:
           SECONDARY_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
           SECONDARY_REPO: ${{ env.SECONDARY_REPO }}
@@ -115,12 +117,12 @@ jobs:
           test -n "$SECONDARY_TOKEN" || { echo 'ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required.'; exit 1; }
           rm -rf secondary
 
-          # First authenticate without silently treating auth/network failure as an empty repo.
+          # Authentication failure must never be mistaken for an empty repository.
           lsremote="$(git ls-remote "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" 2>/dev/null || true)"
           if [ -n "$lsremote" ]; then
             git clone "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" secondary
           else
-            # A truly empty repository has no refs; initialize it locally.
+            # The only accepted no-ref case is a genuinely empty secondary repository.
             mkdir secondary
             git -C secondary init -b main
             git -C secondary remote add origin "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git"
@@ -129,85 +131,67 @@ jobs:
           cd secondary
           git lfs install
           git lfs track '*.pdf' >/dev/null
+          git lfs pull || true
           mkdir -p artifacts/permanent-pdfs/by-sha256
           cd ..
 
           python3 - <<'PY'
           import hashlib, json, shutil
           from pathlib import Path
-
-          src = Path('artifacts/verified-real-pdfs')
-          dst = Path('secondary/artifacts/permanent-pdfs/by-sha256')
-          entries = []
+          src=Path('artifacts/verified-real-pdfs')
+          dst=Path('secondary/artifacts/permanent-pdfs/by-sha256')
+          entries=[]
           for pdf in sorted(src.glob('*.pdf')):
-              data = pdf.read_bytes()
+              data=pdf.read_bytes()
               if data[:5] != b'%PDF-':
                   raise SystemExit(f'not-a-real-pdf: {pdf}')
-              sha = hashlib.sha256(data).hexdigest()
-              target = dst / f'{sha}.pdf'
+              sha=hashlib.sha256(data).hexdigest()
+              target=dst/f'{sha}.pdf'
               if target.exists():
-                  existing = hashlib.sha256(target.read_bytes()).hexdigest()
+                  existing=hashlib.sha256(target.read_bytes()).hexdigest()
                   if existing != sha:
-                      raise SystemExit(f'IMMUTABILITY VIOLATION: existing PDF path has different bytes: {target}')
+                      raise SystemExit(f'IMMUTABILITY VIOLATION: {target}')
               else:
-                  shutil.copy2(pdf, target)
-              entries.append({
-                  'sha256': sha,
-                  'file': f'artifacts/permanent-pdfs/by-sha256/{sha}.pdf',
-                  'bytes': len(data),
-                  'validation': '%PDF- + qpdf --check: ok',
-                  'storage_policy': 'permanent-append-only-real-pdf'
-              })
-
-          index = Path('secondary/artifacts/permanent-pdfs/index.json')
-          if index.exists():
-              old = json.loads(index.read_text(encoding='utf-8'))
-          else:
-              old = {'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1','records':[]}
-          by_sha = {r.get('sha256'): r for r in old.get('records',[]) if r.get('sha256')}
+                  shutil.copy2(pdf,target)
+              entries.append({'sha256':sha,'file':f'artifacts/permanent-pdfs/by-sha256/{sha}.pdf','bytes':len(data),'validation':'%PDF- + qpdf --check: ok','storage_policy':'permanent-append-only-real-pdf'})
+          index=Path('secondary/artifacts/permanent-pdfs/index.json')
+          old=json.loads(index.read_text(encoding='utf-8')) if index.exists() else {'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1','records':[]}
+          by_sha={r.get('sha256'):r for r in old.get('records',[]) if r.get('sha256')}
           for item in entries:
-              by_sha.setdefault(item['sha256'], item)
-          merged = {
-              'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1',
-              'policy':'append-only; existing real .pdf files are never deleted, overwritten, replaced by .pdf.enc, or encrypted-away',
-              'records': sorted(by_sha.values(), key=lambda r: r['sha256'])
-          }
-          index.write_text(json.dumps(merged, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+              by_sha.setdefault(item['sha256'],item)
+          index.write_text(json.dumps({'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1','policy':'append-only; existing real .pdf files are never deleted, overwritten, replaced, renamed, or replaced by .pdf.enc','records':sorted(by_sha.values(),key=lambda r:r['sha256'])},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
 
           cd secondary
           git add .gitattributes artifacts/permanent-pdfs
-
-          # A permanent corpus is append-only: deletion, replacement, or rename of an existing PDF is fatal.
+          # Existing PDF bytes are immutable. Any deletion, modification or rename is fatal.
           if git diff --cached --name-status -- '*.pdf' | grep -E '^(D|M|R)' >/dev/null; then
-            echo 'ERROR: permanent PDF deletion/replacement/rename detected; refusing to push.'
+            echo 'ERROR: permanent PDF deletion/modification/rename detected; refusing to push.'
             exit 1
           fi
-
           if git diff --cached --quiet; then
-            echo 'No new PDF bytes; existing permanent PDFs remain untouched.'
+            echo 'No new PDFs. Existing permanent real PDFs remain untouched.'
             exit 0
           fi
           git config user.name 'Rechercher Permanent PDF Acquisition'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'data(rechercher): append verified real PDFs to permanent corpus'
+          git commit -m 'data(rechercher): append whole-encyclopedia real PDFs permanently'
           git push origin HEAD:main
 
-      - name: Verify permanent LFS objects locally before completion
+      - name: Verify permanent PDF corpus before success
         run: |
           set -euo pipefail
           cd secondary
           git lfs fsck
           test -d artifacts/permanent-pdfs/by-sha256
-          find artifacts/permanent-pdfs/by-sha256 -type f -name '*.pdf' -print | sort > permanent-pdf-inventory.txt
-          test -s permanent-pdf-inventory.txt
-          while IFS= read -r f; do
+          find artifacts/permanent-pdfs/by-sha256 -type f -name '*.pdf' -print0 | while IFS= read -r -d '' f; do
             test "$(head -c 5 "$f")" = '%PDF-'
             qpdf --check "$f"
-          done < permanent-pdf-inventory.txt
-          echo 'PERMANENT_REAL_PDF_STORAGE=VERIFIED'
+          done
+          test -n "$(find artifacts/permanent-pdfs/by-sha256 -type f -name '*.pdf' -print -quit)"
+          echo 'PERMANENT_REAL_PDF_CORPUS=VERIFIED'
 
-      - name: Record acquisition scope and non-encryption policy
+      - name: Record permanent scope policy
         run: |
           set -euo pipefail
           mkdir -p artifacts/governance
@@ -215,21 +199,22 @@ jobs:
           import json
           from pathlib import Path
           Path('artifacts/governance/permanent-pdf-policy.json').write_text(json.dumps({
-              'scope': 'all Islamic/scientific books represented by the maintained corpus from the earliest period (1H) through the present, with continuous future ingestion as new works are catalogued',
-              'required_format': '.pdf',
-              'forbidden_as_primary_storage': '.pdf.enc',
-              'permanent_storage': 'lalibimohamed82-coder/rechercher-pdf-storage via Git LFS',
-              'retention': 'permanent append-only corpus',
-              'validation': ['%PDF-', 'qpdf --check', 'SHA-256'],
-              'rights': 'rights-unclear copies remain protected and are not publicly released'
-          }, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+            'scope':['Prophet era','Companions','Followers','1-400H','401-800H','801-1200H','1201H','Modern era','future catalogued books'],
+            'catalog_glob':'books-batches/**/catalog.json',
+            'required_format':'.pdf',
+            'forbidden_as_primary_storage':'.pdf.enc',
+            'permanent_storage':'lalibimohamed82-coder/rechercher-pdf-storage via Git LFS',
+            'retention':'permanent append-only; never delete/overwrite/rename/replace existing real PDFs',
+            'validation':['%PDF-','qpdf --check','SHA-256'],
+            'rights':'rights-unclear copies remain protected/private and are not publicly released'
+          },ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
 
-      - name: Upload audit metadata only
+      - name: Upload policy audit metadata only
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: rechercher-permanent-pdf-audit-${{ github.run_id }}
+          name: rechercher-permanent-pdf-policy-${{ github.run_id }}
           path: artifacts/governance/permanent-pdf-policy.json
           if-no-files-found: error
           retention-days: 90
