@@ -1,106 +1,159 @@
-name: Rechercher — Recover encrypted vault PDFs
+name: Rechercher — Reacquire real PDFs from saved sources
 
 on:
   workflow_dispatch:
-    inputs:
-      vault_tag:
-        description: 'Optional rechercher-vault-* release tag; defaults to latest'
-        required: false
-        type: string
+  schedule:
+    - cron: '0 */6 * * *'
 
 permissions:
   contents: read
 
 env:
-  GIT_TERMINAL_PROMPT: '0'
+  REVIEW_BRANCH: rechercher/salaf-01-400h-developer-review-acquisition
+  SECONDARY_REPO: lalibimohamed82-coder/rechercher-pdf-storage
 
 jobs:
-  recover:
-    name: Recover encrypted vault copies as verified PDFs
+  reacquire:
+    name: Re-download and verify real PDF files
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 360
     steps:
-      - name: Checkout
+      - name: Checkout trusted main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Install validators
+      - name: Install PDF validator
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y qpdf
+          sudo apt-get install -y qpdf git-lfs
+          git lfs install --local
 
-      - name: Require vault key
+      - name: Recover authoritative acquisition manifest
         env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+          REVIEW_BRANCH: ${{ env.REVIEW_BRANCH }}
         run: |
           set -euo pipefail
-          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required.'; exit 1; }
+          git fetch --no-tags origin "refs/heads/$REVIEW_BRANCH:refs/remotes/origin/$REVIEW_BRANCH"
+          git show "origin/$REVIEW_BRANCH:books-batches/salaf-01-400h/developer-review-manifest.json" > developer-review-manifest.json
+          test -s developer-review-manifest.json
 
-      - name: Select vault release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          INPUT_VAULT_TAG: ${{ inputs.vault_tag }}
+      - name: Re-download every previously acquired PDF from saved sources
         run: |
           set -euo pipefail
-          if [ -n "$INPUT_VAULT_TAG" ]; then
-            TAG="$INPUT_VAULT_TAG"
-          else
-            TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,isDraft,isPrerelease,createdAt \
-              --jq '[.[] | select(.tagName | startswith("rechercher-vault-")) | select(.isDraft == false) | select(.isPrerelease == false)] | sort_by(.createdAt) | last | .tagName')
-          fi
-          test -n "$TAG" && [ "$TAG" != "null" ] || { echo 'ERROR: no rechercher-vault release found.'; exit 1; }
-          echo "VAULT_TAG=$TAG" >> "$GITHUB_ENV"
-          echo "Selected vault release: $TAG"
-
-      - name: Download and decrypt vault PDFs
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          rm -rf recovered encrypted
-          mkdir -p recovered encrypted
-          gh release download "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.pdf.enc' --dir encrypted
-          shopt -s nullglob
-          enc=(encrypted/*.pdf.enc)
-          test "${#enc[@]}" -gt 0 || { echo 'ERROR: selected vault release contains no encrypted PDFs.'; exit 1; }
-          for f in "${enc[@]}"; do
-            out="recovered/$(basename "${f%.enc}")"
-            openssl enc -d -aes-256-cbc -pbkdf2 -md sha256 \
-              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
-            head -c 5 "$out" | grep -qx '%PDF-' || { echo "ERROR: not a PDF: $out"; exit 1; }
-            test -s "$out"
-            qpdf --check "$out"
-          done
-
-      - name: Write recovery manifest
-        run: |
-          set -euo pipefail
-          python3 - "$VAULT_TAG" <<'PY'
-          import hashlib, json, sys
+          rm -rf recovered
+          mkdir -p recovered
+          python3 - <<'PY'
+          import hashlib, json, os, re, subprocess, urllib.request
           from pathlib import Path
-          tag=sys.argv[1]
-          records=[]
-          for p in sorted(Path('recovered').glob('*.pdf')):
-              h=hashlib.sha256(p.read_bytes()).hexdigest()
-              records.append({'file':p.name,'bytes':p.stat().st_size,'sha256':h,'validation':'qpdf --check: ok','pdf_header':'%PDF-'})
-          Path('recovered/recovery-manifest.json').write_text(json.dumps({
-              'schema':'din-allah-encyclopedia/rechercher-vault-pdf-recovery/v1',
-              'release_tag':tag,
-              'verified_pdf_count':len(records),
-              'public_release':False,
-              'records':records,
-              'note':'Recovered PDFs are for authenticated repository-owner review only; no plaintext PDF is published as a release asset.'
+
+          manifest = json.loads(Path('developer-review-manifest.json').read_text(encoding='utf-8'))
+          records = manifest.get('records')
+          if not isinstance(records, list) or not records:
+              raise SystemExit('ERROR: acquisition manifest has no records')
+
+          seen = {}
+          for record in records:
+              acquired = record.get('acquired') or []
+              if not isinstance(acquired, list):
+                  continue
+              expected = str(record.get('sha256') or '').lower()
+              for item in acquired:
+                  if not isinstance(item, dict):
+                      continue
+                  url = item.get('url') or item.get('source_url')
+                  if not isinstance(url, str) or not url.startswith(('http://','https://')):
+                      continue
+                  sha = str(item.get('sha256') or expected).lower()
+                  key = sha if re.fullmatch(r'[0-9a-f]{64}', sha) else url
+                  seen.setdefault(key, {'url': url, 'sha256': sha, 'title': record.get('title') or record.get('book') or 'book'})
+
+          report=[]
+          for idx, item in enumerate(seen.values(), 1):
+              url=item['url']
+              safe=re.sub(r'[^0-9A-Za-z._-]+','-', item['title']).strip('-')[:100] or 'book'
+              target=Path('recovered')/f'{idx:04d}-{safe}.pdf'
+              tmp=target.with_suffix('.download')
+              try:
+                  req=urllib.request.Request(url, headers={'User-Agent':'Din-Allah-Rechercher/real-pdf-reacquisition'})
+                  with urllib.request.urlopen(req, timeout=120) as r, tmp.open('wb') as out:
+                      while True:
+                          chunk=r.read(1024*1024)
+                          if not chunk: break
+                          out.write(chunk)
+                  with tmp.open('rb') as f:
+                      header=f.read(5)
+                  if header != b'%PDF-':
+                      raise RuntimeError('not-a-pdf')
+                  subprocess.run(['qpdf','--check',str(tmp)], check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                  digest=hashlib.sha256(tmp.read_bytes()).hexdigest()
+                  expected=item['sha256']
+                  if re.fullmatch(r'[0-9a-f]{64}', expected) and digest != expected:
+                      raise RuntimeError(f'sha256-mismatch expected={expected} actual={digest}')
+                  tmp.replace(target)
+                  report.append({'url':url,'file':target.name,'bytes':target.stat().st_size,'sha256':digest,'validation':'%PDF- + qpdf --check: ok','status':'reacquired'})
+              except Exception as exc:
+                  if tmp.exists(): tmp.unlink()
+                  report.append({'url':url,'status':'failed','error':str(exc)})
+
+          Path('reacquisition-report.json').write_text(json.dumps({
+              'schema':'din-allah-encyclopedia/rechercher-real-pdf-reacquisition/v1',
+              'attempted_sources':len(seen),
+              'verified_real_pdfs':sum(1 for r in report if r.get('status')=='reacquired'),
+              'failed':sum(1 for r in report if r.get('status')=='failed'),
+              'records':report
           },ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          if not any(r.get('status')=='reacquired' for r in report):
+              raise SystemExit('ERROR: zero real PDFs were reacquired')
           PY
 
-      - name: Upload verified PDFs as protected workflow artifact
+      - name: Upload real PDFs as protected workflow artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: rechercher-recovered-pdfs-${{ github.run_id }}
-          path: recovered/
+          name: rechercher-real-pdfs-${{ github.run_id }}
+          path: |
+            recovered/*.pdf
+            reacquisition-report.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Mirror verified real PDFs to secondary repository with Git LFS
+        env:
+          SECONDARY_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          SECONDARY_REPO: ${{ env.SECONDARY_REPO }}
+        run: |
+          set -euo pipefail
+          test -n "$SECONDARY_TOKEN" || { echo 'ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required for secondary PDF storage.'; exit 1; }
+          rm -rf secondary
+          git clone "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" secondary || {
+            mkdir secondary
+            cd secondary
+            git init -b main
+            cd ..
+          }
+          cd secondary
+          git lfs install
+          git lfs track '*.pdf' >/dev/null
+          mkdir -p artifacts/recovered-pdfs
+          cd ..
+          cp recovered/*.pdf secondary/artifacts/recovered-pdfs/
+          cd secondary
+          git config user.name 'Rechercher PDF Acquisition'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .gitattributes artifacts/recovered-pdfs/*.pdf
+          if git diff --cached --quiet; then
+            echo 'No new PDF bytes to persist in secondary storage.'
+            exit 0
+          fi
+          git commit -m "data(rechercher): persist verified real PDFs"
+          git push origin HEAD:main
+
+      - name: Publish reacquisition audit
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-real-pdf-audit-${{ github.run_id }}
+          path: reacquisition-report.json
           if-no-files-found: error
           retention-days: 90
