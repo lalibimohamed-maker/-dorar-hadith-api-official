@@ -14,7 +14,7 @@ env:
 
 jobs:
   reacquire:
-    name: Re-download and verify real PDF files
+    name: Re-download and permanently persist real PDF files
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -46,7 +46,7 @@ jobs:
           rm -rf recovered
           mkdir -p recovered
           python3 - <<'PY'
-          import hashlib, json, os, re, subprocess, urllib.request
+          import hashlib, json, re, subprocess, urllib.request
           from pathlib import Path
 
           manifest = json.loads(Path('developer-review-manifest.json').read_text(encoding='utf-8'))
@@ -83,9 +83,7 @@ jobs:
                           chunk=r.read(1024*1024)
                           if not chunk: break
                           out.write(chunk)
-                  with tmp.open('rb') as f:
-                      header=f.read(5)
-                  if header != b'%PDF-':
+                  if tmp.stat().st_size < 5 or tmp.open('rb').read(5) != b'%PDF-':
                       raise RuntimeError('not-a-pdf')
                   subprocess.run(['qpdf','--check',str(tmp)], check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
                   digest=hashlib.sha256(tmp.read_bytes()).hexdigest()
@@ -99,7 +97,7 @@ jobs:
                   report.append({'url':url,'status':'failed','error':str(exc)})
 
           Path('reacquisition-report.json').write_text(json.dumps({
-              'schema':'din-allah-encyclopedia/rechercher-real-pdf-reacquisition/v1',
+              'schema':'din-allah-encyclopedia/rechercher-real-pdf-reacquisition/v2',
               'attempted_sources':len(seen),
               'verified_real_pdfs':sum(1 for r in report if r.get('status')=='reacquired'),
               'failed':sum(1 for r in report if r.get('status')=='failed'),
@@ -147,7 +145,7 @@ jobs:
             echo 'No new PDF bytes to persist in secondary storage.'
             exit 0
           fi
-          git commit -m "data(rechercher): persist verified real PDFs"
+          git commit -m 'data(rechercher): persist verified real PDFs permanently'
           git push origin HEAD:main
 
       - name: Publish reacquisition audit
