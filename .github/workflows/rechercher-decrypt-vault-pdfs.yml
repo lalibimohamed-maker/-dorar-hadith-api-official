@@ -1,0 +1,106 @@
+name: Rechercher — Recover encrypted vault PDFs
+
+on:
+  workflow_dispatch:
+    inputs:
+      vault_tag:
+        description: 'Optional rechercher-vault-* release tag; defaults to latest'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  GIT_TERMINAL_PROMPT: '0'
+
+jobs:
+  recover:
+    name: Recover encrypted vault copies as verified PDFs
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf
+
+      - name: Require vault key
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required.'; exit 1; }
+
+      - name: Select vault release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VAULT_TAG: ${{ inputs.vault_tag }}
+        run: |
+          set -euo pipefail
+          if [ -n "$INPUT_VAULT_TAG" ]; then
+            TAG="$INPUT_VAULT_TAG"
+          else
+            TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,isDraft,isPrerelease,createdAt \
+              --jq '[.[] | select(.tagName | startswith("rechercher-vault-")) | select(.isDraft == false) | select(.isPrerelease == false)] | sort_by(.createdAt) | last | .tagName')
+          fi
+          test -n "$TAG" && [ "$TAG" != "null" ] || { echo 'ERROR: no rechercher-vault release found.'; exit 1; }
+          echo "VAULT_TAG=$TAG" >> "$GITHUB_ENV"
+          echo "Selected vault release: $TAG"
+
+      - name: Download and decrypt vault PDFs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          rm -rf recovered encrypted
+          mkdir -p recovered encrypted
+          gh release download "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.pdf.enc' --dir encrypted
+          shopt -s nullglob
+          enc=(encrypted/*.pdf.enc)
+          test "${#enc[@]}" -gt 0 || { echo 'ERROR: selected vault release contains no encrypted PDFs.'; exit 1; }
+          for f in "${enc[@]}"; do
+            out="recovered/$(basename "${f%.enc}")"
+            openssl enc -d -aes-256-cbc -pbkdf2 -md sha256 \
+              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
+            head -c 5 "$out" | grep -qx '%PDF-' || { echo "ERROR: not a PDF: $out"; exit 1; }
+            test -s "$out"
+            qpdf --check "$out"
+          done
+
+      - name: Write recovery manifest
+        run: |
+          set -euo pipefail
+          python3 - "$VAULT_TAG" <<'PY'
+          import hashlib, json, sys
+          from pathlib import Path
+          tag=sys.argv[1]
+          records=[]
+          for p in sorted(Path('recovered').glob('*.pdf')):
+              h=hashlib.sha256(p.read_bytes()).hexdigest()
+              records.append({'file':p.name,'bytes':p.stat().st_size,'sha256':h,'validation':'qpdf --check: ok','pdf_header':'%PDF-'})
+          Path('recovered/recovery-manifest.json').write_text(json.dumps({
+              'schema':'din-allah-encyclopedia/rechercher-vault-pdf-recovery/v1',
+              'release_tag':tag,
+              'verified_pdf_count':len(records),
+              'public_release':False,
+              'records':records,
+              'note':'Recovered PDFs are for authenticated repository-owner review only; no plaintext PDF is published as a release asset.'
+          },ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+      - name: Upload verified PDFs as protected workflow artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-recovered-pdfs-${{ github.run_id }}
+          path: recovered/
+          if-no-files-found: error
+          retention-days: 90
