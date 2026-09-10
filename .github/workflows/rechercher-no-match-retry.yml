@@ -74,6 +74,9 @@ jobs:
             --manifest /tmp/developer-review-manifest.json \
             --vault artifacts/developer-review-vault \
             --report artifacts/governance/no-match-retry-report.json
+          python3 scripts/rechercher_acquisition_metrics.py \
+            --manifest /tmp/developer-review-manifest.json \
+            --report artifacts/governance/no-match-retry-report.json
           cat artifacts/governance/no-match-retry-report.json
           mkdir -p artifacts/retry-new
           find artifacts/developer-review-vault -maxdepth 1 -type f -name '*.pdf' -printf '%f\n' | sort > /tmp/vault-after.txt
