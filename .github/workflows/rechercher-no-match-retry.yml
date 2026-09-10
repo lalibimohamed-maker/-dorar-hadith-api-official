@@ -30,11 +30,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Install PDF validator and Git LFS
+      - name: Install PDF validator, renderer, and Git LFS
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y qpdf git-lfs
+          sudo apt-get install -y qpdf poppler-utils git-lfs
           git lfs install
 
       - name: Require secondary PDF storage key
