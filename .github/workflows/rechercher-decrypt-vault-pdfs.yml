@@ -105,7 +105,6 @@ jobs:
           test -n "$SECONDARY_TOKEN" || { echo 'ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required.'; exit 1; }
           rm -rf secondary
 
-          # Distinguish an authenticated empty repository from an authentication/network failure.
           set +e
           git ls-remote "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" > /tmp/secondary-lsremote.txt 2>/tmp/secondary-lsremote.err
           lsremote_status=$?
@@ -119,7 +118,6 @@ jobs:
           if [ -s /tmp/secondary-lsremote.txt ]; then
             git clone "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" secondary
           else
-            # Authenticated repository with no refs: initialize it without masking auth failures.
             mkdir secondary
             git -C secondary init -b main
             git -C secondary remote add origin "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git"
@@ -138,6 +136,8 @@ jobs:
           src=Path('artifacts/verified-real-pdfs')
           dst=Path('secondary/artifacts/permanent-pdfs/by-sha256')
           entries=[]
+          already_present=0
+          newly_persisted=0
           for pdf in sorted(src.glob('*.pdf')):
               data=pdf.read_bytes()
               if data[:5] != b'%PDF-':
@@ -148,8 +148,10 @@ jobs:
                   existing=hashlib.sha256(target.read_bytes()).hexdigest()
                   if existing != sha:
                       raise SystemExit(f'IMMUTABILITY VIOLATION: {target}')
+                  already_present += 1
               else:
                   shutil.copy2(pdf,target)
+                  newly_persisted += 1
               entries.append({'sha256':sha,'file':f'artifacts/permanent-pdfs/by-sha256/{sha}.pdf','bytes':len(data),'validation':'%PDF- + qpdf --check: ok','storage_policy':'permanent-append-only-real-pdf'})
           index=Path('secondary/artifacts/permanent-pdfs/index.json')
           old=json.loads(index.read_text(encoding='utf-8')) if index.exists() else {'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1','records':[]}
@@ -157,6 +159,9 @@ jobs:
           for item in entries:
               by_sha.setdefault(item['sha256'],item)
           index.write_text(json.dumps({'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1','policy':'append-only; existing real .pdf files are never deleted, overwritten, replaced, renamed, or replaced by .pdf.enc','records':sorted(by_sha.values(),key=lambda r:r['sha256'])},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          Path('artifacts/permanent-persistence-summary.json').write_text(json.dumps({'already_present':already_present,'newly_persisted':newly_persisted,'verified_candidates':len(entries)},indent=2)+'\n',encoding='utf-8')
+          print(f'ALREADY_PRESENT={already_present}')
+          print(f'NEWLY_PERSISTED={newly_persisted}')
           PY
 
           cd secondary
@@ -186,6 +191,24 @@ jobs:
           done
           test -n "$(find artifacts/permanent-pdfs/by-sha256 -type f -name '*.pdf' -print -quit)"
           echo 'PERMANENT_REAL_PDF_CORPUS=VERIFIED'
+
+      - name: Build whole-encyclopedia metrics dashboard
+        if: always()
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_whole_encyclopedia_metrics.py
+
+      - name: Upload whole-encyclopedia metrics dashboard
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-whole-encyclopedia-metrics-${{ github.run_id }}
+          path: |
+            artifacts/governance/whole-encyclopedia-metrics.json
+            artifacts/governance/WHOLE-ENCYCLOPEDIA.txt
+            artifacts/permanent-persistence-summary.json
+          if-no-files-found: warn
+          retention-days: 90
 
       - name: Record permanent scope policy
         run: |
