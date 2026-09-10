@@ -11,6 +11,7 @@ Set RECHERCHER_SEQUENTIAL=0 only for controlled debugging of the legacy worker.
 """
 from __future__ import annotations
 
+import os
 import pathlib
 import re
 import subprocess
