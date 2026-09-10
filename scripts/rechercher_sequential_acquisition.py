@@ -32,12 +32,6 @@ def book_key(book):
 
 
 def chronology_value(book):
-    """Return the best available Hijri chronology number.
-
-    Explicit chronology wins. For authored works, deathYear/author_death_hijri
-    remains the established chronological fallback. Prophet/Quran-era records
-    can explicitly use 0 or another small Hijri marker in their catalog.
-    """
     fields = (
         "chronology_hijri", "hijri_year", "year_hijri", "publication_hijri",
         "author_death_hijri", "deathYear", "death_year_hijri",
@@ -77,8 +71,6 @@ def chronology_rank(book):
         return (0, 3, norm(book.get("title") or book.get("titleAr")), book_key(book))
     if any(x in blob for x in ("follower", "tabi", "تابعي", "تابعون", "التابعون")):
         return (0, 4, norm(book.get("title") or book.get("titleAr")), book_key(book))
-    # Unknown chronology is deliberately after known historical books but before
-    # future additions, so it can be resolved without creating a fake Hijri year.
     return (2, 10**9, norm(book.get("title") or book.get("titleAr")), book_key(book))
 
 
@@ -109,7 +101,7 @@ def load_state(path, books):
                 return state
         except Exception:
             pass
-    state = {
+    return {
         "schema": "rechercher-continuous-hijri-chronological/v1",
         "policy": "unbounded chronological acquisition from the Prophetic era through present and future catalog additions; no finite book-count target",
         "order_policy": "Hijri chronology first; explicit chronology metadata preferred; author death Hijri is fallback; future additions remain at the end",
@@ -118,7 +110,6 @@ def load_state(path, books):
         "books": {},
         "run_count": 0,
     }
-    return state
 
 
 def save_state(path, state):
@@ -137,16 +128,9 @@ def main():
     state = load_state(state_path, books)
     state["run_count"] = int(state.get("run_count", 0)) + 1
     state["order"] = [book_key(b) for b in books]
-
-    # Never drop an existing state record merely because the catalog grew.
     records = state.setdefault("books", {})
     for book in books:
-        records.setdefault(book_key(book), {
-            "status": "pending",
-            "attempts": 0,
-            "source_attempts": {},
-            "last_attempt": None,
-        })
+        records.setdefault(book_key(book), {"status": "pending", "attempts": 0, "source_attempts": {}, "last_attempt": None})
 
     pending = [b for b in books if records.get(book_key(b), {}).get("status") != "acquired"]
     state["pending_before_run"] = len(pending)
@@ -161,7 +145,6 @@ def main():
         print("CONTINUOUS_QUEUE_COMPLETE: no pending catalogued books", flush=True)
         return
 
-    # One chronological queue, not a collection of finite era batches.
     with tempfile.TemporaryDirectory(prefix="rechercher-continuous-") as td:
         temp = Path(td)
         (temp / "books-batches" / "chronological").mkdir(parents=True)
@@ -193,12 +176,21 @@ def main():
         rec["attempts"] = int(rec.get("attempts", 0)) + 1
         rec["last_attempt"] = state["run_count"]
         outcome = by_id.get(str(book.get("id")))
+        if outcome:
+            rec["last_result"] = outcome.get("status")
+            # Preserve detailed source attempts when the worker reports them.
+            attempts = outcome.get("attempts")
+            if isinstance(attempts, list):
+                for attempt in attempts:
+                    if not isinstance(attempt, dict):
+                        continue
+                    source = str(attempt.get("source") or attempt.get("engine") or "unknown")
+                    rec["source_attempts"][source] = int(rec["source_attempts"].get(source, 0)) + 1
         if outcome and outcome.get("status") == "acquired":
             rec["status"] = "acquired"
             rec["sha256"] = outcome.get("sha256")
         else:
             rec["status"] = "pending"
-            rec["last_result"] = outcome.get("status") if outcome else "not-reported"
 
     state["pending_after_run"] = sum(1 for b in books if records.get(book_key(b), {}).get("status") != "acquired")
     state["finished"] = state["pending_after_run"] == 0
@@ -206,7 +198,6 @@ def main():
     save_state(state_path, state)
     print(f"CONTINUOUS_QUEUE_AFTER={state['pending_after_run']} EXIT={result.returncode}", flush=True)
 
-    # A failed/partial slice is resumable; do not turn it into a false success.
     if result.returncode != 0 and not state["finished"]:
         raise SystemExit(result.returncode)
 
