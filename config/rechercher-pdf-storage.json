@@ -1,17 +1,21 @@
 {
-  "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v2",
+  "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v3",
   "primary_repository": "lalibimohamed-maker/-dorar-hadith-api-official",
   "secondary_storage_repository": "lalibimohamed82-coder/rechercher-pdf-storage",
-  "purpose": "Two connected governed Git LFS PDF stores. Every verified real PDF must be persisted to both before acquisition is considered successful.",
+  "purpose": "Two connected Git LFS storage pools with one physical PDF copy per book. The pools are complementary, not mirrored.",
   "format": ".pdf",
-  "content_addressing": "sha256",
+  "content_addressing": "sha256-for-integrity-only",
   "storage_contract": {
     "primary": "artifacts/*.pdf",
-    "secondary": "artifacts/permanent-pdfs/by-sha256/<sha256>.pdf",
+    "secondary": "artifacts/*.pdf",
+    "one_copy_only": true,
+    "distribution": "Each verified PDF is assigned deterministically to exactly one pool from its SHA-256; it is never copied to the other pool.",
     "verified_pdfs_only": true,
     "real_pdf_signature_required": true,
     "qpdf_validation_required": true,
     "encrypted_files_forbidden": true,
+    "storage_content_only_pdf": true,
+    "sha256_is_not_a_storage_path": true,
     "source_provider_not_fixed": true,
     "source_failover": "immediate next independent catalogued source on restriction/failure",
     "no_source_quota": "the engine does not stop after a provider-specific book count"
@@ -23,5 +27,5 @@
     "write_scope": "repository contents read/write for the secondary storage repository",
     "mandatory": true
   },
-  "failure_policy": "If either governed store cannot be reached or a verified PDF cannot be proven in both stores, the acquisition cycle fails closed rather than claiming persistence."
+  "failure_policy": "If a verified PDF cannot be persisted to its assigned pool, the acquisition cycle fails closed. A second PDF copy is never created as a fallback; the book is retried from its sources instead."
 }
