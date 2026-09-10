@@ -32,7 +32,7 @@ def main():
    if k in seen:continue
    seen.add(k);grouped[classify(b,str(p.relative_to(root)))].append(b)
  state_dir=root/'artifacts/governance/sequential-acquisition';state_dir.mkdir(parents=True,exist_ok=True)
- state={'schema':'rechercher-central-sequential-era-engine/v2','order':STAGES,'policy':'one central provider-neutral engine; ordered stages; failures recorded without stopping later stages; verified PDFs resumable; restricted sources are immediately skipped','unique_books':len(seen),'counts':{k:len(v) for k,v in grouped.items()},'completed':[],'failed_stages':[]}
+ state={'schema':'rechercher-central-sequential-era-engine/v3','order':STAGES,'policy':'one central provider-neutral engine; ordered stages; failures recorded without stopping later stages; verified PDFs resumable; restricted sources are immediately skipped; existing PDFs are re-evaluated when quality policy changes','unique_books':len(seen),'counts':{k:len(v) for k,v in grouped.items()},'completed':[],'failed_stages':[]}
  (state_dir/'queue.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
  worker=root/'scripts/rechercher_pdf_acquire.py'
  with tempfile.TemporaryDirectory(prefix='rechercher-sequential-') as td:
@@ -42,8 +42,14 @@ def main():
    marker=state_dir/f'{i:02d}-{slug}.json'
    if not books: marker.write_text(json.dumps({'stage':stage,'status':'empty','books':0},ensure_ascii=False,indent=2)+'\n',encoding='utf-8');state['completed'].append(stage);continue
    print(f'===== STAGE {i}/{len(STAGES)}: {stage} | {len(books)} books =====',flush=True)
-   env=os.environ.copy();env['RECHERCHER_MAX_SOURCE_ATTEMPTS']='24';p=subprocess.run(['python3',str(worker),'--root',str(temp)],cwd=root,env=env)
-   result={'stage':stage,'status':'completed' if p.returncode==0 else 'failed','books':len(books),'exit_code':p.returncode};marker.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-   (state['completed'] if p.returncode==0 else state['failed_stages']).append(stage);(state_dir/'queue.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+   env=os.environ.copy();env['RECHERCHER_MAX_SOURCE_ATTEMPTS']='24';env['RECHERCHER_REEVALUATE_EXISTING']='1'
+   p=subprocess.run(['python3',str(worker),'--root',str(temp)],cwd=root,env=env)
+   summary_path=root/'artifacts/acquisition-run-summary.json'
+   try: summary=json.loads(summary_path.read_text(encoding='utf-8')) if summary_path.exists() else []
+   except Exception: summary=[]
+   failed=[x for x in summary if x.get('status') not in ('acquired',)]
+   result={'stage':stage,'status':'completed' if p.returncode==0 and not failed else 'partial','books':len(books),'exit_code':p.returncode,'failed_records':len(failed),'quality_re_evaluation':True}
+   marker.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+   (state['completed'] if result['status']=='completed' else state['failed_stages']).append(stage);(state_dir/'queue.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
  state['finished']=True;(state_dir/'queue.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 if __name__=='__main__':main()
