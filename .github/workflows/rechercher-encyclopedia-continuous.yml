@@ -1,0 +1,27 @@
+name: Rechercher — Continuous whole-encyclopedia chronological acquisition
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Automatic continuation. The persistent queue decides what remains;
+    # there is no finite book-count target.
+    - cron: '7 * * * *'
+
+# security-justification: trusted default-branch caller only; it invokes the
+# reviewed central reusable acquisition workflow and persists only verified
+# PDF/state outputs to the governed acquisition branch and secondary PDF pool.
+permissions:
+  contents: write
+
+concurrency:
+  group: rechercher-continuous-whole-encyclopedia
+  cancel-in-progress: false
+
+jobs:
+  acquire:
+    name: Resume chronological acquisition
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main
+    with:
+      target_branch: rechercher/encyclopedia-continuous-acquisition
+    secrets:
+      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
