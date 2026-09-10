@@ -9,7 +9,6 @@ permissions:
   contents: read
 
 env:
-  SECONDARY_REPO: lalibimohamed82-coder/rechercher-pdf-storage
   RECHERCHER_CATALOG_GLOB: books-batches/**/catalog.json
   RECHERCHER_MAX_BOOK_WORKERS: 12
 
@@ -96,37 +95,92 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Permanently append real PDFs to the permanent Git LFS corpus
+      - name: Bootstrap permanent storage from Storage Pool
         env:
-          SECONDARY_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
-          SECONDARY_REPO: ${{ env.SECONDARY_REPO }}
+          STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
         run: |
           set -euo pipefail
-          test -n "$SECONDARY_TOKEN" || { echo 'ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required.'; exit 1; }
+          test -n "$STORAGE_TOKEN" || { echo 'ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required.'; exit 1; }
+          test -s config/rechercher-permanent-storage-pool.json
           rm -rf secondary
-
+          primary_repo="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          cfg=json.loads(Path('config/rechercher-permanent-storage-pool.json').read_text(encoding='utf-8'))
+          repo=cfg.get('primary',{}).get('repository')
+          if not repo:
+              raise SystemExit('ERROR: Storage Pool primary repository is not configured')
+          print(repo)
+          PY
+          )"
           set +e
-          git ls-remote "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" > /tmp/secondary-lsremote.txt 2>/tmp/secondary-lsremote.err
-          lsremote_status=$?
+          git ls-remote "https://x-access-token:${STORAGE_TOKEN}@github.com/${primary_repo}.git" > /tmp/storage-lsremote.txt 2>/tmp/storage-lsremote.err
+          status=$?
           set -e
-          if [ "$lsremote_status" -ne 0 ]; then
-            cat /tmp/secondary-lsremote.err >&2 || true
-            echo 'ERROR: cannot authenticate/access permanent PDF storage; refusing to treat it as empty.' >&2
-            exit "$lsremote_status"
+          if [ "$status" -ne 0 ]; then
+            cat /tmp/storage-lsremote.err >&2 || true
+            echo 'ERROR: Storage Pool primary repository is inaccessible; refusing to treat it as empty.' >&2
+            exit "$status"
           fi
-
-          if [ -s /tmp/secondary-lsremote.txt ]; then
-            git clone "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" secondary
+          if [ -s /tmp/storage-lsremote.txt ]; then
+            git clone "https://x-access-token:${STORAGE_TOKEN}@github.com/${primary_repo}.git" secondary
           else
             mkdir secondary
             git -C secondary init -b main
-            git -C secondary remote add origin "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git"
+            git -C secondary remote add origin "https://x-access-token:${STORAGE_TOKEN}@github.com/${primary_repo}.git"
           fi
-
           cd secondary
           git lfs install
           git lfs track '*.pdf' >/dev/null
           git lfs pull || true
+          cd ..
+          python3 scripts/rechercher_storage_pool_route.py --root "$GITHUB_WORKSPACE" --existing-repo-dir secondary --token-env STORAGE_TOKEN
+          storage_repo="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('artifacts/governance/storage-pool-route.json').read_text(encoding='utf-8'))
+          print(r['repository'])
+          PY
+          )"
+          storage_id="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('artifacts/governance/storage-pool-route.json').read_text(encoding='utf-8'))
+          print(r['storage_id'])
+          PY
+          )"
+          echo "RECHERCHER_STORAGE_ID=$storage_id" >> "$GITHUB_ENV"
+          echo "RECHERCHER_STORAGE_REPO=$storage_repo" >> "$GITHUB_ENV"
+          if [ "$storage_repo" != "$primary_repo" ]; then
+            rm -rf secondary
+            git ls-remote "https://x-access-token:${STORAGE_TOKEN}@github.com/${storage_repo}.git" >/tmp/storage-next-lsremote.txt
+            if [ -s /tmp/storage-next-lsremote.txt ]; then
+              git clone "https://x-access-token:${STORAGE_TOKEN}@github.com/${storage_repo}.git" secondary
+            else
+              mkdir secondary
+              git -C secondary init -b main
+              git -C secondary remote add origin "https://x-access-token:${STORAGE_TOKEN}@github.com/${storage_repo}.git"
+            fi
+            cd secondary
+            git lfs install
+            git lfs track '*.pdf' >/dev/null
+            git lfs pull || true
+            cd ..
+          fi
+          echo "Storage Pool route: ${storage_id} -> ${storage_repo}"
+
+      - name: Permanently append real PDFs to the routed permanent Git LFS corpus
+        env:
+          SECONDARY_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          STORAGE_REPO: ${{ env.RECHERCHER_STORAGE_REPO }}
+          STORAGE_ID: ${{ env.RECHERCHER_STORAGE_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$SECONDARY_TOKEN" || { echo 'ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required.'; exit 1; }
+          test -n "$STORAGE_REPO" || { echo 'ERROR: Storage Pool did not resolve a repository.'; exit 1; }
+          test -n "$STORAGE_ID" || { echo 'ERROR: Storage Pool did not resolve a storage ID.'; exit 1; }
+          test -d secondary/.git
+          cd secondary
           mkdir -p artifacts/permanent-pdfs/by-sha256
           cd ..
 
@@ -135,6 +189,7 @@ jobs:
           from pathlib import Path
           src=Path('artifacts/verified-real-pdfs')
           dst=Path('secondary/artifacts/permanent-pdfs/by-sha256')
+          storage_id=Path('/tmp/rechercher-storage-id').read_text(encoding='utf-8').strip() if Path('/tmp/rechercher-storage-id').exists() else None
           entries=[]
           already_present=0
           newly_persisted=0
@@ -152,14 +207,14 @@ jobs:
               else:
                   shutil.copy2(pdf,target)
                   newly_persisted += 1
-              entries.append({'sha256':sha,'file':f'artifacts/permanent-pdfs/by-sha256/{sha}.pdf','bytes':len(data),'validation':'%PDF- + qpdf --check: ok','storage_policy':'permanent-append-only-real-pdf'})
+              entries.append({'sha256':sha,'storage_id':storage_id,'storage_repository':__import__('os').environ['STORAGE_REPO'],'file':f'artifacts/permanent-pdfs/by-sha256/{sha}.pdf','bytes':len(data),'validation':'%PDF- + qpdf --check: ok','storage_policy':'permanent-append-only-real-pdf'})
           index=Path('secondary/artifacts/permanent-pdfs/index.json')
           old=json.loads(index.read_text(encoding='utf-8')) if index.exists() else {'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1','records':[]}
           by_sha={r.get('sha256'):r for r in old.get('records',[]) if r.get('sha256')}
           for item in entries:
               by_sha.setdefault(item['sha256'],item)
           index.write_text(json.dumps({'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v1','policy':'append-only; existing real .pdf files are never deleted, overwritten, replaced, renamed, or replaced by .pdf.enc','records':sorted(by_sha.values(),key=lambda r:r['sha256'])},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          Path('artifacts/permanent-persistence-summary.json').write_text(json.dumps({'already_present':already_present,'newly_persisted':newly_persisted,'verified_candidates':len(entries)},indent=2)+'\n',encoding='utf-8')
+          Path('artifacts/permanent-persistence-summary.json').write_text(json.dumps({'storage_id':__import__('os').environ['STORAGE_ID'],'storage_repository':__import__('os').environ['STORAGE_REPO'],'already_present':already_present,'newly_persisted':newly_persisted,'verified_candidates':len(entries)},indent=2)+'\n',encoding='utf-8')
           print(f'ALREADY_PRESENT={already_present}')
           print(f'NEWLY_PERSISTED={newly_persisted}')
           PY
@@ -207,6 +262,7 @@ jobs:
             artifacts/governance/whole-encyclopedia-metrics.json
             artifacts/governance/WHOLE-ENCYCLOPEDIA.txt
             artifacts/permanent-persistence-summary.json
+            artifacts/governance/storage-pool-route.json
           if-no-files-found: warn
           retention-days: 90
 
@@ -222,7 +278,7 @@ jobs:
             'catalog_glob':'books-batches/**/catalog.json',
             'required_format':'.pdf',
             'forbidden_as_primary_storage':'.pdf.enc',
-            'permanent_storage':'lalibimohamed82-coder/rechercher-pdf-storage via Git LFS',
+            'permanent_storage':'governed Storage Pool via Git LFS',
             'retention':'permanent append-only; never delete/overwrite/rename/replace existing real PDFs',
             'validation':['%PDF-','qpdf --check','SHA-256'],
             'rights':'rights-unclear copies remain protected/private and are not publicly released'
