@@ -8,18 +8,6 @@ on:
 permissions:
   contents: read
 
-# Permanent corpus policy:
-# - The canonical acquired object is always a real .pdf, never .pdf.enc.
-# - Temporary GitHub Actions artifacts are only transport/audit copies (90 days).
-# - Permanent retention is the secondary Git LFS repository.
-# - Permanent PDF paths are SHA-256 based and append-only: never delete, overwrite,
-#   replace, rename, or encrypt-away an existing real PDF.
-# - Scope is the WHOLE encyclopedia: Prophet era -> Companions -> Followers ->
-#   1-400H -> 401-800H -> 801-1200H -> 1201H -> Modern era -> future catalogued books.
-# - Every books-batches/**/catalog.json is an acquisition target; future books are
-#   picked up automatically when their catalog/source records are added.
-# - Rights-unclear material may remain protected/private and must not be publicized.
-
 env:
   SECONDARY_REPO: lalibimohamed82-coder/rechercher-pdf-storage
   RECHERCHER_CATALOG_GLOB: books-batches/**/catalog.json
@@ -117,12 +105,21 @@ jobs:
           test -n "$SECONDARY_TOKEN" || { echo 'ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required.'; exit 1; }
           rm -rf secondary
 
-          # Authentication failure must never be mistaken for an empty repository.
-          lsremote="$(git ls-remote "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" 2>/dev/null || true)"
-          if [ -n "$lsremote" ]; then
+          # Distinguish an authenticated empty repository from an authentication/network failure.
+          set +e
+          git ls-remote "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" > /tmp/secondary-lsremote.txt 2>/tmp/secondary-lsremote.err
+          lsremote_status=$?
+          set -e
+          if [ "$lsremote_status" -ne 0 ]; then
+            cat /tmp/secondary-lsremote.err >&2 || true
+            echo 'ERROR: cannot authenticate/access permanent PDF storage; refusing to treat it as empty.' >&2
+            exit "$lsremote_status"
+          fi
+
+          if [ -s /tmp/secondary-lsremote.txt ]; then
             git clone "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git" secondary
           else
-            # The only accepted no-ref case is a genuinely empty secondary repository.
+            # Authenticated repository with no refs: initialize it without masking auth failures.
             mkdir secondary
             git -C secondary init -b main
             git -C secondary remote add origin "https://x-access-token:${SECONDARY_TOKEN}@github.com/${SECONDARY_REPO}.git"
@@ -164,7 +161,6 @@ jobs:
 
           cd secondary
           git add .gitattributes artifacts/permanent-pdfs
-          # Existing PDF bytes are immutable. Any deletion, modification or rename is fatal.
           if git diff --cached --name-status -- '*.pdf' | grep -E '^(D|M|R)' >/dev/null; then
             echo 'ERROR: permanent PDF deletion/modification/rename detected; refusing to push.'
             exit 1
