@@ -138,26 +138,94 @@ jobs:
           python3 - <<'PY'
           import hashlib, shutil
           from pathlib import Path
-          primary=Path('artifacts'); secondary=Path('.secondary-storage')/'artifacts'; secondary.mkdir(parents=True,exist_ok=True)
-          for pdf in sorted(primary.glob('*.pdf')):
-              data=pdf.read_bytes()
-              if not data.startswith(b'%PDF-') or not data: raise SystemExit(f'not a real PDF: {pdf}')
-              sha=hashlib.sha256(data).hexdigest(); assigned='primary' if int(sha[0],16)%2==0 else 'secondary'
-              target=primary/pdf.name if assigned=='primary' else secondary/pdf.name
-              if assigned=='secondary':
-                  if target.exists() and hashlib.sha256(target.read_bytes()).hexdigest()!=sha: raise SystemExit(f'secondary filename collision: {target}')
-                  shutil.copy2(pdf,target); pdf.unlink()
-          for pdf in sorted(secondary.glob('*.pdf')):
-              data=pdf.read_bytes()
-              if not data.startswith(b'%PDF-'):
-                  pdf.unlink(); continue
-              sha=hashlib.sha256(data).hexdigest()
-              if int(sha[0],16)%2==0:
-                  target=primary/pdf.name
-                  if target.exists() and hashlib.sha256(target.read_bytes()).hexdigest()!=sha: raise SystemExit(f'cross-pool filename collision: {pdf.name}')
-                  if not target.exists(): shutil.copy2(pdf,target)
-                  pdf.unlink()
-          print('ONE_COPY_PARTITION_OK')
+
+          primary = Path('artifacts')
+          secondary = Path('.secondary-storage/artifacts')
+          primary.mkdir(parents=True, exist_ok=True)
+          secondary.mkdir(parents=True, exist_ok=True)
+
+          def sha256(path):
+              h = hashlib.sha256()
+              with path.open('rb') as fh:
+                  for chunk in iter(lambda: fh.read(1024 * 1024), b''):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          def valid_pdf(path):
+              try:
+                  with path.open('rb') as fh:
+                      return path.is_file() and path.stat().st_size > 0 and fh.read(5) == b'%PDF-'
+              except OSError:
+                  return False
+
+          files = []
+          for pool, root in (('primary', primary), ('secondary', secondary)):
+              for path in sorted(root.glob('*.pdf')):
+                  if not valid_pdf(path):
+                      if pool == 'secondary':
+                          path.unlink(missing_ok=True)
+                          continue
+                      raise SystemExit(f'not a real PDF: {path}')
+                  files.append((pool, path, sha256(path)))
+
+          # First deduplicate by content. If the same SHA exists more than once,
+          # retain exactly one physical file; SHA is never used as a storage path.
+          groups = {}
+          for item in files:
+              groups.setdefault(item[2], []).append(item)
+
+          for sha, items in sorted(groups.items()):
+              assigned = 'primary' if int(sha[0], 16) % 2 == 0 else 'secondary'
+              preferred = [x for x in items if x[0] == assigned]
+              if not preferred:
+                  preferred = [x for x in items if x[0] == 'primary'] or items
+              canonical = sorted(preferred, key=lambda x: str(x[1]))[0]
+              for item in items:
+                  if item != canonical:
+                      item[1].unlink(missing_ok=True)
+
+              current_pool, current_path, _ = canonical
+              destination_root = primary if assigned == 'primary' else secondary
+              destination = destination_root / current_path.name
+
+              if current_pool != assigned:
+                  if destination.exists():
+                      if sha256(destination) == sha:
+                          current_path.unlink(missing_ok=True)
+                          current_path = destination
+                          current_pool = assigned
+                      else:
+                          stem, suffix = current_path.stem, current_path.suffix
+                          destination = destination_root / f'{stem}--{sha[:12]}{suffix}'
+                          if destination.exists() and sha256(destination) != sha:
+                              destination = destination_root / f'{stem}--{sha[:16]}{suffix}'
+                          shutil.move(str(current_path), str(destination))
+                          current_path = destination
+                          current_pool = assigned
+                  else:
+                      shutil.move(str(current_path), str(destination))
+                      current_path = destination
+                      current_pool = assigned
+
+              # Resolve filename collisions between different PDF contents without
+              # failing the acquisition. The original filename remains when unique.
+              if current_pool == assigned:
+                  siblings = [p for p in destination_root.glob(f'{current_path.stem}.pdf') if p != current_path]
+                  if siblings:
+                      raise SystemExit(f'unexpected storage collision after canonicalization: {current_path}')
+
+          # A final content census is the authoritative invariant.
+          seen = {}
+          for pool, root in (('primary', primary), ('secondary', secondary)):
+              for path in sorted(root.glob('*.pdf')):
+                  if not valid_pdf(path):
+                      raise SystemExit(f'invalid PDF after partition: {pool}/{path.name}')
+                  sha = sha256(path)
+                  if sha in seen:
+                      raise SystemExit(f'DUPLICATE_PDF_COPY: {path.name} already stored in {seen[sha]}')
+                  seen[sha] = f'{pool}/{path.name}'
+
+          print(f'ONE_COPY_PARTITION_OK count={len(seen)}')
           PY
 
       - name: Persist verified PDFs to primary LFS storage
