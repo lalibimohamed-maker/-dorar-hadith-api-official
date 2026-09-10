@@ -1,0 +1,72 @@
+name: Rechercher — Canonical PDF inventory
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 4 * * *'
+
+permissions:
+  contents: write
+
+env:
+  REVIEW_BRANCH: rechercher/salaf-01-400h-developer-review-acquisition
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: rechercher-canonical-pdf-inventory
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Recover cumulative acquisition manifest
+        run: |
+          set -euo pipefail
+          git fetch origin "$REVIEW_BRANCH"
+          mkdir -p artifacts/inventory
+          git show "origin/$REVIEW_BRANCH:books-batches/salaf-01-400h/developer-review-manifest.json" > artifacts/inventory/developer-review-manifest.json
+          test -s artifacts/inventory/developer-review-manifest.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('artifacts/inventory/developer-review-manifest.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          if not d.get('records'):
+              raise SystemExit('ERROR: cumulative manifest has no records; refusing to publish an empty inventory')
+          print('MANIFEST_RECORDS=' + str(len(d['records'])))
+          print('MANIFEST_COUNTS=' + json.dumps(d.get('counts',{}), ensure_ascii=False, sort_keys=True))
+          PY
+
+      - name: Build SHA-256 canonical inventory
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_build_canonical_pdf_inventory.py \
+            --manifest artifacts/inventory/developer-review-manifest.json \
+            --out artifacts/inventory/canonical-pdf-inventory.json
+          test -s artifacts/inventory/canonical-pdf-inventory.json
+
+      - name: Publish inventory evidence to review branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git fetch origin "$REVIEW_BRANCH"
+          git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
+          mkdir -p artifacts/governance
+          cp artifacts/inventory/canonical-pdf-inventory.json artifacts/governance/canonical-pdf-inventory.json
+          git add artifacts/governance/canonical-pdf-inventory.json
+          if git diff --cached --quiet; then
+            echo 'Canonical inventory unchanged; nothing to persist.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'data(rechercher): persist canonical SHA-256 PDF inventory'
+          GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
