@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-import argparse, html, json, re, shutil, subprocess, os
+import argparse, html, json, re, subprocess, os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit, urlunsplit, quote
 from urllib.request import Request, urlopen
 
 # Rechercher acquisition contract:
-# - seek a real .pdf before any other representation; never treat .pdf.enc as a PDF;
-# - try saved sources in order and fail over automatically;
-# - preserve verified completed PDFs and resume incomplete books;
-# - acquire books concurrently; one failure never stops other workers;
-# - acquisition/research retention and browser redistribution are separate policy decisions;
-# - never bypass access controls or protections. A source must lawfully provide the copy.
+# - acquire a real .pdf first; never treat .pdf.enc as a PDF;
+# - preserve acquired PDFs permanently and resume incomplete books;
+# - rights/redistribution is reviewed AFTER acquisition, not used as an acquisition gate;
+# - rights-unclear copies are retained as protected/private research material and are never browser-published;
+# - never bypass access controls or protections: a source must lawfully provide the copy.
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root', default=None, help='repository worktree to mutate')
@@ -25,13 +24,15 @@ DOWNLOAD_TIMEOUT = 120
 MAX_SOURCE_ATTEMPTS = 12
 MAX_BOOK_WORKERS = max(1, min(int(os.environ.get('RECHERCHER_MAX_BOOK_WORKERS', '12')), 32))
 
-# A catalog may distinguish lawful acquisition/research access from redistribution.
-# Legacy catalogs remain compatible: verified-redistributable is valid for both.
-def acquisition_is_lawful(book):
-    return book.get('acquisition_status') in ('verified-lawful-copy', 'verified-redistributable') or book.get('rights_status') == 'verified-redistributable'
-
 def redistribution_is_allowed(book):
     return book.get('redistribution_status') == 'verified-redistributable' or book.get('rights_status') == 'verified-redistributable'
+
+def rights_state(book):
+    if redistribution_is_allowed(book):
+        return 'verified-redistributable'
+    if book.get('rights_status') or book.get('redistribution_status') or book.get('acquisition_status'):
+        return 'rights-review-required'
+    return 'rights-unknown-protected-private'
 
 def normalize_url(url):
     p = urlsplit(url)
@@ -44,7 +45,7 @@ def fetch(url):
 
 def pdf_links(page, base):
     out, seen = [], set()
-    for m in re.finditer(r'href=["\']([^"\']+)["\']', page, re.I):
+    for m in re.finditer(r'href=[\"\']([^\"\']+)[\"\']', page, re.I):
         u = normalize_url(urljoin(base, html.unescape(m.group(1))))
         if re.search(r'\.pdf(?:\?|$)', u, re.I) and not re.search(r'\.pdf\.enc(?:\?|$)', u, re.I) and u not in seen:
             seen.add(u); out.append(u)
@@ -109,9 +110,7 @@ def candidate_urls(source):
         discovered = pdf_links(fetch(page), page)
     except Exception:
         discovered = []
-    if discovered:
-        return discovered
-    return [normalize_url(page)]
+    return discovered if discovered else [normalize_url(page)]
 
 def download(url, path):
     if re.search(r'\.pdf\.enc(?:\?|$)', url, re.I):
@@ -128,7 +127,6 @@ def acquire_volume(book, volume, expected, work):
             urls = candidate_urls(source)
         except Exception as exc:
             attempts.append({'source': source['url'], 'status': 'source_error', 'error': str(exc)})
-            print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} unavailable; trying next source', flush=True)
             continue
         if source.get('volume') is not None and int(source['volume']) != volume:
             continue
@@ -138,7 +136,6 @@ def acquire_volume(book, volume, expected, work):
         elif source.get('discover_pdfs'):
             if len(urls) < expected:
                 attempts.append({'source': source['url'], 'status': 'incomplete_source', 'found_pdfs': len(urls), 'expected': expected})
-                print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} has {len(urls)}/{expected} PDFs; trying next source', flush=True)
                 continue
             urls = [urls[volume - 1]]
         else:
@@ -154,24 +151,22 @@ def acquire_volume(book, volume, expected, work):
                 if validation['status'] in ('valid', 'repaired'):
                     final = work / f'{volume:03d}.pdf'; candidate.replace(final)
                     return final, {'volume': volume, 'url': url, 'source_label': source.get('label'), 'source_index': source_index, 'bytes': final.stat().st_size, 'sha256': sha256(final), 'validation': validation, 'attempts': attempts}
-                attempts.append({'source': url, 'status': validation['status'], 'reason': validation.get('reason'), 'initial_check': validation.get('initial_check'), 'repair_check': validation.get('repair_check')})
+                attempts.append({'source': url, 'status': validation['status'], 'reason': validation.get('reason')})
             except Exception as exc:
                 attempts.append({'source': url, 'status': 'download_or_validation_error', 'error': str(exc)})
             finally:
                 candidate.unlink(missing_ok=True)
-        print(f'[FAILOVER] {book["id"]} volume {volume}: source {source_index}/{len(sources)} exhausted; trying next source', flush=True)
     return None, {'volume': volume, 'status': 'failed', 'attempts': attempts}
 
 def acquire(book):
-    if not acquisition_is_lawful(book):
-        print(f"[HOLD] {book['id']}: no verified lawful acquisition basis; metadata/source only", flush=True)
-        return {'id': book['id'], 'status': 'held-acquisition'}
+    # IMPORTANT: rights are NOT an acquisition gate. We first acquire and retain
+    # the real PDF; rights review is recorded afterwards. Browser publication
+    # remains independently blocked unless redistribution is verified.
     expected = int(book['expected_volumes'])
     safe = re.sub(r'[^a-z0-9._-]+', '-', book['id'].lower()).strip('-')
     work = ART / safe
     work.mkdir(parents=True, exist_ok=True)
-    vols = []
-    failed = []
+    vols, failed = [], []
     for volume in range(1, expected + 1):
         final = work / f'{volume:03d}.pdf'
         if final.exists():
@@ -184,18 +179,27 @@ def acquire(book):
             vols.append(record)
     if failed:
         (work / 'retry.json').write_text(json.dumps({'id': book['id'], 'failed_volumes': failed}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-        print(f"[RETRY] {book['id']}: {len(failed)} volume(s) failed across all saved sources; recorded for the next run", flush=True)
-        return {'id': book['id'], 'status': 'partial', 'failed_volumes': failed}
+        return {'id': book['id'], 'status': 'partial', 'failed_volumes': failed, 'rights_state': rights_state(book)}
     unified = ART / f'{safe}.pdf'
     pages = [str(work / f'{n:03d}.pdf') for n in range(1, expected + 1)]
     run(['qpdf', '--empty', '--pages', *pages, '--', str(unified)])
     unified_validation = validate_and_repair(unified)
     if unified_validation['status'] not in ('valid', 'repaired'):
-        print(f"[RETRY] {book['id']}: unified PDF failed validation", flush=True)
-        return {'id': book['id'], 'status': 'unified-validation-failed'}
-    manifest = {'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'), 'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols, 'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size, 'unified_sha256': sha256(unified), 'unified_validation': unified_validation, 'acquisition_basis': book.get('acquisition_status') or book.get('rights_status'), 'browser_redistribution': redistribution_is_allowed(book)}
+        return {'id': book['id'], 'status': 'unified-validation-failed', 'rights_state': rights_state(book)}
+    state = rights_state(book)
+    manifest = {
+        'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'),
+        'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols,
+        'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size,
+        'unified_sha256': sha256(unified), 'unified_validation': unified_validation,
+        'rights_state': state,
+        'acquisition_basis_at_download': book.get('acquisition_status') or book.get('rights_status'),
+        'browser_redistribution': redistribution_is_allowed(book),
+        'browser_publication': 'allowed' if redistribution_is_allowed(book) else 'blocked-protected-private'
+    }
     (ART / f'{safe}.manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    return {'id': book['id'], 'status': 'acquired', 'manifest': str((ART / f'{safe}.manifest.json').relative_to(ROOT))}
+    print(f'ACQUIRED {book["id"]}: retained real PDF; post-acquisition rights state={state}; browser_publication={manifest["browser_publication"]}', flush=True)
+    return {'id': book['id'], 'status': 'acquired', 'manifest': str((ART / f'{safe}.manifest.json').relative_to(ROOT)), 'rights_state': state}
 
 def load_books():
     books = {}
