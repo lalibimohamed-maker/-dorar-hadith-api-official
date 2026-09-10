@@ -1,8 +1,7 @@
 name: Rechercher — Central governed PDF acquisition
 
 # One central downloader for the WHOLE encyclopedia. No era-specific acquisition pin.
-# Order: Prophet era -> Quran -> Seerah -> Companions -> Followers -> 1-400H ->
-# 401-800H -> 801-1200H -> 1201H -> Modern era -> Future books.
+# Order: Prophet era -> Quran -> Seerah -> Companions -> Followers -> 1-400H -> 401-800H -> 801-1200H -> 1201H -> Modern era -> Future books.
 permissions:
   contents: write
 
@@ -38,7 +37,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Checkout latest central catalogs and engine
+      - name: Checkout latest central catalogs
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: lalibimohamed-maker/-dorar-hadith-api-official
@@ -69,9 +68,9 @@ jobs:
           python3 .governance-source/scripts/rechercher_dorar_book_index.py --root "$GITHUB_WORKSPACE"
 
       - name: Clean primary PDF storage before acquisition
-        run: python3 .governance-source/scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
+        run: python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
 
-      - name: Acquire real PDFs through the central provider-neutral queue
+      - name: Acquire real PDFs through the central sequential engine
         run: |
           set -euo pipefail
           sudo apt-get update
@@ -79,7 +78,7 @@ jobs:
           git lfs install
           git lfs fetch origin --all || true
           git lfs checkout || true
-          python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
+          python3 scripts/rechercher_sequential_acquisition.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
 
       - name: Reject encrypted or invalid primary PDFs
@@ -112,8 +111,7 @@ jobs:
           printf '%s\n' "$SECONDARY_STORAGE_TOKEN"
           SH
           chmod 700 "$RUNNER_TEMP/rechercher-askpass"
-          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-askpass"
-          export GIT_TERMINAL_PROMPT=0
+          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-askpass" GIT_TERMINAL_PROMPT=0
           git ls-remote "https://github.com/${RECHERCHER_SECONDARY_STORAGE_REPO}.git" >/dev/null
           GIT_LFS_SKIP_SMUDGE=1 git clone "https://github.com/${RECHERCHER_SECONDARY_STORAGE_REPO}.git" .secondary-storage
           cd .secondary-storage
@@ -126,8 +124,6 @@ jobs:
           if ! git diff --cached --quiet; then git commit -m 'chore(rechercher): remove encrypted and invalid PDF storage artifacts'; git lfs push --dry-run origin HEAD; git push origin HEAD; fi
 
       - name: Persist every verified PDF to secondary storage by SHA-256
-        env:
-          SECONDARY_STORAGE_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
         run: |
           set -euo pipefail
           cat > "$RUNNER_TEMP/rechercher-askpass" <<'SH'
@@ -135,7 +131,7 @@ jobs:
           printf '%s\n' "$SECONDARY_STORAGE_TOKEN"
           SH
           chmod 700 "$RUNNER_TEMP/rechercher-askpass"
-          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-askpass"; export GIT_TERMINAL_PROMPT=0
+          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-askpass" GIT_TERMINAL_PROMPT=0
           cd .secondary-storage
           mkdir -p artifacts/permanent-pdfs/by-sha256
           python3 - <<'PY'
