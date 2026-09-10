@@ -27,6 +27,8 @@ spec.loader.exec_module(mod)
 
 LIVE = {"book": "unknown", "engine": "unknown"}
 MIB = 1024 * 1024
+_PDF_PREFETCH = {}
+_PDF_PREFETCH_LOCK = threading.Lock()
 
 
 def _heartbeat(label: str, interval: int = 15):
@@ -46,7 +48,23 @@ def _pdf_like(url: str, content_type: str = "") -> bool:
     return "application/pdf" in content_type.lower() or bool(re.search(r"\.pdf(?:[?#]|$)", url, re.I))
 
 
+def _pop_prefetch(url: str):
+    with _PDF_PREFETCH_LOCK:
+        return _PDF_PREFETCH.pop(url, None)
+
+
+def _save_prefetch(url: str, payload):
+    with _PDF_PREFETCH_LOCK:
+        _PDF_PREFETCH.clear()
+        _PDF_PREFETCH[url] = payload
+
+
 def live_fetch(url: str):
+    cached = _pop_prefetch(url)
+    if cached is not None:
+        print(f"[PDF REUSE] book={LIVE['book']} engine={LIVE['engine']} url={url} reused_prefetched_pdf=true", flush=True)
+        return cached
+
     req = Request(
         url,
         headers={
@@ -89,12 +107,16 @@ def live_fetch(url: str):
                         flush=True,
                     )
                     next_mark += MIB
+            payload = (buf.getvalue(), content_type, final_url)
             print(
                 f"[PDF DONE] book={LIVE['book']} engine={LIVE['engine']} "
                 f"PDF | {downloaded / MIB:.1f} MB",
                 flush=True,
             )
-            return buf.getvalue(), content_type, final_url
+            _save_prefetch(url, payload)
+            if final_url != url:
+                _save_prefetch(final_url, payload)
+            return payload
     finally:
         if stop is not None:
             stop.set()
