@@ -97,6 +97,15 @@ jobs:
           echo "Parallel PDF workers: ${RECHERCHER_MAX_BOOK_WORKERS}"
           python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
+
+          # A .pdf.enc file is never a completed downloadable PDF. Do not
+          # rename it or allow it into either LFS pool as a final book artifact.
+          if find artifacts -type f -name '*.pdf.enc' -print -quit | grep -q .; then
+            echo 'ERROR: encrypted .pdf.enc artifact detected; final Rechercher output must be a real .pdf.'
+            find artifacts -type f -name '*.pdf.enc' -print
+            exit 1
+          fi
+
           git lfs track 'artifacts/*.pdf'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -161,6 +170,9 @@ jobs:
           mkdir -p artifacts
 
           while IFS= read -r -d '' f; do
+            case "$f" in
+              *.pdf.enc) echo "ERROR: encrypted .pdf.enc cannot be stored as a final PDF: $f"; exit 1 ;;
+            esac
             head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: secondary source is not real PDF bytes: $f"; exit 1; }
             test -s "$f"
           done < <(find ../artifacts -type f -name '*.pdf' -print0)
@@ -175,6 +187,9 @@ jobs:
           fi
 
           while IFS= read -r -d '' f; do
+            case "$f" in
+              *.pdf.enc) echo "ERROR: encrypted .pdf.enc cannot be stored as a final PDF: $f"; exit 1 ;;
+            esac
             head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged secondary PDF is a pointer/non-PDF: $f"; exit 1; }
             test -s "$f"
           done < <(find artifacts -type f -name '*.pdf' -print0)
