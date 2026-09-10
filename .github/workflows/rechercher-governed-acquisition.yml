@@ -1,7 +1,7 @@
 name: Rechercher — Central governed PDF acquisition
 
 # One central downloader for the WHOLE encyclopedia. No era-specific acquisition pin.
-# Order: Prophet era -> Quran -> Seerah -> Companions -> Followers -> 1-400H -> 401-800H -> 801-1200H -> 1201H -> Modern era -> Future books.
+# Order is unbounded: Prophet era -> Hijri chronology -> present day -> future catalog additions.
 # Storage rule: ONE physical PDF copy per book. Primary and secondary pools are complementary shards, never mirrors.
 # security-justification: This workflow requires contents: write solely to persist verified, quality-gated PDF shards and governance manifests to the governed acquisition branch and secondary PDF storage; no source-code mutation is performed by the acquisition engine.
 permissions:
@@ -16,7 +16,7 @@ on:
   workflow_call:
     inputs:
       target_branch:
-        description: 'Governed branch for verified real PDFs and manifests.'
+        description: 'Governed branch holding the persistent chronological queue and verified PDF state.'
         required: true
         type: string
     secrets:
@@ -32,14 +32,14 @@ jobs:
     env:
       SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
     steps:
-      - name: Checkout governed acquisition state
+      - name: Checkout persistent chronological acquisition state
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Checkout latest central catalogs
+      - name: Checkout latest central catalogs from main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: lalibimohamed-maker/-dorar-hadith-api-official
@@ -48,20 +48,25 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Synchronize whole-encyclopedia catalogs
+      - name: Synchronize whole-encyclopedia catalogs and chronology policy
         run: |
           set -euo pipefail
           test -s .governance-source/config/rechercher-encyclopedia-catalog-registry.json
+          test -s .governance-source/config/rechercher-central-sequential-scope.json
           mkdir -p books-batches
           cp -a .governance-source/books-batches/. books-batches/
           python3 - <<'PY'
           import json
           from pathlib import Path
           d=json.loads(Path('config/rechercher-central-sequential-scope.json').read_text(encoding='utf-8'))
-          expected=['Prophet era','Quran','Seerah','Companions','Followers','1-400H','401-800H','801-1200H','1201H','Modern era','Future books']
-          if d.get('order') != expected or d.get('catalog_glob') != 'books-batches/**/catalog.json' or d.get('output_format') != '.pdf':
+          if d.get('mode') != 'unbounded_continuous_chronological':
+              raise SystemExit('Central acquisition is still configured as a finite or era-bounded queue.')
+          if d.get('finite_book_count_targets') is not False or d.get('book_count_targets'):
+              raise SystemExit('Finite book-count targeting is forbidden.')
+          if d.get('catalog_glob') != 'books-batches/**/catalog.json' or d.get('output_format') != '.pdf':
               raise SystemExit('Central chronological acquisition scope is invalid.')
-          print('CENTRAL_ORDER=', ' -> '.join(d['order']))
+          print('CHRONOLOGY=', d['chronology'])
+          print('FINITE_BOOK_COUNT_TARGETS=', d['finite_book_count_targets'])
           PY
 
       - name: Connect to secondary PDF pool for state discovery and cleanup
@@ -79,7 +84,6 @@ jobs:
           cd .secondary-storage
           git lfs install
           if git rev-parse --verify HEAD >/dev/null 2>&1; then
-            # Fetch only current tracked PDFs needed for resume, not every historical LFS object.
             git lfs pull --include='artifacts/*.pdf' --exclude='' || true
           else
             git switch --orphan main
@@ -103,13 +107,12 @@ jobs:
       - name: Clean primary PDF working storage
         run: python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
 
-      - name: Acquire real PDFs through the central sequential engine with quality selection
+      - name: Acquire PDFs through the single unbounded Hijri chronological queue
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
           git lfs install
-          # Fetch only current primary PDF objects; never pull the entire LFS history.
           git lfs pull --include='artifacts/*.pdf' --exclude='' || true
           python3 scripts/rechercher_sequential_acquisition.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
@@ -146,7 +149,8 @@ jobs:
                   shutil.copy2(pdf,target); pdf.unlink()
           for pdf in sorted(secondary.glob('*.pdf')):
               data=pdf.read_bytes()
-              if not data.startswith(b'%PDF-'): pdf.unlink(); continue
+              if not data.startswith(b'%PDF-'):
+                  pdf.unlink(); continue
               sha=hashlib.sha256(data).hexdigest()
               if int(sha[0],16)%2==0:
                   target=primary/pdf.name
@@ -156,7 +160,7 @@ jobs:
           print('ONE_COPY_PARTITION_OK')
           PY
 
-      - name: Persist verified PDFs to primary LFS storage (primary shard only)
+      - name: Persist verified PDFs to primary LFS storage
         env:
           TARGET_BRANCH: ${{ inputs.target_branch }}
         run: |
@@ -166,13 +170,13 @@ jobs:
           git add books-batches scripts .gitattributes artifacts/governance
           while IFS= read -r -d '' f; do git add -- "$f"; done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
           if ! git diff --cached --quiet; then
-            git commit -m 'data(rechercher): persist primary PDF shard without duplication'
+            git commit -m 'data(rechercher): persist chronological acquisition state and primary PDFs'
             git pull --rebase --autostash origin "$TARGET_BRANCH"
             git lfs fsck --pointers HEAD; git lfs push --dry-run origin HEAD
             git push origin "HEAD:refs/heads/$TARGET_BRANCH"
           fi
 
-      - name: Persist verified PDFs to secondary LFS storage (secondary shard only)
+      - name: Persist verified PDFs to secondary LFS storage
         run: |
           set -euo pipefail
           cd .secondary-storage
@@ -181,7 +185,7 @@ jobs:
           git add .gitattributes
           while IFS= read -r -d '' f; do git add -- "$f"; done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
           if ! git diff --cached --quiet; then
-            git commit -m 'data(rechercher): persist secondary PDF shard without duplication'
+            git commit -m 'data(rechercher): persist secondary chronological PDF shard'
             git lfs fsck --pointers HEAD; git lfs push --dry-run origin HEAD; git push origin HEAD
           fi
 
