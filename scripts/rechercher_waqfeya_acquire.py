@@ -9,7 +9,9 @@ from urllib.request import Request, urlopen
 # - acquire a real .pdf first; never treat .pdf.enc as a PDF;
 # - preserve acquired PDFs permanently and resume incomplete books;
 # - rights/redistribution is reviewed AFTER acquisition, not used as an acquisition gate;
-# - rights-unclear copies are retained as protected/private research material and are never browser-published;
+# - rights-unclear copies are retained as protected/private research material;
+# - developer/private access is distinct from browser/public access;
+# - rights-unclear copies are never browser-published or publicly downloadable;
 # - never bypass access controls or protections: a source must lawfully provide the copy.
 
 parser = argparse.ArgumentParser()
@@ -187,18 +189,26 @@ def acquire(book):
     if unified_validation['status'] not in ('valid', 'repaired'):
         return {'id': book['id'], 'status': 'unified-validation-failed', 'rights_state': rights_state(book)}
     state = rights_state(book)
+    redistributable = redistribution_is_allowed(book)
     manifest = {
         'id': book['id'], 'title': book['title'], 'author': book['author'], 'edition': book.get('edition'),
         'expected_volumes': expected, 'downloaded_volumes': len(vols), 'volumes': vols,
         'unified_file': str(unified.relative_to(ROOT)), 'unified_bytes': unified.stat().st_size,
         'unified_sha256': sha256(unified), 'unified_validation': unified_validation,
-        'rights_state': state,
+        'acquisition': 'acquired',
+        'pdf': 'real+validated',
+        'storage': 'permanent',
+        'rights_review': state,
         'acquisition_basis_at_download': book.get('acquisition_status') or book.get('rights_status'),
-        'browser_redistribution': redistribution_is_allowed(book),
-        'browser_publication': 'allowed' if redistribution_is_allowed(book) else 'blocked-protected-private'
+        'public_browser': redistributable,
+        'public_download': redistributable,
+        'developer_private_access': True,
+        'storage_visibility': 'private-protected' if not redistributable else 'publication-eligible',
+        'browser_redistribution': redistributable,
+        'browser_publication': 'allowed' if redistributable else 'blocked-protected-private'
     }
     (ART / f'{safe}.manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    print(f'ACQUIRED {book["id"]}: retained real PDF; post-acquisition rights state={state}; browser_publication={manifest["browser_publication"]}', flush=True)
+    print(f'ACQUIRED {book["id"]}: retained real PDF; rights_review={state}; developer_private_access=true; public_browser={redistributable}', flush=True)
     return {'id': book['id'], 'status': 'acquired', 'manifest': str((ART / f'{safe}.manifest.json').relative_to(ROOT)), 'rights_state': state}
 
 def load_books():
