@@ -3,7 +3,7 @@ name: Rechercher — Multi-pass acquisition gap retry
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '0 * * * *'
 
 # security-justification: trusted default-branch code only; no pull-request code is checked out or executed.
 permissions:
@@ -20,7 +20,7 @@ jobs:
   retry:
     name: Retry unresolved PDF acquisitions
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 60
     steps:
       - name: Checkout trusted main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -67,13 +67,14 @@ jobs:
           git show "origin/$REVIEW_BRANCH:books-batches/salaf-01-400h/developer-review-manifest.json" > /tmp/developer-review-manifest.json
           test -s /tmp/developer-review-manifest.json
 
-      - name: Run multi-pass gap retry
+      - name: Run bounded multi-pass gap retry
         run: |
           set -euo pipefail
           python3 scripts/rechercher_no_match_retry.py \
             --manifest /tmp/developer-review-manifest.json \
             --vault artifacts/developer-review-vault \
-            --report artifacts/governance/no-match-retry-report.json
+            --report artifacts/governance/no-match-retry-report.json \
+            --max-books 8
           cat artifacts/governance/no-match-retry-report.json
           mkdir -p artifacts/retry-new
           find artifacts/developer-review-vault -maxdepth 1 -type f -name '*.pdf' -printf '%f\n' | sort > /tmp/vault-after.txt
@@ -101,13 +102,10 @@ jobs:
           files=(artifacts/developer-review-vault/*.pdf)
           test "${#files[@]}" -gt 0 || { echo 'ERROR: vault is empty after retry; refusing persistence.'; exit 1; }
           for f in "${files[@]}"; do
-            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY \
-              -in "$f" -out "artifacts/developer-review-encrypted/$(basename "$f").enc"
+            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "artifacts/developer-review-encrypted/$(basename "$f").enc"
           done
           tag="rechercher-vault-${GITHUB_RUN_ID}"
-          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "Rechercher vault ${GITHUB_RUN_ID}" \
-            --notes 'Encrypted retention vault for validated developer-review PDFs. Plaintext publication remains governed separately.'
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher vault ${GITHUB_RUN_ID}" --notes 'Encrypted retention vault for validated developer-review PDFs. Plaintext publication remains governed separately.'
           gh release upload "$tag" artifacts/developer-review-encrypted/*.enc --repo "$GITHUB_REPOSITORY" --clobber
 
       - name: Snapshot generated state before changing branches
@@ -122,9 +120,6 @@ jobs:
         run: |
           set -euo pipefail
           GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
-          # The retry report is generated on trusted main and is untracked there.
-          # Remove only this exact generated path before switching to the review branch;
-          # the canonical copy is already snapshotted under /tmp.
           rm -f artifacts/governance/no-match-retry-report.json
           git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
