@@ -1,22 +1,27 @@
 {
-  "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v1",
+  "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v2",
   "primary_repository": "lalibimohamed-maker/-dorar-hadith-api-official",
   "secondary_storage_repository": "lalibimohamed82-coder/rechercher-pdf-storage",
-  "purpose": "Use the separately owned GitHub account as an additional Git LFS PDF storage pool without merging repositories or changing the canonical catalog/index.",
+  "purpose": "Two connected governed Git LFS PDF stores. Every verified real PDF must be persisted to both before acquisition is considered successful.",
   "format": ".pdf",
   "content_addressing": "sha256",
-  "mirror_policy": {
+  "storage_contract": {
+    "primary": "artifacts/*.pdf",
+    "secondary": "artifacts/permanent-pdfs/by-sha256/<sha256>.pdf",
     "verified_pdfs_only": true,
-    "preserve_primary_manifest": true,
-    "no_source_rewrite": true,
-    "no_encryption_layer": true,
-    "additive_only": true
+    "real_pdf_signature_required": true,
+    "qpdf_validation_required": true,
+    "encrypted_files_forbidden": true,
+    "source_provider_not_fixed": true,
+    "source_failover": "immediate next independent catalogued source on restriction/failure",
+    "no_source_quota": "the engine does not stop after a provider-specific book count"
   },
   "activation": {
     "repository_must_exist": true,
     "write_secret_name": "RECHERCHER_SECONDARY_STORAGE_TOKEN",
     "secret_owner": "secondary GitHub account",
-    "write_scope": "repository contents read/write for the secondary storage repository"
+    "write_scope": "repository contents read/write for the secondary storage repository",
+    "mandatory": true
   },
-  "fallback": "Until the secondary repository and write secret are configured, the governed downloader continues using its current primary acquisition branch and does not fail the encyclopedia queue because the mirror is unavailable."
+  "failure_policy": "If either governed store cannot be reached or a verified PDF cannot be proven in both stores, the acquisition cycle fails closed rather than claiming persistence."
 }
