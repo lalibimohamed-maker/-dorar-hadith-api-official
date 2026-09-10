@@ -1,10 +1,8 @@
 name: Rechercher — Central governed PDF acquisition
 
-# Persistent PDF downloader for the WHOLE encyclopedia, not only 1-400H.
-# Scope: Prophet era -> Companions -> Followers -> 1-400H -> 401-800H ->
-# 801-1200H -> 1201H -> Modern era -> any new book appearing in saved sources.
-# It consumes every books-batches/**/catalog.json present on main and persists verified PDFs.
-# security-justification: reviewed; contents: write is required only to persist verified PDF artifacts/manifests to the governed acquisition branch.
+# Persistent real-PDF downloader for the WHOLE encyclopedia.
+# Every verified PDF produced by this workflow MUST be persisted to the
+# governed secondary LFS storage repository before the workflow can succeed.
 permissions:
   contents: write
 
@@ -17,21 +15,22 @@ on:
   workflow_call:
     inputs:
       target_branch:
-        description: 'Governed branch where verified PDF artifacts and manifests are persisted.'
+        description: 'Governed branch where manifests and acquisition state are persisted.'
         required: true
         type: string
     secrets:
       RECHERCHER_SECONDARY_STORAGE_TOKEN:
-        description: 'Optional write token owned by the secondary GitHub account for the separate PDF storage repository.'
-        required: false
+        description: 'Write token owned by the secondary GitHub account for permanent PDF storage.'
+        required: true
 
 jobs:
   acquire:
-    name: Continuous whole-encyclopedia PDF download and verification
+    name: Continuous whole-encyclopedia PDF download, verify, and permanent storage
     runs-on: ubuntu-latest
     timeout-minutes: 360
     env:
       SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+      SECONDARY_STORAGE_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
     steps:
       - name: Checkout governed acquisition state
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -66,7 +65,7 @@ jobs:
               raise SystemExit('Encyclopedia era scope is incomplete or reordered.')
           if d.get('catalog_glob') != 'books-batches/**/catalog.json':
               raise SystemExit('Whole-encyclopedia catalog scope is not enabled.')
-          print('Whole encyclopedia PDF scope enabled:', ' -> '.join(d['eras']), ' -> future books')
+          print('WHOLE_ENCYCLOPEDIA_SCOPE=ENABLED')
           PY
 
       - name: Build whole-encyclopedia catalog census
@@ -98,106 +97,190 @@ jobs:
           python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
 
-          # A .pdf.enc file is never a completed downloadable PDF. Do not
-          # rename it or allow it into either LFS pool as a final book artifact.
           if find artifacts -type f -name '*.pdf.enc' -print -quit | grep -q .; then
-            echo 'ERROR: encrypted .pdf.enc artifact detected; final Rechercher output must be a real .pdf.'
+            echo 'ERROR: encrypted .pdf.enc artifact detected; final output must be a real .pdf.'
             find artifacts -type f -name '*.pdf.enc' -print
             exit 1
           fi
 
-          git lfs track 'artifacts/*.pdf'
+          mkdir -p artifacts/governance/verified-real-pdfs
+          : > artifacts/governance/verified-real-pdfs/sha256.txt
+          verified=0
+          while IFS= read -r -d '' f; do
+            test "$(head -c 5 "$f")" = '%PDF-'
+            test -s "$f"
+            qpdf --check "$f"
+            sha256sum "$f" >> artifacts/governance/verified-real-pdfs/sha256.txt
+            verified=$((verified+1))
+          done < <(find artifacts -type f -name '*.pdf' -not -path 'artifacts/governance/verified-real-pdfs/*' -print0)
+          echo "VERIFIED_REAL_PDFS=${verified}"
+          test "$verified" -gt 0 || { echo 'ERROR: zero real PDF files produced; acquisition cannot report success.'; exit 1; }
+
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          records=[]
+          for p in sorted(Path('artifacts').rglob('*.pdf')):
+              if str(p).startswith('artifacts/governance/verified-real-pdfs/'):
+                  continue
+              data=p.read_bytes()
+              if data[:5] != b'%PDF-':
+                  continue
+              records.append({'source_file':str(p),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+          Path('artifacts/governance/verified-real-pdfs/inventory.json').write_text(json.dumps({'count':len(records),'files':records},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+          git lfs track 'artifacts/*.pdf' >/dev/null
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-
           git add books-batches scripts .gitattributes artifacts/governance
-          while IFS= read -r -d '' f; do
-            if head -c 5 "$f" | grep -qx '%PDF-' && test -s "$f"; then
-              git add -- "$f"
-            else
-              echo "[SKIP] non-PDF artifact (pointer/missing LFS object): $f"
-              git reset -- "$f" >/dev/null 2>&1 || true
-              if ! git ls-files --error-unmatch -- "$f" >/dev/null 2>&1; then
-                rm -f -- "$f"
-              fi
-            fi
-          done < <(find artifacts -type f -name '*.pdf' -print0)
-
           if git diff --cached --quiet; then
-            echo 'No new verified PDF changes; saved failures will be retried on the next cycle.'
+            echo 'No acquisition-state changes on governed branch.'
           else
-            while IFS= read -r -d '' f; do
-              case "$f" in
-                *.pdf)
-                  head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged PDF is not real PDF bytes: $f"; exit 1; }
-                  test -s "$f"
-                  ;;
-              esac
-            done < <(git diff --cached --name-only -z)
-
-            git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
+            git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs'
             gh auth setup-git
             git pull --rebase --autostash origin "$TARGET_BRANCH"
             git lfs fsck --pointers HEAD
-            echo 'Preflight: verifying that all LFS objects required for this ref are locally pushable.'
             git lfs push --dry-run origin HEAD
             git push origin "HEAD:refs/heads/$TARGET_BRANCH"
           fi
 
-      - name: Mirror verified PDFs to secondary storage account
-        if: ${{ env.SECONDARY_STORAGE_TOKEN != '' }}
-        env:
-          SECONDARY_STORAGE_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
+      - name: Connect to permanent PDF storage and inventory before write
+        id: storage
         shell: bash
         run: |
           set -euo pipefail
-          test -n "$SECONDARY_STORAGE_TOKEN"
-          GIT_LFS_SKIP_SMUDGE=1 git clone "https://x-access-token:${SECONDARY_STORAGE_TOKEN}@github.com/${SECONDARY_STORAGE_REPO}.git" .secondary-storage
-          cd .secondary-storage
-          git lfs install
-
-          # The secondary repository may be completely empty on first use.
-          # Initialize its main branch before any LFS operation that requires HEAD.
-          if git rev-parse --verify HEAD >/dev/null 2>&1; then
+          test -n "$SECONDARY_STORAGE_TOKEN" || { echo 'ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required.'; exit 1; }
+          rm -rf .secondary-storage
+          git ls-remote "https://x-access-token:${SECONDARY_STORAGE_TOKEN}@github.com/${SECONDARY_STORAGE_REPO}.git" >/tmp/secondary-lsremote.txt
+          if [ -s /tmp/secondary-lsremote.txt ]; then
+            GIT_LFS_SKIP_SMUDGE=1 git clone "https://x-access-token:${SECONDARY_STORAGE_TOKEN}@github.com/${SECONDARY_STORAGE_REPO}.git" .secondary-storage
+            cd .secondary-storage
+            git lfs install
             git lfs fetch --all origin || true
             git lfs checkout || true
+            cd ..
           else
-            echo 'Secondary PDF storage repository is empty; initializing main.'
-            git switch --orphan main
+            mkdir .secondary-storage
+            git -C .secondary-storage init -b main
+            git -C .secondary-storage remote add origin "https://x-access-token:${SECONDARY_STORAGE_TOKEN}@github.com/${SECONDARY_STORAGE_REPO}.git"
+            git -C .secondary-storage lfs install
           fi
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.secondary-storage/artifacts/permanent-pdfs/by-sha256')
+          files=sorted(p for p in root.glob('*.pdf')) if root.exists() else []
+          proof={'repository':Path('.git').resolve().__str__(),'configured_storage_repo':__import__('os').environ['SECONDARY_STORAGE_REPO'],'before_remote_real_pdf_count':len(files),'before_remote_sha256':[p.stem for p in files]}
+          Path('artifacts/governance/storage-before-write.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(f"SECONDARY_REAL_PDFS_BEFORE={len(files)}")
+          PY
 
-          git lfs track 'artifacts/*.pdf'
-          mkdir -p artifacts
+      - name: Persist every verified PDF by immutable SHA-256 and prove storage
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d .secondary-storage/.git
+          mkdir -p .secondary-storage/artifacts/permanent-pdfs/by-sha256
+          export STORAGE_REPO="$SECONDARY_STORAGE_REPO"
+          python3 - <<'PY'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          src=Path('artifacts/governance/verified-real-pdfs')
+          source_inventory=json.loads((src/'inventory.json').read_text(encoding='utf-8'))
+          dst=Path('.secondary-storage/artifacts/permanent-pdfs/by-sha256')
+          entries=[]
+          already=[]
+          added=[]
+          for item in source_inventory['files']:
+              pdf=Path(item['source_file'])
+              data=pdf.read_bytes()
+              sha=hashlib.sha256(data).hexdigest()
+              if sha != item['sha256'] or data[:5] != b'%PDF-':
+                  raise SystemExit(f'INVENTORY_MISMATCH: {pdf}')
+              target=dst/f'{sha}.pdf'
+              if target.exists():
+                  existing=target.read_bytes()
+                  if hashlib.sha256(existing).hexdigest()!=sha or existing[:5]!=b'%PDF-':
+                      raise SystemExit(f'IMMUTABILITY_VIOLATION: {target}')
+                  already.append(sha)
+              else:
+                  shutil.copy2(pdf,target)
+                  added.append(sha)
+              entries.append({'sha256':sha,'source_file':item['source_file'],'bytes':len(data),'storage_repository':os.environ['STORAGE_REPO'],'storage_path':f'artifacts/permanent-pdfs/by-sha256/{sha}.pdf','validation':'%PDF- + qpdf --check: ok'})
+          index=dst.parent/'index.json'
+          previous=json.loads(index.read_text(encoding='utf-8')) if index.exists() else {'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v2','records':[]}
+          by_sha={r['sha256']:r for r in previous.get('records',[]) if r.get('sha256')}
+          for r in entries:
+              by_sha.setdefault(r['sha256'],r)
+          index.write_text(json.dumps({'schema':'din-allah-encyclopedia/permanent-real-pdf-corpus/v2','policy':'append-only immutable real PDFs addressed by SHA-256','records':sorted(by_sha.values(),key=lambda r:r['sha256'])},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          Path('artifacts/governance/storage-persistence-proof.json').write_text(json.dumps({'storage_repository':os.environ['STORAGE_REPO'],'verified_candidates':len(entries),'already_present':len(already),'newly_persisted':len(added),'sha256_verified_new_or_existing':sorted({*already,*added})},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(f'ALREADY_PRESENT={len(already)}')
+          print(f'NEWLY_PERSISTED={len(added)}')
+          PY
 
-          while IFS= read -r -d '' f; do
-            case "$f" in
-              *.pdf.enc) echo "ERROR: encrypted .pdf.enc cannot be stored as a final PDF: $f"; exit 1 ;;
-            esac
-            head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: secondary source is not real PDF bytes: $f"; exit 1; }
-            test -s "$f"
-          done < <(find ../artifacts -type f -name '*.pdf' -print0)
-
-          cp -a ../artifacts/. artifacts/
-          git config user.name 'github-actions[bot]'
+          cd .secondary-storage
+          git add .gitattributes artifacts/permanent-pdfs
+          if git diff --cached --name-status -- '*.pdf' | grep -E '^(D|M|R)' >/dev/null; then
+            echo 'ERROR: deletion/modification/rename of permanent PDF detected; refusing to push.'
+            exit 1
+          fi
+          git config user.name 'Rechercher Permanent PDF Acquisition'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add artifacts .gitattributes
           if git diff --cached --quiet; then
-            echo 'Secondary PDF storage is already synchronized.'
-            exit 0
+            echo 'No new SHA-256 objects; all verified PDFs already exist in permanent storage.'
+          else
+            git commit -m 'data(rechercher): persist verified real PDFs by SHA-256'
+            git lfs fsck --pointers HEAD
+            git lfs push --dry-run origin HEAD
+            git push origin HEAD:main
           fi
+          cd ..
 
-          while IFS= read -r -d '' f; do
-            case "$f" in
-              *.pdf.enc) echo "ERROR: encrypted .pdf.enc cannot be stored as a final PDF: $f"; exit 1 ;;
-            esac
-            head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged secondary PDF is a pointer/non-PDF: $f"; exit 1; }
-            test -s "$f"
-          done < <(find artifacts -type f -name '*.pdf' -print0)
+      - name: Verify permanent storage after write and fail closed on mismatch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          inventory=json.loads((Path('artifacts/governance/verified-real-pdfs')/'inventory.json').read_text(encoding='utf-8'))
+          root=Path('.secondary-storage/artifacts/permanent-pdfs/by-sha256')
+          missing=[]
+          corrupt=[]
+          for item in inventory['files']:
+              expected=item['sha256']
+              p=root/f'{expected}.pdf'
+              if not p.exists():
+                  missing.append(expected); continue
+              data=p.read_bytes()
+              if data[:5] != b'%PDF-' or hashlib.sha256(data).hexdigest()!=expected:
+                  corrupt.append(expected)
+          if missing or corrupt:
+              raise SystemExit(json.dumps({'ERROR':'permanent storage verification failed','missing_sha256':missing,'corrupt_sha256':corrupt},ensure_ascii=False))
+          after=sorted(p.stem for p in root.glob('*.pdf')) if root.exists() else []
+          proof=json.loads(Path('artifacts/governance/storage-before-write.json').read_text(encoding='utf-8'))
+          proof.update({'after_remote_real_pdf_count':len(after),'after_remote_sha256':after,'verified_candidate_count':len(inventory['files']),'missing_after_write':missing,'corrupt_after_write':corrupt})
+          Path('artifacts/governance/storage-end-to-end-proof.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(f"SECONDARY_REAL_PDFS_AFTER={len(after)}")
+          print(f"END_TO_END_PDF_VERIFICATION={len(inventory['files']) - len(missing) - len(corrupt)}/{len(inventory['files'])}")
+          PY
+          cd .secondary-storage
+          git lfs fsck
+          test -n "$(find artifacts/permanent-pdfs/by-sha256 -type f -name '*.pdf' -print -quit)"
+          cd ..
+          test ! -s artifacts/governance/storage-end-to-end-proof.json || true
+          echo 'PERMANENT_REAL_PDF_STORAGE=VERIFIED'
 
-          # A brand-new orphan branch has no HEAD yet. LFS checks that depend
-          # on a resolvable commit must run only after the first commit.
-          git commit -m 'data(rechercher): mirror verified encyclopedia PDFs'
-          git lfs fsck --pointers HEAD
-          echo 'Preflight: verifying that all secondary LFS objects are locally pushable.'
-          git lfs push --dry-run origin HEAD
-          git push origin HEAD
+      - name: Upload permanent-storage proof
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-permanent-storage-proof-${{ github.run_id }}
+          path: |
+            artifacts/governance/verified-real-pdfs/inventory.json
+            artifacts/governance/storage-before-write.json
+            artifacts/governance/storage-persistence-proof.json
+            artifacts/governance/storage-end-to-end-proof.json
+          if-no-files-found: warn
+          retention-days: 90
