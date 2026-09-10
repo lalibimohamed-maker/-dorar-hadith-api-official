@@ -70,7 +70,7 @@ def chronology_rank(book):
     if any(x in blob for x in ("companion", "sahabi", "sahaba", "صحابي", "صحابة", "الصحابة")):
         return (0, 3, norm(book.get("title") or book.get("titleAr")), book_key(book))
     if any(x in blob for x in ("follower", "tabi", "تابعي", "تابعون", "التابعون")):
-        return (0, 4, norm(book.get("title") or book.get("titleAr")), book_key(book)
+        return (0, 4, norm(book.get("title") or book.get("titleAr")), book_key(book))
     return (2, 10**9, norm(book.get("title") or book.get("titleAr")), book_key(book))
 
 
@@ -85,21 +85,20 @@ def load_catalog(root):
             if key not in books:
                 books[key] = dict(book)
                 continue
-            # Multiple catalog overlays may describe the same book.  Do not let
-            # an overlay with sparse metadata shadow acquisition-critical fields
-            # from a richer catalog (e.g. expected_volumes, sources, edition).
+            # Multiple catalog overlays may describe the same book. Do not let
+            # a sparse overlay shadow acquisition-critical fields from a richer
+            # catalog (e.g. expected_volumes, sources, edition).
             merged = books[key]
             for field, value in book.items():
                 if field not in merged or merged.get(field) in (None, "", [], {}):
                     merged[field] = value
-            for field in ("sources",):
-                if isinstance(merged.get(field), list) and isinstance(book.get(field), list):
-                    seen = {json.dumps(x, ensure_ascii=False, sort_keys=True) for x in merged[field]}
-                    for value in book[field]:
-                        marker = json.dumps(value, ensure_ascii=False, sort_keys=True)
-                        if marker not in seen:
-                            merged[field].append(value)
-                            seen.add(marker)
+            if isinstance(merged.get("sources"), list) and isinstance(book.get("sources"), list):
+                seen = {json.dumps(x, ensure_ascii=False, sort_keys=True) for x in merged["sources"]}
+                for value in book["sources"]:
+                    marker = json.dumps(value, ensure_ascii=False, sort_keys=True)
+                    if marker not in seen:
+                        merged["sources"].append(value)
+                        seen.add(marker)
     return sorted(books.values(), key=chronology_rank)
 
 
