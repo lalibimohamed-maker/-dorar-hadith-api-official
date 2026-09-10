@@ -3,6 +3,7 @@ name: Rechercher — Central governed PDF acquisition
 # One central downloader for the WHOLE encyclopedia. No era-specific acquisition pin.
 # Order: Prophet era -> Quran -> Seerah -> Companions -> Followers -> 1-400H -> 401-800H -> 801-1200H -> 1201H -> Modern era -> Future books.
 # Storage rule: ONE physical PDF copy per book. Primary and secondary pools are complementary shards, never mirrors.
+# security-justification: This workflow requires contents: write solely to persist verified, quality-gated PDF shards and governance manifests to the governed acquisition branch and secondary PDF storage; no source-code mutation is performed by the acquisition engine.
 permissions:
   contents: write
 
