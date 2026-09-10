@@ -97,6 +97,15 @@ jobs:
           echo "Parallel PDF workers: ${RECHERCHER_MAX_BOOK_WORKERS}"
           python3 .governance-source/scripts/rechercher_waqfeya_acquire.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
+
+          # A .pdf.enc file is never a completed downloadable PDF. Do not
+          # rename it or allow it into either LFS pool as a final book artifact.
+          if find artifacts -type f -name '*.pdf.enc' -print -quit | grep -q .; then
+            echo 'ERROR: encrypted .pdf.enc artifact detected; final Rechercher output must be a real .pdf.'
+            find artifacts -type f -name '*.pdf.enc' -print
+            exit 1
+          fi
+
           git lfs track 'artifacts/*.pdf'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -127,10 +136,11 @@ jobs:
             done < <(git diff --cached --name-only -z)
 
             git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
-            git lfs fsck --objects
             gh auth setup-git
             git pull --rebase --autostash origin "$TARGET_BRANCH"
-            git lfs fsck --objects
+            git lfs fsck --pointers HEAD
+            echo 'Preflight: verifying that all LFS objects required for this ref are locally pushable.'
+            git lfs push --dry-run origin HEAD
             git push origin "HEAD:refs/heads/$TARGET_BRANCH"
           fi
 
@@ -160,6 +170,9 @@ jobs:
           mkdir -p artifacts
 
           while IFS= read -r -d '' f; do
+            case "$f" in
+              *.pdf.enc) echo "ERROR: encrypted .pdf.enc cannot be stored as a final PDF: $f"; exit 1 ;;
+            esac
             head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: secondary source is not real PDF bytes: $f"; exit 1; }
             test -s "$f"
           done < <(find ../artifacts -type f -name '*.pdf' -print0)
@@ -174,13 +187,17 @@ jobs:
           fi
 
           while IFS= read -r -d '' f; do
+            case "$f" in
+              *.pdf.enc) echo "ERROR: encrypted .pdf.enc cannot be stored as a final PDF: $f"; exit 1 ;;
+            esac
             head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: staged secondary PDF is a pointer/non-PDF: $f"; exit 1; }
             test -s "$f"
           done < <(find artifacts -type f -name '*.pdf' -print0)
 
-          # A brand-new orphan branch has no HEAD yet. LFS fsck must run only
-          # after the first commit creates a resolvable ref; otherwise it fails
-          # with: Git can't resolve ref: "HEAD".
+          # A brand-new orphan branch has no HEAD yet. LFS checks that depend
+          # on a resolvable commit must run only after the first commit.
           git commit -m 'data(rechercher): mirror verified encyclopedia PDFs'
-          git lfs fsck --objects
+          git lfs fsck --pointers HEAD
+          echo 'Preflight: verifying that all secondary LFS objects are locally pushable.'
+          git lfs push --dry-run origin HEAD
           git push origin HEAD
