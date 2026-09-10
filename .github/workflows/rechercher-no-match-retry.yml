@@ -46,7 +46,7 @@ jobs:
           REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
-          mkdir -p artifacts/developer-review-vault
+          mkdir -p artifacts/developer-review-vault /tmp/rechercher-vault
           tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt --jq '[.[] | select(.tagName | startswith("rechercher-vault-"))] | sort_by(.createdAt) | last | .tagName')
           if [ -n "${tag:-}" ] && [ "$tag" != "null" ]; then
             gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern '*.enc' --dir /tmp/rechercher-vault
@@ -58,6 +58,7 @@ jobs:
               qpdf --check "$out"
             done
           fi
+          find artifacts/developer-review-vault -maxdepth 1 -type f -name '*.pdf' -printf '%f\n' | sort > /tmp/vault-before.txt
 
       - name: Recover latest acquisition manifest
         run: |
@@ -74,13 +75,19 @@ jobs:
             --vault artifacts/developer-review-vault \
             --report artifacts/governance/no-match-retry-report.json
           cat artifacts/governance/no-match-retry-report.json
+          mkdir -p artifacts/retry-new
+          find artifacts/developer-review-vault -maxdepth 1 -type f -name '*.pdf' -printf '%f\n' | sort > /tmp/vault-after.txt
+          comm -13 /tmp/vault-before.txt /tmp/vault-after.txt | while IFS= read -r name; do
+            cp "artifacts/developer-review-vault/$name" "artifacts/retry-new/$name"
+          done
+          find artifacts/retry-new -maxdepth 1 -type f -name '*.pdf' | sort
 
       - name: Preserve newly validated PDFs as artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: rechercher-no-match-retry-pdfs-${{ github.run_id }}
-          path: artifacts/developer-review-vault/*.pdf
-          if-no-files-found: error
+          path: artifacts/retry-new/*.pdf
+          if-no-files-found: warn
           retention-days: 90
 
       - name: Encrypt updated vault without deleting plaintext
@@ -91,7 +98,9 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts/developer-review-encrypted
           shopt -s nullglob
-          for f in artifacts/developer-review-vault/*.pdf; do
+          files=(artifacts/developer-review-vault/*.pdf)
+          test "${#files[@]}" -gt 0 || { echo 'ERROR: vault is empty after retry; refusing persistence.'; exit 1; }
+          for f in "${files[@]}"; do
             openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY \
               -in "$f" -out "artifacts/developer-review-encrypted/$(basename "$f").enc"
           done
@@ -101,21 +110,29 @@ jobs:
             --notes 'Encrypted retention vault for validated developer-review PDFs. Plaintext publication remains governed separately.'
           gh release upload "$tag" artifacts/developer-review-encrypted/*.enc --repo "$GITHUB_REPOSITORY" --clobber
 
-      - name: Persist retry manifest and audit evidence
+      - name: Snapshot generated state before changing branches
+        run: |
+          set -euo pipefail
+          cp /tmp/developer-review-manifest.json /tmp/generated-manifest.json
+          cp artifacts/governance/no-match-retry-report.json /tmp/generated-retry-report.json
+
+      - name: Persist retry manifest and detailed audit evidence
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          mkdir -p artifacts/governance
-          cp /tmp/developer-review-manifest.json books-batches/salaf-01-400h/developer-review-manifest.json
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add books-batches/salaf-01-400h/developer-review-manifest.json artifacts/governance/no-match-retry-report.json
-          git commit -m 'data(rechercher): persist multi-pass acquisition retry evidence' || exit 0
           GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
           git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
-          git checkout HEAD@{1} -- books-batches/salaf-01-400h/developer-review-manifest.json artifacts/governance/no-match-retry-report.json
+          cp /tmp/generated-manifest.json books-batches/salaf-01-400h/developer-review-manifest.json
+          mkdir -p artifacts/governance
+          cp /tmp/generated-retry-report.json artifacts/governance/no-match-retry-report.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add books-batches/salaf-01-400h/developer-review-manifest.json artifacts/governance/no-match-retry-report.json
-          git commit -m 'data(rechercher): reconcile multi-pass acquisition state' || exit 0
+          if git diff --cached --quiet; then
+            echo 'No retry state changed; nothing to persist.'
+            exit 0
+          fi
+          git commit -m 'data(rechercher): persist detailed multi-pass acquisition state'
           git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
