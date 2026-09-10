@@ -1962,12 +1962,73 @@
               "result": "no-pdf"
             }
           ]
+        },
+        {
+          "pass": "deep-worldwide-v3",
+          "result": "no-match",
+          "attempts": [
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35270/0011-036-138-005",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35270/0011-028-105-013",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35270/0011-030-112-014",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35270/0011-015-052-010",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35270/0011-031-117-009",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://github.com/OpenITI/RELEASE/tree/master/%D9%85%D8%B3%D8%A7%D9%86%D9%8A%D8%AF%20%D9%81%D8%B1%D8%A7%D8%B3%20%D8%A7%D9%84%D9%85%D9%83%D8%AA%D8%A8%20%D9%81%D8%B1%D8%A7%D8%B3%20%D8%A8%D9%86%20%D9%8A%D8%AD%D9%8A%D9%89%20%D8%A7%D9%84%D9%85%D9%83%D8%AA%D8%A8",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://www.google.com/search?q=site%3Akitab-project.org%20%D9%85%D8%B3%D8%A7%D9%86%D9%8A%D8%AF%20%D9%81%D8%B1%D8%A7%D8%B3%20%D8%A7%D9%84%D9%85%D9%83%D8%AA%D8%A8",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://waqfeya.net/search?q=%D9%85%D8%B3%D8%A7%D9%86%D9%8A%D8%AF+%D9%81%D8%B1%D8%A7%D8%B3+%D8%A7%D9%84%D9%85%D9%83%D8%AA%D8%A8",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://www.almeshkat.net/search.php?q=%D9%85%D8%B3%D8%A7%D9%86%D9%8A%D8%AF+%D9%81%D8%B1%D8%A7%D8%B3+%D8%A7%D9%84%D9%85%D9%83%D8%AA%D8%A8",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://arabicpdfs.com/?s=%D9%85%D8%B3%D8%A7%D9%86%D9%8A%D8%AF%20%D9%81%D8%B1%D8%A7%D8%B3%20%D8%A7%D9%84%D9%85%D9%83%D8%AA%D8%A8",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://altafser.com/?s=%D9%85%D8%B3%D8%A7%D9%86%D9%8A%D8%AF%20%D9%81%D8%B1%D8%A7%D8%B3%20%D8%A7%D9%84%D9%85%D9%83%D8%AA%D8%A8",
+              "result": "no-pdf"
+            }
+          ]
         }
       ],
       "acquisition_metrics": {
         "schema": "rechercher-acquisition-metrics/v1",
-        "retry_passes": 2,
-        "source_attempts": 23,
+        "retry_passes": 3,
+        "source_attempts": 34,
         "unique_sources": 12,
         "source_urls": [
           "https://altafser.com/?s=%D9%85%D8%B3%D8%A7%D9%86%D9%8A%D8%AF%20%D9%81%D8%B1%D8%A7%D8%B3%20%D8%A7%D9%84%D9%85%D9%83%D8%AA%D8%A8",
@@ -1987,14 +2048,14 @@
         "invalid_pdf_attempts": 0,
         "error_attempts": 0,
         "source_attempts_by_engine": {
-          "crossref": 11,
-          "openiti_kitab": 4,
-          "arabic_indexes": 8
+          "crossref": 16,
+          "openiti_kitab": 6,
+          "arabic_indexes": 12
         },
         "last_pass_result": "no-match",
-        "last_pass_at": "2026-09-10T18:17:30Z",
+        "last_pass_at": "2026-09-10T18:46:24Z",
         "last_pass_attempts": 11,
-        "summary": "2 passes → 23 source attempts → no valid PDF"
+        "summary": "3 passes → 34 source attempts → no valid PDF"
       }
     },
     {
@@ -4644,13 +4705,112 @@
               "result": "no-pdf"
             }
           ]
+        },
+        {
+          "pass": "deep-worldwide-v3",
+          "result": "no-match",
+          "attempts": [
+            {
+              "engine": "internet_archive",
+              "url": "https://ia803207.us.archive.org/18/items/0901Pdf/0901%20%20%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A7%D9%82%D8%B1%D8%A7%20%D8%A7%D9%88%D9%86%D9%84%D8%A7%D9%8A%D9%86%20%20%20%20pdf%20%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC.pdf",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-125548aec009d7d517a5.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is linearized\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-125548aec009d7d517a5.pdf: object count mismatch for page 0: hint table = 3; computed = 10\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-125548aec009d7d517a5.pdf: page length mismatch for page 0: hint table = 5901; computed length = 5361 (offset = 1974)\nqpdf: operation succeeded with warnings",
+              "bytes": 6082061
+            },
+            {
+              "engine": "internet_archive",
+              "url": "https://ia902807.us.archive.org/7/items/000155_201807/000155%20%20%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC%20%20%20%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A8%D9%8A%20%D8%AF%D9%8A%20%D8%A7%D9%81%20%D8%A7%D9%82%D8%B1%D8%A7%20%D8%A7%D9%88%D9%86%D9%84%D8%A7%D9%8A%D9%86%20%20%20.pdf",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-139ce506c728b533d1f7.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is linearized\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-139ce506c728b533d1f7.pdf: object count mismatch for page 0: hint table = 3; computed = 10\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-139ce506c728b533d1f7.pdf: page length mismatch for page 0: hint table = 5901; computed length = 5361 (offset = 1974)\nqpdf: operation succeeded with warnings",
+              "bytes": 6082067
+            },
+            {
+              "engine": "internet_archive",
+              "url": "https://dn790000.ca.archive.org/0/items/1162Pdf_201807/1162%D9%83%D8%AA%D8%A7%D8%A8%20%20pdf%20%20%20%D8%A7%D9%82%D8%B1%D8%A7%20%D8%A7%D9%88%D9%86%D9%84%D8%A7%D9%8A%D9%86%20%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC.pdf",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-a52f7c24e78855b259b1.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is linearized\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-a52f7c24e78855b259b1.pdf: object count mismatch for page 0: hint table = 3; computed = 10\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-a52f7c24e78855b259b1.pdf: page length mismatch for page 0: hint table = 5901; computed length = 5361 (offset = 1974)\nqpdf: operation succeeded with warnings",
+              "bytes": 6082067
+            },
+            {
+              "engine": "crossref",
+              "url": "https://journals.ku.edu.kw/jsis/index.php/jsis/article/download/2159/1599",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is linearized\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 0 length mismatch: hint table = 129; computed = 409\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 1 length mismatch: hint table = 409; computed = 271\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 2 length mismatch: hint table = 271; computed = 261\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 3 length mismatch: hint table = 261; computed = 369\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 4 length mismatch: hint table = 369; computed = 112\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 5 length mismatch: hint table = 112; computed = 3279\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 6 length mismatch: hint table = 3279; computed = 947\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 7 length mismatch: hint table = 947; computed = 27\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 8 length mismatch: hint table = 27; computed = 314\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 9 length mismatch: hint table = 314; computed = 262\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 10 length mismatch: hint table = 262; computed = 139\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 11 length mismatch: hint table = 139; computed = 424\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 12 length mismatch: hint table = 424; computed = 2435\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 13 length mismatch: hint table = 2435; computed = 2762\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 14 length mismatch: hint table = 2762; computed = 183\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 15 length mismatch: hint table = 183; computed = 3196\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 16 length mismatch: hint table = 3196; computed = 2491\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 17 length mismatch: hint table = 2491; computed = 3616\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 18 length mismatch: hint table = 3616; computed = 3648\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 19 length mismatch: hint table = 3648; computed = 3537\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 20 length mismatch: hint table = 3537; computed = 606\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 21 length mismatch: hint table = 606; computed = 14461\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 22 length mismatch: hint table = 14461; computed = 23458\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 23 length mismatch: hint table = 23458; computed = 260\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 24 length mismatch: hint table = 260; computed = 70\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 25 length mismatch: hint table = 70; computed = 929\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 26 length mismatch: hint table = 929; computed = 4369\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 27 length mismatch: hint table = 4369; computed = 256\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 28 length mismatch: hint table = 256; computed = 305\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: shared object 29 length mismatch: hint table = 305; computed = 1277\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: first page object offset mismatch\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: object count mismatch for page 0: hint table = 30; computed = 29\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page length mismatch for page 0: hint table = 73525; computed length = 74673 (offset = 2500)\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 0 has shared identifier entries\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 0: shared object 300: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 1: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 1: shared object 322: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 1: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 1: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 2: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 2: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 2: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 2: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 2: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 2: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 3: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 3: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 3: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 3: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 3: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 3: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 4: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 4: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 4: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 4: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 4: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 4: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 5: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 5: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 5: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 5: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 5: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 5: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 5: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 5: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 6: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 6: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 6: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 6: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 6: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 6: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 7: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 7: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 7: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 7: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 7: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 7: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 7: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 7: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 8: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 8: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 8: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 8: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 8: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 8: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 8: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 8: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 9: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 9: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 9: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 9: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 9: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 9: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 10: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 10: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 10: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 10: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 10: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 10: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 10: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 10: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 11: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 11: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 11: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 11: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 11: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 11: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 11: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 11: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 12: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 12: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 12: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 12: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 12: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 12: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 13: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 13: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 13: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 13: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 13: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 13: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 14: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 14: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 14: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 14: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 14: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 14: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 15: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 15: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 15: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 15: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 15: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 15: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 15: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 15: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 16: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 16: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 16: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 16: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 16: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 16: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 16: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 16: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 17: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 17: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 17: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 17: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 17: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 17: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 18: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 18: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 18: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 18: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 18: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 18: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 18: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 18: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 19: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 19: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 19: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 19: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 19: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 19: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 19: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 19: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 20: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 20: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 20: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 20: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 20: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 20: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 20: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 20: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 21: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 21: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 21: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 21: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 21: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 21: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 21: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 21: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 22: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 22: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 22: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 22: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 22: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 22: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 22: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 22: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 23: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 23: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 23: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 23: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 23: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 23: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 23: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 23: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 24: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 24: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 24: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 24: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 24: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 24: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 25: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 25: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 25: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 25: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 25: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 25: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 25: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 25: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 26: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 26: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 26: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 26: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 26: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 26: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 26: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 26: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 27: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 27: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 27: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 27: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 27: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 27: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 28: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 28: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 28: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 28: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 28: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 28: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 28: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 28: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 29: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 29: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 29: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 29: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 29: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 29: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 29: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 29: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 30: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 30: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 30: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 30: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 30: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 30: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 31: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 31: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 31: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 31: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 31: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 31: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 32: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 32: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 32: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 32: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 32: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 32: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 32: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 32: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 33: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 33: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 33: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 33: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 33: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 33: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 34: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 34: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 34: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 34: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 34: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 34: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 35: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 35: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 35: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 35: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 35: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 35: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 35: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 35: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 36: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 36: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 36: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 36: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 36: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 36: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 36: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 36: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 37: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 37: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 37: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 37: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 37: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 37: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 37: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 37: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 38: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 38: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 38: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 38: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 38: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 38: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 38: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 38: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 39: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 39: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 39: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 39: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 39: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 39: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 39: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 39: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 40: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 40: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 40: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 40: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 40: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 40: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 40: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 40: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 41: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 41: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 41: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 41: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 41: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 41: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 41: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 41: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 42: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 42: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 42: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 42: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 42: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 42: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 42: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 42: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 43: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 43: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 43: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 43: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 43: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 43: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 43: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 43: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 44: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 44: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 44: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 44: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 44: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 44: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 44: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 44: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 45: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 45: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 45: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 45: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 45: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 45: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 45: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 45: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 46: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 46: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 46: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 46: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 46: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 46: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 47: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 47: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 47: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 47: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 47: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 47: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 48: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 48: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 48: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 48: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 48: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 48: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 49: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 49: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 49: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 49: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 49: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 49: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 50: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 50: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 50: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 50: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 50: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 50: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 51: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 51: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 51: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 51: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 51: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/تفسير-ابن-جريج--a928365fd805--deep-b01d6db9690842c50780.pdf: page 51: shared object 320: in computed list but not hint table\nqpdf: operation succeeded with warnings",
+              "bytes": 2026135
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.34120/jsis.v29i97.2159",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.12816/0054083",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.1163/9789004279599_tabari_tabaricom_ara_090018",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35695/1946-000-042-006",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.37138/1425-035-002-020",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://github.com/OpenITI/RELEASE/tree/master/%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%A8%D9%86%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B2%D9%8A%D8%B2%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://waqfeya.net/search?q=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1+%D8%A7%D8%A8%D9%86+%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://www.almeshkat.net/search.php?q=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1+%D8%A7%D8%A8%D9%86+%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://arabicpdfs.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://altafser.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "wikimedia_commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/LL-Q22809485_%28apc%29-Hassan_Hassoon-%D8%AA%D9%81%D8%B3%D9%8A%D8%B1_%D8%A7%D8%A8%D9%86_%D8%AC%D8%B1%D9%8A%D8%AC.wav?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "wikisource",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/LL-Q22809485_%28apc%29-Hassan_Hassoon-%D8%AA%D9%81%D8%B3%D9%8A%D8%B1_%D8%A7%D8%A8%D9%86_%D8%AC%D8%B1%D9%8A%D8%AC.wav?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
+              "result": "no-pdf"
+            }
+          ]
         }
       ],
       "acquisition_metrics": {
         "schema": "rechercher-acquisition-metrics/v1",
-        "retry_passes": 2,
-        "source_attempts": 34,
-        "unique_sources": 18,
+        "retry_passes": 3,
+        "source_attempts": 51,
+        "unique_sources": 20,
         "source_urls": [
           "https://altafser.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
           "https://arabicpdfs.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
@@ -4664,6 +4824,8 @@
           "https://doi.org/10.37138/1425-035-002-020",
           "https://github.com/OpenITI/RELEASE/tree/master/%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%A8%D9%86%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B2%D9%8A%D8%B2%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
           "https://ia802807.us.archive.org/7/items/000155_201807/000155%20%20%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC%20%20%20%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A8%D9%8A%20%D8%AF%D9%8A%20%D8%A7%D9%81%20%D8%A7%D9%82%D8%B1%D8%A7%20%D8%A7%D9%88%D9%86%D9%84%D8%A7%D9%8A%D9%86%20%20%20.pdf",
+          "https://ia803207.us.archive.org/18/items/0901Pdf/0901%20%20%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A7%D9%82%D8%B1%D8%A7%20%D8%A7%D9%88%D9%86%D9%84%D8%A7%D9%8A%D9%86%20%20%20%20pdf%20%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC.pdf",
+          "https://ia902807.us.archive.org/7/items/000155_201807/000155%20%20%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC%20%20%20%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A8%D9%8A%20%D8%AF%D9%8A%20%D8%A7%D9%81%20%D8%A7%D9%82%D8%B1%D8%A7%20%D8%A7%D9%88%D9%86%D9%84%D8%A7%D9%8A%D9%86%20%20%20.pdf",
           "https://journals.ku.edu.kw/jsis/index.php/jsis/article/download/2159/1599",
           "https://upload.wikimedia.org/wikipedia/commons/9/9e/LL-Q22809485_%28apc%29-Hassan_Hassoon-%D8%AA%D9%81%D8%B3%D9%8A%D8%B1_%D8%A7%D8%A8%D9%86_%D8%AC%D8%B1%D9%8A%D8%AC.wav?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
           "https://upload.wikimedia.org/wikipedia/commons/9/9e/LL-Q22809485_%28apc%29-Hassan_Hassoon-%D8%AA%D9%81%D8%B3%D9%8A%D8%B1_%D8%A7%D8%A8%D9%86_%D8%AC%D8%B1%D9%8A%D8%AC.wav?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
@@ -4672,20 +4834,20 @@
           "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC"
         ],
         "successful_pdf_attempts": 0,
-        "invalid_pdf_attempts": 8,
+        "invalid_pdf_attempts": 12,
         "error_attempts": 0,
         "source_attempts_by_engine": {
-          "internet_archive": 6,
-          "crossref": 12,
-          "openiti_kitab": 4,
-          "arabic_indexes": 8,
-          "wikimedia_commons": 2,
-          "wikisource": 2
+          "internet_archive": 9,
+          "crossref": 18,
+          "openiti_kitab": 6,
+          "arabic_indexes": 12,
+          "wikimedia_commons": 3,
+          "wikisource": 3
         },
         "last_pass_result": "no-match",
-        "last_pass_at": "2026-09-10T18:17:30Z",
+        "last_pass_at": "2026-09-10T18:46:24Z",
         "last_pass_attempts": 17,
-        "summary": "2 passes → 34 source attempts → no valid PDF"
+        "summary": "3 passes → 51 source attempts → no valid PDF"
       }
     },
     {
@@ -6460,12 +6622,82 @@
               "result": "no-pdf"
             }
           ]
+        },
+        {
+          "pass": "deep-worldwide-v3",
+          "result": "no-match",
+          "attempts": [
+            {
+              "engine": "crossref",
+              "url": "https://journals.ku.edu.kw/jsis/index.php/jsis/article/download/2159/1599",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is linearized\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 0 length mismatch: hint table = 129; computed = 409\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 1 length mismatch: hint table = 409; computed = 271\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 2 length mismatch: hint table = 271; computed = 261\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 3 length mismatch: hint table = 261; computed = 369\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 4 length mismatch: hint table = 369; computed = 112\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 5 length mismatch: hint table = 112; computed = 3279\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 6 length mismatch: hint table = 3279; computed = 947\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 7 length mismatch: hint table = 947; computed = 27\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 8 length mismatch: hint table = 27; computed = 314\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 9 length mismatch: hint table = 314; computed = 262\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 10 length mismatch: hint table = 262; computed = 139\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 11 length mismatch: hint table = 139; computed = 424\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 12 length mismatch: hint table = 424; computed = 2435\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 13 length mismatch: hint table = 2435; computed = 2762\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 14 length mismatch: hint table = 2762; computed = 183\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 15 length mismatch: hint table = 183; computed = 3196\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 16 length mismatch: hint table = 3196; computed = 2491\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 17 length mismatch: hint table = 2491; computed = 3616\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 18 length mismatch: hint table = 3616; computed = 3648\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 19 length mismatch: hint table = 3648; computed = 3537\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 20 length mismatch: hint table = 3537; computed = 606\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 21 length mismatch: hint table = 606; computed = 14461\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 22 length mismatch: hint table = 14461; computed = 23458\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 23 length mismatch: hint table = 23458; computed = 260\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 24 length mismatch: hint table = 260; computed = 70\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 25 length mismatch: hint table = 70; computed = 929\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 26 length mismatch: hint table = 929; computed = 4369\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 27 length mismatch: hint table = 4369; computed = 256\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 28 length mismatch: hint table = 256; computed = 305\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: shared object 29 length mismatch: hint table = 305; computed = 1277\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: first page object offset mismatch\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: object count mismatch for page 0: hint table = 30; computed = 29\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page length mismatch for page 0: hint table = 73525; computed length = 74673 (offset = 2500)\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 0 has shared identifier entries\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 0: shared object 300: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 1: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 1: shared object 322: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 1: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 1: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 2: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 2: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 2: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 2: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 2: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 2: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 3: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 3: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 3: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 3: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 3: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 3: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 4: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 4: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 4: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 4: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 4: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 4: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 5: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 5: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 5: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 5: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 5: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 5: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 5: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 5: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 6: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 6: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 6: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 6: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 6: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 6: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 7: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 7: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 7: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 7: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 7: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 7: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 7: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 7: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 8: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 8: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 8: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 8: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 8: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 8: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 8: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 8: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 9: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 9: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 9: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 9: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 9: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 9: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 10: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 10: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 10: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 10: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 10: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 10: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 10: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 10: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 11: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 11: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 11: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 11: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 11: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 11: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 11: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 11: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 12: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 12: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 12: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 12: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 12: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 12: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 13: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 13: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 13: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 13: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 13: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 13: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 14: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 14: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 14: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 14: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 14: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 14: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 15: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 15: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 15: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 15: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 15: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 15: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 15: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 15: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 16: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 16: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 16: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 16: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 16: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 16: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 16: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 16: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 17: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 17: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 17: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 17: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 17: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 17: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 18: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 18: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 18: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 18: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 18: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 18: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 18: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 18: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 19: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 19: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 19: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 19: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 19: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 19: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 19: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 19: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 20: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 20: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 20: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 20: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 20: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 20: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 20: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 20: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 21: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 21: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 21: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 21: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 21: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 21: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 21: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 21: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 22: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 22: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 22: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 22: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 22: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 22: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 22: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 22: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 23: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 23: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 23: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 23: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 23: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 23: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 23: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 23: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 24: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 24: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 24: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 24: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 24: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 24: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 25: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 25: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 25: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 25: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 25: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 25: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 25: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 25: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 26: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 26: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 26: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 26: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 26: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 26: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 26: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 26: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 27: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 27: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 27: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 27: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 27: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 27: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 28: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 28: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 28: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 28: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 28: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 28: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 28: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 28: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 29: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 29: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 29: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 29: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 29: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 29: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 29: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 29: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 30: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 30: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 30: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 30: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 30: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 30: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 31: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 31: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 31: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 31: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 31: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 31: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 32: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 32: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 32: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 32: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 32: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 32: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 32: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 32: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 33: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 33: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 33: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 33: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 33: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 33: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 34: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 34: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 34: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 34: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 34: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 34: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 35: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 35: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 35: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 35: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 35: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 35: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 35: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 35: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 36: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 36: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 36: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 36: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 36: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 36: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 36: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 36: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 37: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 37: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 37: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 37: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 37: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 37: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 37: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 37: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 38: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 38: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 38: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 38: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 38: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 38: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 38: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 38: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 39: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 39: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 39: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 39: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 39: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 39: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 39: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 39: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 40: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 40: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 40: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 40: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 40: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 40: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 40: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 40: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 41: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 41: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 41: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 41: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 41: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 41: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 41: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 41: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 42: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 42: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 42: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 42: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 42: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 42: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 42: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 42: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 43: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 43: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 43: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 43: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 43: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 43: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 43: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 43: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 44: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 44: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 44: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 44: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 44: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 44: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 44: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 44: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 45: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 45: shared object 308: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 45: shared object 311: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 45: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 45: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 45: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 45: shared object 310: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 45: shared object 321: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 46: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 46: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 46: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 46: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 46: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 46: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 47: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 47: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 47: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 47: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 47: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 47: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 48: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 48: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 48: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 48: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 48: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 48: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 49: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 49: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 49: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 49: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 49: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 49: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 50: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 50: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 50: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 50: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 50: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 50: shared object 320: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 51: shared object 305: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 51: shared object 312: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 51: shared object 326: in hint table but not computed list\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 51: shared object 301: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 51: shared object 306: in computed list but not hint table\nWARNING: artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-b01d6db9690842c50780.pdf: page 51: shared object 320: in computed list but not hint table\nqpdf: operation succeeded with warnings",
+              "bytes": 2026135
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.34120/jsis.v29i97.2159",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35695/1946-000-042-006",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.1163/9789004279599_tabari_tabaricom_ara_090018",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.1163/9789004279599_tabari_tabaricom_ara_100009",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://www.ajrsp.com/vol/issue81/%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A7%D8%AC%D8%AA%D9%85%D8%A7%D8%B9%D9%8A%D8%A9%20%D8%A8%D8%A7%D9%84%D9%86%D8%B3%D9%82%20%D8%A7%D9%84%D8%B3%D9%8A%D8%A7%D8%B3%D9%8A%20%D8%AF%D8%B1%D8%A7%D8%B3%D8%A9%20%D8%AA%D8%AD%D9%84%D9%8A%D9%84%D9%8A%D8%A9%20%D8%A8%D9%8A%D9%86%20%D9%85%D9%82%D8%AF%D9%85%D8%A9%20%D8%A7%D8%A8%D9%86%20%D8%AE%D9%84%D8%AF%D9%88%D9%86%20%D9%88%D9%88%D8%A7%D9%82%D8%B9%20%D8%A7%D9%84%D9%85%D8%AC%D8%AA%D9%85%D8%B9%20%D8%A7%D9%84%D8%B3%D8%B9%D9%88%D8%AF%D9%8A.pdf",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/جزء-ابن-جريج--4a8af58c6e7d--deep-e47ad0a478b69810562a.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+              "bytes": 726272
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://github.com/OpenITI/RELEASE/tree/master/%D8%AC%D8%B2%D8%A1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%A8%D9%86%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B2%D9%8A%D8%B2%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%AC%D8%B2%D8%A1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://waqfeya.net/search?q=%D8%AC%D8%B2%D8%A1+%D8%A7%D8%A8%D9%86+%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://www.almeshkat.net/search.php?q=%D8%AC%D8%B2%D8%A1+%D8%A7%D8%A8%D9%86+%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://arabicpdfs.com/?s=%D8%AC%D8%B2%D8%A1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://altafser.com/?s=%D8%AC%D8%B2%D8%A1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
+              "result": "no-pdf"
+            }
+          ]
         }
       ],
       "acquisition_metrics": {
         "schema": "rechercher-acquisition-metrics/v1",
-        "retry_passes": 2,
-        "source_attempts": 24,
+        "retry_passes": 3,
+        "source_attempts": 36,
         "unique_sources": 12,
         "source_urls": [
           "https://altafser.com/?s=%D8%AC%D8%B2%D8%A1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC",
@@ -6482,17 +6714,17 @@
           "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%AC%D8%B2%D8%A1%20%D8%A7%D8%A8%D9%86%20%D8%AC%D8%B1%D9%8A%D8%AC"
         ],
         "successful_pdf_attempts": 0,
-        "invalid_pdf_attempts": 4,
+        "invalid_pdf_attempts": 6,
         "error_attempts": 0,
         "source_attempts_by_engine": {
-          "crossref": 12,
-          "openiti_kitab": 4,
-          "arabic_indexes": 8
+          "crossref": 18,
+          "openiti_kitab": 6,
+          "arabic_indexes": 12
         },
         "last_pass_result": "no-match",
-        "last_pass_at": "2026-09-10T18:17:30Z",
+        "last_pass_at": "2026-09-10T18:46:24Z",
         "last_pass_attempts": 12,
-        "summary": "2 passes → 24 source attempts → no valid PDF"
+        "summary": "3 passes → 36 source attempts → no valid PDF"
       }
     },
     {
@@ -9545,13 +9777,79 @@
               "result": "no-pdf"
             }
           ]
+        },
+        {
+          "pass": "deep-worldwide-v3",
+          "result": "no-match",
+          "attempts": [
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35696/1915-000-019-002",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://www.tu.edu.ye/journals/index.php/artsmain/article/download/711/521",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35696/.v1i19.711",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.46968/0326-009-004-012",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.1163/9789004279599_tabari_tabaricom_ara_100045",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.1163/9789004279599_tabari_tabaricom_ara_070076",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://github.com/OpenITI/RELEASE/tree/master/%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%85%D8%B3%D9%84%D9%85%20%D8%A8%D9%86%20%D8%AE%D8%A7%D9%84%D8%AF%20%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A%20%D9%85%D8%B3%D9%84%D9%85%20%D8%A8%D9%86%20%D8%AE%D8%A7%D9%84%D8%AF%20%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%85%D8%B3%D9%84%D9%85%20%D8%A8%D9%86%20%D8%AE%D8%A7%D9%84%D8%AF%20%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://waqfeya.net/search?q=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1+%D9%85%D8%B3%D9%84%D9%85+%D8%A8%D9%86+%D8%AE%D8%A7%D9%84%D8%AF+%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://www.almeshkat.net/search.php?q=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1+%D9%85%D8%B3%D9%84%D9%85+%D8%A8%D9%86+%D8%AE%D8%A7%D9%84%D8%AF+%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://arabicpdfs.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%85%D8%B3%D9%84%D9%85%20%D8%A8%D9%86%20%D8%AE%D8%A7%D9%84%D8%AF%20%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://altafser.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%85%D8%B3%D9%84%D9%85%20%D8%A8%D9%86%20%D8%AE%D8%A7%D9%84%D8%AF%20%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
+              "result": "no-pdf"
+            }
+          ]
         }
       ],
       "acquisition_metrics": {
         "schema": "rechercher-acquisition-metrics/v1",
-        "retry_passes": 2,
-        "source_attempts": 24,
-        "unique_sources": 12,
+        "retry_passes": 3,
+        "source_attempts": 36,
+        "unique_sources": 13,
         "source_urls": [
           "https://altafser.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%85%D8%B3%D9%84%D9%85%20%D8%A8%D9%86%20%D8%AE%D8%A7%D9%84%D8%AF%20%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
           "https://arabicpdfs.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%85%D8%B3%D9%84%D9%85%20%D8%A8%D9%86%20%D8%AE%D8%A7%D9%84%D8%AF%20%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
@@ -9564,20 +9862,21 @@
           "https://journal.tu.edu.ye/index.php/artsmain/article/download/711/521",
           "https://waqfeya.net/search?q=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1+%D9%85%D8%B3%D9%84%D9%85+%D8%A8%D9%86+%D8%AE%D8%A7%D9%84%D8%AF+%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
           "https://www.almeshkat.net/search.php?q=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1+%D9%85%D8%B3%D9%84%D9%85+%D8%A8%D9%86+%D8%AE%D8%A7%D9%84%D8%AF+%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
-          "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%85%D8%B3%D9%84%D9%85%20%D8%A8%D9%86%20%D8%AE%D8%A7%D9%84%D8%AF%20%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A"
+          "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%85%D8%B3%D9%84%D9%85%20%D8%A8%D9%86%20%D8%AE%D8%A7%D9%84%D8%AF%20%D8%A7%D9%84%D8%B2%D9%86%D8%AC%D9%8A",
+          "https://www.tu.edu.ye/journals/index.php/artsmain/article/download/711/521"
         ],
         "successful_pdf_attempts": 0,
         "invalid_pdf_attempts": 2,
         "error_attempts": 0,
         "source_attempts_by_engine": {
-          "crossref": 12,
-          "openiti_kitab": 4,
-          "arabic_indexes": 8
+          "crossref": 18,
+          "openiti_kitab": 6,
+          "arabic_indexes": 12
         },
         "last_pass_result": "no-match",
-        "last_pass_at": "2026-09-10T18:17:30Z",
+        "last_pass_at": "2026-09-10T18:46:24Z",
         "last_pass_attempts": 12,
-        "summary": "2 passes → 24 source attempts → no valid PDF"
+        "summary": "3 passes → 36 source attempts → no valid PDF"
       }
     },
     {
@@ -12921,12 +13220,80 @@
               "result": "no-pdf"
             }
           ]
+        },
+        {
+          "pass": "deep-worldwide-v3",
+          "result": "no-match",
+          "attempts": [
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.33976/iugjis.31.3/2023/1",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://almuhaqaq.alamaalhilli.org/index.php/almuhaqaq/article/download/293/203",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/تفسير-يحيى-بن-يمان--981779bc246e--deep-59c0ffb16a40519381db.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+              "bytes": 1056719
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.62745/muhaqqiq.v9i22.293",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.46313/1707-029-004-036",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35156/1174-000-033-002",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.33685/1317-000-094-002",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://github.com/OpenITI/RELEASE/tree/master/%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%8A%D8%AD%D9%8A%D9%89%20%D8%A8%D9%86%20%D9%8A%D9%85%D8%A7%D9%86%20%D9%8A%D8%AD%D9%8A%D9%89%20%D8%A8%D9%86%20%D9%8A%D9%85%D8%A7%D9%86",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%8A%D8%AD%D9%8A%D9%89%20%D8%A8%D9%86%20%D9%8A%D9%85%D8%A7%D9%86",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://waqfeya.net/search?q=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1+%D9%8A%D8%AD%D9%8A%D9%89+%D8%A8%D9%86+%D9%8A%D9%85%D8%A7%D9%86",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://www.almeshkat.net/search.php?q=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1+%D9%8A%D8%AD%D9%8A%D9%89+%D8%A8%D9%86+%D9%8A%D9%85%D8%A7%D9%86",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://arabicpdfs.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%8A%D8%AD%D9%8A%D9%89%20%D8%A8%D9%86%20%D9%8A%D9%85%D8%A7%D9%86",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://altafser.com/?s=%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%8A%D8%AD%D9%8A%D9%89%20%D8%A8%D9%86%20%D9%8A%D9%85%D8%A7%D9%86",
+              "result": "no-pdf"
+            }
+          ]
         }
       ],
       "acquisition_metrics": {
         "schema": "rechercher-acquisition-metrics/v1",
-        "retry_passes": 2,
-        "source_attempts": 24,
+        "retry_passes": 3,
+        "source_attempts": 36,
         "unique_sources": 12,
         "source_urls": [
           "https://almuhaqaq.alamaalhilli.org/index.php/almuhaqaq/article/download/293/203",
@@ -12943,17 +13310,17 @@
           "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D9%8A%D8%AD%D9%8A%D9%89%20%D8%A8%D9%86%20%D9%8A%D9%85%D8%A7%D9%86"
         ],
         "successful_pdf_attempts": 0,
-        "invalid_pdf_attempts": 2,
+        "invalid_pdf_attempts": 3,
         "error_attempts": 0,
         "source_attempts_by_engine": {
-          "crossref": 12,
-          "openiti_kitab": 4,
-          "arabic_indexes": 8
+          "crossref": 18,
+          "openiti_kitab": 6,
+          "arabic_indexes": 12
         },
         "last_pass_result": "no-match",
-        "last_pass_at": "2026-09-10T18:17:30Z",
+        "last_pass_at": "2026-09-10T18:46:24Z",
         "last_pass_attempts": 12,
-        "summary": "2 passes → 24 source attempts → no valid PDF"
+        "summary": "3 passes → 36 source attempts → no valid PDF"
       }
     },
     {
@@ -15513,12 +15880,90 @@
               "result": "no-pdf"
             }
           ]
+        },
+        {
+          "pass": "deep-worldwide-v3",
+          "result": "no-match",
+          "attempts": [
+            {
+              "engine": "crossref",
+              "url": "https://www.jalhss.com/index.php/jalhss/article/download/1565/1546",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/مصنف-مسند-الذماري--edd4bb8a8459--deep-e9020947db92a669c402.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+              "bytes": 1405831
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.33193/jalhss.126.2025.1565",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://scientificjournal.alqalam.edu.iq/index.php/AQJ/article/download/251/56",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.70126/aqj.v9i17.251",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.12816/0054227",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://aafu.journals.ekb.eg/article_522760_c6704096c0470eab020d4fedefbc4da3.pdf",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.21608/aafu.2026.503821.2352",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.1163/9789004279599_tabari_tabaricom_ara_090019",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://github.com/OpenITI/RELEASE/tree/master/%D9%85%D8%B5%D9%86%D9%81/%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D8%B0%D9%85%D8%A7%D8%B1%D9%8A%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%A8%D9%86%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%B1%D8%AD%D9%85%D9%86%20%D8%A7%D9%84%D8%B0%D9%85%D8%A7%D8%B1%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://www.google.com/search?q=site%3Akitab-project.org%20%D9%85%D8%B5%D9%86%D9%81/%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D8%B0%D9%85%D8%A7%D8%B1%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://waqfeya.net/search?q=%D9%85%D8%B5%D9%86%D9%81%2F%D9%85%D8%B3%D9%86%D8%AF+%D8%A7%D9%84%D8%B0%D9%85%D8%A7%D8%B1%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://www.almeshkat.net/search.php?q=%D9%85%D8%B5%D9%86%D9%81%2F%D9%85%D8%B3%D9%86%D8%AF+%D8%A7%D9%84%D8%B0%D9%85%D8%A7%D8%B1%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://arabicpdfs.com/?s=%D9%85%D8%B5%D9%86%D9%81/%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D8%B0%D9%85%D8%A7%D8%B1%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://altafser.com/?s=%D9%85%D8%B5%D9%86%D9%81/%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D8%B0%D9%85%D8%A7%D8%B1%D9%8A",
+              "result": "no-pdf"
+            }
+          ]
         }
       ],
       "acquisition_metrics": {
         "schema": "rechercher-acquisition-metrics/v1",
-        "retry_passes": 2,
-        "source_attempts": 28,
+        "retry_passes": 3,
+        "source_attempts": 42,
         "unique_sources": 14,
         "source_urls": [
           "https://aafu.journals.ekb.eg/article_522760_c6704096c0470eab020d4fedefbc4da3.pdf",
@@ -15537,17 +15982,17 @@
           "https://www.jalhss.com/index.php/jalhss/article/download/1565/1546"
         ],
         "successful_pdf_attempts": 0,
-        "invalid_pdf_attempts": 2,
+        "invalid_pdf_attempts": 3,
         "error_attempts": 0,
         "source_attempts_by_engine": {
-          "crossref": 16,
-          "openiti_kitab": 4,
-          "arabic_indexes": 8
+          "crossref": 24,
+          "openiti_kitab": 6,
+          "arabic_indexes": 12
         },
         "last_pass_result": "no-match",
-        "last_pass_at": "2026-09-10T18:17:30Z",
+        "last_pass_at": "2026-09-10T18:46:24Z",
         "last_pass_attempts": 14,
-        "summary": "2 passes → 28 source attempts → no valid PDF"
+        "summary": "3 passes → 42 source attempts → no valid PDF"
       }
     },
     {
@@ -21245,13 +21690,100 @@
               "bytes": 5404414
             }
           ]
+        },
+        {
+          "pass": "deep-worldwide-v3",
+          "result": "no-match",
+          "attempts": [
+            {
+              "engine": "internet_archive",
+              "url": "https://ia601508.us.archive.org/16/items/alfirdwsiy2018_gmail_2459/2459%20-%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85%20%20%20%D9%83%D8%AA%D8%A7%D8%A8%20%20%D8%A7%D9%82%D8%B1%D8%A7%20%20%D8%A7%D9%88%D9%86%D9%84%D8%A7%D9%8A%D9%86.pdf",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/سنن-الاثرم--2d47ba4b9169--deep-c53eadedb254b949e371.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is linearized\nWARNING: artifacts/developer-review-vault/سنن-الاثرم--2d47ba4b9169--deep-c53eadedb254b949e371.pdf: incorrect object count in outline hint table\nqpdf: operation succeeded with warnings",
+              "bytes": 5328258
+            },
+            {
+              "engine": "crossref",
+              "url": "http://jafd.journals.ekb.eg/article_9863_b6a97e690e4ab9f771a986869f11c52e.pdf",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.21608/jafd.2017.9863",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.35778/1753-000-007-001",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.12816/0054798",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.37144/0298-005-017-009",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://journals.ku.edu.kw/jgaps/index.php/jgaps/article/download/797/465",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/سنن-الاثرم--2d47ba4b9169--deep-417d8b6d23978ac964e4.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+              "bytes": 1605503
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.34120/jgaps.v10i.797",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://github.com/OpenITI/RELEASE/tree/master/%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85%20%D8%A3%D8%AD%D9%85%D8%AF%20%D8%A8%D9%86%20%D9%85%D8%AD%D9%85%D8%AF%20%D8%A8%D9%86%20%D9%87%D8%A7%D9%86%D8%A6%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://waqfeya.net/search?q=%D8%B3%D9%86%D9%86+%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://www.almeshkat.net/search.php?q=%D8%B3%D9%86%D9%86+%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://arabicpdfs.com/?s=%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://altafser.com/?s=%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "wikisource",
+              "url": "https://upload.wikimedia.org/wikisource/ar/7/79/%D8%B3%D9%86%D9%86_%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85_%D8%AE.pdf?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/سنن-الاثرم--2d47ba4b9169--deep-40e9ba44f16c95be6a05.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is linearized\nWARNING: artifacts/developer-review-vault/سنن-الاثرم--2d47ba4b9169--deep-40e9ba44f16c95be6a05.pdf: incorrect offset in outlines table: hint table = 5754325; computed = 5385038\nqpdf: operation succeeded with warnings",
+              "bytes": 5404414
+            }
+          ]
         }
       ],
       "acquisition_metrics": {
         "schema": "rechercher-acquisition-metrics/v1",
-        "retry_passes": 2,
-        "source_attempts": 30,
-        "unique_sources": 15,
+        "retry_passes": 3,
+        "source_attempts": 45,
+        "unique_sources": 16,
         "source_urls": [
           "http://jafd.journals.ekb.eg/article_9863_b6a97e690e4ab9f771a986869f11c52e.pdf",
           "https://altafser.com/?s=%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85",
@@ -21263,6 +21795,7 @@
           "https://doi.org/10.35778/1753-000-007-001",
           "https://doi.org/10.37144/0298-005-017-009",
           "https://github.com/OpenITI/RELEASE/tree/master/%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85%20%D8%A3%D8%AD%D9%85%D8%AF%20%D8%A8%D9%86%20%D9%85%D8%AD%D9%85%D8%AF%20%D8%A8%D9%86%20%D9%87%D8%A7%D9%86%D8%A6%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85",
+          "https://ia601508.us.archive.org/16/items/alfirdwsiy2018_gmail_2459/2459%20-%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85%20%20%20%D9%83%D8%AA%D8%A7%D8%A8%20%20%D8%A7%D9%82%D8%B1%D8%A7%20%20%D8%A7%D9%88%D9%86%D9%84%D8%A7%D9%8A%D9%86.pdf",
           "https://journals.ku.edu.kw/jgaps/index.php/jgaps/article/download/797/465",
           "https://upload.wikimedia.org/wikisource/ar/7/79/%D8%B3%D9%86%D9%86_%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85_%D8%AE.pdf?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
           "https://waqfeya.net/search?q=%D8%B3%D9%86%D9%86+%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85",
@@ -21270,19 +21803,19 @@
           "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%85"
         ],
         "successful_pdf_attempts": 0,
-        "invalid_pdf_attempts": 5,
+        "invalid_pdf_attempts": 8,
         "error_attempts": 0,
         "source_attempts_by_engine": {
-          "internet_archive": 2,
-          "crossref": 14,
-          "openiti_kitab": 4,
-          "arabic_indexes": 8,
-          "wikisource": 2
+          "internet_archive": 3,
+          "crossref": 21,
+          "openiti_kitab": 6,
+          "arabic_indexes": 12,
+          "wikisource": 3
         },
         "last_pass_result": "no-match",
-        "last_pass_at": "2026-09-10T18:17:30Z",
+        "last_pass_at": "2026-09-10T18:46:24Z",
         "last_pass_attempts": 15,
-        "summary": "2 passes → 30 source attempts → no valid PDF"
+        "summary": "3 passes → 45 source attempts → no valid PDF"
       }
     },
     {
@@ -27669,12 +28202,85 @@
               "result": "no-pdf"
             }
           ]
+        },
+        {
+          "pass": "deep-worldwide-v3",
+          "result": "no-match",
+          "attempts": [
+            {
+              "engine": "crossref",
+              "url": "https://scientificjournal.alqalam.edu.iq/index.php/AQJ/article/download/251/56",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.70126/aqj.v9i17.251",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://journals.ku.edu.kw/jsis/index.php/jsis/article/download/1425/865",
+              "result": "invalid-pdf",
+              "validation": "checking artifacts/developer-review-vault/المنتقى-من-مسند-المقلين--8c4829593c84--deep-dfd4f6d898d8fd94995b.pdf\nPDF Version: 1.2\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+              "bytes": 182271
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.34120/jsis.v17i48.1425",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.37144/0298-010-039-014",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.17656/jzsb.10549",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "crossref",
+              "url": "https://doi.org/10.36047/1227-000-035-001",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://github.com/OpenITI/RELEASE/tree/master/%D8%A7%D9%84%D9%85%D9%86%D8%AA%D9%82%D9%89%20%D9%85%D9%86%20%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D9%85%D9%82%D9%84%D9%8A%D9%86%20%D8%AF%D8%B9%D9%84%D8%AC%20%D8%A8%D9%86%20%D8%A3%D8%AD%D9%85%D8%AF%20%D8%A7%D9%84%D8%B3%D8%AC%D8%B3%D8%AA%D8%A7%D9%86%D9%8A",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "openiti_kitab",
+              "url": "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%A7%D9%84%D9%85%D9%86%D8%AA%D9%82%D9%89%20%D9%85%D9%86%20%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D9%85%D9%82%D9%84%D9%8A%D9%86",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://waqfeya.net/search?q=%D8%A7%D9%84%D9%85%D9%86%D8%AA%D9%82%D9%89+%D9%85%D9%86+%D9%85%D8%B3%D9%86%D8%AF+%D8%A7%D9%84%D9%85%D9%82%D9%84%D9%8A%D9%86",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://www.almeshkat.net/search.php?q=%D8%A7%D9%84%D9%85%D9%86%D8%AA%D9%82%D9%89+%D9%85%D9%86+%D9%85%D8%B3%D9%86%D8%AF+%D8%A7%D9%84%D9%85%D9%82%D9%84%D9%8A%D9%86",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://arabicpdfs.com/?s=%D8%A7%D9%84%D9%85%D9%86%D8%AA%D9%82%D9%89%20%D9%85%D9%86%20%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D9%85%D9%82%D9%84%D9%8A%D9%86",
+              "result": "no-pdf"
+            },
+            {
+              "engine": "arabic_indexes",
+              "url": "https://altafser.com/?s=%D8%A7%D9%84%D9%85%D9%86%D8%AA%D9%82%D9%89%20%D9%85%D9%86%20%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D9%85%D9%82%D9%84%D9%8A%D9%86",
+              "result": "no-pdf"
+            }
+          ]
         }
       ],
       "acquisition_metrics": {
         "schema": "rechercher-acquisition-metrics/v1",
-        "retry_passes": 2,
-        "source_attempts": 26,
+        "retry_passes": 3,
+        "source_attempts": 39,
         "unique_sources": 13,
         "source_urls": [
           "https://altafser.com/?s=%D8%A7%D9%84%D9%85%D9%86%D8%AA%D9%82%D9%89%20%D9%85%D9%86%20%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D9%85%D9%82%D9%84%D9%8A%D9%86",
@@ -27692,17 +28298,17 @@
           "https://www.google.com/search?q=site%3Akitab-project.org%20%D8%A7%D9%84%D9%85%D9%86%D8%AA%D9%82%D9%89%20%D9%85%D9%86%20%D9%85%D8%B3%D9%86%D8%AF%20%D8%A7%D9%84%D9%85%D9%82%D9%84%D9%8A%D9%86"
         ],
         "successful_pdf_attempts": 0,
-        "invalid_pdf_attempts": 2,
+        "invalid_pdf_attempts": 3,
         "error_attempts": 0,
         "source_attempts_by_engine": {
-          "crossref": 14,
-          "openiti_kitab": 4,
-          "arabic_indexes": 8
+          "crossref": 21,
+          "openiti_kitab": 6,
+          "arabic_indexes": 12
         },
         "last_pass_result": "no-match",
-        "last_pass_at": "2026-09-10T18:17:30Z",
+        "last_pass_at": "2026-09-10T18:46:24Z",
         "last_pass_attempts": 13,
-        "summary": "2 passes → 26 source attempts → no valid PDF"
+        "summary": "3 passes → 39 source attempts → no valid PDF"
       }
     },
     {
