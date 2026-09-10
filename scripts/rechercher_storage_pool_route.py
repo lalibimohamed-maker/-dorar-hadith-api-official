@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve the permanent PDF storage target from the governed Storage Pool.
-
-The resolver is intentionally fail-closed:
-- only configured repositories can be selected;
-- an active shard is used until its safe threshold is reached;
-- a next shard is selected only when it is configured and available;
-- no repository is ever invented or created by this script.
-"""
+"""Resolve the permanent PDF storage target from the governed Storage Pool."""
 from __future__ import annotations
 
 import argparse
@@ -22,10 +15,7 @@ def run(cmd: list[str], cwd: Path | None = None) -> tuple[int, str, str]:
 
 
 def repo_accessible(repo: str, token: str) -> bool:
-    code, _, _ = run([
-        "git", "ls-remote",
-        f"https://x-access-token:{token}@github.com/{repo}.git",
-    ])
+    code, _, _ = run(["git", "ls-remote", f"https://x-access-token:{token}@github.com/{repo}.git"])
     return code == 0
 
 
@@ -47,16 +37,15 @@ def main() -> int:
     args = ap.parse_args()
 
     root = Path(args.root).resolve()
-    config_path = root / args.config
-    cfg = json.loads(config_path.read_text(encoding="utf-8"))
-    if cfg.get("schema") != "din-allah-encyclopedia/permanent-storage-pool/v1":n        raise SystemExit("ERROR: unsupported Storage Pool schema")
+    cfg = json.loads((root / args.config).read_text(encoding="utf-8"))
+    if cfg.get("schema") != "din-allah-encyclopedia/permanent-storage-pool/v1":
+        raise SystemExit("ERROR: unsupported Storage Pool schema")
 
     token = os.environ.get(args.token_env, "")
     if not token:
         raise SystemExit(f"ERROR: {args.token_env} is required to resolve permanent storage")
 
-    free = cfg.get("free_operation_policy", {})
-    threshold = float(free.get("safe_storage_threshold_gb", 8.5))
+    threshold = float(cfg.get("free_operation_policy", {}).get("safe_storage_threshold_gb", 8.5))
     shards = [cfg.get("primary", {})] + list(cfg.get("future_shards", []))
     configured = [s for s in shards if s.get("repository")]
     if not configured:
@@ -66,7 +55,6 @@ def main() -> int:
     if active_index is None:
         active_index = 0
 
-    # The existing permanent clone is the authoritative local measurement when present.
     current = configured[active_index]
     current_repo = current["repository"]
     current_dir = root / args.existing_repo_dir
@@ -78,7 +66,6 @@ def main() -> int:
     if threshold_reached:
         next_shards = configured[active_index + 1 :]
         if not next_shards:
-            # No configured next shard: hard stop rather than risking overage.
             raise SystemExit(
                 f"ERROR: active storage shard {current_repo} is at/above the safe threshold "
                 f"({used_gb:.3f} GB >= {threshold:.3f} GB) and no configured next repository exists; refusing acquisition."
