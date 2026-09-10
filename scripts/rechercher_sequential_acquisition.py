@@ -79,8 +79,26 @@ def load_catalog(root):
     for path in sorted((root / "books-batches").glob("**/catalog.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         for book in data.get("books", []):
-            if isinstance(book, dict):
-                books.setdefault(book_key(book), book)
+            if not isinstance(book, dict):
+                continue
+            key = book_key(book)
+            if key not in books:
+                books[key] = dict(book)
+                continue
+            # Multiple catalog overlays may describe the same book. Do not let
+            # a sparse overlay shadow acquisition-critical fields from a richer
+            # catalog (e.g. expected_volumes, sources, edition).
+            merged = books[key]
+            for field, value in book.items():
+                if field not in merged or merged.get(field) in (None, "", [], {}):
+                    merged[field] = value
+            if isinstance(merged.get("sources"), list) and isinstance(book.get("sources"), list):
+                seen = {json.dumps(x, ensure_ascii=False, sort_keys=True) for x in merged["sources"]}
+                for value in book["sources"]:
+                    marker = json.dumps(value, ensure_ascii=False, sort_keys=True)
+                    if marker not in seen:
+                        merged["sources"].append(value)
+                        seen.add(marker)
     return sorted(books.values(), key=chronology_rank)
 
 
@@ -178,7 +196,6 @@ def main():
         outcome = by_id.get(str(book.get("id")))
         if outcome:
             rec["last_result"] = outcome.get("status")
-            # Preserve detailed source attempts when the worker reports them.
             attempts = outcome.get("attempts")
             if isinstance(attempts, list):
                 for attempt in attempts:
