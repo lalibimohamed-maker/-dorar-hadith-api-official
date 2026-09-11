@@ -1,0 +1,49 @@
+{
+  "schema": "din-allah/rechercher-master-catalog/v1",
+  "catalog_id": "encyclopedia-unbounded-chronological",
+  "policy": "unbounded chronological acquisition from the Prophetic era through the present and future additions; there is no finite book-count target and no TOTAL-based stopping condition",
+  "chronology": {
+    "start": "Prophetic era / Quran / Seerah",
+    "sequence": ["Prophetic era", "Companions", "Followers", "early Islamic generations", "1-400 AH", "401-800 AH", "801-1200 AH", "1201 AH onward", "modern era", "future additions"],
+    "primary_key": "explicit Hijri chronology; author death Hijri is fallback; future additions remain ordered after known chronology"
+  },
+  "acquisition_contract": {
+    "sole_input": "books-batches/encyclopedia-master/catalog.json",
+    "real_pdf_only": true,
+    "rights_gate_required": true,
+    "provenance_required": true,
+    "identity_and_edition_verification_required": true,
+    "volume_completeness_required": true,
+    "sha256_required": true,
+    "global_duplicate_sha_quarantine": true,
+    "never_delete_verified_acquisitions": true,
+    "resume_from_persistent_state": true,
+    "legacy_salaf_queue_is_invalid": true
+  },
+  "discovery_sources": [
+    {"name":"Jamharah Sciences","role":"chronological bibliographic discovery"},
+    {"name":"OpenITI / KITAB","role":"author/work/version metadata and chronological discovery"},
+    {"name":"Waqfeya","role":"edition and PDF discovery; rights remain a separate gate"},
+    {"name":"Usul / Osoul","role":"Islamic-book bibliographic discovery"},
+    {"name":"Internet Archive","role":"real PDF candidate discovery and acquisition"},
+    {"name":"Open Library","role":"edition and Internet Archive identifier discovery"},
+    {"name":"Library of Congress","role":"bibliographic cross-check"},
+    {"name":"Google Books","role":"edition and availability cross-check"},
+    {"name":"Crossref","role":"bibliographic/DOI cross-check"},
+    {"name":"institutional manuscript catalogues","role":"manuscript-only witness discovery"}
+  ],
+  "local_seed_sources": [
+    {"path":"books-batches/encyclopedia-master/sources/salaf-seed-catalog.json","format":"catalog"},
+    {"path":"books-batches/encyclopedia-master/sources/master-discovery-additions-2026.json","format":"entries"},
+    {"path":"books-batches/encyclopedia-master/sources/worldwide-deep-research-wave-2026-09.json","format":"entries"}
+  ],
+  "rules": [
+    "Discovery records are not automatically downloadable books.",
+    "A work, edition, volume and downloadable PDF are separate evidence layers.",
+    "Rights-unknown records remain catalogued but cannot pass the public acquisition gate.",
+    "Lost, fragmentary, manuscript-only and attribution-disputed works remain catalogued with explicit status.",
+    "Acquisition engines must consume this master namespace only; no legacy catalog path may be used as an acquisition input.",
+    "The queue is a resume state, never a second catalog and never a source of truth.",
+    "Verified PDF objects and their immutable hashes are never deleted by catalog cleanup."
+  ]
+}
