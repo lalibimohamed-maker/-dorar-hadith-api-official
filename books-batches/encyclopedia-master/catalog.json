@@ -56,6 +56,20 @@
       "color_pages_must_not_be_desaturated_for_the_canonical_master": true,
       "original_master_must_be_preserved": true
     },
+    "content_fidelity": {
+      "enabled": true,
+      "canonical_master_must_not_alter_source_content": true,
+      "no_text_substitution": true,
+      "no_ocr_text_replacement_in_canonical_master": true,
+      "no_page_reordering": true,
+      "no_page_insertion_or_deletion": true,
+      "no_crop_or_margin_loss": true,
+      "no_color_loss_or_desaturation": true,
+      "no_silent_image_editing": true,
+      "no_silent_metadata_changes_that_change_bibliographic_identity": true,
+      "ocr_and_readability_derivatives_must_be_separate_from_original_master": true,
+      "content_integrity_verification_required": true
+    },
     "source_comparison": "compare every reachable candidate from A/B/C/D/... before selecting the canonical stored artifact",
     "provenance_preserved_for_all_candidates": true,
     "different_editions_are_not_deduplicated": true,
