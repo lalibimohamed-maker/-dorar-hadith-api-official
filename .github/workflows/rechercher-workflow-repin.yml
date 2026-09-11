@@ -1,0 +1,10 @@
+name: Rechercher workflow repin validation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'Validation workflow for repin change.'
