@@ -679,7 +679,44 @@
       "discovery_registries": [
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
+      "candidates": [
+        {
+          "source": "global:wikisource",
+          "url": "https://upload.wikimedia.org/wikisource/ar/d/d1/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%A3%D8%B0%D9%83%D9%8A%D8%A7%D8%A1.pdf?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 1143026,
+          "sha256": "f231bc60cc0fdef7802a56560231cb90649ab655611052e0489e018cb55d62f6",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-ابن-ابي-ذيب--0d540f75cd23--7ba5b3ba9267d4f05fdf.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.75,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:wikisource",
+          "url": "https://upload.wikimedia.org/wikisource/ar/f/fa/%D9%85%D8%AC%D9%85%D9%88%D8%B9%D8%A9_%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D8%A6%D9%84_%D8%A7%D9%84%D9%85%D9%86%D9%8A%D8%B1%D9%8A%D8%A9.pdf?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 23654152,
+          "sha256": "c39967a8eee950819aca50ae10dafc5895377bebd97c21adb541df55fca34134",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-ابن-ابي-ذيب--0d540f75cd23--b9a728a547d3ec723e32.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
+        }
+      ],
       "availability": "not-acquired",
       "acquisition_state": "global-search-no-match",
       "acquired": [],
@@ -715,7 +752,18 @@
       "discovery_registries": [
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
+      "candidates": [
+        {
+          "source": "global:wikimedia_commons",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests (f061ab2)"
+        },
+        {
+          "source": "global:wikisource",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests (f061ab2)"
+        }
+      ],
       "availability": "not-acquired",
       "acquisition_state": "global-search-no-match",
       "acquired": [],
@@ -735,7 +783,18 @@
         "books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json",
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
+      "candidates": [
+        {
+          "source": "global:wikimedia_commons",
+          "status": "source_error",
+          "error": "HTTP Error 429: Your request does not comply with our robot policy, https://w.wiki/4wJS. Please contact noc@wikimedia.org for further information (0fa5166)"
+        },
+        {
+          "source": "global:wikisource",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+        }
+      ],
       "availability": "not-acquired",
       "acquisition_state": "global-search-no-match",
       "acquired": [],
@@ -2747,6 +2806,41 @@
             "required_author_score": 0.5
           },
           "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia601804.us.archive.org/20/items/1_20200623_20200623_0556/%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A7%D9%84%D8%A2%D8%AB%D8%A7%D8%B1%20%282%29.pdf",
+          "bytes": 9270657,
+          "sha256": "9fb7c874933e1b9a0710e46ecf1e9aef6c1413abfd08473ba18cb8fe099089ce",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الاثار--2f1146e3762b--c7d042e4e56a82534fac.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia802909.us.archive.org/27/items/athar_alshibany/athar_alshibany.pdf",
+          "bytes": 14151764,
+          "sha256": "477ac93bd4b2d1a81390daf3664ce4e0d922ea2550a3499f51b5388ef7a89e38",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الاثار--2f1146e3762b--38f6826d3cf8951699dd.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/الاثار--2f1146e3762b--38f6826d3cf8951699dd.pdf"
         }
       ],
       "availability": "copy-acquired",
@@ -2789,6 +2883,23 @@
         {
           "source": "global:internet_archive",
           "url": "https://ia902909.us.archive.org/27/items/athar_alshibany/athar_alshibany.pdf",
+          "bytes": 14151764,
+          "sha256": "477ac93bd4b2d1a81390daf3664ce4e0d922ea2550a3499f51b5388ef7a89e38",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الاثار--2f1146e3762b--38f6826d3cf8951699dd.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/الاثار--2f1146e3762b--38f6826d3cf8951699dd.pdf"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia802909.us.archive.org/27/items/athar_alshibany/athar_alshibany.pdf",
           "bytes": 14151764,
           "sha256": "477ac93bd4b2d1a81390daf3664ce4e0d922ea2550a3499f51b5388ef7a89e38",
           "validation": {
@@ -3722,6 +3833,23 @@
           },
           "status": "acquired_for_review",
           "local_path": "artifacts/developer-review-vault/الكسب--9f55cd1f42bf--2035b151964cd72c599d.pdf"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia601902.us.archive.org/30/items/20200622_20200622_1632/%D8%A7%D9%84%D9%83%D8%B3%D8%A8%20%D9%84%D9%84%D8%A7%D9%85%D8%A7%D9%85%20%D9%85%D8%AD%D9%85%D8%AF%20%D8%A8%D9%86%20%D8%A7%D9%84%D8%AD%D8%B3%D9%86%20%D8%A7%D9%84%D8%B4%D9%8A%D8%A8%D8%A7%D9%86%D9%8A.pdf",
+          "bytes": 6812615,
+          "sha256": "d81837d25eb6167eef52cb5e16069a7f8bb63573803d4e5d200f905ebeff5c35",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الكسب--9f55cd1f42bf--2035b151964cd72c599d.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/الكسب--9f55cd1f42bf--2035b151964cd72c599d.pdf"
         }
       ],
       "availability": "copy-acquired",
@@ -3764,6 +3892,23 @@
         {
           "source": "global:internet_archive",
           "url": "https://ia801902.us.archive.org/30/items/20200622_20200622_1632/%D8%A7%D9%84%D9%83%D8%B3%D8%A8%20%D9%84%D9%84%D8%A7%D9%85%D8%A7%D9%85%20%D9%85%D8%AD%D9%85%D8%AF%20%D8%A8%D9%86%20%D8%A7%D9%84%D8%AD%D8%B3%D9%86%20%D8%A7%D9%84%D8%B4%D9%8A%D8%A8%D8%A7%D9%86%D9%8A.pdf",
+          "bytes": 6812615,
+          "sha256": "d81837d25eb6167eef52cb5e16069a7f8bb63573803d4e5d200f905ebeff5c35",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الكسب--9f55cd1f42bf--2035b151964cd72c599d.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/الكسب--9f55cd1f42bf--2035b151964cd72c599d.pdf"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia601902.us.archive.org/30/items/20200622_20200622_1632/%D8%A7%D9%84%D9%83%D8%B3%D8%A8%20%D9%84%D9%84%D8%A7%D9%85%D8%A7%D9%85%20%D9%85%D8%AD%D9%85%D8%AF%20%D8%A8%D9%86%20%D8%A7%D9%84%D8%AD%D8%B3%D9%86%20%D8%A7%D9%84%D8%B4%D9%8A%D8%A8%D8%A7%D9%86%D9%8A.pdf",
           "bytes": 6812615,
           "sha256": "d81837d25eb6167eef52cb5e16069a7f8bb63573803d4e5d200f905ebeff5c35",
           "validation": {
@@ -4038,6 +4183,12 @@
           "source": "global:wikimedia_commons",
           "status": "source_error",
           "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://archive.org/download/20200131_20200131_0800/%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A7%D9%84%D8%B2%D9%87%D8%AF.pdf",
+          "status": "download_error",
+          "error": "HTTP Error 500: Internal Server Error"
         }
       ],
       "availability": "copy-acquired",
@@ -4351,6 +4502,12 @@
             "required_author_score": 0.5
           },
           "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://archive.org/download/BBib-Alex-16526/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%AE%D8%B1%D8%A7%D8%AC_16526_%D9%8A%D8%AD%D9%8A%D9%89_%D8%A8%D9%86_%D8%A2%D8%AF%D9%85_%D8%A7%D9%84%D9%82%D8%B1%D8%B4%D9%89.pdf",
+          "status": "download_error",
+          "error": "HTTP Error 500: Internal Server Error"
         }
       ],
       "availability": "not-acquired",
@@ -5922,6 +6079,23 @@
             "required_author_score": 0.5
           },
           "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://dn721802.ca.archive.org/0/items/Tabaqat0108/Tabaqat0108.pdf",
+          "bytes": 1789256,
+          "sha256": "b5984b5aa365b06588656b68c931e76d39eb898512dcc5f60f1e95e8bad47998",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الطبقات-الكبرى--6a76180e74a2--8ded2624dedb7b7127fd.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/الطبقات-الكبرى--6a76180e74a2--8ded2624dedb7b7127fd.pdf"
         }
       ],
       "availability": "copy-acquired",
@@ -5977,6 +6151,23 @@
           },
           "status": "acquired_for_review",
           "local_path": "artifacts/developer-review-vault/الطبقات-الكبرى--6a76180e74a2--f09d33fe8680ceded190.pdf"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://dn721802.ca.archive.org/0/items/Tabaqat0108/Tabaqat0108.pdf",
+          "bytes": 1789256,
+          "sha256": "b5984b5aa365b06588656b68c931e76d39eb898512dcc5f60f1e95e8bad47998",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الطبقات-الكبرى--6a76180e74a2--8ded2624dedb7b7127fd.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/الطبقات-الكبرى--6a76180e74a2--8ded2624dedb7b7127fd.pdf"
         }
       ],
       "acquired_count": 1,
@@ -6705,6 +6896,24 @@
           "validation": {
             "ok": true,
             "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المصنف--b4cb6529fe3c--1b9f6896f0d4b0bb41aa.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia801502.us.archive.org/8/items/AAlexandrina-070234/070234_%D8%A7%D9%84%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D9%85%D8%B5%D9%86%D9%81_%D9%81%D9%89_%D8%A7%D9%84%D8%A7%D8%AD%D8%A7%D8%AF%D9%8A%D8%AB_%D9%88%D8%A7%D9%84%D8%A7%D8%AB%D8%A7%D8%B1.pdf",
+          "bytes": 51301960,
+          "sha256": "baeca9f9d1a0b1c7382c78adb2f27a0d123ff16fc8c730290d61d1cdd54eda33",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المصنف--b4cb6529fe3c--b1828ba2f37a929dd590.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
           },
           "identity": {
             "reason": "book_identity_mismatch",
@@ -8269,6 +8478,24 @@
           "validation": {
             "ok": true,
             "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/التاريخ-الكبير--d7fb1ffa4750--ac5e1b3cfc73a51d339a.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia803104.us.archive.org/7/items/978-603-02-8609-6/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%AA%D8%A7%D8%B1%D9%8A%D8%AE_%D8%A7%D9%84%D9%83%D8%A8%D9%8A%D8%B1_%D9%84%D9%84%D8%A8%D8%AE%D8%A7%D8%B1%D9%8A_pdf_12.pdf",
+          "bytes": 19634519,
+          "sha256": "0f269451e1ff338a9b193a82fbe3541c05ae3133c9b1cfeca94accf052d6a47a",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/التاريخ-الكبير--d7fb1ffa4750--d236409a81225daf77bd.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
           },
           "identity": {
             "reason": "book_identity_mismatch",
@@ -11510,6 +11737,24 @@
           "validation": {
             "ok": true,
             "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنة--59e74f098568--dcf1148b56984bc7cd61.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia601504.us.archive.org/14/items/1_20260304_20260304_1300/%D8%A7%D9%84%D8%B3%D9%86%D8%A9%20%D9%84%D9%84%D8%AE%D9%84%D8%A7%D9%84%20-%20%D8%AC1.pdf",
+          "bytes": 20140720,
+          "sha256": "09b665ac6b716aca4bc8764d2b7e40a26661f78d87c3e72163f7c36093abe949",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/السنة--59e74f098568--3053419a2670efa1cdf8.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
           },
           "identity": {
             "reason": "book_identity_mismatch",
@@ -14806,6 +15051,12 @@
             "required_author_score": 0.5
           },
           "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://archive.org/download/20260106_20260106_0816/%E2%80%8F%E2%80%8F%D8%A3%D8%AE%D9%84%D8%A7%D9%82%20%D8%A7%D9%84%D8%B9%D9%84%D9%85%D8%A7%D8%A1.pdf",
+          "status": "download_error",
+          "error": "HTTP Error 500: Internal Server Error"
         }
       ],
       "availability": "not-acquired",
@@ -15561,6 +15812,24 @@
           "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Mukhtalif_al-sh%C4%AB%CA%BBah_f%C4%AB_a%E1%B8%A5k%C4%81m_al-shar%C4%AB%27ah_%28IA_McGillLibrary-rbsc_islam-ms-isl-0019-18030%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
           "status": "download_error",
           "error": "HTTP Error 429: Too many requests (f061ab2)"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia600702.us.archive.org/21/items/3_20260306_20260306_2119/%D8%A7%D9%84%D8%B4%D8%B1%D9%8A%D8%B9%D8%A9%20%D9%84%D9%84%D8%A2%D8%AC%D8%B1%D9%8A%20-%20%D8%AC2%20%D9%85%D9%84%D9%88%D9%86.pdf",
+          "bytes": 82037898,
+          "sha256": "12aad7516ee8d27eb1def4d55502d2a8e67dfcf8b686466af7a7e1dc430672b5",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الشريعة--4bd4efb0e687--c17b187199f9dc61393a.pdf\nPDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
         }
       ],
       "availability": "not-acquired",
@@ -15737,6 +16006,24 @@
           "validation": {
             "ok": true,
             "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المعجم-الصغير--60841c2d96a9--5571aea4f3df81a5299d.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia600606.us.archive.org/15/items/AAlexandrina-408249/408249%20-%20%D8%A7%D9%84%D9%85%D8%B9%D8%AC%D9%85%20%D8%A7%D9%84%D8%B5%D8%BA%D9%8A%D8%B1%20%D9%84%D9%84%D8%B7%D8%A8%D8%B1%D8%A7%D9%86%D9%89.pdf",
+          "bytes": 45615897,
+          "sha256": "4508f290405417d793c768bf0adc2f9709b59fcfd2070d8a10fb72fceb70dcf8",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المعجم-الصغير--60841c2d96a9--8a50c404bc17dc726d83.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
           },
           "identity": {
             "reason": "book_identity_mismatch",
@@ -16838,6 +17125,12 @@
             "required_author_score": 0.5
           },
           "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://archive.org/download/BBib-Alex-03706/%D8%AA%D9%87%D8%B0%D9%8A%D8%A8_%D8%A7%D9%84%D9%84%D8%BA%D8%A9_%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_07_03706_%D8%A3%D8%A8%D9%8A_%D9%85%D9%86%D8%B5%D9%88%D8%B1_%D9%85%D8%AD%D9%85%D8%AF_%D8%A8%D9%86_%D8%A3%D8%AD%D9%85%D8%AF_%D8%A7%D9%84%D8%A3%D8%B2%D9%87%D8%B1%D9%8A.pdf",
+          "status": "download_error",
+          "error": "HTTP Error 500: Internal Server Error"
         }
       ],
       "availability": "not-acquired",
@@ -18561,9 +18854,9 @@
   ],
   "counts": {
     "books": 247,
-    "acquired_books": 29,
-    "acquired_files": 29,
-    "global_search_no_match": 218,
-    "identity_rejections": 204
+    "acquired_books": 25,
+    "acquired_files": 25,
+    "global_search_no_match": 222,
+    "identity_rejections": 188
   }
 }
