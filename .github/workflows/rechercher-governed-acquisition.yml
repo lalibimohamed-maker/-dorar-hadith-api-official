@@ -75,7 +75,11 @@ jobs:
           test -n "$SECONDARY_STORAGE_TOKEN"
           cat > "$RUNNER_TEMP/rechercher-askpass" <<'SH'
           #!/bin/sh
-          printf '%s\n' "$SECONDARY_STORAGE_TOKEN"
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
+          esac
           SH
           chmod 700 "$RUNNER_TEMP/rechercher-askpass"
           export GIT_ASKPASS="$RUNNER_TEMP/rechercher-askpass" GIT_TERMINAL_PROMPT=0
@@ -168,8 +172,6 @@ jobs:
                       raise SystemExit(f'not a real PDF: {path}')
                   files.append((pool, path, sha256(path)))
 
-          # First deduplicate by content. If the same SHA exists more than once,
-          # retain exactly one physical file; SHA is never used as a storage path.
           groups = {}
           for item in files:
               groups.setdefault(item[2], []).append(item)
@@ -207,14 +209,11 @@ jobs:
                       current_path = destination
                       current_pool = assigned
 
-              # Resolve filename collisions between different PDF contents without
-              # failing the acquisition. The original filename remains when unique.
               if current_pool == assigned:
                   siblings = [p for p in destination_root.glob(f'{current_path.stem}.pdf') if p != current_path]
                   if siblings:
                       raise SystemExit(f'unexpected storage collision after canonicalization: {current_path}')
 
-          # A final content census is the authoritative invariant.
           seen = {}
           for pool, root in (('primary', primary), ('secondary', secondary)):
               for path in sorted(root.glob('*.pdf')):
@@ -231,11 +230,23 @@ jobs:
       - name: Persist verified PDFs to primary LFS storage
         env:
           TARGET_BRANCH: ${{ inputs.target_branch }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          cat > "$RUNNER_TEMP/rechercher-primary-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$GITHUB_TOKEN" ;;
+            *) printf '%s\n' "$GITHUB_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/rechercher-primary-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-primary-askpass" GIT_TERMINAL_PROMPT=0
           git lfs track 'artifacts/*.pdf'
           git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add books-batches scripts .gitattributes artifacts/governance
+          git reset -- ':(glob)scripts/**/__pycache__/**' ':(glob)scripts/**/*.py[cod]' 2>/dev/null || true
           while IFS= read -r -d '' f; do git add -- "$f"; done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
           if ! git diff --cached --quiet; then
             git commit -m 'data(rechercher): persist chronological acquisition state and primary PDFs'
@@ -245,12 +256,26 @@ jobs:
           fi
 
       - name: Persist verified PDFs to secondary LFS storage
+        env:
+          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
         run: |
           set -euo pipefail
+          test -n "$SECONDARY_STORAGE_TOKEN"
           cd .secondary-storage
+          cat > "$RUNNER_TEMP/rechercher-secondary-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/rechercher-secondary-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-secondary-askpass" GIT_TERMINAL_PROMPT=0
           git lfs track 'artifacts/*.pdf'
           git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add .gitattributes
+          git reset -- ':(glob)**/__pycache__/**' ':(glob)**/*.py[cod]' 2>/dev/null || true
           while IFS= read -r -d '' f; do git add -- "$f"; done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
           if ! git diff --cached --quiet; then
             git commit -m 'data(rechercher): persist secondary chronological PDF shard'
