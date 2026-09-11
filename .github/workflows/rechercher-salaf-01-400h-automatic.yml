@@ -5,9 +5,8 @@ on:
   schedule:
     - cron: '*/5 * * * *'
 
-# security-justification: contents: write is required only to invoke the
-# acquire-first workflow, which persists encrypted review-vault evidence;
-# the caller itself never publishes unverified content.
+# security-justification: contents: write is required by the governed reusable
+# acquisition workflow to persist only verified PDFs and resumable governance state.
 permissions:
   contents: write
 
@@ -18,8 +17,10 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-acquire-first-reusable.yml@e25326c18e393a033923e4c76cc3f43f396c0cb8
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@7f78d14f8f74f55b80b1f0c41b493bc564445be1 # governed acquisition workflow
+    with:
+      target_branch: rechercher/encyclopedia-master-unbounded-acquisition
     secrets:
-      REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
     permissions:
       contents: write

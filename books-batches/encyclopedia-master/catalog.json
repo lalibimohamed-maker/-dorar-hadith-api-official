@@ -1,0 +1,79 @@
+{
+  "schema": "din-allah/rechercher-master-catalog/v2",
+  "catalog_id": "encyclopedia-unbounded-chronological",
+  "policy": "unbounded chronological acquisition from the Prophetic era through present and future additions; no finite book-count target",
+  "books": [],
+  "chronology": {
+    "start": "Prophetic era / Quran / Seerah",
+    "sequence": ["Prophetic era", "Companions", "Followers", "early Islamic generations", "Hijri chronology", "present day", "future additions"],
+    "primary_key": "explicit chronology; author death Hijri fallback; future additions remain after present material"
+  },
+  "discovery_sources": [
+    "Jamharah Sciences",
+    "OpenITI / KITAB",
+    "Waqfeya",
+    "Usul / Osoul",
+    "Internet Archive",
+    "Open Library",
+    "Library of Congress",
+    "Google Books",
+    "Crossref",
+    "institutional manuscript catalogues"
+  ],
+  "historical_recovery": {
+    "commit": "ef5dc22c8c677e88cb26b3937a7c1fb9563164c7",
+    "sources": [
+      "books-batches/salaf-01-400h/catalog.json",
+      "books-batches/salaf-01-400h/master-discovery-additions-2026.json",
+      "books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json"
+    ],
+    "note": "These are immutable historical recovery references only; the legacy files are no longer acquisition inputs."
+  },
+  "future_source_directory": "books-batches/encyclopedia-master/sources/",
+  "acquisition_contract": {
+    "real_pdf_only": true,
+    "rights_gate_required": true,
+    "provenance_required": true,
+    "edition_identity_required": true,
+    "volume_completeness_required": true,
+    "all_expected_volumes_must_be_acquired": true,
+    "volume_count_must_be_evidence_backed": true,
+    "sha256_required": true,
+    "duplicate_binary_policy": "one_stored_binary_per_identical_sha256",
+    "canonical_copy_selection": "select_best_verified_complete_candidate_across_all_catalogued_sources",
+    "quality_selection": {
+      "enabled": true,
+      "priority": [
+        "complete_work_and_all_expected_volumes",
+        "valid_real_pdf",
+        "highest_image_quality_and_resolution",
+        "clear_text_and_high_text_layer_quality",
+        "clean_readable_background",
+        "preserve_original_color_pages_and_color_information",
+        "uncropped_pages_and_margins",
+        "page_count_and_file_integrity"
+      ],
+      "color_pages_must_not_be_desaturated_for_the_canonical_master": true,
+      "original_master_must_be_preserved": true
+    },
+    "content_fidelity": {
+      "enabled": true,
+      "canonical_master_must_not_alter_source_content": true,
+      "no_text_substitution": true,
+      "no_ocr_text_replacement_in_canonical_master": true,
+      "no_page_reordering": true,
+      "no_page_insertion_or_deletion": true,
+      "no_crop_or_margin_loss": true,
+      "no_color_loss_or_desaturation": true,
+      "no_silent_image_editing": true,
+      "no_silent_metadata_changes_that_change_bibliographic_identity": true,
+      "ocr_and_readability_derivatives_must_be_separate_from_original_master": true,
+      "content_integrity_verification_required": true
+    },
+    "source_comparison": "compare every reachable candidate from A/B/C/D/... before selecting the canonical stored artifact",
+    "provenance_preserved_for_all_candidates": true,
+    "different_editions_are_not_deduplicated": true,
+    "verified_pdfs_are_never_deleted": true,
+    "queue_is_state_not_catalog": true
+  }
+}
