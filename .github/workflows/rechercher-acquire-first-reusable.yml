@@ -159,6 +159,34 @@ jobs:
           incoming=json.loads(subprocess.check_output(['git','show',f'{sys.argv[1]}:{path}'],text=True))
           try: existing=json.loads(subprocess.check_output(['git','show',f'HEAD:{path}'],text=True))
           except subprocess.CalledProcessError: existing=None
+
+          def quarantine_cross_book_duplicates(data):
+              owners={}
+              for rec in data.get('records',[]):
+                  rid=str(rec.get('id') or '')
+                  for item in rec.get('acquired',[]) or []:
+                      digest=item.get('sha256')
+                      if digest: owners.setdefault(digest,set()).add(rid)
+              for rec in data.get('records',[]):
+                  rid=str(rec.get('id') or '')
+                  kept=[]; quarantined=list(rec.get('quarantined_acquired',[]) or [])
+                  for item in rec.get('acquired',[]) or []:
+                      digest=item.get('sha256'); ids=owners.get(digest,set()) if digest else set()
+                      if digest and len(ids)>1:
+                          q=dict(item); q['quarantine_reason']='cross_book_sha256_collision'; q['quarantine_conflicts']=sorted(ids); quarantined.append(q)
+                      else:
+                          kept.append(item)
+                  if quarantined: rec['quarantined_acquired']=quarantined
+                  rec['acquired']=kept; rec['acquired_count']=len(kept)
+                  if quarantined and not kept: rec['availability']='quarantined'; rec['acquisition_state']='quarantined'
+              counts=data.setdefault('counts',{})
+              records=data.get('records',[])
+              counts['acquired_books']=sum(r.get('acquisition_state')=='acquired' for r in records)
+              counts['acquired_files']=sum(r.get('acquired_count',0) for r in records)
+              counts['quarantined_books']=sum(r.get('acquisition_state')=='quarantined' for r in records)
+              counts['quarantined_files']=sum(len(r.get('quarantined_acquired',[]) or []) for r in records)
+              return data
+
           if not existing:
               merged=incoming
           else:
@@ -169,19 +197,20 @@ jobs:
                   if rid not in old:
                       old[rid]=rec; continue
                   cur=old[rid]
-                  for key in ('discovery_registries','candidates','acquired'):
+                  for key in ('discovery_registries','candidates','acquired','quarantined_acquired'):
                       vals=[]
                       for src in (cur.get(key,[]),rec.get(key,[])):
                           for v in src:
                               if v not in vals: vals.append(v)
                       if vals: cur[key]=vals
                   if rec.get('acquired_count',0) > cur.get('acquired_count',0):
-                      cur.update({k:v for k,v in rec.items() if k not in ('discovery_registries','candidates','acquired')})
+                      cur.update({k:v for k,v in rec.items() if k not in ('discovery_registries','candidates','acquired','quarantined_acquired')})
               merged=dict(existing); merged['records']=list(old.values()); merged['counts']=incoming.get('counts',merged.get('counts',{}))
+          merged=quarantine_cross_book_duplicates(merged)
           Path(path).write_text(json.dumps(merged,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
           git add books-batches/salaf-01-400h/developer-review-manifest.json
-          git commit -m 'data(rechercher): reconcile safety-gated acquire-first manifest'
+          git commit -m 'data(rechercher): reconcile and quarantine legacy duplicate acquisitions'
           GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
           git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           echo "ACQUIRE_FIRST_PERSISTED=$ACQ_COMMIT"
