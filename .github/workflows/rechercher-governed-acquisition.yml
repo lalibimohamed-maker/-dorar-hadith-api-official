@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Checkout latest central catalogs from main
+      - name: Checkout latest governed engine and catalogs from main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: lalibimohamed-maker/-dorar-hadith-api-official
@@ -48,13 +48,23 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Synchronize whole-encyclopedia catalogs and chronology policy
+      - name: Synchronize whole-encyclopedia catalogs, engine and chronology policy
         run: |
           set -euo pipefail
           test -s .governance-source/config/rechercher-encyclopedia-catalog-registry.json
           test -s .governance-source/config/rechercher-central-sequential-scope.json
-          mkdir -p books-batches
+          mkdir -p books-batches scripts
           cp -a .governance-source/books-batches/. books-batches/
+          for script in \
+            rechercher_sequential_acquisition.py \
+            rechercher_acquisition_engine.py \
+            rechercher_pdf_storage_hygiene.py \
+            rechercher_pdf_quality_gate.py; do
+            test -s ".governance-source/scripts/$script"
+            cp -f ".governance-source/scripts/$script" "scripts/$script"
+          done
+          test ! -e scripts/rechercher_pdf_acquire.py || { echo 'legacy rechercher_pdf_acquire.py must not be present in governed execution state'; exit 1; }
+          test ! -e scripts/rechercher_waqfeya_acquire_original.py || { echo 'legacy rechercher_waqfeya_acquire_original.py must not be present in governed execution state'; exit 1; }
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -67,6 +77,7 @@ jobs:
               raise SystemExit('Central chronological acquisition scope is invalid.')
           print('CHRONOLOGY=', d['chronology'])
           print('FINITE_BOOK_COUNT_TARGETS=', d['finite_book_count_targets'])
+          print('ACQUISITION_ENGINE_SOURCE=governed-main')
           PY
 
       - name: Connect to secondary PDF pool for state discovery and cleanup
