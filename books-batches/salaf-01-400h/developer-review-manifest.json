@@ -1770,6 +1770,24 @@
           "source": "global:wikisource",
           "status": "source_error",
           "error": "HTTP Error 429: Too many requests (f061ab2)"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia800708.us.archive.org/17/items/al-jihad_abdullah_bin_al-mubarak/%D8%A7%D9%84%D8%AC%D9%87%D8%A7%D8%AF%20%D9%84%D9%84%D8%A5%D9%85%D8%A7%D9%85%20%D8%A7%D9%84%D8%AD%D8%A7%D9%81%D8%B8%20%D8%A7%D9%84%D9%85%D8%AC%D8%A7%D9%87%D8%AF%20%D8%B9%D8%A8%D8%AF%D8%A7%D9%84%D9%84%D9%87%20%D8%A8%D9%86%20%D8%A7%D9%84%D9%85%D8%A8%D8%A7%D8%B1%D9%83.pdf",
+          "bytes": 3348226,
+          "sha256": "d249a2231e7f291526b76ea5651e2404942709f3c65513d20a3bfdc290da06d4",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الجهاد--dbce39b81e7f--4e0a258c335fb35974d1.pdf\nPDF Version: 1.4\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 1.0,
+            "author_score": 0.333,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
         }
       ],
       "availability": "not-acquired",
@@ -1800,6 +1818,16 @@
           "source": "global:wikisource",
           "status": "source_error",
           "error": "HTTP Error 429: Too many requests (f061ab2)"
+        },
+        {
+          "source": "global:wikimedia_commons",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+        },
+        {
+          "source": "global:wikisource",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
         }
       ],
       "availability": "not-acquired",
@@ -1830,14 +1858,54 @@
           "source": "global:wikimedia_commons",
           "status": "source_error",
           "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+        },
+        {
+          "source": "global:wikisource",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+        },
+        {
+          "source": "global:wikisource",
+          "url": "https://upload.wikimedia.org/wikisource/ar/d/d1/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%A3%D8%B0%D9%83%D9%8A%D8%A7%D8%A1.pdf?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 1143026,
+          "sha256": "f231bc60cc0fdef7802a56560231cb90649ab655611052e0489e018cb55d62f6",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-ابن-المبارك--1e2066e32c7a--7ba5b3ba9267d4f05fdf.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/كتاب-ابن-المبارك--1e2066e32c7a--7ba5b3ba9267d4f05fdf.pdf"
         }
       ],
-      "availability": "not-acquired",
-      "acquisition_state": "global-search-no-match",
-      "acquired": [],
-      "acquired_count": 0,
+      "availability": "copy-acquired",
+      "acquisition_state": "acquired",
+      "acquired": [
+        {
+          "source": "global:wikisource",
+          "url": "https://upload.wikimedia.org/wikisource/ar/d/d1/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%A3%D8%B0%D9%83%D9%8A%D8%A7%D8%A1.pdf?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 1143026,
+          "sha256": "f231bc60cc0fdef7802a56560231cb90649ab655611052e0489e018cb55d62f6",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/كتاب-ابن-المبارك--1e2066e32c7a--7ba5b3ba9267d4f05fdf.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/كتاب-ابن-المبارك--1e2066e32c7a--7ba5b3ba9267d4f05fdf.pdf"
+        }
+      ],
+      "acquired_count": 1,
       "rejected_identity_count": 0,
-      "rights_action": "none"
+      "rights_action": "developer-vault-encrypt"
     },
     {
       "id": "مسند-ابن-المبارك--b4ff3800ac88",
@@ -1850,7 +1918,18 @@
       "discovery_registries": [
         "books-batches/salaf-01-400h/engine-source-overlay.json"
       ],
-      "candidates": [],
+      "candidates": [
+        {
+          "source": "global:wikimedia_commons",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+        },
+        {
+          "source": "global:wikisource",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+        }
+      ],
       "availability": "not-acquired",
       "acquisition_state": "global-search-no-match",
       "acquired": [],
@@ -4121,6 +4200,12 @@
             "required_author_score": 0.5
           },
           "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://archive.org/download/20200623_20200623_0552/%D8%A7%D9%84%D9%85%D8%AE%D8%A7%D8%B1%D8%AC%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%AD%D9%8A%D9%84%20%D9%84%D9%84%D8%B4%D9%8A%D8%A8%D8%A7%D9%86%D9%8A.pdf",
+          "status": "download_error",
+          "error": "HTTP Error 500: Internal Server Error"
         }
       ],
       "availability": "not-acquired",
@@ -5260,6 +5345,23 @@
           },
           "status": "acquired_for_review",
           "local_path": "artifacts/developer-review-vault/usul-al-sunnah-al-humaydi--0680c77533f3461acc49.pdf"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia800800.us.archive.org/35/items/talib-al-ilm-4fc7123c-38ce-43e1-a79a-6ab6bdb91c5e/talib-al-ilm-4fc7123c-38ce-43e1-a79a-6ab6bdb91c5e.pdf",
+          "bytes": 921400,
+          "sha256": "0b14499f3ba8b801cb3b1280decb7c366bf0510a7339b3c8052f7079c3f099dd",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/usul-al-sunnah-al-humaydi--0680c77533f3461acc49.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/usul-al-sunnah-al-humaydi--0680c77533f3461acc49.pdf"
         }
       ],
       "availability": "copy-acquired",
@@ -5268,6 +5370,23 @@
         {
           "source": "global:internet_archive",
           "url": "https://dn721906.ca.archive.org/0/items/talib-al-ilm-4fc7123c-38ce-43e1-a79a-6ab6bdb91c5e/talib-al-ilm-4fc7123c-38ce-43e1-a79a-6ab6bdb91c5e.pdf",
+          "bytes": 921400,
+          "sha256": "0b14499f3ba8b801cb3b1280decb7c366bf0510a7339b3c8052f7079c3f099dd",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/usul-al-sunnah-al-humaydi--0680c77533f3461acc49.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "title_score": 1.0,
+            "author_score": 1.0,
+            "signals": "url_or_pdf_metadata_or_first_pages"
+          },
+          "status": "acquired_for_review",
+          "local_path": "artifacts/developer-review-vault/usul-al-sunnah-al-humaydi--0680c77533f3461acc49.pdf"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia800800.us.archive.org/35/items/talib-al-ilm-4fc7123c-38ce-43e1-a79a-6ab6bdb91c5e/talib-al-ilm-4fc7123c-38ce-43e1-a79a-6ab6bdb91c5e.pdf",
           "bytes": 921400,
           "sha256": "0b14499f3ba8b801cb3b1280decb7c366bf0510a7339b3c8052f7079c3f099dd",
           "validation": {
@@ -7197,6 +7316,24 @@
           "validation": {
             "ok": true,
             "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المصنف--b4cb6529fe3c--e17706e51b1fe7735a7f.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia600608.us.archive.org/17/items/AAlexandrina-127755/127755_%D8%A7%D9%84%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D9%85%D8%B5%D9%86%D9%81_%D9%81%D9%89_%D8%A7%D9%84%D8%A7%D8%AD%D8%A7%D8%AF%D9%8A%D8%AB_%D9%88%D8%A7%D9%84%D8%A7%D8%AB%D8%A7%D8%B1.pdf",
+          "bytes": 28649484,
+          "sha256": "20b7cb36dd50f74e61cc2335abb87e35db5e40864bd5131d48204cf27af4f23b",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/المصنف--b4cb6529fe3c--deaa9deb653923cbcd84.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
           },
           "identity": {
             "reason": "book_identity_mismatch",
@@ -15890,6 +16027,17 @@
             "required_author_score": 0.5
           },
           "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia800401.us.archive.org/18/items/1_20240818_20240818_0227/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B1%D9%8A%D8%B9%D8%A9_%D9%84%D9%84%D8%A2%D8%AC%D8%B1%D9%8A%D9%A3_%D8%AA_%D8%B9%D8%A7%D8%AF%D9%84_%D8%A2%D9%84_%D8%AD%D9%85%D8%AF%D8%A7%D9%86.pdf",
+          "bytes": 12435032,
+          "sha256": "c3d8a731f84f81d2fef43162be3a6edeb7fac35b6d6d3446710c6a7a5a4dd216",
+          "validation": {
+            "ok": false,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الشريعة--fb30e366c56c--bf5ed0011a1d82e89384.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is linearized\nWARNING: /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/الشريعة--fb30e366c56c--bf5ed0011a1d82e89384.pdf: incorrect offset in outlines table: hint table = 12400648; computed = 12398678\nqpdf: operation succeeded with warnings"
+          },
+          "status": "invalid_pdf"
         }
       ],
       "availability": "not-acquired",
@@ -17793,6 +17941,24 @@
             "required_author_score": 0.5
           },
           "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia801504.us.archive.org/27/items/BBib-Alex-03701/%D8%AA%D9%87%D8%B0%D9%8A%D8%A8_%D8%A7%D9%84%D9%84%D8%BA%D8%A9_%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_08_03701_%D8%A3%D8%A8%D9%8A_%D9%85%D9%86%D8%B5%D9%88%D8%B1_%D9%85%D8%AD%D9%85%D8%AF_%D8%A8%D9%86_%D8%A3%D8%AD%D9%85%D8%AF_%D8%A7%D9%84%D8%A3%D8%B2%D9%87%D8%B1%D9%8A.pdf",
+          "bytes": 13709877,
+          "sha256": "61a5258dd2e49c0c6144656706e7c15d59ead2f7a4c147b4ca2345c04d1499a7",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/tahdhib-lugha-azhari--5163eca28b01e73b08ff.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
         }
       ],
       "availability": "not-acquired",
@@ -18186,6 +18352,24 @@
           "validation": {
             "ok": true,
             "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تصحيفات-المحدثين--d822a4268ca3--a07b3705845ac84dbf93.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia800804.us.archive.org/19/items/AAlexandrina-139413/139413%20-%20%D8%AA%D8%B5%D8%AD%D9%8A%D9%81%D8%A7%D8%AA%20%D8%A7%D9%84%D9%85%D8%AD%D8%AF%D8%AB%D9%8A%D9%86.pdf",
+          "bytes": 18967201,
+          "sha256": "1c0fd0713dc3df08c5fc9b9c8abb49408fb80795d8694190a34f324a8aaa6974",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/تصحيفات-المحدثين--d822a4268ca3--f4c27a9ac6e3a9e6ec6c.pdf\nPDF Version: 1.3\nFile is not encrypted\nFile is linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
           },
           "identity": {
             "reason": "book_identity_mismatch",
@@ -19280,6 +19464,24 @@
           "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/%D8%B3%D9%84%D8%B3%D9%84%D8%A9_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_-_23_-_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_%D9%81%D9%8A_%D8%A3%D8%AD%D8%A7%D8%AF%D9%8A%D8%AB_%D9%84%D8%B9%D9%86_%D8%A7%D9%84%D9%86%D8%A8%D9%8A_%D8%A7%D9%84%D9%85%D8%AA%D8%A8%D8%B1%D8%AC%D8%A7%D8%AA_%D9%85%D9%86_%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A1_%D9%88%D9%85%D8%A7_%D9%81%D9%8A_%D9%85%D8%B9%D9%86%D8%A7%D9%87_%D8%8C_%D9%88%D9%85%D8%A7_%D8%AA%D8%A8%D8%B9%D9%87%D8%A7_%D9%85%D9%86_%D8%A3%D9%82%D8%A7%D9%88%D9%8A%D9%84_-_200_%D8%AD%D8%AF%D9%8A%D8%AB.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
           "status": "download_error",
           "error": "HTTP Error 429: Too many requests (76af2b0)"
+        },
+        {
+          "source": "global:wikisource",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/%D8%B3%D9%84%D8%B3%D9%84%D8%A9_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_-_23_-_%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84_%D9%81%D9%8A_%D8%A3%D8%AD%D8%A7%D8%AF%D9%8A%D8%AB_%D9%84%D8%B9%D9%86_%D8%A7%D9%84%D9%86%D8%A8%D9%8A_%D8%A7%D9%84%D9%85%D8%AA%D8%A8%D8%B1%D8%AC%D8%A7%D8%AA_%D9%85%D9%86_%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A1_%D9%88%D9%85%D8%A7_%D9%81%D9%8A_%D9%85%D8%B9%D9%86%D8%A7%D9%87_%D8%8C_%D9%88%D9%85%D8%A7_%D8%AA%D8%A8%D8%B9%D9%87%D8%A7_%D9%85%D9%86_%D8%A3%D9%82%D8%A7%D9%88%D9%8A%D9%84_-_200_%D8%AD%D8%AF%D9%8A%D8%AB.pdf?utm_source=ar.wikisource.org&utm_campaign=imageinfo&utm_content=original",
+          "bytes": 753056,
+          "sha256": "893851aa87897ac9907a045246f50c39f6a0722565a3f6422226df7c3bcddca9",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/معرفة-الصحابة--ad57d7c5bbcd--0beaa14f2fe5d65c85d7.pdf\nPDF Version: 1.5\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.5,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
         }
       ],
       "availability": "not-acquired",
@@ -19492,6 +19694,24 @@
             "required_author_score": 0.5
           },
           "status": "book_identity_mismatch"
+        },
+        {
+          "source": "global:internet_archive",
+          "url": "https://ia800104.us.archive.org/16/items/Usul_al_sunnah_ibn_abi_zamanin/%D8%A3%D8%B5%D9%88%D9%84%20%D8%A7%D9%84%D8%B3%D9%86%D8%A9%20%D9%84%D8%A7%D8%A8%D9%86%20%D8%A3%D8%A8%D9%8A%20%D8%B2%D9%85%D9%86%D9%8A%D9%86%202.pdf",
+          "bytes": 21395610,
+          "sha256": "8c6b07fe037fcf44ec39694cb20deeda606504993ba27b0bb69ba61ad0e594d1",
+          "validation": {
+            "ok": true,
+            "output": "checking /home/runner/work/-dorar-hadith-api-official/-dorar-hadith-api-official/artifacts/developer-review-vault/اصول-السنة--41aabfe8528a--af2cf4b04b7fe43739a5.pdf\nPDF Version: 1.6\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect"
+          },
+          "identity": {
+            "reason": "book_identity_mismatch",
+            "title_score": 0.0,
+            "author_score": 0.0,
+            "required_title_score": 0.6,
+            "required_author_score": 0.5
+          },
+          "status": "book_identity_mismatch"
         }
       ],
       "availability": "not-acquired",
@@ -19552,6 +19772,16 @@
           "source": "global:wikisource",
           "status": "source_error",
           "error": "HTTP Error 429: Too many requests (f061ab2)"
+        },
+        {
+          "source": "global:wikimedia_commons",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+        },
+        {
+          "source": "global:wikisource",
+          "status": "source_error",
+          "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
         }
       ],
       "availability": "not-acquired",
@@ -19581,9 +19811,9 @@
   ],
   "counts": {
     "books": 247,
-    "acquired_books": 28,
-    "acquired_files": 28,
-    "global_search_no_match": 219,
+    "acquired_books": 29,
+    "acquired_files": 29,
+    "global_search_no_match": 218,
     "identity_rejections": 201
   }
 }
