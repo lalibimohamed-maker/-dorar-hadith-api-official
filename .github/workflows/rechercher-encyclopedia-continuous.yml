@@ -20,7 +20,7 @@ concurrency:
 jobs:
   acquire:
     name: Resume chronological acquisition
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@53c490b3b8cc579b921b606ab92bbd57dfa1e0cc
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@b55153c8b34f7732269a67b4f4f117b9a848fe3f
     with:
       target_branch: rechercher/encyclopedia-continuous-acquisition
     secrets:
