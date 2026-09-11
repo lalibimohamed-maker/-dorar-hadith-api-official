@@ -22,6 +22,7 @@ def main() -> int:
         if not GOVERNED_BUILDER.is_file():
             raise SystemExit(f"missing master catalog materializer: {GOVERNED_BUILDER}")
         shutil.copy2(GOVERNED_BUILDER, BUILDER)
+    subprocess.run([sys.executable, str(BUILDER)], cwd=ROOT, check=True)
 
     core_result = subprocess.run(
         [sys.executable, str(CORE), *sys.argv[1:]],
