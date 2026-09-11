@@ -61,6 +61,19 @@ jobs:
               raise SystemExit('ERROR: zero files acquired; nothing will be persisted.')
           PY
 
+      - name: Final PDF identity / uniqueness / completeness gate
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_pdf_safety_gate.py \
+            --root "$GITHUB_WORKSPACE" \
+            --manifest books-batches/salaf-01-400h/developer-review-manifest.json \
+            --catalog books-batches/salaf-01-400h/catalog.json \
+            --review-branch "$REVIEW_BRANCH" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json \
+            --min-pages 2 \
+            --min-bytes 65536
+
       - name: Emit explicit acquisition evidence
         run: |
           set -euo pipefail
@@ -72,8 +85,8 @@ jobs:
           for r in d.get('records',[]):
               for a in r.get('acquired',[]):
                   total += 1
-                  print(f"[DOWNLOADED+VERIFIED] {r.get('id')} bytes={a.get('bytes')} sha256={a.get('sha256')} source={a.get('url')}")
-          print(f"[DOWNLOADED+VERIFIED:COUNT] {total}")
+                  print(f"[DOWNLOADED+VERIFIED+SAFETY-GATED] {r.get('id')} bytes={a.get('bytes')} sha256={a.get('sha256')} source={a.get('url')}")
+          print(f"[DOWNLOADED+VERIFIED+SAFETY-GATED:COUNT] {total}")
           PY
 
       - name: Verify acquired PDFs before storage
@@ -86,6 +99,7 @@ jobs:
             head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: not a PDF: $f"; exit 1; }
             test -s "$f"
             qpdf --check "$f"
+            pdfinfo "$f" | awk '/^Pages:/ { if ($2 < 2) { print "ERROR: suspiciously few pages: " FILENAME " pages=" $2; exit 1 } }'
             sha256sum "$f"
           done
 
@@ -109,7 +123,7 @@ jobs:
           VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
           gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "Rechercher acquired vault ${GITHUB_RUN_ID}" \
-            --notes "Acquire-first persistence boundary. Every asset was downloaded, checked as PDF, hashed, then encrypted before storage."
+            --notes "Acquire-first persistence boundary. Every asset passed PDF syntax, page-count, identity, completeness, and cross-book SHA-256 gates before encryption."
           : > artifacts/governance/vault-release.jsonl
           for f in "${enc[@]}"; do
             gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
@@ -124,7 +138,7 @@ jobs:
               digest, path=raw.split(None,1)
               assets.append({'sha256':digest,'file':path})
           release=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo',os.environ['GITHUB_REPOSITORY'],'--json','url,tagName'],text=True))
-          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v1','persistence_boundary':'acquire-first','release':release,'assets':assets},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v2','persistence_boundary':'acquire-first','release':release,'assets':assets},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
           rm -f artifacts/governance/vault-release.jsonl
 
@@ -136,7 +150,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add artifacts/governance/vault-release.json books-batches/salaf-01-400h/developer-review-manifest.json
-          git commit -m 'data(rechercher): persist acquired copies before downstream audits'
+          git commit -m 'data(rechercher): persist safety-gated acquired copies before downstream audits'
           ACQ_COMMIT=$(git rev-parse HEAD)
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
