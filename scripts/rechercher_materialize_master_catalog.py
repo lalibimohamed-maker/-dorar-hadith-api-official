@@ -29,8 +29,8 @@ HISTORICAL = [
 IA_SEARCH = "https://archive.org/advancedsearch.php?q={query}&fl[]=identifier,title,creator,description,volume&rows=8&page=1&output=json"
 IA_METADATA = "https://archive.org/metadata/{}"
 USER_AGENT = "DinAllah-Encyclopedia-Rechercher/2.0"
-
 ARABIC_MARKS = re.compile(r"[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]")
+
 
 def load_json_text(text: str):
     return json.loads(text)
@@ -111,9 +111,25 @@ def http_json(url, timeout=30):
         return json.loads(response.read().decode("utf-8", "replace"))
 
 
+def normalize_legacy_sources(book):
+    if isinstance(book.get("sources"), list) and book.get("sources"):
+        return book
+    candidates = []
+    for key_name in ("source_url", "url", "waqfeya_url", "archive_url", "internet_archive_url", "openlibrary_url"):
+        value = book.get(key_name)
+        if value:
+            candidates.append({"url": str(value), "label": key_name, "discover_pdfs": True})
+    if candidates:
+        result = dict(book)
+        result["sources"] = candidates
+        return result
+    return book
+
+
 def discover_archive_source(book):
     """Return only high-confidence IA PDF candidates; never grant rights."""
-    if book.get("sources") or book.get("source_url") or book.get("url") or book.get("waqfeya_url") or book.get("archive_url"):
+    book = normalize_legacy_sources(book)
+    if book.get("sources"):
         return book
     title = str(book.get("title") or "").strip()
     author = str(book.get("author") or "").strip()
@@ -155,36 +171,35 @@ def discover_archive_source(book):
             continue
         pdfs.append(name)
     if len(pdfs) != 1:
-        # Multiple PDFs may represent volumes, derivatives or supplements. Do not guess.
         return book
     pdf_name = pdfs[0]
-    source = {
-        "url": f"https://archive.org/download/{quote(identifier, safe='')}/{quote(pdf_name, safe='/-_.')}" ,
-        "pdf_url": f"https://archive.org/download/{quote(identifier, safe='')}/{quote(pdf_name, safe='/-_.')}",
+    pdf_url = f"https://archive.org/download/{quote(identifier, safe='')}/{quote(pdf_name, safe='/-_.')}"
+    result = dict(book)
+    result["sources"] = [{
+        "url": pdf_url,
+        "pdf_url": pdf_url,
         "label": "internet-archive-source-discovery",
         "discovery": "high-confidence-title-author-match",
         "match_score": round(best_score, 4),
         "identifier": identifier,
         "rights_review_required": True,
         "discover_pdfs": False,
-    }
-    book = dict(book)
-    book["sources"] = [source]
-    book["source_discovery"] = {
+    }]
+    result["source_discovery"] = {
         "provider": "Internet Archive",
         "identifier": identifier,
         "match_score": round(best_score, 4),
         "pdf_candidates": 1,
-        "volume_inference": "single-file-candidate-only; treated as one volume only by acquisition engine after direct-PDF validation",
+        "volume_inference": "single-file-candidate-only; expected volume may safely resolve to one only after direct-PDF validation",
     }
-    return book
+    return result
 
 
 def enrich_books(books):
-    targets = [b for b in books if not (b.get("sources") or b.get("source_url") or b.get("url") or b.get("waqfeya_url") or b.get("archive_url"))]
+    targets = [b for b in books if not normalize_legacy_sources(b).get("sources")]
     if not targets:
-        return books
-    enriched = {key(b): b for b in books}
+        return [normalize_legacy_sources(b) for b in books]
+    enriched = {key(b): normalize_legacy_sources(b) for b in books}
     with ThreadPoolExecutor(max_workers=8, thread_name_prefix="rechercher-source") as pool:
         futures = {pool.submit(discover_archive_source, b): key(b) for b in targets}
         for future in as_completed(futures):
@@ -232,11 +247,14 @@ def main():
         "real_pdf_is_required_for_acquisition": True,
         "verified_pdfs_are_never_deleted_by_catalog_cleanup": True,
         "source_discovery": "Internet Archive high-confidence title/author match; discovery never grants redistribution rights",
+        "legacy_url_normalization": "source_url/url/waqfeya/archive URLs are promoted into sources before acquisition",
     }
     MASTER.write_text(json.dumps(master, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     discovered = sum(1 for b in books if b.get("source_discovery"))
+    with_sources = sum(1 for b in books if b.get("sources"))
     print("MASTER_CATALOG_MODE=UNBOUNDED")
     print(f"MASTER_CATALOG_RECORDS={len(books)}")
+    print(f"MASTER_CATALOG_WITH_SOURCES={with_sources}")
     print(f"MASTER_CATALOG_SOURCE_DISCOVERY={discovered}")
     print("MASTER_CATALOG_TARGET=NONE")
     print("MASTER_CATALOG_STOP_CONDITION=NONE")
