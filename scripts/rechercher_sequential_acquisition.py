@@ -6,20 +6,31 @@ All catalogued books are merged into one chronological queue ordered by
 explicit Hijri chronology metadata, then author death Hijri as the fallback.
 The queue state is persistent and each hosted run consumes only the currently
 pending prefix. A later run resumes exactly where the previous run stopped.
+
+Before handing books to the strict PDF engine, this runner resolves missing
+expected-volume counts from explicit catalog metadata, edition text, structured
+source metadata and conservative source-page PDF enumeration. It never guesses
+one volume merely because the count is missing.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import os
+import re
 import subprocess
 import tempfile
 from pathlib import Path
+from urllib.parse import quote, urljoin, urlsplit, urlunsplit
+from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE_DIR_NAME = "artifacts/governance/sequential-acquisition"
 QUEUE_NAME = "queue.json"
+USER_AGENT = "DinAllah-Encyclopedia/1.3"
+VOLUME_FIELDS = ("expected_volumes", "volume_count", "num_volumes", "volumes")
 
 
 def norm(value):
@@ -90,8 +101,13 @@ def load_catalog(root):
 
 
 def fingerprint(books):
-    payload = "\n".join(f"{book_key(b)}|{chronology_rank(b)[0]}|{chronology_rank(b)[1]}" for b in books)
+    payload = "\n".join(f"{book_key(b)}|{chronology_rank(b)[0]}|{chronology_rank(b)[1]}|{resolve_explicit_volume_count(b) or ''}" for b in books)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def save_state(path, state):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def load_state(path, books):
@@ -99,7 +115,7 @@ def load_state(path, books):
     if path.exists():
         try:
             state = json.loads(path.read_text(encoding="utf-8"))
-            if state.get("schema") == "rechercher-continuous-hijri-chronological/v1":
+            if state.get("schema") == "rechercher-continuous-hijri-chronological/v2":
                 state.setdefault("books", {})
                 state.setdefault("order", [])
                 state["catalog_fingerprint"] = current_fp
@@ -107,9 +123,10 @@ def load_state(path, books):
         except Exception:
             pass
     return {
-        "schema": "rechercher-continuous-hijri-chronological/v1",
+        "schema": "rechercher-continuous-hijri-chronological/v2",
         "policy": "unbounded chronological acquisition from the Prophetic era through present and future catalog additions; no finite book-count target",
         "order_policy": "Hijri chronology first; explicit chronology metadata preferred; author death Hijri is fallback; future additions remain at the end",
+        "volume_policy": "explicit metadata > structured source metadata > explicit edition/source PDF enumeration; never default to one volume without evidence",
         "catalog_fingerprint": current_fp,
         "order": [book_key(b) for b in books],
         "books": {},
@@ -117,9 +134,126 @@ def load_state(path, books):
     }
 
 
-def save_state(path, state):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+def normalize_url(url):
+    p = urlsplit(str(url))
+    return urlunsplit((p.scheme, p.netloc, quote(p.path, safe="/%:@-._~"), p.query, p.fragment))
+
+
+def fetch_text(url):
+    req = Request(normalize_url(url), headers={"User-Agent": USER_AGENT})
+    with urlopen(req, timeout=25) as r:
+        return r.read().decode("utf-8", "replace")
+
+
+def pdf_links(page, base):
+    out, seen = [], set()
+    for m in re.finditer(r'href=[\"\']([^\"\']+)[\"\']', page, re.I):
+        u = normalize_url(urljoin(base, html.unescape(m.group(1))))
+        if re.search(r"\.pdf(?:\?|$)", u, re.I) and not re.search(r"\.pdf\.enc(?:\?|$)", u, re.I) and u not in seen:
+            seen.add(u)
+            out.append(u)
+    return out
+
+
+def positive_int(value):
+    if isinstance(value, bool):
+        return None
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        return None
+    return value if value > 0 and value <= 100 else None
+
+
+def resolve_explicit_volume_count(book):
+    for key in VOLUME_FIELDS:
+        count = positive_int(book.get(key))
+        if count:
+            return count
+    sources = book.get("sources") or []
+    if not isinstance(sources, list):
+        sources = [sources]
+    for source in sources:
+        if not isinstance(source, dict):
+            continue
+        for key in VOLUME_FIELDS:
+            count = positive_int(source.get(key))
+            if count:
+                return count
+        mapping = source.get("volume_url_map")
+        if isinstance(mapping, dict) and mapping:
+            numeric_keys = [k for k in mapping if str(k).isdigit() and int(k) > 0]
+            if numeric_keys:
+                return max(int(k) for k in numeric_keys)
+    for key in ("edition", "note", "notes", "description"):
+        text = str(book.get(key) or "")
+        m = re.search(r"(?<!\d)(\d{1,2})\s*(?:مجلد(?:ًا|اً|ات)?|جزء(?:ًا|اً|ا|ء)?|vol(?:ume)?s?\b)", text, re.I)
+        if m:
+            count = positive_int(m.group(1))
+            if count:
+                return count
+    return None
+
+
+def source_urls(book):
+    values = []
+    for source in book.get("sources") or []:
+        if isinstance(source, str):
+            values.append(source)
+        elif isinstance(source, dict) and source.get("url"):
+            values.append(source["url"])
+    for key in ("source_url", "url", "waqfeya_url", "archive_url", "internet_archive_url", "openlibrary_url"):
+        if book.get(key):
+            values.append(book[key])
+    seen = set()
+    out = []
+    for value in values:
+        try:
+            u = normalize_url(value)
+        except Exception:
+            continue
+        if u not in seen:
+            seen.add(u)
+            out.append(u)
+    return out
+
+
+def infer_volume_count_from_sources(book):
+    explicit = resolve_explicit_volume_count(book)
+    if explicit:
+        return explicit, "explicit-metadata"
+    direct_pdf_count = None
+    page_counts = []
+    for url in source_urls(book)[:8]:
+        if re.search(r"\.pdf(?:\?|$)", url, re.I) and not re.search(r"\.pdf\.enc(?:\?|$)", url, re.I):
+            direct_pdf_count = 1 if direct_pdf_count is None else direct_pdf_count
+            continue
+        try:
+            page = fetch_text(url)
+            links = pdf_links(page, url)
+        except Exception:
+            continue
+        if len(links) == 1:
+            page_counts.append(1)
+        elif len(links) > 1:
+            page_counts.append(len(links))
+    if page_counts:
+        unique = sorted(set(page_counts))
+        if len(unique) == 1:
+            return unique[0], "source-page-pdf-enumeration"
+    if direct_pdf_count == 1:
+        return 1, "direct-pdf-source"
+    return None, "unresolved"
+
+
+def resolve_volumes_for_book(book, record):
+    existing = positive_int(record.get("resolved_expected_volumes")) if isinstance(record, dict) else None
+    if existing:
+        return existing, str(record.get("volume_resolution_method") or "persistent-state")
+    count, method = infer_volume_count_from_sources(book)
+    if count:
+        return count, method
+    return None, method
 
 
 def main():
@@ -141,6 +275,24 @@ def main():
     state["pending_before_run"] = len(pending)
     state["total_catalog_books"] = len(books)
     state["finished"] = False
+
+    resolved = 0
+    unresolved = []
+    for book in pending:
+        key = book_key(book)
+        rec = records.setdefault(key, {"status": "pending", "attempts": 0, "source_attempts": {}, "last_attempt": None})
+        count, method = resolve_volumes_for_book(book, rec)
+        if count:
+            book["expected_volumes"] = count
+            rec["resolved_expected_volumes"] = count
+            rec["volume_resolution_method"] = method
+            resolved += 1
+            print(f"VOLUME_RESOLVED {key}: expected_volumes={count} method={method}", flush=True)
+        else:
+            unresolved.append(key)
+            rec["volume_resolution_method"] = method
+            print(f"VOLUME_UNRESOLVED {key}: no safe volume-count evidence", flush=True)
+    state["volume_resolution"] = {"resolved": resolved, "unresolved": len(unresolved), "unresolved_ids": unresolved}
     save_state(state_path, state)
 
     if not pending:
@@ -164,6 +316,7 @@ def main():
         worker = root / "scripts" / "rechercher_acquisition_engine.py"
         print(f"CONTINUOUS_QUEUE_RUN={state['run_count']} TOTAL={len(books)} PENDING={len(pending)}", flush=True)
         print("CHRONOLOGY_POLICY=Prophet -> Hijri chronology -> present -> future additions", flush=True)
+        print(f"VOLUME_RESOLUTION={resolved} resolved / {len(unresolved)} unresolved", flush=True)
         result = subprocess.run(["python3", str(worker), "--root", str(temp)], cwd=root, env=env)
 
     summary_path = root / "artifacts" / "acquisition-run-summary.json"
