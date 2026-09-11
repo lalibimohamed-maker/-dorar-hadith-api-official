@@ -9,7 +9,7 @@ on:
 permissions:
   contents: write
 
-# security-justification: this workflow requires contents: write only to persist encrypted acquisition evidence and review-vault release assets; plaintext book copies are never committed.
+# security-justification: contents: write is required only to persist encrypted acquisition evidence and review-vault release assets; plaintext book copies are never committed.
 
 env:
   GIT_TERMINAL_PROMPT: '0'
@@ -44,10 +44,11 @@ jobs:
           set -euo pipefail
           test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
 
-      - name: Acquire copies — first persistence boundary
+      - name: Acquire copies — content-first identity and uniqueness boundary
         run: |
           set -euo pipefail
-          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" \
+          python3 scripts/rechercher_developer_review_acquisition_v7.py --root "$GITHUB_WORKSPACE" \
+            --review-branch "$REVIEW_BRANCH" \
             --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
             --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
           test -s books-batches/salaf-01-400h/developer-review-manifest.json
@@ -61,6 +62,15 @@ jobs:
               raise SystemExit('ERROR: zero files acquired; nothing will be persisted.')
           PY
 
+      - name: Final PDF identity / uniqueness / completeness firewall
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_pdf_safety_gate_v2.py \
+            --root "$GITHUB_WORKSPACE" \
+            --manifest books-batches/salaf-01-400h/developer-review-manifest.json \
+            --catalog books-batches/salaf-01-400h/catalog.json \
+            --review-branch "$REVIEW_BRANCH"
+
       - name: Emit explicit acquisition evidence
         run: |
           set -euo pipefail
@@ -72,8 +82,8 @@ jobs:
           for r in d.get('records',[]):
               for a in r.get('acquired',[]):
                   total += 1
-                  print(f"[DOWNLOADED+VERIFIED] {r.get('id')} bytes={a.get('bytes')} sha256={a.get('sha256')} source={a.get('url')}")
-          print(f"[DOWNLOADED+VERIFIED:COUNT] {total}")
+                  print(f"[DOWNLOADED+VERIFIED+IDENTITY+UNIQUE] {r.get('id')} bytes={a.get('bytes')} pages={a.get('pages')} sha256={a.get('sha256')} source={a.get('url')}")
+          print(f"[DOWNLOADED+VERIFIED+IDENTITY+UNIQUE:COUNT] {total}")
           PY
 
       - name: Verify acquired PDFs before storage
@@ -86,6 +96,7 @@ jobs:
             head -c 5 "$f" | grep -qx '%PDF-' || { echo "ERROR: not a PDF: $f"; exit 1; }
             test -s "$f"
             qpdf --check "$f"
+            pdfinfo "$f" | awk '/^Pages:/ { if ($2 < 2) { print "ERROR: suspiciously few pages: " FILENAME " pages=" $2; exit 1 } }'
             sha256sum "$f"
           done
 
@@ -109,7 +120,7 @@ jobs:
           VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
           gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "Rechercher acquired vault ${GITHUB_RUN_ID}" \
-            --notes "Acquire-first persistence boundary. Every asset was downloaded, checked as PDF, hashed, then encrypted before storage."
+            --notes "Acquire-first persistence boundary. Every asset passed PDF syntax, page-count, PDF-internal identity, completeness, and cross-book SHA-256 gates before encryption."
           : > artifacts/governance/vault-release.jsonl
           for f in "${enc[@]}"; do
             gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
@@ -124,7 +135,7 @@ jobs:
               digest, path=raw.split(None,1)
               assets.append({'sha256':digest,'file':path})
           release=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo',os.environ['GITHUB_REPOSITORY'],'--json','url,tagName'],text=True))
-          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v1','persistence_boundary':'acquire-first','release':release,'assets':assets},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v2','persistence_boundary':'acquire-first','release':release,'assets':assets},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
           rm -f artifacts/governance/vault-release.jsonl
 
@@ -136,7 +147,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add artifacts/governance/vault-release.json books-batches/salaf-01-400h/developer-review-manifest.json
-          git commit -m 'data(rechercher): persist acquired copies before downstream audits'
+          git commit -m 'data(rechercher): persist safety-gated acquired copies before downstream audits'
           ACQ_COMMIT=$(git rev-parse HEAD)
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
@@ -148,6 +159,34 @@ jobs:
           incoming=json.loads(subprocess.check_output(['git','show',f'{sys.argv[1]}:{path}'],text=True))
           try: existing=json.loads(subprocess.check_output(['git','show',f'HEAD:{path}'],text=True))
           except subprocess.CalledProcessError: existing=None
+
+          def quarantine_cross_book_duplicates(data):
+              owners={}
+              for rec in data.get('records',[]):
+                  rid=str(rec.get('id') or '')
+                  for item in rec.get('acquired',[]) or []:
+                      digest=item.get('sha256')
+                      if digest: owners.setdefault(digest,set()).add(rid)
+              for rec in data.get('records',[]):
+                  rid=str(rec.get('id') or '')
+                  kept=[]; quarantined=list(rec.get('quarantined_acquired',[]) or [])
+                  for item in rec.get('acquired',[]) or []:
+                      digest=item.get('sha256'); ids=owners.get(digest,set()) if digest else set()
+                      if digest and len(ids)>1:
+                          q=dict(item); q['quarantine_reason']='cross_book_sha256_collision'; q['quarantine_conflicts']=sorted(ids); quarantined.append(q)
+                      else:
+                          kept.append(item)
+                  if quarantined: rec['quarantined_acquired']=quarantined
+                  rec['acquired']=kept; rec['acquired_count']=len(kept)
+                  if quarantined and not kept: rec['availability']='quarantined'; rec['acquisition_state']='quarantined'
+              counts=data.setdefault('counts',{})
+              records=data.get('records',[])
+              counts['acquired_books']=sum(r.get('acquisition_state')=='acquired' for r in records)
+              counts['acquired_files']=sum(r.get('acquired_count',0) for r in records)
+              counts['quarantined_books']=sum(r.get('acquisition_state')=='quarantined' for r in records)
+              counts['quarantined_files']=sum(len(r.get('quarantined_acquired',[]) or []) for r in records)
+              return data
+
           if not existing:
               merged=incoming
           else:
@@ -158,19 +197,20 @@ jobs:
                   if rid not in old:
                       old[rid]=rec; continue
                   cur=old[rid]
-                  for key in ('discovery_registries','candidates','acquired'):
+                  for key in ('discovery_registries','candidates','acquired','quarantined_acquired'):
                       vals=[]
                       for src in (cur.get(key,[]),rec.get(key,[])):
                           for v in src:
                               if v not in vals: vals.append(v)
                       if vals: cur[key]=vals
                   if rec.get('acquired_count',0) > cur.get('acquired_count',0):
-                      cur.update({k:v for k,v in rec.items() if k not in ('discovery_registries','candidates','acquired')})
+                      cur.update({k:v for k,v in rec.items() if k not in ('discovery_registries','candidates','acquired','quarantined_acquired')})
               merged=dict(existing); merged['records']=list(old.values()); merged['counts']=incoming.get('counts',merged.get('counts',{}))
+          merged=quarantine_cross_book_duplicates(merged)
           Path(path).write_text(json.dumps(merged,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
           git add books-batches/salaf-01-400h/developer-review-manifest.json
-          git commit -m 'data(rechercher): reconcile acquire-first manifest'
+          git commit -m 'data(rechercher): reconcile and quarantine legacy duplicate acquisitions'
           GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
           git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           echo "ACQUIRE_FIRST_PERSISTED=$ACQ_COMMIT"

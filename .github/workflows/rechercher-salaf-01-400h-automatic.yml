@@ -18,7 +18,7 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-acquire-first-reusable.yml@0fe397fbaf84d2769248fb4789cd31c97ab98510
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-acquire-first-reusable.yml@e25326c18e393a033923e4c76cc3f43f396c0cb8
     secrets:
       REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
     permissions:
