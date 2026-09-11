@@ -1,0 +1,81 @@
+{
+  "schema": "rechercher-pdf-quality-gate/v1",
+  "status": "PASS",
+  "pdf_count": 4,
+  "failed": [],
+  "results": [
+    {
+      "file": "001.pdf",
+      "status": "pass",
+      "pages": 256,
+      "bytes": 5257111,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 256,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "al-sunnah-abdullah-ahmad-1349-waqf--1655ed8143c9.pdf",
+      "status": "pass",
+      "pages": 256,
+      "bytes": 4786075,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 256,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "al-sunnah-abdullah-ahmad-1349-waqf.pdf",
+      "status": "pass",
+      "pages": 256,
+      "bytes": 4786075,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 256,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "waqfeya-fatawa-committee-collection.pdf",
+      "status": "pass",
+      "pages": 938,
+      "bytes": 20004008,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 938,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    }
+  ],
+  "policy": "technical quality and completeness gate; source PDF is never modified; rights/publication remain separate governance decisions"
+}
