@@ -1,22 +1,42 @@
 #!/usr/bin/env python3
 """Build a conservative whole-encyclopedia book census from saved catalogs.
 
-This is a discovery/census layer. It does not grant rights or download files.
-It accepts multiple book-catalog shapes already used by the repository and keeps
-future additions discoverable through the central catalog registry.
+The central master catalog is materialized first so supplementary indexes such
+as Dorar see the same 247-book acquisition universe as Rechercher itself.
+This layer remains discovery-only: it never grants rights or downloads files.
 """
 import json
 import re
+import subprocess
 from pathlib import Path
 from collections import defaultdict
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / 'config' / 'rechercher-encyclopedia-catalog-registry.json'
+MASTER = ROOT / 'books-batches' / 'encyclopedia-master' / 'catalog.json'
 OUT = ROOT / 'artifacts' / 'governance' / 'encyclopedia-master-catalog-census.json'
 
 
 def load_json(path):
     return json.loads(path.read_text(encoding='utf-8'))
+
+
+def ensure_master_materialized():
+    """Make the central catalog authoritative before any census/matching step."""
+    builder = ROOT / 'scripts' / 'rechercher_materialize_master_catalog.py'
+    governed = ROOT / '.governance-source' / 'scripts' / 'rechercher_materialize_master_catalog.py'
+    if not builder.exists() and governed.exists():
+        builder.parent.mkdir(parents=True, exist_ok=True)
+        builder.write_text(governed.read_text(encoding='utf-8'), encoding='utf-8')
+    if builder.exists():
+        current = {}
+        if MASTER.exists():
+            try:
+                current = load_json(MASTER)
+            except Exception:
+                current = {}
+        if not isinstance(current.get('books'), list) or not current.get('books'):
+            subprocess.run(['python3', str(builder)], cwd=ROOT, check=True)
 
 
 def safe_text(v):
@@ -52,7 +72,6 @@ def add(rows, *, source, target_scope, item, item_kind='book'):
 def extract_source(path, scope_hint):
     payload = load_json(path)
     rows = []
-    # Direct books array (primary catalog shape).
     if isinstance(payload, dict) and isinstance(payload.get('books'), list):
         author_map = {}
         for a in payload.get('authors', []) or []:
@@ -69,11 +88,9 @@ def extract_source(path, scope_hint):
                 b.setdefault('deathYear', a.get('deathYear'))
                 b.setdefault('era', a.get('era'))
             add(rows, source=str(path.relative_to(ROOT)), target_scope=scope_hint, item=b)
-    # Seerah sourceWorks shape.
     if isinstance(payload, dict) and isinstance(payload.get('sourceWorks'), list):
         for work in payload['sourceWorks']:
             add(rows, source=str(path.relative_to(ROOT)), target_scope='Prophet era / Seerah', item=work, item_kind='sourceWork')
-    # Fiqh authors -> nested works shape.
     if isinstance(payload, dict) and isinstance(payload.get('authors'), list):
         for author in payload['authors']:
             if not isinstance(author, dict):
@@ -87,12 +104,10 @@ def extract_source(path, scope_hint):
 
 
 def iter_source_paths():
-    # Explicit primary book batches are always included.
     seen = set()
     for p in sorted((ROOT / 'books-batches').glob('**/catalog.json')):
         seen.add(p.resolve())
-        yield p, 'catalogured book batch'
-
+        yield p, 'catalogued book batch'
     registry = load_json(REGISTRY)
     for era in registry.get('eras', []):
         scope = era.get('label', era.get('id', 'unknown'))
@@ -132,6 +147,7 @@ def classify(row):
 
 
 def main():
+    ensure_master_materialized()
     all_rows = []
     errors = []
     for path, scope in iter_source_paths():
@@ -147,7 +163,6 @@ def main():
         if current is None:
             dedup[key] = row
         else:
-            # Preserve multi-source provenance without creating duplicates.
             refs = set(current.get('source_refs') or [])
             refs.update(row.get('source_refs') or [])
             current['source_refs'] = sorted(str(x) for x in refs if x)
@@ -166,8 +181,9 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     report = {
         'schema': 'rechercher-encyclopedia-master-catalog-census/v1',
-        'purpose': 'Conservative census of saved book-catalog evidence across all eras and future catalog intake.',
+        'purpose': 'Conservative census of the materialized central catalog plus governed saved source catalogs.',
         'registry': str(REGISTRY.relative_to(ROOT)),
+        'master_catalog': str(MASTER.relative_to(ROOT)),
         'source_patterns': ['books-batches/**/catalog.json'],
         'book_count_unique': len(books),
         'counts_by_era': dict(sorted(counts.items())),
@@ -184,10 +200,7 @@ def main():
     print(f'[CENSUS] unique catalog records: {len(books)}', flush=True)
     for era, count in sorted(counts.items()):
         print(f'[CENSUS] {era}: {count}', flush=True)
-    if errors:
-        print(f'[CENSUS] source parse errors: {len(errors)}', flush=True)
-    else:
-        print('[CENSUS] source parse errors: 0', flush=True)
+    print(f'[CENSUS] source parse errors: {len(errors)}', flush=True)
 
 
 if __name__ == '__main__':
