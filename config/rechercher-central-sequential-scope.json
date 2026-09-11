@@ -4,7 +4,7 @@
   "chronology": "Prophet era -> Companions -> Followers -> Hijri chronology -> present day -> future catalog additions",
   "finite_book_count_targets": false,
   "book_count_targets": [],
-  "catalog_glob": "books-batches/encyclopedia-master/catalog.json",
+  "catalog_glob": "books-batches/**/catalog.json",
   "master_catalog": "books-batches/encyclopedia-master/catalog.json",
   "legacy_catalogs_forbidden": ["books-batches/salaf-01-400h/**"],
   "output_format": ".pdf",
@@ -15,5 +15,5 @@
   "resume_policy": "persistent chronological queue; every run resumes pending books and preserves per-book attempt state; queue is state, never catalog",
   "chronology_policy": "explicit Hijri chronology metadata first; author death Hijri fallback; future additions always remain after present-day material",
   "hosted_runtime_policy": "each hosted job is a resumable execution slice; automatic continuation is required and the queue never ends because of a book-count target",
-  "catalog_policy": "the master catalog is materialized from preserved historical discovery waves plus future master-source additions; discovery never implies rights or PDF availability"
+  "catalog_policy": "the master catalog is the only catalog under books-batches; historical discovery waves are materialized into it before acquisition"
 }
