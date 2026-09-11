@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Final pre-persistence firewall for acquired Rechercher PDFs."""
+"""Final pre-persistence firewall for acquired Rechercher PDFs.
+
+Important contract: acquisition incompleteness is a retryable queue state, not
+an artifact-safety violation. This firewall fails only on unsafe or corrupted
+PDF artifacts that were actually acquired for persistence.
+"""
 import argparse,hashlib,json,re,subprocess,tempfile,unicodedata
 from pathlib import Path
 ARABIC_DIACRITICS=re.compile(r'[\u0610-\u061a\u064b-\u065f\u0670\u06d6-\u06ed]')
@@ -42,10 +47,10 @@ def prior_index(root,branch,manifest):
    if s:out.setdefault(s,set()).add(rid)
  return out
 def main():
- p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--manifest',required=True);p.add_argument('--catalog',required=True);p.add_argument('--review-branch',required=True);a=p.parse_args();root=Path(a.root).resolve();m=json.loads((root/a.manifest).read_text(encoding='utf-8'));cat=json.loads((root/a.catalog).read_text(encoding='utf-8'));books={str(x.get('id')):x for x in cat.get('books',[]) if x.get('id')};prior=prior_index(root,a.review_branch,a.manifest);sha_ids={};fail=[];checked=0
+ p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--manifest',required=True);p.add_argument('--catalog',required=True);p.add_argument('--review-branch',required=True);a=p.parse_args();root=Path(a.root).resolve();m=json.loads((root/a.manifest).read_text(encoding='utf-8'));cat=json.loads((root/a.catalog).read_text(encoding='utf-8'));books={str(x.get('id')):x for x in cat.get('books',[]) if x.get('id')};prior=prior_index(root,a.review_branch,a.manifest);sha_ids={};fail=[];checked=0;incomplete=[]
  for r in m.get('records',[]):
   rid=str(r.get('id') or '');b=books.get(rid,r);expected=int(b.get('expected_volumes') or 1);acq=r.get('acquired',[]) or []
-  if len(acq)!=expected:fail.append(f'{rid}: incomplete acquisition {len(acq)}/{expected}')
+  if len(acq)!=expected:incomplete.append({'id':rid,'acquired':len(acq),'expected':expected})
   title=toks(b.get('title',''));author=toks(b.get('author',''))
   for item in acq:
    lp=item.get('local_path');
@@ -65,7 +70,7 @@ def main():
    if conflicts:fail.append(f'{rid}: SHA already belongs to {sorted(conflicts)}')
  for s,ids in sha_ids.items():
   if len(ids)>1:fail.append(f'cross-book SHA collision {s}: {sorted(ids)}')
- print(json.dumps({'schema':'din-allah-encyclopedia/rechercher-pdf-safety-firewall/v2','checked_files':checked,'failures':fail},ensure_ascii=False,indent=2))
+ print(json.dumps({'schema':'din-allah-encyclopedia/rechercher-pdf-safety-firewall/v2','checked_files':checked,'incomplete_acquisitions':len(incomplete),'incomplete_records':incomplete,'failures':fail},ensure_ascii=False,indent=2))
  if fail:
   print('PDF_SAFETY_FIREWALL=FAIL')
   return 1
