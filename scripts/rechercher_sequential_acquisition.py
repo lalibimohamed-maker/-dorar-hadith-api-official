@@ -13,7 +13,6 @@ import argparse
 import hashlib
 import json
 import os
-import re
 import subprocess
 import tempfile
 from pathlib import Path
@@ -32,10 +31,7 @@ def book_key(book):
 
 
 def chronology_value(book):
-    fields = (
-        "chronology_hijri", "hijri_year", "year_hijri", "publication_hijri",
-        "author_death_hijri", "deathYear", "death_year_hijri",
-    )
+    fields = ("chronology_hijri", "hijri_year", "year_hijri", "publication_hijri", "author_death_hijri", "deathYear", "death_year_hijri")
     for field in fields:
         value = book.get(field)
         if isinstance(value, dict):
@@ -49,18 +45,12 @@ def chronology_value(book):
 
 
 def chronology_rank(book):
-    """Sort from the Prophetic era to the present, then future additions."""
-    blob = " ".join(norm(book.get(k)) for k in (
-        "target_scope", "scope", "era", "generation", "generation_type",
-        "category", "type", "period",
-    ))
+    blob = " ".join(norm(book.get(k)) for k in ("target_scope", "scope", "era", "generation", "generation_type", "category", "type", "period"))
     if any(x in blob for x in ("future", "مستقبل", "future book")):
         return (3, 10**9, norm(book.get("title") or book.get("titleAr")), book_key(book))
-
     h = chronology_value(book)
     if h is not None:
         return (1, h, norm(book.get("title") or book.get("titleAr")), book_key(book))
-
     if any(x in blob for x in ("prophet era", "prophet", "نبوي", "النبي")):
         return (0, 0, norm(book.get("title") or book.get("titleAr")), book_key(book))
     if "quran" in blob or "قرآن" in blob or "qur'an" in blob:
@@ -85,9 +75,6 @@ def load_catalog(root):
             if key not in books:
                 books[key] = dict(book)
                 continue
-            # Multiple catalog overlays may describe the same book. Do not let
-            # a sparse overlay shadow acquisition-critical fields from a richer
-            # catalog (e.g. expected_volumes, sources, edition).
             merged = books[key]
             for field, value in book.items():
                 if field not in merged or merged.get(field) in (None, "", [], {}):
@@ -174,7 +161,7 @@ def main():
         env = os.environ.copy()
         env["RECHERCHER_MAX_SOURCE_ATTEMPTS"] = "24"
         env["RECHERCHER_REEVALUATE_EXISTING"] = "1"
-        worker = root / "scripts" / "rechercher_pdf_acquire.py"
+        worker = root / "scripts" / "rechercher_acquisition_engine.py"
         print(f"CONTINUOUS_QUEUE_RUN={state['run_count']} TOTAL={len(books)} PENDING={len(pending)}", flush=True)
         print("CHRONOLOGY_POLICY=Prophet -> Hijri chronology -> present -> future additions", flush=True)
         result = subprocess.run(["python3", str(worker), "--root", str(temp)], cwd=root, env=env)
