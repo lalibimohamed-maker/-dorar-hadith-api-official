@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BUILDER = ROOT / "scripts/rechercher_materialize_master_catalog.py"
 GOVERNED_BUILDER = ROOT / ".governance-source/scripts/rechercher_materialize_master_catalog.py"
 VOLUME_RESOLVER = ROOT / "scripts/rechercher_resolve_volume_evidence.py"
+GOVERNED_VOLUME_RESOLVER = ROOT / ".governance-source/scripts/rechercher_resolve_volume_evidence.py"
 ENGINE = ROOT / "scripts/rechercher_acquisition_engine.py"
 RETRYABLE_STATUSES = {
     "blocked-missing-expected-volumes",
@@ -25,6 +26,12 @@ def main() -> int:
         shutil.copy2(GOVERNED_BUILDER, BUILDER)
     subprocess.run([sys.executable, str(BUILDER)], cwd=ROOT, check=True)
 
+    # The governed reusable workflow checks out the latest main source into
+    # .governance-source but may intentionally copy only the execution-critical
+    # scripts. Recover the resolver from that source tree when it was not copied,
+    # keeping the workflow immutable while ensuring the new gate has its helper.
+    if not VOLUME_RESOLVER.is_file() and GOVERNED_VOLUME_RESOLVER.is_file():
+        shutil.copy2(GOVERNED_VOLUME_RESOLVER, VOLUME_RESOLVER)
     if not VOLUME_RESOLVER.is_file():
         raise SystemExit(f"missing volume-evidence resolver: {VOLUME_RESOLVER}")
     subprocess.run([sys.executable, str(VOLUME_RESOLVER)], cwd=ROOT, check=True)
