@@ -1,7 +1,7 @@
 {
   "schema": "rechercher-pdf-quality-gate/v1",
   "status": "PASS",
-  "pdf_count": 4,
+  "pdf_count": 9,
   "failed": [],
   "results": [
     {
@@ -49,6 +49,96 @@
       "chars_per_page": 0.0,
       "median_image_dpi": 200.0,
       "blank_pages": 256,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-14e3927ff5ea54e74c78.pdf",
+      "status": "pass",
+      "pages": 2176,
+      "bytes": 51605612,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 2176,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-7f6a86e225de04f89f9e.pdf",
+      "status": "pass",
+      "pages": 2442,
+      "bytes": 47647887,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 2442,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-e7f61c1cb5c0ac9509f4.pdf",
+      "status": "pass",
+      "pages": 1,
+      "bytes": 9439,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 1,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "sarih-sunna-tabari.pdf",
+      "status": "pass",
+      "pages": 56,
+      "bytes": 717965,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 56,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "sunan-abi-dawud.pdf",
+      "status": "pass",
+      "pages": 132,
+      "bytes": 2187109,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 132,
       "checks": [
         "pdf-signature",
         "qpdf",
