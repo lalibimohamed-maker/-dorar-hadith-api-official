@@ -73,9 +73,13 @@ jobs:
               continue
             fi
 
-            # Include untracked canonical governance files in drift detection. A branch
-            # that lacked the auditor is therefore repaired and receives the canonical copy.
-            if [ -z "$(git -C "$worktree" status --porcelain -- .github/workflows scripts)" ]; then
+            # Do not pass absent directories to git as pathspecs: old/minimal branches may
+            # legitimately have no .github/workflows or scripts directory at all.
+            # Filter the complete clean-worktree status instead, preserving strict failure
+            # behavior for real git errors while making missing governance paths non-fatal.
+            governance_status="$(git -C "$worktree" status --porcelain --untracked-files=all \
+              | awk '$2 ~ /^(\.github\/workflows|scripts)\// {print}')"
+            if [ -z "$governance_status" ]; then
               echo "COMPLIANT $branch"
               git worktree remove --force "$worktree"
               continue
@@ -84,8 +88,8 @@ jobs:
             # main is protected: it is audited with the same rules, but repaired only through a reviewed PR.
             if [ "$branch" = "main" ]; then
               echo "PROTECTED_MAIN_DRIFT $branch"
-              git -C "$worktree" status --short -- .github/workflows scripts
-              git -C "$worktree" diff -- .github/workflows scripts
+              printf '%s\n' "$governance_status"
+              git -C "$worktree" diff -- .github/workflows scripts || true
               main_drift=1
               git worktree remove --force "$worktree"
               continue
@@ -98,7 +102,14 @@ jobs:
               continue
             fi
 
-            git -C "$worktree" add .github/workflows scripts
+            # Stage only directories that actually exist; git add must not receive a
+            # pathspec for a directory absent from an old/minimal branch.
+            if [ -d "$worktree/.github/workflows" ]; then
+              git -C "$worktree" add .github/workflows
+            fi
+            if [ -d "$worktree/scripts" ]; then
+              git -C "$worktree" add scripts
+            fi
             git -C "$worktree" commit -m 'chore(governance): repair branch workflow policy'
 
             current_sha="$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')"
