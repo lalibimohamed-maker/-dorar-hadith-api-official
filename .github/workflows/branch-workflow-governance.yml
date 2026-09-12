@@ -59,13 +59,23 @@ jobs:
             echo "=== auditing $branch @ $before_sha ==="
             git worktree add --detach "$worktree" "$before_sha" >/dev/null
 
+            # The auditor is governance infrastructure owned by main, not branch content.
+            # Run the canonical main version even when the audited commit predates it or
+            # does not contain the script. This prevents missing-tool false failures.
+            mkdir -p "$worktree/scripts"
+            cp scripts/enforce_all_branch_governance.py \
+              "$worktree/scripts/enforce_all_branch_governance.py"
+            chmod 0755 "$worktree/scripts/enforce_all_branch_governance.py"
+
             if ! (cd "$worktree" && python3 scripts/enforce_all_branch_governance.py); then
               echo "POLICY_ERROR $branch"
               git worktree remove --force "$worktree"
               continue
             fi
 
-            if git -C "$worktree" diff --quiet -- .github/workflows scripts; then
+            # Include untracked canonical governance files in drift detection. A branch
+            # that lacked the auditor is therefore repaired and receives the canonical copy.
+            if [ -z "$(git -C "$worktree" status --porcelain -- .github/workflows scripts)" ]; then
               echo "COMPLIANT $branch"
               git worktree remove --force "$worktree"
               continue
@@ -74,6 +84,7 @@ jobs:
             # main is protected: it is audited with the same rules, but repaired only through a reviewed PR.
             if [ "$branch" = "main" ]; then
               echo "PROTECTED_MAIN_DRIFT $branch"
+              git -C "$worktree" status --short -- .github/workflows scripts
               git -C "$worktree" diff -- .github/workflows scripts
               main_drift=1
               git worktree remove --force "$worktree"
