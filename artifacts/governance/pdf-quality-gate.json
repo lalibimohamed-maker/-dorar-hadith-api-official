@@ -1,7 +1,7 @@
 {
   "schema": "rechercher-pdf-quality-gate/v1",
   "status": "PASS",
-  "pdf_count": 14,
+  "pdf_count": 16,
   "failed": [],
   "results": [
     {
@@ -131,6 +131,24 @@
       ]
     },
     {
+      "file": "master-e7f61c1cb5c0ac9509f4--fac518229102.pdf",
+      "status": "pass",
+      "pages": 1,
+      "bytes": 9439,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 1,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-e7f61c1cb5c0ac9509f4.pdf",
       "status": "pass",
       "pages": 1,
@@ -157,6 +175,24 @@
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
       "blank_pages": 3480,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "sarih-sunna-tabari--9825c0a33231.pdf",
+      "status": "pass",
+      "pages": 56,
+      "bytes": 717965,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 56,
       "checks": [
         "pdf-signature",
         "qpdf",
