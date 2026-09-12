@@ -15,6 +15,7 @@ permissions:
 env:
   GIT_TERMINAL_PROMPT: '0'
   REVIEW_BRANCH: 'rechercher/salaf-01-400h-developer-review-acquisition'
+  CATALOG_PATH: 'books-batches/encyclopedia-master/catalog.json'
 
 concurrency:
   group: rechercher-acquire-first
@@ -45,10 +46,29 @@ jobs:
           set -euo pipefail
           test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
 
+      - name: Materialize central unbounded master catalog
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_materialize_master_catalog.py --root "$GITHUB_WORKSPACE"
+          test -s "$CATALOG_PATH"
+          python3 - "$CATALOG_PATH" <<'PY'
+          import json, sys
+          from pathlib import Path
+          p=Path(sys.argv[1])
+          d=json.loads(p.read_text(encoding='utf-8'))
+          books=d.get('books', [])
+          print('ACQUIRE_FIRST_MASTER_CATALOG', json.dumps({
+              'path': str(p),
+              'records': len(books),
+              'with_sources': sum(bool(b.get('sources')) for b in books),
+          }, ensure_ascii=False, sort_keys=True))
+          PY
+
       - name: Acquire copies — first persistence boundary
         run: |
           set -euo pipefail
           python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" \
+            --catalog "$CATALOG_PATH" \
             --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
             --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
           test -s books-batches/salaf-01-400h/developer-review-manifest.json
