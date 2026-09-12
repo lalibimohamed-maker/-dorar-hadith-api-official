@@ -63,6 +63,7 @@ jobs:
         run: |
           set -euo pipefail
           git fetch origin "$REVIEW_BRANCH"
+          mkdir -p books-batches/salaf-01-400h
           git show "origin/$REVIEW_BRANCH:books-batches/salaf-01-400h/developer-review-manifest.json" > books-batches/salaf-01-400h/developer-review-manifest.json
           test -s books-batches/salaf-01-400h/developer-review-manifest.json
 
@@ -93,11 +94,24 @@ jobs:
           gh auth setup-git
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          # The authoritative manifest was materialized from REVIEW_BRANCH above.
+          # It is intentionally untracked while this job is still on main. A direct
+          # checkout of REVIEW_BRANCH would therefore abort because that branch tracks
+          # the same path. Remove only this exact generated copy; REVIEW_BRANCH will
+          # restore its tracked copy immediately after checkout.
+          REVIEW_MANIFEST='books-batches/salaf-01-400h/developer-review-manifest.json'
+          test -s "$REVIEW_MANIFEST"
+          rm -f -- "$REVIEW_MANIFEST"
+
           git add artifacts/governance/pdf-hygiene-report.json
           git diff --cached --quiet || git commit -m 'data(rechercher): persist whole-encyclopedia PDF hygiene report'
           STATE_COMMIT=$(git rev-parse HEAD)
+
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
+          test -s "$REVIEW_MANIFEST"
+
           git checkout "$STATE_COMMIT" -- artifacts/governance/pdf-hygiene-report.json
           git add artifacts/governance/pdf-hygiene-report.json
           git diff --cached --quiet || git commit -m 'data(rechercher): reconcile whole-encyclopedia PDF hygiene state'
