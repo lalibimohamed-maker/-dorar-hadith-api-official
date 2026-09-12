@@ -2295,5 +2295,14 @@
     "rights_are_not_inferred": true,
     "real_pdf_is_required_for_acquisition": true,
     "verified_pdf_is_never_deleted_by_catalog_cleanup": true
+  },
+  "volume_evidence": {
+    "schema": "rechercher-volume-evidence/v1",
+    "resolved": 6,
+    "unresolved": 241,
+    "methods": {
+      "explicit-book-metadata": 6
+    },
+    "rule": "never infer one volume without direct or source-enumeration evidence"
   }
 }
