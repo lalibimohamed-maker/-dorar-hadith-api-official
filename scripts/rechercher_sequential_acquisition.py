@@ -21,11 +21,6 @@ def run_checked(path: Path, *args: str):
 
 
 def acquired_ids() -> set[str]:
-    """Return IDs with a persisted, validated acquisition manifest.
-
-    This is deliberately manifest-based: a PDF sitting in storage alone is not
-    enough to suppress a queue item, and no rights state is inferred here.
-    """
     found: set[str] = set()
     artifacts = ROOT / "artifacts"
     for manifest in artifacts.glob("*.manifest.json"):
@@ -44,15 +39,10 @@ def acquired_ids() -> set[str]:
 
 
 def prepare_pending_only_catalog(acquired: set[str]):
-    """Temporarily expose only pending books to the PDF engine.
-
-    The materialized master catalog remains the persistent source of truth. All
-    catalog files are restored in a finally block after the engine finishes.
-    """
+    """Temporarily expose only pending books; restore all catalogs afterward."""
     catalogs = sorted((ROOT / "books-batches").glob("**/catalog.json"))
     if not acquired or not catalogs:
         return None
-
     backup_root = ROOT / ".rechercher-catalog-backup"
     backup_root.mkdir(parents=True, exist_ok=True)
     backups = []
@@ -62,8 +52,6 @@ def prepare_pending_only_catalog(acquired: set[str]):
         backup.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(catalog), str(backup))
         backups.append((catalog, backup))
-
-    master_backup = backup_root / "master-original.json"
     master_original = next((b for c, b in backups if c == ROOT / "books-batches/encyclopedia-master/catalog.json"), None)
     if master_original is None:
         raise RuntimeError("materialized master catalog missing")
@@ -92,21 +80,20 @@ def restore_catalogs(backups):
         catalog.unlink(missing_ok=True)
         catalog.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(backup), str(catalog))
-    root = ROOT / ".rechercher-catalog-backup"
-    shutil.rmtree(root, ignore_errors=True)
+    shutil.rmtree(ROOT / ".rechercher-catalog-backup", ignore_errors=True)
 
 
 def main() -> int:
-    if not BUILDER.is_file():
-        if not GOVERNED_BUILDER.is_file():
-            raise SystemExit(f"missing master catalog materializer: {GOVERNED_BUILDER}")
-        shutil.copy2(GOVERNED_BUILDER, BUILDER)
+    # Always take the builder/resolver from the reviewed main checkout. The
+    # target branch is persistent state, not the source of executable policy.
+    if not GOVERNED_BUILDER.is_file():
+        raise SystemExit(f"missing governed master catalog materializer: {GOVERNED_BUILDER}")
+    shutil.copy2(GOVERNED_BUILDER, BUILDER)
     run_checked(BUILDER)
 
-    if not VOLUME_RESOLVER.is_file() and GOVERNED_VOLUME_RESOLVER.is_file():
-        shutil.copy2(GOVERNED_VOLUME_RESOLVER, VOLUME_RESOLVER)
-    if not VOLUME_RESOLVER.is_file():
-        raise SystemExit(f"missing volume-evidence resolver: {VOLUME_RESOLVER}")
+    if not GOVERNED_VOLUME_RESOLVER.is_file():
+        raise SystemExit(f"missing governed volume-evidence resolver: {GOVERNED_VOLUME_RESOLVER}")
+    shutil.copy2(GOVERNED_VOLUME_RESOLVER, VOLUME_RESOLVER)
     run_checked(VOLUME_RESOLVER)
 
     if not ENGINE.is_file():
@@ -129,13 +116,11 @@ def main() -> int:
         return engine_result.returncode
     if not isinstance(summary, list) or not summary:
         return engine_result.returncode
-
     items = [item for item in summary if isinstance(item, dict)]
     statuses = {str(item.get("status")) for item in items}
     retryable = sum(1 for item in items if item.get("status") in RETRYABLE_STATUSES)
     acquired = sum(1 for item in items if item.get("status") == "acquired")
     terminal_failures = statuses - RETRYABLE_STATUSES - {"acquired"}
-
     if statuses and not terminal_failures:
         print(f"ACQUISITION_PROGRESS_OK acquired={acquired} retryable={retryable} total={len(items)}", flush=True)
         if retryable:
