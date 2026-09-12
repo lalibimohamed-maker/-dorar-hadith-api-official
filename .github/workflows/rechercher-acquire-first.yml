@@ -2,8 +2,10 @@ name: Rechercher — Acquire first, store first
 
 on:
   workflow_dispatch:
+  # This job has a 4-hour timeout. Schedule no more frequently than that so
+  # completed/active runs are not followed by a superseding waiting request.
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0 */4 * * *'
 
 # Acquire-first pipeline: a successfully acquired copy is stored before any
 # downstream research/governance stage can block persistence.
