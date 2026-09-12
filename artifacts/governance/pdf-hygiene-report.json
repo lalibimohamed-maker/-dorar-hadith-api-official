@@ -1,0 +1,58 @@
+{
+  "schema": "din-allah-encyclopedia/pdf-hygiene/v2",
+  "scope": {
+    "pdf_root": "artifacts/developer-review-vault",
+    "recursive": true,
+    "whole_recovered_encyclopedia_vault": true
+  },
+  "policy": {
+    "automatic_delete": "none",
+    "safe_duplicate_action": "quarantine_exact_sha256_duplicate_same_catalog_identity_only",
+    "near_duplicates": "report_only",
+    "same_bytes_different_catalog_identity": "report_only",
+    "untracked_pdfs": "report_only",
+    "quarantine": "reversible_and_auditable"
+  },
+  "counts": {
+    "pdf_files_scanned": 24,
+    "valid_pdf_files": 24,
+    "invalid_pdf_signatures": 0,
+    "unique_sha256_groups": 24,
+    "exact_duplicate_groups": 0,
+    "safe_redundant_copies_quarantined": 0,
+    "ambiguous_duplicate_groups": 0,
+    "untracked_pdf_files": 0,
+    "remaining_active_pdfs": 24
+  },
+  "invalid_pdf_files": [],
+  "exact_duplicate_groups": [],
+  "quarantined": [],
+  "ambiguous": [],
+  "untracked_pdf_files": [],
+  "remaining_active_pdfs": [
+    "--070b79c9cd34--815871ce985663033236.pdf",
+    "--2b2ed1f3b4e0--a8ab295f4f70e2728e41.pdf",
+    "--2f1146e3762b--38f6826d3cf8951699dd.pdf",
+    "--9218ac59ba3c--f2dd65451be321212d9b.pdf",
+    "--96069568cb10--da382a9bb351e40a186a.pdf",
+    "--9f55cd1f42bf--2035b151964cd72c599d.pdf",
+    "--b7367c5ffce5--c05bd319b59e91d7701f.pdf",
+    "-.--6a76180e74a2--f09d33fe8680ceded190.pdf",
+    "-.--771739b67c4d--38b69ecb87686711e638.pdf",
+    "-.--9981cac55a5a--baba45e763a5ddb9f64d.pdf",
+    "-.--c24bdd6bc88c--0d85bb3a9cf7bb145e68.pdf",
+    "-.--e7f61c1cb5c0--9ef84008dd279ac89c46.pdf",
+    "-.-.--14e3927ff5ea--118811137b63023fbc17.pdf",
+    "-.-.--3d162e0d6b26--7504b4def6c4659fb6d9.pdf",
+    "-.-.--d4a7f77dd375--d848dc71344d0da84688.pdf",
+    "-.-.--e0f9e4f5749f--7ba5b3ba9267d4f05fdf.pdf",
+    "-.-.-.--7f6a86e225de--5fbbcce683686701b851.pdf",
+    "-.-.-.--f9fee0e52281--6d4f57c47a0b4bc41f91.pdf",
+    "musnad-ahmad--9678fd5b92b4d00a2745.pdf",
+    "muwatta-malik--bcfa9d83388f2ebcab30.pdf",
+    "sarih-sunna-tabari--456069b3afd722788f15.pdf",
+    "sunan-abi-dawud--bf50c14a30130b888f49.pdf",
+    "sunan-al-nasai--94691e4256773250291d.pdf",
+    "usul-al-sunnah-al-humaydi--0680c77533f3461acc49.pdf"
+  ]
+}
