@@ -55,18 +55,26 @@ def main() -> int:
     if not isinstance(summary, list) or not summary:
         return engine_result.returncode
 
-    statuses = {str(item.get("status")) for item in summary if isinstance(item, dict)}
-    if statuses and statuses.issubset(RETRYABLE_STATUSES):
-        retryable = sum(
-            1
-            for item in summary
-            if isinstance(item, dict) and item.get("status") in RETRYABLE_STATUSES
-        )
+    items = [item for item in summary if isinstance(item, dict)]
+    statuses = {str(item.get("status")) for item in items}
+    retryable = sum(1 for item in items if item.get("status") in RETRYABLE_STATUSES)
+    acquired = sum(1 for item in items if item.get("status") == "acquired")
+    terminal_failures = statuses - RETRYABLE_STATUSES - {"acquired"}
+
+    # A partial-progress pass is successful when every non-acquired result is
+    # explicitly retryable. This preserves real PDFs already acquired while
+    # leaving unresolved volume/source gaps pending for the next scheduled pass.
+    if statuses and not terminal_failures:
         print(
-            f"RETRYABLE_ACQUISITION_GAPS={retryable} "
-            "(kept pending for the next scheduled pass)",
+            f"ACQUISITION_PROGRESS_OK acquired={acquired} retryable={retryable} total={len(items)}",
             flush=True,
         )
+        if retryable:
+            print(
+                f"RETRYABLE_ACQUISITION_GAPS={retryable} "
+                "(kept pending for the next scheduled pass)",
+                flush=True,
+            )
         return 0
 
     return engine_result.returncode
