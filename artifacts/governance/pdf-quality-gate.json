@@ -1,7 +1,7 @@
 {
   "schema": "rechercher-pdf-quality-gate/v1",
   "status": "PASS",
-  "pdf_count": 67,
+  "pdf_count": 77,
   "failed": [],
   "results": [
     {
@@ -103,6 +103,24 @@
       "chars_per_page": 0.0,
       "median_image_dpi": 200.0,
       "blank_pages": 256,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "fusul-fi-usul-jassas.pdf",
+      "status": "pass",
+      "pages": 520,
+      "bytes": 12203067,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 275.0,
+      "blank_pages": 520,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -221,6 +239,42 @@
       ]
     },
     {
+      "file": "master-22025b2889bfe3cf8d45.pdf",
+      "status": "pass",
+      "pages": 384,
+      "bytes": 32194997,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 384,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-2524af3dbaa76c02ab8b.pdf",
+      "status": "pass",
+      "pages": 586,
+      "bytes": 68917270,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 586,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-2aabe3466ffc10bdc6c1--19321020c7f1.pdf",
       "status": "pass",
       "pages": 253,
@@ -240,6 +294,24 @@
     },
     {
       "file": "master-2aabe3466ffc10bdc6c1--ba48c045852e.pdf",
+      "status": "pass",
+      "pages": 253,
+      "bytes": 1752682,
+      "text_chars": 442013,
+      "chars_per_page": 1747.09,
+      "median_image_dpi": null,
+      "blank_pages": 0,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-2aabe3466ffc10bdc6c1--bccf0e4ed8d8.pdf",
       "status": "pass",
       "pages": 253,
       "bytes": 1752682,
@@ -511,12 +583,12 @@
     {
       "file": "master-796220a3674e1bb12d75.pdf",
       "status": "pass",
-      "pages": 3480,
-      "bytes": 54060213,
+      "pages": 6946,
+      "bytes": 123029938,
       "text_chars": 0,
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
-      "blank_pages": 3480,
+      "blank_pages": 6946,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -797,6 +869,24 @@
       ]
     },
     {
+      "file": "master-e7f61c1cb5c0ac9509f4--f69fb335851f.pdf",
+      "status": "pass",
+      "pages": 1,
+      "bytes": 9439,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 1,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-e7f61c1cb5c0ac9509f4--fac518229102.pdf",
       "status": "pass",
       "pages": 1,
@@ -823,6 +913,24 @@
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
       "blank_pages": 1,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-e9ca220a0ead848d089d.pdf",
+      "status": "pass",
+      "pages": 586,
+      "bytes": 68917270,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 586,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -923,6 +1031,24 @@
       ]
     },
     {
+      "file": "musannaf-ibn-abi-shaybah-india.pdf",
+      "status": "pass",
+      "pages": 1332,
+      "bytes": 52211717,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 1332,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "muwatta-malik.pdf",
       "status": "pass",
       "pages": 639,
@@ -961,12 +1087,12 @@
     {
       "file": "sahih-bukhari.pdf",
       "status": "pass",
-      "pages": 494,
-      "bytes": 6481443,
-      "text_chars": 736326,
-      "chars_per_page": 1490.54,
-      "median_image_dpi": 247.0,
-      "blank_pages": 12,
+      "pages": 58,
+      "bytes": 11298612,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 58,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -996,6 +1122,24 @@
     },
     {
       "file": "sarih-sunna-tabari--9825c0a33231.pdf",
+      "status": "pass",
+      "pages": 56,
+      "bytes": 717965,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 56,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "sarih-sunna-tabari--b29babcc56d1.pdf",
       "status": "pass",
       "pages": 56,
       "bytes": 717965,
@@ -1087,12 +1231,12 @@
     {
       "file": "sunan-abi-dawud.pdf",
       "status": "pass",
-      "pages": 686,
-      "bytes": 6908803,
+      "pages": 132,
+      "bytes": 2187109,
       "text_chars": 0,
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
-      "blank_pages": 686,
+      "blank_pages": 132,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -1139,6 +1283,24 @@
       ]
     },
     {
+      "file": "tawhid-ibn-khuzaymah--712f1386fd3d.pdf",
+      "status": "pass",
+      "pages": 658,
+      "bytes": 19404685,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 350.0,
+      "blank_pages": 658,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "tawhid-ibn-khuzaymah.pdf",
       "status": "pass",
       "pages": 658,
@@ -1147,6 +1309,24 @@
       "chars_per_page": 0.0,
       "median_image_dpi": 350.0,
       "blank_pages": 658,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "usul-al-sunnah-al-humaydi--33fba0f7ec72.pdf",
+      "status": "pass",
+      "pages": 56,
+      "bytes": 808164,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 56,
       "checks": [
         "pdf-signature",
         "qpdf",
