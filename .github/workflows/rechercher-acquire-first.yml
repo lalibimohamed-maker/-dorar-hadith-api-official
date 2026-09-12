@@ -10,8 +10,6 @@ on:
 permissions:
   contents: write
 
-# security-justification: this workflow requires contents: write only to persist encrypted, verified acquisition evidence and release assets; plaintext book copies are never committed.
-
 env:
   GIT_TERMINAL_PROMPT: '0'
   REVIEW_BRANCH: 'rechercher/salaf-01-400h-developer-review-acquisition'
@@ -67,10 +65,10 @@ jobs:
       - name: Acquire copies — first persistence boundary
         run: |
           set -euo pipefail
+          # The central materialized catalog is the authoritative acquisition input.
+          # Do not pass legacy Salaf discovery registries that are no longer tracked.
           python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" \
-            --catalog "$CATALOG_PATH" \
-            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
-            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+            --catalog "$CATALOG_PATH"
           test -s books-batches/salaf-01-400h/developer-review-manifest.json
           python3 - <<'PY'
           import json
