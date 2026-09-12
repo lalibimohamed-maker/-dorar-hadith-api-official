@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BUILDER = ROOT / "scripts/rechercher_materialize_master_catalog.py"
 GOVERNED_BUILDER = ROOT / ".governance-source/scripts/rechercher_materialize_master_catalog.py"
+VOLUME_RESOLVER = ROOT / "scripts/rechercher_resolve_volume_evidence.py"
 ENGINE = ROOT / "scripts/rechercher_acquisition_engine.py"
 RETRYABLE_STATUSES = {
     "blocked-missing-expected-volumes",
@@ -23,6 +24,10 @@ def main() -> int:
             raise SystemExit(f"missing master catalog materializer: {GOVERNED_BUILDER}")
         shutil.copy2(GOVERNED_BUILDER, BUILDER)
     subprocess.run([sys.executable, str(BUILDER)], cwd=ROOT, check=True)
+
+    if not VOLUME_RESOLVER.is_file():
+        raise SystemExit(f"missing volume-evidence resolver: {VOLUME_RESOLVER}")
+    subprocess.run([sys.executable, str(VOLUME_RESOLVER)], cwd=ROOT, check=True)
 
     if not ENGINE.is_file():
         raise SystemExit(f"missing governed real-PDF acquisition engine: {ENGINE}")
