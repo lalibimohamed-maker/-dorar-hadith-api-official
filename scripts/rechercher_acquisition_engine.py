@@ -10,6 +10,7 @@ Contract:
 - merge duplicate catalog overlays before acquisition;
 - require acquisition-critical metadata without raising raw KeyError;
 - validate and repair PDFs with qpdf;
+- apply the canonical PDF quality/completeness gate before promotion;
 - compare reachable catalogued candidates and retain the best-quality PDF;
 - preserve provenance, hashes and rights state;
 - never advance a book to acquired unless every expected volume is real and valid.
@@ -27,6 +28,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import quote, urljoin, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
+
+from rechercher_pdf_quality_gate import inspect as inspect_pdf
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--root", default=None)
@@ -261,8 +264,13 @@ def acquire_volume(book, volume, expected, work):
                     if validation["status"] not in ("valid", "repaired"):
                         attempts.append({"source": url, "status": "invalid_pdf", "reason": validation.get("reason")})
                         continue
+                    quality = inspect_pdf(candidate)
+                    if quality.get("status") != "pass":
+                        attempts.append({"source": url, "status": "quality_rejected", "reason": quality.get("reason"), "quality": quality})
+                        print(f"REJECTED quality {book_key(book)} volume {volume}: {url} reason={quality.get('reason')}", flush=True)
+                        continue
                     q = quality_score(candidate)
-                    rec = {"source": url, "source_label": source.get("label"), "source_index": source_index, "url_index": url_index, "validation": validation, "quality": q}
+                    rec = {"source": url, "source_label": source.get("label"), "source_index": source_index, "url_index": url_index, "validation": validation, "quality": q, "quality_gate": quality}
                     attempts.append({"source": url, "status": "valid_candidate", "quality": q})
                     rank = (q["score"], q.get("median_image_dpi") or 0, q["pages"], q["bytes"])
                     best_rank = (best["quality"]["score"], best["quality"].get("median_image_dpi") or 0, best["quality"]["pages"], best["quality"]["bytes"]) if best else None
@@ -286,6 +294,7 @@ def acquire_volume(book, volume, expected, work):
             "source_label": best.get("source_label"), "source_index": best.get("source_index"),
             "bytes": final.stat().st_size, "sha256": sha256(final),
             "validation": best["validation"], "quality": best["quality"],
+            "quality_gate": best["quality_gate"],
             "candidate_count": sum(1 for a in attempts if a.get("status") == "valid_candidate"),
             "attempts": attempts,
         }
@@ -320,8 +329,9 @@ def acquire(book):
         final = work / f"{volume:03d}.pdf"
         if final.exists() and not REEVALUATE_EXISTING:
             validation = validate_and_repair(final)
-            if validation["status"] in ("valid", "repaired"):
-                vols.append({"volume": volume, "status": "already-present", "bytes": final.stat().st_size, "sha256": sha256(final), "validation": validation})
+            quality = inspect_pdf(final) if validation["status"] in ("valid", "repaired") else {"status": "fail", "reason": "qpdf-invalid"}
+            if validation["status"] in ("valid", "repaired") and quality.get("status") == "pass":
+                vols.append({"volume": volume, "status": "already-present", "bytes": final.stat().st_size, "sha256": sha256(final), "validation": validation, "quality_gate": quality})
                 continue
             final.unlink(missing_ok=True)
         _, record = acquire_volume(book, volume, expected, work)
@@ -338,13 +348,17 @@ def acquire(book):
     unified_validation = validate_and_repair(unified)
     if unified_validation["status"] not in ("valid", "repaired"):
         return {"id": book_key(book), "status": "unified-validation-failed", "rights_state": rights_state(book)}
+    unified_quality = inspect_pdf(unified)
+    if unified_quality.get("status") != "pass":
+        unified.unlink(missing_ok=True)
+        return {"id": book_key(book), "status": "unified-quality-failed", "quality_gate": unified_quality, "rights_state": rights_state(book)}
     state = rights_state(book)
     redistributable = redistribution_is_allowed(book)
     manifest = {
         "id": book_key(book), "title": book.get("title"), "author": book.get("author"),
         "edition": book.get("edition"), "expected_volumes": expected, "downloaded_volumes": len(vols),
         "volumes": vols, "unified_file": str(unified.relative_to(ROOT)), "unified_bytes": unified.stat().st_size,
-        "unified_sha256": sha256(unified), "unified_validation": unified_validation,
+        "unified_sha256": sha256(unified), "unified_validation": unified_validation, "unified_quality_gate": unified_quality,
         "acquisition": "acquired", "pdf": "real+validated", "storage": "permanent",
         "rights_review": state, "acquisition_basis_at_download": book.get("acquisition_status") or book.get("rights_status"),
         "public_browser": redistributable, "public_download": redistributable,
