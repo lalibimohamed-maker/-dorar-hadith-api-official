@@ -5,7 +5,9 @@ on:
   schedule:
     # Automatic continuation. The persistent queue decides what remains;
     # there is no finite book-count target.
-    - cron: '*/5 * * * *'
+    # Keep the interval longer than the normal acquisition window so
+    # scheduled requests do not build a superseding concurrency queue.
+    - cron: '0 */6 * * *'
 
 # security-justification: trusted default-branch caller only; it invokes the
 # reviewed central reusable acquisition workflow and persists only verified
