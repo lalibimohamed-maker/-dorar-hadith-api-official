@@ -2,8 +2,11 @@ name: Rechercher — Encyclopedia continuous PDF downloader
 
 on:
   workflow_dispatch:
+  # The governed acquisition job can run for up to 6 hours. Keep the scheduled
+  # cadence at the timeout boundary so scheduled runs do not build a waiting
+  # queue that supersedes earlier requests. Manual dispatch remains available.
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0 */6 * * *'
 
 # security-justification: contents: write is required by the governed reusable
 # acquisition workflow to persist only verified PDFs and resumable governance state.
