@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
-"""Materialize the single Rechercher master catalog and enrich missing sources.
+"""Materialize the master catalog and persist global PDF-source discovery.
 
-Historical discovery remains metadata-only. Source discovery may attach a
-candidate public PDF URL, but it never infers redistribution rights. A book is
-only considered acquired after the normal PDF, identity, volume and rights
-ledger gates succeed.
+Discovery never grants redistribution rights. Only real PDF/download candidates
+are promoted to acquisition sources; metadata-only providers remain evidence.
 """
 from __future__ import annotations
 
 import difflib
 import hashlib
+import html
 import json
 import re
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urljoin, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,67 +25,31 @@ HISTORICAL = [
     "books-batches/salaf-01-400h/master-discovery-additions-2026.json",
     "books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json",
 ]
-IA_SEARCH = "https://archive.org/advancedsearch.php?q={query}&fl[]=identifier,title,creator,description,volume&rows=8&page=1&output=json"
+IA_SEARCH = "https://archive.org/advancedsearch.php?q={query}&fl[]=identifier,title,creator,description,volume&rows=12&page=1&output=json"
 IA_METADATA = "https://archive.org/metadata/{}"
-USER_AGENT = "DinAllah-Encyclopedia-Rechercher/2.0"
+WAQFEYA_SEARCH = "https://waqfeya.net/search.php?field=title&getword={query}&st=0"
+GOOGLE_BOOKS = "https://www.googleapis.com/books/v1/volumes?q={query}&maxResults=10"
+OPENLIBRARY = "https://openlibrary.org/search.json?q={query}&limit=10"
+USER_AGENT = "DinAllah-Encyclopedia-Rechercher/3.0"
 ARABIC_MARKS = re.compile(r"[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]")
+PDF_RE = re.compile(r"\.pdf(?:\?|$)", re.I)
 
 
-def load_json_text(text: str):
-    return json.loads(text)
+def http_json(url, timeout=30):
+    req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
+    with urlopen(req, timeout=timeout) as response:
+        return json.loads(response.read().decode("utf-8", "replace"))
 
 
-def git_history_json(path: str):
-    try:
-        out = subprocess.check_output(["git", "show", f"{HISTORY_COMMIT}:{path}"], cwd=ROOT, text=True)
-        return load_json_text(out)
-    except Exception:
-        return None
+def fetch_text(url, timeout=30):
+    req = Request(url, headers={"User-Agent": USER_AGENT})
+    with urlopen(req, timeout=timeout) as response:
+        return response.read().decode("utf-8", "replace")
 
 
-def stable_id(title: str, author: str, death):
-    raw = f"{title}|{author}|{death or ''}".encode("utf-8")
-    return "master-" + hashlib.sha256(raw).hexdigest()[:20]
-
-
-def as_book(entry: dict, source: str):
-    title = str(entry.get("title") or "").strip()
-    author = str(entry.get("author") or "").strip()
-    if not title:
-        return None
-    death = entry.get("author_death_hijri", entry.get("death_hijri"))
-    book = dict(entry)
-    book["id"] = book.get("id") or stable_id(title, author, death)
-    book["source_registry"] = source
-    book.setdefault("rights_status", "discovery-only")
-    return book
-
-
-def source_entries(data, source):
-    if not isinstance(data, dict):
-        return []
-    out = []
-    for key in ("books", "entries"):
-        values = data.get(key)
-        if isinstance(values, list):
-            for item in values:
-                if isinstance(item, dict):
-                    b = as_book(item, source)
-                    if b:
-                        out.append(b)
-    return out
-
-
-def key(book):
-    return (str(book.get("title") or "").strip(), str(book.get("author") or "").strip(), book.get("author_death_hijri", book.get("death_hijri")))
-
-
-def chronology(book):
-    value = book.get("chronology_hijri", book.get("author_death_hijri", book.get("death_hijri")))
-    try:
-        return (0, int(value), str(book.get("title") or ""))
-    except (TypeError, ValueError):
-        return (1, 999999, str(book.get("title") or ""))
+def normalize_url(url):
+    p = urlsplit(str(url))
+    return urlunsplit((p.scheme, p.netloc, quote(p.path, safe="/%:@-._~"), p.query, p.fragment))
 
 
 def norm(value):
@@ -105,29 +68,221 @@ def similarity(a, b):
     return max(overlap, difflib.SequenceMatcher(None, na, nb).ratio())
 
 
-def http_json(url, timeout=30):
-    req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
-    with urlopen(req, timeout=timeout) as response:
-        return json.loads(response.read().decode("utf-8", "replace"))
+def key(book):
+    return (str(book.get("title") or "").strip(), str(book.get("author") or "").strip(), book.get("author_death_hijri", book.get("death_hijri")))
+
+
+def stable_id(title, author, death):
+    return "master-" + hashlib.sha256(f"{title}|{author}|{death or ''}".encode()).hexdigest()[:20]
+
+
+def as_book(entry, source):
+    title = str(entry.get("title") or "").strip()
+    if not title:
+        return None
+    book = dict(entry)
+    book["id"] = book.get("id") or stable_id(title, str(book.get("author") or ""), book.get("author_death_hijri", book.get("death_hijri")))
+    book["source_registry"] = source
+    book.setdefault("rights_status", "discovery-only")
+    return book
+
+
+def source_entries(data, source):
+    out = []
+    if not isinstance(data, dict):
+        return out
+    for field in ("books", "entries"):
+        for item in data.get(field) or []:
+            if isinstance(item, dict):
+                book = as_book(item, source)
+                if book:
+                    out.append(book)
+    return out
+
+
+def git_history_json(path):
+    try:
+        return json.loads(subprocess.check_output(["git", "show", f"{HISTORY_COMMIT}:{path}"], cwd=ROOT, text=True))
+    except Exception:
+        return None
 
 
 def normalize_legacy_sources(book):
     if isinstance(book.get("sources"), list) and book.get("sources"):
-        return book
+        return dict(book)
+    result = dict(book)
     candidates = []
-    for key_name in ("source_url", "url", "waqfeya_url", "archive_url", "internet_archive_url", "openlibrary_url"):
-        value = book.get(key_name)
-        if value:
-            candidates.append({"url": str(value), "label": key_name, "discover_pdfs": True})
+    for field in ("source_url", "url", "waqfeya_url", "archive_url", "internet_archive_url", "openlibrary_url"):
+        if result.get(field):
+            candidates.append({"url": str(result[field]), "label": field, "discover_pdfs": True})
     if candidates:
-        result = dict(book)
         result["sources"] = candidates
-        return result
-    return book
+    return result
 
 
-def discover_archive_source(book):
-    """Return only high-confidence IA PDF candidates; never grant rights."""
+def merge_sources(existing, additions):
+    merged = list(existing or []) if isinstance(existing, list) else []
+    seen = {normalize_url(x.get("url")) for x in merged if isinstance(x, dict) and x.get("url")}
+    for item in additions:
+        if not item.get("url"):
+            continue
+        url = normalize_url(item["url"])
+        if url not in seen:
+            item = dict(item)
+            item["url"] = url
+            merged.append(item)
+            seen.add(url)
+    return merged
+
+
+def pdf_links(page, base):
+    out, seen = [], set()
+    for match in re.finditer(r'href=["\']([^"\']+)["\']', page, re.I):
+        url = normalize_url(urljoin(base, html.unescape(match.group(1))))
+        if PDF_RE.search(url) and not re.search(r"\.pdf\.enc(?:\?|$)", url, re.I) and url not in seen:
+            seen.add(url)
+            out.append(url)
+    return out
+
+
+def archive_candidates(title, author):
+    queries = [
+        f'title:"{title}" AND creator:"{author}"' if author else f'title:"{title}"',
+        f'"{title}" AND creator:"{author}"' if author else f'"{title}"',
+        f'title:{title}'
+    ]
+    results = []
+    seen_ids = set()
+    for raw in queries:
+        try:
+            payload = http_json(IA_SEARCH.format(query=quote(raw)))
+        except Exception:
+            continue
+        for doc in (((payload or {}).get("response") or {}).get("docs") or []):
+            identifier = str(doc.get("identifier") or "").strip()
+            if not identifier or identifier in seen_ids:
+                continue
+            creator = doc.get("creator")
+            if isinstance(creator, list):
+                creator = " ".join(map(str, creator))
+            ts = similarity(title, doc.get("title"))
+            au = similarity(author, creator) if author else 1.0
+            score = 0.65 * ts + 0.35 * au
+            if ts >= 0.78 and (not author or au >= 0.35):
+                seen_ids.add(identifier)
+                try:
+                    meta = http_json(IA_METADATA.format(quote(identifier, safe="")))
+                    files = meta.get("files") or []
+                except Exception:
+                    continue
+                pdfs = []
+                for item in files:
+                    name = str(item.get("name") or "")
+                    lower = name.casefold()
+                    if lower.endswith(".pdf") and not any(x in lower for x in ("_text.pdf", "_ocr.pdf", "_bw.pdf")):
+                        pdfs.append(name)
+                for pdf_name in pdfs[:24]:
+                    results.append({
+                        "url": f"https://archive.org/download/{quote(identifier, safe='')}/{quote(pdf_name, safe='/-_.')}",
+                        "pdf_url": f"https://archive.org/download/{quote(identifier, safe='')}/{quote(pdf_name, safe='/-_.')}",
+                        "label": "internet-archive-global-discovery",
+                        "provider": "Internet Archive",
+                        "discovery": "title-author-ranked-search",
+                        "match_score": round(score, 4),
+                        "identifier": identifier,
+                        "rights_review_required": True,
+                        "discover_pdfs": False,
+                    })
+    results.sort(key=lambda x: (-x.get("match_score", 0), x["url"]))
+    return results[:24]
+
+
+def waqfeya_candidates(title, author):
+    try:
+        page = fetch_text(WAQFEYA_SEARCH.format(query=quote(title)))
+    except Exception:
+        return []
+    links = []
+    for match in re.finditer(r'href=["\']([^"\']*/books/[^"\']+)["\']', page, re.I):
+        link = normalize_url(urljoin("https://waqfeya.net/", html.unescape(match.group(1))))
+        if link not in links:
+            links.append(link)
+    ranked = []
+    for link in links[:30]:
+        try:
+            book_page = fetch_text(link)
+        except Exception:
+            continue
+        page_title = ""
+        m = re.search(r'<h1[^>]*>(.*?)</h1>', book_page, re.I | re.S)
+        if m:
+            page_title = re.sub(r"<[^>]+>", " ", html.unescape(m.group(1)))
+        score = similarity(title, page_title or link)
+        if score < 0.65:
+            continue
+        pdfs = pdf_links(book_page, link)
+        for pdf in pdfs[:24]:
+            ranked.append({
+                "url": link,
+                "pdf_url": pdf,
+                "label": "waqfeya-global-discovery",
+                "provider": "Waqfeya",
+                "discovery": "title-ranked-book-page",
+                "match_score": round(score, 4),
+                "rights_review_required": True,
+                "discover_pdfs": False,
+            })
+    ranked.sort(key=lambda x: (-x.get("match_score", 0), x["pdf_url"]))
+    return ranked[:24]
+
+
+def google_books_candidates(title, author):
+    query = quote(f'intitle:{title} inauthor:{author}' if author else f'intitle:{title}')
+    try:
+        payload = http_json(GOOGLE_BOOKS.format(query=query))
+    except Exception:
+        return []
+    out = []
+    for item in (payload.get("items") or [])[:10]:
+        info = item.get("volumeInfo") or {}
+        access = item.get("accessInfo") or {}
+        score = similarity(title, info.get("title"))
+        if score < 0.75:
+            continue
+        pdf = access.get("pdf") or {}
+        link = pdf.get("downloadLink") or pdf.get("acsTokenLink")
+        if link:
+            out.append({"url": link, "pdf_url": link, "label": "google-books-pdf-discovery", "provider": "Google Books", "discovery": "accessInfo.pdf", "match_score": round(score, 4), "rights_review_required": True, "discover_pdfs": False})
+    return out
+
+
+def openlibrary_candidates(title, author):
+    query = quote(f'title:"{title}" author:"{author}"' if author else f'title:"{title}"')
+    try:
+        payload = http_json(OPENLIBRARY.format(query=query))
+    except Exception:
+        return []
+    out = []
+    for doc in (payload.get("docs") or [])[:10]:
+        score = similarity(title, doc.get("title"))
+        if score < 0.78:
+            continue
+        for ia in doc.get("ia") or []:
+            identifier = str(ia).strip()
+            if identifier:
+                out.append({
+                    "url": f"https://archive.org/details/{quote(identifier, safe='')}",
+                    "label": "openlibrary-to-archive-discovery",
+                    "provider": "Open Library",
+                    "discovery": "OpenLibrary IA identifier; PDF enumeration delegated to source page",
+                    "match_score": round(score, 4),
+                    "rights_review_required": True,
+                    "discover_pdfs": True,
+                })
+    return out
+
+
+def discover_sources(book):
     book = normalize_legacy_sources(book)
     if book.get("sources"):
         return book
@@ -135,94 +290,74 @@ def discover_archive_source(book):
     author = str(book.get("author") or "").strip()
     if not title:
         return book
-    query = quote(f'title:"{title}" AND creator:"{author}"' if author else f'title:"{title}"')
-    try:
-        payload = http_json(IA_SEARCH.format(query=query))
-        docs = (((payload or {}).get("response") or {}).get("docs") or [])
-    except Exception:
-        return book
-    ranked = []
-    for doc in docs:
-        score = similarity(title, doc.get("title"))
-        creator = doc.get("creator")
-        if isinstance(creator, list):
-            creator = " ".join(map(str, creator))
-        author_score = similarity(author, creator) if author else 1.0
-        combined = 0.65 * score + 0.35 * author_score
-        if score >= 0.86 and (not author or author_score >= 0.45):
-            ranked.append((combined, doc))
-    if not ranked:
-        return book
-    ranked.sort(key=lambda x: x[0], reverse=True)
-    best_score, best = ranked[0]
-    identifier = str(best.get("identifier") or "").strip()
-    if not identifier:
-        return book
-    try:
-        metadata = http_json(IA_METADATA.format(quote(identifier, safe="")))
-    except Exception:
-        return book
-    files = metadata.get("files") or []
-    pdfs = []
-    for item in files:
-        name = str(item.get("name") or "")
-        lower = name.casefold()
-        if not lower.endswith(".pdf") or any(x in lower for x in ("_text.pdf", "_ocr.pdf", "_bw.pdf")):
+    candidates = []
+    # Real-PDF-capable providers first; metadata providers may bridge to IA.
+    for worker in (
+        lambda: archive_candidates(title, author),
+        lambda: waqfeya_candidates(title, author),
+        lambda: google_books_candidates(title, author),
+        lambda: openlibrary_candidates(title, author),
+    ):
+        try:
+            candidates.extend(worker())
+        except Exception:
             continue
-        pdfs.append(name)
-    if len(pdfs) != 1:
-        return book
-    pdf_name = pdfs[0]
-    pdf_url = f"https://archive.org/download/{quote(identifier, safe='')}/{quote(pdf_name, safe='/-_.')}"
+    sources = merge_sources(book.get("sources"), candidates)
     result = dict(book)
-    result["sources"] = [{
-        "url": pdf_url,
-        "pdf_url": pdf_url,
-        "label": "internet-archive-source-discovery",
-        "discovery": "high-confidence-title-author-match",
-        "match_score": round(best_score, 4),
-        "identifier": identifier,
-        "rights_review_required": True,
-        "discover_pdfs": False,
-    }]
-    result["source_discovery"] = {
-        "provider": "Internet Archive",
-        "identifier": identifier,
-        "match_score": round(best_score, 4),
-        "pdf_candidates": 1,
-        "volume_inference": "single-file-candidate-only; expected volume may safely resolve to one only after direct-PDF validation",
-    }
+    if sources:
+        result["sources"] = sources
+        result["source_discovery"] = {
+            "attempted": True,
+            "providers": sorted({str(x.get("provider") or x.get("label")) for x in sources}),
+            "candidate_count": len(sources),
+            "discovery_version": "global-pdf-v1",
+        }
+    else:
+        result["source_discovery"] = {
+            "attempted": True,
+            "providers": ["Internet Archive", "Waqfeya", "Google Books", "Open Library"],
+            "candidate_count": 0,
+            "status": "no-pdf-candidate-found",
+            "discovery_version": "global-pdf-v1",
+        }
     return result
 
 
 def enrich_books(books):
-    targets = [b for b in books if not normalize_legacy_sources(b).get("sources")]
+    normalized = [normalize_legacy_sources(b) for b in books]
+    targets = [b for b in normalized if not b.get("sources")]
     if not targets:
-        return [normalize_legacy_sources(b) for b in books]
-    enriched = {key(b): normalize_legacy_sources(b) for b in books}
-    with ThreadPoolExecutor(max_workers=8, thread_name_prefix="rechercher-source") as pool:
-        futures = {pool.submit(discover_archive_source, b): key(b) for b in targets}
+        return normalized
+    enriched = {key(b): b for b in normalized}
+    with ThreadPoolExecutor(max_workers=8, thread_name_prefix="rechercher-global-source") as pool:
+        futures = {pool.submit(discover_sources, b): key(b) for b in targets}
         for future in as_completed(futures):
             try:
                 enriched[futures[future]] = future.result()
-            except Exception:
-                pass
+            except Exception as exc:
+                b = enriched[futures[future]]
+                b["source_discovery"] = {"attempted": True, "status": "discovery-error", "error": str(exc), "discovery_version": "global-pdf-v1"}
     return list(enriched.values())
+
+
+def chronology(book):
+    value = book.get("chronology_hijri", book.get("author_death_hijri", book.get("death_hijri")))
+    try:
+        return (0, int(value), str(book.get("title") or ""))
+    except (TypeError, ValueError):
+        return (1, 999999, str(book.get("title") or ""))
 
 
 def main():
     if not MASTER.exists():
         raise SystemExit(f"missing master catalog: {MASTER}")
     master = json.loads(MASTER.read_text(encoding="utf-8"))
-    books = list(master.get("books") or [])
-    merged = {key(b): b for b in books if isinstance(b, dict)}
-
+    merged = {key(b): b for b in (master.get("books") or []) if isinstance(b, dict)}
     for path in HISTORICAL:
         data = git_history_json(path)
         if data:
             for book in source_entries(data, f"git-history:{path}"):
                 merged.setdefault(key(book), book)
-
     source_dir = MASTER.parent / "sources"
     if source_dir.exists():
         for path in sorted(source_dir.glob("*.json")):
@@ -246,16 +381,20 @@ def main():
         "rights_are_not_inferred": True,
         "real_pdf_is_required_for_acquisition": True,
         "verified_pdfs_are_never_deleted_by_catalog_cleanup": True,
-        "source_discovery": "Internet Archive high-confidence title/author match; discovery never grants redistribution rights",
+        "source_discovery": "global multi-source PDF discovery v1",
+        "providers": ["Internet Archive", "Waqfeya", "Google Books", "Open Library"],
+        "metadata_providers_never_grant_rights": True,
         "legacy_url_normalization": "source_url/url/waqfeya/archive URLs are promoted into sources before acquisition",
     }
     MASTER.write_text(json.dumps(master, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    discovered = sum(1 for b in books if b.get("source_discovery"))
+    discovered = sum(1 for b in books if b.get("source_discovery", {}).get("candidate_count", 0) > 0)
     with_sources = sum(1 for b in books if b.get("sources"))
+    no_source = sum(1 for b in books if b.get("source_discovery", {}).get("candidate_count", 0) == 0)
     print("MASTER_CATALOG_MODE=UNBOUNDED")
     print(f"MASTER_CATALOG_RECORDS={len(books)}")
     print(f"MASTER_CATALOG_WITH_SOURCES={with_sources}")
     print(f"MASTER_CATALOG_SOURCE_DISCOVERY={discovered}")
+    print(f"MASTER_CATALOG_NO_SOURCE_AFTER_GLOBAL_DISCOVERY={no_source}")
     print("MASTER_CATALOG_TARGET=NONE")
     print("MASTER_CATALOG_STOP_CONDITION=NONE")
 
