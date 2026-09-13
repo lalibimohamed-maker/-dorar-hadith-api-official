@@ -15,8 +15,10 @@ on:
 permissions:
   contents: write
 
+# All acquisition callers write to the same secondary LFS repository. A shared
+# group prevents cross-queue non-fast-forward races on secondary/main.
 concurrency:
-  group: rechercher-continuous-whole-encyclopedia
+  group: rechercher-secondary-lfs-persistence
   cancel-in-progress: false
 
 jobs:
