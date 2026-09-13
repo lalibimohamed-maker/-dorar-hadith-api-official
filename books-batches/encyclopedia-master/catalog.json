@@ -1164,17 +1164,6 @@
       "id": "master-3b2d8599306a53eb7c5d",
       "source_registry": "git-history:books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json",
       "rights_status": "discovery-only",
-      "sources": [
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%B3%D9%8A%D8%B1_%D8%A3%D8%B9%D9%84%D8%A7%D9%85_%D8%A7%D9%84%D9%86%D8%A8%D9%84%D8%A7%D8%A1/%D9%85%D8%B9%D9%85%D8%B1_%D8%A8%D9%86_%D8%B1%D8%A7%D8%B4%D8%AF",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.6383,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        }
-      ],
       "discovery_evidence": {
         "attempted_providers": [
           "Gallica",
@@ -1210,7 +1199,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 1,
+        "source_candidate_count": 0,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -1220,9 +1209,21 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "Wikisource"
+          "DPLA",
+          "Gallica",
+          "Google Books",
+          "HathiTrust",
+          "Internet Archive",
+          "Library of Congress",
+          "Open Library",
+          "Qatar Digital Library",
+          "Waqfeya",
+          "Wikimedia Commons",
+          "Wikisource",
+          "WorldCat"
         ],
-        "candidate_count": 1,
+        "candidate_count": 0,
+        "status": "no-pdf-candidate-found",
         "discovery_version": "global-worldwide-pdf-v2"
       }
     },
@@ -1376,6 +1377,17 @@
       "rights_status": "discovery-only",
       "id": "master-cba2ac63f0c3704cac30",
       "source_registry": "git-history:books-batches/salaf-01-400h/master-discovery-additions-2026.json",
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%B3%D9%8A%D8%B1_%D8%A3%D8%B9%D9%84%D8%A7%D9%85_%D8%A7%D9%84%D9%86%D8%A8%D9%84%D8%A7%D8%A1/%D8%B3%D8%B9%D9%8A%D8%AF_%D8%A8%D9%86_%D8%A3%D8%A8%D9%8A_%D8%B9%D8%B1%D9%88%D8%A8%D8%A9",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.7018,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ],
       "discovery_evidence": {
         "attempted_providers": [
           "Gallica",
@@ -1411,7 +1423,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -1421,21 +1433,9 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       }
     },
@@ -2583,15 +2583,6 @@
       "source_registry": "git-history:books-batches/salaf-01-400h/catalog.json",
       "sources": [
         {
-          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D9%85%D9%88%D8%B7%D8%A3",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 1.0,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
           "url": "https://archive.org/download/AlMuwatae/MuwataeCover.pdf",
           "pdf_url": "https://archive.org/download/AlMuwatae/MuwataeCover.pdf",
           "label": "internet-archive-global-discovery",
@@ -2693,7 +2684,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 7,
+        "source_candidate_count": 6,
         "direct_pdf_candidate_count": 6,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -2703,10 +2694,9 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "Internet Archive",
-          "Wikisource"
+          "Internet Archive"
         ],
-        "candidate_count": 7,
+        "candidate_count": 6,
         "discovery_version": "global-worldwide-pdf-v2"
       },
       "expected_volumes": 1
@@ -5166,6 +5156,17 @@
       "id": "master-2fe38a876d42bcaf4257",
       "source_registry": "git-history:books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json",
       "rights_status": "discovery-only",
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%AA%D9%81%D8%B3%D9%8A%D8%B1_%D8%A7%D9%84%D9%85%D8%B1%D8%A7%D8%BA%D9%8A/%D9%85%D9%82%D8%AF%D9%85%D8%A9_%D8%A7%D9%84%D8%AA%D9%81%D8%B3%D9%8A%D8%B1",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6122,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ],
       "discovery_evidence": {
         "attempted_providers": [
           "Gallica",
@@ -5201,7 +5202,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -5211,21 +5212,9 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       }
     },
@@ -5944,17 +5933,6 @@
       "id": "master-53ecfaae38525039bc8b",
       "source_registry": "git-history:books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json",
       "rights_status": "discovery-only",
-      "sources": [
-        {
-          "url": "https://ar.wikisource.org/wiki/%D9%83%D8%AA%D8%A7%D8%A8_%D8%AC%D9%85%D8%A7%D8%B9_%D8%A7%D9%84%D8%B9%D9%84%D9%85",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.8,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        }
-      ],
       "discovery_evidence": {
         "attempted_providers": [
           "Gallica",
@@ -5990,7 +5968,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 1,
+        "source_candidate_count": 0,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -6000,9 +5978,21 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "Wikisource"
+          "DPLA",
+          "Gallica",
+          "Google Books",
+          "HathiTrust",
+          "Internet Archive",
+          "Library of Congress",
+          "Open Library",
+          "Qatar Digital Library",
+          "Waqfeya",
+          "Wikimedia Commons",
+          "Wikisource",
+          "WorldCat"
         ],
-        "candidate_count": 1,
+        "candidate_count": 0,
+        "status": "no-pdf-candidate-found",
         "discovery_version": "global-worldwide-pdf-v2"
       }
     },
@@ -8707,15 +8697,6 @@
       "source_registry": "git-history:books-batches/salaf-01-400h/master-discovery-additions-2026.json",
       "sources": [
         {
-          "url": "https://ar.wikisource.org/wiki/%D9%81%D8%B6%D8%A7%D8%A6%D9%84_%D8%A7%D9%84%D8%B5%D8%AD%D8%A7%D8%A8%D8%A9_%D9%84%D8%A3%D8%AD%D9%85%D8%AF_%D8%A8%D9%86_%D8%AD%D9%86%D8%A8%D9%84",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.65,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
           "url": "https://archive.org/download/Nader.Al-Imam.Al-Mahdi/%D9%83%D8%AA%D8%A7%D8%A8%20%D9%81%D8%B6%D8%A7%D8%A6%D9%84%20%D8%A7%D9%84%D8%B5%D8%AD%D8%A7%D8%A8%D8%A9.pdf",
           "pdf_url": "https://archive.org/download/Nader.Al-Imam.Al-Mahdi/%D9%83%D8%AA%D8%A7%D8%A8%20%D9%81%D8%B6%D8%A7%D8%A6%D9%84%20%D8%A7%D9%84%D8%B5%D8%AD%D8%A7%D8%A8%D8%A9.pdf",
           "label": "internet-archive-global-discovery",
@@ -8762,7 +8743,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 2,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 1,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -8772,10 +8753,9 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "Internet Archive",
-          "Wikisource"
+          "Internet Archive"
         ],
-        "candidate_count": 2,
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       },
       "expected_volumes": 1
@@ -11099,6 +11079,17 @@
       "rights_status": "discovery-only",
       "id": "master-2524af3dbaa76c02ab8b",
       "source_registry": "git-history:books-batches/salaf-01-400h/master-discovery-additions-2026.json",
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%AF%D9%84%D8%A7%D8%A6%D9%84_%D8%A7%D9%84%D9%86%D8%A8%D9%88%D8%A9_%D9%84%D9%84%D9%81%D8%B1%D9%8A%D8%A7%D8%A8%D9%8A",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.7273,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ],
       "discovery_evidence": {
         "attempted_providers": [
           "Gallica",
@@ -11134,7 +11125,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -11144,21 +11135,9 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       },
       "expected_volumes": 1
@@ -12770,71 +12749,6 @@
       "id": "master-d4a7f77dd37554d881f6",
       "source_registry": "git-history:books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json",
       "rights_status": "discovery-only",
-      "sources": [
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%B5%D8%AD%D9%8A%D8%AD_%D8%A7%D8%A8%D9%86_%D8%AE%D8%B2%D9%8A%D9%85%D8%A9",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 1.0,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%B5%D8%AD%D9%8A%D8%AD_%D8%A7%D8%A8%D9%86_%D8%AE%D8%B2%D9%8A%D9%85%D8%A9/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%AC%D9%85%D8%B9%D8%A9",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.7,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%B5%D8%AD%D9%8A%D8%AD_%D8%A7%D8%A8%D9%86_%D8%AE%D8%B2%D9%8A%D9%85%D8%A9/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%B5%D9%84%D8%A7%D8%A9",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.7,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%B5%D8%AD%D9%8A%D8%AD_%D8%A7%D8%A8%D9%86_%D8%AE%D8%B2%D9%8A%D9%85%D8%A9/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D9%85%D9%86%D8%A7%D8%B3%D9%83",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.6829,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%B5%D8%AD%D9%8A%D8%AD_%D8%A7%D8%A8%D9%86_%D8%AE%D8%B2%D9%8A%D9%85%D8%A9/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D9%88%D8%B6%D9%88%D8%A1",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.7,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%B5%D8%AD%D9%8A%D8%AD_%D8%A7%D8%A8%D9%86_%D8%AE%D8%B2%D9%8A%D9%85%D8%A9/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%B5%D9%8A%D8%A7%D9%85",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.7,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%B5%D8%AD%D9%8A%D8%AD_%D8%A7%D8%A8%D9%86_%D8%AE%D8%B2%D9%8A%D9%85%D8%A9/%D9%83%D8%AA%D8%A7%D8%A8_%D8%A7%D9%84%D8%B2%D9%83%D8%A7%D8%A9",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.7,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        }
-      ],
       "discovery_evidence": {
         "attempted_providers": [
           "Gallica",
@@ -12870,7 +12784,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 7,
+        "source_candidate_count": 0,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -12880,9 +12794,21 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "Wikisource"
+          "DPLA",
+          "Gallica",
+          "Google Books",
+          "HathiTrust",
+          "Internet Archive",
+          "Library of Congress",
+          "Open Library",
+          "Qatar Digital Library",
+          "Waqfeya",
+          "Wikimedia Commons",
+          "Wikisource",
+          "WorldCat"
         ],
-        "candidate_count": 7,
+        "candidate_count": 0,
+        "status": "no-pdf-candidate-found",
         "discovery_version": "global-worldwide-pdf-v2"
       },
       "expected_volumes": 1
@@ -14565,17 +14491,6 @@
       "rights_status": "discovery-only",
       "id": "master-616a74043a00fdb16713",
       "source_registry": "git-history:books-batches/salaf-01-400h/master-discovery-additions-2026.json",
-      "sources": [
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%AC%D8%B1%D8%AD_%D9%88%D8%A7%D9%84%D8%AA%D8%B9%D8%AF%D9%8A%D9%84",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 1.0,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        }
-      ],
       "discovery_evidence": {
         "attempted_providers": [
           "Gallica",
@@ -14611,7 +14526,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 1,
+        "source_candidate_count": 0,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -14621,9 +14536,21 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "Wikisource"
+          "DPLA",
+          "Gallica",
+          "Google Books",
+          "HathiTrust",
+          "Internet Archive",
+          "Library of Congress",
+          "Open Library",
+          "Qatar Digital Library",
+          "Waqfeya",
+          "Wikimedia Commons",
+          "Wikisource",
+          "WorldCat"
         ],
-        "candidate_count": 1,
+        "candidate_count": 0,
+        "status": "no-pdf-candidate-found",
         "discovery_version": "global-worldwide-pdf-v2"
       }
     },
@@ -14708,15 +14635,6 @@
       "source_registry": "git-history:books-batches/salaf-01-400h/master-discovery-additions-2026.json",
       "sources": [
         {
-          "url": "https://ar.wikisource.org/wiki/%D8%AA%D9%81%D8%B3%D9%8A%D8%B1_%D8%A7%D8%A8%D9%86_%D9%83%D8%AB%D9%8A%D8%B1/%D8%B3%D9%88%D8%B1%D8%A9_%D8%A7%D9%84%D9%86%D8%A8%D8%A3",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.6047,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
           "url": "https://archive.org/download/talib-al-ilm-9e36af08-65b1-42d7-8927-c0461b8532ec/talib-al-ilm-9e36af08-65b1-42d7-8927-c0461b8532ec.pdf",
           "pdf_url": "https://archive.org/download/talib-al-ilm-9e36af08-65b1-42d7-8927-c0461b8532ec/talib-al-ilm-9e36af08-65b1-42d7-8927-c0461b8532ec.pdf",
           "label": "internet-archive-global-discovery",
@@ -14774,7 +14692,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 3,
+        "source_candidate_count": 2,
         "direct_pdf_candidate_count": 2,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -14784,10 +14702,9 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "Internet Archive",
-          "Wikisource"
+          "Internet Archive"
         ],
-        "candidate_count": 3,
+        "candidate_count": 2,
         "discovery_version": "global-worldwide-pdf-v2"
       },
       "expected_volumes": 1
@@ -17438,17 +17355,6 @@
       "id": "master-8e3fd1347bd4e7731ed8",
       "source_registry": "git-history:books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json",
       "rights_status": "discovery-only",
-      "sources": [
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%B4%D8%B9%D8%A7%D8%B1_%D8%A3%D8%B5%D8%AD%D8%A7%D8%A8_%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 1.0,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        }
-      ],
       "discovery_evidence": {
         "attempted_providers": [
           "Gallica",
@@ -17484,7 +17390,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 1,
+        "source_candidate_count": 0,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -17494,9 +17400,21 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "Wikisource"
+          "DPLA",
+          "Gallica",
+          "Google Books",
+          "HathiTrust",
+          "Internet Archive",
+          "Library of Congress",
+          "Open Library",
+          "Qatar Digital Library",
+          "Waqfeya",
+          "Wikimedia Commons",
+          "Wikisource",
+          "WorldCat"
         ],
-        "candidate_count": 1,
+        "candidate_count": 0,
+        "status": "no-pdf-candidate-found",
         "discovery_version": "global-worldwide-pdf-v2"
       },
       "expected_volumes": 1
@@ -19423,26 +19341,6 @@
       "id": "master-b56d9ad644b7da429621",
       "source_registry": "git-history:books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json",
       "rights_status": "discovery-only",
-      "sources": [
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%AA%D9%81%D8%B3%D9%8A%D8%B1_%D8%A7%D9%84%D9%85%D8%B1%D8%A7%D8%BA%D9%8A/%D9%85%D9%82%D8%AF%D9%85%D8%A9_%D8%A7%D9%84%D8%AA%D9%81%D8%B3%D9%8A%D8%B1",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.6087,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        },
-        {
-          "url": "https://ar.wikisource.org/wiki/%D8%AA%D9%81%D8%B3%D9%8A%D8%B1_%D8%A7%D9%84%D9%85%D8%B1%D8%A7%D8%BA%D9%8A/%D8%B3%D9%88%D8%B1%D8%A9_%D8%A7%D9%84%D8%B4%D8%B9%D8%B1%D8%A7%D8%A1",
-          "label": "wikisource-global-discovery",
-          "provider": "Wikisource",
-          "discovery": "Arabic Wikisource title search",
-          "match_score": 0.6222,
-          "rights_review_required": true,
-          "discover_pdfs": true
-        }
-      ],
       "discovery_evidence": {
         "attempted_providers": [
           "Gallica",
@@ -19478,7 +19376,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 2,
+        "source_candidate_count": 0,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -19488,9 +19386,21 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "Wikisource"
+          "DPLA",
+          "Gallica",
+          "Google Books",
+          "HathiTrust",
+          "Internet Archive",
+          "Library of Congress",
+          "Open Library",
+          "Qatar Digital Library",
+          "Waqfeya",
+          "Wikimedia Commons",
+          "Wikisource",
+          "WorldCat"
         ],
-        "candidate_count": 2,
+        "candidate_count": 0,
+        "status": "no-pdf-candidate-found",
         "discovery_version": "global-worldwide-pdf-v2"
       }
     },
