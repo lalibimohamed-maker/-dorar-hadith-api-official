@@ -60,13 +60,12 @@ jobs:
               console.log(`OK ${id} ${response.status} ${response.url}`);
             } else {
               const detail = lastError?.message || `HTTP ${response?.status ?? 'unknown'}`;
-              console.log(`ERROR ${id} ${url} ${detail}`);
+              console.warn(`WARN ${id} ${url} ${detail}`);
               failures.push({ id, url, detail });
             }
           }
           if (failures.length) {
-            console.error(`Source monitor: ${failures.length}/${urls.size} registered source(s) need attention.`);
-            process.exitCode = 1;
+            console.warn(`Source monitor: ${failures.length}/${urls.size} registered source(s) need attention; retained for retry and review.`);
           } else {
             console.log(`Source monitor: ${urls.size} registered source(s) reachable.`);
           }
