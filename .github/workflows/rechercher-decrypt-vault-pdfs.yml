@@ -9,8 +9,10 @@ permissions:
   # security-justification: This workflow requires contents: write solely to invoke the reviewed central acquisition engine and persist verified PDF acquisition results; it does not bypass protected branches.
   contents: write
 
+# All acquisition callers write to the same secondary LFS repository. A shared
+# group prevents cross-queue non-fast-forward races on secondary/main.
 concurrency:
-  group: rechercher-continuous-whole-encyclopedia
+  group: rechercher-secondary-lfs-persistence
   cancel-in-progress: false
 
 jobs:

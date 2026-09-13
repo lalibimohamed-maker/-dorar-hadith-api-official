@@ -62,9 +62,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          # GitHub documents 202 as the normal response for update-branch.
-          # 502/503/504 are transient server/gateway failures and must not turn
-          # an otherwise valid PR into a false Auto-Heal failure.
+          # update-branch can return transient GitHub gateway/server errors.
+          # Those errors must never make Auto-Heal fail after the retry budget;
+          # GitHub remains the source of truth and the next review event can retry.
           for attempt in 1 2 3 4 5; do
             echo "[UPDATE-BRANCH] attempt=${attempt}/5 expected_head_sha=${EXPECTED_HEAD_SHA}"
 
@@ -91,9 +91,9 @@ jobs:
                 sleep "$delay"
                 continue
               fi
-              echo '[UPDATE-BRANCH] GitHub continued returning a transient 5xx after 5 attempts.'
+              echo '[UPDATE-BRANCH] GitHub still returned a transient 5xx after 5 attempts; leaving the PR untouched and ending successfully.'
               echo "$response"
-              exit 1
+              exit 0
             fi
 
             echo '[UPDATE-BRANCH] non-transient failure; refusing to retry blindly.'

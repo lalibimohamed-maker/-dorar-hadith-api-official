@@ -13,8 +13,10 @@ on:
 permissions:
   contents: write
 
+# All callers write to the same secondary LFS repository. A shared group is
+# mandatory so different acquisition queues can never race on secondary/main.
 concurrency:
-  group: rechercher-encyclopedia-pdf-download
+  group: rechercher-secondary-lfs-persistence
   cancel-in-progress: false
 
 jobs:
