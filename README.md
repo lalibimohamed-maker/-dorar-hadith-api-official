@@ -1,5 +1,17 @@
 # موسوعة دين الله API — Deen Allah Encyclopedia API
 
+<p align="center">
+  <img src="docs/assets/din-allah-continuous-engineering-award.svg" alt="Din Allah Encyclopedia — Continuous Engineering Award" width="300">
+</p>
+
+<p align="center">
+  <strong>🏆 DIN ALLAH ENCYCLOPEDIA — CONTINUOUS ENGINEERING AWARD</strong><br>
+  🥇 <em>For exceptional persistence in building an open Islamic knowledge corpus</em><br>
+  🤝 <strong>Human-led · AI-assisted · Open Source</strong>
+</p>
+
+> [Read the award meaning and engineering principles →](docs/DIN-ALLAH-CONTINUOUS-ENGINEERING-AWARD.md)
+
 منصة API متعددة اللغات للبحث المنظم في القرآن والحديث والتفسير والسيرة والفقه والعقيدة وكتب العلماء ومصادر تعليم القرآن، مع إسناد كل معلومة إلى مصدرها وعدم خلط صحة الرواية بوجودها في كتاب.
 
 ## الهوية
