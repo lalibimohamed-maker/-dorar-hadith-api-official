@@ -55,11 +55,7 @@ jobs:
           test -s .governance-source/config/rechercher-central-sequential-scope.json
           mkdir -p books-batches scripts
           cp -a .governance-source/books-batches/. books-batches/
-          for script in \
-            rechercher_sequential_acquisition.py \
-            rechercher_acquisition_engine.py \
-            rechercher_pdf_storage_hygiene.py \
-            rechercher_pdf_quality_gate.py; do
+          for script in rechercher_sequential_acquisition.py rechercher_acquisition_engine.py rechercher_pdf_storage_hygiene.py rechercher_pdf_quality_gate.py; do
             test -s ".governance-source/scripts/$script"
             cp -f ".governance-source/scripts/$script" "scripts/$script"
           done
@@ -69,12 +65,9 @@ jobs:
           import json
           from pathlib import Path
           d=json.loads(Path('config/rechercher-central-sequential-scope.json').read_text(encoding='utf-8'))
-          if d.get('mode') != 'unbounded_continuous_chronological':
-              raise SystemExit('Central acquisition is still configured as a finite or era-bounded queue.')
-          if d.get('finite_book_count_targets') is not False or d.get('book_count_targets'):
-              raise SystemExit('Finite book-count targeting is forbidden.')
-          if d.get('catalog_glob') != 'books-batches/**/catalog.json' or d.get('output_format') != '.pdf':
-              raise SystemExit('Central chronological acquisition scope is invalid.')
+          if d.get('mode') != 'unbounded_continuous_chronological': raise SystemExit('Central acquisition is still configured as a finite or era-bounded queue.')
+          if d.get('finite_book_count_targets') is not False or d.get('book_count_targets'): raise SystemExit('Finite book-count targeting is forbidden.')
+          if d.get('catalog_glob') != 'books-batches/**/catalog.json' or d.get('output_format') != '.pdf': raise SystemExit('Central chronological acquisition scope is invalid.')
           print('CHRONOLOGY=', d['chronology'])
           print('FINITE_BOOK_COUNT_TARGETS=', d['finite_book_count_targets'])
           print('ACQUISITION_ENGINE_SOURCE=governed-main')
@@ -153,88 +146,50 @@ jobs:
           python3 - <<'PY'
           import hashlib, shutil
           from pathlib import Path
-
-          primary = Path('artifacts')
-          secondary = Path('.secondary-storage/artifacts')
-          primary.mkdir(parents=True, exist_ok=True)
-          secondary.mkdir(parents=True, exist_ok=True)
-
+          primary=Path('artifacts'); secondary=Path('.secondary-storage/artifacts')
+          primary.mkdir(parents=True, exist_ok=True); secondary.mkdir(parents=True, exist_ok=True)
           def sha256(path):
-              h = hashlib.sha256()
+              h=hashlib.sha256()
               with path.open('rb') as fh:
-                  for chunk in iter(lambda: fh.read(1024 * 1024), b''):
-                      h.update(chunk)
+                  for chunk in iter(lambda: fh.read(1024*1024), b''): h.update(chunk)
               return h.hexdigest()
-
           def valid_pdf(path):
               try:
-                  with path.open('rb') as fh:
-                      return path.is_file() and path.stat().st_size > 0 and fh.read(5) == b'%PDF-'
-              except OSError:
-                  return False
-
-          files = []
-          for pool, root in (('primary', primary), ('secondary', secondary)):
+                  with path.open('rb') as fh: return path.is_file() and path.stat().st_size>0 and fh.read(5)==b'%PDF-'
+              except OSError: return False
+          files=[]
+          for pool,root in (('primary',primary),('secondary',secondary)):
               for path in sorted(root.glob('*.pdf')):
                   if not valid_pdf(path):
-                      if pool == 'secondary':
-                          path.unlink(missing_ok=True)
-                          continue
+                      if pool=='secondary': path.unlink(missing_ok=True); continue
                       raise SystemExit(f'not a real PDF: {path}')
-                  files.append((pool, path, sha256(path)))
-
-          groups = {}
-          for item in files:
-              groups.setdefault(item[2], []).append(item)
-
-          for sha, items in sorted(groups.items()):
-              assigned = 'primary' if int(sha[0], 16) % 2 == 0 else 'secondary'
-              preferred = [x for x in items if x[0] == assigned]
-              if not preferred:
-                  preferred = [x for x in items if x[0] == 'primary'] or items
-              canonical = sorted(preferred, key=lambda x: str(x[1]))[0]
+                  files.append((pool,path,sha256(path)))
+          groups={}
+          for item in files: groups.setdefault(item[2],[]).append(item)
+          for sha,items in sorted(groups.items()):
+              assigned='primary' if int(sha[0],16)%2==0 else 'secondary'
+              preferred=[x for x in items if x[0]==assigned] or [x for x in items if x[0]=='primary'] or items
+              canonical=sorted(preferred,key=lambda x:str(x[1]))[0]
               for item in items:
-                  if item != canonical:
-                      item[1].unlink(missing_ok=True)
-
-              current_pool, current_path, _ = canonical
-              destination_root = primary if assigned == 'primary' else secondary
-              destination = destination_root / current_path.name
-
-              if current_pool != assigned:
-                  if destination.exists():
-                      if sha256(destination) == sha:
-                          current_path.unlink(missing_ok=True)
-                          current_path = destination
-                          current_pool = assigned
-                      else:
-                          stem, suffix = current_path.stem, current_path.suffix
-                          destination = destination_root / f'{stem}--{sha[:12]}{suffix}'
-                          if destination.exists() and sha256(destination) != sha:
-                              destination = destination_root / f'{stem}--{sha[:16]}{suffix}'
-                          shutil.move(str(current_path), str(destination))
-                          current_path = destination
-                          current_pool = assigned
+                  if item!=canonical: item[1].unlink(missing_ok=True)
+              current_pool,current_path,_=canonical; destination_root=primary if assigned=='primary' else secondary; destination=destination_root/current_path.name
+              if current_pool!=assigned:
+                  if destination.exists() and sha256(destination)==sha:
+                      current_path.unlink(missing_ok=True); current_path=destination; current_pool=assigned
                   else:
-                      shutil.move(str(current_path), str(destination))
-                      current_path = destination
-                      current_pool = assigned
-
-              if current_pool == assigned:
-                  siblings = [p for p in destination_root.glob(f'{current_path.stem}.pdf') if p != current_path]
-                  if siblings:
-                      raise SystemExit(f'unexpected storage collision after canonicalization: {current_path}')
-
-          seen = {}
-          for pool, root in (('primary', primary), ('secondary', secondary)):
+                      if destination.exists() and sha256(destination)!=sha:
+                          destination=destination_root/f'{current_path.stem}--{sha[:12]}{current_path.suffix}'
+                      shutil.move(str(current_path),str(destination)); current_path=destination; current_pool=assigned
+              if current_pool==assigned:
+                  siblings=[p for p in destination_root.glob(f'{current_path.stem}.pdf') if p!=current_path]
+                  if siblings: raise SystemExit(f'unexpected storage collision after canonicalization: {current_path}')
+          seen={}
+          for pool,root in (('primary',primary),('secondary',secondary)):
               for path in sorted(root.glob('*.pdf')):
-                  if not valid_pdf(path):
-                      raise SystemExit(f'invalid PDF after partition: {pool}/{path.name}')
-                  sha = sha256(path)
-                  if sha in seen:
-                      raise SystemExit(f'DUPLICATE_PDF_COPY: {path.name} already stored in {seen[sha]}')
-                  seen[sha] = f'{pool}/{path.name}'
-
+                  if not valid_pdf(path): raise SystemExit(f'invalid PDF after partition: {pool}/{path.name}')
+                  sha=sha256(path)
+                  if sha in seen: raise SystemExit(f'DUPLICATE_PDF_COPY: {path.name} already stored in {seen[sha]}')
+                  seen[sha]=f'{pool}/{path.name}'
           print(f'ONE_COPY_PARTITION_OK count={len(seen)}')
           PY
 
@@ -290,7 +245,21 @@ jobs:
           while IFS= read -r -d '' f; do git add -- "$f"; done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
           if ! git diff --cached --quiet; then
             git commit -m 'data(rechercher): persist secondary chronological PDF shard'
-            git lfs fsck --pointers HEAD; git lfs push --dry-run origin HEAD; git push origin HEAD
+            for attempt in 1 2 3; do
+              git fetch origin main
+              git rebase origin/main
+              git lfs fsck --pointers HEAD
+              git lfs push --dry-run origin HEAD
+              if git push origin HEAD:refs/heads/main; then
+                echo "SECONDARY_PUSH_OK attempt=$attempt"
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo 'ERROR: secondary storage remained non-fast-forward after 3 synchronized attempts.' >&2
+                exit 1
+              fi
+              sleep 3
+            done
           fi
 
       - name: Verify exactly one stored copy per verified PDF
