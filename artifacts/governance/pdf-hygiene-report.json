@@ -14,45 +14,136 @@
     "quarantine": "reversible_and_auditable"
   },
   "counts": {
-    "pdf_files_scanned": 24,
-    "valid_pdf_files": 24,
+    "pdf_files_scanned": 39,
+    "valid_pdf_files": 39,
     "invalid_pdf_signatures": 0,
-    "unique_sha256_groups": 24,
-    "exact_duplicate_groups": 0,
-    "safe_redundant_copies_quarantined": 0,
-    "ambiguous_duplicate_groups": 0,
-    "untracked_pdf_files": 0,
-    "remaining_active_pdfs": 24
+    "unique_sha256_groups": 35,
+    "exact_duplicate_groups": 3,
+    "safe_redundant_copies_quarantined": 1,
+    "ambiguous_duplicate_groups": 2,
+    "untracked_pdf_files": 11,
+    "remaining_active_pdfs": 38
   },
   "invalid_pdf_files": [],
-  "exact_duplicate_groups": [],
-  "quarantined": [],
-  "ambiguous": [],
-  "untracked_pdf_files": [],
+  "exact_duplicate_groups": [
+    {
+      "sha256": "9d05055f5e06c8f8d138af77b3180c565464205767e1639a53ecf6eaa8cb2c22",
+      "files": [
+        "master-e7f61c1cb5c0ac9509f4--0922abed67aed0a19978.pdf",
+        "sunan-al-kubra-nasai--94691e4256773250291d.pdf",
+        "sunan-al-nasai--94691e4256773250291d.pdf"
+      ],
+      "catalog_identities": [
+        "sunan-al-kubra-nasai",
+        "sunan-al-nasai"
+      ]
+    },
+    {
+      "sha256": "a5d5e044cd9f99e1819a3ecf7b9eef9d7288a36dd471c4a50cbc0094dd67e986",
+      "files": [
+        "master-9981cac55a5a7def698a--27528aa062cd19928dc9.pdf",
+        "master-9b254608ae25433a579f--27528aa062cd19928dc9.pdf"
+      ],
+      "catalog_identities": [
+        "معجم-الصحابة--9981cac55a5a"
+      ]
+    },
+    {
+      "sha256": "f231bc60cc0fdef7802a56560231cb90649ab655611052e0489e018cb55d62f6",
+      "files": [
+        "al-sunnah-abdullah-ahmad-1349-waqf--7ba5b3ba9267d4f05fdf.pdf",
+        "master-c6ed82217d88ac0538a8--7ba5b3ba9267d4f05fdf.pdf"
+      ],
+      "catalog_identities": [
+        "al-sunnah-abdullah-ahmad-1349-waqf",
+        "السنة--da25c500642a"
+      ]
+    }
+  ],
+  "quarantined": [
+    {
+      "file": "master-9b254608ae25433a579f--27528aa062cd19928dc9.pdf",
+      "canonical": "master-9981cac55a5a7def698a--27528aa062cd19928dc9.pdf",
+      "sha256": "a5d5e044cd9f99e1819a3ecf7b9eef9d7288a36dd471c4a50cbc0094dd67e986",
+      "quarantine": "artifacts/developer-review-quarantine/master-9b254608ae25433a579f--27528aa062cd19928dc9.pdf"
+    }
+  ],
+  "ambiguous": [
+    {
+      "sha256": "9d05055f5e06c8f8d138af77b3180c565464205767e1639a53ecf6eaa8cb2c22",
+      "files": [
+        "master-e7f61c1cb5c0ac9509f4--0922abed67aed0a19978.pdf",
+        "sunan-al-kubra-nasai--94691e4256773250291d.pdf",
+        "sunan-al-nasai--94691e4256773250291d.pdf"
+      ],
+      "catalog_identities": [
+        "sunan-al-kubra-nasai",
+        "sunan-al-nasai"
+      ]
+    },
+    {
+      "sha256": "f231bc60cc0fdef7802a56560231cb90649ab655611052e0489e018cb55d62f6",
+      "files": [
+        "al-sunnah-abdullah-ahmad-1349-waqf--7ba5b3ba9267d4f05fdf.pdf",
+        "master-c6ed82217d88ac0538a8--7ba5b3ba9267d4f05fdf.pdf"
+      ],
+      "catalog_identities": [
+        "al-sunnah-abdullah-ahmad-1349-waqf",
+        "السنة--da25c500642a"
+      ]
+    }
+  ],
+  "untracked_pdf_files": [
+    "master-3d162e0d6b2659858a90--63c127ccccbddfef6dd9.pdf",
+    "sahih-bukhari--4433d16aa71923a0c7bf.pdf",
+    "master-66e7e4ae62b82daae8f1--c1e14b7757d2c14866e1.pdf",
+    "master-96069568cb106ae59413--4357807d4e005fb60b8c.pdf",
+    "tafsir-abd-al-razzaq--9fb22c3c633bb92e5630.pdf",
+    "master-8e3fd1347bd4e7731ed8--ca9233f209704dfc123c.pdf",
+    "master-5dcba9d464f2c20a0c7c--e2f6853d58837147b815.pdf",
+    "master-c82c9310f928010de904--6d14dc0c2d30d16ea043.pdf",
+    "master-60387b12408cecce9d79--5ab27317fe1c9ec02aba.pdf",
+    "master-b6c12b888c961a24a437--c28b595362bd4cf200f0.pdf",
+    "musannaf-abd-al-razzaq-taasil--c9367c70ae360b0879d4.pdf"
+  ],
   "remaining_active_pdfs": [
-    "--070b79c9cd34--815871ce985663033236.pdf",
-    "--2b2ed1f3b4e0--a8ab295f4f70e2728e41.pdf",
-    "--2f1146e3762b--38f6826d3cf8951699dd.pdf",
-    "--9218ac59ba3c--f2dd65451be321212d9b.pdf",
-    "--96069568cb10--da382a9bb351e40a186a.pdf",
-    "--9f55cd1f42bf--2035b151964cd72c599d.pdf",
-    "--b7367c5ffce5--c05bd319b59e91d7701f.pdf",
-    "-.--6a76180e74a2--f09d33fe8680ceded190.pdf",
-    "-.--771739b67c4d--38b69ecb87686711e638.pdf",
-    "-.--9981cac55a5a--baba45e763a5ddb9f64d.pdf",
-    "-.--c24bdd6bc88c--0d85bb3a9cf7bb145e68.pdf",
-    "-.--e7f61c1cb5c0--9ef84008dd279ac89c46.pdf",
-    "-.-.--14e3927ff5ea--118811137b63023fbc17.pdf",
-    "-.-.--3d162e0d6b26--7504b4def6c4659fb6d9.pdf",
-    "-.-.--d4a7f77dd375--d848dc71344d0da84688.pdf",
-    "-.-.--e0f9e4f5749f--7ba5b3ba9267d4f05fdf.pdf",
-    "-.-.-.--7f6a86e225de--5fbbcce683686701b851.pdf",
-    "-.-.-.--f9fee0e52281--6d4f57c47a0b4bc41f91.pdf",
-    "musnad-ahmad--9678fd5b92b4d00a2745.pdf",
+    "al-sunnah-abdullah-ahmad-1349-waqf--7ba5b3ba9267d4f05fdf.pdf",
+    "master-070b79c9cd34caa61317--815871ce985663033236.pdf",
+    "master-1244964b7f8faa517aaa--900b22313ea70c42aee4.pdf",
+    "master-14e3927ff5ea54e74c78--cae7a8c4f5c329a00732.pdf",
+    "master-2b2ed1f3b4e0353f64f9--a8ab295f4f70e2728e41.pdf",
+    "master-2f1146e3762b546b7b33--38f6826d3cf8951699dd.pdf",
+    "master-3d162e0d6b2659858a90--63c127ccccbddfef6dd9.pdf",
+    "master-5dcba9d464f2c20a0c7c--e2f6853d58837147b815.pdf",
+    "master-60387b12408cecce9d79--5ab27317fe1c9ec02aba.pdf",
+    "master-66e7e4ae62b82daae8f1--c1e14b7757d2c14866e1.pdf",
+    "master-6a76180e74a23445f34f--f09d33fe8680ceded190.pdf",
+    "master-7539433bc02b9fef49fd--1dd540696df408d6e13f.pdf",
+    "master-771739b67c4d58ab7cec--38b69ecb87686711e638.pdf",
+    "master-7f6a86e225de04f89f9e--c91f4885067c810868a4.pdf",
+    "master-8e3fd1347bd4e7731ed8--ca9233f209704dfc123c.pdf",
+    "master-9218ac59ba3c9959a441--f2dd65451be321212d9b.pdf",
+    "master-96069568cb106ae59413--4357807d4e005fb60b8c.pdf",
+    "master-9981cac55a5a7def698a--27528aa062cd19928dc9.pdf",
+    "master-9f55cd1f42bfbbadb398--2035b151964cd72c599d.pdf",
+    "master-b6c12b888c961a24a437--c28b595362bd4cf200f0.pdf",
+    "master-b7367c5ffce537e2fcbb--c05bd319b59e91d7701f.pdf",
+    "master-c24bdd6bc88cdb478de6--a7f62568fa903d02eaa8.pdf",
+    "master-c6ed82217d88ac0538a8--7ba5b3ba9267d4f05fdf.pdf",
+    "master-c82c9310f928010de904--6d14dc0c2d30d16ea043.pdf",
+    "master-d4a7f77dd37554d881f6--d848dc71344d0da84688.pdf",
+    "master-e0f9e4f5749fe2b0d232--2f58a624be83145e5765.pdf",
+    "master-e7f61c1cb5c0ac9509f4--0922abed67aed0a19978.pdf",
+    "master-f9fee0e52281bd6ab250--e00d2d2a9b70cb361114.pdf",
+    "musannaf-abd-al-razzaq-taasil--c9367c70ae360b0879d4.pdf",
+    "musnad-ahmad--a1302bafd82463db3a03.pdf",
     "muwatta-malik--bcfa9d83388f2ebcab30.pdf",
-    "sarih-sunna-tabari--456069b3afd722788f15.pdf",
-    "sunan-abi-dawud--bf50c14a30130b888f49.pdf",
+    "sahih-bukhari--4433d16aa71923a0c7bf.pdf",
+    "sarih-sunna-tabari--59107af48cb9f13e5cc1.pdf",
+    "sunan-abi-dawud--5eabcb62b4676abfcef4.pdf",
+    "sunan-al-kubra-nasai--94691e4256773250291d.pdf",
     "sunan-al-nasai--94691e4256773250291d.pdf",
+    "tafsir-abd-al-razzaq--9fb22c3c633bb92e5630.pdf",
     "usul-al-sunnah-al-humaydi--0680c77533f3461acc49.pdf"
   ]
 }
