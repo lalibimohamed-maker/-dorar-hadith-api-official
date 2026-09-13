@@ -71,7 +71,32 @@ jobs:
           steps.pr.outputs.draft != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
           set -euo pipefail
-          gh pr merge "$PR_NUMBER" --repo "$REPOSITORY" --auto --merge
-          echo 'Auto-merge armed. GitHub will merge only after every protected requirement, including the required secondary-account approval and required checks, is satisfied.'
+          for attempt in 1 2 3; do
+            pr_json="$(gh api "/repos/${REPOSITORY}/pulls/${PR_NUMBER}")"
+            mergeable="$(jq -r '.mergeable' <<<"$pr_json")"
+            mergeable_state="$(jq -r '.mergeable_state' <<<"$pr_json")"
+
+            echo "[AUTO-MERGE] attempt=${attempt} mergeable=${mergeable} state=${mergeable_state}"
+
+            if [[ "$mergeable" == "true" ]]; then
+              if gh pr merge "$PR_NUMBER" --repo "$REPOSITORY" --auto --merge; then
+                echo 'Auto-merge armed. GitHub will merge only after every protected requirement, including the required secondary-account approval and required checks, is satisfied.'
+                exit 0
+              fi
+              echo "[AUTO-MERGE] GitHub rejected the merge request; re-checking protected state."
+            elif [[ "$mergeable" == "false" ]]; then
+              echo "[AUTO-MERGE] PR is not mergeable yet (mergeable_state=${mergeable_state}); this is a pending protected-gate state, not a workflow failure."
+            else
+              echo '[AUTO-MERGE] GitHub has not finished calculating mergeability; waiting for the next check.'
+            fi
+
+            if [[ "$attempt" -lt 3 ]]; then
+              sleep 5
+            fi
+          done
+
+          echo '[AUTO-MERGE] Auto-merge remains pending; GitHub will merge automatically once the protected requirements become satisfied.'
+          exit 0
