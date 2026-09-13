@@ -6,12 +6,9 @@ on:
     - cron: '0 */6 * * *'
 
 permissions:
+  # security-justification: This workflow requires contents: write solely to invoke the reviewed central acquisition engine and persist verified PDF acquisition results; it does not bypass protected branches.
   contents: write
 
-# This workflow is a permanent-acquisition entry point only. The reviewed
-# central engine owns catalog materialization, acquisition, validation and
-# primary/secondary LFS persistence. Sharing the concurrency group prevents
-# this entry point from racing the chronological caller against the same queue.
 concurrency:
   group: rechercher-continuous-whole-encyclopedia
   cancel-in-progress: false
