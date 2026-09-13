@@ -6,6 +6,7 @@ on:
     - cron: '0 */4 * * *'
 
 permissions:
+  # security-justification: This workflow requires contents: write to persist verified acquisition manifests and release evidence to the protected review branch; it does not bypass protected branches or force-push.
   contents: write
 
 env:
