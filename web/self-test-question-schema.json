@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Din Allah Self Test Question",
+  "type": "object",
+  "required": ["id", "domain", "topic", "level", "type", "question", "answer", "source", "status"],
+  "properties": {
+    "id": {"type": "string"},
+    "domain": {"enum": ["quran", "hadith", "mustalah", "fiqh", "usulFiqh", "seerah", "prophets", "quranStories", "hadithStories", "mixed"]},
+    "topic": {"type": "string", "minLength": 1},
+    "level": {"enum": ["beginner", "intermediate", "advanced"]},
+    "type": {"enum": ["mcq", "trueFalse", "shortAnswer", "cloze", "flashcard"]},
+    "question": {"type": "string", "minLength": 1},
+    "options": {"type": "array", "items": {"type": "string"}},
+    "answer": {},
+    "explanation": {"type": "string"},
+    "source": {"type": "string", "minLength": 1},
+    "sourceUrl": {"type": "string", "format": "uri"},
+    "sourceLocator": {"type": "string"},
+    "rights": {"enum": ["public-domain", "licensed", "reference-only", "unknown"]},
+    "status": {"enum": ["draft", "reviewed", "blocked"]}
+  }
+}
