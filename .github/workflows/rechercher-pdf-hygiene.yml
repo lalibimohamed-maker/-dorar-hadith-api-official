@@ -46,13 +46,21 @@ jobs:
           mkdir -p artifacts/recovered-vault artifacts/developer-review-vault artifacts/governance
           tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt --jq '[.[] | select(.tagName | startswith("rechercher-vault-"))] | sort_by(.createdAt) | last | .tagName')
           if [ -z "${tag:-}" ] || [ "$tag" = "null" ]; then
-            echo 'No vault release exists; hygiene has nothing to inspect.'
-            printf '%s\n' '{"schema":"din-allah-encyclopedia/pdf-hygiene/v2","counts":{"pdf_files_scanned":0,"safe_redundant_copies_quarantined":0}}' > artifacts/governance/pdf-hygiene-report.json
+            echo 'No vault release exists; continuing with authoritative acquisition manifest.'
             exit 0
           fi
+
+          enc_count=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '[.assets[] | select(.name | endswith(".enc"))] | length')
+          if [ "${enc_count:-0}" -eq 0 ]; then
+            echo "Vault release $tag has no .enc assets; continuing without encrypted-vault recovery."
+            exit 0
+          fi
+
           gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern '*.enc' --dir artifacts/recovered-vault
           shopt -s nullglob
-          for f in artifacts/recovered-vault/*.enc; do
+          enc_files=(artifacts/recovered-vault/*.enc)
+          test "${#enc_files[@]}" -gt 0
+          for f in "${enc_files[@]}"; do
             out="artifacts/developer-review-vault/$(basename "${f%.enc}")"
             openssl enc -d -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
             test "$(head -c 5 "$out")" = '%PDF-'
