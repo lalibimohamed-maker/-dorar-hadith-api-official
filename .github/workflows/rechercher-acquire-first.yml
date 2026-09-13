@@ -55,12 +55,47 @@ jobs:
           print('ACQUIRE_FIRST_MASTER_CATALOG records=%d with_sources=%d' % (len(d.get('books',[])), sum(bool(b.get('sources')) for b in d.get('books',[]))))
           PY
 
-      - name: Provide compatibility discovery registries for legacy manifest schema
+      - name: Restore cumulative discovery registries
         run: |
           set -euo pipefail
           mkdir -p books-batches/salaf-01-400h
-          printf '%s\n' '{"entries":[]}' > books-batches/salaf-01-400h/master-discovery-additions-2026.json
-          printf '%s\n' '{"entries":[]}' > books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          git fetch origin "$REVIEW_BRANCH" || true
+          restore_registry() {
+            local path="$1"
+            local fallback='{"entries":[]}';
+            if test -s "$path"; then
+              python3 - "$path" <<'PY'
+          import json,sys
+          from pathlib import Path
+          p=Path(sys.argv[1])
+          d=json.loads(p.read_text(encoding='utf-8'))
+          assert isinstance(d,dict) and isinstance(d.get('entries',[]),list)
+          PY
+              return
+            fi
+            if git show "origin/$REVIEW_BRANCH:$path" > "$path" 2>/dev/null; then
+              python3 - "$path" <<'PY'
+          import json,sys
+          from pathlib import Path
+          p=Path(sys.argv[1])
+          d=json.loads(p.read_text(encoding='utf-8'))
+          if not (isinstance(d,dict) and isinstance(d.get('entries',[]),list)):
+              raise SystemExit(1)
+          print('RESTORED_DISCOVERY_REGISTRY', p)
+          PY
+              return
+            fi
+            printf '%s\n' "$fallback" > "$path"
+          }
+          restore_registry books-batches/salaf-01-400h/master-discovery-additions-2026.json
+          restore_registry books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for raw in ('books-batches/salaf-01-400h/master-discovery-additions-2026.json','books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json'):
+              d=json.loads(Path(raw).read_text(encoding='utf-8'))
+              print('DISCOVERY_REGISTRY',raw,'entries=',len(d.get('entries',[])))
+          PY
 
       - name: Acquire copies — first persistence boundary
         run: |
@@ -123,20 +158,30 @@ jobs:
           PY
           rm -f artifacts/governance/vault-release.jsonl
 
-      - name: Persist manifest and release evidence to review branch
+      - name: Persist manifest, discovery memory and release evidence to review branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add artifacts/governance/vault-release.json books-batches/salaf-01-400h/developer-review-manifest.json
-          git commit -m 'data(rechercher): persist acquired copies before downstream audits'
+          git add artifacts/governance/vault-release.json \
+            books-batches/salaf-01-400h/developer-review-manifest.json \
+            books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          git diff --cached --quiet || git commit -m 'data(rechercher): persist acquisition state and cumulative discovery memory'
           ACQ_COMMIT=$(git rev-parse HEAD)
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
-          git checkout "$ACQ_COMMIT" -- artifacts/governance/vault-release.json books-batches/salaf-01-400h/developer-review-manifest.json
-          git add artifacts/governance/vault-release.json books-batches/salaf-01-400h/developer-review-manifest.json
-          git commit -m 'data(rechercher): reconcile acquire-first manifest'
+          git checkout "$ACQ_COMMIT" -- \
+            artifacts/governance/vault-release.json \
+            books-batches/salaf-01-400h/developer-review-manifest.json \
+            books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          git add artifacts/governance/vault-release.json \
+            books-batches/salaf-01-400h/developer-review-manifest.json \
+            books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          git diff --cached --quiet || git commit -m 'data(rechercher): reconcile acquire-first state and discovery memory'
           git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           echo "ACQUIRE_FIRST_PERSISTED=$ACQ_COMMIT"

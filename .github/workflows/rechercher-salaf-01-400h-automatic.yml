@@ -13,8 +13,10 @@ on:
 permissions:
   contents: write
 
+# This caller writes to the same secondary PDF LFS repository as the other
+# governed acquisition callers. Serialize the shared persistence boundary.
 concurrency:
-  group: rechercher-encyclopedia-pdf-download
+  group: rechercher-secondary-lfs-persistence
   cancel-in-progress: false
 
 jobs:
