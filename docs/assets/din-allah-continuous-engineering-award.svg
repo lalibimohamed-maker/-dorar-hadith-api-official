@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Din Allah Encyclopedia — Continuous Engineering Award</title>
+  <desc id="desc">Human-led, AI-assisted, open-source collaboration mark for Din Allah Encyclopedia.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="65%">
+      <stop offset="0" stop-color="#f7f0d0"/>
+      <stop offset="0.58" stop-color="#eadca5"/>
+      <stop offset="1" stop-color="#c9a84b"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff1a8"/>
+      <stop offset="0.45" stop-color="#c9a84b"/>
+      <stop offset="1" stop-color="#8a6721"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f5b48"/>
+      <stop offset="1" stop-color="#06352c"/>
+    </linearGradient>
+    <pattern id="islamic" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M40 4 76 40 40 76 4 40Z M40 18 62 40 40 62 18 40Z" fill="none" stroke="#c9a84b" stroke-width="2" opacity=".22"/>
+      <circle cx="40" cy="40" r="5" fill="#c9a84b" opacity=".2"/>
+    </pattern>
+    <path id="topArc" d="M 150 500 A 350 350 0 0 1 850 500"/>
+    <path id="bottomArc" d="M 850 500 A 350 350 0 0 1 150 500"/>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-opacity=".22"/>
+    </filter>
+  </defs>
+
+  <circle cx="500" cy="500" r="468" fill="url(#green)" stroke="#6f551f" stroke-width="10" filter="url(#shadow)"/>
+  <circle cx="500" cy="500" r="438" fill="url(#bg)" stroke="url(#gold)" stroke-width="12"/>
+  <circle cx="500" cy="500" r="415" fill="url(#islamic)" stroke="#0a493a" stroke-width="5"/>
+  <circle cx="500" cy="500" r="385" fill="none" stroke="#c9a84b" stroke-width="3"/>
+  <circle cx="500" cy="500" r="340" fill="#f7f0d0" stroke="#0a493a" stroke-width="4"/>
+
+  <g fill="#0a493a" stroke="#c9a84b" stroke-width="3">
+    <path d="M500 315 l18 45 49 4 -38 31 12 48 -41 -26 -41 26 12 -48 -38 -31 49 -4z"/>
+    <path d="M500 670 l-135 -72 v-72 l135 72 135-72 v72z" fill="#0a493a"/>
+    <path d="M365 526 l135 72 135-72" fill="none" stroke="#c9a84b" stroke-width="8"/>
+    <path d="M500 598 v72" fill="none" stroke="#c9a84b" stroke-width="7"/>
+  </g>
+
+  <g font-family="Noto Naskh Arabic, Amiri, serif" text-anchor="middle" fill="#073d31">
+    <text x="500" y="176" font-size="54" font-weight="700" direction="rtl">موسوعة دينُ اللّه</text>
+  </g>
+  <g font-family="Georgia, Times New Roman, serif" text-anchor="middle" fill="#073d31">
+    <text x="500" y="830" font-size="31" letter-spacing="4" font-weight="700">DIN ALLAH ENCYCLOPEDIA</text>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle" fill="#8a6721">
+    <text x="500" y="455" font-size="31" font-weight="700" letter-spacing="2">CONTINUOUS ENGINEERING</text>
+    <text x="500" y="493" font-size="31" font-weight="700" letter-spacing="2">AWARD</text>
+    <text x="500" y="755" font-size="19" letter-spacing="2">HUMAN-LED · AI-ASSISTED · OPEN SOURCE</text>
+  </g>
+
+  <g fill="#c9a84b">
+    <circle cx="205" cy="500" r="8"/><circle cx="795" cy="500" r="8"/>
+  </g>
+  <g transform="translate(500 900)">
+    <path d="M-92 0 H92" stroke="#c9a84b" stroke-width="4"/>
+    <path d="M-50 -13 l-18 13 18 13 M50 -13 l18 13-18 13" fill="none" stroke="#c9a84b" stroke-width="4"/>
+  </g>
+</svg>
