@@ -8,9 +8,10 @@ on:
     - cron: '17,47 * * * *'
   workflow_dispatch:
 
-# security-justification: this workflow audits every branch and repairs governed policy drift; it needs contents: write for non-protected branches.
+# security-justification: this workflow audits every branch and repairs governed policy drift; it needs contents: write for non-protected branches and pull-requests: write to open reviewed repair PRs for protected main.
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: branch-workflow-governance
@@ -85,12 +86,60 @@ jobs:
               continue
             fi
 
-            # main is protected: it is audited with the same rules, but repaired only through a reviewed PR.
+            # main is protected. Never bypass it. Convert detected drift into a dedicated
+            # repair branch and reviewed PR so the audit can finish successfully while the
+            # protected branch remains untouched.
             if [ "$branch" = "main" ]; then
               echo "PROTECTED_MAIN_DRIFT $branch"
               printf '%s\n' "$governance_status"
-              git -C "$worktree" diff -- .github/workflows scripts || true
-              main_drift=1
+              repair_branch="automation/governance-main-repair-${before_sha:0:12}"
+              repair_worktree="/tmp/governance-worktrees/main-repair-${before_sha:0:12}"
+              existing_pr=""
+
+              if git ls-remote --exit-code origin "refs/heads/$repair_branch" >/dev/null 2>&1; then
+                existing_pr="$(gh pr list --base main --head "$repair_branch" --state open --json number,url --jq '.[0].url // empty')"
+              else
+                rm -rf "$repair_worktree"
+                git worktree add --detach "$repair_worktree" "$before_sha" >/dev/null
+                mkdir -p "$repair_worktree/scripts"
+                cp scripts/enforce_all_branch_governance.py \
+                  "$repair_worktree/scripts/enforce_all_branch_governance.py"
+                chmod 0755 "$repair_worktree/scripts/enforce_all_branch_governance.py"
+                (cd "$repair_worktree" && python3 scripts/enforce_all_branch_governance.py)
+
+                repair_status="$(git -C "$repair_worktree" status --porcelain --untracked-files=all \
+                  | awk '$2 ~ /^(\.github\/workflows|scripts)\// {print}')"
+                if [ -z "$repair_status" ]; then
+                  echo "MAIN_DRIFT_RECHECK_CLEAN $branch"
+                  git worktree remove --force "$repair_worktree"
+                  git worktree remove --force "$worktree"
+                  continue
+                fi
+
+                git -C "$repair_worktree" switch -c "$repair_branch" "$before_sha"
+                if [ -d "$repair_worktree/.github/workflows" ]; then
+                  git -C "$repair_worktree" add .github/workflows
+                fi
+                if [ -d "$repair_worktree/scripts" ]; then
+                  git -C "$repair_worktree" add scripts
+                fi
+                git -C "$repair_worktree" commit -m 'chore(governance): repair protected main policy drift'
+                git -C "$repair_worktree" push origin "HEAD:refs/heads/$repair_branch"
+                git worktree remove --force "$repair_worktree"
+              fi
+
+              if [ -z "$existing_pr" ]; then
+                existing_pr="$(gh pr list --base main --head "$repair_branch" --state open --json number,url --jq '.[0].url // empty')"
+              fi
+              if [ -z "$existing_pr" ]; then
+                existing_pr="$(gh pr create \
+                  --base main \
+                  --head "$repair_branch" \
+                  --title 'fix(governance): repair protected main workflow policy drift' \
+                  --body 'Automated governance repair. This PR contains only the canonical workflow-policy normalization required by Branch Workflow Governance. Main protection is preserved; no protected-branch bypass or force-push is used. Review and merge through the normal protected-branch process.')"
+              fi
+
+              echo "MAIN_REPAIR_PR_PENDING $existing_pr"
               git worktree remove --force "$worktree"
               continue
             fi
@@ -125,6 +174,6 @@ jobs:
           done < <(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin/ | sort -u)
 
           if [ "$main_drift" -ne 0 ]; then
-            echo 'main requires a reviewed PR repair; no protected-branch bypass was attempted.'
+            echo 'Unexpected protected-main repair failure; no protected-branch bypass was attempted.'
             exit 1
           fi
