@@ -37,7 +37,9 @@ export function startCognitiveSession(engine, { sessionId, learnerId, itemId, so
   requireId(learnerId, 'learnerId');
   const session = { sessionId, learnerId, itemId: itemId ?? null, sourceIds: [...new Set(sourceIds)], stage: 'UNDERSTAND', startedAt: now, events: [] };
   engine.sessions.set(sessionId, session);
-  memoryEvent(engine, session, 'SESSION_STARTED', { itemId: session.itemId, sourceIds: session.sourceIds }, now);
+  const event = { type: 'SESSION_STARTED', itemId: session.itemId, sourceIds: session.sourceIds, at: now };
+  session.events.push(event);
+  memoryEvent(engine, session, event.type, { itemId: session.itemId, sourceIds: session.sourceIds }, now);
   return session;
 }
 
