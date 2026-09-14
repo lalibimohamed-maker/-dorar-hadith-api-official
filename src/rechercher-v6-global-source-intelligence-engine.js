@@ -21,7 +21,9 @@ function assertRightsState(state) {
 
 function assertImmutablePreserved(before, after) {
   for (const field of IMMUTABLE_FIELDS) {
-    if (JSON.stringify(before?.[field]) !== JSON.stringify(after?.[field])) {
+    const previous = before?.[field];
+    if (previous === undefined || previous === null) continue;
+    if (JSON.stringify(previous) !== JSON.stringify(after?.[field])) {
       throw new Error(`V6 cannot mutate immutable field: ${field}`);
     }
   }
@@ -41,8 +43,7 @@ export function createV6StageNodeContract() {
       'WORK_EDITION_MANUSCRIPT_LINKING'
     ],
     acceptedInputs: [
-      { type: 'RESEARCH_OUTPUT' },
-      { type: 'SOURCE_CANDIDATE' }
+      { type: 'RESEARCH_OUTPUT' }
     ],
     producedOutputs: [
       { type: 'SOURCE_CANDIDATE' },
