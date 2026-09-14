@@ -18,7 +18,19 @@ test('concepts preserve multilingual distinction instead of false equivalence', 
   registerConcept(e, { conceptId: 'fiqh:wajib', label: 'واجب', domain: 'fiqh' });
   registerTerm(e, { termId: 'ar:wajib', conceptId: 'fiqh:wajib', language: 'ar', term: 'واجب' });
   registerTerm(e, { termId: 'fr:wajib', conceptId: 'fiqh:wajib', language: 'fr', term: 'obligation' });
-  alignTerms(e, { alignmentId: 'a1', fromTermId: 'ar:wajib', toTermId: 'fr:wajib', matchType: 'CLOSE', confidence: 0.8 });
+  alignTerms(e, {
+    alignmentId: 'a1',
+    fromTermId: 'ar:wajib',
+    toTermId: 'fr:wajib',
+    matchType: 'CLOSE',
+    confidence: 0.8,
+    provenance: {
+      sourceIds: ['source:terminology:fiqh'],
+      sourceLanguage: 'ar',
+      targetLanguage: 'fr',
+      evidence: 'source-backed terminology alignment',
+    },
+  });
   assert.equal(e.alignments.get('a1').matchType, 'CLOSE');
 });
 
