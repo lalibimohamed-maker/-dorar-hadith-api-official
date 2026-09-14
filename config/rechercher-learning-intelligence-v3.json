@@ -1,0 +1,59 @@
+{
+  "engine": "Rechercher Learning Intelligence Engine v3",
+  "version": "3.0.0",
+  "status": "implemented",
+  "purpose": "Graph Cognitive Intelligence for source-grounded adaptive learning",
+  "graphs": {
+    "knowledge": true,
+    "evidence": true,
+    "prerequisite": true,
+    "misconception": true,
+    "learner": true
+  },
+  "learner_model": {
+    "mastery": true,
+    "retrievability": true,
+    "confidence": true,
+    "calibration_bias": true,
+    "misconceptions": true,
+    "prerequisite_gaps": true,
+    "transfer": true,
+    "multimodal_profile": ["text", "audio", "visual", "speech", "source_navigation"]
+  },
+  "method_evaluation": {
+    "registry": true,
+    "immediate_outcome": true,
+    "delayed_outcome": true,
+    "transfer_outcome": true,
+    "time_cost": true,
+    "ablation_comparison": true,
+    "minimum_trials_before_comparison": 10,
+    "no_additional_method_is_assumed_superior_without_evidence": true
+  },
+  "religious_content": {
+    "source_grounded": true,
+    "evidence_graph_required": true,
+    "rights_validation_required": true,
+    "scholarly_review_for_sensitive_claims": true,
+    "uncertainty_must_be_preserved": true,
+    "model_must_not_invent_consensus": true
+  },
+  "privacy": {
+    "local_first": true,
+    "telemetry_opt_in": false,
+    "biometric_or_physiological_collection": false,
+    "multimodal_profile_must_use_minimum_necessary_data": true
+  },
+  "acquisition_boundary": {
+    "learning_may_not_block_pdf_acquisition": true,
+    "learning_failures_are_non_blocking": true,
+    "graph_failures_are_non_blocking": true
+  },
+  "evaluation": {
+    "continuous": true,
+    "delayed_retest": true,
+    "transfer_test": true,
+    "calibration": true,
+    "method_ablation": true
+  }
+}

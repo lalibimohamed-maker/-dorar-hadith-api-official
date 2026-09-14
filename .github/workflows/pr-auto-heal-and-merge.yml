@@ -26,10 +26,11 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       REPOSITORY: ${{ github.repository }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
+
     steps:
       - name: Inspect PR state
         id: pr
@@ -44,6 +45,7 @@ jobs:
           echo "mergeable_state=$(jq -r '.mergeable_state' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
           echo "draft=$(jq -r '.draft' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
           echo "head_repo=$(jq -r '.head.repo.full_name // empty' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$(jq -r '.head.sha' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
           echo "base=$(jq -r '.base.ref' <<<"$pr_json")" >> "$GITHUB_OUTPUT"
 
       - name: Update branch when GitHub reports it is behind
@@ -55,13 +57,49 @@ jobs:
           steps.pr.outputs.mergeable_state == 'behind'
         env:
           GH_TOKEN: ${{ github.token }}
+          EXPECTED_HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+        shell: bash
         run: |
           set -euo pipefail
-          gh api --method PUT \
-            -H 'Accept: application/vnd.github+json' \
-            "/repos/${REPOSITORY}/pulls/${PR_NUMBER}/update-branch" \
-            -f update_method=merge >/dev/null
-          echo 'PR branch was automatically synchronized with main.'
+
+          # update-branch can return transient GitHub gateway/server errors.
+          # Those errors must never make Auto-Heal fail after the retry budget;
+          # GitHub remains the source of truth and the next review event can retry.
+          for attempt in 1 2 3 4 5; do
+            echo "[UPDATE-BRANCH] attempt=${attempt}/5 expected_head_sha=${EXPECTED_HEAD_SHA}"
+
+            response_file="$(mktemp)"
+            if gh api --method PUT \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2026-03-10' \
+              "/repos/${REPOSITORY}/pulls/${PR_NUMBER}/update-branch" \
+              -f update_method=merge \
+              -f "expected_head_sha=${EXPECTED_HEAD_SHA}" \
+              >"$response_file" 2>&1; then
+              echo '[UPDATE-BRANCH] GitHub accepted the branch update.'
+              rm -f "$response_file"
+              exit 0
+            fi
+
+            response="$(cat "$response_file")"
+            rm -f "$response_file"
+
+            if grep -Eq 'HTTP/[0-9.]+ (502|503|504)|Server Error \(HTTP (502|503|504)\)' <<<"$response"; then
+              if [[ "$attempt" -lt 5 ]]; then
+                delay=$((attempt * 5))
+                echo "[UPDATE-BRANCH] transient GitHub gateway/server error; retrying in ${delay}s."
+                sleep "$delay"
+                continue
+              fi
+              echo '[UPDATE-BRANCH] GitHub still returned a transient 5xx after 5 attempts; leaving the PR untouched and ending successfully.'
+              echo "$response"
+              exit 0
+            fi
+
+            echo '[UPDATE-BRANCH] non-transient failure; refusing to retry blindly.'
+            echo "$response"
+            exit 1
+          done
 
       - name: Arm protected auto-merge
         if: >-
@@ -86,7 +124,7 @@ jobs:
                 echo 'Auto-merge armed. GitHub will merge only after every protected requirement, including the required secondary-account approval and required checks, is satisfied.'
                 exit 0
               fi
-              echo "[AUTO-MERGE] GitHub rejected the merge request; re-checking protected state."
+              echo '[AUTO-MERGE] GitHub rejected the merge request; re-checking protected state.'
             elif [[ "$mergeable" == "false" ]]; then
               echo "[AUTO-MERGE] PR is not mergeable yet (mergeable_state=${mergeable_state}); this is a pending protected-gate state, not a workflow failure."
             else
