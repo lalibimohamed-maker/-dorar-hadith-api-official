@@ -1,20 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createUnifiedScholarWorkspace,registerWorkspaceLearner,openLearningSession,linkEngineArtifact,submitWorkspaceReview,workspacePublishable} from '../src/rechercher-unified-scholar-workspace.js';
+import {createUnifiedScholarWorkspace,registerWorkspaceSource,registerWorkspaceLearner,openLearningSession,linkEngineArtifact,submitWorkspaceReview,workspacePublishable} from '../src/rechercher-unified-scholar-workspace.js';
 
-test('student workspace blocks publication until teacher or scholar review',()=>{
+test('student workspace blocks publication until review and allowed source rights',()=>{
   const w=createUnifiedScholarWorkspace();
+  registerWorkspaceSource(w,{sourceId:'book-1',sourceHash:'sha256:book',rightsStatus:'UNKNOWN'});
   registerWorkspaceLearner(w,{learnerId:'student-1',role:'STUDENT'});
   openLearningSession(w,{sessionId:'s1',learnerId:'student-1',conceptIds:['fiqh-1'],sourceIds:['book-1']});
   linkEngineArtifact(w,{linkId:'l1',sessionId:'s1',engine:'FIQH',artifactId:'position-1',sourceIds:['book-1'],reviewRequired:true});
   assert.equal(workspacePublishable(w,'s1'),false);
   assert.throws(()=>submitWorkspaceReview(w,{reviewId:'r1',linkId:'l1',reviewerId:'student-2',reviewerRole:'STUDENT',verdict:'APPROVED'}));
   submitWorkspaceReview(w,{reviewId:'r2',linkId:'l1',reviewerId:'teacher-1',reviewerRole:'TEACHER',verdict:'APPROVED'});
+  assert.equal(workspacePublishable(w,'s1'),false);
+  w.sources.get('book-1').rightsStatus='ALLOWED';
   assert.equal(workspacePublishable(w,'s1'),true);
 });
 
 test('revision and rejection remain publication blockers',()=>{
   const w=createUnifiedScholarWorkspace();
+  registerWorkspaceSource(w,{sourceId:'source-1',sourceHash:'sha256:source',rightsStatus:'ALLOWED'});
   registerWorkspaceLearner(w,{learnerId:'student-1'});
   openLearningSession(w,{sessionId:'s2',learnerId:'student-1'});
   linkEngineArtifact(w,{linkId:'l2',sessionId:'s2',engine:'RESEARCH',artifactId:'claim-1',sourceIds:['source-1'],reviewRequired:true});
