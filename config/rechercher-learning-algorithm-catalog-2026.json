@@ -1,0 +1,33 @@
+{
+  "version": "2026-09",
+  "purpose": "Global research-derived algorithm catalog for Rechercher learning orchestration",
+  "schedulers": [
+    {"id":"fsrs","role":"preferred-modern-spaced-review","explainability":"medium-high","data":"review-history"},
+    {"id":"sm2","role":"compatibility-reference","explainability":"high","data":"review-history"},
+    {"id":"leitner","role":"simple-offline-fallback-and-game-mechanic","explainability":"very-high","data":"box-state"},
+    {"id":"forgetting-curve","role":"interpretable-retention-estimation","explainability":"high","data":"review-history"},
+    {"id":"deadline-aware","role":"target-date-optimization","explainability":"high","data":"target-date-and-review-state"}
+  ],
+  "selection_objectives": [
+    "retrievability-risk",
+    "recent-error",
+    "mastery-gap",
+    "prerequisite-gap",
+    "confidence-mismatch",
+    "novelty",
+    "interleaving-value",
+    "transfer-value",
+    "source-diversity",
+    "time-budget"
+  ],
+  "knowledge_models": ["explainable-skill-state","bkt-when-appropriate","irt-when-item-bank-supports-it","advanced-knowledge-tracing-only-when-governed-and-justified"],
+  "required_event_fields": ["itemId","sourceId","skillIds","mode","correctness","confidence","timestamp","feedbackShown","nextReview"],
+  "card_lifecycle": ["draft","machine-generated","source-verified","scholar-reviewed","published","deprecated"],
+  "game_event_rule": "game-performance-is-learning-evidence-only-when-mapped-to-defined-skills-and-retrieval/feedback-events",
+  "mastery_rule": "mastery-requires-more-than-game-score; include-delayed-or-transfer-evidence",
+  "religious_content_rule": "canonical/source-grounded answers only; disputed interpretation must expose evidence and scholarly positions",
+  "acquisition_nonblocking": true,
+  "free_first": true,
+  "offline_first": true,
+  "privacy_minimization": true
+}
