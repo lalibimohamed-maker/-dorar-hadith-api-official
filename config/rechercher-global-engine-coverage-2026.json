@@ -1,6 +1,6 @@
 {
   "engine": "rechercher-global-engine-coverage",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "principle": "Every requested Rechercher capability is explicitly classified; documentation alone never counts as implementation.",
   "status_model": ["IMPLEMENTED","PARTIAL","PLANNED"],
   "coverage": {
@@ -19,10 +19,10 @@
     "book_work_edition": "PARTIAL",
     "manuscript_intelligence": "PARTIAL",
     "iiif_page_canvas": "PARTIAL",
-    "ocr_htr_alignment": "PLANNED",
+    "ocr_htr_alignment": "PARTIAL",
     "text_pdf_page_passage_linking": "PARTIAL",
-    "edition_comparison": "PLANNED",
-    "version_revision_tracking": "PLANNED",
+    "edition_comparison": "PARTIAL",
+    "version_revision_tracking": "PARTIAL",
     "student_learning": "IMPLEMENTED",
     "teacher_engine": "IMPLEMENTED",
     "scholar_engine": "IMPLEMENTED",
@@ -30,7 +30,7 @@
     "active_recall": "PARTIAL",
     "spaced_repetition": "IMPLEMENTED",
     "interleaving": "PARTIAL",
-    "progressive_summarization": "PLANNED",
+    "progressive_summarization": "PARTIAL",
     "knowledge_gap_tutor": "PARTIAL",
     "teach_me": "PARTIAL",
     "self_test": "PARTIAL",
@@ -56,6 +56,13 @@
     "low_resource_languages": "PLANNED",
     "accessibility": "PARTIAL",
     "offline_resilient_learning": "PARTIAL"
+  },
+  "v5_executable_progress": {
+    "research_foundation_engine": "IMPLEMENTED_UNIT_TESTED_MINIMUM",
+    "learning_gap_methods": "BLOCKED_BY_WRITE_SAFETY_ON_NEW_FILE",
+    "specialized_islamic_engine_expansion": "NOT_YET_COMMITTED",
+    "integration": "NOT_YET_VERIFIED",
+    "ci_security_governance": "PENDING_AFTER_THIS_INCREMENT"
   },
   "global_research_foundation": {
     "world_source_types_registered": true,
