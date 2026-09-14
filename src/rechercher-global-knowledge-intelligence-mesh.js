@@ -1,4 +1,5 @@
 import { createV7GlobalKnowledgeEvidenceGraphEngine, addNode, addEvidenceEdge, recordKnowledgeGap, createAiSynthesis } from './rechercher-v7-global-knowledge-evidence-graph-engine.js';
+import { createGlobalSourceDiscoveryEngine, registerDiscoveryProvider, buildFallbackPlan, recordProviderFailure, bestCandidate } from './rechercher-global-source-discovery-engine.js';
 
 export const WORLD_SOURCE_TYPES = Object.freeze([
   'NATIONAL_LIBRARY','UNIVERSITY_LIBRARY','ARCHIVE','MUSEUM','MANUSCRIPT_REPOSITORY','DIGITAL_HUMANITIES','ISLAMIC_CORPUS','BOOK_PDF','ARTICLE','AUDIO','VIDEO','MAP','OCR_HTR','STRUCTURED_DATA','API','IIIF','KNOWLEDGE_GRAPH','WEB_SOURCE'
@@ -6,11 +7,13 @@ export const WORLD_SOURCE_TYPES = Object.freeze([
 export const MULTILINGUAL_RELATIONS = Object.freeze(['EXACT','CLOSE','HISTORICAL','SCHOOL_SPECIFIC','TRANSLATION_VARIANT','NO_EXACT_EQUIVALENT']);
 export const RESEARCH_STATES = Object.freeze(['DISCOVER','SYNTHESIS','VERIFICATION']);
 
-export function createGlobalKnowledgeIntelligenceMesh() {
+export function createGlobalKnowledgeIntelligenceMesh({ providers = [] } = {}) {
+  const discovery = createGlobalSourceDiscoveryEngine();
+  for (const provider of providers) registerDiscoveryProvider(discovery, provider);
   return {
     status: 'FOUNDATION_IMPLEMENTED_EXTENSION_POINT',
     sources: new Map(), works: new Map(), concepts: new Map(), terminology: [],
-    gaps: new Map(), research: new Map(), graph: createV7GlobalKnowledgeEvidenceGraphEngine(), traces: []
+    gaps: new Map(), research: new Map(), graph: createV7GlobalKnowledgeEvidenceGraphEngine(), traces: [], discovery
   };
 }
 
@@ -21,6 +24,18 @@ export function registerWorldSource(mesh, source) {
   if (!source.rightsState) throw new Error('rights state is required');
   mesh.sources.set(source.sourceId, structuredClone(source));
   return structuredClone(source);
+}
+
+export function planWorldDiscovery(mesh, options = {}) {
+  return buildFallbackPlan(mesh.discovery, options);
+}
+
+export function recordWorldProviderFailure(mesh, failure) {
+  return recordProviderFailure(mesh.discovery, failure);
+}
+
+export function selectBestManifestation(mesh, candidates = []) {
+  return bestCandidate(mesh.discovery, candidates);
 }
 
 export function registerWork(mesh, work) {
