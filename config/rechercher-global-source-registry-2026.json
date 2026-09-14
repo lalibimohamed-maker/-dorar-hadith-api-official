@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "status": "OPEN_EXTENSION_POINT",
   "purpose": "Rights-aware worldwide discovery registry for high-quality books, manuscripts and scholarly source records. Discovery must never block lawful PDF acquisition.",
   "acquisitionPrinciple": {
@@ -13,25 +13,19 @@
     "neverPublish": ["UNKNOWN", "RESTRICTED", "EXPLICIT_PERMISSION_REQUIRED"],
     "neverBypass": ["access_controls", "robots_or_rate_limits", "copyright_or_license_restrictions"],
     "noProxyRotation": true,
-    "noUserAgentRotation": true
+    "noUserAgentRotation": true,
+    "sourceFailureMustNotBlockWork": true,
+    "fallbackPolicy": "continue_across_independent_providers_until_best_verified_manifestation_or_exhaustion"
   },
   "qualityPolicy": {
-    "prefer": [
-      "complete_volume_set",
-      "highest_available_resolution",
-      "original_page_images",
-      "official_pdf",
-      "lossless_or_minimally_lossy_derivative",
-      "stable_identifier",
-      "page_level_manifest",
-      "verified_bibliographic_metadata"
-    ],
+    "prefer": ["complete_volume_set", "highest_available_resolution", "original_page_images", "official_pdf", "lossless_or_minimally_lossy_derivative", "stable_identifier", "page_level_manifest", "verified_bibliographic_metadata"],
     "validation": ["pdf_signature", "qpdf_check", "page_count", "content_hash", "identity_match", "rights_evidence"],
     "retainOriginalPdf": true,
     "encryptedPdfEncForbidden": true
   },
   "providers": [
-    {"id":"iiif_biblissima","type":"IIIF_AGGREGATOR","scope":"MANUSCRIPTS_RARE_BOOKS","priority":10,"discovery":"IIIF_MANIFEST","download":"SOURCE_DEPENDENT","rights":"SOURCE_RECORD"},
+    {"id":"iiif_biblissima","type":"IIIF_AGGREGATOR","scope":"MANUSCRIPTS_RARE_BOOKS","priority":10,"discovery":"IIIF_MANIFEST","download":"SOURCE_DEPENDENT","rights":"SOURCE_RECORD","engines":["MANIFEST_DISCOVERY","CANVAS_DISCOVERY","ANNOTATION_DISCOVERY"]},
+    {"id":"iiif_presentation","type":"IIIF_STANDARD","scope":"DIGITAL_OBJECTS","priority":10,"discovery":"PRESENTATION_3_MANIFEST","download":"CANVAS_RESOURCES","rights":"SOURCE_RECORD","engines":["MANIFEST","CANVAS","ANNOTATION_PAGE","CONTENT_SEARCH","CHANGE_DISCOVERY"]},
     {"id":"gallica_bnf","type":"NATIONAL_LIBRARY","scope":"BOOKS_MANUSCRIPTS","priority":10,"discovery":"CATALOG_IIIF","download":"PDF_OR_IIIF","rights":"ITEM_LICENSE"},
     {"id":"digital_bodleian","type":"UNIVERSITY_LIBRARY","scope":"MANUSCRIPTS_BOOKS","priority":10,"discovery":"IIIF","download":"IIIF","rights":"ITEM_LICENSE"},
     {"id":"bayerische_staatsbibliothek","type":"NATIONAL_LIBRARY","scope":"MANUSCRIPTS_BOOKS","priority":10,"discovery":"IIIF_CATALOG","download":"SOURCE_DEPENDENT","rights":"ITEM_LICENSE"},
@@ -44,11 +38,13 @@
     {"id":"google_books","type":"BOOK_SEARCH","scope":"BOOKS","priority":8,"discovery":"BOOKS_API","download":"FULL_VIEW_ONLY_WHEN_ALLOWED","rights":"GOOGLE_BOOKS_STATUS"},
     {"id":"europeana","type":"CULTURAL_HERITAGE_AGGREGATOR","scope":"BOOKS_MANUSCRIPTS_MEDIA","priority":8,"discovery":"API_IIIF","download":"SOURCE_DEPENDENT","rights":"ITEM_RECORD"},
     {"id":"dpla","type":"CULTURAL_HERITAGE_AGGREGATOR","scope":"DIGITIZED_BOOKS_MANUSCRIPTS","priority":8,"discovery":"API","download":"SOURCE_DEPENDENT","rights":"ITEM_RECORD"},
-    {"id":"openiti","type":"ISLAMIC_CORPUS","scope":"ISLAMIC_TEXTS","priority":9,"discovery":"CORPUS_METADATA","download":"CORPUS_FILES","rights":"CORPUS_LICENSE"}
+    {"id":"openiti","type":"ISLAMIC_CORPUS","scope":"ISLAMIC_TEXTS","priority":9,"discovery":"CORPUS_METADATA","download":"CORPUS_FILES","rights":"CORPUS_LICENSE"},
+    {"id":"openalex","type":"SCHOLARLY_GRAPH","scope":"WORKS_AUTHORS_SOURCES_INSTITUTIONS_TOPICS","priority":8,"discovery":"REST_API","download":"METADATA_AND_OA_LOCATIONS","rights":"METADATA_OPEN","engines":["WORK_SEARCH","AUTHOR_SEARCH","SOURCE_SEARCH","CITATION_NEIGHBORHOOD","OPEN_ACCESS_DISCOVERY"]},
+    {"id":"crossref","type":"SCHOLARLY_METADATA","scope":"WORKS_DOIS_LICENSES_REFERENCES","priority":8,"discovery":"REST_API","download":"FULLTEXT_LINKS_WHEN_PROVIDED","rights":"METADATA_OPEN","engines":["DOI_RESOLUTION","WORK_SEARCH","LICENSE_DISCOVERY","FULLTEXT_LINK_DISCOVERY","REFERENCE_METADATA"]}
   ],
   "recordModel": {
     "required": ["source_id","work_id","edition_id","manifestation_id","source_uri","retrieval_date","content_hash","rights_state","rights_evidence","provenance"],
-    "optional": ["page_id","passage_id","iiif_manifest","pdf_uri","image_uri","text_uri","audio_uri","video_uri","language","script","institution","shelfmark","catalog_id","quality_score","resolution_dpi","page_count"]
+    "optional": ["page_id","passage_id","iiif_manifest","pdf_uri","image_uri","text_uri","audio_uri","video_uri","language","script","institution","shelfmark","catalog_id","quality_score","resolution_dpi","page_count","provider_id","provider_record_id","discovery_engine"]
   },
   "qualityScore": {
     "factors": ["completeness","resolution","page_legibility","bibliographic_identity","source_stability","provenance_strength","rights_clarity","text_extractability"],
