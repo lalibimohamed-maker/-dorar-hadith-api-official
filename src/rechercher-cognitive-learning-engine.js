@@ -21,12 +21,23 @@ function requireId(value, name) {
   if (!value) throw new TypeError(`${name} is required`);
 }
 
+function memoryEvent(engine, session, type, payload, at) {
+  return recordSessionEvent(engine.memory, {
+    learnerId: session.learnerId,
+    sessionId: session.sessionId,
+    eventId: `${session.sessionId}:${session.events.length + 1}`,
+    type,
+    payload,
+    at
+  });
+}
+
 export function startCognitiveSession(engine, { sessionId, learnerId, itemId, sourceIds = [], now = new Date().toISOString() } = {}) {
   requireId(sessionId, 'sessionId');
   requireId(learnerId, 'learnerId');
   const session = { sessionId, learnerId, itemId: itemId ?? null, sourceIds: [...new Set(sourceIds)], stage: 'UNDERSTAND', startedAt: now, events: [] };
   engine.sessions.set(sessionId, session);
-  recordSessionEvent(engine.memory, { learnerId, event: { type: 'SESSION_STARTED', sessionId, itemId: session.itemId, sourceIds: session.sourceIds, at: now } });
+  memoryEvent(engine, session, 'SESSION_STARTED', { itemId: session.itemId, sourceIds: session.sourceIds }, now);
   return session;
 }
 
@@ -38,9 +49,9 @@ export function advanceCognitiveStage(engine, sessionId, stage, { reason = 'prog
   const target = COGNITIVE_STAGES.indexOf(stage);
   if (target < current) throw new RangeError('cognitive stages cannot move backwards');
   session.stage = stage;
-  const event = { type: 'STAGE_ADVANCED', sessionId, stage, reason, at: now };
+  const event = { type: 'STAGE_ADVANCED', stage, reason, at: now };
   session.events.push(event);
-  recordSessionEvent(engine.memory, { learnerId: session.learnerId, event });
+  memoryEvent(engine, session, event.type, { stage, reason }, now);
   return session;
 }
 
@@ -51,23 +62,23 @@ export function processCognitiveAttempt(engine, sessionId, attempt = {}, { state
   const nextState = updateAfterAttempt(state, attempt);
   const decision = buildLearningDecision({ itemId: session.itemId, skillIds: attempt.skillIds ?? [], sourceIds: [...new Set([...session.sourceIds, ...sourceIds])], state: nextState, now });
   const feedbackId = `${sessionId}:${session.events.length + 1}`;
-  enqueueFeedback(engine.feedback, { feedbackId, learnerId: session.learnerId, itemId: session.itemId, outcome: attempt.correct ? 'CORRECT' : 'INCORRECT', evidenceSourceIds: decision.sourceIds, diagnosis });
-  const event = { type: 'ATTEMPT_PROCESSED', sessionId, diagnosis, decision, at: now };
+  enqueueFeedback(engine.feedback, { feedbackId, learnerId: session.learnerId, conceptId: attempt.conceptId ?? session.itemId ?? 'unknown', promptId: attempt.promptId ?? session.itemId ?? 'unknown', answer: attempt.answer, evidenceSourceIds: decision.sourceIds });
+  const event = { type: 'ATTEMPT_PROCESSED', diagnosis, decision, feedbackId, at: now };
   session.events.push(event);
-  recordSessionEvent(engine.memory, { learnerId: session.learnerId, event });
+  memoryEvent(engine, session, event.type, event, now);
   return { diagnosis, nextState, decision, feedbackId };
 }
 
-export function completeCognitiveFeedback(engine, feedbackId, { reviewerRole = 'SYSTEM', notes = '' } = {}) {
-  return resolveFeedback(engine.feedback, { feedbackId, reviewerRole, notes });
+export function completeCognitiveFeedback(engine, feedbackId, { outcome, reviewerRole = 'SYSTEM', note = '' } = {}) {
+  return resolveFeedback(engine.feedback, { feedbackId, outcome, reviewerRole, note });
 }
 
-export function promoteCognitiveMemory(engine, { learnerId, memoryId, sourceIds = [] } = {}) {
-  return promoteMemory(engine.memory, { learnerId, memoryId, sourceIds });
+export function promoteCognitiveMemory(engine, { learnerId, memoryId, key, value, sourceIds = [], reason = '' } = {}) {
+  return promoteMemory(engine.memory, { learnerId, memoryId, key, value, sourceIds, reason });
 }
 
 export function buildCognitivePlan(engine, { learnerId, conceptId, state = {}, sourceIds = [], pedagogyItem = {}, minTransferConfidence = 0.6 } = {}) {
-  const memory = getLearnerMemory(engine.memory, learnerId);
+  const memories = getLearnerMemory(engine.memory, learnerId);
   const transfers = conceptId && engine.transferGraph.concepts.has(conceptId)
     ? suggestTransfers(engine.transferGraph, conceptId, minTransferConfidence)
     : [];
@@ -76,8 +87,8 @@ export function buildCognitivePlan(engine, { learnerId, conceptId, state = {}, s
     : { decision: 'REVIEW_REQUIRED', reason: 'pedagogy-policy-not-supplied' };
   return {
     stages: [...COGNITIVE_STAGES],
-    decision: buildLearningDecision({ itemId: pedagogyItem.itemId, sourceIds, state }),
-    memory: { session: memory.session, longTerm: memory.longTerm },
+    decision: buildLearningDecision({ itemId: pedagogyItem.itemId ?? conceptId, sourceIds, state }),
+    memory: memories,
     transfers,
     safety,
     pendingFeedback: pendingFeedback(engine.feedback, learnerId)
