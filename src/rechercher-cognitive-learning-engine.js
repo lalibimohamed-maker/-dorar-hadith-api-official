@@ -1,16 +1,18 @@
 import { buildLearningDecision, diagnosePerformance, updateAfterAttempt, evaluateTransfer } from './learning/rechercher-learning-intelligence-engine.mjs';
 import { createLearningMemoryEngine, recordSessionEvent, promoteMemory, getLearnerMemory } from './rechercher-learning-memory-engine.js';
 import { createFeedbackLoopEngine, enqueueFeedback, resolveFeedback, pendingFeedback } from './rechercher-feedback-loop-engine.js';
-import { suggestTransfers } from './rechercher-transfer-graph-engine.js';
-import { evaluatePedagogyItem } from './rechercher-pedagogy-safety-engine.js';
+import { createTransferGraphEngine, suggestTransfers } from './rechercher-transfer-graph-engine.js';
+import { createPedagogySafetyEngine, evaluatePedagogyItem } from './rechercher-pedagogy-safety-engine.js';
 
 export const COGNITIVE_STAGES = Object.freeze(['UNDERSTAND', 'PRACTICE', 'RETRIEVE', 'FEEDBACK', 'MASTERY', 'TRANSFER', 'REPLAN']);
 
-export function createCognitiveLearningEngine({ memory = {}, feedback = {}, learner = {} } = {}) {
+export function createCognitiveLearningEngine({ memory = {}, feedback = {}, learner = {}, transferGraph = null, pedagogySafety = null } = {}) {
   return {
     memory: createLearningMemoryEngine(memory),
     feedback: createFeedbackLoopEngine(feedback),
     learner: { ...learner },
+    transferGraph: transferGraph ?? createTransferGraphEngine(),
+    pedagogySafety: pedagogySafety ?? createPedagogySafetyEngine(),
     sessions: new Map()
   };
 }
@@ -42,7 +44,7 @@ export function advanceCognitiveStage(engine, sessionId, stage, { reason = 'prog
   return session;
 }
 
-export function processCognitiveAttempt(engine, sessionId, attempt = {}, { state = {}, items = [], sourceIds = [], now = new Date().toISOString() } = {}) {
+export function processCognitiveAttempt(engine, sessionId, attempt = {}, { state = {}, sourceIds = [], now = new Date().toISOString() } = {}) {
   const session = engine.sessions.get(sessionId);
   requireId(session, 'session');
   const diagnosis = diagnosePerformance(attempt);
@@ -53,7 +55,7 @@ export function processCognitiveAttempt(engine, sessionId, attempt = {}, { state
   const event = { type: 'ATTEMPT_PROCESSED', sessionId, diagnosis, decision, at: now };
   session.events.push(event);
   recordSessionEvent(engine.memory, { learnerId: session.learnerId, event });
-  return { diagnosis, nextState, decision, feedbackId, nextItem: items.length ? decision : null };
+  return { diagnosis, nextState, decision, feedbackId };
 }
 
 export function completeCognitiveFeedback(engine, feedbackId, { reviewerRole = 'SYSTEM', notes = '' } = {}) {
@@ -64,10 +66,14 @@ export function promoteCognitiveMemory(engine, { learnerId, memoryId, sourceIds 
   return promoteMemory(engine.memory, { learnerId, memoryId, sourceIds });
 }
 
-export function buildCognitivePlan(engine, { learnerId, state = {}, sourceIds = [], pedagogyItem = {}, minTransferConfidence = 0.6 } = {}) {
+export function buildCognitivePlan(engine, { learnerId, conceptId, state = {}, sourceIds = [], pedagogyItem = {}, minTransferConfidence = 0.6 } = {}) {
   const memory = getLearnerMemory(engine.memory, learnerId);
-  const transfers = suggestTransfers(engine.transferGraph ?? { edges: [] }, learnerId, minTransferConfidence);
-  const safety = evaluatePedagogyItem(pedagogyItem);
+  const transfers = conceptId && engine.transferGraph.concepts.has(conceptId)
+    ? suggestTransfers(engine.transferGraph, conceptId, minTransferConfidence)
+    : [];
+  const safety = pedagogyItem.policyId
+    ? evaluatePedagogyItem(engine.pedagogySafety, pedagogyItem)
+    : { decision: 'REVIEW_REQUIRED', reason: 'pedagogy-policy-not-supplied' };
   return {
     stages: [...COGNITIVE_STAGES],
     decision: buildLearningDecision({ itemId: pedagogyItem.itemId, sourceIds, state }),
