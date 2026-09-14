@@ -1,0 +1,22 @@
+{
+  "name": "Rechercher Federated Stage Network Registry",
+  "version": "2026.09",
+  "status": "IMPLEMENTED_EXECUTABLE_FOUNDATION",
+  "core": ["V1_FOUNDATION", "V2_FEDERATION", "V3_DOMAIN_LEARNING", "V4_LEARNING_INTELLIGENCE", "V5_GLOBAL_RESEARCH"],
+  "extensionRanges": ["V6_V20", "V21_V30", "V31_PLUS"],
+  "futureStatus": "OPEN_EXTENSION_POINT",
+  "contract": {
+    "required": ["stageId", "version", "capabilities", "acceptedInputs", "producedOutputs", "requiredEvidence", "rightsPolicy", "reviewPolicy", "dependencies", "handoffs", "safety"],
+    "immutable": ["sourceIdentity", "contentHash", "canonicalQuranArabic", "originalPdf"],
+    "rightsBypass": false,
+    "acquisitionIndependent": true,
+    "traceRequired": true,
+    "handoffCompatibilityRequired": true,
+    "replanObservable": true
+  },
+  "integration": {
+    "flow": ["REGISTER", "DECLARE_CAPABILITIES", "ACCEPT_INPUT_CONTRACT", "PROCESS", "EMIT_VERIFIED_OUTPUT", "HANDOFF", "TRACE", "OBSERVE", "REPLAN"],
+    "futureNodesMustNotRewriteCore": true
+  },
+  "mergePolicy": "V1_V5_AND_REGISTRY_MUST_PASS_FULL_CI_SECURITY_GOVERNANCE_BEFORE_MERGE"
+}
