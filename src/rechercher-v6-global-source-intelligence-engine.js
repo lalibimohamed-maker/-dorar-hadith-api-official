@@ -42,13 +42,8 @@ export function createV6StageNodeContract() {
       'RIGHTS_EVALUATION',
       'WORK_EDITION_MANUSCRIPT_LINKING'
     ],
-    acceptedInputs: [
-      { type: 'RESEARCH_OUTPUT' }
-    ],
-    producedOutputs: [
-      { type: 'SOURCE_CANDIDATE' },
-      { type: 'VERIFIED_SOURCE' }
-    ],
+    acceptedInputs: [{ type: 'RESEARCH_OUTPUT' }],
+    producedOutputs: [{ type: 'SOURCE_CANDIDATE' }, { type: 'VERIFIED_SOURCE' }],
     requiredEvidence: [
       { type: 'SOURCE_IDENTITY' },
       { type: 'PROVENANCE' },
@@ -60,10 +55,7 @@ export function createV6StageNodeContract() {
       unknownIsPublishable: false,
       restrictedIsPublishable: false
     },
-    reviewPolicy: {
-      scholarlyVerification: true,
-      humanReviewForAuthoritativeUse: true
-    },
+    reviewPolicy: { scholarlyVerification: true, humanReviewForAuthoritativeUse: true },
     dependencies: ['V5_GLOBAL_RESEARCH'],
     handoffs: ['RESEARCH_TO_SOURCE_INTELLIGENCE', 'SOURCE_INTELLIGENCE_TO_EVIDENCE'],
     tracePolicy: { traceIdRequired: true },
@@ -91,16 +83,10 @@ export function discoverSource(engine, candidate) {
   requireId(candidate?.candidateId, 'candidateId');
   requireId(candidate?.sourceUrl, 'sourceUrl');
   const record = {
-    state: 'SOURCE_CANDIDATE',
-    candidateId: candidate.candidateId,
-    sourceUrl: candidate.sourceUrl,
-    sourceType: candidate.sourceType || 'WEB',
-    institution: candidate.institution || null,
-    language: candidate.language || null,
-    discoveredAt: candidate.discoveredAt || new Date().toISOString(),
-    provenance: clone(candidate.provenance || null),
-    rightsState: candidate.rightsState || 'UNKNOWN',
-    ...clone(candidate)
+    state: 'SOURCE_CANDIDATE', candidateId: candidate.candidateId, sourceUrl: candidate.sourceUrl,
+    sourceType: candidate.sourceType || 'WEB', institution: candidate.institution || null,
+    language: candidate.language || null, discoveredAt: candidate.discoveredAt || new Date().toISOString(),
+    provenance: clone(candidate.provenance || null), rightsState: candidate.rightsState || 'UNKNOWN', ...clone(candidate)
   };
   assertRightsState(record.rightsState);
   engine.candidates.set(record.candidateId, clone(record));
@@ -122,13 +108,7 @@ export function resolveSourceIdentity(engine, candidateId, identity) {
   const candidate = engine.candidates.get(candidateId);
   if (!candidate) throw new Error('source candidate not found');
   requireId(identity?.sourceId, 'sourceId');
-  const updated = {
-    ...clone(candidate),
-    sourceIdentity: clone(identity),
-    sourceId: identity.sourceId,
-    identityState: 'VERIFIED',
-    state: 'IDENTITY_RESOLVED'
-  };
+  const updated = { ...clone(candidate), sourceIdentity: clone(identity), sourceId: identity.sourceId, identityState: 'VERIFIED', state: 'IDENTITY_RESOLVED' };
   assertImmutablePreserved(candidate, updated);
   engine.candidates.set(candidateId, updated);
   recordTrace(engine, 'SOURCE_IDENTITY_RESOLVED', { candidateId, sourceId: identity.sourceId });
@@ -140,8 +120,7 @@ export function deduplicateSource(engine, candidateId) {
   if (!candidate) throw new Error('source candidate not found');
   const identityKey = candidate.sourceId || candidate.sourceUrl;
   const duplicate = [...engine.sources.values()].find(source =>
-    source.sourceId === identityKey ||
-    (candidate.contentHash && source.contentHash === candidate.contentHash) ||
+    source.sourceId === identityKey || (candidate.contentHash && source.contentHash === candidate.contentHash) ||
     (candidate.sourceUrl && source.sourceUrl === candidate.sourceUrl)
   );
   if (duplicate) {
@@ -155,6 +134,7 @@ export function evaluateRights(engine, candidateId, rightsState, evidence = null
   const candidate = engine.candidates.get(candidateId);
   if (!candidate) throw new Error('source candidate not found');
   assertRightsState(rightsState);
+  if (!evidence) throw new Error('rights evidence is required');
   const updated = { ...clone(candidate), rightsState, rightsEvidence: clone(evidence) };
   assertImmutablePreserved(candidate, updated);
   engine.candidates.set(candidateId, updated);
@@ -167,23 +147,14 @@ export function verifySource(engine, candidateId) {
   if (!candidate) throw new Error('source candidate not found');
   if (candidate.identityState !== 'VERIFIED') throw new Error('source identity must be verified');
   if (!candidate.provenance) throw new Error('provenance evidence is required');
+  if (!candidate.rightsEvidence) throw new Error('rights evidence is required');
   if (!candidate.sourceId) throw new Error('sourceId is required');
   const duplicate = deduplicateSource(engine, candidateId);
   if (duplicate.duplicate) return duplicate.canonicalSource;
-  const verified = {
-    ...clone(candidate),
-    state: 'VERIFIED_SOURCE',
-    verifiedAt: new Date().toISOString(),
-    publishable: candidate.rightsState === 'ALLOWED'
-  };
+  const verified = { ...clone(candidate), state: 'VERIFIED_SOURCE', verifiedAt: new Date().toISOString(), publishable: candidate.rightsState === 'ALLOWED' };
   assertImmutablePreserved(candidate, verified);
   engine.sources.set(verified.sourceId, clone(verified));
-  recordTrace(engine, 'SOURCE_VERIFIED', {
-    candidateId,
-    sourceId: verified.sourceId,
-    publishable: verified.publishable,
-    rightsState: verified.rightsState
-  });
+  recordTrace(engine, 'SOURCE_VERIFIED', { candidateId, sourceId: verified.sourceId, publishable: verified.publishable, rightsState: verified.rightsState });
   return clone(verified);
 }
 
@@ -209,12 +180,5 @@ export function recordTrace(engine, type, payload = {}, traceId = null) {
 }
 
 export function v6Health(engine) {
-  return {
-    stageId: engine.stageId,
-    status: engine.status,
-    candidates: engine.candidates.size,
-    verifiedSources: engine.sources.size,
-    links: engine.links.length,
-    traces: engine.traces.length
-  };
+  return { stageId: engine.stageId, status: engine.status, candidates: engine.candidates.size, verifiedSources: engine.sources.size, links: engine.links.length, traces: engine.traces.length };
 }
