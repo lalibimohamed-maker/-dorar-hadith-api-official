@@ -1,0 +1,40 @@
+{
+  "version": "4.0.0",
+  "memory": {
+    "session": {
+      "purpose": "ephemeral current-session context",
+      "retention": "session-scoped",
+      "raw_micro_events_allowed": true
+    },
+    "long_term": {
+      "purpose": "multi-week and multi-month learner trajectory",
+      "stores": ["mastery", "calibration", "misconceptions", "modality_profile", "transfer_history"],
+      "raw_event_log_default": false
+    }
+  },
+  "feedback_loop_buffer": {
+    "signals": ["pause", "hesitation", "revision", "hint_request", "answer_attempt", "confidence_change", "navigation", "completion"],
+    "max_session_events": 50,
+    "feeds": ["calibration", "diagnosis", "method_selection"]
+  },
+  "cross_domain_transfer": {
+    "enabled": true,
+    "requires_evidence": true,
+    "route_by": ["skill", "domain", "relation", "confidence", "evidence"],
+    "evaluation": ["immediate", "delayed", "transfer"]
+  },
+  "pedagogical_safety": {
+    "scaffold_before_answer": true,
+    "preserve_struggle": true,
+    "no_answer_dump": true,
+    "progressive_disclosure": true,
+    "learner_agency": true,
+    "source_grounded": true,
+    "rights_aware": true,
+    "biometric_inference_default": false
+  },
+  "architecture": {
+    "learning_downstream_of_acquisition": true,
+    "acquisition_must_not_wait_for_learning": true
+  }
+}
