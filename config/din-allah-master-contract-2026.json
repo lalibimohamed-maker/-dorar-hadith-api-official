@@ -1,0 +1,96 @@
+{
+  "contract": "DIN-ALLAH-MASTER-CONTRACT-2026",
+  "status": "governing-reference",
+  "principles": {
+    "corpus_time_scope": "unbounded: from the Prophetic era through all Islamic eras to the modern and contemporary world and future additions",
+    "no_legacy_time_cap": true,
+    "legacy_catalog_numbers_are_not_limits": ["1-400 AH", "247", "1608"],
+    "acquisition_must_not_be_blocked_by_noncritical_enhancements": true,
+    "acquire_first_store_first": true
+  },
+  "corpus": {
+    "coverage": ["Quran", "Hadith", "Sirah", "Tafsir", "Fiqh", "Aqidah", "Arabic and Islamic sciences", "biographies", "manuscripts", "books", "audio", "video", "educational resources"],
+    "source_separation": true,
+    "canonical_quran_arabic_unchanged": true
+  },
+  "pdf_acquisition": {
+    "objective": "continuous worldwide discovery and acquisition of real usable PDFs",
+    "pipeline": ["discover", "acquire", "preserve-original", "validate", "inspect", "OCR-when-needed", "extract", "integrity-check", "normalize-copy", "manifest", "publish-when-permitted"],
+    "original_pdf_preserved": true,
+    "user_facing_encrypted_pdf_outputs": false,
+    "progress_logging": ["attempt-count", "source-count", "byte-or-MB-progress", "PDF-DONE", "stall-detection"],
+    "failure_isolation": true,
+    "temporary_network_failures": ["retry", "backoff", "quarantine", "continue"],
+    "nonfatal_unresolved_books": "remain in census and continue with other books",
+    "educational_features_must_not_gate_acquisition": true
+  },
+  "rights_and_provenance": {
+    "immutable_source_hash": true,
+    "source_provenance": true,
+    "rights_status_per_item": true,
+    "unknown_rights": "catalog internally; do not make public-download claims until permitted",
+    "waqf_or_restricted_material": "requires explicit permission before public distribution",
+    "rights_failure_must_not_erase_discovery": true
+  },
+  "learning_system": {
+    "entry_points": ["Global Search", "يا بوابة العلم", "اختبر نفسك", "علّمني", "اقرأ وتعلّم", "تلاوتي", "بطاقاتي", "مساري"],
+    "methods": ["retrieval practice", "spacing", "interleaving", "elaboration", "worked examples", "self-explanation", "concept mapping", "formative assessment", "corrective feedback", "metacognitive reflection", "transfer practice", "cumulative review", "teach-back", "Socratic dialogue", "research apprenticeship", "progressive disclosure", "prerequisite learning"],
+    "adaptive_learning": true,
+    "source_grounded_learning": true,
+    "evidence_first_answers": true,
+    "uncertainty_and_confidence": true,
+    "contradiction_aware_research": true,
+    "knowledge_graph": true,
+    "personal_learning_path": true,
+    "offline_pwa_goal": true,
+    "privacy_first": true
+  },
+  "educational_visual_models": {
+    "enabled": true,
+    "artifacts": ["concept maps", "knowledge graphs", "prerequisite graphs", "timelines", "source/evidence maps", "comparison matrices", "learning-path maps", "interactive diagrams", "worked-example visualizations"],
+    "nonblocking": true
+  },
+  "recitation": {
+    "quran_recitation_remains_arabic": true,
+    "authoritative_correction_claim_requires_validated_speech_or_phoneme_alignment_and_tajweed_engine": true,
+    "no_false_correction_claims": true
+  },
+  "languages": {
+    "global_multilingual_discovery": true,
+    "ui_and_learning_language_can_vary": true,
+    "source_language_preserved": true,
+    "translation_does_not_replace_canonical_quran_arabic": true
+  },
+  "global_source_intelligence": {
+    "worldwide": true,
+    "multilingual": true,
+    "source_families": ["national libraries", "university collections", "manuscript repositories", "official Islamic institutions", "open digital libraries", "scholarly indexes", "audio repositories", "video repositories", "educational platforms", "regional-language repositories"],
+    "source_registry_reusable": true,
+    "discovery_memory": true,
+    "source_quality_scoring": true,
+    "provenance_before_publication": true
+  },
+  "global_learning_intelligence": {
+    "scope": "research and continuously improve methods for understanding, retention, transfer, research literacy, and knowledge navigation",
+    "evidence_base": ["cognitive science", "learning science", "metacognition", "knowledge graphs", "intelligent tutoring systems", "adaptive learning", "human-centred AI", "information retrieval", "semantic search", "educational visualization"],
+    "massive_practice_loop": ["diagnose", "teach", "retrieve", "feedback", "space", "interleave", "transfer", "reflect", "reassess", "adapt"],
+    "continuous_improvement": true,
+    "human_scholar_review": true
+  },
+  "governance": {
+    "main_branch_protection": true,
+    "reviewed_changes": true,
+    "security_checks_must_remain": true,
+    "free_first": true,
+    "open_source_preference": true,
+    "no_paid_dependency_required_for_core_corpus_acquisition": true
+  },
+  "definition_of_done": [
+    "requirement is represented in this contract",
+    "implementation exists or has an explicit guarded/planned state",
+    "critical invariants have automated tests where practical",
+    "acquisition can continue despite noncritical learning or enrichment failures",
+    "rights and provenance remain enforceable",
+    "legacy time-range limits cannot silently return"
+  ]
+}
