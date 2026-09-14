@@ -1,0 +1,20 @@
+{
+  "engine": "rechercher-global-deep-research-intelligence",
+  "version": "1.0.0",
+  "status": "architectural-foundation",
+  "golden_rule": "Rechercher does not know everything; it knows where knowledge is, how it relates, where it comes from, how well established it is, what remains unknown, and how a human can reach the original.",
+  "pipeline": ["WORLD_SOURCES","DISCOVERY","IDENTITY_RESOLUTION","DEDUPLICATION","PROVENANCE","RIGHTS","VERSION_EDITION_MANUSCRIPT","MULTIMODAL_ALIGNMENT","KNOWLEDGE_GRAPH","EVIDENCE_GRAPH","CONTRADICTION_UNCERTAINTY","SEARCH","LEARNING","RESEARCH"],
+  "source_types": ["NATIONAL_LIBRARY","UNIVERSITY_LIBRARY","ARCHIVE","MANUSCRIPT_REPOSITORY","DIGITAL_REPOSITORY","SCHOLARLY_GRAPH","ISLAMIC_CORPUS","BOOK_PDF","OCR","AUDIO","VIDEO","IMAGE","MAP","STRUCTURED_DATA","WEB"],
+  "source_identity": ["source_id","work_id","edition_id","manifestation_id","page_id","passage_id","language","license","rights_status","provenance","retrieval_date","content_hash"],
+  "knowledge_entity_model": ["WORK","AUTHOR","EDITION","MANUSCRIPT","SCAN","PDF","TEXT","TRANSLATION","COMMENTARY","CITATION"],
+  "graph_layers": ["SOURCE_GRAPH","DOMAIN_ONTOLOGY","LEARNING_RESOURCE_GRAPH","LEARNER_STATE_GRAPH","EVIDENCE_GRAPH","ATTRIBUTION_GRAPH","SCHOLAR_GRAPH","HADITH_CHAIN_GRAPH","FIQH_DISAGREEMENT_GRAPH","SIRAH_EVENT_GRAPH","MANUSCRIPT_EDITION_GRAPH","CLAIM_GRAPH","CONTRADICTION_GRAPH"],
+  "relation_policy": ["SUPPORTED_BY","CONTRADICTED_BY","EXPLAINS","COMMENTS_ON","QUOTES","ATTRIBUTED_TO","TRANSMITTED_BY","TRANSLATED_AS","DERIVED_FROM"],
+  "relation_required_fields": ["status","evidence","confidence","provenance","review_state"],
+  "discovery_intelligence": {"enabled": true,"tracks_negative_evidence": true,"creates_knowledge_gaps": true,"does_not_treat_absence_as_proof": true},
+  "manuscript_intelligence": {"iiif_ready": true,"preserves_page_identity": true,"supports_image_ocr_transcription_translation_annotations": true,"original_artifact_immutable": true},
+  "multilingual_intelligence": {"locale_neutral": true,"supports_source_learning_interface_language_separation": true,"term_relation_states":["EXACT","APPROXIMATE","HISTORICAL","SCHOOL_SPECIFIC","VARIANT","NO_EXACT_EQUIVALENT"]},
+  "trust_layer": {"states":["DISCOVERED","EXTRACTED","LINKED","EVIDENCE_FOUND","VERIFIED","HUMAN_REVIEWED","UNVERIFIED","HYPOTHESIS"],"no_evidence_must_not_be_promoted_to_verified":true},
+  "ai_output": {"must_be_decomposable": true,"components":["DIRECT_SOURCE_EVIDENCE","DERIVED_INFORMATION","SCHOLARLY_INTERPRETATION","AI_SYNTHESIS","UNCERTAINTY","SOURCES"],"non_authoritative_without_human_review":true},
+  "safety_contract": {"cannot_control_acquisition":true,"cannot_stop_pdf_download":true,"cannot_bypass_rights":true,"cannot_bypass_provenance":true,"cannot_modify_original_pdf":true,"cannot_modify_canonical_quran_arabic":true,"cannot_erase_scholarly_or_madhhab_disagreement":true,"rights_unknown_or_restricted_not_publishable":true},
+  "external_standards": {"iiif_presentation":"3.0","ai_risk_reference":"NIST AI RMF / Generative AI Profile","evaluation":"TEVV"}
+}
