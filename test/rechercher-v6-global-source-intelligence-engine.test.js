@@ -80,9 +80,11 @@ test('V6 deduplicates the same source without replacing its immutable identity',
   const base = { sourceUrl: 'https://example.org/same', contentHash: 'sha256:same', provenance: { retrieval: 'official' }, rightsState: 'ALLOWED' };
   discoverSource(engine, { ...base, candidateId: 'a' });
   resolveSourceIdentity(engine, 'a', { sourceId: 'source:same' });
+  evaluateRights(engine, 'a', 'ALLOWED', { license: 'CC-BY' });
   const first = verifySource(engine, 'a');
   discoverSource(engine, { ...base, candidateId: 'b' });
   resolveSourceIdentity(engine, 'b', { sourceId: 'source:same' });
+  evaluateRights(engine, 'b', 'ALLOWED', { license: 'CC-BY' });
   const second = verifySource(engine, 'b');
   assert.equal(first.sourceId, second.sourceId);
   assert.equal(engine.sources.size, 1);
