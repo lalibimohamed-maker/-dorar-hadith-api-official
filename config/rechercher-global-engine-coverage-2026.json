@@ -1,16 +1,18 @@
 {
   "engine": "rechercher-global-engine-coverage",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "principle": "Every requested Rechercher capability is explicitly classified; documentation alone never counts as implementation.",
   "status_model": ["IMPLEMENTED","PARTIAL","PLANNED"],
   "coverage": {
     "global_knowledge_search": "PARTIAL",
     "global_source_federation": "IMPLEMENTED",
+    "global_source_discovery_fallback": "IMPLEMENTED",
     "source_identity_deduplication": "IMPLEMENTED",
     "provenance": "PARTIAL",
     "rights_license": "PARTIAL",
     "knowledge_graph": "PARTIAL",
     "evidence_graph": "IMPLEMENTED",
+    "specialized_research_graphs": "IMPLEMENTED_FOUNDATION",
     "contradiction_scholarly_disagreement": "PARTIAL",
     "knowledge_gap_discovery": "IMPLEMENTED",
     "citation_reproducibility": "IMPLEMENTED",
@@ -27,6 +29,13 @@
     "teacher_engine": "IMPLEMENTED",
     "scholar_engine": "IMPLEMENTED",
     "adaptive_learning": "IMPLEMENTED",
+    "cognitive_learning_v5": "IMPLEMENTED_FOUNDATION",
+    "retention_forecasting": "IMPLEMENTED_FOUNDATION",
+    "session_knowledge_tracing": "IMPLEMENTED_FOUNDATION",
+    "intervention_outcome_measurement": "IMPLEMENTED_FOUNDATION",
+    "strategy_failure_detection": "IMPLEMENTED_FOUNDATION",
+    "knowledge_action_gap": "IMPLEMENTED_FOUNDATION",
+    "learner_model_versioning": "IMPLEMENTED_FOUNDATION",
     "active_recall": "PARTIAL",
     "spaced_repetition": "IMPLEMENTED",
     "interleaving": "PARTIAL",
@@ -52,20 +61,17 @@
     "arabic_irab_sarf_learning": "PARTIAL",
     "multilingual_concepts": "IMPLEMENTED",
     "cross_language_terminology": "IMPLEMENTED",
-    "translation_provenance": "PARTIAL",
+    "translation_provenance": "IMPLEMENTED_FOUNDATION",
     "low_resource_languages": "PLANNED",
     "accessibility": "PARTIAL",
     "offline_resilient_learning": "PARTIAL"
   },
-  "v5_executable_progress": {
-    "research_foundation_engine": "IMPLEMENTED_UNIT_TESTED_MINIMUM",
-    "learning_gap_methods": "BLOCKED_BY_WRITE_SAFETY_ON_NEW_FILE",
-    "specialized_islamic_engine_expansion": "NOT_YET_COMMITTED",
-    "integration": "NOT_YET_VERIFIED",
-    "ci_security_governance": "PENDING_AFTER_THIS_INCREMENT"
-  },
   "global_research_foundation": {
     "world_source_types_registered": true,
+    "global_discovery_fallback_engine": true,
+    "iiif_manifest_canvas_annotation_engine_hooks": true,
+    "openalex_scholarly_graph_provider": true,
+    "crossref_metadata_and_fulltext-link_provider": true,
     "negative_evidence_is_not_absence_proof": true,
     "ai_synthesis_is_non_authoritative_without_human_review": true,
     "rights_unknown_or_restricted_not_publishable": true,
@@ -76,6 +82,7 @@
   "verification": {
     "required_before_claiming_complete": ["unit_tests","full_ci","security_gates","governance_gates","integration_tests"],
     "current_pr": 530,
-    "current_state": "DRAFT_NOT_MERGED"
+    "current_state": "DRAFT_NOT_MERGED",
+    "last_code_increment": "c06184490fb2e8131bd44460a8953c6f02013d4e"
   }
 }
