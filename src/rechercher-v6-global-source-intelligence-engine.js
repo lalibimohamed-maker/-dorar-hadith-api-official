@@ -1,4 +1,5 @@
 import { createStageNodeContract } from './rechercher-stage-node-contract.js';
+import { registerNode } from './rechercher-stage-network-registry.js';
 
 export const V6_STAGE_ID = 'V6_GLOBAL_SOURCE_INTELLIGENCE';
 export const V6_SOURCE_STATES = Object.freeze(['SOURCE_CANDIDATE', 'IDENTITY_RESOLVED', 'VERIFIED_SOURCE']);
@@ -67,6 +68,10 @@ export function createV6StageNodeContract() {
     tracePolicy: { traceIdRequired: true },
     status: 'OPEN_EXTENSION_POINT'
   });
+}
+
+export function registerV6Node(registry) {
+  return registerNode(registry, createV6StageNodeContract());
 }
 
 export function createV6GlobalSourceIntelligenceEngine({ observability = null } = {}) {
