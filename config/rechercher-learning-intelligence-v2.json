@@ -1,0 +1,15 @@
+{
+  "engine": "Rechercher Learning Intelligence Engine",
+  "version": "2.0.0",
+  "purpose": "Evidence-aware adaptive learning for the Din Allah Encyclopedia",
+  "learner_model": ["mastery","retrievability","confidence","error_rate","misconceptions","prerequisites","transfer","response_time"],
+  "knowledge_tracing": ["explainable-rules","BKT-compatible","IRT-compatible","deep-model-compatible"],
+  "selection_objectives": ["mastery_gap","retrieval_risk","confidence_mismatch","prerequisite_gap","due_review","transfer_value","source_diversity","time_budget"],
+  "methods": ["retrieval","spacing","interleaving","worked_examples","self_explanation","teach_back","comparison","source_criticism","transfer","reading","audio","visual","game"],
+  "game_policy": {"adaptive_difficulty": true,"learning_objective_required": true,"no_addiction_optimization": true,"delayed_mastery_measurement": true},
+  "feedback": {"immediate": true,"source_grounded": true,"explain_error": true,"show_evidence": true},
+  "privacy": {"local_first": true,"telemetry_opt_in": true,"human_agency": true,"data_minimization": true},
+  "religious_content": {"verified_sources_required": true,"scholarly_review_path": true,"unknown_rights_not_publishable": true},
+  "acquisition_boundary": {"learning_may_not_block_pdf_acquisition": true,"learning_failures_are_non_blocking": true},
+  "evaluation": ["delayed_retest","transfer_test","confidence_calibration","method_ablation","fairness_checks","longitudinal_retention"]
+}
