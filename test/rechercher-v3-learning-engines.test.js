@@ -1,9 +1,9 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const recitation = require('../src/rechercher-recitation-learning-engine');
-const tafsir = require('../src/rechercher-tafsir-sirah-engine');
-const arabic = require('../src/rechercher-arabic-terminology-engine');
-const orchestration = require('../src/rechercher-v3-learning-orchestrator');
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import * as recitation from '../src/rechercher-recitation-learning-engine.js';
+import * as tafsir from '../src/rechercher-tafsir-sirah-engine.js';
+import * as arabic from '../src/rechercher-arabic-terminology-engine.js';
+import * as orchestration from '../src/rechercher-v3-learning-orchestrator.js';
 
 test('recitation keeps canonical Arabic source-grounded and requires human verification', () => {
   const e = recitation.createRecitationLearningEngine();
