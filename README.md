@@ -1,11 +1,11 @@
 # موسوعة دين الله API — Deen Allah Encyclopedia API
 
 <p align="center">
-  <img src="docs/assets/din-allah-continuous-engineering-award.svg" alt="Din Allah Encyclopedia — Continuous Engineering Award" width="300">
+  <img src="docs/assets/din-allah-continuous-engineering-award.svg" alt="Deen Allah Encyclopedia — Continuous Engineering Award" width="100%">
 </p>
 
 <p align="center">
-  <strong>🏆 DIN ALLAH ENCYCLOPEDIA — CONTINUOUS ENGINEERING AWARD</strong><br>
+  <strong>🏆 DEEN ALLAH ENCYCLOPEDIA — CONTINUOUS ENGINEERING AWARD</strong><br>
   🥇 <em>For exceptional persistence in building an open Islamic knowledge corpus</em><br>
   🤝 <strong>Human-led · AI-assisted · Open Source</strong>
 </p>
