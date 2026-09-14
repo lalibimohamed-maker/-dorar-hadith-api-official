@@ -97,7 +97,7 @@ export function recordMethodOutcome(registry, outcome) {
   return next;
 }
 
-const mean = values => values.length ? values.reduce((a, b) => a + b, 0) / values.length : null;
+const mean = values => values.length ? Number((values.reduce((a, b) => a + b, 0) / values.length).toFixed(6)) : null;
 
 export function evaluateMethod(registry, methodId) {
   const r = registry?.[methodId];
