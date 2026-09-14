@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createStageNetworkRegistry, registerNode, validateHandoff, routeHandoff, requestReplan, networkCapabilities } from '../src/rechercher-stage-network-registry.js';
 import { createStageNodeContract } from '../src/rechercher-stage-node-contract.js';
 
-const node = (stageId, input, output, dependency = []) => createStageNodeContract({
+const node = (stageId, input, output, dependencies = []) => createStageNodeContract({
   stageId, version: '1.0', capabilities: ['TEST_CAPABILITY'],
   acceptedInputs: [{ type: input }], producedOutputs: [{ type: output }],
   requiredEvidence: [{ type: 'SOURCE_IDENTITY' }],
