@@ -1,6 +1,7 @@
 name: Rechercher — Native source connectors
 
 on:
+  pull_request:
   workflow_dispatch:
   schedule:
     - cron: '17 */6 * * *'
@@ -34,6 +35,7 @@ jobs:
           node --check src/rechercher/source-census.js
           node --check config/rechercher-native-sources.js
           node --check scripts/rechercher-native-connectors.mjs
+          node --check scripts/rechercher-native-acquisition-bridge.mjs
       - name: Run native connector tests
         run: |
           node --test test/rechercher-native-connectors.test.js
