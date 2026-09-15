@@ -1,11 +1,19 @@
 {
   "engine": "rechercher-global-engine-coverage",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "principle": "Every requested Rechercher capability is explicitly classified; documentation alone never counts as implementation.",
   "lifecycleCompletion": {"engine":"rechercher-global-lifecycle-completion","scope":"V1_TO_V31_PLUS","stageCount":31,"hardGates":["engine","resources","contracts","inputs","outputs","handoffs","tests","integration","provenance","rights","immutability","security","governance","observability"],"falseCompleteProtection":true,"v31PlusTracked":true},
   "coverage": {
     "V1_FOUNDATION":"IMPLEMENTED_FOUNDATION","V2_FEDERATION":"IMPLEMENTED_FOUNDATION","V3_DOMAIN_LEARNING":"IMPLEMENTED_FOUNDATION","V4_LEARNING_INTELLIGENCE":"IMPLEMENTED_FOUNDATION","V5_GLOBAL_RESEARCH":"IMPLEMENTED_FOUNDATION","V6_GLOBAL_SOURCE_INTELLIGENCE":"IMPLEMENTED_FOUNDATION","V7_GLOBAL_RESEARCH_GRAPH":"IMPLEMENTED_FOUNDATION","V8_AUTONOMOUS_ADAPTIVE_LEARNING":"IMPLEMENTED_FOUNDATION",
-    "V9":"OPEN_EXTENSION_POINT","V10":"OPEN_EXTENSION_POINT","V11":"OPEN_EXTENSION_POINT","V12":"OPEN_EXTENSION_POINT","V13":"OPEN_EXTENSION_POINT","V14":"OPEN_EXTENSION_POINT","V15":"OPEN_EXTENSION_POINT","V16":"OPEN_EXTENSION_POINT","V17":"OPEN_EXTENSION_POINT","V18":"OPEN_EXTENSION_POINT","V19":"OPEN_EXTENSION_POINT","V20":"OPEN_EXTENSION_POINT","V21":"OPEN_EXTENSION_POINT","V22":"OPEN_EXTENSION_POINT","V23":"OPEN_EXTENSION_POINT","V24":"OPEN_EXTENSION_POINT","V25":"OPEN_EXTENSION_POINT","V26":"OPEN_EXTENSION_POINT","V27":"OPEN_EXTENSION_POINT","V28":"OPEN_EXTENSION_POINT","V29":"OPEN_EXTENSION_POINT","V30":"OPEN_EXTENSION_POINT","V31_PLUS":"OPEN_EXTENSION_POINT"
+    "V9":"IMPLEMENTED_FOUNDATION","V10":"OPEN_EXTENSION_POINT","V11":"OPEN_EXTENSION_POINT","V12":"OPEN_EXTENSION_POINT","V13":"OPEN_EXTENSION_POINT","V14":"OPEN_EXTENSION_POINT","V15":"OPEN_EXTENSION_POINT","V16":"OPEN_EXTENSION_POINT","V17":"OPEN_EXTENSION_POINT","V18":"OPEN_EXTENSION_POINT","V19":"OPEN_EXTENSION_POINT","V20":"OPEN_EXTENSION_POINT","V21":"OPEN_EXTENSION_POINT","V22":"OPEN_EXTENSION_POINT","V23":"OPEN_EXTENSION_POINT","V24":"OPEN_EXTENSION_POINT","V25":"OPEN_EXTENSION_POINT","V26":"OPEN_EXTENSION_POINT","V27":"OPEN_EXTENSION_POINT","V28":"OPEN_EXTENSION_POINT","V29":"OPEN_EXTENSION_POINT","V30":"OPEN_EXTENSION_POINT","V31_PLUS":"OPEN_EXTENSION_POINT"
   },
-  "verification":{"requiredBeforeComplete":["unit_tests","full_ci","security_gates","governance_gates","integration_tests"],"productionCompleteRequiresMainMerge":true,"currentPr":530,"currentState":"DRAFT_NOT_MERGED"}
+  "V9": {
+    "engine": "src/rechercher-v9-multimodal-recitation-engine.js",
+    "test": "test/rechercher-v9-multimodal-recitation-engine.test.js",
+    "config": "config/rechercher-v9-multimodal-recitation-2026.json",
+    "capabilities": ["multimodal", "source_identity", "iiif_manuscript_pages", "ocr_transcription_alignment", "verse_word_alignment", "recitation_tracking", "tajweed_candidates", "omission_addition_substitution", "hesitation_repetition", "memorization_state", "spaced_memorization", "multilingual_concepts", "non_fatwa_feedback"],
+    "status": "IMPLEMENTED_FOUNDATION",
+    "remaining": ["production_model_benchmarks", "broad_reciter_demographic_validation", "full_tajweed_rule_coverage", "large_scale_IIIF_source_adapters", "human_scholar_evaluation_set"]
+  },
+  "verification":{"requiredBeforeComplete":["unit_tests","full_ci","security_gates","governance_gates","integration_tests"],"productionCompleteRequiresMainMerge":true,"currentPr":536,"currentState":"DRAFT_NOT_MERGED"}
 }
