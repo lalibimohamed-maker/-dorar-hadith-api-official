@@ -1,6 +1,6 @@
 {
   "engine": "rechercher-global-engine-coverage",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "principle": "Every requested Rechercher capability is explicitly classified; documentation alone never counts as implementation.",
   "coverage": {
     "global_knowledge_search": "PARTIAL",
@@ -29,6 +29,8 @@
     "scholar_engine": "IMPLEMENTED",
     "adaptive_learning": "IMPLEMENTED_FOUNDATION",
     "autonomous_adaptive_learning_v8": "IMPLEMENTED_FOUNDATION",
+    "v6_global_source_intelligence": "IMPLEMENTED_FOUNDATION",
+    "v6_v8_resource_integration": "IMPLEMENTED_FOUNDATION",
     "cognitive_learning_v5": "IMPLEMENTED_FOUNDATION",
     "retention_forecasting": "IMPLEMENTED_FOUNDATION",
     "session_knowledge_tracing": "IMPLEMENTED_FOUNDATION",
@@ -78,14 +80,16 @@
     "original_pdf_immutable": true,
     "canonical_quran_arabic_immutable": true,
     "acquisition_independent": true,
+    "v6_global_source_intelligence": true,
     "v8_research_observatory": true,
     "v8_knowledge_gap_intelligence": true,
-    "v8_autonomous_adaptive_learning": true
+    "v8_autonomous_adaptive_learning": true,
+    "v6_v8_resource_integration": true
   },
   "verification": {
     "required_before_claiming_complete": ["unit_tests","full_ci","security_gates","governance_gates","integration_tests"],
     "current_pr": 530,
     "current_state": "DRAFT_NOT_MERGED",
-    "last_code_increment": "e61677df79f027bab8921708e1b32c49bebe3251"
+    "last_code_increment": "767d63ed8d0dc16cd03340a6920a0766407058c7"
   }
 }
