@@ -1,10 +1,11 @@
 import { NATIVE_SOURCES } from '../../config/rechercher-native-sources.js';
-import { RECHERCHER_COUNTRY_SOURCE_REGISTRIES, flattenCountrySources } from '../../config/rechercher-country-source-registries.js';
+import { RECHERCHER_COUNTRY_SOURCE_REGISTRIES } from '../../config/rechercher-country-source-registries.js';
+import { allCountrySources } from './country-source-registry.js';
 
 export const ARAB_COUNTRY_CODES = Object.freeze(Object.keys(RECHERCHER_COUNTRY_SOURCE_REGISTRIES));
 
 export function buildSourceCensus() {
-  const countrySources = flattenCountrySources();
+  const countrySources = allCountrySources();
   const all = [...NATIVE_SOURCES.map((source) => ({ ...source, registry: 'global' })), ...countrySources.map((source) => ({ ...source, registry: 'country' }))];
   const ids = new Set();
   const duplicateIds = [];
@@ -16,7 +17,7 @@ export function buildSourceCensus() {
   for (const source of countrySources) byCountry[source.country] = (byCountry[source.country] ?? 0) + 1;
   const nativeProtocols = {};
   for (const source of all) {
-    const protocol = source.native_protocol ?? source.connector?.kind ?? 'unknown';
+    const protocol = source.connector?.kind ?? 'unknown';
     nativeProtocols[protocol] = (nativeProtocols[protocol] ?? 0) + 1;
   }
   return {
