@@ -1,5 +1,3 @@
-'use strict';
-
 const STAGES = Object.freeze([
   'V1_FOUNDATION','V2_FEDERATION','V3_DOMAIN_LEARNING','V4_LEARNING_INTELLIGENCE','V5_GLOBAL_RESEARCH',
   'V6_GLOBAL_SOURCE_INTELLIGENCE','V7_GLOBAL_RESEARCH_GRAPH','V8_AUTONOMOUS_ADAPTIVE_LEARNING',
@@ -96,7 +94,7 @@ function createGlobalLifecycleCompletionEngine() {
   };
 }
 
-module.exports = {
+export {
   STAGES,
   STATUS,
   HARD_GATES,
