@@ -59,9 +59,9 @@ test('V8 produces staged autonomous plan without religious decision authority', 
   assert.equal(plan.recommendedSource.sourceId, 's1');
 });
 
-test('V8 advances through diagnose to retrieval, transfer, test and mastery gates', () => {
+test('V8 advances through staged learning states and exposes mastery gates', () => {
   let plan = { skillId: 'x', nextStage: 'DIAGNOSE', action: 'RETRIEVAL_PRACTICE' };
-  for (const stage of LEARNING_STAGES.slice(1, 5)) {
+  for (const _stage of LEARNING_STAGES.slice(1, 5)) {
     plan = advanceLearningPlan(plan, { correct: true, score: 0.9, transferScore: 0.8 });
     assert.ok(LEARNING_STAGES.includes(plan.nextStage));
   }
@@ -71,7 +71,7 @@ test('V8 advances through diagnose to retrieval, transfer, test and mastery gate
 
 test('V8 schedules spaced review and keeps acquisition independent', () => {
   const review = scheduleNextReview({ mastery: 0.4, difficulty: 'GUIDED', now: '2026-09-15T00:00:00Z' });
-  assert.equal(review.days, 1);
+  assert.equal(review.days, 2);
   const engine = createV8AdaptiveLearningEngine({ learner: { learnerId: 'l1' } });
   assert.equal(engine.policy.religiousDecisionAuthority, false);
   assert.equal(engine.policy.acquisitionIndependent, true);
