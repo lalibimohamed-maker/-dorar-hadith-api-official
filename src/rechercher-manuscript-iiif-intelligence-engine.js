@@ -90,7 +90,7 @@ function createManuscriptIIIFEngine() {
   };
 }
 
-module.exports = {
+export {
   IIIF_PROTOCOL,
   REVIEW_STATES,
   createManifestRecord,
