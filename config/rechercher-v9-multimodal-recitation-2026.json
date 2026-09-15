@@ -1,0 +1,60 @@
+{
+  "stage": "V9_MULTIMODAL_ISLAMIC_LEARNING",
+  "version": "9.0.0",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "scope": ["text", "pdf", "image", "manuscript", "audio", "recitation", "video", "dialogue"],
+  "sourceIdentity": ["source_id", "work_id", "edition_id", "manifestation_id", "page_id", "passage_id", "language", "license", "rights", "provenance", "retrieval_date", "content_hash"],
+  "manuscript": {
+    "representation": "IIIF_PRESENTATION_3",
+    "pageModel": ["image", "ocr", "transcription", "normalized_text", "translation", "annotation", "scholar_note", "citation", "confidence"],
+    "derivedContentMustRemainLinkedToCanvas": true
+  },
+  "recitation": {
+    "reference": "canonical_quran_arabic",
+    "alignment": ["verse", "word", "media_time"],
+    "tracking": ["surah", "ayah", "riwayah", "session", "confidence"],
+    "analysis": ["omission", "addition", "substitution", "repetition", "hesitation", "boundary_drift", "tajweed_candidate"],
+    "feedback": "learning_assistance_only",
+    "religiousAuthority": false,
+    "fatwaCapability": false,
+    "canonicalTextMutation": false
+  },
+  "memorization": {
+    "state": ["retention", "fluency", "accuracy", "confidence", "error_history", "mastery_status"],
+    "adaptiveReview": true,
+    "spacedReview": true
+  },
+  "multilingual": {
+    "model": "CONCEPT_CENTRIC",
+    "relations": ["EXACT_EQUIVALENT", "APPROXIMATE_EQUIVALENT", "HISTORICAL_EQUIVALENT", "SCHOOL_SPECIFIC_TERM", "TRANSLATION_VARIANT", "NO_EXACT_EQUIVALENT"],
+    "lowResourceLanguagesAllowed": true,
+    "originalTermPreserved": true
+  },
+  "pipelineBoundary": ["ACQUISITION", "VALIDATION", "RIGHTS", "PROVENANCE", "CORPUS", "KNOWLEDGE", "LEARNING", "RESEARCH"],
+  "safety": {
+    "originalPdfImmutable": true,
+    "canonicalQuranArabicImmutable": true,
+    "rightsCannotBeOverriddenByLearning": true,
+    "knowledgeGraphCannotCreateSourceTrust": true,
+    "recitationEngineCannotActAsInfallibleReligiousAuthority": true,
+    "humanScholarReviewForAuthoritativeReligiousJudgment": true
+  },
+  "researchBasis": {
+    "iiifPresentationApi3": "https://iiif.io/api/presentation/3.0/",
+    "fairPrinciples": "https://www.go-fair.org/fair-principles/",
+    "multimodalEducationGraph": "AAAI 2026 SciMKG",
+    "quranAsrBenchmark": "Quran-Lab/quranic-asr-benchmark",
+    "quranRecitationAsr": "FaresElmenshawi/quran-recitations-asr",
+    "quranPronunciationDetection": "arXiv:2509.00094",
+    "tajweedDetection": "arXiv:2101.04200",
+    "adaptiveHifz": "International Conference on Islamic Education and Instruction 2026"
+  },
+  "completion": {
+    "unitTestsRequired": true,
+    "integrationTestsRequired": true,
+    "rightsEvidenceRequired": true,
+    "provenanceRequired": true,
+    "scholarReviewRequiredForAuthoritativeUse": true,
+    "globalV1V31PlusGateRequired": true
+  }
+}
