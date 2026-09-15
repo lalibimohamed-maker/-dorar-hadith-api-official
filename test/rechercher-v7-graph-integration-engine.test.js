@@ -72,7 +72,7 @@ test('health exposes graph and trace counters',()=>{
   const runtime=createRuntime({sourceEngine:verifiedSourceEngine()});
   ingestClaim(runtime,{claimId:'h',text:'health check',status:'DIRECT_SOURCE',provenance});
   const value=health(runtime);
-  assert.equal(value.version,'7.2.0');
+  assert.equal(value.version,'7.2.1');
   assert.equal(value.claims,1);
   assert.ok(value.traces>=1);
 });
