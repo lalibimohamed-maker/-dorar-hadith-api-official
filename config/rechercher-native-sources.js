@@ -59,6 +59,7 @@ export const NATIVE_SOURCES = Object.freeze([
     },
     notes: 'Disabled until a legitimate Smithsonian API key is configured; no hard-coded demo key.',
   },
+  { id: 'islamenc', name: 'Islamic Content Encyclopedia (IslamEnc)', enabled: true, acquisition: 'text-and-pdf-when-permitted', rightsPolicy: 'publisher-declared', connector: { kind: 'web-discovery', searchUrl: 'https://s.islamenc.com/', queryMap: q, mapResults: () => [] }, notes: 'Global multilingual Islamic encyclopedia. Public site documents an API/developer service; native API endpoint and license terms must be verified before upgrading connector kind or bulk acquisition.' },
   { id: 'gallica-bnf', name: 'Gallica / BnF', enabled: true, acquisition: 'oai-or-web-metadata', rightsPolicy: 'gallica-rights', connector: { kind: 'web-discovery', searchUrl: 'https://gallica.bnf.fr/services/engine/search/sru', queryMap: q, mapResults: () => [] } },
   { id: 'british-library-eap', name: 'British Library / EAP', enabled: true, acquisition: 'oai-or-web-metadata', rightsPolicy: 'bl-rights', connector: { kind: 'web-discovery', searchUrl: 'https://eap.bl.uk/', queryMap: q, mapResults: () => [] } },
   { id: 'princeton-pul', name: 'Princeton PUL', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'pul-rights', connector: { kind: 'web-discovery', searchUrl: 'https://dpul.princeton.edu/', queryMap: q, mapResults: () => [] } },
