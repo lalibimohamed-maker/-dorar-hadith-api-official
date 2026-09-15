@@ -2,6 +2,7 @@ const DEFAULT_TIMEOUT_MS = 15_000;
 
 export const CONNECTOR_KINDS = Object.freeze([
   'rest-json',
+  'rest-json-keyed-path',
   'iiif',
   'oai-pmh',
   'sru',
@@ -64,6 +65,17 @@ async function restSearch(source, query, options) {
   return source.connector.mapResults(json).map((record) => normalizeRecord(record, source));
 }
 
+async function keyedPathSearch(source, query, options) {
+  const apiKey = process.env[source.connector.requiresEnv];
+  if (!apiKey) return [];
+  const page = Number(source.connector.queryMap(query)?.page ?? 1);
+  const url = source.connector.endpointTemplate
+    .replace('{API_KEY}', encodeURIComponent(apiKey))
+    .replace('{page}', String(Math.max(1, page)));
+  const { json } = await fetchJson(url, options);
+  return source.connector.mapResults(json).map((record) => normalizeRecord(record, source));
+}
+
 async function iiifSearch(source, query, options) {
   const url = withQuery(source.connector.searchUrl, source.connector.queryMap(query));
   const { json } = await fetchJson(url, options);
@@ -80,6 +92,7 @@ export async function searchConnector(source, query, options = {}) {
   if (!source?.enabled) return [];
   switch (source.connector.kind) {
     case 'rest-json': return restSearch(source, query, options);
+    case 'rest-json-keyed-path': return keyedPathSearch(source, query, options);
     case 'iiif': return iiifSearch(source, query, options);
     case 'oai-pmh': return oaiIdentify(source, options);
     case 'sru': return restSearch(source, query, options);
@@ -93,6 +106,9 @@ export async function probeConnector(source, options = {}) {
   try {
     if (source.connector.kind === 'web-discovery') {
       return { sourceId: source.id, status: 'configured', elapsedMs: Date.now() - started };
+    }
+    if (source.connector.requiresEnv && !process.env[source.connector.requiresEnv]) {
+      return { sourceId: source.id, status: 'configured', reason: `missing runtime secret ${source.connector.requiresEnv}`, elapsedMs: Date.now() - started };
     }
     await searchConnector(source, 'test', { ...options, timeoutMs: options.timeoutMs ?? 10_000 });
     return { sourceId: source.id, status: 'healthy', elapsedMs: Date.now() - started };
@@ -109,6 +125,6 @@ export function createConnectorManifest(sources) {
     kind: source.connector.kind,
     acquisition: source.acquisition ?? 'metadata-only',
     rightsPolicy: source.rightsPolicy ?? 'unknown-blocked',
-    endpoints: source.connector.endpoint ? [source.connector.endpoint] : source.connector.searchUrl ? [source.connector.searchUrl] : [],
+    endpoints: source.connector.endpoint ? [source.connector.endpoint] : source.connector.searchUrl ? [source.connector.searchUrl] : source.connector.endpointTemplate ? [source.connector.endpointTemplate] : [],
   }));
 }
