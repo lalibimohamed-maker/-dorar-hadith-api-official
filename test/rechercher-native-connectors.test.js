@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { NATIVE_SOURCES } from '../config/rechercher-native-sources.js';
+import { VERIFIED_MULTILINGUAL_CONNECTORS } from '../config/rechercher-verified-multilingual-connectors.js';
 import { RECHERCHER_COUNTRY_SOURCE_REGISTRIES, RECHERCHER_COUNTRY_CODES } from '../config/rechercher-country-source-registries.js';
 import { allCountrySources, countrySources } from '../src/rechercher/country-source-registry.js';
 import { createConnectorManifest } from '../src/rechercher/native-source-connectors.js';
@@ -11,6 +12,15 @@ test('native source registry contains the core international and Islamic sources
   for (const id of ['internet-archive', 'open-library', 'openiti', 'wikimedia-commons', 'library-of-congress', 'crossref', 'google-books', 'gallica-bnf', 'british-library-eap', 'princeton-pul', 'bodleian', 'cambridge-digital', 'vatican-library', 'qatar-digital-library', 'nyu-aco', 'al-furqan', 'waqfeya', 'shamela']) {
     assert.ok(ids.has(id), `missing ${id}`);
   }
+});
+
+test('verified multilingual registry contains documented Quran and Islamic APIs without inventing endpoints', () => {
+  const byId = new Map(VERIFIED_MULTILINGUAL_CONNECTORS.map((source) => [source.id, source]));
+  assert.equal(byId.get('quranenc').connector.kind, 'rest-json-catalog');
+  assert.match(byId.get('quranenc').connector.searchUrl, /^https:\/\/quranenc\.com\/api\//);
+  assert.equal(byId.get('hadeethenc-api').connector.kind, 'web-discovery');
+  assert.equal(byId.get('islamenc-api').connector.kind, 'web-discovery');
+  assert.equal(byId.get('islamhouse').connector.kind, 'rest-json-keyed-path');
 });
 
 test('country registries cover the Arab source map and Saudi has a deep registry', () => {
