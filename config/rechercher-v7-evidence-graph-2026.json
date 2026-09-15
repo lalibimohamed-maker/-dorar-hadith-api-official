@@ -1,0 +1,50 @@
+{
+  "schema": "rechercher-v7-evidence-graph-2026",
+  "version": "7.1.0",
+  "status": "executable-extension",
+  "graphFamilies": [
+    "ATTRIBUTION",
+    "SCHOLAR",
+    "HADITH_CHAIN",
+    "FIQH_DISAGREEMENT",
+    "MULTILINGUAL_EVIDENCE"
+  ],
+  "pipeline": [
+    "SOURCE",
+    "WORK",
+    "EDITION",
+    "MANIFESTATION",
+    "PAGE",
+    "PASSAGE",
+    "CLAIM",
+    "EVIDENCE",
+    "CONTRADICTION",
+    "REVIEW",
+    "GRAPH"
+  ],
+  "multilingualMatchTypes": [
+    "EXACT",
+    "CLOSE",
+    "HISTORICAL",
+    "SCHOOL_SPECIFIC",
+    "TRANSLATION_VARIANT",
+    "NO_EXACT_EQUIVALENT"
+  ],
+  "safety": {
+    "requiresProvenance": true,
+    "requiresGraphEndpoints": true,
+    "requiresScholarReviewForVerification": true,
+    "preserveDisagreement": true,
+    "aiCannotSelfVerify": true,
+    "preserveSourceIdentity": true,
+    "preserveContentHash": true,
+    "preserveOriginalPdf": true,
+    "preserveCanonicalQuranArabic": true,
+    "doesNotModifyAcquisition": true
+  },
+  "integration": {
+    "upstream": ["V7_CLAIM_EVIDENCE_CONTRADICTION", "V6_GLOBAL_SOURCE_INTELLIGENCE", "V5_GLOBAL_RESEARCH"],
+    "downstream": ["GLOBAL_SEARCH", "LEARNING_INTELLIGENCE", "EXPORT"],
+    "acquisitionIsolation": true
+  }
+}
