@@ -9,17 +9,18 @@ import { federatedSearch, selectAcquisitionCandidates } from '../src/rechercher/
 
 test('native source registry contains the core international and Islamic sources', () => {
   const ids = new Set(NATIVE_SOURCES.map((s) => s.id));
-  for (const id of ['internet-archive', 'open-library', 'openiti', 'wikimedia-commons', 'library-of-congress', 'crossref', 'google-books', 'gallica-bnf', 'british-library-eap', 'princeton-pul', 'bodleian', 'cambridge-digital', 'vatican-library', 'qatar-digital-library', 'nyu-aco', 'al-furqan', 'waqfeya', 'shamela']) {
-    assert.ok(ids.has(id), `missing ${id}`);
-  }
+  for (const id of ['internet-archive', 'open-library', 'openiti', 'wikimedia-commons', 'library-of-congress', 'crossref', 'google-books', 'gallica-bnf', 'british-library-eap', 'princeton-pul', 'bodleian', 'cambridge-digital', 'vatican-library', 'qatar-digital-library', 'nyu-aco', 'al-furqan', 'waqfeya', 'shamela']) assert.ok(ids.has(id), `missing ${id}`);
 });
 
-test('verified multilingual registry contains documented Quran and Islamic APIs without inventing endpoints', () => {
+test('verified multilingual registry contains extracted official API contracts', () => {
   const byId = new Map(VERIFIED_MULTILINGUAL_CONNECTORS.map((source) => [source.id, source]));
   assert.equal(byId.get('quranenc').connector.kind, 'rest-json-catalog');
   assert.match(byId.get('quranenc').connector.searchUrl, /^https:\/\/quranenc\.com\/api\//);
-  assert.equal(byId.get('hadeethenc-api').connector.kind, 'web-discovery');
-  assert.equal(byId.get('islamenc-api').connector.kind, 'web-discovery');
+  assert.equal(byId.get('hadeethenc-api').connector.kind, 'rest-json-catalog');
+  assert.equal(byId.get('hadeethenc-api').connector.searchUrl, 'https://hadeethenc.com/api/v1/hadeeths/list/');
+  assert.equal(byId.get('hadeethenc-api').connector.queryMap().language, 'ar');
+  assert.equal(byId.get('islamenc-api').connector.kind, 'rest-json-catalog');
+  assert.equal(byId.get('islamenc-api').connector.searchUrl, 'https://s.islamenc.com/api/v1/services');
   assert.equal(byId.get('islamhouse').connector.kind, 'rest-json-keyed-path');
 });
 
@@ -58,12 +59,7 @@ test('acquisition candidate selection blocks restricted records', () => {
 });
 
 test('federation can run against a supplied local source set without changing corpus data', async () => {
-  const source = {
-    id: 'fixture', name: 'Fixture', enabled: true, acquisition: 'metadata-only', rightsPolicy: 'unknown-blocked',
-    connector: {
-      kind: 'web-discovery', searchUrl: 'https://example.org', queryMap: () => ({}), mapResults: () => [],
-    },
-  };
+  const source = { id: 'fixture', name: 'Fixture', enabled: true, acquisition: 'metadata-only', rightsPolicy: 'unknown-blocked', connector: { kind: 'web-discovery', searchUrl: 'https://example.org', queryMap: () => ({}), mapResults: () => [] } };
   const result = await federatedSearch('كتاب', { sources: [source] });
   assert.equal(result.sourcesChecked, 1);
   assert.equal(result.recordsFound, 0);
