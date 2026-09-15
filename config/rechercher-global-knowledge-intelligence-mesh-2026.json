@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "id": "RECHERCHER_GLOBAL_KNOWLEDGE_INTELLIGENCE_MESH_2026",
+  "status": "FOUNDATION_IMPLEMENTED_EXTENSION_POINT",
+  "principle": "WORLD_SOURCES -> DISCOVERY -> IDENTITY -> PROVENANCE -> RIGHTS -> WORK_EDITION_MANIFESTATION -> MANUSCRIPT_PAGE_PASSAGE -> MULTIMODAL_ALIGNMENT -> KNOWLEDGE_GRAPH -> EVIDENCE_GRAPH -> CONTRADICTION_UNCERTAINTY -> KNOWLEDGE_GAPS -> SEARCH -> LEARNING -> RESEARCH",
+  "worldSourceTypes": ["NATIONAL_LIBRARY","UNIVERSITY_LIBRARY","ARCHIVE","MUSEUM","MANUSCRIPT_REPOSITORY","DIGITAL_HUMANITIES","ISLAMIC_CORPUS","BOOK_PDF","ARTICLE","AUDIO","VIDEO","MAP","OCR_HTR","STRUCTURED_DATA","API","IIIF","KNOWLEDGE_GRAPH","WEB_SOURCE"],
+  "multilingualRelations": ["EXACT","CLOSE","HISTORICAL","SCHOOL_SPECIFIC","TRANSLATION_VARIANT","NO_EXACT_EQUIVALENT"],
+  "researchStates": ["DISCOVER","SYNTHESIS","VERIFICATION"],
+  "trustPolicy": { "aiSynthesisDefaultReviewState": "UNVERIFIED", "authoritativeUseRequiresReview": true },
+  "rightsPolicy": { "unknownPublishable": false, "restrictedPublishable": false, "explicitPermissionRequiredPublishable": false },
+  "immutableFields": ["sourceIdentity","contentHash","canonicalQuranArabic","originalPdf"],
+  "iiif": { "presentationApi": "3.0", "manifestCanvasAnnotation": true, "externalAnnotationPages": true },
+  "security": { "proxyRotation": false, "userAgentRotation": false, "accessControlBypass": false },
+  "nextExtensions": ["GLOBAL_SOURCE_REGISTRY_ADAPTERS","MANUSCRIPT_IIIF_ALIGNMENT","SCHOLARLY_EVIDENCE_GRAPH_VALIDATION","KNOWLEDGE_GAP_PLANNER","WORLDWIDE_DISCOVERY_CONNECTORS"]
+}
