@@ -55,9 +55,16 @@ export function reconcileWorkCandidate(candidate, existing = [], thresholds = DE
     .sort((a, b) => b.score - a.score);
 
   const best = ranked[0];
-  // A translated/transliterated title can legitimately have little lexical
-  // overlap.  Require two independent bibliographic anchors before linking
-  // such a candidate to an existing Work; otherwise create a new candidate.
+  // Titles can be translated, transliterated, or represented in another
+  // script. Exact author + edition anchors are therefore an independent,
+  // deterministic reconciliation path that does not depend on title overlap.
+  const exactAuthorAndEdition = Boolean(
+    best
+      && normalize(candidate?.author)
+      && normalize(candidate?.edition)
+      && normalize(candidate?.author) === normalize(best.record?.author)
+      && normalize(candidate?.edition) === normalize(best.record?.edition)
+  );
   const anchoredByAuthorAndEdition = Boolean(
     best
       && best.scores.author >= thresholds.author
@@ -68,6 +75,7 @@ export function reconcileWorkCandidate(candidate, existing = [], thresholds = DE
       && (
         (best.scores.title >= thresholds.title && best.scores.author >= thresholds.author)
         || anchoredByAuthorAndEdition
+        || exactAuthorAndEdition
       )
   );
   return Object.freeze({
