@@ -1,0 +1,54 @@
+name: Rechercher — Native source connectors
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-native-connectors
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Syntax check native connector runtime
+        run: |
+          node --check src/rechercher/native-source-connectors.js
+          node --check src/rechercher/native-federation-engine.js
+          node --check config/rechercher-native-sources.js
+          node --check scripts/rechercher-native-connectors.mjs
+      - name: Run native connector tests
+        run: node --test test/rechercher-native-connectors.test.js
+      - name: Emit connector manifest
+        run: node scripts/rechercher-native-connectors.mjs manifest > rechercher-native-connectors-manifest.json
+      - name: Upload manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: rechercher-native-connectors-manifest
+          path: rechercher-native-connectors-manifest.json
+
+  live-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Probe enabled native endpoints
+        run: node scripts/rechercher-native-connectors.mjs health
