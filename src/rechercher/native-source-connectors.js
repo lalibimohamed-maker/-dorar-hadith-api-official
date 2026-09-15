@@ -3,6 +3,7 @@ const DEFAULT_TIMEOUT_MS = 15_000;
 export const CONNECTOR_KINDS = Object.freeze([
   'rest-json',
   'rest-json-keyed-path',
+  'rest-json-catalog',
   'iiif',
   'oai-pmh',
   'sru',
@@ -76,6 +77,12 @@ async function keyedPathSearch(source, query, options) {
   return source.connector.mapResults(json).map((record) => normalizeRecord(record, source));
 }
 
+async function catalogSearch(source, query, options) {
+  const url = withQuery(source.connector.searchUrl, source.connector.queryMap(query));
+  const { json } = await fetchJson(url, options);
+  return source.connector.mapResults(json, query).map((record) => normalizeRecord(record, source));
+}
+
 async function iiifSearch(source, query, options) {
   const url = withQuery(source.connector.searchUrl, source.connector.queryMap(query));
   const { json } = await fetchJson(url, options);
@@ -93,6 +100,7 @@ export async function searchConnector(source, query, options = {}) {
   switch (source.connector.kind) {
     case 'rest-json': return restSearch(source, query, options);
     case 'rest-json-keyed-path': return keyedPathSearch(source, query, options);
+    case 'rest-json-catalog': return catalogSearch(source, query, options);
     case 'iiif': return iiifSearch(source, query, options);
     case 'oai-pmh': return oaiIdentify(source, options);
     case 'sru': return restSearch(source, query, options);
