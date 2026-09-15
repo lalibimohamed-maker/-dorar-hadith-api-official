@@ -111,15 +111,17 @@ export function buildLearningPlanFromVerifiedResource(integration, { skillId, gr
 }
 
 export function integrationHealth(integration) {
+  const publishableSources = [...integration.v6.sources.values()].filter(isPublishableSource).length;
   return {
     version: integration.version,
     v6: {
       candidates: integration.v6.candidates.size,
       verifiedSources: integration.v6.sources.size,
-      publishableSources: [...integration.v6.sources.values()].filter(isPublishableSource).length,
+      publishableSources,
     },
     v8: { version: integration.v8.version, learnerId: integration.v8.learner.learnerId },
     resources: integration.resources.length,
+    publishableSources,
     traces: integration.traces.length,
   };
 }
