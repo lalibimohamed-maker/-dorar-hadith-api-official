@@ -19,8 +19,8 @@ export const NATIVE_SOURCES = Object.freeze([
   {
     id: 'openiti', name: 'OpenITI / KITAB', enabled: true, acquisition: 'repository-text-and-metadata', rightsPolicy: 'repository-license',
     connector: {
-      kind: 'rest-json', searchUrl: 'https://api.github.com/search/code', queryMap: (query) => ({ q: `${query} org:OpenITI`, per_page: 20 }),
-      mapResults: (json) => (json?.items ?? []).map((d) => ({ identifier: d.html_url, title: d.name, itemUrl: d.html_url })),
+      kind: 'rest-json', searchUrl: 'https://api.github.com/search/repositories', queryMap: (query) => ({ q: `${query} org:OpenITI`, per_page: 20 }),
+      mapResults: (json) => (json?.items ?? []).map((d) => ({ identifier: d.html_url, title: d.name, author: d.owner?.login, itemUrl: d.html_url, rightsUrl: d.html_url })),
     },
   },
   {
@@ -40,7 +40,7 @@ export const NATIVE_SOURCES = Object.freeze([
   {
     id: 'crossref', name: 'Crossref', enabled: true, acquisition: 'metadata-only', rightsPolicy: 'publisher-declared',
     connector: {
-      kind: 'rest-json', searchUrl: 'https://api.crossref.org/works', queryMap: (query) => ({ query: query, rows: 20 }),
+      kind: 'rest-json', searchUrl: 'https://api.crossref.org/works', queryMap: (query) => ({ query, rows: 20 }),
       mapResults: (json) => (json?.message?.items ?? []).map((d) => ({ identifier: d.DOI, title: first(d.title), author: d.author?.map((a) => `${a.given ?? ''} ${a.family ?? ''}`).join('; '), year: d.published?.['date-parts']?.[0]?.[0], itemUrl: d.URL })),
     },
   },
@@ -52,58 +52,23 @@ export const NATIVE_SOURCES = Object.freeze([
     },
   },
   {
-    id: 'smithsonian', name: 'Smithsonian', enabled: true, acquisition: 'metadata-and-public-media', rightsPolicy: 'smithsonian-declared',
+    id: 'smithsonian', name: 'Smithsonian', enabled: false, acquisition: 'metadata-and-public-media', rightsPolicy: 'smithsonian-declared',
     connector: {
-      kind: 'rest-json', searchUrl: 'https://api.si.edu/openaccess/api/v1.0/search', queryMap: (query) => ({ q: query, api_key: 'DEMO_KEY', rows: 20 }),
+      kind: 'rest-json', searchUrl: 'https://api.si.edu/openaccess/api/v1.0/search', queryMap: (query) => ({ q: query, api_key: process.env.SMITHSONIAN_API_KEY, rows: 20 }),
       mapResults: (json) => (json?.response?.rows ?? []).map((d) => ({ identifier: d.id, title: d.title, itemUrl: d.content?.descriptiveNonRepeating?.record_link })),
     },
+    notes: 'Disabled until a legitimate Smithsonian API key is configured; no hard-coded demo key.',
   },
-  {
-    id: 'gallica-bnf', name: 'Gallica / BnF', enabled: true, acquisition: 'oai-or-web-metadata', rightsPolicy: 'gallica-rights',
-    connector: { kind: 'web-discovery', searchUrl: 'https://gallica.bnf.fr/services/engine/search/sru', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'british-library-eap', name: 'British Library / EAP', enabled: true, acquisition: 'oai-or-web-metadata', rightsPolicy: 'bl-rights',
-    connector: { kind: 'web-discovery', searchUrl: 'https://eap.bl.uk/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'princeton-pul', name: 'Princeton PUL', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'pul-rights',
-    connector: { kind: 'web-discovery', searchUrl: 'https://dpul.princeton.edu/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'bodleian', name: 'Bodleian Libraries', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'bodleian-rights',
-    connector: { kind: 'web-discovery', searchUrl: 'https://digital.bodleian.ox.ac.uk/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'cambridge-digital', name: 'Cambridge Digital Library', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'cambridge-rights',
-    connector: { kind: 'web-discovery', searchUrl: 'https://cudl.lib.cam.ac.uk/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'vatican-library', name: 'Vatican Library', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'vatican-rights',
-    connector: { kind: 'web-discovery', searchUrl: 'https://digi.vatlib.it/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'qatar-digital-library', name: 'Qatar Digital Library', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'qdl-rights',
-    connector: { kind: 'web-discovery', searchUrl: 'https://www.qdl.qa/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'nyu-aco', name: 'NYU Arabic Collections Online', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'aco-rights',
-    connector: { kind: 'web-discovery', searchUrl: 'https://aco.dlib.nyu.edu/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'al-furqan', name: 'Al-Furqan Islamic Heritage Foundation', enabled: true, acquisition: 'web-discovery', rightsPolicy: 'institution-declared',
-    connector: { kind: 'web-discovery', searchUrl: 'https://al-furqan.com/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'waqfeya', name: 'Waqfeya', enabled: true, acquisition: 'web-discovery-and-pdf-when-permitted', rightsPolicy: 'source-declared',
-    connector: { kind: 'web-discovery', searchUrl: 'https://waqfeya.net/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'shamela', name: 'Al-Maktaba Al-Shamela', enabled: true, acquisition: 'web-discovery', rightsPolicy: 'source-declared',
-    connector: { kind: 'web-discovery', searchUrl: 'https://shamela.ws/', queryMap: q, mapResults: () => [] },
-  },
-  {
-    id: 'oai-generic', name: 'Generic OAI-PMH', enabled: false, acquisition: 'metadata-only', rightsPolicy: 'unknown-blocked',
-    connector: { kind: 'oai-pmh', endpoint: 'https://example.org/oai', queryMap: q, mapResults: () => [] },
-  },
+  { id: 'gallica-bnf', name: 'Gallica / BnF', enabled: true, acquisition: 'oai-or-web-metadata', rightsPolicy: 'gallica-rights', connector: { kind: 'web-discovery', searchUrl: 'https://gallica.bnf.fr/services/engine/search/sru', queryMap: q, mapResults: () => [] } },
+  { id: 'british-library-eap', name: 'British Library / EAP', enabled: true, acquisition: 'oai-or-web-metadata', rightsPolicy: 'bl-rights', connector: { kind: 'web-discovery', searchUrl: 'https://eap.bl.uk/', queryMap: q, mapResults: () => [] } },
+  { id: 'princeton-pul', name: 'Princeton PUL', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'pul-rights', connector: { kind: 'web-discovery', searchUrl: 'https://dpul.princeton.edu/', queryMap: q, mapResults: () => [] } },
+  { id: 'bodleian', name: 'Bodleian Libraries', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'bodleian-rights', connector: { kind: 'web-discovery', searchUrl: 'https://digital.bodleian.ox.ac.uk/', queryMap: q, mapResults: () => [] } },
+  { id: 'cambridge-digital', name: 'Cambridge Digital Library', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'cambridge-rights', connector: { kind: 'web-discovery', searchUrl: 'https://cudl.lib.cam.ac.uk/', queryMap: q, mapResults: () => [] } },
+  { id: 'vatican-library', name: 'Vatican Library', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'vatican-rights', connector: { kind: 'web-discovery', searchUrl: 'https://digi.vatlib.it/', queryMap: q, mapResults: () => [] } },
+  { id: 'qatar-digital-library', name: 'Qatar Digital Library', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'qdl-rights', connector: { kind: 'web-discovery', searchUrl: 'https://www.qdl.qa/', queryMap: q, mapResults: () => [] } },
+  { id: 'nyu-aco', name: 'NYU Arabic Collections Online', enabled: true, acquisition: 'iiif-or-web-metadata', rightsPolicy: 'aco-rights', connector: { kind: 'web-discovery', searchUrl: 'https://aco.dlib.nyu.edu/', queryMap: q, mapResults: () => [] } },
+  { id: 'al-furqan', name: 'Al-Furqan Islamic Heritage Foundation', enabled: true, acquisition: 'web-discovery', rightsPolicy: 'institution-declared', connector: { kind: 'web-discovery', searchUrl: 'https://al-furqan.com/', queryMap: q, mapResults: () => [] } },
+  { id: 'waqfeya', name: 'Waqfeya', enabled: true, acquisition: 'web-discovery-and-pdf-when-permitted', rightsPolicy: 'source-declared', connector: { kind: 'web-discovery', searchUrl: 'https://waqfeya.net/', queryMap: q, mapResults: () => [] } },
+  { id: 'shamela', name: 'Al-Maktaba Al-Shamela', enabled: true, acquisition: 'web-discovery', rightsPolicy: 'source-declared', connector: { kind: 'web-discovery', searchUrl: 'https://shamela.ws/', queryMap: q, mapResults: () => [] } },
+  { id: 'oai-generic', name: 'Generic OAI-PMH', enabled: false, acquisition: 'metadata-only', rightsPolicy: 'unknown-blocked', connector: { kind: 'oai-pmh', endpoint: 'https://example.org/oai', queryMap: q, mapResults: () => [] } },
 ]);
