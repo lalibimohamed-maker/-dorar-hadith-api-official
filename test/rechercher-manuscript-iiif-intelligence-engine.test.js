@@ -1,12 +1,12 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const {
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
   createManifestRecord,
   addCanvas,
   alignPageText,
   rankManifestation,
   isPublishableManifest
-} = require('../src/rechercher-manuscript-iiif-intelligence-engine');
+} from '../src/rechercher-manuscript-iiif-intelligence-engine.js';
 
 test('creates a provenance-gated IIIF Presentation 3.0 manifest', () => {
   const manifest = createManifestRecord({
