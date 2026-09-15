@@ -91,100 +91,126 @@ function createEdge(input = {}) {
     from: input.from,
     to: input.to,
     relation: input.relation,
+    confidence: Number.isFinite(input.confidence) ? input.confidence : 0,
     provenance: requireProvenance(input.provenance),
+    reviewState: input.reviewState || 'UNREVIEWED',
     metadata: structuredClone(input.metadata || {}),
   });
 }
 
+function assertEndpoints(nodes, edges) {
+  const ids = new Set(nodes.map((node) => node.nodeId));
+  for (const edge of edges) {
+    if (!ids.has(edge.from) || !ids.has(edge.to)) throw new Error(`missing graph endpoint for ${edge.edgeId}`);
+  }
+}
+
 function buildGraph({ family, nodes = [], edges = [] } = {}) {
   if (!GRAPH_FAMILIES.includes(family)) throw new Error(`unsupported graph family: ${family}`);
-  const nodeIds = new Set(nodes.map(node => node.nodeId));
-  for (const edge of edges) {
-    if (!nodeIds.has(edge.from) || !nodeIds.has(edge.to)) throw new Error('graph edge references a missing endpoint');
+  assertEndpoints(nodes, edges);
+  return Object.freeze({ family, nodes: [...nodes], edges: [...edges] });
+}
+
+function verifyGraph(graph, review = {}) {
+  if (!graph || !GRAPH_FAMILIES.includes(graph.family)) throw new Error('valid graph family is required');
+  if (review.reviewState !== 'SCHOLAR_REVIEWED') throw new Error('scholarly review is required before graph verification');
+  return Object.freeze({ ...graph, reviewState: 'VERIFIED' });
+}
+
+function createAttributionGraph(input = {}) {
+  return buildGraph({ family: 'ATTRIBUTION', nodes: input.nodes || [], edges: input.edges || [] });
+}
+
+function createScholarGraph(input = {}) {
+  return buildGraph({ family: 'SCHOLAR', nodes: input.nodes || [], edges: input.edges || [] });
+}
+
+function createHadithChainGraph(input = {}) {
+  const graph = buildGraph({ family: 'HADITH_CHAIN', nodes: input.nodes || [], edges: input.edges || [] });
+  for (const edge of graph.edges) {
+    if (!['NARRATED_BY', 'RECEIVED_FROM', 'TRANSMITTED_BY', 'SUPPORTS', 'CONTRADICTS'].includes(edge.relation)) {
+      throw new Error(`invalid hadith-chain relation: ${edge.relation}`);
+    }
   }
-  return Object.freeze({ family, nodes: nodes.map(structuredClone), edges: edges.map(structuredClone) });
+  return graph;
 }
 
-function verifyGraph(graph, reviewState = 'SCHOLAR_REVIEWED') {
-  if (reviewState !== 'SCHOLAR_REVIEWED' && reviewState !== 'VERIFIED') {
-    throw new Error('scholarly review is required for graph verification');
+function createFiqhDisagreementGraph(input = {}) {
+  const graph = buildGraph({ family: 'FIQH_DISAGREEMENT', nodes: input.nodes || [], edges: input.edges || [] });
+  for (const edge of graph.edges) {
+    if (!['DIFFERS_FROM', 'SUPPORTS', 'CONTRADICTS', 'EXPLAINS'].includes(edge.relation)) {
+      throw new Error(`invalid fiqh-disagreement relation: ${edge.relation}`);
+    }
   }
-  return Object.freeze({ ...structuredClone(graph), reviewState });
-}
-
-function createAttributionGraph(nodes = [], edges = []) {
-  return buildGraph({ family: 'ATTRIBUTION', nodes, edges });
-}
-
-function createScholarGraph(nodes = [], edges = []) {
-  return buildGraph({ family: 'SCHOLAR', nodes, edges });
-}
-
-function createHadithChainGraph(nodes = [], edges = []) {
-  const allowed = new Set(['NARRATED_BY', 'RECEIVED_FROM', 'TRANSMITTED_BY', 'SUPPORTS', 'CONTRADICTS']);
-  for (const edge of edges) {
-    if (!allowed.has(edge.relation)) throw new Error(`unsupported hadith chain relation: ${edge.relation}`);
-  }
-  return buildGraph({ family: 'HADITH_CHAIN', nodes, edges });
-}
-
-function createFiqhDisagreementGraph(nodes = [], edges = []) {
-  const allowed = new Set(['DIFFERS_FROM', 'SUPPORTS', 'CONTRADICTS', 'EXPLAINS']);
-  for (const edge of edges) {
-    if (!allowed.has(edge.relation)) throw new Error(`unsupported fiqh disagreement relation: ${edge.relation}`);
-  }
-  return buildGraph({ family: 'FIQH_DISAGREEMENT', nodes, edges });
+  return graph;
 }
 
 function alignEvidenceAcrossLanguages(input = {}) {
   requiredString(input.alignmentId, 'alignmentId');
   requiredString(input.sourceEvidenceId, 'sourceEvidenceId');
   requiredString(input.targetEvidenceId, 'targetEvidenceId');
-  requiredString(input.sourceLanguage, 'sourceLanguage');
-  requiredString(input.targetLanguage, 'targetLanguage');
   if (!MATCH_TYPES.includes(input.matchType)) throw new Error(`unsupported match type: ${input.matchType}`);
+  requireProvenance(input.provenance);
   return Object.freeze({
     alignmentId: input.alignmentId,
     sourceEvidenceId: input.sourceEvidenceId,
     targetEvidenceId: input.targetEvidenceId,
-    sourceLanguage: input.sourceLanguage,
-    targetLanguage: input.targetLanguage,
+    sourceLanguage: requiredString(input.sourceLanguage, 'sourceLanguage'),
+    targetLanguage: requiredString(input.targetLanguage, 'targetLanguage'),
     matchType: input.matchType,
-    confidence: input.confidence ?? null,
-    provenance: requireProvenance(input.provenance),
+    confidence: Number.isFinite(input.confidence) ? input.confidence : 0,
+    terminology: structuredClone(input.terminology || null),
+    provenance: structuredClone(input.provenance),
+    reviewState: input.reviewState || 'REVIEW_REQUIRED',
   });
 }
 
-function buildMultilingualEvidenceGraph({ nodes = [], alignments = [] } = {}) {
-  const nodeIds = new Set(nodes.map(node => node.nodeId));
-  const edges = alignments.map(alignment => {
+function buildMultilingualEvidenceGraph(input = {}) {
+  const alignments = (input.alignments || []).map(alignEvidenceAcrossLanguages);
+  const nodes = input.nodes || [];
+  const nodeIds = new Set(nodes.map((node) => node.nodeId));
+  for (const alignment of alignments) {
     if (!nodeIds.has(alignment.sourceEvidenceId) || !nodeIds.has(alignment.targetEvidenceId)) {
-      throw new Error('multilingual alignment references a missing evidence endpoint');
+      throw new Error(`missing multilingual evidence endpoint for ${alignment.alignmentId}`);
     }
-    const relation = alignment.matchType === 'EXACT'
-      ? 'SAME_CONCEPT'
-      : alignment.matchType === 'NO_EXACT_EQUIVALENT'
-        ? 'NO_EXACT_EQUIVALENT'
-        : 'TRANSLATION_VARIANT';
-    return createEdge({
-      edgeId: `alignment:${alignment.alignmentId}`,
+  }
+  return buildGraph({
+    family: 'MULTILINGUAL_EVIDENCE',
+    nodes,
+    edges: alignments.map((alignment) => ({
+      edgeId: alignment.alignmentId,
       from: alignment.sourceEvidenceId,
       to: alignment.targetEvidenceId,
-      relation,
+      relation: alignment.matchType === 'EXACT' ? 'SAME_CONCEPT' : alignment.matchType === 'NO_EXACT_EQUIVALENT' ? 'NO_EXACT_EQUIVALENT' : 'TRANSLATION_VARIANT',
+      confidence: alignment.confidence,
       provenance: alignment.provenance,
+      reviewState: alignment.reviewState,
       metadata: {
         sourceLanguage: alignment.sourceLanguage,
         targetLanguage: alignment.targetLanguage,
         matchType: alignment.matchType,
-        confidence: alignment.confidence,
+        terminology: alignment.terminology,
       },
-    });
+    })),
   });
-  return buildGraph({ family: 'MULTILINGUAL_EVIDENCE', nodes, edges });
 }
 
 function createV7EvidenceGraphEngine() {
-  return Object.freeze({ version: '7.1.0', status: 'FOUNDATION_IMPLEMENTED_EXTENSION_POINT' });
+  return Object.freeze({
+    version: '7.1.0',
+    graphFamilies: [...GRAPH_FAMILIES],
+    relationTypes: [...RELATION_TYPES],
+    matchTypes: [...MATCH_TYPES],
+    createNode,
+    createEdge,
+    createAttributionGraph,
+    createScholarGraph,
+    createHadithChainGraph,
+    createFiqhDisagreementGraph,
+    alignEvidenceAcrossLanguages,
+    buildMultilingualEvidenceGraph,
+    verifyGraph,
+  });
 }
 
 export {
@@ -194,13 +220,12 @@ export {
   MATCH_TYPES,
   createNode,
   createEdge,
-  buildGraph,
-  verifyGraph,
   createAttributionGraph,
   createScholarGraph,
   createHadithChainGraph,
   createFiqhDisagreementGraph,
   alignEvidenceAcrossLanguages,
   buildMultilingualEvidenceGraph,
+  verifyGraph,
   createV7EvidenceGraphEngine,
 };
