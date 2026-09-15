@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
 
 function ensureDir(file) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -22,4 +22,4 @@ function linkRecord({ from, to, relation, sourceId, location, verification = 'un
   return { from, to, relation, sourceId, location, verification };
 }
 
-module.exports = { appendJsonl, narratorRecord, judgmentRecord, linkRecord };
+export { appendJsonl, narratorRecord, judgmentRecord, linkRecord };
