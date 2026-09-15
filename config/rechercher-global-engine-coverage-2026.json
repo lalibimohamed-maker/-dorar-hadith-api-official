@@ -1,6 +1,6 @@
 {
   "engine": "rechercher-global-engine-coverage",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "principle": "Every requested Rechercher capability is explicitly classified; documentation alone never counts as implementation.",
   "coverage": {
     "global_knowledge_search": "PARTIAL",
@@ -16,7 +16,7 @@
     "knowledge_gap_discovery": "IMPLEMENTED",
     "citation_reproducibility": "IMPLEMENTED",
     "research_workspace": "IMPLEMENTED",
-    "research_observatory": "IMPLEMENTED",
+    "research_observatory": "IMPLEMENTED_FOUNDATION",
     "book_work_edition": "PARTIAL",
     "manuscript_intelligence": "PARTIAL",
     "iiif_page_canvas": "PARTIAL",
@@ -27,7 +27,8 @@
     "student_learning": "IMPLEMENTED",
     "teacher_engine": "IMPLEMENTED",
     "scholar_engine": "IMPLEMENTED",
-    "adaptive_learning": "IMPLEMENTED",
+    "adaptive_learning": "IMPLEMENTED_FOUNDATION",
+    "autonomous_adaptive_learning_v8": "IMPLEMENTED_FOUNDATION",
     "cognitive_learning_v5": "IMPLEMENTED_FOUNDATION",
     "retention_forecasting": "IMPLEMENTED_FOUNDATION",
     "session_knowledge_tracing": "IMPLEMENTED_FOUNDATION",
@@ -36,14 +37,14 @@
     "knowledge_action_gap": "IMPLEMENTED_FOUNDATION",
     "learner_model_versioning": "IMPLEMENTED_FOUNDATION",
     "active_recall": "PARTIAL",
-    "spaced_repetition": "IMPLEMENTED",
+    "spaced_repetition": "IMPLEMENTED_FOUNDATION",
     "interleaving": "PARTIAL",
     "progressive_summarization": "PARTIAL",
     "knowledge_gap_tutor": "PARTIAL",
     "teach_me": "PARTIAL",
     "self_test": "PARTIAL",
-    "mastery": "IMPLEMENTED",
-    "learning_paths": "IMPLEMENTED",
+    "mastery": "IMPLEMENTED_FOUNDATION",
+    "learning_paths": "IMPLEMENTED_FOUNDATION",
     "teach_back_socratic": "PARTIAL",
     "metacognition": "PARTIAL",
     "quran_learning": "IMPLEMENTED",
@@ -78,12 +79,13 @@
     "canonical_quran_arabic_immutable": true,
     "acquisition_independent": true,
     "v8_research_observatory": true,
-    "v8_knowledge_gap_intelligence": true
+    "v8_knowledge_gap_intelligence": true,
+    "v8_autonomous_adaptive_learning": true
   },
   "verification": {
     "required_before_claiming_complete": ["unit_tests","full_ci","security_gates","governance_gates","integration_tests"],
     "current_pr": 530,
     "current_state": "DRAFT_NOT_MERGED",
-    "last_code_increment": "69c8d7374409a0ace9119730989ddae73baa19b2"
+    "last_code_increment": "e61677df79f027bab8921708e1b32c49bebe3251"
   }
 }
