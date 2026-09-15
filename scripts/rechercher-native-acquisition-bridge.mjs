@@ -5,6 +5,17 @@ const query = process.argv.slice(2).join(' ').trim() || 'الحديث';
 const OUT_DIR = 'books-batches/rechercher-native-live';
 const OUT = `${OUT_DIR}/catalog.json`;
 
+function isAllowedCreativeCommonsLicense(value) {
+  try {
+    const url = new URL(String(value));
+    if (url.protocol !== 'https:') return false;
+    const hostname = url.hostname.toLowerCase();
+    return hostname === 'creativecommons.org' || hostname.endsWith('.creativecommons.org');
+  } catch {
+    return false;
+  }
+}
+
 async function enrichInternetArchive(record) {
   if (record.sourceId !== 'internet-archive' || !record.identifier) return null;
   const response = await fetch(`https://archive.org/metadata/${encodeURIComponent(record.identifier)}`, {
@@ -13,8 +24,8 @@ async function enrichInternetArchive(record) {
   if (!response.ok) return null;
   const metadata = await response.json();
   const rights = String(metadata?.metadata?.rights ?? '').toLowerCase();
-  const license = String(metadata?.metadata?.licenseurl ?? '').toLowerCase();
-  const redistributable = rights.includes('public domain') || rights.includes('creativecommons') || license.includes('creativecommons.org') || license.includes('publicdomain');
+  const license = String(metadata?.metadata?.licenseurl ?? '');
+  const redistributable = rights.includes('public domain') || rights.includes('creativecommons') || isAllowedCreativeCommonsLicense(license);
   if (!redistributable) return null;
   const pdf = (metadata?.files ?? []).find((file) => /\.pdf$/i.test(String(file.name ?? '')));
   if (!pdf) return null;
