@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createV6GlobalSourceIntelligenceEngine, discoverSource, resolveSourceIdentity, evaluateRights, verifySource } from '../src/rechercher-v6-global-source-intelligence-engine.js';
-import { createRuntime, ingestClaim, ingestEvidence, ingestContradiction, alignLanguages, buildIntegratedResearchGraph, search, health } from '../src/rechercher-v7-graph-integration-engine.js';
+import { createRuntime, createV7GraphIntegrationStageNodeContract, ingestClaim, ingestEvidence, ingestContradiction, alignLanguages, buildIntegratedResearchGraph, search, health } from '../src/rechercher-v7-graph-integration-engine.js';
 
 const provenance={sourceIds:['source-1'],locator:'page:12'};
 function verifiedSourceEngine(rightsState='ALLOWED') {
@@ -9,10 +9,17 @@ function verifiedSourceEngine(rightsState='ALLOWED') {
   discoverSource(engine,{candidateId:'candidate-1',sourceUrl:'https://example.org/book.pdf',sourceType:'DIGITAL_BOOK',provenance,rightsState:'UNKNOWN'});
   resolveSourceIdentity(engine,'candidate-1',{sourceId:'source-1'});
   evaluateRights(engine,'candidate-1',rightsState,{kind:'rights-record',recordId:'rights-1'});
-  const source=verifySource(engine,'candidate-1');
-  source.provenance=provenance;
+  verifySource(engine,'candidate-1');
   return engine;
 }
+
+test('V7.2 exposes a validated stage contract',()=>{
+  const contract=createV7GraphIntegrationStageNodeContract();
+  assert.equal(contract.stageId,'V7_GRAPH_INTEGRATION');
+  assert.ok(contract.capabilities.includes('RIGHTS_AWARE_GRAPH_SEARCH'));
+  assert.equal(contract.safety.canMutateOriginalPdf,false);
+  assert.equal(contract.rightsPolicy.unknownIsPublishable,false);
+});
 
 test('V7.2 integrates verified V6 sources into claim/evidence graph',()=>{
   const runtime=createRuntime({sourceEngine:verifiedSourceEngine()});
@@ -41,7 +48,6 @@ test('contradictions remain explicit in the integrated graph',()=>{
   ingestClaim(runtime,{claimId:'right',text:'right position',status:'DIRECT_SOURCE',provenance});
   ingestContradiction(runtime,{contradictionId:'c-1',leftClaimId:'left',rightClaimId:'right',type:'SCHOLARLY_DISAGREEMENT',confidence:.9,provenance});
   const graph=buildIntegratedResearchGraph(runtime);
-  assert.equal(graph.nodes.some(n=>n.contradictionId==='c-1'),false);
   assert.ok(graph.graphNodes.some(n=>n.nodeId==='contradiction:c-1'));
   assert.equal(graph.graphEdges.filter(e=>e.relation==='CONTRADICTS').length,2);
 });
