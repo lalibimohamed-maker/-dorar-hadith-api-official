@@ -1,75 +1,14 @@
 {
   "engine": "rechercher-worldwide-resource-registry",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "status": "IMPLEMENTED_FOUNDATION",
-  "purpose": "Register worldwide research resources, interoperability standards, preservation metadata, scholarly discovery families and engine dependencies without treating registration as proof of implementation.",
-  "externalStandards": {
-    "IIIF_PRESENTATION": "3.0",
-    "W3C_WEB_ANNOTATION": "Recommendation",
-    "W3C_PROV_O": "Recommendation",
-    "PREMIS": "3.0",
-    "RO_CRATE": "1.2",
-    "DATACITE": "4.7",
-    "JSON_LD": "1.1"
-  },
-  "resourceIdentity": [
-    "resourceId", "resourceType", "title", "sourceUrl", "language", "license", "rights",
-    "provenance", "retrievalDate", "contentHash", "persistentId", "workId", "editionId",
-    "manifestationId", "pageId", "passageId", "iiifManifestId", "reviewState"
-  ],
-  "sourceFamilies": [
-    "NATIONAL_LIBRARY", "UNIVERSITY_LIBRARY", "ARCHIVE", "MUSEUM", "MANUSCRIPT_REPOSITORY",
-    "DIGITAL_HUMANITIES", "ISLAMIC_CORPUS", "SCHOLARLY_GRAPH", "OPEN_REPOSITORY", "BOOK_PDF",
-    "ARTICLE", "AUDIO", "VIDEO", "IMAGE", "OCR_HTR", "IIIF", "STRUCTURED_DATA", "API", "WEB_SOURCE"
-  ],
-  "multilingualRelations": ["EXACT", "CLOSE", "HISTORICAL", "SCHOOL_SPECIFIC", "TRANSLATION_VARIANT", "NO_EXACT_EQUIVALENT"],
-  "preservation": {
-    "originalPdfImmutable": true,
-    "canonicalQuranArabicImmutable": true,
-    "contentHashRequiredWhenAvailable": true,
-    "premisEventsRecommended": true,
-    "roCrateExportSupportedByRegistry": true
-  },
-  "provenance": {
-    "model": "W3C_PROV_O",
-    "sourceToPassageChain": true,
-    "derivationMustBeTraceable": true
-  },
-  "iiif": {
-    "presentationApi": "3.0",
-    "webAnnotationModel": true,
-    "canvasPagePassageAlignment": true,
-    "externalAnnotationPages": true,
-    "contentSearchMustBeImplementedBySearchLayer": true
-  },
-  "scholarlyDiscovery": {
-    "openAlex": "candidate_adapter",
-    "crossref": "candidate_adapter",
-    "datacite": "candidate_adapter",
-    "nationalLibraries": "candidate_adapter_family",
-    "universityLibraries": "candidate_adapter_family",
-    "digitalManuscriptRepositories": "candidate_adapter_family"
-  },
-  "languageEquity": {
-    "lowResourceLanguagesTracked": true,
-    "languageTechnologyGapTracking": true,
-    "sourceLanguageSeparatedFromLearningLanguage": true,
-    "interfaceLanguageSeparatedFromSourceLanguage": true
-  },
-  "rightsPolicy": {
-    "unknownPublishable": false,
-    "restrictedPublishable": false,
-    "explicitPermissionRequiredPublishable": false,
-    "learningNeedCannotOverrideRights": true
-  },
-  "securityPolicy": {
-    "proxyRotation": false,
-    "userAgentRotation": false,
-    "accessControlBypass": false
-  },
-  "implementationBoundary": {
-    "registryIsNotProofOfAdapterAvailability": true,
-    "externalAdaptersRemainExplicitExtensionPoints": true,
-    "globalCompletionRequiresExecutableTestsAndIntegration": true
-  }
+  "resourceChain": ["SOURCE","WORK","EDITION","MANIFESTATION","MANUSCRIPT","PAGE","CANVAS","PASSAGE","EVIDENCE","CLAIM"],
+  "externalStandards": {"IIIF_PRESENTATION":"3.0","W3C_WEB_ANNOTATION":"Recommendation","W3C_PROV_O":"Recommendation","PREMIS":"3.0","RO_CRATE":"1.2","DATACITE":"4.7","JSON_LD":"1.1"},
+  "engines":["rechercher-resource-identity-chain-engine","rechercher-preservation-event-engine","rechercher-research-object-crate-engine","rechercher-global-v1-v31plus-completion-engine"],
+  "preservation":{"originalPdfImmutable":true,"canonicalQuranArabicImmutable":true,"contentHashRequiredWhenAvailable":true,"premisEventsRequiredForPreservedArtifacts":true,"roCrateExportSupported":true},
+  "provenance":{"model":"W3C_PROV_O","sourceToClaimChain":true,"derivationMustBeTraceable":true},
+  "rightsPolicy":{"unknownPublishable":false,"restrictedPublishable":false,"explicitPermissionRequiredPublishable":false,"learningNeedCannotOverrideRights":true,"acquisitionIndependentFromPublication":true},
+  "temporalScope":{"start":"PROPHETIC_ERA","end":"PRESENT_AND_FUTURE","openEnded":true,"defaultGlobal":true},
+  "languageEquity":{"lowResourceLanguagesTracked":true,"sourceLanguageSeparatedFromLearningLanguage":true,"interfaceLanguageSeparatedFromSourceLanguage":true},
+  "implementationBoundary":{"registryIsNotProofOfAdapterAvailability":true,"externalAdaptersRemainExplicitExtensionPoints":true,"globalCompletionRequiresExecutableTestsAndIntegration":true}
 }
