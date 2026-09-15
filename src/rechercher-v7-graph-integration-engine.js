@@ -1,7 +1,9 @@
 import { createNode, createEdge, buildMultilingualEvidenceGraph } from './rechercher-v7-evidence-graph-engine.js';
 import { createClaim, createEvidence, createContradiction, buildResearchGraph } from './rechercher-claim-evidence-contradiction-engine.js';
+import { createStageNodeContract } from './rechercher-stage-node-contract.js';
 
 export const V7_GRAPH_INTEGRATION_VERSION = '7.2.0';
+export const V7_GRAPH_INTEGRATION_STAGE_ID = 'V7_GRAPH_INTEGRATION';
 export const PUBLIC_RIGHTS_STATE = 'ALLOWED';
 
 function clone(value) { return structuredClone(value); }
@@ -14,6 +16,21 @@ function requireSource(source) {
   return source;
 }
 export function sourceIsPublic(source) { return source?.state === 'VERIFIED_SOURCE' && source?.rightsState === PUBLIC_RIGHTS_STATE && source?.publishable === true; }
+export function createV7GraphIntegrationStageNodeContract() {
+  return createStageNodeContract({
+    stageId: V7_GRAPH_INTEGRATION_STAGE_ID,
+    version: '1.0',
+    capabilities: ['CLAIM_EVIDENCE_GRAPH_INTEGRATION','RIGHTS_AWARE_GRAPH_SEARCH','CONTRADICTION_GRAPHING','MULTILINGUAL_EVIDENCE_ALIGNMENT'],
+    acceptedInputs: [{ type:'VERIFIED_SOURCE' }, { type:'CLAIM' }, { type:'EVIDENCE' }, { type:'CONTRADICTION' }],
+    producedOutputs: [{ type:'GRAPH' }, { type:'SEARCH_RESULT' }],
+    requiredEvidence: [{ type:'SOURCE_IDENTITY' }, { type:'PROVENANCE' }, { type:'RIGHTS_STATE' }],
+    rightsPolicy: { defaultState:'UNKNOWN', publishableState:'ALLOWED', unknownIsPublishable:false, restrictedIsPublishable:false },
+    reviewPolicy: { scholarlyVerification:true, humanReviewForAuthoritativeUse:true },
+    dependencies: ['V6_GLOBAL_SOURCE_INTELLIGENCE','V7_CLAIM_EVIDENCE_CONTRADICTION'],
+    handoffs: ['SOURCE_INTELLIGENCE_TO_EVIDENCE','EVIDENCE_TO_GRAPH','GRAPH_TO_SEARCH'],
+    tracePolicy: { traceIdRequired:true },
+  });
+}
 
 export function createRuntime({ sourceEngine = null, observability = null } = {}) {
   return { version: V7_GRAPH_INTEGRATION_VERSION, sourceEngine, observability, claims:new Map(), evidences:new Map(), contradictions:new Map(), nodes:new Map(), edges:new Map(), alignments:[], searchIndex:new Map(), traces:[] };
