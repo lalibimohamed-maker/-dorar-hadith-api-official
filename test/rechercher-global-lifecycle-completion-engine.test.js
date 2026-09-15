@@ -1,15 +1,13 @@
-'use strict';
-
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const {
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
   STAGES,
   HARD_GATES,
   createStageRecord,
   buildGlobalCompletionReport,
   isStageComplete,
   assertNoFalseComplete
-} = require('../src/rechercher-global-lifecycle-completion-engine');
+} from '../src/rechercher-global-lifecycle-completion-engine.js';
 
 test('tracks every stage from V1 through V31+', () => {
   assert.equal(STAGES.length, 31);
