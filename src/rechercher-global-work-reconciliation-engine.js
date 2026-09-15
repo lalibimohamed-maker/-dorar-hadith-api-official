@@ -55,7 +55,21 @@ export function reconcileWorkCandidate(candidate, existing = [], thresholds = DE
     .sort((a, b) => b.score - a.score);
 
   const best = ranked[0];
-  const matched = Boolean(best && best.scores.title >= thresholds.title && best.scores.author >= thresholds.author);
+  // A translated/transliterated title can legitimately have little lexical
+  // overlap.  Require two independent bibliographic anchors before linking
+  // such a candidate to an existing Work; otherwise create a new candidate.
+  const anchoredByAuthorAndEdition = Boolean(
+    best
+      && best.scores.author >= thresholds.author
+      && best.scores.edition >= thresholds.edition
+  );
+  const matched = Boolean(
+    best
+      && (
+        (best.scores.title >= thresholds.title && best.scores.author >= thresholds.author)
+        || anchoredByAuthorAndEdition
+      )
+  );
   return Object.freeze({
     matched,
     action: matched ? 'LINK_TO_EXISTING_WORK' : 'CREATE_NEW_WORK_CANDIDATE',
