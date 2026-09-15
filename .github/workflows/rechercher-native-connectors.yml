@@ -18,9 +18,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
       - name: Setup Node 24
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
       - name: Syntax check native connector runtime
@@ -32,12 +35,7 @@ jobs:
       - name: Run native connector tests
         run: node --test test/rechercher-native-connectors.test.js
       - name: Emit connector manifest
-        run: node scripts/rechercher-native-connectors.mjs manifest > rechercher-native-connectors-manifest.json
-      - name: Upload manifest
-        uses: actions/upload-artifact@v4
-        with:
-          name: rechercher-native-connectors-manifest
-          path: rechercher-native-connectors-manifest.json
+        run: node scripts/rechercher-native-connectors.mjs manifest
 
   live-health:
     runs-on: ubuntu-latest
@@ -45,9 +43,12 @@ jobs:
     needs: test
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
       - name: Setup Node 24
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
       - name: Probe enabled native endpoints
