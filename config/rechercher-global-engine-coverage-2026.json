@@ -1,8 +1,7 @@
 {
   "engine": "rechercher-global-engine-coverage",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "principle": "Every requested Rechercher capability is explicitly classified; documentation alone never counts as implementation.",
-  "status_model": ["IMPLEMENTED","PARTIAL","PLANNED"],
   "coverage": {
     "global_knowledge_search": "PARTIAL",
     "global_source_federation": "IMPLEMENTED",
@@ -17,7 +16,7 @@
     "knowledge_gap_discovery": "IMPLEMENTED",
     "citation_reproducibility": "IMPLEMENTED",
     "research_workspace": "IMPLEMENTED",
-    "research_observatory": "PARTIAL",
+    "research_observatory": "IMPLEMENTED",
     "book_work_edition": "PARTIAL",
     "manuscript_intelligence": "PARTIAL",
     "iiif_page_canvas": "PARTIAL",
@@ -77,12 +76,14 @@
     "rights_unknown_or_restricted_not_publishable": true,
     "original_pdf_immutable": true,
     "canonical_quran_arabic_immutable": true,
-    "acquisition_independent": true
+    "acquisition_independent": true,
+    "v8_research_observatory": true,
+    "v8_knowledge_gap_intelligence": true
   },
   "verification": {
     "required_before_claiming_complete": ["unit_tests","full_ci","security_gates","governance_gates","integration_tests"],
     "current_pr": 530,
     "current_state": "DRAFT_NOT_MERGED",
-    "last_code_increment": "c06184490fb2e8131bd44460a8953c6f02013d4e"
+    "last_code_increment": "69c8d7374409a0ace9119730989ddae73baa19b2"
   }
 }
