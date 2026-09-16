@@ -9,7 +9,7 @@ test('global multilingual registry contains verified full API sources', () => {
     const item = byId(id);
     assert.ok(item, `missing ${id}`);
     assert.equal(item.api?.documented, true, `${id} must expose documented API metadata`);
-    assert.ok(item.api?.baseUrl || item.api?.endpoints, `${id} must expose API surface metadata`);
+    assert.ok(item.api?.baseUrl || (Array.isArray(item.api?.endpoints) && item.api.endpoints.length > 0), `${id} must expose API surface metadata`);
   }
 });
 
@@ -19,7 +19,7 @@ test('Quranpedia registry keeps the complete documented API surface', () => {
     '/mushafs', '/mushafs/{mushaf_id}/{surah_id}/{ayah_number?}',
     '/surah/information/{surah}', '/ayah/{surah}/{ayah}/{service}',
     '/translations/{surah}/{ayah}/{language?}', '/translation-books/{language_code?}',
-    '/translation/{book_id}/{surah_id}/{ayah_number?}', '/tafsir', '/books', '/fatwas',
+    '/translation/{book_id}/{surah}/{ayah_number?}', '/tafsir', '/books', '/fatwas',
     '/topics', '/reciters', '/search/{query}/{type}', '/changes?since={date}',
   ]);
 });
