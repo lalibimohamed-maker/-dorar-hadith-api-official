@@ -5,11 +5,11 @@ import registry from '../config/rechercher-global-multilingual-sources-v2.js';
 const byId = (id) => registry.find((source) => source.id === id);
 
 test('global multilingual registry contains verified full API sources', () => {
-  for (const id of ['quranpedia-api', 'islamhouse-api', 'quranenc-api', 'hadeethenc-api']) {
+  for (const id of ['quranpedia-api', 'islamhouse-api', 'quranenc-api', 'hadeethenc-api', 'islamenc-api', 'islamcontent-api']) {
     const item = byId(id);
     assert.ok(item, `missing ${id}`);
     assert.equal(item.api?.documented, true, `${id} must expose documented API metadata`);
-    assert.ok(item.api?.baseUrl || (Array.isArray(item.api?.endpoints) && item.api.endpoints.length > 0), `${id} must expose API surface metadata`);
+    assert.ok(item.api?.baseUrl || (Array.isArray(item.api?.endpoints) && item.api.endpoints.length > 0) || item.api?.collectionUrl, `${id} must expose API surface metadata`);
   }
 });
 
@@ -43,17 +43,37 @@ test('HadeethEnc remains fully discoverable rather than a single-category connec
   assert.ok(item.api.endpoints.some((endpoint) => endpoint === '/hadeeths/list/?language={language}&category_id={categoryId}&page={page}&per_page={perPage}'));
 });
 
-test('new multilingual sources remain discovery-only until primary API documentation is verified', () => {
-  const islamenc = byId('islamenc');
-  assert.ok(islamenc);
-  assert.equal(islamenc.access.mode, 'web-discovery');
-  assert.equal(islamenc.api, null);
-  assert.equal(islamenc.access.apiVerification, 'pending-primary-documentation');
+test('IslamEnc developer API exposes its verified service catalog', () => {
+  const item = byId('islamenc-api');
+  assert.equal(item.api.baseUrl, 'https://s.islamenc.com/api/v1');
+  assert.deepEqual(item.api.endpoints, ['/services']);
+  assert.equal(item.api.documented, true);
+  assert.equal(item.api.verification, 'official-developers-api-link-and-live-json-service-catalog');
+});
 
-  const terminology = byId('terminologyenc');
-  assert.ok(terminology);
-  assert.equal(terminology.access.mode, 'web-discovery');
-  assert.equal(terminology.api, null);
+test('IslamContent official Postman collection preserves its complete documented endpoint list', () => {
+  const item = byId('islamcontent-api');
+  assert.equal(item.api.documented, true);
+  assert.equal(item.api.collectionUrl, 'https://islamcontent.com/islam_in_brief_api.postman_collection.json');
+  assert.equal(item.api.endpointHost, 'http://newislamhouse-content.hdbc.co');
+  assert.deepEqual(item.api.endpoints, [
+    'GET /Api/categories?lang={lang}',
+    'GET /Api/content?lang={lang}',
+    'GET /Api/content?lang={lang}&name={name}&subject_category={subject_category}&author={author}&sort_by={sort_by}',
+    'GET /Api/languages',
+    'GET /Api/authors?lang={lang}&name={name}',
+    'GET /Api/single-content?id={id}',
+  ]);
+  assert.equal(item.api.liveVerification, 'pending');
+});
+
+test('new multilingual satellites are represented without invented APIs', () => {
+  for (const id of ['islamenc-kids', 'islamenc-saadi', 'islamenc-qna', 'islamenc-rayaheen', 'islamenc-hajj', 'islamhouse-translated-content', 'terminologyenc']) {
+    const item = byId(id);
+    assert.ok(item, `missing ${id}`);
+    assert.equal(item.access.mode, 'web-discovery');
+    assert.equal(item.api, null);
+  }
 });
 
 test('discovery never grants download rights', () => {
