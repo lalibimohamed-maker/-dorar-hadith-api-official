@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { NATIVE_SOURCES } from '../config/rechercher-native-sources.js';
-import { createConnectorManifest } from '../src/rechercher/native-source-connectors.js';
+import { VERIFIED_MULTILINGUAL_CONNECTORS } from '../config/rechercher-verified-multilingual-connectors.js';
+import { createConnectorManifest, discoverConnector } from '../src/rechercher/native-source-connectors.js';
 import { federatedSearch, healthCheck } from '../src/rechercher/native-federation-engine.js';
 import { assertSourceCensus, buildSourceCensus } from '../src/rechercher/source-census.js';
 
@@ -19,6 +20,21 @@ if (mode === 'manifest') {
   console.log(JSON.stringify(await healthCheck({ concurrency: 5 }), null, 2));
 } else if (mode === 'search') {
   console.log(JSON.stringify(await federatedSearch(query, { concurrency: 5, timeoutMs: 12000 }), null, 2));
+} else if (mode === 'hadeethenc-discover') {
+  const source = VERIFIED_MULTILINGUAL_CONNECTORS.find((item) => item.id === 'hadeethenc-api');
+  if (!source) throw new Error('hadeethenc-api connector is not registered');
+  const language = process.env.HADEETHENC_LANGUAGE || undefined;
+  const result = await discoverConnector(source, {
+    language,
+    concurrency: 1,
+    timeoutMs: 15000,
+    pageSize: 100,
+    onProgress: ({ language: currentLanguage, categoryId, pagesRead, recordsFound }) => {
+      console.log(JSON.stringify({ event: 'progress', sourceId: source.id, language: currentLanguage, categoryId, pagesRead, recordsFound }));
+    },
+  });
+  await writeFile('artifacts/rechercher-hadeethenc-full-discovery.json', JSON.stringify(result, null, 2));
+  console.log(JSON.stringify({ sourceId: result.sourceId, strategy: result.strategy, languagesChecked: result.languagesChecked, recordsFound: result.recordsFound, elapsedMs: result.elapsedMs, telemetryEntries: result.telemetry.length }, null, 2));
 } else if (mode === 'health:file') {
   const result = await healthCheck({ concurrency: 5 });
   await writeFile('artifacts/rechercher-native-source-health.json', JSON.stringify(result, null, 2));
