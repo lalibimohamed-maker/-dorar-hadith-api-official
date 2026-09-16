@@ -19,6 +19,9 @@ export function validateNode(node = {}) {
   if (!node.id) errors.push("missing:id");
   if (!isNodeType(node.type)) errors.push(`unsupported-node-type:${node.type}`);
   if (!node.provenance || typeof node.provenance !== "object") errors.push("missing:provenance");
+  if (node.metadata?.sourceClassification === "structured-knowledge-source" && node.type !== "knowledge_source") {
+    errors.push("structured-source-must-use-knowledge_source-node");
+  }
   return { valid: errors.length === 0, errors };
 }
 
