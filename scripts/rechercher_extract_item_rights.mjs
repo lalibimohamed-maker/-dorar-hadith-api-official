@@ -11,7 +11,7 @@ const KEY_ALIASES = new Map([
   ['copyright', 'copyright'], ['copyright_notice', 'copyright'], ['public_domain', 'public_domain'],
   ['publicdomain', 'public_domain'], ['cc0', 'cc0'], ['cc_by', 'cc_by'], ['cc-by', 'cc_by'],
   ['cc_by_sa', 'cc_by_sa'], ['cc-by-sa', 'cc_by_sa'], ['permission', 'permission_statements'],
-  ['permissions', 'permission_statements'], ['permission_statement', 'permission_statements'],
+  ['permissions', 'permission_statements'], ['permission_statement', 'permission_statements'], ['permission_statements', 'permission_statements'],
   ['terms', 'institutional_terms'], ['terms_of_use', 'institutional_terms'], ['institutional_terms', 'institutional_terms'],
   ['item_metadata', 'item_level_metadata'], ['item_level_metadata', 'item_level_metadata'],
   ['item_id', 'item_level_metadata'], ['resource_id', 'item_level_metadata'], ['identifier', 'item_level_metadata']
@@ -71,9 +71,8 @@ export function extractRightsMetadata({metadata = null, text = '', sourceUrl = n
   const normalizedText = rightsTerms.map((f) => f.value).join(' ');
   const identity = itemId || resourceId || identityFields[0]?.value || null;
 
-  // A caller-supplied itemId/resourceId establishes identity only. It does not
-  // prove that the rights statement belongs to that item. Item-level matching
-  // therefore requires an identifier found in the item's metadata object.
+  // Caller-supplied IDs establish a candidate identity only. Redistribution
+  // still requires an identifier present in the item's own metadata.
   const metadataHasIdentity = identityFields.length > 0;
   const itemSpecificRights = metadataHasIdentity && rightsTerms.length > 0;
   const licenseUrl = unique.find((f) => f.field === 'license_url')?.value || (normalizedText.match(LICENSE_URL)?.[0] || null);
