@@ -20,7 +20,7 @@ export const VERIFIED_MULTILINGUAL_CONNECTORS = Object.freeze([
     connector: {
       kind: 'rest-json-catalog',
       searchUrl: 'https://hadeethenc.com/api/v1/hadeeths/list/',
-      queryMap: ({ language = 'ar', categoryId, page = 1, perPage = 100 } = {}) => ({ language, category_id: categoryId, page, per_page: perPage }),
+      queryMap: ({ language = 'ar', categoryId, page = 1, perPage = 100, probe = false } = {}) => ({ language, category_id: probe ? 1 : categoryId, page, per_page: perPage }),
       discovery: {
         strategy: 'languages-categories-pagination',
         languagesUrl: 'https://hadeethenc.com/api/v1/languages',
@@ -35,7 +35,7 @@ export const VERIFIED_MULTILINGUAL_CONNECTORS = Object.freeze([
       },
       mapResults: (json, query) => (Array.isArray(json) ? json : (json?.data ?? [])).filter((d) => !query || `${d.title ?? ''} ${d.hadeeth ?? ''}`.toLowerCase().includes(String(query).toLowerCase())).map((d) => ({ identifier: d.id, title: d.title, language: d.language ?? null, itemUrl: `https://hadeethenc.com/api/v1/hadeeths/one/?id=${encodeURIComponent(d.id)}&language=${encodeURIComponent(d.language ?? 'ar')}`, rightsUrl: 'https://hadeethenc-content.islamcontent.com/en/developers_api', rightsStatus: 'publisher-declared', method: 'hadeethenc-developer-api-v1' })),
     },
-    notes: 'Full native discovery is graph-based: languages -> categories -> paginated hadith lists -> optional detail records. No fixed category is required; category_id is supplied dynamically for every list request. Category 1 is not a discovery constraint.',
+    notes: 'Full native discovery is graph-based: languages -> categories -> paginated hadith lists -> optional detail records. No fixed category is required for discovery. The category_id=1 seed exists only when queryMap is explicitly called with probe=true for a deterministic health check.',
   },
   {
     id: 'islamenc-api', name: 'IslamEnc Developer APIs', enabled: true, acquisition: 'multilingual-quran-hadith-and-islamic-content-api', rightsPolicy: 'publisher-declared',
