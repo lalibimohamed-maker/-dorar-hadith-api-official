@@ -63,8 +63,8 @@ test('manifest exposes connector kind, acquisition, rights policy and discovery 
   const verifiedManifest = createConnectorManifest(VERIFIED_MULTILINGUAL_CONNECTORS);
   const hadeethManifest = verifiedManifest.find((x) => x.id === 'hadeethenc-api');
   assert.equal(hadeethManifest.discoveryStrategy, 'languages-categories-pagination');
-  assert.ok(hadeethManifest.endpoints.includes('https://hadeethenc.com/api/v1/languages'));
-  assert.ok(hadeethManifest.endpoints.includes('https://hadeethenc.com/api/v1/categories/list/'));
+  assert.ok(hadeethManifest.endpoints.some((endpoint) => endpoint === 'https://hadeethenc.com/api/v1/languages'));
+  assert.ok(hadeethManifest.endpoints.some((endpoint) => endpoint === 'https://hadeethenc.com/api/v1/categories/list/'));
 });
 
 test('acquisition candidate selection requires an explicitly downloadable rights status', () => {
