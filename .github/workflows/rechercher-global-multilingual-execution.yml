@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: rechercher-global-multilingual-evidence-${{ github.event.pull_request.number || github.ref }}
@@ -16,6 +16,7 @@ concurrency:
 
 env:
   CROSSREF_MAILTO: rechercher-research@users.noreply.github.com
+  LEDGER_ROOT: research/evidence/global-multilingual
 
 jobs:
   execute:
@@ -27,9 +28,10 @@ jobs:
       matrix:
         shard: [0, 1, 2]
     steps:
-      - name: Checkout
+      - name: Checkout PR head
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
           persist-credentials: false
 
       - name: Setup Node.js 24
@@ -57,7 +59,7 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}
 
-      - name: Upload shard evidence
+      - name: Upload transport evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: rechercher-global-multilingual-shard-${{ matrix.shard }}
@@ -66,15 +68,17 @@ jobs:
           retention-days: 90
 
   aggregate:
-    name: Aggregate and verify all 3192 cells
+    name: Aggregate, verify, and permanently record all 3192 cells
     needs: execute
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
-      - name: Checkout
+      - name: Checkout PR head
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          persist-credentials: true
 
       - name: Download all shard evidence
         uses: actions/download-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -83,45 +87,112 @@ jobs:
           path: artifacts/rechercher/global-multilingual-research
           merge-multiple: true
 
-      - name: Verify exact 3192-cell result set
+      - name: Verify exact 3192-cell result set and evidence policy
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           import path from 'node:path';
           const dir = 'artifacts/rechercher/global-multilingual-research';
+          const policy = JSON.parse(fs.readFileSync('config/rechercher/global-multilingual-evidence-ledger-policy-2026.json', 'utf8'));
           const files = fs.readdirSync(dir).filter((x) => x.endsWith('.jsonl')).sort();
           if (files.length !== 3) throw new Error(`Expected 3 shard JSONL files, found ${files.length}`);
           const rows = files.flatMap((file) => fs.readFileSync(path.join(dir, file), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse));
           const ids = new Set(rows.map((r) => r.cell_id));
           if (rows.length !== 3192 || ids.size !== 3192) throw new Error(`Expected 3192 unique cells; got rows=${rows.length}, unique=${ids.size}`);
-          const forbidden = rows.filter((r) => r.machine_translation_used || r.canonical_arabic_overwrite);
-          if (forbidden.length) throw new Error(`Quran boundary violation records: ${forbidden.length}`);
-          const stageOrder = ['primary_or_institutional_source','official_api','digital_corpus','structured_web','scholarly_dataset','translation_metadata','provenance','rights','verification'];
+          if (rows.some((r) => r.machine_translation_used || r.canonical_arabic_overwrite)) throw new Error('Translation/Quran boundary violation');
+          const evidenceStages = ['primary_or_institutional_source','official_api','digital_corpus','structured_web','scholarly_dataset','translation_metadata','provenance','rights','verification'];
           for (const row of rows) {
             const actual = row.stages.map((s) => s.stage);
-            if (JSON.stringify(actual) !== JSON.stringify(stageOrder)) throw new Error(`Pipeline mismatch: ${row.cell_id}`);
+            if (JSON.stringify(actual) !== JSON.stringify(evidenceStages)) throw new Error(`Evidence subpipeline mismatch: ${row.cell_id}`);
+            if (!['translation-needed','source-verified','institutionally-reviewed','scholarly','provenance-complete','candidate','unverified','machine-translated','not-applicable'].includes(row.translation_state)) throw new Error(`Unknown translation state: ${row.cell_id}`);
+            if (row.translation_state === 'source-verified' && !row.stages.find((s) => s.stage === 'translation_metadata')?.evidence?.ok) throw new Error(`Unsubstantiated source-verified translation: ${row.cell_id}`);
           }
           const verification = Object.groupBy(rows, (r) => r.final_verification);
+          const translation = Object.groupBy(rows, (r) => r.translation_state);
           const summary = {
-            schema: 'rechercher/global-multilingual-research-aggregate/v1',
+            schema: 'rechercher/global-multilingual-research-aggregate/v2',
+            record_class: policy.record_class,
+            durable_ledger_root: policy.durable_record.location,
             generated_at: new Date().toISOString(),
             total_cells: rows.length,
             unique_cells: ids.size,
             verification_counts: Object.fromEntries(Object.entries(verification).map(([k,v]) => [k,v.length])),
-            translation_counts: Object.fromEntries(Object.entries(Object.groupBy(rows, (r) => r.translation_state)).map(([k,v]) => [k,v.length])),
-            machine_translation_cells: forbidden.filter((r) => r.machine_translation_used).length,
-            canonical_arabic_overwrite_cells: forbidden.filter((r) => r.canonical_arabic_overwrite).length,
+            translation_counts: Object.fromEntries(Object.entries(translation).map(([k,v]) => [k,v.length])),
+            machine_translation_cells: rows.filter((r) => r.machine_translation_used).length,
+            canonical_arabic_overwrite_cells: rows.filter((r) => r.canonical_arabic_overwrite).length,
+            evidence_subpipeline_stages: evidenceStages,
             shards: files
           };
           fs.writeFileSync(path.join(dir, 'aggregate-summary.json'), JSON.stringify(summary, null, 2) + '\n');
           console.log(JSON.stringify(summary));
           NODE
 
-      - name: Upload complete 3192-cell evidence
+      - name: Build permanent scientific ledger
+        env:
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          const input = 'artifacts/rechercher/global-multilingual-research';
+          const runId = process.env.RUN_ID;
+          const headSha = process.env.HEAD_SHA;
+          const runDir = path.join(process.env.LEDGER_ROOT, 'runs', runId);
+          fs.mkdirSync(runDir, {recursive: true});
+          const files = fs.readdirSync(input).filter((x) => x.endsWith('.jsonl')).sort();
+          const rows = files.flatMap((file) => fs.readFileSync(path.join(input, file), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse));
+          const durable = rows.map((r) => ({
+            schema: 'rechercher/global-multilingual-scientific-record/v1',
+            record_class: 'permanent_scientific_record',
+            run_id: runId,
+            commit_sha: headSha,
+            cell_id: r.cell_id,
+            language: r.language,
+            language_iso: r.language_iso,
+            domain: r.domain,
+            provider: r.provider,
+            source_identity: {provider: r.provider, source_status: r.stages[0]?.evidence?.ok ? 'observed' : r.stages[0]?.status},
+            source_urls: [...new Set(r.stages.flatMap((s) => s.evidence?.url ? [s.evidence.url] : []))],
+            observed_evidence: r.stages.filter((s) => s.evidence).map((s) => ({stage: s.stage, status: s.status, evidence: s.evidence})),
+            translation_state: r.translation_state,
+            translation_evidence: r.stages.find((s) => s.stage === 'translation_metadata')?.evidence || null,
+            provenance_chain: r.stages.find((s) => s.stage === 'provenance')?.provenance || null,
+            rights_evidence: r.stages.find((s) => s.stage === 'rights')?.evidence || null,
+            verification_state: r.final_verification,
+            verification_reasons: {stages: r.stages.map((s) => ({stage: s.stage, status: s.status}))},
+            checksums_when_applicable: r.stages.flatMap((s) => s.evidence?.sha256_observed_prefix ? [{url: s.evidence.url, sha256_observed_prefix: s.evidence.sha256_observed_prefix}] : []),
+            timestamps: {checked_at: r.checked_at},
+            retry_and_failure_history: r.stages.flatMap((s) => s.evidence?.error ? [{stage: s.stage, error: s.evidence.error}] : [])
+          }));
+          fs.writeFileSync(path.join(runDir, 'records.jsonl'), durable.map((r) => JSON.stringify(r)).join('\n') + '\n');
+          const summary = JSON.parse(fs.readFileSync(path.join(input, 'aggregate-summary.json'), 'utf8'));
+          const manifest = {schema: 'rechercher/global-multilingual-scientific-ledger-manifest/v1', record_class: 'permanent_scientific_record', run_id: runId, commit_sha: headSha, generated_at: new Date().toISOString(), total_cells: durable.length, summary, records_file: 'records.jsonl', corpus_direct_write: false};
+          fs.writeFileSync(path.join(runDir, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
+          fs.copyFileSync(path.join(input, 'aggregate-summary.json'), path.join(runDir, 'aggregate-summary.json'));
+          fs.mkdirSync(path.join(process.env.LEDGER_ROOT), {recursive: true});
+          fs.writeFileSync(path.join(process.env.LEDGER_ROOT, 'latest.json'), JSON.stringify({schema: manifest.schema, latest_run_id: runId, commit_sha: headSha, records: `runs/${runId}/records.jsonl`, manifest: `runs/${runId}/manifest.json`}, null, 2) + '\n');
+          NODE
+
+      - name: Commit permanent scientific ledger
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/evidence/global-multilingual
+          if git diff --cached --quiet; then
+            echo "No durable ledger changes to commit."
+            exit 0
+          fi
+          git commit -m "data(rechercher): persist multilingual scientific evidence ledger [skip ci]"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}"
+
+      - name: Upload reproducibility bundle
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: rechercher-global-multilingual-3192-results
+          name: rechercher-global-multilingual-reproducibility-bundle
           path: artifacts/rechercher/global-multilingual-research/
           if-no-files-found: error
           retention-days: 90
