@@ -1,0 +1,36 @@
+name: Rechercher — Global multilingual source census
+
+on:
+  pull_request:
+    paths:
+      - 'config/rechercher-global-multilingual-sources-v2.js'
+      - 'scripts/rechercher-global-multilingual-census.mjs'
+      - 'test/rechercher-global-multilingual.test.js'
+      - '.github/workflows/rechercher-global-multilingual-census.yml'
+  push:
+    branches:
+      - main
+      - 'feat/rechercher-*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: node --test test/rechercher-global-multilingual.test.js
+      - run: node scripts/rechercher-global-multilingual-census.mjs > global-multilingual-census.json
+      - run: node -e "const x=require('./global-multilingual-census.json'); if(x.sourceCount<15) process.exit(1); if(x.nativeApiSourceCount<4) process.exit(1); console.log(JSON.stringify({sourceCount:x.sourceCount,nativeApiSourceCount:x.nativeApiSourceCount,discoveryOnlySourceCount:x.discoveryOnlySourceCount,languages:x.languageDirectoryEntries.length},null,2))"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rechercher-global-multilingual-census
+          path: global-multilingual-census.json
