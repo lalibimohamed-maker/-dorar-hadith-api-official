@@ -68,8 +68,20 @@ export default [
     languages: 'multilingual',
     content: ['quran-translations', 'tafsir', 'surah', 'ayah'],
     access: { mode: 'rest-json', authentication: 'none-or-public-endpoints' },
-    api: { documented: true, multilingual: true, endpoints: [] },
-    rights: { discovery: true, liveApi: true, preserveOriginalText: true, attribution: true },
+    api: {
+      baseUrl: 'https://quranenc.com/api/v1',
+      documented: true,
+      multilingual: true,
+      endpoints: [
+        '/translations/list/[[{language}]]/?localization={language_iso_code}',
+        '/translation/sura/{translation_key}/{sura_number}',
+        '/translation/aya/{translation_key}/{sura_number}/{aya_number}',
+        '/translations/note',
+      ],
+      staticAudioBaseUrl: 'https://d.quranenc.com/data/audio/{translation_key}/{sura_3digits}{aya_3digits}.mp3',
+      formats: ['json', 'xml', 'csv', 'xls'],
+    },
+    rights: { discovery: true, liveApi: true, republish: 'source-policy', preserveOriginalText: true, attribution: true },
   }),
   source({
     id: 'hadeethenc-api',
