@@ -87,6 +87,11 @@ jobs:
           path: artifacts/rechercher/global-multilingual-research
           merge-multiple: true
 
+      - name: Validate explicit translation evidence
+        run: |
+          set -euo pipefail
+          node scripts/rechercher_validate_translation_evidence.mjs artifacts/rechercher/global-multilingual-research
+
       - name: Verify exact 3192-cell result set and evidence policy
         run: |
           set -euo pipefail
@@ -106,7 +111,9 @@ jobs:
             const actual = row.stages.map((s) => s.stage);
             if (JSON.stringify(actual) !== JSON.stringify(evidenceStages)) throw new Error(`Evidence subpipeline mismatch: ${row.cell_id}`);
             if (!['translation-needed','source-verified','institutionally-reviewed','scholarly','provenance-complete','candidate','unverified','machine-translated','not-applicable'].includes(row.translation_state)) throw new Error(`Unknown translation state: ${row.cell_id}`);
-            if (row.translation_state === 'source-verified' && !row.stages.find((s) => s.stage === 'translation_metadata')?.evidence?.ok) throw new Error(`Unsubstantiated source-verified translation: ${row.cell_id}`);
+            const translationStage = row.stages.find((s) => s.stage === 'translation_metadata');
+            if (row.translation_state === 'source-verified' && translationStage?.translation_evidence?.explicit_translation_evidence !== true) throw new Error(`Unsubstantiated source-verified translation: ${row.cell_id}`);
+            if (row.translation_state === 'machine-translated' && row.machine_translation_used !== true) throw new Error(`Machine translation state mismatch: ${row.cell_id}`);
           }
           const verification = Object.groupBy(rows, (r) => r.final_verification);
           const translation = Object.groupBy(rows, (r) => r.translation_state);
@@ -158,7 +165,7 @@ jobs:
             source_urls: [...new Set(r.stages.flatMap((s) => s.evidence?.url ? [s.evidence.url] : []))],
             observed_evidence: r.stages.filter((s) => s.evidence).map((s) => ({stage: s.stage, status: s.status, evidence: s.evidence})),
             translation_state: r.translation_state,
-            translation_evidence: r.stages.find((s) => s.stage === 'translation_metadata')?.evidence || null,
+            translation_evidence: r.stages.find((s) => s.stage === 'translation_metadata')?.translation_evidence || null,
             provenance_chain: r.stages.find((s) => s.stage === 'provenance')?.provenance || null,
             rights_evidence: r.stages.find((s) => s.stage === 'rights')?.evidence || null,
             verification_state: r.final_verification,
