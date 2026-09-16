@@ -7,11 +7,12 @@ const root = process.cwd();
 const matrix = JSON.parse(fs.readFileSync(path.join(root, 'config/rechercher/global-multilingual-search-matrix-2026.json'), 'utf8'));
 const registry = JSON.parse(fs.readFileSync(path.join(root, matrix.language_registry), 'utf8'));
 
-test('global matrix is exactly 132 languages by 24 domains', () => {
+test('global matrix is exactly 133 languages by 24 domains', () => {
   assert.equal(registry.enumerated_islamhouse_languages.length, matrix.language_count);
   assert.equal(matrix.domains.length, matrix.domain_count);
-  assert.equal(matrix.language_count * matrix.domain_count, 3168);
-  assert.equal(matrix.expected_search_cells, 3168);
+  assert.equal(matrix.language_count * matrix.domain_count, 3192);
+  assert.equal(matrix.expected_search_cells, 3192);
+  assert.ok(registry.enumerated_islamhouse_languages.includes('Bengali'));
 });
 
 test('every cell uses the full evidence pipeline', () => {
