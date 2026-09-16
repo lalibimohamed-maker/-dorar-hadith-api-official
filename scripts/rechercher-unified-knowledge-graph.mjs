@@ -2,8 +2,9 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { createGraph, addNode, addEdge, snapshotGraph, validateRuntimeGraph } from '../src/deen-graph-runtime.js';
 import DEEP_SOURCES from '../config/rechercher-islamcontent-terminology-deep-registry-v1.js';
 import { VERIFIED_MULTILINGUAL_CONNECTORS } from '../config/rechercher-verified-multilingual-connectors.js';
+import GLOBAL_STRUCTURED_KNOWLEDGE_SOURCES from '../config/rechercher-global-structured-knowledge-sources-v1.js';
 
-const UA = 'Rechercher-Unified-Knowledge-Graph/1.0';
+const UA = 'Rechercher-Unified-Knowledge-Graph/1.1';
 const args = new Set(process.argv.slice(2));
 const has = (name) => args.has(`--${name}`);
 const maxCategories = Number(process.env.RECHERCHER_GRAPH_MAX_CATEGORIES || 24);
@@ -15,9 +16,9 @@ const id = (type, source, key) => `${type}:${source}:${slug(key)}`;
 const provenance = (sourceId, citation, verificationState = 'source_verified') => ({ sourceId, citation, verificationState, retrievedBy: 'rechercher-unified-knowledge-graph' });
 const edge = (from, to, type, sourceId, citation) => ({ id: `edge:${sourceId}:${slug(`${from}|${to}|${type}`)}`, from, to, type, provenance: provenance(sourceId, citation) });
 
-function addSourceNode(graph, sourceId, title, url, kind = 'knowledge_source') {
+function addSourceNode(graph, sourceId, title, url, kind = 'knowledge_source', metadata = {}) {
   const nodeId = id(kind, sourceId, sourceId);
-  if (!graph.nodes.has(nodeId)) addNode(graph, { id: nodeId, type: kind, label: title, sourceId, provenance: provenance(sourceId, url), metadata: { url } });
+  if (!graph.nodes.has(nodeId)) addNode(graph, { id: nodeId, type: kind, label: title, sourceId, provenance: provenance(sourceId, url), metadata: { url, ...metadata } });
   return nodeId;
 }
 
@@ -55,9 +56,53 @@ function addRecord(graph, sourceId, parentNode, key, label, url, metadata = {}) 
   return recordNode;
 }
 
+function addLanguageNodes(graph, source) {
+  const sourceNode = id('knowledge_source', source.id, source.id);
+  for (const language of source.languages || []) {
+    const languageNode = id('language', source.id, language);
+    if (!graph.nodes.has(languageNode)) addNode(graph, { id: languageNode, type: 'language', label: language, language, sourceId: source.id, provenance: provenance(source.id, source.sourceUrl) });
+    const e = edge(sourceNode, languageNode, 'supports_language', source.id, source.sourceUrl);
+    if (!graph.edges.has(e.id)) addEdge(graph, e);
+  }
+}
+
+function addGlobalStructuredSources(graph) {
+  const stats = { sources: 0, languages: 0, endpoints: 0 };
+  for (const source of GLOBAL_STRUCTURED_KNOWLEDGE_SOURCES) {
+    const sourceNode = addSourceNode(graph, source.id, source.name, source.sourceUrl, source.kind, {
+      apiDiscoveryStatus: source.apiDiscoveryStatus,
+      discoveryMode: source.discoveryMode,
+      verification: source.verification,
+      requiresCredentials: source.requiresCredentials,
+      discoveryDoesNotGrantDownloadRights: source.discoveryDoesNotGrantDownloadRights,
+      docsUrl: source.docsUrl || null,
+    });
+    stats.sources += 1;
+    stats.languages += (source.languages || []).length;
+    addLanguageNodes(graph, source);
+    for (const domain of source.domains || []) {
+      const domainNode = id('concept', source.id, `domain-${domain}`);
+      if (!graph.nodes.has(domainNode)) addNode(graph, { id: domainNode, type: 'concept', label: domain, sourceId: source.id, provenance: provenance(source.id, source.sourceUrl), metadata: { domain } });
+      const e = edge(sourceNode, domainNode, 'provides', source.id, source.sourceUrl);
+      if (!graph.edges.has(e.id)) addEdge(graph, e);
+    }
+    for (const endpoint of source.documentedEndpoints || []) {
+      const endpointNode = addRecord(graph, source.id, sourceNode, `api:${endpoint}`, endpoint, source.docsUrl || source.sourceUrl, {
+        endpoint,
+        apiBase: source.apiBase || null,
+        auth: source.auth || null,
+        apiDiscoveryStatus: source.apiDiscoveryStatus,
+      });
+      addEdge(graph, edge(sourceNode, endpointNode, 'offers_service', source.id, source.docsUrl || source.sourceUrl));
+      stats.endpoints += 1;
+    }
+  }
+  return stats;
+}
+
 async function addTerminology(graph) {
   const source = DEEP_SOURCES.find((item) => item.id === 'terminologyenc-deep');
-  const sourceNode = addSourceNode(graph, 'terminologyenc', 'TerminologyEnc', source.baseUrl);
+  const sourceNode = addSourceNode(graph, 'terminologyenc', 'TerminologyEnc', source.baseUrl, 'knowledge_source', { apiDiscoveryStatus: 'actively-seeking', discoveryMode: 'structured-web' });
   const languages = source.languages;
   for (const lang of languages) {
     const langNode = id('language', 'terminologyenc', lang);
@@ -177,9 +222,15 @@ function addConnectorCatalog(graph) {
 
 async function main() {
   const graph = createGraph();
+  const globalStats = addGlobalStructuredSources(graph);
   addConnectorCatalog(graph);
   addServiceCatalog(graph);
-  const stats = { terminology: { categories: 0, terms: 0 }, quranenc: { translations: 0, live: false }, hadeethenc: { languages: 0, categories: 0, live: false } };
+  const stats = {
+    globalStructuredSources: globalStats,
+    terminology: { categories: 0, terms: 0 },
+    quranenc: { translations: 0, live: false },
+    hadeethenc: { languages: 0, categories: 0, live: false },
+  };
   if (!has('catalog-only')) {
     stats.terminology = await addTerminology(graph);
     stats.quranenc = await addQuranGraph(graph);
@@ -189,7 +240,15 @@ async function main() {
   if (!validation.valid) throw new Error(`Invalid graph: ${validation.errors.join('; ')}`);
   const snapshot = snapshotGraph(graph);
   await mkdir(output.substring(0, output.lastIndexOf('/')), { recursive: true });
-  await writeFile(output, JSON.stringify({ schema: 'deen-allah-unified-knowledge-graph/v1', generatedAt: new Date().toISOString(), acquisitionPolicy: 'discovery-does-not-grant-download-rights', apiPolicy: 'promote-only-after-verification', stats, graph: snapshot }, null, 2));
+  await writeFile(output, JSON.stringify({
+    schema: 'deen-allah-unified-knowledge-graph/v1',
+    generatedAt: new Date().toISOString(),
+    acquisitionPolicy: 'discovery-does-not-grant-download-rights',
+    apiPolicy: 'promote-only-after-first-party-verification',
+    corpusIsolation: true,
+    stats,
+    graph: snapshot,
+  }, null, 2));
   console.log(JSON.stringify({ output, ...validation, stats }, null, 2));
 }
 
