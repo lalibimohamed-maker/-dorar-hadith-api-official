@@ -24,6 +24,18 @@ test('Quranpedia registry keeps the complete documented API surface', () => {
   ]);
 });
 
+test('QuranEnc registry keeps the documented API surface', () => {
+  const item = byId('quranenc-api');
+  assert.equal(item.api.baseUrl, 'https://quranenc.com/api/v1');
+  assert.deepEqual(item.api.endpoints, [
+    '/translations/list/[[{language}]]/?localization={language_iso_code}',
+    '/translation/sura/{translation_key}/{sura_number}',
+    '/translation/aya/{translation_key}/{sura_number}/{aya_number}',
+    '/translations/note',
+  ]);
+  assert.equal(item.api.staticAudioBaseUrl, 'https://d.quranenc.com/data/audio/{translation_key}/{sura_3digits}{aya_3digits}.mp3');
+});
+
 test('HadeethEnc remains fully discoverable rather than a single-category connector', () => {
   const item = byId('hadeethenc-api');
   assert.ok(item.api.deepDiscovery);
