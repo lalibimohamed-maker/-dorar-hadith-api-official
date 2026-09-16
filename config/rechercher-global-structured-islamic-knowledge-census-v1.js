@@ -1,0 +1,141 @@
+const TARGET_LANGUAGES = Object.freeze([
+  { code: 'ar', name: 'Arabic', priority: 1 },
+  { code: 'en', name: 'English', priority: 2 },
+  { code: 'fr', name: 'French', priority: 3 },
+  { code: 'tr', name: 'Turkish', priority: 4 },
+  { code: 'fa', name: 'Persian', priority: 5 },
+  { code: 'ur', name: 'Urdu', priority: 6 },
+  { code: 'bn', name: 'Bengali', priority: 7 },
+  { code: 'id', name: 'Indonesian', priority: 8 },
+  { code: 'ms', name: 'Malay', priority: 9 },
+  { code: 'ru', name: 'Russian', priority: 10 },
+  { code: 'de', name: 'German', priority: 11 },
+  { code: 'es', name: 'Spanish', priority: 12 },
+  { code: 'pt', name: 'Portuguese', priority: 13 },
+  { code: 'bs', name: 'Bosnian', priority: 14 },
+  { code: 'sq', name: 'Albanian', priority: 15 },
+  { code: 'uz', name: 'Uzbek', priority: 16 },
+  { code: 'kk', name: 'Kazakh', priority: 17 },
+  { code: 'sw', name: 'Swahili', priority: 18 },
+  { code: 'ha', name: 'Hausa', priority: 19 },
+  { code: 'am', name: 'Amharic', priority: 20 },
+  { code: 'zh', name: 'Chinese', priority: 21 },
+  { code: 'ja', name: 'Japanese', priority: 22 },
+  { code: 'ko', name: 'Korean', priority: 23 },
+]);
+
+const KNOWLEDGE_DOMAINS = Object.freeze([
+  'quran', 'quran-translation', 'tafsir', 'quranic-sciences',
+  'hadith', 'hadith-translation', 'hadith-sciences', 'mustalah-al-hadith',
+  'sirah', 'seerah', 'fiqh', 'usul-al-fiqh', 'furuu-al-fiqh',
+  'fatwa', 'aqeedah', 'usul-al-aqeedah', 'scholars', 'narrators',
+  'rijal', 'shuruh', 'dictionary', 'terminology', 'books', 'biography',
+]);
+
+const SOURCE_TIERS = Object.freeze([
+  'first-party-api',
+  'first-party-structured-web',
+  'institutional-corpus',
+  'scholarly-dataset',
+  'verified-secondary-index',
+  'discovery-candidate',
+]);
+
+const TRANSLATION_POLICY = Object.freeze({
+  canonicalArabicIsNeverTranslated: true,
+  neverAutoTranslateAlreadyVettedTranslations: true,
+  preserveTranslatorAndEditionProvenance: true,
+  preserveFootnotesAndReferences: true,
+  preserveSourceTextWithoutSilentCorrection: true,
+  compareMultipleTranslationsWithoutDeclaringOneUniversallyCorrect: true,
+  requireHumanOrInstitutionalReviewForTrustedLabel: true,
+  separateTranslationFromTafsir: true,
+  separateHadithTranslationFromHadithText: true,
+  recordTranslationMethod: true,
+  recordSourceLanguage: true,
+  recordTargetLanguage: true,
+});
+
+const SOURCES = Object.freeze([
+  {
+    id: 'quran-foundation-content-api',
+    tier: 'first-party-api',
+    domains: ['quran', 'quran-translation', 'tafsir'],
+    languages: TARGET_LANGUAGES.map(({ code }) => code),
+    sourceUrl: 'https://quran.com/',
+    docsUrl: 'https://api-docs.quran.com/docs/category/content-apis-4.0.0/',
+    evidence: 'First-party Content API v4 documents chapters, verses, translations, tafsirs, resources and offline synchronization; the API exposes language metadata and translation resources.',
+    apiStatus: 'verified-first-party-documentation',
+  },
+  {
+    id: 'quranic-arabic-corpus',
+    tier: 'scholarly-dataset',
+    domains: ['quran', 'quranic-sciences', 'dictionary', 'terminology'],
+    languages: ['ar', 'en'],
+    sourceUrl: 'https://corpus.quran.com/',
+    docsUrl: 'https://corpus.quran.com/documentation/',
+    evidence: 'Scholarly annotated Quranic Arabic resource with morphology, syntax, semantic ontology, English word-by-word translation and downloadable annotation data.',
+    apiStatus: 'documented-java-api-and-data-download',
+  },
+  {
+    id: 'sunnah-com-api',
+    tier: 'first-party-api',
+    domains: ['hadith', 'hadith-translation', 'books'],
+    languages: ['ar', 'en'],
+    sourceUrl: 'https://sunnah.com/',
+    docsUrl: 'https://github.com/sunnah-com/api',
+    evidence: 'First-party API repository/OpenAPI surface for collections, books and collection metadata.',
+    apiStatus: 'verified-first-party-openapi',
+  },
+  {
+    id: 'openiti-corpus',
+    tier: 'institutional-corpus',
+    domains: ['books', 'scholars', 'fiqh', 'tafsir', 'hadith', 'sirah', 'dictionary'],
+    languages: ['ar', 'fa', 'ota', 'ur', 'ms'],
+    sourceUrl: 'https://openiti.org/',
+    docsUrl: 'https://openiti.org/projects/OpenITI%20Corpus.html',
+    evidence: 'Open-access machine-actionable Islamicate corpus with Arabic, Persian, Ottoman Turkish and Urdu; current MAKHZAN research data also covers Malay and Javanese material.',
+    apiStatus: 'api-agnostic-structured-corpus',
+  },
+  {
+    id: 'altafsir',
+    tier: 'first-party-structured-web',
+    domains: ['quran', 'tafsir', 'quranic-sciences', 'dictionary', 'hadith'],
+    languages: ['ar', 'en', 'fr', 'tr', 'ur', 'id', 'ms'],
+    sourceUrl: 'https://www.altafsir.com/',
+    evidence: 'Structured tafsir and Quran knowledge catalogue; API status remains unverified and must not be invented.',
+    apiStatus: 'actively-seeking-first-party-api-evidence',
+  },
+  {
+    id: 'tdv-islam-ansiklopedisi',
+    tier: 'first-party-structured-web',
+    domains: ['hadith', 'tafsir', 'fiqh', 'aqeedah', 'sirah', 'history', 'tasawwuf', 'language'],
+    languages: ['tr'],
+    sourceUrl: 'https://islamansiklopedisi.org.tr/',
+    evidence: 'Institutional Turkish Islamic encyclopedia covering major Islamic studies disciplines; API status remains unverified.',
+    apiStatus: 'actively-seeking-first-party-api-evidence',
+  },
+  {
+    id: 'islamenc-islamcontent-islamhouse-family',
+    tier: 'first-party-api',
+    domains: ['quran', 'quran-translation', 'hadith', 'hadith-translation', 'tafsir', 'fiqh', 'fatwa', 'aqeedah', 'sirah', 'books', 'terminology'],
+    languages: TARGET_LANGUAGES.map(({ code }) => code),
+    sourceUrl: 'https://s.islamenc.com/',
+    docsUrl: 'https://s.islamenc.com/',
+    evidence: 'Official IslamEnc service catalogue plus documented IslamHouse/IslamContent APIs already federated in Rechercher; language coverage must be measured from live service metadata rather than assumed.',
+    apiStatus: 'mixed-verified-services',
+  },
+]);
+
+const CENSUS = Object.freeze({
+  version: '1.0.0',
+  targetLanguages: TARGET_LANGUAGES,
+  knowledgeDomains: KNOWLEDGE_DOMAINS,
+  sourceTiers: SOURCE_TIERS,
+  translationPolicy: TRANSLATION_POLICY,
+  sources: SOURCES,
+  rule: 'Every language/domain cell must be evidence-backed; absence is recorded as a gap, never filled by machine invention.',
+});
+
+export { TARGET_LANGUAGES, KNOWLEDGE_DOMAINS, SOURCE_TIERS, TRANSLATION_POLICY, SOURCES };
+export default CENSUS;
