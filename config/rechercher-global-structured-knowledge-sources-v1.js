@@ -3,7 +3,8 @@ export const GLOBAL_STRUCTURED_KNOWLEDGE_SOURCES = Object.freeze([
     id: 'quran-foundation',
     name: 'Quran Foundation Content API',
     kind: 'structured-knowledge-source',
-    languages: ['ar', 'en', 'fr', 'tr', 'ur', 'id', 'es', 'de', 'ru', 'zh', 'ja', 'ko'],
+    languages: ['ar', 'en'],
+    languageCoverage: 'live-api-resources-languages',
     domains: ['quran', 'translation', 'tafsir', 'audio', 'recitation', 'hadith', 'resources', 'pages', 'juz', 'hizb', 'ruku', 'manzil'],
     discoveryMode: 'documented-api',
     apiDiscoveryStatus: 'verified-first-party-documentation',
@@ -12,7 +13,7 @@ export const GLOBAL_STRUCTURED_KNOWLEDGE_SOURCES = Object.freeze([
     documentedEndpoints: [
       '/chapters', '/verses', '/translations', '/tafsirs', '/audio', '/recitations',
       '/pages', '/juzs', '/hizbs', '/ruku', '/manzils', '/resources', '/hadith',
-      '/resources/sync', '/resources/snapshots/{resource_group}/{resource_id}'
+      '/resources/languages', '/resources/sync', '/resources/snapshots/{resource_group}/{resource_id}'
     ],
     sourceUrl: 'https://quran.com/',
     docsUrl: 'https://api-docs.quran.com/docs/category/content-apis-4.0.0/',
