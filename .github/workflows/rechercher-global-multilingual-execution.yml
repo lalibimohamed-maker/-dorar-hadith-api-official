@@ -56,7 +56,7 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}
       - name: Upload transport evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a0 # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: rechercher-global-multilingual-shard-${{ matrix.shard }}
           path: artifacts/rechercher/global-multilingual-research/
@@ -159,32 +159,7 @@ jobs:
           fs.mkdirSync(runDir, {recursive: true});
           const files = fs.readdirSync(input).filter((x) => x.endsWith('.jsonl')).sort();
           const rows = files.flatMap((file) => fs.readFileSync(path.join(input, file), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse));
-          const durable = rows.map((r) => ({
-            schema: 'rechercher/global-multilingual-scientific-record/v1',
-            record_class: 'permanent_scientific_record',
-            run_id: runId,
-            commit_sha: headSha,
-            cell_id: r.cell_id,
-            language: r.language,
-            language_iso: r.language_iso,
-            domain: r.domain,
-            provider: r.provider,
-            source_identity: {provider: r.provider, source_status: r.stages[0]?.evidence?.ok ? 'observed' : r.stages[0]?.status},
-            source_urls: [...new Set(r.stages.flatMap((s) => s.evidence?.url ? [s.evidence.url] : []))],
-            observed_evidence: r.stages.filter((s) => s.evidence).map((s) => ({stage: s.stage, status: s.status, evidence: s.evidence})),
-            translation_state: r.translation_state,
-            translation_evidence: r.stages.find((s) => s.stage === 'translation_metadata')?.translation_evidence || null,
-            provenance_chain: r.stages.find((s) => s.stage === 'provenance')?.provenance || null,
-            rights_evidence: r.rights_evidence || r.stages.find((s) => s.stage === 'rights')?.evidence || null,
-            resource_metadata: r.resource_metadata || null,
-            rights_decision: r.stages.find((s) => s.stage === 'rights')?.rights_decision || 'fail-closed',
-            redistribution_permission: r.redistribution_permission || 'not-granted',
-            verification_state: r.final_verification,
-            verification_reasons: {stages: r.stages.map((s) => ({stage: s.stage, status: s.status}))},
-            checksums_when_applicable: r.stages.flatMap((s) => s.evidence?.sha256_observed_prefix ? [{url: s.evidence.url, sha256_observed_prefix: s.evidence.sha256_observed_prefix}] : []),
-            timestamps: {checked_at: r.checked_at},
-            retry_and_failure_history: r.stages.flatMap((s) => s.evidence?.error ? [{stage: s.stage, error: s.evidence.error}] : [])
-          }));
+          const durable = rows.map((r) => ({schema: 'rechercher/global-multilingual-scientific-record/v1', record_class: 'permanent_scientific_record', run_id: runId, commit_sha: headSha, cell_id: r.cell_id, language: r.language, language_iso: r.language_iso, domain: r.domain, provider: r.provider, source_identity: {provider: r.provider, source_status: r.stages[0]?.evidence?.ok ? 'observed' : r.stages[0]?.status}, source_urls: [...new Set(r.stages.flatMap((s) => s.evidence?.url ? [s.evidence.url] : []))], observed_evidence: r.stages.filter((s) => s.evidence).map((s) => ({stage: s.stage, status: s.status, evidence: s.evidence})), translation_state: r.translation_state, translation_evidence: r.stages.find((s) => s.stage === 'translation_metadata')?.translation_evidence || null, provenance_chain: r.stages.find((s) => s.stage === 'provenance')?.provenance || null, rights_evidence: r.rights_evidence || r.stages.find((s) => s.stage === 'rights')?.evidence || null, resource_metadata: r.resource_metadata || null, rights_decision: r.stages.find((s) => s.stage === 'rights')?.rights_decision || 'fail-closed', redistribution_permission: r.redistribution_permission || 'not-granted', verification_state: r.final_verification, verification_reasons: {stages: r.stages.map((s) => ({stage: s.stage, status: s.status}))}, checksums_when_applicable: r.stages.flatMap((s) => s.evidence?.sha256_observed_prefix ? [{url: s.evidence.url, sha256_observed_prefix: s.evidence.sha256_observed_prefix}] : []), timestamps: {checked_at: r.checked_at}, retry_and_failure_history: r.stages.flatMap((s) => s.evidence?.error ? [{stage: s.stage, error: s.evidence.error}] : [])}));
           fs.writeFileSync(path.join(runDir, 'records.jsonl'), durable.map((r) => JSON.stringify(r)).join('\n') + '\n');
           const summary = JSON.parse(fs.readFileSync(path.join(input, 'aggregate-summary.json'), 'utf8'));
           const manifest = {schema: 'rechercher/global-multilingual-scientific-ledger-manifest/v1', record_class: 'permanent_scientific_record', run_id: runId, commit_sha: headSha, generated_at: new Date().toISOString(), total_cells: durable.length, summary, records_file: 'records.jsonl', corpus_direct_write: false};
@@ -206,7 +181,7 @@ jobs:
           git commit -m "data(rechercher): persist multilingual scientific evidence ledger [skip ci]"
           git push origin "HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}"
       - name: Upload reproducibility bundle
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a0 # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: rechercher-global-multilingual-reproducibility-bundle
           path: artifacts/rechercher/global-multilingual-research/
