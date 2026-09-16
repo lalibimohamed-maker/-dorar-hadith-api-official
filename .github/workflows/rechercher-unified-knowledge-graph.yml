@@ -34,6 +34,8 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Validate unified graph contracts
         run: node --test test/rechercher-unified-knowledge-graph.test.js
+      - name: Validate global structured source contracts
+        run: node --test test/rechercher-global-structured-knowledge-sources.test.js
       - name: Validate deep source contracts
         run: node --test test/rechercher-deep-islamcontent-terminology.test.js
       - name: Build unified graph
