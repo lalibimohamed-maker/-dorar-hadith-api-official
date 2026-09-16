@@ -67,7 +67,11 @@ jobs:
     name: Aggregate, verify, and permanently record all 3192 cells
     needs: execute
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # The rights/resource collector performs bounded external evidence checks for every cell.
+    # The previous 45-minute cap canceled a healthy run while that step was still progressing.
+    # Keep the aggregate within GitHub's documented maximum job timeout and let the
+    # fail-closed rights gate decide eligibility after collection completes.
+    timeout-minutes: 360
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
     # security-justification: contents: write is restricted to the trusted same-repository aggregate job solely to persist the auditable scientific evidence ledger; discovery remains read-only, protected main is not bypassed, and public redistribution remains item-level-rights gated.
     permissions:
@@ -92,6 +96,7 @@ jobs:
           set -euo pipefail
           node scripts/rechercher_validate_translation_evidence.mjs artifacts/rechercher/global-multilingual-research
       - name: Collect item-level rights and resource metadata
+        timeout-minutes: 360
         run: |
           set -euo pipefail
           node scripts/rechercher_collect_item_rights_and_resources.mjs artifacts/rechercher/global-multilingual-research
