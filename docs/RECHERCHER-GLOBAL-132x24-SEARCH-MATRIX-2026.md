@@ -1,10 +1,10 @@
-# Rechercher — Global 132 × 24 Search Matrix
+# Rechercher — Global 133 × 24 Search Matrix
 
 ## Objective
 
-Rechercher now treats the current first-party IslamHouse snapshot of 132 enumerated languages as a concrete research universe across 24 Islamic knowledge/resource domains: **3,168 deterministic search cells**.
+Rechercher now treats the current first-party IslamHouse snapshot of **133 enumerated languages** as a concrete research universe across 24 Islamic knowledge/resource domains: **3,192 deterministic search cells**.
 
-The 132-language snapshot is evidence-backed by the current official catalogue; the source itself reports 133 languages, while the current enumerated snapshot contains 132 names. The discrepancy remains explicit until the missing language is independently identified and normalized.
+The previous 132-language snapshot had one missing enumerated language. The current official IslamHouse catalogue reports 133 languages and explicitly includes **Bengali** in the language selector. Bengali is therefore promoted from the discrepancy state into the evidence-backed language registry; no language was invented or inferred. citeturn2search0
 
 ## Cell pipeline
 
@@ -39,7 +39,7 @@ Quran, tafsir, hadith, hadith explanation, Sunnah, sirah, aqidah, fiqh, usul al-
 
 ## First-party anchors
 
-- IslamHouse: official language catalogue.
+- IslamHouse: official language catalogue and API service.
 - QuranEnc: translation catalogue/API and downloadable structured formats.
 - Quran Foundation: Content API and incremental Content Sync for translations, tafsirs and related public resources.
 - HadeethEnc: multilingual translated Prophetic-hadith resources.
