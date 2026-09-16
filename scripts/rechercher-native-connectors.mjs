@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { NATIVE_SOURCES } from '../config/rechercher-native-sources.js';
 import { VERIFIED_MULTILINGUAL_CONNECTORS } from '../config/rechercher-verified-multilingual-connectors.js';
+import GLOBAL_MULTILINGUAL_SOURCES from '../config/rechercher-global-multilingual-sources-v2.js';
 import { createConnectorManifest, discoverConnector } from '../src/rechercher/native-source-connectors.js';
 import { federatedSearch, healthCheck } from '../src/rechercher/native-federation-engine.js';
 import { assertSourceCensus, buildSourceCensus } from '../src/rechercher/source-census.js';
@@ -12,6 +13,35 @@ await mkdir('artifacts', { recursive: true });
 
 if (mode === 'manifest') {
   console.log(JSON.stringify({ generatedAt: new Date().toISOString(), sources: createConnectorManifest(NATIVE_SOURCES) }, null, 2));
+} else if (mode === 'global-manifest') {
+  console.log(JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    registry: 'global-multilingual-v2',
+    sources: GLOBAL_MULTILINGUAL_SOURCES,
+    nativeApis: GLOBAL_MULTILINGUAL_SOURCES.filter((source) => source.api?.documented).map((source) => ({ id: source.id, api: source.api })),
+  }, null, 2));
+} else if (mode === 'global-census') {
+  const languages = new Set();
+  const contentTypes = new Set();
+  const nativeApis = [];
+  for (const source of GLOBAL_MULTILINGUAL_SOURCES) {
+    for (const language of (Array.isArray(source.languages) ? source.languages : [source.languages])) languages.add(language);
+    for (const type of source.content ?? []) contentTypes.add(type);
+    if (source.api?.documented) nativeApis.push(source.id);
+  }
+  const census = {
+    generatedAt: new Date().toISOString(),
+    registry: 'global-multilingual-v2',
+    sourceCount: GLOBAL_MULTILINGUAL_SOURCES.length,
+    nativeApiSourceCount: nativeApis.length,
+    nativeApiSources: nativeApis,
+    languageDirectoryEntries: [...languages].sort(),
+    contentTypes: [...contentTypes].sort(),
+    discoveryOnlySourceCount: GLOBAL_MULTILINGUAL_SOURCES.filter((source) => source.api == null).length,
+    invariant: 'discovery-never-grants-download-rights',
+  };
+  await writeFile('artifacts/rechercher-global-multilingual-census.json', JSON.stringify(census, null, 2));
+  console.log(JSON.stringify(census, null, 2));
 } else if (mode === 'census') {
   const census = assertSourceCensus(buildSourceCensus());
   await writeFile('artifacts/rechercher-source-census.json', JSON.stringify(census, null, 2));
