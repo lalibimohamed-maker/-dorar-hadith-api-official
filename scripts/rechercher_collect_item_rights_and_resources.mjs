@@ -15,7 +15,7 @@ async function get(url, retries = 3) {
   let lastError = null;
   for (let attempt = 0; attempt < retries; attempt += 1) {
     try {
-      const res = await fetch(url, {redirect: 'follow', headers: {accept: 'application/json,text/html;q=0.9,*/*;q=0.1', 'user-agent': 'DinAllah-Rechercher/rights-audit-v1'}});
+      const res = await fetch(url, {redirect: 'follow', headers: {accept: 'application/json,text/html;q=0.9,*/*;q=0.1', 'user-agent': 'DinAllah-Rechercher/rights-audit-v2'}});
       const text = await res.text();
       const record = {url, final_url: res.url, http_status: res.status, ok: res.ok, content_type: res.headers.get('content-type') || null, text};
       cache.set(url, record);
@@ -78,16 +78,19 @@ for (const file of files) {
     item = findArchiveItem(parseJson(corpusResponse?.text || ''));
     const rightsFields = [];
     const resourceCandidates = [];
+    let itemMetadataIdentity = null;
     if (item?.item_id) {
       row.item_id = item.item_id;
       row.resource_id = item.item_id;
       const metadataResponse = await get(`https://archive.org/metadata/${encodeURIComponent(item.item_id)}`);
       const metadata = parseJson(metadataResponse?.text || '');
       if (metadata) {
-        rightsFields.push(...flattenRights(metadata.metadata || {}));
+        const itemMetadata = metadata.metadata || {};
+        itemMetadataIdentity = itemMetadata.identifier || null;
+        rightsFields.push(...flattenRights(itemMetadata));
         rightsFields.push(...flattenRights(metadata));
         resourceCandidates.push(...extractArchivePdfResources(metadata));
-        row.resource_metadata = {source: 'archive.org/metadata', item_id: item.item_id, title: metadata.metadata?.title || item.title || null, creator: metadata.metadata?.creator || item.creator || null, mediatype: metadata.metadata?.mediatype || item.mediatype || null, pdf_candidates: resourceCandidates};
+        row.resource_metadata = {source: 'archive.org/metadata', item_id: item.item_id, title: itemMetadata.title || item.title || null, creator: itemMetadata.creator || item.creator || null, mediatype: itemMetadata.mediatype || item.mediatype || null, pdf_candidates: resourceCandidates};
       }
     }
     if (source?.evidence?.url) {
@@ -102,11 +105,15 @@ for (const file of files) {
     const rightsText = deduped.map((x) => `${x.field}: ${x.value}`).join('\n');
     const explicitLicense = REDISTRIBUTABLE_LICENSE.test(rightsText);
     const explicitPermission = EXPLICIT_PERMISSION.test(rightsText);
-    const itemEvidence = Boolean(row.item_id && deduped.length > 0);
-    const redistributionEvidence = explicitLicense || explicitPermission;
+    // The item id from discovery is only an identity candidate. Rights become
+    // item-level evidence only when the rights metadata itself contains the
+    // item's identifier. Generic source/legal pages must never qualify.
+    const itemMetadataRights = itemMetadataIdentity && deduped.some((x) => /identifier|item_id|resource_id/i.test(x.field) && String(x.value) === String(itemMetadataIdentity));
+    const itemEvidence = Boolean(itemMetadataRights && deduped.some((x) => RIGHTS_KEYS.some((key) => x.field.toLowerCase().includes(key))));
+    const redistributionEvidence = itemEvidence && (explicitLicense || explicitPermission);
     row.rights_evidence = {item_id: row.item_id || null, source_url: source?.evidence?.final_url || source?.evidence?.url || null, fields: deduped, explicit_license_or_public_domain: explicitLicense, explicit_permission_statement: explicitPermission, item_level_evidence: itemEvidence, redistribution_evidence: redistributionEvidence, checked_at: new Date().toISOString()};
-    rights.evidence = {...(rights.evidence || {}), item_id: row.item_id || null, fields: deduped, pdf_candidates: resourceCandidates, checked_at: row.rights_evidence.checked_at};
-    if (itemEvidence && redistributionEvidence) {
+    rights.evidence = {...(rights.evidence || {}), item_id: row.item_id || null, fields: deduped, pdf_candidates: resourceCandidates, item_metadata_identity: itemMetadataIdentity, item_level_evidence: itemEvidence, checked_at: row.rights_evidence.checked_at};
+    if (redistributionEvidence) {
       rights.rights_status = 'known-terms';
       rights.item_level_rights_verified = true;
       rights.rights_decision = 'eligible-for-public-redistribution';
@@ -119,4 +126,4 @@ for (const file of files) {
   }
   await fs.writeFile(filePath, rows.map((row) => JSON.stringify(row)).join('\n') + '\n', 'utf8');
 }
-console.log(JSON.stringify({schema: 'rechercher/item-rights-resource-collection/v1', files: files.length, policy: 'open-discovery-and-resource-analysis; fail-closed-only-at-public-redistribution-gate'}));
+console.log(JSON.stringify({schema: 'rechercher/item-rights-resource-collection/v2', files: files.length, policy: 'open-discovery-and-resource-analysis; fail-closed-only-at-public-redistribution-gate; generic-source-rights-never-qualify'}));
