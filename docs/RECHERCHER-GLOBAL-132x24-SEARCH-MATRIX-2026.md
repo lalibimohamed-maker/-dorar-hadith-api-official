@@ -4,7 +4,7 @@
 
 Rechercher now treats the current first-party IslamHouse snapshot of **133 enumerated languages** as a concrete research universe across 24 Islamic knowledge/resource domains: **3,192 deterministic search cells**.
 
-The previous 132-language snapshot had one missing enumerated language. The current official IslamHouse catalogue reports 133 languages and explicitly includes **Bengali** in the language selector. Bengali is therefore promoted from the discrepancy state into the evidence-backed language registry; no language was invented or inferred. citeturn2search0
+The previous 132-language snapshot had one missing enumerated language. The current official IslamHouse catalogue reports 133 languages and explicitly includes **Bengali** in the language selector. Bengali is therefore promoted from the discrepancy state into the evidence-backed language registry; no language was invented or inferred.
 
 ## Cell pipeline
 
