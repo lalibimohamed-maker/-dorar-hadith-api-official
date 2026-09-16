@@ -49,11 +49,12 @@ test('manifest exposes connector kind, acquisition and rights policy', () => {
   assert.ok(manifest.some((x) => x.id === 'gallica-bnf' && x.kind === 'web-discovery'));
 });
 
-test('acquisition candidate selection blocks restricted records', () => {
+test('acquisition candidate selection requires an explicitly downloadable rights status', () => {
   const records = [
     { sourceId: 'a', identifier: '1', pdfUrl: 'https://example.org/a.pdf', rightsStatus: 'public' },
     { sourceId: 'b', identifier: '2', pdfUrl: 'https://example.org/a.pdf', rightsStatus: 'public' },
     { sourceId: 'c', identifier: '3', pdfUrl: 'https://example.org/c.pdf', rightsStatus: 'restricted' },
+    { sourceId: 'd', identifier: '4', pdfUrl: 'https://example.org/d.pdf', rightsStatus: 'source-declared' },
   ];
   assert.deepEqual(selectAcquisitionCandidates(records).map((x) => x.pdfUrl), ['https://example.org/a.pdf']);
 });
