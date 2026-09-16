@@ -1,16 +1,17 @@
 name: Rechercher — Global multilingual evidence execution
 
 on:
-  push:
+  pull_request:
     branches:
-      - 'feat/rechercher-global-multilingual-resource-discovery-v9'
+      - main
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: rechercher-global-multilingual-evidence
+  group: rechercher-global-multilingual-evidence-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 env:
