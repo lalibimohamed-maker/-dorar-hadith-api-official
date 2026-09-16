@@ -12,16 +12,26 @@ test('native source registry contains the core international and Islamic sources
   for (const id of ['internet-archive', 'open-library', 'openiti', 'wikimedia-commons', 'library-of-congress', 'crossref', 'google-books', 'gallica-bnf', 'british-library-eap', 'princeton-pul', 'bodleian', 'cambridge-digital', 'vatican-library', 'qatar-digital-library', 'nyu-aco', 'al-furqan', 'waqfeya', 'shamela']) assert.ok(ids.has(id), `missing ${id}`);
 });
 
-test('verified multilingual registry contains extracted official API contracts', () => {
+test('verified multilingual registry contains dynamic HadeethEnc discovery contract', () => {
   const byId = new Map(VERIFIED_MULTILINGUAL_CONNECTORS.map((source) => [source.id, source]));
   assert.equal(byId.get('quranenc').connector.kind, 'rest-json-catalog');
   assert.match(byId.get('quranenc').connector.searchUrl, /^https:\/\/quranenc\.com\/api\//);
-  assert.equal(byId.get('hadeethenc-api').connector.kind, 'rest-json-catalog');
-  assert.equal(byId.get('hadeethenc-api').connector.searchUrl, 'https://hadeethenc.com/api/v1/hadeeths/list/');
-  assert.equal(byId.get('hadeethenc-api').connector.queryMap().language, 'ar');
-  assert.equal(byId.get('hadeethenc-api').connector.queryMap().category_id, 1);
-  assert.equal(byId.get('hadeethenc-api').connector.queryMap().page, 1);
-  assert.equal(byId.get('hadeethenc-api').connector.queryMap().per_page, 20);
+  const hadeeth = byId.get('hadeethenc-api');
+  assert.equal(hadeeth.connector.kind, 'rest-json-catalog');
+  assert.equal(hadeeth.connector.searchUrl, 'https://hadeethenc.com/api/v1/hadeeths/list/');
+  assert.equal(hadeeth.connector.queryMap({ language: 'fr', categoryId: 42, page: 3, perPage: 77 }).language, 'fr');
+  assert.equal(hadeeth.connector.queryMap({ language: 'fr', categoryId: 42, page: 3, perPage: 77 }).category_id, 42);
+  assert.equal(hadeeth.connector.queryMap({ language: 'fr', categoryId: 42, page: 3, perPage: 77 }).page, 3);
+  assert.equal(hadeeth.connector.queryMap({ language: 'fr', categoryId: 42, page: 3, perPage: 77 }).per_page, 77);
+  assert.equal(hadeeth.connector.discovery.strategy, 'languages-categories-pagination');
+  assert.equal(hadeeth.connector.discovery.languagesUrl, 'https://hadeethenc.com/api/v1/languages');
+  assert.equal(hadeeth.connector.discovery.categoriesUrl, 'https://hadeethenc.com/api/v1/categories/list/');
+  assert.equal(hadeeth.connector.discovery.rootsUrl, 'https://hadeethenc.com/api/v1/categories/roots/');
+  assert.equal(hadeeth.connector.discovery.hadithUrl, 'https://hadeethenc.com/api/v1/hadeeths/list/');
+  assert.equal(hadeeth.connector.discovery.detailUrl, 'https://hadeethenc.com/api/v1/hadeeths/one/');
+  assert.equal(hadeeth.connector.discovery.pageSize, 100);
+  assert.equal(hadeeth.connector.discovery.maxRetries, 4);
+  assert.ok(!hadeeth.connector.queryMap({ language: 'ar' }).hasOwnProperty('category_id') || hadeeth.connector.queryMap({ language: 'ar' }).category_id === undefined);
   assert.equal(byId.get('islamenc-api').connector.kind, 'rest-json-catalog');
   assert.equal(byId.get('islamenc-api').connector.searchUrl, 'https://s.islamenc.com/api/v1/services');
   assert.equal(byId.get('islamhouse').connector.kind, 'rest-json-keyed-path');
@@ -45,11 +55,16 @@ test('country registry adapters preserve country and rights metadata', () => {
   assert.ok(sa.every((source) => source.connector.kind === 'web-discovery'));
 });
 
-test('manifest exposes connector kind, acquisition and rights policy', () => {
+test('manifest exposes connector kind, acquisition, rights policy and discovery strategy', () => {
   const manifest = createConnectorManifest(NATIVE_SOURCES);
   assert.equal(manifest.length, NATIVE_SOURCES.length);
   assert.ok(manifest.some((x) => x.id === 'internet-archive' && x.kind === 'rest-json'));
   assert.ok(manifest.some((x) => x.id === 'gallica-bnf' && x.kind === 'web-discovery'));
+  const verifiedManifest = createConnectorManifest(VERIFIED_MULTILINGUAL_CONNECTORS);
+  const hadeethManifest = verifiedManifest.find((x) => x.id === 'hadeethenc-api');
+  assert.equal(hadeethManifest.discoveryStrategy, 'languages-categories-pagination');
+  assert.ok(hadeethManifest.endpoints.includes('https://hadeethenc.com/api/v1/languages'));
+  assert.ok(hadeethManifest.endpoints.includes('https://hadeethenc.com/api/v1/categories/list/'));
 });
 
 test('acquisition candidate selection requires an explicitly downloadable rights status', () => {
