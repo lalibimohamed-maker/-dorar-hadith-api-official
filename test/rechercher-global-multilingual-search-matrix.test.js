@@ -1,7 +1,7 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const root = process.cwd();
 const matrix = JSON.parse(fs.readFileSync(path.join(root, 'config/rechercher/global-multilingual-search-matrix-2026.json'), 'utf8'));
