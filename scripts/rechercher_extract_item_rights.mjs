@@ -1,17 +1,8 @@
 import crypto from 'node:crypto';
 
 export const RIGHTS_FIELDS = [
-  'license',
-  'license_url',
-  'rights',
-  'copyright',
-  'public_domain',
-  'cc0',
-  'cc_by',
-  'cc_by_sa',
-  'permission_statements',
-  'institutional_terms',
-  'item_level_metadata'
+  'license', 'license_url', 'rights', 'copyright', 'public_domain', 'cc0', 'cc_by', 'cc_by_sa',
+  'permission_statements', 'institutional_terms', 'item_level_metadata'
 ];
 
 const KEY_ALIASES = new Map([
@@ -21,10 +12,9 @@ const KEY_ALIASES = new Map([
   ['publicdomain', 'public_domain'], ['cc0', 'cc0'], ['cc_by', 'cc_by'], ['cc-by', 'cc_by'],
   ['cc_by_sa', 'cc_by_sa'], ['cc-by-sa', 'cc_by_sa'], ['permission', 'permission_statements'],
   ['permissions', 'permission_statements'], ['permission_statement', 'permission_statements'],
-  ['terms', 'institutional_terms'], ['terms_of_use', 'institutional_terms'],
-  ['institutional_terms', 'institutional_terms'], ['item_metadata', 'item_level_metadata'],
-  ['item_level_metadata', 'item_level_metadata'], ['item_id', 'item_level_metadata'],
-  ['resource_id', 'item_level_metadata'], ['identifier', 'item_level_metadata']
+  ['terms', 'institutional_terms'], ['terms_of_use', 'institutional_terms'], ['institutional_terms', 'institutional_terms'],
+  ['item_metadata', 'item_level_metadata'], ['item_level_metadata', 'item_level_metadata'],
+  ['item_id', 'item_level_metadata'], ['resource_id', 'item_level_metadata'], ['identifier', 'item_level_metadata']
 ]);
 
 const ITEM_KEYS = new Set(['item_id', 'resource_id', 'identifier', 'ark', 'handle', 'isbn', 'doi']);
@@ -76,16 +66,22 @@ export function extractRightsMetadata({metadata = null, text = '', sourceUrl = n
   if (resourceId) fields.push({field: 'item_level_metadata', source_key: 'resource_id', value: resourceId, path: 'resource_id'});
 
   const unique = [...new Map(fields.map((f) => [`${f.field}|${f.value}|${f.path}`, f])).values()];
-  const itemEvidence = unique.filter((f) => f.field === 'item_level_metadata' && /item_id|resource_id|identifier|source_url/i.test(f.source_key));
+  const identityFields = unique.filter((f) => f.field === 'item_level_metadata' && /^(item_id|resource_id|identifier)$/i.test(f.source_key));
   const rightsTerms = unique.filter((f) => f.field !== 'item_level_metadata');
   const normalizedText = rightsTerms.map((f) => f.value).join(' ');
-  const itemLevelMatch = Boolean(itemId || resourceId) && (itemEvidence.length > 0 || unique.some((f) => /item_id|resource_id|identifier/i.test(f.source_key)));
+  const identity = itemId || resourceId || identityFields[0]?.value || null;
+
+  // A caller-supplied itemId/resourceId establishes identity only. It does not
+  // prove that the rights statement belongs to that item. Item-level matching
+  // therefore requires an identifier found in the item's metadata object.
+  const metadataHasIdentity = identityFields.length > 0;
+  const itemSpecificRights = metadataHasIdentity && rightsTerms.length > 0;
   const licenseUrl = unique.find((f) => f.field === 'license_url')?.value || (normalizedText.match(LICENSE_URL)?.[0] || null);
   const redistributableTerms = REDISTRIBUTABLE_LICENSE.test(normalizedText) || unique.some((f) => ['cc0', 'cc_by', 'cc_by_sa', 'public_domain'].includes(f.field));
-  const identity = itemId || resourceId || unique.find((f) => f.field === 'item_level_metadata' && /item_id|resource_id|identifier/i.test(f.source_key))?.value || null;
+  const redistributionEvidence = itemSpecificRights && redistributableTerms;
 
   return {
-    schema: 'rechercher/item-rights-evidence/v1',
+    schema: 'rechercher/item-rights-evidence/v2',
     item_id: itemId || null,
     resource_id: resourceId || null,
     source_url: sourceUrl || null,
@@ -101,11 +97,12 @@ export function extractRightsMetadata({metadata = null, text = '', sourceUrl = n
       cc_by: unique.some((f) => f.field === 'cc_by'),
       cc_by_sa: unique.some((f) => f.field === 'cc_by_sa'),
       permission_statements: unique.filter((f) => f.field === 'permission_statements').map((f) => f.value),
-      institutional_terms: unique.filter((f) => f.field === 'institutional_terms').map((f) => f.value)
+      institutional_terms: unique.filter((f) => f.field === 'institutional_terms').map((f) => f.value),
+      item_level_metadata: unique.filter((f) => f.field === 'item_level_metadata').map((f) => ({source_key: f.source_key, value: f.value, path: f.path}))
     },
     item_identity: identity,
-    item_level_match: itemLevelMatch,
-    redistribution_evidence: redistributableTerms && itemLevelMatch,
+    item_level_match: itemSpecificRights,
+    redistribution_evidence: redistributionEvidence,
     evidence_fingerprint: crypto.createHash('sha256').update(JSON.stringify(unique)).digest('hex')
   };
 }
