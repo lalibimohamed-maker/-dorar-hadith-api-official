@@ -32,12 +32,15 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci --ignore-scripts
-      - name: Validate graph contract
+      - name: Validate unified graph contracts
+        run: node --test test/rechercher-unified-knowledge-graph.test.js
+      - name: Validate deep source contracts
         run: node --test test/rechercher-deep-islamcontent-terminology.test.js
       - name: Build unified graph
         env:
           RECHERCHER_GRAPH_MAX_CATEGORIES: 24
           RECHERCHER_GRAPH_MAX_TERMS: 120
+          RECHERCHER_GRAPH_MAX_RECORDS: 200
           RECHERCHER_GRAPH_LANG_LIMIT: 3
         run: |
           if [ "${{ inputs.catalog_only }}" = "true" ]; then
@@ -45,10 +48,14 @@ jobs:
           else
             node scripts/rechercher-unified-knowledge-graph.mjs
           fi
+      - name: Add IslamContent federation
+        if: ${{ inputs.catalog_only != true }}
+        run: node scripts/rechercher-unified-knowledge-graph-islamcontent.mjs
       - name: Upload graph artifact
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: rechercher-unified-knowledge-graph-${{ github.run_id }}
           path: artifacts/rechercher/unified-knowledge-graph.json
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 14
