@@ -1,0 +1,126 @@
+name: Rechercher — Global multilingual evidence execution
+
+on:
+  push:
+    branches:
+      - 'feat/rechercher-global-multilingual-resource-discovery-v9'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-global-multilingual-evidence
+  cancel-in-progress: false
+
+env:
+  CROSSREF_MAILTO: rechercher-research@users.noreply.github.com
+
+jobs:
+  execute:
+    name: Execute 3192 multilingual research cells
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Execute shard
+        run: |
+          set -euo pipefail
+          node scripts/rechercher_execute_global_multilingual_queue.mjs \
+            --shard-index=${{ matrix.shard }} \
+            --shard-count=8 \
+            --output-dir=artifacts/rechercher/global-multilingual-research
+
+      - name: Validate shard completeness
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const summary = JSON.parse(fs.readFileSync(`artifacts/rechercher/global-multilingual-research/summary-${process.env.SHARD}.json`, 'utf8'));
+          if (summary.actual_cells !== summary.expected_shard_cells) throw new Error(`Shard incomplete: ${summary.actual_cells}/${summary.expected_shard_cells}`);
+          NODE
+        env:
+          SHARD: ${{ matrix.shard }}
+
+      - name: Upload shard evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-global-multilingual-shard-${{ matrix.shard }}
+          path: artifacts/rechercher/global-multilingual-research/
+          if-no-files-found: error
+          retention-days: 90
+
+  aggregate:
+    name: Aggregate and verify all 3192 cells
+    needs: execute
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download all shard evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v6.0.0
+        with:
+          pattern: rechercher-global-multilingual-shard-*
+          path: artifacts/rechercher/global-multilingual-research
+          merge-multiple: true
+
+      - name: Verify exact 3192-cell result set
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          const dir = 'artifacts/rechercher/global-multilingual-research';
+          const files = fs.readdirSync(dir).filter((x) => x.endsWith('.jsonl')).sort();
+          if (files.length !== 8) throw new Error(`Expected 8 shard JSONL files, found ${files.length}`);
+          const rows = files.flatMap((file) => fs.readFileSync(path.join(dir, file), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse));
+          const ids = new Set(rows.map((r) => r.cell_id));
+          if (rows.length !== 3192 || ids.size !== 3192) throw new Error(`Expected 3192 unique cells; got rows=${rows.length}, unique=${ids.size}`);
+          const forbidden = rows.filter((r) => r.machine_translation_used || r.canonical_arabic_overwrite);
+          if (forbidden.length) throw new Error(`Quran boundary violation records: ${forbidden.length}`);
+          const stageOrder = ['primary_or_institutional_source','official_api','digital_corpus','structured_web','scholarly_dataset','translation_metadata','provenance','rights','verification'];
+          for (const row of rows) {
+            const actual = row.stages.map((s) => s.stage);
+            if (JSON.stringify(actual) !== JSON.stringify(stageOrder)) throw new Error(`Pipeline mismatch: ${row.cell_id}`);
+          }
+          const verification = Object.groupBy(rows, (r) => r.final_verification);
+          const summary = {
+            schema: 'rechercher/global-multilingual-research-aggregate/v1',
+            generated_at: new Date().toISOString(),
+            total_cells: rows.length,
+            unique_cells: ids.size,
+            verification_counts: Object.fromEntries(Object.entries(verification).map(([k,v]) => [k,v.length])),
+            translation_counts: Object.fromEntries(Object.entries(Object.groupBy(rows, (r) => r.translation_state)).map(([k,v]) => [k,v.length])),
+            machine_translation_cells: forbidden.filter((r) => r.machine_translation_used).length,
+            canonical_arabic_overwrite_cells: forbidden.filter((r) => r.canonical_arabic_overwrite).length,
+            shards: files
+          };
+          fs.writeFileSync(path.join(dir, 'aggregate-summary.json'), JSON.stringify(summary, null, 2) + '\n');
+          console.log(JSON.stringify(summary));
+          NODE
+
+      - name: Upload complete 3192-cell evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-global-multilingual-3192-results
+          path: artifacts/rechercher/global-multilingual-research/
+          if-no-files-found: error
+          retention-days: 90
