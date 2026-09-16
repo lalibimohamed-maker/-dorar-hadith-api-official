@@ -1,0 +1,69 @@
+{
+  "schema": "rechercher/global-multilingual-search-matrix/v1",
+  "purpose": "Deterministic evidence-driven search matrix for the 132-language global discovery snapshot across 24 Islamic knowledge/resource domains.",
+  "language_registry": "config/rechercher/global-multilingual-resource-discovery-2026.json",
+  "language_count": 132,
+  "domain_count": 24,
+  "expected_search_cells": 3168,
+  "expansion_policy": {
+    "formula": "evidence_backed_languages × configured_resource_lanes",
+    "minimum_language_target": 106,
+    "target_is_not_a_cap": true,
+    "do_not_synthesize_languages_without_evidence": true
+  },
+  "domains": [
+    "quran",
+    "tafsir",
+    "hadith",
+    "hadith_explanation",
+    "sunnah",
+    "sirah",
+    "aqidah",
+    "fiqh",
+    "usul_al_fiqh",
+    "fatwa",
+    "islamic_terms",
+    "islamic_history",
+    "islamic_ethics",
+    "dua_adhkar",
+    "education",
+    "books",
+    "articles",
+    "audio",
+    "video",
+    "pdf",
+    "structured_metadata",
+    "provenance",
+    "rights",
+    "verification"
+  ],
+  "cell_pipeline": [
+    "primary_or_institutional_source",
+    "official_api",
+    "digital_corpus",
+    "structured_web",
+    "scholarly_dataset",
+    "translation_metadata",
+    "provenance",
+    "rights",
+    "verification"
+  ],
+  "translation_states": [
+    "source-verified",
+    "institutionally-reviewed",
+    "scholarly",
+    "provenance-complete",
+    "candidate",
+    "unverified",
+    "translation-needed",
+    "machine-translated"
+  ],
+  "quran_boundary": {
+    "canonical_arabic": "isolated_corpus_layer",
+    "human_translation": "separate_resource_layer",
+    "machine_translation": "separate_unverified_fallback_layer",
+    "overwrite_canonical_arabic": false
+  },
+  "cell_identity": "{language_source_snapshot_id}:{language}:{domain}",
+  "execution_rule": "Each Cartesian-product cell is a research queue unit. A cell may remain translation-needed or candidate; absence of a translation never authorizes automatic substitution for a verified source."
+}
