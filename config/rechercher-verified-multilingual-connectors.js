@@ -17,10 +17,10 @@ export const VERIFIED_MULTILINGUAL_CONNECTORS = Object.freeze([
   },
   {
     id: 'hadeethenc-api', name: 'Encyclopedia of Translated Prophetic Hadiths Developer API', enabled: true, acquisition: 'multilingual-hadith-api', rightsPolicy: 'publisher-declared',
-    connector: { kind: 'rest-json-catalog', searchUrl: 'https://hadeethenc.com/api/v1/hadeeths/list/', queryMap: () => ({ language: 'ar', page: 1, per_page: 20 }),
+    connector: { kind: 'rest-json-catalog', searchUrl: 'https://hadeethenc.com/api/v1/hadeeths/list/', queryMap: () => ({ language: 'ar', category_id: 1, page: 1, per_page: 20 }),
       mapResults: (json, query) => (Array.isArray(json) ? json : (json?.data ?? [])).filter((d) => !query || `${d.title ?? ''} ${d.hadeeth ?? ''}`.toLowerCase().includes(String(query).toLowerCase())).map((d) => ({ identifier: d.id, title: d.title, language: 'ar', itemUrl: `https://hadeethenc.com/api/v1/hadeeths/one/?id=${encodeURIComponent(d.id)}&language=ar`, rightsUrl: 'https://hadeethenc-content.islamcontent.com/en/developers_api', rightsStatus: 'publisher-declared', method: 'hadeethenc-developer-api-v1' })),
     },
-    notes: 'Endpoint contract extracted from the published HadeethEnc developer API/Postman documentation: languages, categories, paginated hadith list, and hadith detail endpoints. No access-control bypass.',
+    notes: 'The hadith-list endpoint requires a category_id in its native contract; category 1 is used only as a deterministic health/probe seed. Category discovery remains available through the native categories endpoints, and acquisition remains independent.',
   },
   {
     id: 'islamenc-api', name: 'IslamEnc Developer APIs', enabled: true, acquisition: 'multilingual-quran-hadith-and-islamic-content-api', rightsPolicy: 'publisher-declared',
