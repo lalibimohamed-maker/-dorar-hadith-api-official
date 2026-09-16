@@ -17,8 +17,9 @@ const provenance = (sourceId, citation, verificationState = 'source_verified') =
 const edge = (from, to, type, sourceId, citation) => ({ id: `edge:${sourceId}:${slug(`${from}|${to}|${type}`)}`, from, to, type, provenance: provenance(sourceId, citation) });
 
 function addSourceNode(graph, sourceId, title, url, kind = 'knowledge_source', metadata = {}) {
-  const nodeId = id(kind, sourceId, sourceId);
-  if (!graph.nodes.has(nodeId)) addNode(graph, { id: nodeId, type: kind, label: title, sourceId, provenance: provenance(sourceId, url), metadata: { url, ...metadata } });
+  const nodeKind = kind === 'structured-knowledge-source' ? 'knowledge_source' : kind;
+  const nodeId = id(nodeKind, sourceId, sourceId);
+  if (!graph.nodes.has(nodeId)) addNode(graph, { id: nodeId, type: nodeKind, label: title, sourceId, provenance: provenance(sourceId, url), metadata: { url, sourceClassification: kind, ...metadata } });
   return nodeId;
 }
 
@@ -225,12 +226,7 @@ async function main() {
   const globalStats = addGlobalStructuredSources(graph);
   addConnectorCatalog(graph);
   addServiceCatalog(graph);
-  const stats = {
-    globalStructuredSources: globalStats,
-    terminology: { categories: 0, terms: 0 },
-    quranenc: { translations: 0, live: false },
-    hadeethenc: { languages: 0, categories: 0, live: false },
-  };
+  const stats = { globalStructuredSources: globalStats, terminology: { categories: 0, terms: 0 }, quranenc: { translations: 0, live: false }, hadeethenc: { languages: 0, categories: 0, live: false } };
   if (!has('catalog-only')) {
     stats.terminology = await addTerminology(graph);
     stats.quranenc = await addQuranGraph(graph);
@@ -240,15 +236,7 @@ async function main() {
   if (!validation.valid) throw new Error(`Invalid graph: ${validation.errors.join('; ')}`);
   const snapshot = snapshotGraph(graph);
   await mkdir(output.substring(0, output.lastIndexOf('/')), { recursive: true });
-  await writeFile(output, JSON.stringify({
-    schema: 'deen-allah-unified-knowledge-graph/v1',
-    generatedAt: new Date().toISOString(),
-    acquisitionPolicy: 'discovery-does-not-grant-download-rights',
-    apiPolicy: 'promote-only-after-first-party-verification',
-    corpusIsolation: true,
-    stats,
-    graph: snapshot,
-  }, null, 2));
+  await writeFile(output, JSON.stringify({ schema: 'deen-allah-unified-knowledge-graph/v1', generatedAt: new Date().toISOString(), acquisitionPolicy: 'discovery-does-not-grant-download-rights', apiPolicy: 'promote-only-after-verification', stats, graph: snapshot }, null, 2));
   console.log(JSON.stringify({ output, ...validation, stats }, null, 2));
 }
 
