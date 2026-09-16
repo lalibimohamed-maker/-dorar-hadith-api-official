@@ -1,7 +1,7 @@
 {
   "schema": "rechercher-pdf-quality-gate/v1",
   "status": "PASS",
-  "pdf_count": 745,
+  "pdf_count": 789,
   "failed": [],
   "results": [
     {
@@ -13,6 +13,24 @@
       "chars_per_page": 0.0,
       "median_image_dpi": 200.0,
       "blank_pages": 256,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "al-radd-ala-al-jahmiyyah-darimi--393d27d4913f.pdf",
+      "status": "pass",
+      "pages": 238,
+      "bytes": 3059522,
+      "text_chars": 351182,
+      "chars_per_page": 1475.55,
+      "median_image_dpi": 189.0,
+      "blank_pages": 0,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -797,6 +815,24 @@
       ]
     },
     {
+      "file": "jami-bayan-tabari--b0a6c7978904.pdf",
+      "status": "pass",
+      "pages": 936,
+      "bytes": 24533534,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 936,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "jami-bayan-tabari--b4713ae98df4.pdf",
       "status": "pass",
       "pages": 936,
@@ -834,6 +870,24 @@
     },
     {
       "file": "jami-bayan-tabari--d796735daca3.pdf",
+      "status": "pass",
+      "pages": 936,
+      "bytes": 24533534,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 936,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "jami-bayan-tabari--f4ebcdc20a96.pdf",
       "status": "pass",
       "pages": 936,
       "bytes": 24533534,
@@ -1121,6 +1175,24 @@
       ]
     },
     {
+      "file": "khasa-is-nasai--dd51c91ea73b.pdf",
+      "status": "pass",
+      "pages": 168,
+      "bytes": 51921314,
+      "text_chars": 3528,
+      "chars_per_page": 21.0,
+      "median_image_dpi": 296.0,
+      "blank_pages": 0,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "khasa-is-nasai--dd97f984e70e.pdf",
       "status": "pass",
       "pages": 168,
@@ -1319,6 +1391,24 @@
       ]
     },
     {
+      "file": "master-14ba4e30b1d1a1adac3c--7919bf13e79c.pdf",
+      "status": "pass",
+      "pages": 631,
+      "bytes": 12389968,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 631,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-14ba4e30b1d1a1adac3c--97fab1adaa7a.pdf",
       "status": "pass",
       "pages": 631,
@@ -1446,6 +1536,24 @@
     },
     {
       "file": "master-14e3927ff5ea54e74c78--150ef25317c8.pdf",
+      "status": "pass",
+      "pages": 1604,
+      "bytes": 52250349,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 1604,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-14e3927ff5ea54e74c78--1be7889fd469.pdf",
       "status": "pass",
       "pages": 1604,
       "bytes": 52250349,
@@ -1644,6 +1752,24 @@
     },
     {
       "file": "master-14e3927ff5ea54e74c78--7bf0c381f52a.pdf",
+      "status": "pass",
+      "pages": 1604,
+      "bytes": 52250349,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 1604,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-14e3927ff5ea54e74c78--7ff1f5b863f8.pdf",
       "status": "pass",
       "pages": 1604,
       "bytes": 52250349,
@@ -2041,12 +2167,12 @@
     {
       "file": "master-2524af3dbaa76c02ab8b.pdf",
       "status": "pass",
-      "pages": 588,
-      "bytes": 14901604,
+      "pages": 586,
+      "bytes": 68917270,
       "text_chars": 0,
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
-      "blank_pages": 588,
+      "blank_pages": 586,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -2381,6 +2507,24 @@
       ]
     },
     {
+      "file": "master-328f420a2fa2a01ab6eb--1a2e3695d330.pdf",
+      "status": "pass",
+      "pages": 1383,
+      "bytes": 17415074,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 1383,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-328f420a2fa2a01ab6eb--3cb0a7efab4c.pdf",
       "status": "pass",
       "pages": 1383,
@@ -2400,6 +2544,24 @@
     },
     {
       "file": "master-328f420a2fa2a01ab6eb--54c3edcaffbb.pdf",
+      "status": "pass",
+      "pages": 1383,
+      "bytes": 17415074,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 1383,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-328f420a2fa2a01ab6eb--5c39d25ea9f6.pdf",
       "status": "pass",
       "pages": 1383,
       "bytes": 17415074,
@@ -2669,6 +2831,24 @@
       ]
     },
     {
+      "file": "master-3d162e0d6b2659858a90--1a9f24f997da.pdf",
+      "status": "pass",
+      "pages": 551,
+      "bytes": 7912683,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 551,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-3d162e0d6b2659858a90--1e56e81cff09.pdf",
       "status": "pass",
       "pages": 551,
@@ -2832,6 +3012,24 @@
     },
     {
       "file": "master-3d162e0d6b2659858a90--f9b765e4b8a7.pdf",
+      "status": "pass",
+      "pages": 551,
+      "bytes": 7912683,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 551,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-3d162e0d6b2659858a90--ff4ada8a8659.pdf",
       "status": "pass",
       "pages": 551,
       "bytes": 7912683,
@@ -3137,6 +3335,24 @@
       ]
     },
     {
+      "file": "master-4b6d982d1ee549ad0c01--3c67eed93924.pdf",
+      "status": "pass",
+      "pages": 817,
+      "bytes": 31721142,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 600.0,
+      "blank_pages": 817,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-4b6d982d1ee549ad0c01--3d7974d3e62c.pdf",
       "status": "pass",
       "pages": 817,
@@ -3227,6 +3443,24 @@
       ]
     },
     {
+      "file": "master-4b6d982d1ee549ad0c01--9e99edaddc8d.pdf",
+      "status": "pass",
+      "pages": 817,
+      "bytes": 31721142,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 600.0,
+      "blank_pages": 817,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-4b6d982d1ee549ad0c01--bc1baedad845.pdf",
       "status": "pass",
       "pages": 817,
@@ -3282,6 +3516,24 @@
     },
     {
       "file": "master-4c0da760e5dc77addced--101860f4b726.pdf",
+      "status": "pass",
+      "pages": 878,
+      "bytes": 15286469,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 878,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-4c0da760e5dc77addced--1cd71e8c8b85.pdf",
       "status": "pass",
       "pages": 878,
       "bytes": 15286469,
@@ -3713,6 +3965,42 @@
       ]
     },
     {
+      "file": "master-54b4777425f0438865ba--77ec1756dc31.pdf",
+      "status": "pass",
+      "pages": 127,
+      "bytes": 1359748,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 127,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-54b4777425f0438865ba--7c6706242940.pdf",
+      "status": "pass",
+      "pages": 127,
+      "bytes": 1359748,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 127,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-54b4777425f0438865ba--95585e0a15a8.pdf",
       "status": "pass",
       "pages": 127,
@@ -4055,6 +4343,24 @@
       ]
     },
     {
+      "file": "master-56a91e52d14a89818c2b--7b366b66be3b.pdf",
+      "status": "pass",
+      "pages": 238,
+      "bytes": 3059522,
+      "text_chars": 351182,
+      "chars_per_page": 1475.55,
+      "median_image_dpi": 189.0,
+      "blank_pages": 0,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-56a91e52d14a89818c2b--7f68a738a766.pdf",
       "status": "pass",
       "pages": 238,
@@ -4325,6 +4631,24 @@
       ]
     },
     {
+      "file": "master-59e74f098568f7d59640--3f68d22145b7.pdf",
+      "status": "pass",
+      "pages": 1337,
+      "bytes": 33900864,
+      "text_chars": 62,
+      "chars_per_page": 0.05,
+      "median_image_dpi": 737.0,
+      "blank_pages": 1336,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-59e74f098568f7d59640--5895b7eb4c28.pdf",
       "status": "pass",
       "pages": 1337,
@@ -4380,6 +4704,24 @@
     },
     {
       "file": "master-59e74f098568f7d59640--9b8c6ecb4b04.pdf",
+      "status": "pass",
+      "pages": 1337,
+      "bytes": 33900864,
+      "text_chars": 62,
+      "chars_per_page": 0.05,
+      "median_image_dpi": 737.0,
+      "blank_pages": 1336,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-59e74f098568f7d59640--ba9200c137d1.pdf",
       "status": "pass",
       "pages": 1337,
       "bytes": 33900864,
@@ -4650,6 +4992,24 @@
     },
     {
       "file": "master-60387b12408cecce9d79--b8a10248e369.pdf",
+      "status": "pass",
+      "pages": 614,
+      "bytes": 7582768,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 614,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-60387b12408cecce9d79--b94d5c4d304a.pdf",
       "status": "pass",
       "pages": 614,
       "bytes": 7582768,
@@ -5135,6 +5495,24 @@
       ]
     },
     {
+      "file": "master-66e7e4ae62b82daae8f1--71c61f1deab0.pdf",
+      "status": "pass",
+      "pages": 230,
+      "bytes": 5711814,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 230,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-66e7e4ae62b82daae8f1--9797957b27d0.pdf",
       "status": "pass",
       "pages": 230,
@@ -5262,6 +5640,24 @@
     },
     {
       "file": "master-66e7e4ae62b82daae8f1--f61d5a840aaa.pdf",
+      "status": "pass",
+      "pages": 230,
+      "bytes": 5711814,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 230,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-66e7e4ae62b82daae8f1--ff24417ac582.pdf",
       "status": "pass",
       "pages": 230,
       "bytes": 5711814,
@@ -5497,12 +5893,12 @@
     {
       "file": "master-6a76180e74a23445f34f.pdf",
       "status": "pass",
-      "pages": 64,
-      "bytes": 7871237,
+      "pages": 44,
+      "bytes": 5830860,
       "text_chars": 0,
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
-      "blank_pages": 64,
+      "blank_pages": 44,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -5747,6 +6143,24 @@
       ]
     },
     {
+      "file": "master-6ade30fe9c61bc47b78b--f84d2e443294.pdf",
+      "status": "pass",
+      "pages": 148,
+      "bytes": 4135992,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 148,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-6ade30fe9c61bc47b78b--fa9163c30291.pdf",
       "status": "pass",
       "pages": 148,
@@ -5910,6 +6324,24 @@
     },
     {
       "file": "master-796220a3674e1bb12d75--7b8165921604.pdf",
+      "status": "pass",
+      "pages": 3480,
+      "bytes": 54060213,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 3480,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-796220a3674e1bb12d75--7f16d5cfa6b9.pdf",
       "status": "pass",
       "pages": 3480,
       "bytes": 54060213,
@@ -6091,12 +6523,12 @@
     {
       "file": "master-796220a3674e1bb12d75.pdf",
       "status": "pass",
-      "pages": 3480,
-      "bytes": 54060213,
+      "pages": 6946,
+      "bytes": 123029938,
       "text_chars": 0,
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
-      "blank_pages": 3480,
+      "blank_pages": 6946,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -6162,6 +6594,24 @@
     },
     {
       "file": "master-7f6a86e225de04f89f9e--790667a9cb2b.pdf",
+      "status": "pass",
+      "pages": 2442,
+      "bytes": 47647887,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 2442,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-7f6a86e225de04f89f9e--91497343ec6c.pdf",
       "status": "pass",
       "pages": 2442,
       "bytes": 47647887,
@@ -6342,6 +6792,24 @@
     },
     {
       "file": "master-7f6a86e225de04f89f9e--f48a8c1434b9.pdf",
+      "status": "pass",
+      "pages": 2442,
+      "bytes": 47647887,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 2442,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-7f6a86e225de04f89f9e--f8ea900e6688.pdf",
       "status": "pass",
       "pages": 2442,
       "bytes": 47647887,
@@ -6630,6 +7098,24 @@
     },
     {
       "file": "master-8866458d3b357a807810--d82cd0f66414.pdf",
+      "status": "pass",
+      "pages": 344,
+      "bytes": 5019027,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 344,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-8866458d3b357a807810--f152b973d9bc.pdf",
       "status": "pass",
       "pages": 344,
       "bytes": 5019027,
@@ -7007,6 +7493,24 @@
       ]
     },
     {
+      "file": "master-9981cac55a5a7def698a--599da418eaa0.pdf",
+      "status": "pass",
+      "pages": 472,
+      "bytes": 4471408,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 472,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-9981cac55a5a7def698a--5a21869603c5.pdf",
       "status": "pass",
       "pages": 472,
@@ -7044,6 +7548,24 @@
     },
     {
       "file": "master-9981cac55a5a7def698a--7092b2408036.pdf",
+      "status": "pass",
+      "pages": 472,
+      "bytes": 4471408,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 472,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-9981cac55a5a7def698a--70a07b9a38a6.pdf",
       "status": "pass",
       "pages": 472,
       "bytes": 4471408,
@@ -7296,6 +7818,24 @@
     },
     {
       "file": "master-9b254608ae25433a579f--976291aef418.pdf",
+      "status": "pass",
+      "pages": 472,
+      "bytes": 4471408,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 472,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-9b254608ae25433a579f--99ecb427adff.pdf",
       "status": "pass",
       "pages": 472,
       "bytes": 4471408,
@@ -7673,6 +8213,24 @@
       ]
     },
     {
+      "file": "master-a557907b3f3704700f61--dc7bcc0fd734.pdf",
+      "status": "pass",
+      "pages": 778,
+      "bytes": 14524128,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 600.0,
+      "blank_pages": 778,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-a557907b3f3704700f61--de5283478f9f.pdf",
       "status": "pass",
       "pages": 778,
@@ -7800,6 +8358,24 @@
     },
     {
       "file": "master-b6c12b888c961a24a437--5f73aaa718a5.pdf",
+      "status": "pass",
+      "pages": 886,
+      "bytes": 14870417,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 886,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-b6c12b888c961a24a437--9c3d93aaf967.pdf",
       "status": "pass",
       "pages": 886,
       "bytes": 14870417,
@@ -7998,6 +8574,24 @@
     },
     {
       "file": "master-c24bdd6bc88cdb478de6--19e76865915d.pdf",
+      "status": "pass",
+      "pages": 32,
+      "bytes": 12619237,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 333.0,
+      "blank_pages": 32,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-c24bdd6bc88cdb478de6--1a7944163868.pdf",
       "status": "pass",
       "pages": 32,
       "bytes": 12619237,
@@ -8429,6 +9023,24 @@
       ]
     },
     {
+      "file": "master-c82c9310f928010de904--b3c8d8cdcace.pdf",
+      "status": "pass",
+      "pages": 416,
+      "bytes": 5581763,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 416,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-c82c9310f928010de904--b7eb7e35baa7.pdf",
       "status": "pass",
       "pages": 416,
@@ -8843,6 +9455,24 @@
       ]
     },
     {
+      "file": "master-e0f9e4f5749fe2b0d232--382938c7c043.pdf",
+      "status": "pass",
+      "pages": 253,
+      "bytes": 7601583,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 600.0,
+      "blank_pages": 253,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "master-e0f9e4f5749fe2b0d232--757b1d0c69d4.pdf",
       "status": "pass",
       "pages": 126,
@@ -9007,12 +9637,12 @@
     {
       "file": "master-e0f9e4f5749fe2b0d232.pdf",
       "status": "pass",
-      "pages": 253,
-      "bytes": 7601583,
+      "pages": 126,
+      "bytes": 2155516,
       "text_chars": 0,
       "chars_per_page": 0.0,
-      "median_image_dpi": 600.0,
-      "blank_pages": 253,
+      "median_image_dpi": 300.0,
+      "blank_pages": 126,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -9367,12 +9997,12 @@
     {
       "file": "master-e7f61c1cb5c0ac9509f4.pdf",
       "status": "pass",
-      "pages": 1,
-      "bytes": 9439,
+      "pages": 535,
+      "bytes": 9986216,
       "text_chars": 0,
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
-      "blank_pages": 1,
+      "blank_pages": 535,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -9493,12 +10123,12 @@
     {
       "file": "master-e9ca220a0ead848d089d.pdf",
       "status": "pass",
-      "pages": 588,
-      "bytes": 14901604,
+      "pages": 586,
+      "bytes": 68917270,
       "text_chars": 0,
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
-      "blank_pages": 588,
+      "blank_pages": 586,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -9835,12 +10465,30 @@
     {
       "file": "master-f9fee0e52281bd6ab250.pdf",
       "status": "pass",
-      "pages": 3480,
-      "bytes": 54060213,
+      "pages": 6946,
+      "bytes": 123029938,
       "text_chars": 0,
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
-      "blank_pages": 3480,
+      "blank_pages": 6946,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-fa8f876213444fa5a9e9--19023cdd7841.pdf",
+      "status": "pass",
+      "pages": 587,
+      "bytes": 29791168,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 600.0,
+      "blank_pages": 587,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -9906,6 +10554,24 @@
     },
     {
       "file": "master-fa8f876213444fa5a9e9--54054d95ad0f.pdf",
+      "status": "pass",
+      "pages": 587,
+      "bytes": 29791168,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 600.0,
+      "blank_pages": 587,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "master-fa8f876213444fa5a9e9--56559b246f3a.pdf",
       "status": "pass",
       "pages": 587,
       "bytes": 29791168,
@@ -10518,6 +11184,24 @@
     },
     {
       "file": "muwatta-malik--54a35f024092.pdf",
+      "status": "pass",
+      "pages": 639,
+      "bytes": 12059068,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 639,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "muwatta-malik--54bb21900447.pdf",
       "status": "pass",
       "pages": 639,
       "bytes": 12059068,
@@ -11347,12 +12031,12 @@
     {
       "file": "sahih-bukhari.pdf",
       "status": "pass",
-      "pages": 494,
-      "bytes": 6481443,
-      "text_chars": 736326,
-      "chars_per_page": 1490.54,
-      "median_image_dpi": 247.0,
-      "blank_pages": 12,
+      "pages": 58,
+      "bytes": 11298612,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 58,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -11759,6 +12443,24 @@
       ]
     },
     {
+      "file": "sharh-maani-athar-tahawi--935c6f45f9e3.pdf",
+      "status": "pass",
+      "pages": 551,
+      "bytes": 7912683,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 551,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "sharh-maani-athar-tahawi--93de60835287.pdf",
       "status": "pass",
       "pages": 551,
@@ -11778,6 +12480,24 @@
     },
     {
       "file": "sharh-maani-athar-tahawi--96b06023e067.pdf",
+      "status": "pass",
+      "pages": 551,
+      "bytes": 7912683,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 200.0,
+      "blank_pages": 551,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "sharh-maani-athar-tahawi--986e2de206c8.pdf",
       "status": "pass",
       "pages": 551,
       "bytes": 7912683,
@@ -11941,12 +12661,12 @@
     {
       "file": "sharh-maani-athar-tahawi.pdf",
       "status": "pass",
-      "pages": 551,
-      "bytes": 7912683,
+      "pages": 477,
+      "bytes": 64562441,
       "text_chars": 0,
       "chars_per_page": 0.0,
-      "median_image_dpi": 200.0,
-      "blank_pages": 551,
+      "median_image_dpi": 150.0,
+      "blank_pages": 477,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -12047,6 +12767,24 @@
       ]
     },
     {
+      "file": "sunan-abi-dawud--5ddd4bc08659.pdf",
+      "status": "pass",
+      "pages": 686,
+      "bytes": 6908803,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 686,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "sunan-abi-dawud--76aaef627295.pdf",
       "status": "pass",
       "pages": 686,
@@ -12137,6 +12875,24 @@
       ]
     },
     {
+      "file": "sunan-abi-dawud--b76e363fbd4c.pdf",
+      "status": "pass",
+      "pages": 686,
+      "bytes": 6908803,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 686,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "sunan-abi-dawud--d76641242cf9.pdf",
       "status": "pass",
       "pages": 132,
@@ -12211,12 +12967,12 @@
     {
       "file": "sunan-abi-dawud.pdf",
       "status": "pass",
-      "pages": 686,
-      "bytes": 6908803,
+      "pages": 132,
+      "bytes": 2187109,
       "text_chars": 0,
       "chars_per_page": 0.0,
       "median_image_dpi": 300.0,
-      "blank_pages": 686,
+      "blank_pages": 132,
       "checks": [
         "pdf-signature",
         "qpdf",
@@ -12839,6 +13595,24 @@
       ]
     },
     {
+      "file": "tawhid-ibn-khuzaymah--570ca1adb72c.pdf",
+      "status": "pass",
+      "pages": 658,
+      "bytes": 19404685,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 350.0,
+      "blank_pages": 658,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
       "file": "tawhid-ibn-khuzaymah--57f20dffe142.pdf",
       "status": "pass",
       "pages": 658,
@@ -13164,6 +13938,24 @@
     },
     {
       "file": "usul-al-sunnah-al-humaydi--35d1d7aaf752.pdf",
+      "status": "pass",
+      "pages": 56,
+      "bytes": 808164,
+      "text_chars": 0,
+      "chars_per_page": 0.0,
+      "median_image_dpi": 300.0,
+      "blank_pages": 56,
+      "checks": [
+        "pdf-signature",
+        "qpdf",
+        "page-count",
+        "text-layer",
+        "image-resolution",
+        "blank-page-sanity"
+      ]
+    },
+    {
+      "file": "usul-al-sunnah-al-humaydi--360fc6374184.pdf",
       "status": "pass",
       "pages": 56,
       "bytes": 808164,
