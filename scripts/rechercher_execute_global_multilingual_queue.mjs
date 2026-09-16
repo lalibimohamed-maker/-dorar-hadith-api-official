@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 const ROOT = process.cwd();
 const registry = JSON.parse(await fs.readFile(path.join(ROOT, 'config/rechercher/global-multilingual-resource-discovery-2026.json'), 'utf8'));
 const matrix = JSON.parse(await fs.readFile(path.join(ROOT, 'config/rechercher/global-multilingual-search-matrix-2026.json'), 'utf8'));
+const expansion = JSON.parse(await fs.readFile(path.join(ROOT, 'config/rechercher/multilingual-resource-expansion-2026.json'), 'utf8'));
 
 const args = new Map(process.argv.slice(2).map((arg) => {
   const [k, ...rest] = arg.replace(/^--/, '').split('=');
@@ -18,17 +19,19 @@ const contact = process.env.CROSSREF_MAILTO || 'rechercher-research@users.norepl
 if (!Number.isInteger(shardIndex) || !Number.isInteger(shardCount) || shardIndex < 0 || shardCount < 1 || shardIndex >= shardCount) {
   throw new Error(`Invalid shard ${shardIndex}/${shardCount}`);
 }
-if (registry.language_count !== 133 || registry.domain_count !== 24 || registry.expected_search_cells !== 3192) {
+if (registry.matrix.language_count !== 133 || registry.matrix.domain_count !== 24 || registry.matrix.expected_search_cells !== 3192) {
   throw new Error('Global matrix contract is not 133 x 24 x 3192');
+}
+if (registry.resource_lanes.length !== 24 || matrix.cell_pipeline.length !== 9 || expansion.resource_routes.length !== 9) {
+  throw new Error('Resource lanes or nine-stage evidence pipeline changed unexpectedly');
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const cache = new Map();
 
-function sha256(text) {
-  return crypto.createHash('sha256').update(text).digest('hex');
+function sha256(bytes) {
+  return crypto.createHash('sha256').update(bytes).digest('hex');
 }
-
 function isoNow() { return new Date().toISOString(); }
 
 async function fetchEvidence(url, {label, maxBytes = 262144, retries = 3} = {}) {
@@ -46,7 +49,6 @@ async function fetchEvidence(url, {label, maxBytes = 262144, retries = 3} = {}) 
       });
       const bytes = Buffer.from(await res.arrayBuffer());
       const sample = bytes.subarray(0, maxBytes);
-      const text = sample.toString('utf8');
       const record = {
         label,
         url,
@@ -72,63 +74,51 @@ async function fetchEvidence(url, {label, maxBytes = 262144, retries = 3} = {}) 
   return record;
 }
 
-async function limitedMap(items, concurrency, fn) {
-  const results = new Array(items.length);
-  let next = 0;
-  async function worker() {
-    while (true) {
-      const i = next++;
-      if (i >= items.length) return;
-      results[i] = await fn(items[i], i);
-    }
-  }
-  await Promise.all(Array.from({length: Math.min(concurrency, items.length || 1)}, worker));
-  return results;
-}
-
-const providerById = Object.fromEntries(registry.evidence_sources.map((s) => [s.id, s]));
-const configuredProviders = Object.fromEntries((registry.providers || []).map((s) => [s.id, s]));
+const evidenceSources = Object.fromEntries(registry.evidence_sources.map((s) => [s.id, s]));
+const expansionLanguages = Object.fromEntries(expansion.languages.map((s) => [s.name.toLowerCase(), s]));
 
 const providerRoots = {
   quranenc: 'https://quranenc.com/en/',
   quran_foundation: 'https://api-docs.quran.foundation/',
-  islamhouse: 'https://islamhouse.com/',
+  hadeethenc: 'https://hadeethenc.com/ar/',
+  islamhouse: 'https://islamhouse.com/en/',
   alislam: 'https://www.alislam.org/',
   tanzil: 'https://tanzil.net/'
 };
 
+function languageRecord(name) {
+  const hinted = expansionLanguages[name.toLowerCase()];
+  return hinted ? {...hinted, name} : {name, iso: null, source: 'islamhouse', status: 'candidate'};
+}
+
 function primaryProvider(language) {
-  const source = language.source;
-  if (configuredProviders[source]) return source;
-  if (providerById[source]) return source;
+  if (evidenceSources[language.source]) return language.source;
   return 'islamhouse';
 }
 
 function sourceUrl(provider, iso) {
-  if (provider === 'quranenc') return `https://quranenc.com/${encodeURIComponent(iso)}/`;
-  if (provider === 'hadeethenc') return `https://hadeethenc.com/${encodeURIComponent(iso)}/`;
-  if (provider === 'quran_foundation') return providerRoots.quran_foundation;
-  if (provider === 'alislam') return providerRoots.alislam;
-  if (provider === 'tanzil') return providerRoots.tanzil;
-  return providerRoots.islamhouse;
+  if (provider === 'quranenc' && iso) return `https://quranenc.com/${encodeURIComponent(iso)}/`;
+  if (provider === 'hadeethenc' && iso) return `https://hadeethenc.com/${encodeURIComponent(iso)}/`;
+  return providerRoots[provider] || providerRoots.islamhouse;
 }
 
 function apiUrl(domain, iso) {
-  if (domain === 'quran') return `https://quranenc.com/api/v1/translations/list/${encodeURIComponent(iso)}/?localization=en`;
-  if (domain === 'hadith' || domain === 'hadith_explanation' || domain === 'sunnah') return `https://hadeethenc.com/${encodeURIComponent(iso)}/`;
-  if (domain === 'tafsir') return `https://api-docs.quran.foundation/docs/content_apis_versioned/4.0.0/tafsirs/`;
+  if (domain === 'quran' && iso) return `https://quranenc.com/api/v1/translations/list/${encodeURIComponent(iso)}/?localization=en`;
+  if (['hadith', 'hadith_explanation', 'sunnah'].includes(domain) && iso) return `https://hadeethenc.com/${encodeURIComponent(iso)}/`;
+  if (domain === 'tafsir') return 'https://api-docs.quran.foundation/docs/content_apis_versioned/4.0.0/tafsirs/';
   return null;
 }
 
 function structuredUrl(domain, iso, provider) {
-  if (provider === 'quranenc') return sourceUrl('quranenc', iso);
-  if (provider === 'hadeethenc') return sourceUrl('hadeethenc', iso);
-  if (domain === 'books' || domain === 'pdf') return 'https://islamhouse.com/';
+  if (provider === 'quranenc' && iso) return sourceUrl('quranenc', iso);
+  if (provider === 'hadeethenc' && iso) return sourceUrl('hadeethenc', iso);
+  if (domain === 'books' || domain === 'pdf') return providerRoots.islamhouse;
   return sourceUrl(provider, iso);
 }
 
 function corpusUrl(language, domain) {
-  const query = encodeURIComponent(`(${language.name} OR ${language.iso}) AND (${domain.replaceAll('_', ' ')})`);
+  const lang = language.iso ? `${language.name} ${language.iso}` : language.name;
+  const query = encodeURIComponent(`(${lang}) AND (${domain.replaceAll('_', ' ')})`);
   return `https://archive.org/advancedsearch.php?q=${query}&fl[]=identifier&fl[]=title&rows=1&page=1&output=json`;
 }
 
@@ -143,7 +133,6 @@ function rightsUrl(provider, domain) {
   if (provider === 'quran_foundation') return 'https://api-docs.quran.foundation/legal/developer-terms/';
   if (provider === 'alislam') return 'https://www.alislam.org/';
   if (provider === 'tanzil') return 'https://tanzil.net/docs/';
-  if (provider === 'islamhouse') return 'https://islamhouse.com/';
   if (domain === 'books' || domain === 'pdf') return 'https://archive.org/legal/terms.php';
   return providerRoots.islamhouse;
 }
@@ -159,8 +148,7 @@ function evidenceStatus(record) {
 
 function translationState(domain, apiRecord) {
   if (!['quran', 'hadith', 'hadith_explanation', 'sunnah'].includes(domain)) return 'not-applicable';
-  if (apiRecord?.ok) return 'source-verified';
-  return 'translation-needed';
+  return apiRecord?.ok ? 'source-verified' : 'translation-needed';
 }
 
 function verificationState(stages) {
@@ -171,10 +159,7 @@ function verificationState(stages) {
   return 'unverified';
 }
 
-const languages = registry.enumerated_islamhouse_languages.map((name) => {
-  const record = registry.language_records?.find?.((x) => x.name === name) || {name};
-  return {...record, name};
-});
+const languages = registry.enumerated_islamhouse_languages.map(languageRecord);
 const domains = registry.resource_lanes;
 const allCells = languages.flatMap((language) => domains.map((domain) => ({language, domain})));
 const cells = allCells.filter((_, index) => index % shardCount === shardIndex);
@@ -186,20 +171,22 @@ let done = 0;
 for (const {language, domain} of cells) {
   const provider = primaryProvider(language);
   const primary = await fetchEvidence(sourceUrl(provider, language.iso), {label: 'primary_or_institutional_source'});
-  const api = apiUrl(domain, language.iso) ? await fetchEvidence(apiUrl(domain, language.iso), {label: 'official_api'}) : null;
+  const apiTarget = apiUrl(domain, language.iso);
+  const api = apiTarget ? await fetchEvidence(apiTarget, {label: 'official_api'}) : null;
   const corpus = await fetchEvidence(corpusUrl(language, domain), {label: 'digital_corpus'});
   const structured = await fetchEvidence(structuredUrl(domain, language.iso, provider), {label: 'structured_web'});
   const scholarly = await fetchEvidence(scholarlyUrl(language, domain), {label: 'scholarly_dataset', retries: 5});
-  const translationMeta = apiUrl(domain, language.iso) && ['quran','hadith','hadith_explanation','sunnah'].includes(domain) ? api : null;
+  const translationMeta = api && ['quran', 'hadith', 'hadith_explanation', 'sunnah'].includes(domain) ? api : null;
   const rights = await fetchEvidence(rightsUrl(provider, domain), {label: 'rights'});
 
   const evidence = [primary, api, corpus, structured, scholarly, translationMeta, rights].filter(Boolean);
   const provenance = {
-    cell_id: `${registry.language_source_snapshot_id || 'islamhouse-133'}:${language.name}:${domain}`,
+    cell_id: `islamhouse-133:${language.name}:${domain}`,
     language: language.name,
-    language_iso: language.iso || null,
+    language_iso: language.iso,
     domain,
     source_provider: provider,
+    source_status: language.status,
     evidence_count: evidence.length,
     evidence_urls: [...new Set(evidence.map((e) => e.url))],
     observed_evidence_hashes: evidence.filter((e) => e.ok).map((e) => ({url: e.url, sha256_observed_prefix: e.sha256_observed_prefix})),
@@ -223,7 +210,7 @@ for (const {language, domain} of cells) {
     schema: 'rechercher/global-multilingual-research-result/v1',
     cell_id: provenance.cell_id,
     language: language.name,
-    language_iso: language.iso || null,
+    language_iso: language.iso,
     domain,
     translation_state: translationState(domain, translationMeta),
     machine_translation_used: false,
@@ -241,9 +228,12 @@ await fs.mkdir(outputDir, {recursive: true});
 const jsonlPath = path.join(outputDir, `shard-${shardIndex}.jsonl`);
 await fs.writeFile(jsonlPath, rows.map((row) => JSON.stringify(row)).join('\n') + '\n', 'utf8');
 
-const counts = Object.fromEntries(['verified-evidence-chain','partially-verified','unverified'].map((s) => [s, rows.filter((r) => r.final_verification === s).length]));
+const verificationCounts = {};
 const translationCounts = {};
-for (const row of rows) translationCounts[row.translation_state] = (translationCounts[row.translation_state] || 0) + 1;
+for (const row of rows) {
+  verificationCounts[row.final_verification] = (verificationCounts[row.final_verification] || 0) + 1;
+  translationCounts[row.translation_state] = (translationCounts[row.translation_state] || 0) + 1;
+}
 const summary = {
   schema: 'rechercher/global-multilingual-research-summary/v1',
   generated_at: isoNow(),
@@ -255,7 +245,7 @@ const summary = {
   expected_total_cells: allCells.length,
   expected_shard_cells: cells.length,
   actual_cells: rows.length,
-  verification_counts: counts,
+  verification_counts: verificationCounts,
   translation_counts: translationCounts,
   canonical_arabic_overwrite_cells: rows.filter((r) => r.canonical_arabic_overwrite).length,
   machine_translation_cells: rows.filter((r) => r.machine_translation_used).length,
