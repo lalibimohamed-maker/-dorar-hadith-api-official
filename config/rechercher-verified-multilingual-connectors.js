@@ -17,10 +17,25 @@ export const VERIFIED_MULTILINGUAL_CONNECTORS = Object.freeze([
   },
   {
     id: 'hadeethenc-api', name: 'Encyclopedia of Translated Prophetic Hadiths Developer API', enabled: true, acquisition: 'multilingual-hadith-api', rightsPolicy: 'publisher-declared',
-    connector: { kind: 'rest-json-catalog', searchUrl: 'https://hadeethenc.com/api/v1/hadeeths/list/', queryMap: () => ({ language: 'ar', category_id: 1, page: 1, per_page: 20 }),
-      mapResults: (json, query) => (Array.isArray(json) ? json : (json?.data ?? [])).filter((d) => !query || `${d.title ?? ''} ${d.hadeeth ?? ''}`.toLowerCase().includes(String(query).toLowerCase())).map((d) => ({ identifier: d.id, title: d.title, language: 'ar', itemUrl: `https://hadeethenc.com/api/v1/hadeeths/one/?id=${encodeURIComponent(d.id)}&language=ar`, rightsUrl: 'https://hadeethenc-content.islamcontent.com/en/developers_api', rightsStatus: 'publisher-declared', method: 'hadeethenc-developer-api-v1' })),
+    connector: {
+      kind: 'rest-json-catalog',
+      searchUrl: 'https://hadeethenc.com/api/v1/hadeeths/list/',
+      queryMap: ({ language = 'ar', categoryId, page = 1, perPage = 100 } = {}) => ({ language, category_id: categoryId, page, per_page: perPage }),
+      discovery: {
+        strategy: 'languages-categories-pagination',
+        languagesUrl: 'https://hadeethenc.com/api/v1/languages',
+        categoriesUrl: 'https://hadeethenc.com/api/v1/categories/list/',
+        rootsUrl: 'https://hadeethenc.com/api/v1/categories/roots/',
+        hadithUrl: 'https://hadeethenc.com/api/v1/hadeeths/list/',
+        detailUrl: 'https://hadeethenc.com/api/v1/hadeeths/one/',
+        defaultLanguage: 'ar',
+        pageSize: 100,
+        maxRetries: 4,
+        retryStatuses: [429, 500, 502, 503, 504],
+      },
+      mapResults: (json, query) => (Array.isArray(json) ? json : (json?.data ?? [])).filter((d) => !query || `${d.title ?? ''} ${d.hadeeth ?? ''}`.toLowerCase().includes(String(query).toLowerCase())).map((d) => ({ identifier: d.id, title: d.title, language: d.language ?? null, itemUrl: `https://hadeethenc.com/api/v1/hadeeths/one/?id=${encodeURIComponent(d.id)}&language=${encodeURIComponent(d.language ?? 'ar')}`, rightsUrl: 'https://hadeethenc-content.islamcontent.com/en/developers_api', rightsStatus: 'publisher-declared', method: 'hadeethenc-developer-api-v1' })),
     },
-    notes: 'The hadith-list endpoint requires a category_id in its native contract; category 1 is used only as a deterministic health/probe seed. Category discovery remains available through the native categories endpoints, and acquisition remains independent.',
+    notes: 'Full native discovery is graph-based: languages -> categories -> paginated hadith lists -> optional detail records. No fixed category is required; category_id is supplied dynamically for every list request. Category 1 is not a discovery constraint.',
   },
   {
     id: 'islamenc-api', name: 'IslamEnc Developer APIs', enabled: true, acquisition: 'multilingual-quran-hadith-and-islamic-content-api', rightsPolicy: 'publisher-declared',
