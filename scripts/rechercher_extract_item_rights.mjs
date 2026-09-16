@@ -62,8 +62,11 @@ export function extractRightsMetadata({metadata = null, text = '', sourceUrl = n
     for (const match of textValue.matchAll(pattern)) fields.push({field, source_key: 'text', value: match[0].trim(), path: 'text'});
   }
   if (sourceUrl) fields.push({field: 'item_level_metadata', source_key: 'source_url', value: sourceUrl, path: 'source_url'});
-  if (itemId) fields.push({field: 'item_level_metadata', source_key: 'item_id', value: itemId, path: 'item_id'});
-  if (resourceId) fields.push({field: 'item_level_metadata', source_key: 'resource_id', value: resourceId, path: 'resource_id'});
+  // Caller-supplied IDs are candidate identities for the record, not proof that
+  // rights evidence belongs to that item. Only identifiers found in the item's
+  // own metadata can establish item-level rights matching.
+  if (itemId) fields.push({field: 'item_level_metadata', source_key: 'caller_item_id', value: itemId, path: 'caller_item_id'});
+  if (resourceId) fields.push({field: 'item_level_metadata', source_key: 'caller_resource_id', value: resourceId, path: 'caller_resource_id'});
 
   const unique = [...new Map(fields.map((f) => [`${f.field}|${f.value}|${f.path}`, f])).values()];
   const identityFields = unique.filter((f) => f.field === 'item_level_metadata' && /^(item_id|resource_id|identifier)$/i.test(f.source_key));
