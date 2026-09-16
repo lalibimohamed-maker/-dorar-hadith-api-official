@@ -24,6 +24,20 @@ test('Quranpedia registry keeps the complete documented API surface', () => {
   ]);
 });
 
+test('IslamHouse registry keeps the expanded official API surface', () => {
+  const item = byId('islamhouse-api');
+  assert.equal(item.api.baseUrl, 'https://api2.islamhouse.com/v1');
+  assert.equal(item.api.publicApi, true);
+  assert.equal(item.api.collectionCompleteness, 'official-repository-listed-endpoints');
+  assert.equal(item.api.authenticationNote.includes('public client key'), true);
+  assert.ok(item.api.endpoints.includes('/main/get-categories-tree/{language}/json'));
+  assert.ok(item.api.endpoints.includes('/main/get-item/{itemId}/{language}/json'));
+  assert.ok(item.api.endpoints.includes('/main/get-item-translations/{itemId}/{language}/json'));
+  assert.ok(item.api.endpoints.includes('/main/books/{language}/{sourceLanguage}/{page}/{perPage}/json'));
+  assert.ok(item.api.endpoints.includes('/quran/get-available-languages/json'));
+  assert.ok(item.api.endpoints.includes('/quran/get-category/{id}/{language}/json'));
+});
+
 test('QuranEnc registry keeps the documented API surface', () => {
   const item = byId('quranenc-api');
   assert.equal(item.api.baseUrl, 'https://quranenc.com/api/v1');
