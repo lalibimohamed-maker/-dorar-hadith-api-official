@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+        shard: [0, 1, 2]
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -42,7 +42,7 @@ jobs:
           set -euo pipefail
           node scripts/rechercher_execute_global_multilingual_queue.mjs \
             --shard-index=${{ matrix.shard }} \
-            --shard-count=8 \
+            --shard-count=3 \
             --output-dir=artifacts/rechercher/global-multilingual-research
 
       - name: Validate shard completeness
@@ -76,7 +76,7 @@ jobs:
           persist-credentials: false
 
       - name: Download all shard evidence
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v6.0.0
+        uses: actions/download-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           pattern: rechercher-global-multilingual-shard-*
           path: artifacts/rechercher/global-multilingual-research
@@ -90,7 +90,7 @@ jobs:
           import path from 'node:path';
           const dir = 'artifacts/rechercher/global-multilingual-research';
           const files = fs.readdirSync(dir).filter((x) => x.endsWith('.jsonl')).sort();
-          if (files.length !== 8) throw new Error(`Expected 8 shard JSONL files, found ${files.length}`);
+          if (files.length !== 3) throw new Error(`Expected 3 shard JSONL files, found ${files.length}`);
           const rows = files.flatMap((file) => fs.readFileSync(path.join(dir, file), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse));
           const ids = new Set(rows.map((r) => r.cell_id));
           if (rows.length !== 3192 || ids.size !== 3192) throw new Error(`Expected 3192 unique cells; got rows=${rows.length}, unique=${ids.size}`);
