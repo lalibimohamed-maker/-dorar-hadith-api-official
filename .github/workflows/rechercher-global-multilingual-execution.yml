@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: rechercher-global-multilingual-evidence-${{ github.event.pull_request.number || github.ref }}
@@ -69,6 +69,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
+    # security-justification: contents: write is restricted to the trusted same-repository aggregate job solely to persist the auditable scientific evidence ledger; discovery remains read-only, protected main is not bypassed, and public redistribution remains item-level-rights gated.
+    permissions:
+      contents: write
+    env:
+      PR_HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Checkout PR head
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -76,7 +82,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
           persist-credentials: true
       - name: Download all shard evidence
-        uses: actions/download-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           pattern: rechercher-global-multilingual-shard-*
           path: artifacts/rechercher/global-multilingual-research
@@ -144,16 +150,13 @@ jobs:
           console.log(JSON.stringify(summary));
           NODE
       - name: Build permanent scientific ledger
-        env:
-          RUN_ID: ${{ github.run_id }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           import path from 'node:path';
           const input = 'artifacts/rechercher/global-multilingual-research';
-          const runId = process.env.RUN_ID;
+          const runId = process.env.RUN_ID || process.env.GITHUB_RUN_ID;
           const headSha = process.env.HEAD_SHA;
           const runDir = path.join(process.env.LEDGER_ROOT, 'runs', runId);
           fs.mkdirSync(runDir, {recursive: true});
@@ -168,6 +171,8 @@ jobs:
           fs.mkdirSync(path.join(process.env.LEDGER_ROOT), {recursive: true});
           fs.writeFileSync(path.join(process.env.LEDGER_ROOT, 'latest.json'), JSON.stringify({schema: manifest.schema, latest_run_id: runId, commit_sha: headSha, records: `runs/${runId}/records.jsonl`, manifest: `runs/${runId}/manifest.json`}, null, 2) + '\n');
           NODE
+        env:
+          RUN_ID: ${{ github.run_id }}
       - name: Commit permanent scientific ledger
         run: |
           set -euo pipefail
@@ -179,7 +184,7 @@ jobs:
             exit 0
           fi
           git commit -m "data(rechercher): persist multilingual scientific evidence ledger [skip ci]"
-          git push origin "HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}"
+          git push origin "HEAD:${PR_HEAD_REF}"
       - name: Upload reproducibility bundle
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
