@@ -70,5 +70,19 @@ export async function healthCheck(options = {}) {
   return { checkedAt: new Date().toISOString(), sourcesChecked: results.length, healthy: results.filter((r) => r.status === 'healthy').length, degraded: results.filter((r) => r.status === 'degraded').length, configured: results.filter((r) => r.status === 'configured').length, results };
 }
 
-export function acquisitionCandidate(record) { return Boolean(record.pdfUrl) && record.rightsStatus !== 'restricted'; }
-export function selectAcquisitionCandidates(records) { return uniqueBy(records.filter(acquisitionCandidate), (r) => r.pdfUrl); }
+const DOWNLOADABLE_RIGHTS_STATUSES = new Set([
+  'public',
+  'public-domain',
+  'cc-by',
+  'cc-by-sa',
+  'verified-source-terms',
+  'verified-redistributable',
+]);
+
+export function acquisitionCandidate(record) {
+  return Boolean(record.pdfUrl) && DOWNLOADABLE_RIGHTS_STATUSES.has(String(record.rightsStatus ?? '').toLowerCase());
+}
+
+export function selectAcquisitionCandidates(records) {
+  return uniqueBy(records.filter(acquisitionCandidate), (r) => r.pdfUrl);
+}
