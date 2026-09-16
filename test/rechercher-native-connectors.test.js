@@ -19,6 +19,9 @@ test('verified multilingual registry contains extracted official API contracts',
   assert.equal(byId.get('hadeethenc-api').connector.kind, 'rest-json-catalog');
   assert.equal(byId.get('hadeethenc-api').connector.searchUrl, 'https://hadeethenc.com/api/v1/hadeeths/list/');
   assert.equal(byId.get('hadeethenc-api').connector.queryMap().language, 'ar');
+  assert.equal(byId.get('hadeethenc-api').connector.queryMap().category_id, 1);
+  assert.equal(byId.get('hadeethenc-api').connector.queryMap().page, 1);
+  assert.equal(byId.get('hadeethenc-api').connector.queryMap().per_page, 20);
   assert.equal(byId.get('islamenc-api').connector.kind, 'rest-json-catalog');
   assert.equal(byId.get('islamenc-api').connector.searchUrl, 'https://s.islamenc.com/api/v1/services');
   assert.equal(byId.get('islamhouse').connector.kind, 'rest-json-keyed-path');
