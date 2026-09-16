@@ -56,7 +56,7 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}
       - name: Upload transport evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a0 # v7.0.1
         with:
           name: rechercher-global-multilingual-shard-${{ matrix.shard }}
           path: artifacts/rechercher/global-multilingual-research/
@@ -85,6 +85,10 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/rechercher_validate_translation_evidence.mjs artifacts/rechercher/global-multilingual-research
+      - name: Collect item-level rights and resource metadata
+        run: |
+          set -euo pipefail
+          node scripts/rechercher_collect_item_rights_and_resources.mjs artifacts/rechercher/global-multilingual-research
       - name: Enforce item-level rights gate
         run: |
           set -euo pipefail
@@ -111,12 +115,13 @@ jobs:
             if (row.translation_state === 'source-verified' && translationStage?.translation_evidence?.explicit_translation_evidence !== true) throw new Error(`Unsubstantiated source-verified translation: ${row.cell_id}`);
             const rightsStage = row.stages.find((s) => s.stage === 'rights');
             if (rightsStage?.item_level_rights_verified !== true && row.redistribution_permission !== 'not-granted') throw new Error(`Rights fail-closed violation: ${row.cell_id}`);
+            if (rightsStage?.item_level_rights_verified === true && row.redistribution_permission !== 'verified-per-item') throw new Error(`Verified rights without explicit per-item permission state: ${row.cell_id}`);
           }
           const verification = Object.groupBy(rows, (r) => r.final_verification);
           const translation = Object.groupBy(rows, (r) => r.translation_state);
           const rights = Object.groupBy(rows, (r) => r.redistribution_permission || 'not-granted');
           const summary = {
-            schema: 'rechercher/global-multilingual-research-aggregate/v3',
+            schema: 'rechercher/global-multilingual-research-aggregate/v4',
             record_class: policy.record_class,
             durable_ledger_root: policy.durable_record.location,
             generated_at: new Date().toISOString(),
@@ -125,9 +130,14 @@ jobs:
             verification_counts: Object.fromEntries(Object.entries(verification).map(([k,v]) => [k,v.length])),
             translation_counts: Object.fromEntries(Object.entries(translation).map(([k,v]) => [k,v.length])),
             rights_counts: Object.fromEntries(Object.entries(rights).map(([k,v]) => [k,v.length])),
+            item_level_rights_verified_cells: rows.filter((r) => r.stages.find((s) => s.stage === 'rights')?.item_level_rights_verified === true).length,
+            redistributable_cells: rows.filter((r) => r.redistribution_permission === 'verified-per-item').length,
+            catalogued_without_redistribution_cells: rows.filter((r) => r.redistribution_permission !== 'verified-per-item').length,
             machine_translation_cells: rows.filter((r) => r.machine_translation_used).length,
             canonical_arabic_overwrite_cells: rows.filter((r) => r.canonical_arabic_overwrite).length,
             evidence_subpipeline_stages: evidenceStages,
+            discovery_policy: 'open-discovery-and-resource-analysis',
+            redistribution_policy: 'item-level-rights-evidence-required-fail-closed',
             shards: files
           };
           fs.writeFileSync(path.join(dir, 'aggregate-summary.json'), JSON.stringify(summary, null, 2) + '\n');
@@ -165,7 +175,8 @@ jobs:
             translation_state: r.translation_state,
             translation_evidence: r.stages.find((s) => s.stage === 'translation_metadata')?.translation_evidence || null,
             provenance_chain: r.stages.find((s) => s.stage === 'provenance')?.provenance || null,
-            rights_evidence: r.stages.find((s) => s.stage === 'rights')?.evidence || null,
+            rights_evidence: r.rights_evidence || r.stages.find((s) => s.stage === 'rights')?.evidence || null,
+            resource_metadata: r.resource_metadata || null,
             rights_decision: r.stages.find((s) => s.stage === 'rights')?.rights_decision || 'fail-closed',
             redistribution_permission: r.redistribution_permission || 'not-granted',
             verification_state: r.final_verification,
@@ -195,7 +206,7 @@ jobs:
           git commit -m "data(rechercher): persist multilingual scientific evidence ledger [skip ci]"
           git push origin "HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}"
       - name: Upload reproducibility bundle
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a0 # v7.0.1
         with:
           name: rechercher-global-multilingual-reproducibility-bundle
           path: artifacts/rechercher/global-multilingual-research/
