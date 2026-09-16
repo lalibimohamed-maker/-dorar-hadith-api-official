@@ -25,4 +25,5 @@ jobs:
 
       - name: Audit all workflow files
         shell: bash
+        # The audit script scopes untrusted-input checks to the actual run block.
         run: node scripts/workflow-security-gate.mjs
