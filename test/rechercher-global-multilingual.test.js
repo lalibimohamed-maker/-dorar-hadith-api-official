@@ -43,6 +43,19 @@ test('HadeethEnc remains fully discoverable rather than a single-category connec
   assert.ok(item.api.endpoints.some((endpoint) => endpoint === '/hadeeths/list/?language={language}&category_id={categoryId}&page={page}&per_page={perPage}'));
 });
 
+test('new multilingual sources remain discovery-only until primary API documentation is verified', () => {
+  const islamenc = byId('islamenc');
+  assert.ok(islamenc);
+  assert.equal(islamenc.access.mode, 'web-discovery');
+  assert.equal(islamenc.api, null);
+  assert.equal(islamenc.access.apiVerification, 'pending-primary-documentation');
+
+  const terminology = byId('terminologyenc');
+  assert.ok(terminology);
+  assert.equal(terminology.access.mode, 'web-discovery');
+  assert.equal(terminology.api, null);
+});
+
 test('discovery never grants download rights', () => {
   for (const item of registry) assert.equal(item.discoveryOnly, true);
 });
