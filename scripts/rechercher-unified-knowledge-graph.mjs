@@ -44,7 +44,7 @@ function htmlLinks(html, baseUrl) {
 
 function titleFromHtml(html) {
   const match = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  return match ? match[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() : null;
+  return match ? match[1].replace(/[<>]/g, '').replace(/\s+/g, ' ').trim() : null;
 }
 
 function addRecord(graph, sourceId, parentNode, key, label, url, metadata = {}) {
