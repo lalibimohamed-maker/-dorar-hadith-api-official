@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/rechercher-global-multilingual-execution.yml'
-      - 'scripts/rechercher_global_multilingual_matrix.mjs'
+      - 'scripts/rechercher_execute_global_multilingual_queue.mjs'
       - 'scripts/rechercher_validate_translation_evidence.mjs'
       - 'scripts/rechercher_translation_candidate_diagnostics.mjs'
       - 'config/translation-sources-2026.json'
@@ -51,7 +51,7 @@ jobs:
         env:
           SHARD_INDEX: ${{ matrix.shard }}
           SHARD_COUNT: '3'
-        run: node scripts/rechercher_global_multilingual_matrix.mjs
+        run: node scripts/rechercher_execute_global_multilingual_queue.mjs --shard-index=${SHARD_INDEX} --shard-count=${SHARD_COUNT}
       - name: Validate translation evidence
         run: node scripts/rechercher_validate_translation_evidence.mjs
       - name: Validate candidate diagnostics and integrity
