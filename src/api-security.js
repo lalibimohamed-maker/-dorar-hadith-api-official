@@ -21,11 +21,10 @@ export function isTrustedProxy(req) { const remote = String(req.socket.remoteAdd
 export function clientIp(req) { if (trustProxyEnabled() && isTrustedProxy(req)) { if (trustProxyMode() === "cloudflare") { const cf = String(req.headers["cf-connecting-ip"] || "").trim(); if (cf && net.isIP(cf)) return cf; } const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim(); if (forwarded && net.isIP(forwarded)) return forwarded; } return req.socket.remoteAddress || "unknown"; }
 export function edgeRequestAllowed(req) { if (!edgeOnlyEnabled()) return true; return isTrustedProxy(req); }
 
-// Intentional HMAC for ephemeral rate-limit bucketing, not password storage.
-// The random key prevents offline reuse across processes.
-
-// codeql[js/insufficient-password-hash]
-export function rateIdentity(req) { const rawKey = String(req.headers["x-api-key"] || "").trim(); if (rawKey) return `key:${crypto.createHmac("sha256", RATE_IDENTITY_SECRET).update(rawKey).digest("hex")}`; return `ip:${clientIp(req)}`; }
+// Derive an ephemeral, process-local bucket identifier from the API key.
+// HKDF is a key-derivation primitive, not password storage; the random process secret
+// prevents the derived identifier from being reusable for offline API-key guessing.
+export function rateIdentity(req) { const rawKey = String(req.headers["x-api-key"] || "").trim(); if (rawKey) { const bucketKey = crypto.hkdfSync("sha256", rawKey, RATE_IDENTITY_SECRET, "rechercher-rate-limit", 32); return `key:${Buffer.from(bucketKey).toString("hex")}`; } return `ip:${clientIp(req)}`; }
 
 export function createRateLimiter({ max = DEFAULT_RATE_LIMIT, windowMs = DEFAULT_WINDOW_MS, prefix = "api" } = {}) {
   const buckets = new Map();
