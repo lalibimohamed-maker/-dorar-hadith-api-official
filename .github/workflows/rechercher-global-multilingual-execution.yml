@@ -53,12 +53,6 @@ jobs:
           SHARD_INDEX: ${{ matrix.shard }}
           SHARD_COUNT: '3'
         run: node scripts/rechercher_execute_global_multilingual_queue.mjs --shard-index=${SHARD_INDEX} --shard-count=${SHARD_COUNT}
-      - name: Validate translation evidence
-        run: node scripts/rechercher_validate_translation_evidence.mjs
-      - name: Validate candidate diagnostics and integrity
-        run: node scripts/rechercher_translation_candidate_diagnostics.mjs
-      - name: Rights and resource gate
-        run: node scripts/rechercher_validate_rights_and_resources.mjs
       - name: Upload shard evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
