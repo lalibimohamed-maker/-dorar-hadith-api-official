@@ -8,6 +8,7 @@ on:
       - 'scripts/rechercher_execute_global_multilingual_queue.mjs'
       - 'scripts/rechercher_validate_translation_evidence.mjs'
       - 'scripts/rechercher_translation_candidate_diagnostics.mjs'
+      - 'scripts/rechercher_validate_item_rights.mjs'
       - 'config/translation-sources-2026.json'
       - 'research/evidence/global-multilingual/**'
   schedule:
@@ -91,7 +92,7 @@ jobs:
       - name: Validate candidate diagnostics and integrity
         run: node scripts/rechercher_translation_candidate_diagnostics.mjs
       - name: Rights and resource gate
-        run: node scripts/rechercher_validate_rights_and_resources.mjs
+        run: node scripts/rechercher_validate_item_rights.mjs
       - name: Verify exact 3,192-cell matrix
         env:
           EXPECTED_CELL_COUNT: ${{ env.EXPECTED_CELL_COUNT }}
