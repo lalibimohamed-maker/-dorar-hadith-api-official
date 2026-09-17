@@ -1,0 +1,34 @@
+{
+  "schema": "rechercher/global-multilingual-resource-discovery/v1",
+  "purpose": "Evidence-backed global discovery of Islamic resources by language; language presence is never treated as proof of translation quality or completeness.",
+  "policy": {
+    "minimum_verified_resource_lanes": 106,
+    "106_is_not_a_hard_cap": true,
+    "language_lane_requires_evidence": true,
+    "discovery_does_not_equal_redistribution_permission": true,
+    "rights_verified_per_item": true,
+    "canonical_arabic_quran_separate": true,
+    "human_translation_separate_from_machine_translation": true,
+    "missing_translation_state": "translation-needed",
+    "machine_translation_state": "machine-translated",
+    "machine_translation_verification_state": "unverified"
+  },
+  "matrix": {
+    "language_count": 133,
+    "domain_count": 24,
+    "expected_search_cells": 3192,
+    "definition": "Every enumerated language is paired with every configured Islamic resource domain; each pair is an independent evidence-research queue cell."
+  },
+  "evidence_sources": [
+    {"id":"islamhouse","name":"IslamHouse","url":"https://islamhouse.com/en/","claimed_language_count":133,"enumerated_language_count_in_current_web_snapshot":133,"evidence":"Official All Languages catalogue reports Languages 133; the current selector includes Bengali and Malagasy, closing the missing-entry gap in this repository snapshot.","status":"source-verified"},
+    {"id":"quranenc","name":"Encyclopedia of the Noble Quran","url":"https://quranenc.com/en/","claimed_language_count":80,"claimed_translation_count":100,"resource_scope":["quran_translations","tafsir","pdf","api","xml","csv","excel","audio"],"evidence":"Official catalogue states +80 Languages and +100 Translations and exposes translation metadata and API routes.","status":"source-verified"},
+    {"id":"quran_foundation","name":"Quran Foundation Content API","url":"https://api-docs.quran.foundation/","resource_scope":["languages","translations","tafsirs","recitations","articles","content_sync"],"evidence":"Official API exposes ISO language codes and translations_count, translation resources, tafsirs and Content Sync.","status":"source-verified"},
+    {"id":"hadeethenc","name":"Encyclopedia of Translated Prophetic Hadiths","url":"https://hadeethenc.com/","claimed_language_count":70,"resource_scope":["prophetic_hadith","explanations","api","pdf","excel"],"evidence":"Official site states 70 languages and exposes downloadable/API resources; language pages enumerate many additional languages and ISO-like codes.","status":"source-verified"}
+  ],
+  "enumerated_islamhouse_languages": ["Afar","Afrikanns","Akane","Albanian","Amharic","Arabic","Armenian","Assamese","Avar","Aymara","Azerbaijani","Balochi","Bambara","Bassa","Bengali","Bisaya","Bosnian","Brahui","Bulgarian","Burmese","Chamie","Chechen","Chewa","Chinese","Circassian","Comorian","Creole","Czech","Dag","Danish","Dari Persian","Ddn","Dutch","English","Estonian","Finnish","Fon","French","Fula","Gamukhia","Georgian","German","Greek","Gujrati","Hausa","Hebrew","Hindi","Hr","Hungarian","Icelandian","Igbo","Indonesian","Ingush","Italian","Japanese","Jawla","Kannada","Kashmiri","Kazakh","Khmer","Kinyarwanda","Korean","Kurdish","Kurmanji","Kyrgyz","Lao","Latvian","Lingala","Lithuanian","Luy","Macedonian","Maguindanao","Malay","Malayalam","Maldivi","Mandinka","Mangolian","Maranao","Marathi","Men","Moore","N'ko","Nepali","Norwegian","Oriya","Oromoo","Pashto","Persian","Polish","Portuguese","Punjabi","Quechua","Rn","Rohingya","Romani","Romanian","Russian","Sango","Serbian","Sesotho","Sindhi","Sinhalese","Slovak","Slovenian","Sn","Somali","Soninke","Spanish","Swahili","Swedish","Tagalog","Tajik","Tamasheq","Tamazight","Tamil","Tatar","Telugu","Thai","Tigrinya","Turkish","Turkmani","Ugandan","Ukrainian","Urdu","Uyghur","Uzbek","Vietnamese","Wolof","Xhosa","Yao","Yoruba","Zulu","Malagasy"],
+  "discovery_method": {"phase_1":"Enumerate first-party language catalogues and official APIs.","phase_2":"Normalize language names to ISO codes only after evidence-backed mapping.","phase_3":"Intersect language sets across Quran, hadith, tafsir, books and terminology resources.","phase_4":"Attach provenance, rights and verification state to every resource, not merely to the language.","phase_5":"Promote at least 106 evidence-backed language lanes; keep additional discovered lanes queued.","phase_6":"Search regional, scholarly and institutional sources for languages underrepresented by the major global providers."},
+  "resource_lanes": ["quran","tafsir","hadith","hadith_explanation","sunnah","sirah","aqidah","fiqh","usul_al_fiqh","fatwa","islamic_terms","islamic_history","islamic_ethics","dua_adhkar","education","books","articles","audio","video","pdf","structured_metadata","provenance","rights","verification"],
+  "cell_pipeline": ["primary_or_institutional_source","official_api","digital_corpus","structured_web","scholarly_dataset","translation_metadata","provenance","rights","verification"],
+  "expansion_rule": "Never stop at the first 106. Every newly evidenced language becomes a resource lane candidate and is promoted according to verification evidence.",
+  "no_auto_translation_rule": "Automatic translation may only be stored as an explicitly labelled fallback and must never overwrite canonical Arabic or source-verified human translations."
+}
