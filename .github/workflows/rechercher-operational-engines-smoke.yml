@@ -19,9 +19,10 @@ jobs:
       - name: Install system engines
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ffmpeg qpdf tesseract-ocr libsndfile1
+          sudo apt-get install -y --no-install-recommends ffmpeg qpdf ghostscript tesseract-ocr libsndfile1
           ffmpeg -version
           qpdf --version
+          gs --version
           tesseract --version
       - name: Install Python engines
         run: |
@@ -35,3 +36,5 @@ jobs:
         run: docker build -f Dockerfile.rechercher-python-sandbox -t rechercher-python-sandbox:ci .
       - name: Boundary smoke
         run: node --test test/rechercher-operational-scale-guards.test.js
+      - name: V9 multimodal engine tests
+        run: node --test test/rechercher-v9-multimodal-recitation-engine.test.js test/rechercher-v9-multimodal-learning-orchestrator.test.js
