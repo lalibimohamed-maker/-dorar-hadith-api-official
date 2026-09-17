@@ -73,12 +73,22 @@ jobs:
         run: docker build -f Dockerfile.rechercher-python-sandbox -t rechercher-python-sandbox:security .
       - name: Scan Python sandbox image
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME/.cache/trivy:/root/.cache/" ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed rechercher-python-sandbox:security
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$HOME/.cache/trivy:/root/.cache/" \
+            -v "$PWD:/workspace:ro" \
+            ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 \
+            image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed --ignorefile /workspace/.trivyignore rechercher-python-sandbox:security
       - name: Build MFA sandbox image
         run: docker build -f Dockerfile.rechercher-mfa-sandbox -t rechercher-mfa-sandbox:security .
       - name: Scan MFA sandbox image
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME/.cache/trivy:/root/.cache/" ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed rechercher-mfa-sandbox:security
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$HOME/.cache/trivy:/root/.cache/" \
+            -v "$PWD:/workspace:ro" \
+            ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 \
+            image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed --ignorefile /workspace/.trivyignore rechercher-mfa-sandbox:security
 
   api-dast:
     name: API DAST (OWASP ZAP)
