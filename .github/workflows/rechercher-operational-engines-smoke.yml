@@ -1,0 +1,35 @@
+name: Rechercher — Operational engines smoke
+on:
+  push:
+    branches:
+      - feat/rechercher-operational-engines-installation-2026
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  python-engines:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install system engines
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg qpdf tesseract-ocr libsndfile1
+          ffmpeg -version
+          qpdf --version
+          tesseract --version
+      - name: Install Python engines
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements/rechercher-ai-engines.txt ocrmypdf
+          python3 - <<'PY'
+          import cv2, librosa, faster_whisper, sentence_transformers, transformers, PIL
+          print('PYTHON_ENGINE_IMPORTS_OK')
+          PY
+      - name: Build sandbox image
+        run: docker build -f Dockerfile.rechercher-python-sandbox -t rechercher-python-sandbox:ci .
+      - name: Boundary smoke
+        run: node --test test/rechercher-operational-scale-guards.test.js
