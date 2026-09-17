@@ -47,4 +47,4 @@ jobs:
       - name: Boundary smoke
         run: node --test test/rechercher-operational-scale-guards.test.js
       - name: V9 multimodal engine tests
-        run: node --test test/rechercher-v9-multimodal-recitation-engine.test.js test/rechercher-v9-multimodal-learning-orchestrator.test.js
+        run: node --test test/rechercher-v9-multimodal-recitation-engine.test.js test/rechercher-v9-multimodal-learning-orchestrator.test.js test/rechercher-v9-runtime-invariants.test.js
