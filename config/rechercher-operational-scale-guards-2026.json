@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "RECHERCHER_OPERATIONAL_SCALE_GUARDS_2026",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "scope": "V1_TO_V31_PLUS",
+  "guards": {
+    "graphLedger": {
+      "stages": ["V6", "V7"],
+      "appendOnly": true,
+      "stateVersionRequired": true,
+      "hashChainRequired": true,
+      "digitalSignatureSupported": true,
+      "timeTravelQueries": true,
+      "deletionByEventOnly": true
+    },
+    "orchestration": {
+      "stages": ["V2", "V5"],
+      "runtime": "Node.js 24",
+      "priorityQueues": true,
+      "gapDrivenLearningPriority": true,
+      "tokenBucket": true,
+      "backpressure": true,
+      "boundedConcurrency": true
+    },
+    "groundedConfidence": {
+      "stages": ["V1", "V7"],
+      "range": [0, 1],
+      "initialState": "UNVERIFIED",
+      "acceptedVariationDoesNotPenalize": true,
+      "trueContradictionState": "DISPUTED",
+      "provenanceRequired": true,
+      "evidenceWeighted": true
+    },
+    "zeroTrustPython": {
+      "stage": "V9",
+      "sandboxRequired": true,
+      "unixSocketPreferred": true,
+      "workerNoDatabaseAccess": true,
+      "workerNoGraphAccess": true,
+      "workerNoCredentialAccess": true,
+      "rawMediaInModalAbstractionOut": true,
+      "immutableImageDigestRequired": true
+    },
+    "crossLingualEntityFixity": {
+      "stages": ["V2", "V5"],
+      "model": "FRBR_WEMI_COMPATIBLE",
+      "canonicalWorkIdentityImmutable": true,
+      "translationRelation": "TRANSLATION_OF",
+      "originalLanguageAnchor": "ar",
+      "translationCannotCreateNewWorkIdentity": true
+    }
+  },
+  "scaleBudgets": {
+    "searchCells": 3192,
+    "rawDiscoveryCeiling": 1600000,
+    "workQueueBounded": true,
+    "maxExternalCallsPerTask": 100,
+    "maxRuntimeSecondsPerTask": 900,
+    "maxBytesPerWorkerRequest": 67108864
+  },
+  "nonNegotiable": [
+    "originalPdfImmutable",
+    "canonicalQuranArabicImmutable",
+    "sourceIdentityImmutable",
+    "rightsNeverGrantedByKnowledgeGraph",
+    "aiCannotSelfVerify",
+    "learnerSandboxCannotWritePublicGraph",
+    "feedbackCannotAutoDeployModels"
+  ]
+}
