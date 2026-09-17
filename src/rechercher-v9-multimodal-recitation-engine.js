@@ -6,6 +6,29 @@ export const V9_ALIGNMENT_STATES = Object.freeze(['UNALIGNED', 'PARTIAL', 'ALIGN
 export const V9_ERROR_TYPES = Object.freeze(['OMISSION', 'ADDITION', 'SUBSTITUTION', 'REPETITION', 'HESITATION', 'BOUNDARY_DRIFT', 'TAJWEED_CANDIDATE']);
 export const V9_MATCH_TYPES = Object.freeze(['EXACT', 'CLOSE', 'NO_MATCH']);
 export const V9_TERM_RELATIONS = Object.freeze(['EXACT_EQUIVALENT', 'APPROXIMATE_EQUIVALENT', 'HISTORICAL_EQUIVALENT', 'SCHOOL_SPECIFIC_TERM', 'TRANSLATION_VARIANT', 'NO_EXACT_EQUIVALENT']);
+export const V9_MODALITIES = Object.freeze(['TEXT', 'PDF', 'IMAGE', 'AUDIO', 'VIDEO']);
+export const V9_FEEDBACK_TYPES = Object.freeze(['CORRECTION', 'CONFIRMATION', 'REJECTION', 'BOUNDARY_ADJUSTMENT', 'ALIGNMENT_CORRECTION', 'TAJWEED_CORRECTION', 'TRANSCRIPTION_CORRECTION']);
+export const V9_REVIEW_STATES = Object.freeze(['UNREVIEWED', 'CANDIDATE', 'HUMAN_REVIEWED', 'VERIFIED', 'REJECTED']);
+
+/**
+ * Adapter registry only: V9 never silently downloads or executes third-party models.
+ * Runtime adapters can be bound by deployment code after their licenses, model cards,
+ * hashes and local security policy have been verified.
+ */
+export const V9_ENGINE_ADAPTERS = Object.freeze({
+  MEDIA_NORMALIZER: ['FFmpeg'],
+  PDF_IMAGE_TEXT: ['PDFium', 'MuPDF', 'PDFBox'],
+  OCR: ['OCRmyPDF', 'Tesseract'],
+  IMAGE_FEATURES: ['OpenCV'],
+  AUDIO_FEATURES: ['librosa'],
+  ASR: ['Whisper', 'faster-whisper'],
+  FORCED_ALIGNMENT: ['Montreal Forced Aligner', 'WhisperX-compatible adapter'],
+  CROSS_MODAL_EMBEDDINGS: ['Sentence Transformers', 'CLIP/SigLIP-compatible adapter'],
+  VIDEO_SEGMENTATION: ['FFmpeg', 'OpenCV'],
+  FUSION: ['late-fusion', 'weighted-evidence-fusion', 'cross-modal-embedding-fusion'],
+  POLICY: ['rights-policy-engine', 'privacy-policy-engine', 'usage-constraint-engine'],
+  FEEDBACK: ['active-learning-queue', 'human-review-dataset', 'model-evaluation-loop']
+});
 
 const IMMUTABLE_FIELDS = Object.freeze(['sourceIdentity', 'contentHash', 'canonicalQuranArabic', 'originalPdf']);
 const clone = value => structuredClone(value);
@@ -25,9 +48,14 @@ function preserveImmutable(before, after) {
 export function createV9StageNodeContract() {
   return createStageNodeContract({
     stageId: V9_STAGE_ID,
-    version: '1.0',
+    version: '1.1',
     capabilities: [
       'MULTIMODAL_TEXT_AUDIO_IMAGE_VIDEO_PDF',
+      'MEDIA_IDENTITY',
+      'PREPROCESSING_NORMALIZATION',
+      'FEATURE_EXTRACTION',
+      'SIGNAL_ALIGNMENT',
+      'MODALITY_FUSION',
       'SOURCE_IDENTITY_CHAIN',
       'IIIF_MANIFEST_PAGE_CANVAS_ALIGNMENT',
       'OCR_TRANSCRIPTION_ALIGNMENT',
@@ -40,44 +68,101 @@ export function createV9StageNodeContract() {
       'SPACED_MEMORIZATION',
       'MULTILINGUAL_CONCEPT_ALIGNMENT',
       'RECITATION_FEEDBACK',
+      'ACTIVE_LEARNING_FEEDBACK_LOOP',
+      'RIGHTS_PRIVACY_USAGE_GUARDRAILS',
       'HUMAN_SCHOLAR_REVIEW_BOUNDARY'
     ],
-    acceptedInputs: [{ type: 'VERIFIED_SOURCE' }, { type: 'LEARNING_PLAN' }, { type: 'CANONICAL_QURAN_ARABIC' }],
-    producedOutputs: [{ type: 'MULTIMODAL_ALIGNMENT' }, { type: 'RECITATION_ASSESSMENT' }, { type: 'MEMORIZATION_STATE' }, { type: 'MULTILINGUAL_CONCEPT_ALIGNMENT' }],
-    requiredEvidence: [{ type: 'SOURCE_IDENTITY' }, { type: 'PROVENANCE' }, { type: 'RIGHTS_STATE' }, { type: 'ALIGNMENT_EVIDENCE' }],
+    acceptedInputs: [{ type: 'VERIFIED_SOURCE' }, { type: 'LEARNING_PLAN' }, { type: 'CANONICAL_QURAN_ARABIC' }, { type: 'MULTIMODAL_RESOURCE' }],
+    producedOutputs: [{ type: 'PREPROCESSED_MODALITY_BUNDLE' }, { type: 'MULTIMODAL_ALIGNMENT' }, { type: 'RECITATION_ASSESSMENT' }, { type: 'MEMORIZATION_STATE' }, { type: 'MULTILINGUAL_CONCEPT_ALIGNMENT' }, { type: 'FEEDBACK_EVENT' }],
+    requiredEvidence: [{ type: 'SOURCE_IDENTITY' }, { type: 'PROVENANCE' }, { type: 'RIGHTS_STATE' }, { type: 'ALIGNMENT_EVIDENCE' }, { type: 'PREPROCESSING_TRACE' }],
     rightsPolicy: { defaultState: 'UNKNOWN', publishableState: 'ALLOWED', unknownIsPublishable: false, restrictedIsPublishable: false },
     reviewPolicy: { scholarlyVerification: true, humanReviewForAuthoritativeUse: true, recitationFeedbackIsNonFatwa: true },
     dependencies: ['V6_GLOBAL_SOURCE_INTELLIGENCE', 'V7_GLOBAL_RESEARCH_GRAPH', 'V8_AUTONOMOUS_ADAPTIVE_LEARNING'],
-    handoffs: ['SOURCE_TO_MULTIMODAL', 'KNOWLEDGE_TO_RECITATION', 'RECITATION_TO_LEARNING', 'MULTIMODAL_TO_RESEARCH'],
-    safety: { canOverrideRights: false, canMutateSourceIdentity: false, canMutateContentHash: false, canMutateCanonicalQuranArabic: false, canMutateOriginalPdf: false, acquisitionIndependent: true, religiousDecisionAuthority: false },
+    handoffs: ['SOURCE_TO_MULTIMODAL', 'KNOWLEDGE_TO_RECITATION', 'RECITATION_TO_LEARNING', 'MULTIMODAL_TO_RESEARCH', 'FEEDBACK_TO_ADAPTATION'],
+    safety: { canOverrideRights: false, canMutateSourceIdentity: false, canMutateContentHash: false, canMutateCanonicalQuranArabic: false, canMutateOriginalPdf: false, acquisitionIndependent: true, religiousDecisionAuthority: false, privateDataDisclosure: false, unsafeExternalExecution: false },
     status: 'OPEN_EXTENSION_POINT'
   });
 }
 
 export function registerV9Node(registry) { return registerNode(registry, createV9StageNodeContract()); }
 
-export function createV9MultimodalRecitationEngine({ observability = null } = {}) {
-  return { stageId: V9_STAGE_ID, version: '9.0.0', status: 'IMPLEMENTED_FOUNDATION', observability, sourceIdentities: new Map(), manifests: new Map(), alignments: [], recitations: new Map(), memorization: new Map(), terminology: [], traces: [] };
+export function createV9MultimodalRecitationEngine({ observability = null, adapters = {} } = {}) {
+  return {
+    stageId: V9_STAGE_ID, version: '9.1.0', status: 'IMPLEMENTED_FOUNDATION', observability,
+    adapters: { ...clone(V9_ENGINE_ADAPTERS), ...clone(adapters) },
+    sourceIdentities: new Map(), manifests: new Map(), alignments: [], recitations: new Map(), memorization: new Map(), terminology: [],
+    mediaBundles: new Map(), fusedEvidence: [], guardrailDecisions: [], reviews: [], feedback: [], modelUpdates: [], traces: []
+  };
+}
+
+export function createMediaIdentity(input = {}) {
+  requireId(input.mediaId, 'mediaId');
+  assertOneOf(input.modality, V9_MODALITIES, 'modality');
+  requireId(input.contentHash, 'contentHash');
+  return Object.freeze({ mediaId: input.mediaId, modality: input.modality, mimeType: input.mimeType || null, contentHash: input.contentHash, sourceId: input.sourceId || null, byteLength: input.byteLength ?? null, durationMs: input.durationMs ?? null, dimensions: clone(input.dimensions || null), retrievedAt: input.retrievedAt || null });
+}
+
+export function registerMediaIdentity(engine, input) {
+  const media = createMediaIdentity(input);
+  engine.mediaBundles.set(media.mediaId, { identity: media, preprocessing: null, features: [], signals: [], fused: null });
+  trace(engine, 'MEDIA_IDENTITY_REGISTERED', { mediaId: media.mediaId, modality: media.modality });
+  return clone(media);
+}
+
+export function preprocessModality(engine, input = {}) {
+  requireId(input.mediaId, 'mediaId');
+  const bundle = engine.mediaBundles.get(input.mediaId);
+  if (!bundle) throw new Error('media identity not registered');
+  const normalized = {
+    mediaId: input.mediaId,
+    modality: bundle.identity.modality,
+    sourceFormat: input.sourceFormat || bundle.identity.mimeType || null,
+    targetFormat: input.targetFormat || null,
+    normalizedSampleRate: input.normalizedSampleRate ?? null,
+    normalizedChannels: input.normalizedChannels ?? null,
+    normalizedDimensions: clone(input.normalizedDimensions || bundle.identity.dimensions || null),
+    segments: clone(input.segments || []),
+    textBlocks: clone(input.textBlocks || []),
+    frames: clone(input.frames || []),
+    audioWindows: clone(input.audioWindows || []),
+    preprocessingSteps: clone(input.preprocessingSteps || []),
+    toolchain: clone(input.toolchain || []),
+    integrity: { inputHash: bundle.identity.contentHash, outputHash: input.outputHash || null },
+    status: 'PREPROCESSED'
+  };
+  bundle.preprocessing = normalized;
+  trace(engine, 'MODALITY_PREPROCESSED', { mediaId: input.mediaId, modality: normalized.modality, steps: normalized.preprocessingSteps.length });
+  return clone(normalized);
+}
+
+export function extractModalityFeatures(engine, input = {}) {
+  requireId(input.mediaId, 'mediaId');
+  const bundle = engine.mediaBundles.get(input.mediaId);
+  if (!bundle?.preprocessing) throw new Error('preprocessing is required before feature extraction');
+  const features = { mediaId: input.mediaId, extractor: input.extractor || null, featureType: input.featureType || null, vectors: clone(input.vectors || []), timestamps: clone(input.timestamps || []), dimensions: input.dimensions ?? null, confidence: input.confidence ?? null, model: input.model || null, modelHash: input.modelHash || null };
+  bundle.features.push(features);
+  trace(engine, 'FEATURES_EXTRACTED', { mediaId: input.mediaId, featureType: features.featureType });
+  return clone(features);
+}
+
+export function fuseModalities(engine, input = {}) {
+  requireId(input.fusionId, 'fusionId');
+  if (!Array.isArray(input.mediaIds) || input.mediaIds.length < 2) throw new TypeError('at least two mediaIds are required for modality fusion');
+  const bundles = input.mediaIds.map(id => engine.mediaBundles.get(id));
+  if (bundles.some(bundle => !bundle?.preprocessing)) throw new Error('all modalities must be preprocessed before fusion');
+  const evidence = bundles.flatMap(bundle => bundle.features.map(feature => ({ mediaId: bundle.identity.mediaId, modality: bundle.identity.modality, featureType: feature.featureType, confidence: feature.confidence ?? null })));
+  const fused = { fusionId: input.fusionId, mediaIds: [...input.mediaIds], method: input.method || 'WEIGHTED_EVIDENCE_FUSION', evidence, fusedVector: clone(input.fusedVector || null), confidence: input.confidence ?? null, reviewState: 'CANDIDATE' };
+  engine.fusedEvidence.push(fused);
+  for (const bundle of bundles) bundle.fused = fused.fusionId;
+  trace(engine, 'MODALITIES_FUSED', { fusionId: fused.fusionId, mediaCount: fused.mediaIds.length });
+  return clone(fused);
 }
 
 export function createSourceIdentity(input = {}) {
   for (const key of ['source_id', 'work_id', 'edition_id', 'manifestation_id', 'language', 'retrieval_date', 'content_hash']) requireId(input[key], key);
   assertRights(input.rights);
   requireId(input.provenance, 'provenance');
-  return Object.freeze({
-    source_id: input.source_id,
-    work_id: input.work_id,
-    edition_id: input.edition_id,
-    manifestation_id: input.manifestation_id,
-    page_id: input.page_id || null,
-    passage_id: input.passage_id || null,
-    language: input.language,
-    license: input.license || null,
-    rights: input.rights,
-    provenance: clone(input.provenance),
-    retrieval_date: input.retrieval_date,
-    content_hash: input.content_hash
-  });
+  return Object.freeze({ source_id: input.source_id, work_id: input.work_id, edition_id: input.edition_id, manifestation_id: input.manifestation_id, page_id: input.page_id || null, passage_id: input.passage_id || null, language: input.language, license: input.license || null, rights: input.rights, provenance: clone(input.provenance), retrieval_date: input.retrieval_date, content_hash: input.content_hash });
 }
 
 export function registerSourceIdentity(engine, identity) {
@@ -90,21 +175,7 @@ export function registerSourceIdentity(engine, identity) {
 export function createIiifPageModel(input = {}) {
   requireId(input.manifestId, 'manifestId'); requireId(input.canvasId, 'canvasId'); requireId(input.pageId, 'pageId'); requireId(input.imageId, 'imageId');
   if (!Array.isArray(input.annotations)) throw new TypeError('annotations must be an array');
-  return Object.freeze({
-    manifestId: input.manifestId,
-    canvasId: input.canvasId,
-    pageId: input.pageId,
-    image: { id: input.imageId, type: 'Image', format: input.imageFormat || 'image/jpeg' },
-    ocr: input.ocr || null,
-    transcription: input.transcription || null,
-    normalizedText: input.normalizedText || null,
-    translations: clone(input.translations || []),
-    annotations: clone(input.annotations),
-    scholarNotes: clone(input.scholarNotes || []),
-    citations: clone(input.citations || []),
-    confidence: input.confidence ?? null,
-    language: input.language || null
-  });
+  return Object.freeze({ manifestId: input.manifestId, canvasId: input.canvasId, pageId: input.pageId, image: { id: input.imageId, type: 'Image', format: input.imageFormat || 'image/jpeg' }, ocr: input.ocr || null, transcription: input.transcription || null, normalizedText: input.normalizedText || null, translations: clone(input.translations || []), annotations: clone(input.annotations), scholarNotes: clone(input.scholarNotes || []), citations: clone(input.citations || []), confidence: input.confidence ?? null, language: input.language || null });
 }
 
 export function registerIiifPage(engine, page) {
@@ -117,11 +188,7 @@ export function registerIiifPage(engine, page) {
 export function alignTextToMedia(engine, input = {}) {
   requireId(input.alignmentId, 'alignmentId'); requireId(input.mediaId, 'mediaId'); requireId(input.textId, 'textId');
   if (!Array.isArray(input.segments) || !input.segments.length) throw new TypeError('segments are required');
-  const segments = input.segments.map((segment, index) => {
-    requireId(segment.text, `segments[${index}].text`);
-    if (!Number.isFinite(segment.startMs) || !Number.isFinite(segment.endMs) || segment.endMs < segment.startMs) throw new TypeError('invalid media timing');
-    return { ...clone(segment), index };
-  });
+  const segments = input.segments.map((segment, index) => { requireId(segment.text, `segments[${index}].text`); if (!Number.isFinite(segment.startMs) || !Number.isFinite(segment.endMs) || segment.endMs < segment.startMs) throw new TypeError('invalid media timing'); return { ...clone(segment), index }; });
   const result = { alignmentId: input.alignmentId, mediaId: input.mediaId, textId: input.textId, state: input.state || 'ALIGNED', method: input.method || 'REVIEWED_ALIGNMENT', segments, provenance: clone(input.provenance || null) };
   assertOneOf(result.state, V9_ALIGNMENT_STATES, 'alignment state');
   engine.alignments.push(result); trace(engine, 'TEXT_MEDIA_ALIGNED', { alignmentId: result.alignmentId, segments: segments.length });
@@ -154,11 +221,54 @@ export function analyzeRecitation(input = {}) {
   return { matchType: errors.length ? 'CLOSE' : 'EXACT', errors, repetitionCount: repetitions, hesitationCount: hesitations, tajweedCandidates, confidence: input.confidence ?? null, reviewRequired: Boolean(errors.length || tajweedCandidates.length) };
 }
 
+export function applyGuardrails(engine, input = {}) {
+  requireId(input.operationId, 'operationId');
+  const source = input.sourceId ? engine.sourceIdentities.get(input.sourceId) : null;
+  const rights = input.rights || source?.rights || 'UNKNOWN';
+  assertRights(rights);
+  const violations = [];
+  if (rights !== 'ALLOWED' && input.action === 'PUBLISH') violations.push('RIGHTS_NOT_PUBLISHABLE');
+  if (input.privateData === true && input.action === 'EXPOSE') violations.push('PRIVATE_DATA_EXPOSURE');
+  if (input.termsAccepted === false) violations.push('USAGE_TERMS_NOT_ACCEPTED');
+  if (input.canonicalMutation === true) violations.push('CANONICAL_QURAN_MUTATION');
+  if (input.originalMutation === true) violations.push('ORIGINAL_MEDIA_MUTATION');
+  if (input.externalExecution === true) violations.push('UNSAFE_EXTERNAL_EXECUTION');
+  const decision = { operationId: input.operationId, allowed: violations.length === 0, rights, violations, action: input.action || 'READ', evaluatedAt: new Date().toISOString() };
+  engine.guardrailDecisions.push(decision); trace(engine, 'GUARDRAIL_DECISION', { operationId: decision.operationId, allowed: decision.allowed, violations: decision.violations });
+  if (!decision.allowed) throw new Error(`V9 guardrail blocked operation: ${violations.join(',')}`);
+  return clone(decision);
+}
+
 export function recordRecitationAssessment(engine, sessionId, assessment) {
   const session = engine.recitations.get(sessionId); if (!session) throw new Error('recitation session not found');
-  const result = { ...clone(assessment), sessionId, religiousRuling: false, authoritativeFatwa: false, humanReviewRequiredForReligiousJudgment: true };
+  const result = { ...clone(assessment), sessionId, religiousRuling: false, authoritativeFatwa: false, humanReviewRequiredForReligiousJudgment: true, reviewState: assessment.reviewState || (assessment.reviewRequired ? 'CANDIDATE' : 'UNREVIEWED') };
   session.assessment = result; engine.recitations.set(sessionId, session); trace(engine, 'RECITATION_ASSESSED', { sessionId, errorCount: assessment.errors?.length || 0 });
   return clone(result);
+}
+
+export function submitHumanReview(engine, input = {}) {
+  requireId(input.reviewId, 'reviewId'); requireId(input.targetId, 'targetId');
+  assertOneOf(input.state, V9_REVIEW_STATES, 'review state');
+  requireId(input.reviewerId, 'reviewerId');
+  const review = { reviewId: input.reviewId, targetId: input.targetId, reviewerId: input.reviewerId, reviewerRole: input.reviewerRole || 'HUMAN_REVIEWER', state: input.state, corrections: clone(input.corrections || []), confirmations: clone(input.confirmations || []), rationale: input.rationale || null, evidenceRefs: clone(input.evidenceRefs || []), reviewedAt: input.reviewedAt || new Date().toISOString() };
+  engine.reviews.push(review); trace(engine, 'HUMAN_REVIEW_RECORDED', { reviewId: review.reviewId, state: review.state });
+  return clone(review);
+}
+
+export function recordFeedback(engine, input = {}) {
+  requireId(input.feedbackId, 'feedbackId'); requireId(input.targetId, 'targetId'); assertOneOf(input.type, V9_FEEDBACK_TYPES, 'feedback type'); requireId(input.reviewerId, 'reviewerId');
+  const feedback = { feedbackId: input.feedbackId, targetId: input.targetId, type: input.type, reviewerId: input.reviewerId, before: clone(input.before || null), after: clone(input.after || null), evidenceRefs: clone(input.evidenceRefs || []), accepted: input.accepted !== false, createdAt: input.createdAt || new Date().toISOString() };
+  if (input.before && input.after) preserveImmutable(input.before, input.after);
+  engine.feedback.push(feedback); trace(engine, 'HUMAN_FEEDBACK_RECORDED', { feedbackId: feedback.feedbackId, type: feedback.type });
+  return clone(feedback);
+}
+
+export function runActiveLearningCycle(engine, input = {}) {
+  requireId(input.cycleId, 'cycleId');
+  const eligible = engine.feedback.filter(item => item.accepted && (!input.targetId || item.targetId === input.targetId));
+  const update = { cycleId: input.cycleId, sampleCount: eligible.length, feedbackIds: eligible.map(item => item.feedbackId), trainingAllowed: eligible.length > 0, modelVersionBefore: input.modelVersionBefore || null, modelVersionAfter: input.modelVersionAfter || null, evaluationRequired: true, deploymentAllowed: false, createdAt: new Date().toISOString() };
+  engine.modelUpdates.push(update); trace(engine, 'ACTIVE_LEARNING_CYCLE_RECORDED', { cycleId: update.cycleId, sampleCount: update.sampleCount });
+  return clone(update);
 }
 
 export function updateMemorizationState(engine, input = {}) {
@@ -196,5 +306,5 @@ export function trace(engine, type, payload = {}) {
 }
 
 export function v9Health(engine) {
-  return { stageId: engine.stageId, version: engine.version, status: engine.status, sourceIdentities: engine.sourceIdentities.size, pages: engine.manifests.size, alignments: engine.alignments.length, recitationSessions: engine.recitations.size, memorizationStates: engine.memorization.size, terminologyAlignments: engine.terminology.length, traces: engine.traces.length };
+  return { stageId: engine.stageId, version: engine.version, status: engine.status, sourceIdentities: engine.sourceIdentities.size, mediaBundles: engine.mediaBundles.size, pages: engine.manifests.size, alignments: engine.alignments.length, fusedEvidence: engine.fusedEvidence.length, recitationSessions: engine.recitations.size, memorizationStates: engine.memorization.size, terminologyAlignments: engine.terminology.length, reviews: engine.reviews.length, feedback: engine.feedback.length, modelUpdates: engine.modelUpdates.length, guardrailDecisions: engine.guardrailDecisions.length, traces: engine.traces.length };
 }
