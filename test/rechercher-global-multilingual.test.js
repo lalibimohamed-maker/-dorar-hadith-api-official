@@ -1,0 +1,104 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import registry from '../config/rechercher-global-multilingual-sources-v2.js';
+
+const byId = (id) => registry.find((source) => source.id === id);
+
+test('global multilingual registry contains verified full API sources', () => {
+  for (const id of ['quranpedia-api', 'islamhouse-api', 'quranenc-api', 'hadeethenc-api', 'islamenc-api', 'islamcontent-api']) {
+    const item = byId(id);
+    assert.ok(item, `missing ${id}`);
+    assert.equal(item.api?.documented, true, `${id} must expose documented API metadata`);
+    assert.ok(item.api?.baseUrl || (Array.isArray(item.api?.endpoints) && item.api.endpoints.length > 0) || item.api?.collectionUrl, `${id} must expose API surface metadata`);
+  }
+});
+
+test('Quranpedia registry keeps the complete documented API surface', () => {
+  const item = byId('quranpedia-api');
+  assert.deepEqual(item.api.endpoints, [
+    '/mushafs', '/mushafs/{mushaf_id}/{surah_id}/{ayah_number?}',
+    '/surah/information/{surah}', '/ayah/{surah}/{ayah}/{service}',
+    '/translations/{surah}/{ayah}/{language?}', '/translation-books/{language_code?}',
+    '/translation/{book_id}/{surah}/{ayah_number?}', '/tafsir', '/books', '/fatwas',
+    '/topics', '/reciters', '/search/{query}/{type}', '/changes?since={date}',
+  ]);
+});
+
+test('IslamHouse registry keeps the expanded official API surface', () => {
+  const item = byId('islamhouse-api');
+  assert.equal(item.api.baseUrl, 'https://api2.islamhouse.com/v1');
+  assert.equal(item.api.publicApi, true);
+  assert.equal(item.api.collectionCompleteness, 'official-repository-listed-endpoints');
+  assert.equal(item.api.authenticationNote.includes('public client key'), true);
+  assert.ok(item.api.endpoints.includes('/main/get-categories-tree/{language}/json'));
+  assert.ok(item.api.endpoints.includes('/main/get-item/{itemId}/{language}/json'));
+  assert.ok(item.api.endpoints.includes('/main/get-item-translations/{itemId}/{language}/json'));
+  assert.ok(item.api.endpoints.includes('/main/books/{language}/{sourceLanguage}/{page}/{perPage}/json'));
+  assert.ok(item.api.endpoints.includes('/quran/get-available-languages/json'));
+  assert.ok(item.api.endpoints.includes('/quran/get-category/{id}/{language}/json'));
+});
+
+test('QuranEnc registry keeps the documented API surface', () => {
+  const item = byId('quranenc-api');
+  assert.equal(item.api.baseUrl, 'https://quranenc.com/api/v1');
+  assert.deepEqual(item.api.endpoints, [
+    '/translations/list/[[{language}]]/?localization={language_iso_code}',
+    '/translation/sura/{translation_key}/{sura_number}',
+    '/translation/aya/{translation_key}/{sura_number}/{aya_number}',
+    '/translations/note',
+  ]);
+  assert.equal(item.api.staticAudioBaseUrl, 'https://d.quranenc.com/data/audio/{translation_key}/{sura_3digits}{aya_3digits}.mp3');
+});
+
+test('HadeethEnc remains fully discoverable rather than a single-category connector', () => {
+  const item = byId('hadeethenc-api');
+  assert.ok(item.api.deepDiscovery);
+  assert.ok(item.api.endpoints.some((endpoint) => endpoint === '/categories/list/?language={language}'));
+  assert.ok(item.api.endpoints.some((endpoint) => endpoint === '/hadeeths/list/?language={language}&category_id={categoryId}&page={page}&per_page={perPage}'));
+});
+
+test('IslamEnc developer API exposes its verified service catalog', () => {
+  const item = byId('islamenc-api');
+  assert.equal(item.api.baseUrl, 'https://s.islamenc.com/api/v1');
+  assert.deepEqual(item.api.endpoints, ['/services']);
+  assert.equal(item.api.documented, true);
+  assert.equal(item.api.verification, 'official-developers-api-link-and-live-json-service-catalog');
+});
+
+test('IslamContent official Postman collection preserves its complete documented endpoint list', () => {
+  const item = byId('islamcontent-api');
+  assert.equal(item.api.documented, true);
+  assert.equal(item.api.collectionUrl, 'https://islamcontent.com/islam_in_brief_api.postman_collection.json');
+  assert.equal(item.api.endpointHost, 'http://newislamhouse-content.hdbc.co');
+  assert.deepEqual(item.api.endpoints, [
+    'GET /Api/categories?lang={lang}',
+    'GET /Api/content?lang={lang}',
+    'GET /Api/content?lang={lang}&name={name}&subject_category={subject_category}&author={author}&sort_by={sort_by}',
+    'GET /Api/languages',
+    'GET /Api/authors?lang={lang}&name={name}',
+    'GET /Api/single-content?id={id}',
+  ]);
+  assert.equal(item.api.liveVerification, 'pending');
+});
+
+test('new multilingual satellites are represented without invented APIs', () => {
+  for (const id of ['islamenc-kids', 'islamenc-saadi', 'islamenc-qna', 'islamenc-rayaheen', 'islamenc-hajj', 'islamhouse-translated-content', 'terminologyenc']) {
+    const item = byId(id);
+    assert.ok(item, `missing ${id}`);
+    assert.equal(item.access.mode, 'web-discovery');
+    assert.equal(item.api, null);
+  }
+});
+
+test('discovery never grants download rights', () => {
+  for (const item of registry) assert.equal(item.discoveryOnly, true);
+});
+
+test('requested multilingual web sources are represented without invented APIs', () => {
+  for (const id of ['islamqa-multilingual', 'alukah', 'ketabonline', 'islamplus', 'islamdag', 'muslim-library', 'islamicbulletin', 'whyislam', 'osoulstore', 'islamreligion', 'byenah', 'daura']) {
+    const item = byId(id);
+    assert.ok(item, `missing ${id}`);
+    assert.equal(item.access.mode, 'web-discovery');
+    assert.equal(item.api, null);
+  }
+});
