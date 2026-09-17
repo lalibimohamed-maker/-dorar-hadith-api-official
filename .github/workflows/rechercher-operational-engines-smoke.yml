@@ -13,7 +13,9 @@ jobs:
   python-engines:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@3d3c42e5c5f6f5a7f7f4d6d5e4d1f8e8c2a5b9c7 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install system engines
         run: |
           sudo apt-get update
