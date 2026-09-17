@@ -34,14 +34,16 @@ jobs:
           import fitz, pypdfium2, pikepdf
           print('PYTHON_ENGINE_IMPORTS_OK')
           PY
-      - name: Verify PDFBox runtime
+      - name: Verify PDFBox and zero-trust sandbox
         run: |
           docker build -f Dockerfile.rechercher-python-sandbox -t rechercher-python-sandbox:ci .
-          docker run --rm --network none rechercher-python-sandbox:ci "import subprocess; subprocess.run(['java','-jar','/opt/pdfbox-app.jar','--version'], check=True)"
-      - name: Verify sandbox boundary
-        run: |
           docker run --rm --network none --read-only --tmpfs /tmp --cap-drop ALL \
-            rechercher-python-sandbox:ci "import os; print('SANDBOX_USER=', os.getuid()); print('NETWORK_POLICY=external-network-disabled-by-runner')"
+            rechercher-python-sandbox:ci "import os, subprocess; print('SANDBOX_USER=', os.getuid()); subprocess.run(['java','-jar','/opt/pdfbox-app.jar','--version'], check=True); print('NETWORK_POLICY=external-network-disabled-by-runner')"
+      - name: Verify Montreal Forced Aligner runtime
+        run: |
+          docker build -f Dockerfile.rechercher-mfa-sandbox -t rechercher-mfa-sandbox:ci .
+          docker run --rm --network none --read-only --tmpfs /tmp --cap-drop ALL \
+            rechercher-mfa-sandbox:ci version
       - name: Boundary smoke
         run: node --test test/rechercher-operational-scale-guards.test.js
       - name: V9 multimodal engine tests
