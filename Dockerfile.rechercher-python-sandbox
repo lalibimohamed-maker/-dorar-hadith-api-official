@@ -11,8 +11,10 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt && pip install --no-cach
 
 ARG PDFBOX_VERSION=3.0.8
 RUN curl -fsSL -o /opt/pdfbox-app.jar \
-    https://archive.apache.org/dist/pdfbox/${PDFBOX_VERSION}/pdfbox-app-${PDFBOX_VERSION}.jar \
-    && sha256sum /opt/pdfbox-app.jar
+    https://downloads.apache.org/pdfbox/${PDFBOX_VERSION}/pdfbox-app-${PDFBOX_VERSION}.jar \
+    && curl -fsSL -o /opt/pdfbox-app.jar.sha512 \
+    https://downloads.apache.org/pdfbox/${PDFBOX_VERSION}/pdfbox-app-${PDFBOX_VERSION}.jar.sha512 \
+    && cd /opt && sha512sum -c pdfbox-app.jar.sha512
 
 RUN useradd --create-home --uid 10001 rechercher \
     && mkdir -p /workspace/input /workspace/output \
