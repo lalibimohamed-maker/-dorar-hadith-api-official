@@ -13,10 +13,7 @@ on:
   schedule:
     - cron: '13 2 * * *'
 
-permissions:
-  # security-justification: required only so the aggregate job can persist the validated permanent scientific ledger under research/evidence/global-multilingual; no repository-wide write operation is intended.
-  contents: write
-  pull-requests: write
+permissions: {}
 
 concurrency:
   group: rechercher-global-multilingual-${{ github.ref }}
@@ -67,6 +64,9 @@ jobs:
     needs: matrix
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    permissions:
+      # security-justification: write is scoped to the aggregate job because only this job persists the validated permanent scientific ledger; matrix workers remain read-only.
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
