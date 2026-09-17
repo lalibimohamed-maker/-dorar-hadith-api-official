@@ -30,7 +30,7 @@ jobs:
       - run: node --test test/rechercher-global-multilingual.test.js
       - run: node scripts/rechercher-global-multilingual-census.mjs > global-multilingual-census.json
       - run: node -e "const x=require('./global-multilingual-census.json'); if(x.sourceCount<15) process.exit(1); if(x.nativeApiSourceCount<4) process.exit(1); console.log(JSON.stringify({sourceCount:x.sourceCount,nativeApiSourceCount:x.nativeApiSourceCount,discoveryOnlySourceCount:x.discoveryOnlySourceCount,languages:x.languageDirectoryEntries.length},null,2))"
-      - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: rechercher-global-multilingual-census
           path: global-multilingual-census.json
