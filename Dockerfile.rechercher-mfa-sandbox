@@ -12,11 +12,8 @@ RUN conda install -y -c conda-forge python=3.11 montreal-forced-aligner=3.* \
        'urllib3>=2.7.0' \
        'jaraco.context>=6.1.0' \
     && conda clean -afy \
-    && python - <<'PY' \
-import importlib.metadata as md
-for name, minimum in (('setuptools','78.1.1'),('wheel','0.46.2'),('urllib3','2.7.0'),('jaraco.context','6.1.0')):
-    print(f'{name}=={md.version(name)} (minimum {minimum})')
-PY
+    && python -c "import importlib.metadata as md; requirements=(('setuptools','78.1.1'),('wheel','0.46.2'),('urllib3','2.7.0'),('jaraco.context','6.1.0')); print(*[f'{name}=={md.version(name)} (minimum {minimum})' for name, minimum in requirements], sep='\\n')"
+
 RUN useradd --create-home --uid 10002 rechercher-mfa \
     && mkdir -p /workspace/input /workspace/output /tmp/mfa \
     && chown -R rechercher-mfa:rechercher-mfa /workspace /tmp/mfa
