@@ -23,15 +23,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
-
       - name: Install Bandit
         run: python -m pip install --disable-pip-version-check 'bandit>=1.8,<2'
-
       - name: Run Bandit on repository Python engines
         shell: bash
         run: |
@@ -50,7 +47,6 @@ jobs:
           fi
           bandit -r "${PY_FILES[@]}" -x '*/tests/*,*/test/*' -f json -o bandit-report.json
           bandit -r "${PY_FILES[@]}" -x '*/tests/*,*/test/*'
-
       - name: Upload Bandit report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v6.0.0
@@ -67,38 +63,21 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
       - name: Pull pinned Trivy image
         run: docker pull ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9
-
       - name: Trivy IaC / Dockerfile scan
         run: |
-          docker run --rm \
-            -v "$PWD:/workspace:ro" \
-            ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 \
-            config --severity HIGH,CRITICAL --exit-code 1 /workspace
-
+          docker run --rm -v "$PWD:/workspace:ro" ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 config --severity HIGH,CRITICAL --exit-code 1 /workspace
       - name: Build Python sandbox image
         run: docker build -f Dockerfile.rechercher-python-sandbox -t rechercher-python-sandbox:security .
-
       - name: Scan Python sandbox image
         run: |
-          docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v "$HOME/.cache/trivy:/root/.cache/" \
-            ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 \
-            image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed rechercher-python-sandbox:security
-
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME/.cache/trivy:/root/.cache/" ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed rechercher-python-sandbox:security
       - name: Build MFA sandbox image
         run: docker build -f Dockerfile.rechercher-mfa-sandbox -t rechercher-mfa-sandbox:security .
-
       - name: Scan MFA sandbox image
         run: |
-          docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v "$HOME/.cache/trivy:/root/.cache/" \
-            ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 \
-            image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed rechercher-mfa-sandbox:security
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME/.cache/trivy:/root/.cache/" ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed rechercher-mfa-sandbox:security
 
   api-dast:
     name: API DAST (OWASP ZAP)
@@ -109,16 +88,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@8207627b7e6f3a9b6f0e2d4e6d0a0b3e7f2a7b0f # v7.0.0
         with:
           node-version: '24'
           cache: npm
-
       - name: Install dependencies
         run: npm ci
-
       - name: Start local API under test
         shell: bash
         run: |
@@ -126,26 +102,17 @@ jobs:
           PORT=3000 npm start > /tmp/deen-allah-api.log 2>&1 &
           echo $! > /tmp/deen-allah-api.pid
           for _ in {1..60}; do
-            if curl --fail --silent --show-error http://127.0.0.1:3000/performance >/tmp/api-performance.json; then
-              cat /tmp/api-performance.json
+            if curl --fail --silent --show-error http://127.0.0.1:3000/health >/tmp/api-health.json; then
+              cat /tmp/api-health.json
               exit 0
             fi
             sleep 1
           done
           cat /tmp/deen-allah-api.log
           exit 1
-
       - name: Run OWASP ZAP baseline scan
         run: |
-          docker run --rm --network host \
-            -v "$PWD:/zap/wrk:rw" \
-            ghcr.io/zaproxy/zaproxy@sha256:287ddd7943bf5cfd3db08a8401750e75903f12db0d5b3e92586af16acdf0a8c9 \
-            zap-baseline.py \
-              -t http://127.0.0.1:3000 \
-              -r /zap/wrk/zap-report.html \
-              -J /zap/wrk/zap-report.json \
-              -l HIGH
-
+          docker run --rm --network host -v "$PWD:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy@sha256:287ddd7943bf5cfd3db08a8401750e75903f12db0d5b3e92586af16acdf0a8c9 zap-baseline.py -t http://127.0.0.1:3000 -r /zap/wrk/zap-report.html -J /zap/wrk/zap-report.json -l HIGH
       - name: Upload ZAP report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v6.0.0
@@ -155,7 +122,6 @@ jobs:
             zap-report.html
             zap-report.json
           if-no-files-found: ignore
-
       - name: Stop local API
         if: always()
         run: |
