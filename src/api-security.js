@@ -6,6 +6,7 @@ const DEFAULT_WINDOW_MS = 60_000;
 const MAX_RATE_ENTRIES = 50_000;
 const DEFAULT_MAX_URL_BYTES = 8 * 1024;
 const DEFAULT_MAX_ARRAY_ITEMS = 50;
+const RATE_IDENTITY_SECRET = crypto.randomBytes(32);
 
 function parseList(value) { return String(value || "").split(",").map((item) => item.trim()).filter(Boolean); }
 function ipv4ToInt(ip) { const parts = ip.split(".").map(Number); if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return null; return (((parts[0] << 24) >>> 0) + (parts[1] << 16) + (parts[2] << 8) + parts[3]) >>> 0; }
@@ -19,7 +20,7 @@ function allowedOrigins() { return new Set(parseList(process.env.CORS_ALLOWED_OR
 export function isTrustedProxy(req) { const remote = String(req.socket.remoteAddress || ""); if (remote === "127.0.0.1" || remote === "::1" || remote === "::ffff:127.0.0.1") return true; return trustedProxyCidrs().some((cidr) => cidrContains(remote, cidr)); }
 export function clientIp(req) { if (trustProxyEnabled() && isTrustedProxy(req)) { if (trustProxyMode() === "cloudflare") { const cf = String(req.headers["cf-connecting-ip"] || "").trim(); if (cf && net.isIP(cf)) return cf; } const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim(); if (forwarded && net.isIP(forwarded)) return forwarded; } return req.socket.remoteAddress || "unknown"; }
 export function edgeRequestAllowed(req) { if (!edgeOnlyEnabled()) return true; return isTrustedProxy(req); }
-export function rateIdentity(req) { const rawKey = String(req.headers["x-api-key"] || "").trim(); if (rawKey) return `key:${crypto.createHash("sha256").update(rawKey).digest("hex")}`; return `ip:${clientIp(req)}`; }
+export function rateIdentity(req) { const rawKey = String(req.headers["x-api-key"] || "").trim(); if (rawKey) return `key:${crypto.createHmac("sha256", RATE_IDENTITY_SECRET).update(rawKey).digest("hex")}`; return `ip:${clientIp(req)}`; }
 
 export function createRateLimiter({ max = DEFAULT_RATE_LIMIT, windowMs = DEFAULT_WINDOW_MS, prefix = "api" } = {}) {
   const buckets = new Map();
