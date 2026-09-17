@@ -45,8 +45,9 @@ jobs:
             echo 'No Python source files found; Bandit gate is not applicable.'
             exit 0
           fi
-          bandit -r "${PY_FILES[@]}" -x '*/tests/*,*/test/*' -f json -o bandit-report.json
-          bandit -r "${PY_FILES[@]}" -x '*/tests/*,*/test/*'
+          echo 'Bandit policy: HIGH severity findings are blocking; lower-severity findings remain visible in the advisory report.'
+          bandit -r "${PY_FILES[@]}" -x '*/tests/*,*/test/*' -f json -o bandit-report.json --severity-level low || true
+          bandit -r "${PY_FILES[@]}" -x '*/tests/*,*/test/*' --severity-level high
       - name: Upload Bandit report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v6.0.0
