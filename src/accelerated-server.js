@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { spawn } from "node:child_process";
 import { pipeline } from "node:stream";
 import { createAccelerationMesh, cachePolicyForPath } from "./acceleration-mesh.js";
-import { clientIp, corsHeaders, createRateLimiter, protectedPath, requestBodyTooLarge, securityHeaders } from "./api-security.js";
+import { clientIp, corsHeaders, createRateLimiter, edgeRequestAllowed, protectedPath, queryArrayTooLarge, requestBodyTooLarge, requestUrlTooLarge, securityHeaders } from "./api-security.js";
 
 const PUBLIC_PORT = Number(process.env.PORT || 3000);
 const INTERNAL_PORT = Number(process.env.INTERNAL_PORT || PUBLIC_PORT + 1);
@@ -130,9 +130,21 @@ function fetchUpstreamStream(req) {
 }
 
 async function proxyRequest(req, res) {
+  if (!edgeRequestAllowed(req)) {
+    res.writeHead(403, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...securityHeaders(req) });
+    return res.end(JSON.stringify({ error: "Origin accepts traffic only from the configured trusted edge" }));
+  }
   if (req.rawHeaders.join("\r\n").length > MAX_HEADER_BYTES) {
     res.writeHead(431, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...securityHeaders(req) });
     return res.end(JSON.stringify({ error: "Request headers too large" }));
+  }
+  if (requestUrlTooLarge(req)) {
+    res.writeHead(414, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...securityHeaders(req) });
+    return res.end(JSON.stringify({ error: "Request URL too large" }));
+  }
+  if (queryArrayTooLarge(req)) {
+    res.writeHead(413, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...securityHeaders(req) });
+    return res.end(JSON.stringify({ error: "Query batch exceeds configured item limit" }));
   }
   if (requestBodyTooLarge(req)) {
     res.writeHead(413, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...securityHeaders(req) });
