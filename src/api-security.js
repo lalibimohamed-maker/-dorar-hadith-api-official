@@ -23,6 +23,7 @@ export function edgeRequestAllowed(req) { if (!edgeOnlyEnabled()) return true; r
 
 // codeql[js/insufficient-password-hash]
 // Intentional HMAC for ephemeral rate-limit bucketing, not password storage; the random key prevents offline reuse across processes.
+
 export function rateIdentity(req) { const rawKey = String(req.headers["x-api-key"] || "").trim(); if (rawKey) return `key:${crypto.createHmac("sha256", RATE_IDENTITY_SECRET).update(rawKey).digest("hex")}`; return `ip:${clientIp(req)}`; }
 
 export function createRateLimiter({ max = DEFAULT_RATE_LIMIT, windowMs = DEFAULT_WINDOW_MS, prefix = "api" } = {}) {
