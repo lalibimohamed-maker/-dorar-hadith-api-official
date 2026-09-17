@@ -1,9 +1,44 @@
 {
   "stage": "V9_MULTIMODAL_ISLAMIC_LEARNING",
-  "version": "9.0.0",
+  "version": "9.1.0",
   "status": "IMPLEMENTED_FOUNDATION",
   "scope": ["text", "pdf", "image", "manuscript", "audio", "recitation", "video", "dialogue"],
+  "pipeline": [
+    "MEDIA_IDENTITY",
+    "PREPROCESSING",
+    "FEATURE_EXTRACTION",
+    "SIGNAL_ALIGNMENT",
+    "PROVENANCE",
+    "MODALITY_FUSION",
+    "CANDIDATE_FINDING",
+    "GUARDRAILS",
+    "HUMAN_REVIEW",
+    "VERIFICATION",
+    "FEEDBACK_LOOP",
+    "ACTIVE_LEARNING",
+    "MODEL_EVALUATION"
+  ],
   "sourceIdentity": ["source_id", "work_id", "edition_id", "manifestation_id", "page_id", "passage_id", "language", "license", "rights", "provenance", "retrieval_date", "content_hash"],
+  "preprocessing": {
+    "normalization": ["container_decode", "format_normalization", "sample_rate_normalization", "channel_normalization", "image_orientation", "image_dimensions", "video_frame_sampling", "pdf_page_rendering", "text_normalization"],
+    "featureExtraction": ["OCR", "ASR", "visual_features", "audio_features", "text_embeddings", "image_text_embeddings", "temporal_features"],
+    "fusion": ["late_fusion", "weighted_evidence_fusion", "cross_modal_embedding_fusion"],
+    "derivedDataMustRetainInputHash": true,
+    "originalMediaImmutable": true
+  },
+  "engines": {
+    "mediaNormalizer": ["FFmpeg"],
+    "pdfImageText": ["PDFium", "MuPDF", "PDFBox"],
+    "ocr": ["OCRmyPDF", "Tesseract"],
+    "imageFeatures": ["OpenCV"],
+    "audioFeatures": ["librosa"],
+    "asr": ["Whisper", "faster-whisper"],
+    "forcedAlignment": ["Montreal Forced Aligner", "WhisperX-compatible adapter"],
+    "crossModalEmbeddings": ["Sentence Transformers", "CLIP/SigLIP-compatible adapter"],
+    "videoSegmentation": ["FFmpeg", "OpenCV"],
+    "policy": ["rights-policy-engine", "privacy-policy-engine", "usage-constraint-engine"],
+    "feedback": ["active-learning-queue", "human-review-dataset", "model-evaluation-loop"]
+  },
   "manuscript": {
     "representation": "IIIF_PRESENTATION_3",
     "pageModel": ["image", "ocr", "transcription", "normalized_text", "translation", "annotation", "scholar_note", "citation", "confidence"],
@@ -18,6 +53,30 @@
     "religiousAuthority": false,
     "fatwaCapability": false,
     "canonicalTextMutation": false
+  },
+  "guardrails": {
+    "rights": ["ALLOWED", "RESTRICTED", "UNKNOWN", "EXPLICIT_PERMISSION_REQUIRED"],
+    "publishOnlyWhenAllowed": true,
+    "unknownIsNotPublishable": true,
+    "restrictedIsNotPublishable": true,
+    "privacyExposureBlocked": true,
+    "usageTermsViolationBlocked": true,
+    "canonicalQuranMutationBlocked": true,
+    "originalMediaMutationBlocked": true,
+    "unsafeExternalExecutionBlocked": true
+  },
+  "humanReview": {
+    "states": ["UNREVIEWED", "CANDIDATE", "HUMAN_REVIEWED", "VERIFIED", "REJECTED"],
+    "requiredForAuthoritativeReligiousUse": true,
+    "reviewerIdentityRequired": true,
+    "evidenceReferencesRequired": true
+  },
+  "feedbackLoop": {
+    "types": ["CORRECTION", "CONFIRMATION", "REJECTION", "BOUNDARY_ADJUSTMENT", "ALIGNMENT_CORRECTION", "TAJWEED_CORRECTION", "TRANSCRIPTION_CORRECTION"],
+    "activeLearning": true,
+    "evaluationRequiredBeforeDeployment": true,
+    "automaticDeployment": false,
+    "sourceCorpusMutation": false
   },
   "memorization": {
     "state": ["retention", "fluency", "accuracy", "confidence", "error_history", "mastery_status"],
@@ -41,20 +100,26 @@
   },
   "researchBasis": {
     "iiifPresentationApi3": "https://iiif.io/api/presentation/3.0/",
-    "fairPrinciples": "https://www.go-fair.org/fair-principles/",
-    "multimodalEducationGraph": "AAAI 2026 SciMKG",
-    "quranAsrBenchmark": "Quran-Lab/quranic-asr-benchmark",
-    "quranRecitationAsr": "FaresElmenshawi/quran-recitations-asr",
-    "quranPronunciationDetection": "arXiv:2509.00094",
-    "tajweedDetection": "arXiv:2101.04200",
-    "adaptiveHifz": "International Conference on Islamic Education and Instruction 2026"
+    "webAnnotationDataModel": "https://www.w3.org/TR/annotation-model/",
+    "w3cProv": "https://www.w3.org/TR/prov-dm/",
+    "premis": "https://www.loc.gov/standards/premis/v3/",
+    "ffmpeg": "https://github.com/FFmpeg/FFmpeg",
+    "montrealForcedAligner": "https://github.com/MontrealCorpusTools/Montreal-Forced-Aligner",
+    "sentenceTransformers": "https://github.com/UKPLab/sentence-transformers",
+    "transformers": "https://github.com/huggingface/transformers",
+    "multimodalAlignmentSurvey": "arXiv:2411.17040",
+    "multimodalRagSurvey": "arXiv:2502.08826",
+    "activeLearningHumanInLoopSurvey": "arXiv:1910.02923"
   },
   "completion": {
     "unitTestsRequired": true,
     "integrationTestsRequired": true,
+    "preprocessingEvidenceRequired": true,
     "rightsEvidenceRequired": true,
     "provenanceRequired": true,
+    "guardrailDecisionRequired": true,
     "scholarReviewRequiredForAuthoritativeUse": true,
+    "feedbackEvaluationRequiredBeforeModelDeployment": true,
     "globalV1V31PlusGateRequired": true
   }
 }
