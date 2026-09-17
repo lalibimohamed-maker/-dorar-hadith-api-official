@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"1.0.0",
+  "stage":"V6-V9_OPERATIONAL_FOUNDATION",
+  "policy":"Register first; execute only from verified deployment images and pinned resources.",
+  "engines":[
+    {"id":"ffmpeg","role":"media-normalization","modalities":["audio","video"],"status":"CI_INSTALLABLE"},
+    {"id":"ocrmypdf-tesseract","role":"ocr","modalities":["pdf","image"],"status":"CI_INSTALLABLE"},
+    {"id":"pdfium-mupdf-pdfbox","role":"pdf-render-extraction","modalities":["pdf"],"status":"ADAPTER_REGISTERED"},
+    {"id":"opencv","role":"image-features","modalities":["image","video"],"status":"PYTHON_INSTALLABLE"},
+    {"id":"librosa","role":"audio-features","modalities":["audio"],"status":"PYTHON_INSTALLABLE"},
+    {"id":"whisper-faster-whisper","role":"asr","modalities":["audio","video"],"status":"PYTHON_INSTALLABLE"},
+    {"id":"montreal-forced-aligner","role":"forced-alignment","modalities":["audio","text"],"status":"PYTHON_INSTALLABLE"},
+    {"id":"sentence-transformers-clipsiglip","role":"cross-modal-embeddings","modalities":["text","image","video"],"status":"PYTHON_INSTALLABLE"}
+  ],
+  "standards":["IIIF Presentation 3.0","W3C Web Annotation","W3C PROV","PREMIS 3.0","FRBR/WEMI","NIST SP 800-207"],
+  "security":{"pythonNetwork":false,"pythonDatabase":false,"pythonGraph":false,"credentialForwarding":false,"sourceMutation":false},
+  "execution":"sandbox-container-only",
+  "verification":"resource-install-smoke + zero-trust-boundary tests"
+}
