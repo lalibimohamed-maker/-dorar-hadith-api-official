@@ -1,0 +1,30 @@
+{
+  "schema": "rechercher/web-discovery-priority/v1",
+  "purpose": "Canonical global multilingual web-discovery sources for Rechercher. Discovery does not grant redistribution rights or Corpus write access.",
+  "policy": {
+    "default_connector": "web-discovery",
+    "native_upgrade_requires_verified_protocol": true,
+    "rights_required_for_download": true,
+    "corpus_isolation": true
+  },
+  "sources": [
+    {"id":"terminology-enc","name":"Encyclopedia of Translated Islamic Terms","url":"https://terminologyenc.com/","languages":"multilingual","role":"terminology;translation;reference","enabled":true},
+    {"id":"alquran-islam-gov-qa","name":"Quran Encyclopedia — Qatar","url":"https://alquran.islam.gov.qa/","languages":"multilingual","role":"quran;tafsir;reference","enabled":true},
+    {"id":"islamic-content","name":"Islamic Content / Aljamhara","url":"https://islamic-content.com/","languages":"multilingual","role":"quran;hadith;encyclopedia;reference","enabled":true},
+    {"id":"islamhouse","name":"IslamHouse","url":"https://islamhouse.com/","languages":"multilingual","role":"books;articles;audio;video;dawah","enabled":true},
+    {"id":"islamhouse-files","name":"IslamHouse File Distribution","url":"https://d1.islamhouse.com/","languages":"multilingual","role":"files;pdf;media","enabled":true},
+    {"id":"islamqa","name":"Islam Question & Answer","url":"https://islamqa.info/","languages":"multilingual","role":"questions;answers;fiqh;aqidah;hadith","enabled":true},
+    {"id":"islamreligion","name":"The Religion of Islam","url":"https://www.islamreligion.com/","languages":"multilingual","role":"articles;dawah;reference","enabled":true},
+    {"id":"byenah","name":"Bayenah / Byenah","url":"https://byenah.com/","languages":"multilingual","role":"dawah;lectures;media;reference","enabled":true},
+    {"id":"muslim-library","name":"Muslim Library","url":"https://www.muslim-library.com/","languages":"multilingual","role":"books;library;reference","enabled":true},
+    {"id":"islamic-bulletin","name":"Islamic Bulletin","url":"https://islamicbulletin.org/","languages":"multilingual","role":"books;articles;dawah","enabled":true},
+    {"id":"whyislam","name":"WhyIslam","url":"https://www.whyislam.org/","languages":"multilingual","role":"dawah;articles;education","enabled":true},
+    {"id":"osoul-store","name":"Osoul Store","url":"https://osoulstore.com/","languages":"multilingual","role":"books;digital-publications;media","enabled":true},
+    {"id":"alukah","name":"Alukah","url":"https://www.alukah.net/","languages":"multilingual","role":"articles;books;research;reference","enabled":true},
+    {"id":"ketab-online","name":"KetabOnline","url":"https://ketabonline.com/","languages":"arabic","role":"books;digital-library;reference","enabled":true},
+    {"id":"azbyka","name":"Azbyka","url":"https://azbyka.ru/","languages":"russian","role":"religion;reference;comparative-discovery","enabled":true},
+    {"id":"islam-plus-ru","name":"Islam Plus Russian","url":"https://islam.plus/ru","languages":"russian","role":"articles;fatwas;media;reference","enabled":true},
+    {"id":"islamdag","name":"IslamDag","url":"https://islamdag.ru/","languages":"russian","role":"articles;dawah;reference","enabled":true},
+    {"id":"daura","name":"Daura","url":"https://daura.com/","languages":"multilingual","role":"education;courses;islamic-content","enabled":true}
+  ]
+}
