@@ -9,10 +9,14 @@ function parseOrigins() {
 }
 
 const allowedOrigins = parseOrigins();
+const trustProxy = String(process.env.TRUST_PROXY || "false").toLowerCase() === "true";
 
 export function clientIp(req) {
-  const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
-  return forwarded || req.socket.remoteAddress || "unknown";
+  if (trustProxy) {
+    const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+    if (forwarded) return forwarded;
+  }
+  return req.socket.remoteAddress || "unknown";
 }
 
 export function rateIdentity(req) {
@@ -51,7 +55,7 @@ export function corsHeaders(req) {
     "access-control-max-age": "600",
     vary: "Origin, Accept-Encoding, Accept-Language",
   };
-  if (origin && allowedOrigins.has("*") ) headers["access-control-allow-origin"] = "*";
+  if (origin && allowedOrigins.has("*")) headers["access-control-allow-origin"] = "*";
   else if (origin && allowedOrigins.has(origin)) {
     headers["access-control-allow-origin"] = origin;
     headers["access-control-allow-credentials"] = "true";
