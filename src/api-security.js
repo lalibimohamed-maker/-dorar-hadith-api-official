@@ -1,22 +1,69 @@
 import crypto from "node:crypto";
+import net from "node:net";
 
 const DEFAULT_RATE_LIMIT = 60;
 const DEFAULT_WINDOW_MS = 60_000;
 const MAX_RATE_ENTRIES = 50_000;
+const DEFAULT_MAX_URL_BYTES = 8 * 1024;
+const DEFAULT_MAX_ARRAY_ITEMS = 50;
+
+function parseList(value) {
+  return String(value || "").split(",").map((item) => item.trim()).filter(Boolean);
+}
 
 function parseOrigins() {
-  return new Set(String(process.env.CORS_ALLOWED_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean));
+  return new Set(parseList(process.env.CORS_ALLOWED_ORIGINS));
+}
+
+function ipv4ToInt(ip) {
+  const parts = ip.split(".").map(Number);
+  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return null;
+  return (((parts[0] << 24) >>> 0) + (parts[1] << 16) + (parts[2] << 8) + parts[3]) >>> 0;
+}
+
+function cidrContains(ip, cidr) {
+  if (ip === cidr) return true;
+  const [network, prefixText] = cidr.split("/");
+  if (!network || prefixText === undefined) return false;
+  const prefix = Number(prefixText);
+  if (net.isIPv4(ip) && net.isIPv4(network)) {
+    if (!Number.isInteger(prefix) || prefix < 0 || prefix > 32) return false;
+    const value = ipv4ToInt(ip);
+    const base = ipv4ToInt(network);
+    if (value === null || base === null) return false;
+    const mask = prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0;
+    return (value & mask) === (base & mask);
+  }
+  return false;
 }
 
 const allowedOrigins = parseOrigins();
 const trustProxy = String(process.env.TRUST_PROXY || "false").toLowerCase() === "true";
+const trustProxyMode = String(process.env.TRUST_PROXY_MODE || "xff").toLowerCase();
+const trustedProxyCidrs = parseList(process.env.TRUSTED_PROXY_CIDRS);
+const edgeOnly = String(process.env.EDGE_ONLY || "false").toLowerCase() === "true";
+
+export function isTrustedProxy(req) {
+  const remote = String(req.socket.remoteAddress || "");
+  if (remote === "127.0.0.1" || remote === "::1" || remote === "::ffff:127.0.0.1") return true;
+  return trustedProxyCidrs.some((cidr) => cidrContains(remote, cidr));
+}
 
 export function clientIp(req) {
-  if (trustProxy) {
+  if (trustProxy && isTrustedProxy(req)) {
+    if (trustProxyMode === "cloudflare") {
+      const cf = String(req.headers["cf-connecting-ip"] || "").trim();
+      if (cf && net.isIP(cf)) return cf;
+    }
     const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
-    if (forwarded) return forwarded;
+    if (forwarded && net.isIP(forwarded)) return forwarded;
   }
   return req.socket.remoteAddress || "unknown";
+}
+
+export function edgeRequestAllowed(req) {
+  if (!edgeOnly) return true;
+  return isTrustedProxy(req);
 }
 
 export function rateIdentity(req) {
@@ -76,6 +123,28 @@ export function securityHeaders(req) {
 export function requestBodyTooLarge(req, maxBytes = Number(process.env.MAX_REQUEST_BODY_BYTES || 1_048_576)) {
   const length = Number(req.headers["content-length"] || 0);
   return Number.isFinite(length) && length > maxBytes;
+}
+
+export function requestUrlTooLarge(req, maxBytes = Number(process.env.MAX_URL_BYTES || DEFAULT_MAX_URL_BYTES)) {
+  return Buffer.byteLength(String(req.url || "/"), "utf8") > maxBytes;
+}
+
+export function queryArrayTooLarge(req, maxItems = Number(process.env.MAX_QUERY_ARRAY_ITEMS || DEFAULT_MAX_ARRAY_ITEMS)) {
+  const url = new URL(req.url || "/", "http://localhost");
+  for (const key of ["translationIds", "tafsirIds"]) {
+    const value = url.searchParams.get(key);
+    if (value && value.split(",").filter(Boolean).length > maxItems) return true;
+  }
+  const judgments = url.searchParams.get("judgments");
+  if (judgments) {
+    try {
+      const parsed = JSON.parse(judgments);
+      if (Array.isArray(parsed) && parsed.length > maxItems) return true;
+    } catch {
+      // Endpoint-level validation returns the semantic 400 response.
+    }
+  }
+  return false;
 }
 
 export function isLoopback(req) {
