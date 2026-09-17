@@ -15,7 +15,7 @@ async function getJson(url, { fetchImpl = globalThis.fetch, headers = {} } = {})
   return response.json();
 }
 
-function candidate({ adapter, url, sourceId = null, workId = null, format = null, rightsStatus = 'UNKNOWN', provenance = null, metadata = {} }) {
+export function candidate({ adapter, url, sourceId = null, workId = null, format = null, rightsStatus = 'UNKNOWN', provenance = null, metadata = {} }) {
   return Object.freeze({ adapter, url, sourceId, workId, format, rightsStatus, provenance, metadata, acquisitionIndependentFromPublication: true, publishable: rightsStatus === 'ALLOWED' });
 }
 
