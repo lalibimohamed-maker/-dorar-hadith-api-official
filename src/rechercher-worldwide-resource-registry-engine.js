@@ -96,7 +96,8 @@ export function validateWorldwideResource(resource) {
   const missing = REQUIRED_RESOURCE_FIELDS.filter(field => resource?.[field] === undefined || resource?.[field] === null || resource?.[field] === '');
   const rightsValid = RIGHTS.includes(resource?.rights);
   const publishableValid = resource?.publishable !== true || resource?.rights === 'ALLOWED';
-  return { valid: missing.length === 0 && rightsValid && publishableValid, missing, rightsValid, publishableValid };
+  const rightsGate = resource?.rights === 'ALLOWED';
+  return { valid: missing.length === 0 && rightsValid && rightsGate && publishableValid, missing, rightsValid, publishableValid, rightsGate };
 }
 
 export function validateEngineRegistration(registry, engineId) {
@@ -124,7 +125,7 @@ export function buildWorldwideResourceAudit(registry) {
     standardCoverage,
     resourcesValid: invalidRights.length === 0,
     enginesValid: engineResults.every(r => r.valid),
-    rightsSafe: resourceResults.every(r => r.publishableValid),
+    rightsSafe: resourceResults.every(r => r.publishableValid && r.rightsGate),
     complete: resourceResults.length > 0 && engineResults.length > 0 && standardCoverage.valid && invalidRights.length === 0 && engineResults.every(r => r.valid),
     resourceResults,
     engineResults,
