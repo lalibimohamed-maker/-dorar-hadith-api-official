@@ -1,11 +1,15 @@
 FROM condaforge/mambaforge:24.9.2-0
 
-ENV CONDA_NONINTERACTIVE=true PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+ENV CONDA_NONINTERACTIVE=true \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    MFA_ROOT_DIR=/tmp/mfa
+
 RUN conda install -y -c conda-forge python=3.11 montreal-forced-aligner=3.* \
     && conda clean -afy
 RUN useradd --create-home --uid 10002 rechercher-mfa \
-    && mkdir -p /workspace/input /workspace/output \
-    && chown -R rechercher-mfa:rechercher-mfa /workspace
+    && mkdir -p /workspace/input /workspace/output /tmp/mfa \
+    && chown -R rechercher-mfa:rechercher-mfa /workspace /tmp/mfa
 USER rechercher-mfa
 WORKDIR /workspace
 ENTRYPOINT ["mfa"]
