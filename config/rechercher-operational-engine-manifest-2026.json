@@ -1,16 +1,18 @@
 {
-  "schemaVersion":"1.1.0",
+  "schemaVersion":"1.2.0",
   "stage":"V6-V9_OPERATIONAL_FOUNDATION",
   "policy":"Register first; execute only from verified deployment images and pinned resources.",
   "engines":[
-    {"id":"ffmpeg","role":"media-normalization-and-video-segmentation","modalities":["audio","video"],"status":"CI_INSTALLABLE"},
-    {"id":"ocrmypdf-tesseract","role":"ocr","modalities":["pdf","image"],"status":"CI_INSTALLABLE"},
-    {"id":"pdfium-mupdf-pdfbox","role":"pdf-render-extraction","modalities":["pdf"],"status":"ADAPTER_REGISTERED"},
-    {"id":"opencv","role":"image-and-video-features","modalities":["image","video"],"status":"PYTHON_INSTALLABLE"},
-    {"id":"librosa","role":"audio-features","modalities":["audio"],"status":"PYTHON_INSTALLABLE"},
-    {"id":"whisper-faster-whisper","role":"asr","modalities":["audio","video"],"status":"PYTHON_INSTALLABLE"},
-    {"id":"montreal-forced-aligner","role":"verse-word-phonetic-alignment","modalities":["audio","text"],"status":"PYTHON_INSTALLABLE"},
-    {"id":"sentence-transformers-clipsiglip","role":"cross-modal-embeddings","modalities":["text","image","video"],"status":"PYTHON_INSTALLABLE"}
+    {"id":"ffmpeg","role":"media-normalization-and-video-segmentation","modalities":["audio","video"],"execution":"system","status":"CI_INSTALLABLE","source":"https://ffmpeg.org/"},
+    {"id":"ocrmypdf-tesseract","role":"ocr","modalities":["pdf","image"],"execution":"sandbox","status":"CI_INSTALLABLE","source":"https://ocrmypdf.readthedocs.io/"},
+    {"id":"pdfium-pymupdf-pdfbox","role":"pdf-render-extraction-validation","modalities":["pdf"],"execution":"sandbox","status":"CI_INSTALLABLE","source":["https://pymupdf.readthedocs.io/","https://pdfbox.apache.org/"]},
+    {"id":"pypdfium2","role":"pdfium-rendering-adapter","modalities":["pdf"],"execution":"sandbox","status":"PYTHON_INSTALLABLE","source":"https://pypi.org/project/pypdfium2/"},
+    {"id":"opencv","role":"image-and-video-features","modalities":["image","video"],"execution":"sandbox","status":"PYTHON_INSTALLABLE","source":"https://opencv.org/"},
+    {"id":"librosa","role":"audio-features","modalities":["audio"],"execution":"sandbox","status":"PYTHON_INSTALLABLE","source":"https://librosa.org/"},
+    {"id":"whisper-faster-whisper","role":"asr","modalities":["audio","video"],"execution":"sandbox","status":"PYTHON_INSTALLABLE","source":["https://github.com/openai/whisper","https://github.com/SYSTRAN/faster-whisper"]},
+    {"id":"whisperx","role":"word-level-timestamps-and-alignment","modalities":["audio","text"],"execution":"sandbox","status":"PYTHON_INSTALLABLE","source":"https://github.com/m-bain/whisperX"},
+    {"id":"montreal-forced-aligner","role":"phonetic-forced-alignment","modalities":["audio","text"],"execution":"dedicated-conda-sandbox","status":"CI_BUILD_REQUIRED","source":"https://github.com/MontrealCorpusTools/Montreal-Forced-Aligner"},
+    {"id":"sentence-transformers-clipsiglip","role":"cross-modal-embeddings","modalities":["text","image","video"],"execution":"sandbox","status":"PYTHON_INSTALLABLE","source":["https://github.com/UKPLab/sentence-transformers","https://huggingface.co/docs/transformers"]}
   ],
   "v9Capabilities":[
     "MEDIA_IDENTITY","PDF_IMAGE_MANUSCRIPT_PROCESSING","OCR_TRANSCRIPTION_ALIGNMENT","AUDIO_ASR",
@@ -24,5 +26,9 @@
   "execution":"sandbox-container-only",
   "v9Orchestrator":"src/rechercher-v9-multimodal-learning-orchestrator.js",
   "v9Config":"config/rechercher-v9-multimodal-recitation-2026.json",
-  "verification":"resource-install-smoke + zero-trust-boundary tests + V9 end-to-end contract tests"
+  "verification":"resource-install-smoke + zero-trust-boundary tests + V9 end-to-end contract tests",
+  "externalResourcesMustBeRecorded":true,
+  "originalMediaImmutable":true,
+  "canonicalQuranArabicImmutable":true,
+  "automaticModelDeployment":false
 }
