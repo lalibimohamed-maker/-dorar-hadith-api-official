@@ -4,6 +4,7 @@ import {
   chunkAudioStream,
   streamAudioToPython,
   runAudioSignalPreflight,
+  resolveAudioSourceFactory,
   validateCrossModalityAnchorMap,
   attachMandatoryErrorAnchors,
   lockV9CandidateStatus,
@@ -65,4 +66,22 @@ test('AI result cannot enter the public graph without an Ed25519 human-review si
   });
   assert.equal(verified.publicGraphEligible, true);
   assert.equal(verified.automaticPromotion, false);
+});
+
+
+test('two-pass audio analysis requires a replayable factory for one-shot async streams', async () => {
+  async function* oneShot() { yield Buffer.alloc(12); }
+  assert.throws(
+    () => resolveAudioSourceFactory({ audioSource: oneShot() }),
+    /AUDIO_STREAM_FACTORY_REQUIRED_FOR_TWO_PASS_ANALYSIS/
+  );
+
+  let factoryCalls = 0;
+  const factory = () => {
+    factoryCalls += 1;
+    return [Buffer.alloc(12)];
+  };
+  const resolved = resolveAudioSourceFactory({ audioSourceFactory: factory });
+  assert.deepEqual([...resolved()], [Buffer.alloc(12)]);
+  assert.equal(factoryCalls, 1);
 });
