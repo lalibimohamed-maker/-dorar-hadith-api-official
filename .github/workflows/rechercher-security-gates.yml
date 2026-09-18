@@ -122,8 +122,50 @@ jobs:
           cat /tmp/deen-allah-api.log
           exit 1
       - name: Run OWASP ZAP baseline scan
+        shell: bash
         run: |
-          docker run --rm --network host -v "$PWD:/zap/wrk:rw" zaproxy/zap-stable@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa zap-baseline.py -t http://127.0.0.1:3000 -r /zap/wrk/zap-report.html -J /zap/wrk/zap-report.json -l HIGH
+          set -euo pipefail
+          # ZAP -l accepts alert status levels (PASS/IGNORE/INFO/WARN/FAIL),
+          # not vulnerability severities. HIGH is therefore invalid.
+          # Keep the baseline scan warning-tolerant, then enforce the intended
+          # HIGH-risk gate from the generated JSON report.
+          docker run --rm --network host -v "$PWD:/zap/wrk:rw" \
+            zaproxy/zap-stable@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa \
+            zap-baseline.py \
+              -t http://127.0.0.1:3000 \
+              -r /zap/wrk/zap-report.html \
+              -J /zap/wrk/zap-report.json \
+              -l WARN \
+              -I
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("zap-report.json")
+          if not report.is_file():
+              raise SystemExit("ZAP JSON report was not generated")
+
+          data = json.loads(report.read_text(encoding="utf-8"))
+          high = []
+          for site in data.get("site", []):
+              for alert in site.get("alerts", []):
+                  if str(alert.get("riskcode", "")).strip() == "3":
+                      high.append({
+                          "name": alert.get("name", "unknown"),
+                          "url": alert.get("url", ""),
+                          "count": alert.get("count", 0),
+                          "pluginid": alert.get("pluginid", ""),
+                      })
+
+          if high:
+              print("ZAP HIGH-risk alerts detected:")
+              for item in high:
+                  print(json.dumps(item, ensure_ascii=False))
+              raise SystemExit(1)
+
+          print("ZAP HIGH-risk gate passed: no riskcode=3 alerts.")
+          PY
       - name: Upload ZAP report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
