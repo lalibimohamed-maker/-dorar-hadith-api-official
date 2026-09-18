@@ -1,4 +1,4 @@
-import { Readable } from 'node:stream';
+import { Readable, PassThrough } from 'node:stream';
 import {
   createV9MultimodalRecitationEngine,
   registerMediaIdentity,
@@ -54,18 +54,72 @@ export async function* chunkAudioStream(audioSource, maxPayloadSize = V9_RUNTIME
 }
 
 /**
+ * Live audio tee with bounded PassThrough buffers. A single live source is
+ * consumed once; both consumers receive the same bytes and backpressure from
+ * either branch pauses the producer.
+ */
+export function createLiveAudioTee(audioSource, { highWaterMark = V9_RUNTIME_INVARIANTS.MAX_AUDIO_PAYLOAD_BYTES } = {}) {
+  if (!audioSource?.[Symbol.asyncIterator]) throw new TypeError('LIVE_AUDIO_ASYNC_SOURCE_REQUIRED');
+  const snr = new PassThrough({ highWaterMark });
+  const processing = new PassThrough({ highWaterMark });
+  let stopped = false;
+  const waitDrain = stream => stream.writableNeedDrain ? new Promise((resolve, reject) => {
+    const drain = () => { cleanup(); resolve(); };
+    const error = err => { cleanup(); reject(err); };
+    const cleanup = () => { stream.off('drain', drain); stream.off('error', error); };
+    stream.once('drain', drain); stream.once('error', error);
+  }) : Promise.resolve();
+  const completion = (async () => {
+    try {
+      for await (const value of audioSource) {
+        if (stopped) break;
+        const chunk = Buffer.isBuffer(value) ? value : Buffer.from(value);
+        if (!snr.write(chunk)) await waitDrain(snr);
+        if (!processing.write(chunk)) await waitDrain(processing);
+      }
+      snr.end(); processing.end();
+    } catch (error) {
+      snr.destroy(error); processing.destroy(error);
+      throw error;
+    }
+  })();
+  return Object.freeze({
+    snrSource: snr,
+    processingSource: processing,
+    completion,
+    stop(reason = new Error('LIVE_AUDIO_TEE_STOPPED')) {
+      stopped = true; snr.destroy(reason); processing.destroy(reason);
+    }
+  });
+}
+
+/**
  * Zero-trust streaming bridge: only bounded audio chunks cross the Node/Python boundary.
  * The bridge must consume each chunk independently and MUST NOT receive a whole recording.
  */
+async function writeAudioChunkWithBackpressure(writable, chunk) {
+  if (typeof writable.write !== 'function') throw new TypeError('audio writable bridge is required');
+  if (writable.write(chunk)) return;
+  await new Promise((resolve, reject) => {
+    const drain = () => { cleanup(); resolve(); };
+    const error = err => { cleanup(); reject(err); };
+    const cleanup = () => { writable.off('drain', drain); writable.off('error', error); };
+    writable.once('drain', drain); writable.once('error', error);
+  });
+}
+
 export async function streamAudioToPython({ audioSource, bridge, maxPayloadSize = V9_RUNTIME_INVARIANTS.MAX_AUDIO_PAYLOAD_BYTES } = {}) {
-  if (!bridge || typeof bridge.processAudioChunk !== 'function') throw new TypeError('zero-trust audio bridge is required');
+  if (!bridge || (typeof bridge.processAudioChunk !== 'function' && typeof bridge.writeAudioChunk !== 'function')) throw new TypeError('zero-trust audio bridge is required');
   const results = [];
   let chunkCount = 0;
   let totalBytes = 0;
   for await (const chunk of chunkAudioStream(audioSource, maxPayloadSize)) {
     if (chunk.byteLength > maxPayloadSize) throw new Error('AUDIO_CHUNK_EXCEEDS_MAX_PAYLOAD');
-    const result = await bridge.processAudioChunk(chunk, { chunkIndex: chunkCount, maxPayloadSize, mediaOnly: true });
-    results.push(result);
+    const meta = { chunkIndex: chunkCount, maxPayloadSize, mediaOnly: true };
+    const result = typeof bridge.processAudioChunk === 'function'
+      ? await bridge.processAudioChunk(chunk, meta)
+      : await writeAudioChunkWithBackpressure(bridge.writeAudioChunk, chunk);
+    results.push(result ?? { accepted: true });
     totalBytes += chunk.byteLength;
     chunkCount += 1;
   }
@@ -112,10 +166,13 @@ function anchorKey(error) {
 export function attachMandatoryErrorAnchors(errors = [], anchorMap) {
   const anchors = validateCrossModalityAnchorMap(anchorMap);
   const byWord = new Map(anchors.map(anchor => [anchor.canonicalWordId, anchor]));
+  const seen = new Set();
   return Object.freeze(errors.map((error, index) => {
-    const key = anchorKey(error) || anchors[index]?.canonicalWordId;
+    const key = anchorKey(error);
     const anchor = byWord.get(key);
-    if (!anchor) throw new Error(`CROSS_MODAL_ANCHOR_MISSING_FOR_ERROR:${index}`);
+    if (!anchor) throw new Error('CROSS_MODAL_ANCHOR_MISSING_FOR_ERROR:' + index);
+    if (seen.has(key)) throw new Error('CROSS_MODAL_ANCHOR_DUPLICATE_FOR_ERROR:' + index);
+    seen.add(key);
     return Object.freeze({
       ...clone(error),
       canonicalWordId: anchor.canonicalWordId,
