@@ -163,6 +163,22 @@ export function validateCrossModalityAnchorMap(anchorMap = []) {
   return Object.freeze(anchorMap.map(normalizeAnchor));
 }
 
+/**
+ * Resolve a replayable source for static/two-pass analysis. Live streams must use
+ * createLiveAudioTee instead so the SNR pass and processing pass observe identical bytes.
+ */
+export function resolveAudioSourceFactory({ audioSource = null, audioSourceFactory = null, audioMode = 'STATIC' } = {}) {
+  if (audioMode === 'LIVE') {
+    if (audioSourceFactory) throw new Error('LIVE_AUDIO_FACTORY_FORBIDDEN');
+    return () => { throw new Error('LIVE_AUDIO_FACTORY_NOT_APPLICABLE'); };
+  }
+  if (typeof audioSourceFactory === 'function') return audioSourceFactory;
+  if (audioSource?.[Symbol.asyncIterator] && !Array.isArray(audioSource)) {
+    throw new Error('AUDIO_STREAM_FACTORY_REQUIRED_FOR_TWO_PASS_ANALYSIS');
+  }
+  return () => audioSource;
+}
+
 function anchorKey(error) {
   return error?.canonicalWordId || error?.expected?.canonicalWordId || error?.observed?.canonicalWordId || null;
 }
