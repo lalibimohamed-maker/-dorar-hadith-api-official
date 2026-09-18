@@ -24,7 +24,7 @@ test('full V9 case wires PDF/image/audio evidence through streaming, SNR, anchor
     anchorMap: [{ audioTimestamp: { startMs: 0, endMs: 500 }, mfaTimestamp: { startMs: 0, endMs: 500 }, canvasCoordinate: { x: 1, y: 2, w: 3, h: 4 }, canonicalWordId: 'quran:1:1:1', iiifCanvasId: 'https://example.test/canvas/1' }],
     alignment: { alignmentId: 'align:1', mediaId: 'audio:1', textId: 'ayah:1:1', segments: [{ text: 'word', startMs: 0, endMs: 500 }], provenance: { sourceId: 'src:quran:test' } },
     recitation: { sessionId: 'session:1', sourceId: 'src:quran:test', surahId: 1, ayahs: [{ ayahId: 1, startMs: 0, endMs: 1000 }] },
-    recitationAnalysis: { referenceWords: [{ word: 'a', canonicalWordId: 'quran:1:1:1' }, { word: 'b' }], observedWords: [{ word: 'a', canonicalWordId: 'quran:1:1:1' }, { word: 'x' }], hesitationCount: 1, tajweedCandidates: [{ rule: 'candidate', confidence: 0.6 }] },
+    recitationAnalysis: { referenceWords: [{ word: 'a', canonicalWordId: 'quran:1:1:1' }, { word: 'b' }], observedWords: [{ word: 'a', canonicalWordId: 'quran:1:1:1' }, { word: 'x' }], hesitationCount: 1, tajweedCandidates: [{ rule: 'candidate', confidence: 0.6, canonicalWordId: 'quran:1:1:1' }] },
     memorization: { learnerId: 'learner:1', unitId: '1:1', accuracy: 0.9, retention: 0.8 }, spacedReview: { quality: 0.9 },
     terminology: { conceptId: 'tajweed:ghunnah', sourceLanguage: 'ar', targetLanguage: 'en', sourceTerm: 'غنة', targetTerm: 'ghunnah', relation: 'EXACT_EQUIVALENT', provenance: { sourceId: 'src:quran:test' } }, feedback: { errors: [{ type: 'TAJWEED_CANDIDATE' }] }
   });
