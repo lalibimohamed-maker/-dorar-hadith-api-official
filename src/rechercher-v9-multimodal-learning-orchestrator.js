@@ -97,14 +97,18 @@ export function createLiveAudioTee(audioSource, { highWaterMark = V9_RUNTIME_INV
  * Zero-trust streaming bridge: only bounded audio chunks cross the Node/Python boundary.
  * The bridge must consume each chunk independently and MUST NOT receive a whole recording.
  */
-async function writeAudioChunkWithBackpressure(writable, chunk) {
-  if (typeof writable.write !== 'function') throw new TypeError('audio writable bridge is required');
-  if (writable.write(chunk)) return;
+async function writeAudioChunkWithBackpressure(bridge, chunk, meta) {
+  if (typeof bridge.writeAudioChunk !== 'function') throw new TypeError('audio writable bridge is required');
+  const accepted = await bridge.writeAudioChunk(chunk, meta);
+  if (accepted !== false) return;
+  if (typeof bridge.once !== 'function' || typeof bridge.off !== 'function') {
+    throw new Error('AUDIO_BACKPRESSURE_DRAIN_SIGNAL_REQUIRED');
+  }
   await new Promise((resolve, reject) => {
     const drain = () => { cleanup(); resolve(); };
     const error = err => { cleanup(); reject(err); };
-    const cleanup = () => { writable.off('drain', drain); writable.off('error', error); };
-    writable.once('drain', drain); writable.once('error', error);
+    const cleanup = () => { bridge.off('drain', drain); bridge.off('error', error); };
+    bridge.once('drain', drain); bridge.once('error', error);
   });
 }
 
@@ -118,7 +122,7 @@ export async function streamAudioToPython({ audioSource, bridge, maxPayloadSize 
     const meta = { chunkIndex: chunkCount, maxPayloadSize, mediaOnly: true };
     const result = typeof bridge.processAudioChunk === 'function'
       ? await bridge.processAudioChunk(chunk, meta)
-      : await writeAudioChunkWithBackpressure(bridge.writeAudioChunk, chunk);
+      : await writeAudioChunkWithBackpressure(bridge, chunk, meta);
     results.push(result ?? { accepted: true });
     totalBytes += chunk.byteLength;
     chunkCount += 1;
