@@ -255,6 +255,23 @@ export function evaluateV9FeedbackImpact(batch, metrics = {}) {
   return Object.freeze({ batchId: batch.batchId, evaluated: true, metrics: clone(metrics), deploymentAllowed: false, requiresGovernedModelEvaluation: true, requiresHumanApproval: true });
 }
 
+export function invalidateV9CandidateSession({ sessionId, sourceId, reason } = {}) {
+  requireId(sessionId, 'sessionId');
+  requireId(sourceId, 'sourceId');
+  requireId(reason, 'reason');
+  return Object.freeze({
+    sessionId,
+    sourceId,
+    reason,
+    status: 'INVALIDATED',
+    candidatePersisted: false,
+    sandboxPersistenceBlocked: true,
+    publicGraphPersistenceBlocked: true,
+    rollbackCompleted: true,
+    invalidatedAt: new Date().toISOString(),
+  });
+}
+
 export async function runV9MultimodalLearningCase(input = {}) {
   requireId(input.sourceIdentity, 'sourceIdentity');
   if (!Array.isArray(input.media) || input.media.length === 0) throw new TypeError('media is required');
@@ -311,11 +328,18 @@ export async function runV9MultimodalLearningCase(input = {}) {
   if (assessment?.errors?.length || assessment?.tajweedCandidates?.length) {
     if (!anchorMap) throw new Error('CROSS_MODAL_ANCHOR_MAP_REQUIRED_BEFORE_RECITATION_ERRORS');
     try {
-      assessment.errors = [...attachMandatoryErrorAnchors(assessment.errors, anchorMap)];
-      assessment.tajweedCandidates = assessment.tajweedCandidates.map((candidate, index) => {
-        const anchored = attachMandatoryErrorAnchors([{ type: 'TAJWEED_CANDIDATE', ...candidate }], anchorMap)[0];
-        return { ...anchored, candidateIndex: index };
-      });
+      // Build every anchored collection before mutating the assessment. This makes
+      // anchor validation transactional: one missing anchor invalidates the whole
+      // candidate session and leaves no partially anchored candidate state.
+      const anchoredErrors = attachMandatoryErrorAnchors(assessment.errors, anchorMap);
+      const anchoredTajweedCandidates = Object.freeze(
+        assessment.tajweedCandidates.map((candidate, index) => {
+          const anchored = attachMandatoryErrorAnchors([{ type: 'TAJWEED_CANDIDATE', ...candidate }], anchorMap)[0];
+          return Object.freeze({ ...anchored, candidateIndex: index });
+        })
+      );
+      assessment.errors = [...anchoredErrors];
+      assessment.tajweedCandidates = [...anchoredTajweedCandidates];
       assessment.status = V9_RUNTIME_INVARIANTS.AI_STATUS_LOCK;
       assessment.workspace = 'LEARNER_SANDBOX';
       assessment.target = 'LEARNER_SANDBOX';
