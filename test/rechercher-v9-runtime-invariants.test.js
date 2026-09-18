@@ -5,6 +5,8 @@ import {
   streamAudioToPython,
   runAudioSignalPreflight,
   resolveAudioSourceFactory,
+  createLiveAudioTee,
+  invalidateV9CandidateSession,
   validateCrossModalityAnchorMap,
   attachMandatoryErrorAnchors,
   lockV9CandidateStatus,
@@ -84,4 +86,54 @@ test('two-pass audio analysis requires a replayable factory for one-shot async s
   const resolved = resolveAudioSourceFactory({ audioSourceFactory: factory });
   assert.deepEqual([...resolved()], [Buffer.alloc(12)]);
   assert.equal(factoryCalls, 1);
+});
+
+
+test('live audio tee fans out one source with bounded branches', async () => {
+  async function* live() { yield Buffer.alloc(7); yield Buffer.alloc(5); }
+  const tee = createLiveAudioTee(live(), { highWaterMark: 8 });
+  const [snr, processing] = await Promise.all([
+    (async () => { const out=[]; for await (const c of tee.snrSource) out.push(c.length); return out; })(),
+    (async () => { const out=[]; for await (const c of tee.processingSource) out.push(c.length); return out; })()
+  ]);
+  await tee.completion;
+  assert.deepEqual(snr, [7, 5]);
+  assert.deepEqual(processing, [7, 5]);
+});
+
+test('writable bridge backpressure is awaited instead of queueing', async () => {
+  let writes = 0;
+  let releaseDrain;
+  const writable = {
+    write(chunk) {
+      writes += chunk.length;
+      return false;
+    },
+    once(event, handler) {
+      if (event === 'drain') releaseDrain = handler;
+      return this;
+    },
+    off() { return this; }
+  };
+  const pending = streamAudioToPython({
+    audioSource: [Buffer.alloc(4)],
+    maxPayloadSize: 8,
+    bridge: { writeAudioChunk: writable.write.bind(writable) }
+  });
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(writes, 4);
+  releaseDrain();
+  const report = await pending;
+  assert.equal(report.totalBytes, 4);
+});
+
+test('incomplete cross-modal evidence invalidates the whole candidate session', () => {
+  const invalidated = invalidateV9CandidateSession({
+    sessionId: 'session:100',
+    sourceId: 'source:1',
+    reason: 'CROSS_MODAL_ANCHOR_MISSING_FOR_ERROR:99'
+  });
+  assert.equal(invalidated.status, 'INVALIDATED');
+  assert.equal(invalidated.candidatePersisted, false);
+  assert.equal(invalidated.sandboxPersistenceBlocked, true);
 });
