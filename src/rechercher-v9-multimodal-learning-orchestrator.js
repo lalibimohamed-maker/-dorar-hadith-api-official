@@ -290,14 +290,25 @@ export async function runV9MultimodalLearningCase(input = {}) {
   const assessment = input.recitationAnalysis ? analyzeRecitation(input.recitationAnalysis) : null;
   if (assessment?.errors?.length || assessment?.tajweedCandidates?.length) {
     if (!anchorMap) throw new Error('CROSS_MODAL_ANCHOR_MAP_REQUIRED_BEFORE_RECITATION_ERRORS');
-    assessment.errors = [...attachMandatoryErrorAnchors(assessment.errors, anchorMap)];
-    assessment.tajweedCandidates = assessment.tajweedCandidates.map((candidate, index) => {
-      const anchored = attachMandatoryErrorAnchors([{ type: 'TAJWEED_CANDIDATE', ...candidate }], anchorMap)[0];
-      return { ...anchored, candidateIndex: index };
-    });
-    assessment.status = V9_RUNTIME_INVARIANTS.AI_STATUS_LOCK;
-    assessment.workspace = 'LEARNER_SANDBOX';
-    assessment.target = 'LEARNER_SANDBOX';
+    try {
+      assessment.errors = [...attachMandatoryErrorAnchors(assessment.errors, anchorMap)];
+      assessment.tajweedCandidates = assessment.tajweedCandidates.map((candidate, index) => {
+        const anchored = attachMandatoryErrorAnchors([{ type: 'TAJWEED_CANDIDATE', ...candidate }], anchorMap)[0];
+        return { ...anchored, candidateIndex: index };
+      });
+      assessment.status = V9_RUNTIME_INVARIANTS.AI_STATUS_LOCK;
+      assessment.workspace = 'LEARNER_SANDBOX';
+      assessment.target = 'LEARNER_SANDBOX';
+    } catch (error) {
+      throw Object.assign(new Error('V9_CANDIDATE_SESSION_INVALIDATED'), {
+        cause: error,
+        invalidation: invalidateV9CandidateSession({
+          sessionId: recitation?.sessionId || input.sessionId || ('v9-session:' + source.source_id),
+          sourceId: source.source_id,
+          reason: error.message
+        })
+      });
+    }
   }
   const recordedAssessment = recitation && assessment ? recordRecitationAssessment(engine, recitation.sessionId, assessment) : null;
   const memorization = input.memorization ? updateMemorizationState(engine, input.memorization) : null;
