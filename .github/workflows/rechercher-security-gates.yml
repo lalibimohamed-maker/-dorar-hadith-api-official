@@ -129,7 +129,17 @@ jobs:
           # not vulnerability severities. HIGH is therefore invalid.
           # Keep the baseline scan warning-tolerant, then enforce the intended
           # HIGH-risk gate from the generated JSON report.
-          docker run --rm --network host -v "$PWD:/zap/wrk:rw" \
+          # The ZAP container runs as the non-root `zap` user. The checkout
+          # workspace is owned by the GitHub runner user, so mounting it directly
+          # at /zap/wrk can make ZAP unable to create its reports (EACCES).
+          # Use a dedicated runner-temp work directory with container-writable
+          # permissions, then copy the reports back into the workspace.
+          ZAP_WORKDIR="$RUNNER_TEMP/zap-work"
+          rm -rf "$ZAP_WORKDIR"
+          mkdir -p "$ZAP_WORKDIR"
+          chmod 0777 "$ZAP_WORKDIR"
+
+          docker run --rm --network host -v "$ZAP_WORKDIR:/zap/wrk:rw" \
             zaproxy/zap-stable@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa \
             zap-baseline.py \
               -t http://127.0.0.1:3000 \
@@ -137,6 +147,9 @@ jobs:
               -J /zap/wrk/zap-report.json \
               -l WARN \
               -I
+
+          cp "$ZAP_WORKDIR/zap-report.html" "$PWD/zap-report.html"
+          cp "$ZAP_WORKDIR/zap-report.json" "$PWD/zap-report.json"
 
           python3 - <<'PY'
           import json
