@@ -249,9 +249,27 @@ export async function runV9MultimodalLearningCase(input = {}) {
   if (audioMedia.length) {
     if (!input.audioSource) throw new Error('AUDIO_STREAM_SOURCE_REQUIRED');
     if (!input.audioBridge) throw new Error('ZERO_TRUST_AUDIO_BRIDGE_REQUIRED');
-    audioPreflight = await runAudioSignalPreflight({ audioSource: input.audioSource, bridge: input.audioBridge, minSnrDb: input.minSnrDb, maxPayloadSize: input.maxAudioPayloadSize });
-    if (input.streamAudioToPython !== false) {
-      audioStreamReport = await streamAudioToPython({ audioSource: input.audioSource, bridge: input.audioBridge, maxPayloadSize: input.maxAudioPayloadSize });
+    const isLiveAudio = input.audioMode === 'LIVE';
+    const liveTee = isLiveAudio ? createLiveAudioTee(input.audioSource, { highWaterMark: input.maxAudioPayloadSize || V9_RUNTIME_INVARIANTS.MAX_AUDIO_PAYLOAD_BYTES }) : null;
+    const audioSourceFactory = isLiveAudio ? null : resolveAudioSourceFactory({ audioSource: input.audioSource, audioSourceFactory: input.audioSourceFactory });
+    const processingPromise = input.streamAudioToPython === false ? null : streamAudioToPython({
+      audioSource: isLiveAudio ? liveTee.processingSource : audioSourceFactory(),
+      bridge: input.audioBridge,
+      maxPayloadSize: input.maxAudioPayloadSize
+    });
+    try {
+      audioPreflight = await runAudioSignalPreflight({
+        audioSource: isLiveAudio ? liveTee.snrSource : audioSourceFactory(),
+        bridge: input.audioBridge,
+        minSnrDb: input.minSnrDb,
+        maxPayloadSize: input.maxAudioPayloadSize
+      });
+      if (processingPromise) audioStreamReport = await processingPromise;
+      if (liveTee) await liveTee.completion;
+    } catch (error) {
+      if (liveTee) liveTee.stop(error);
+      if (processingPromise) await processingPromise.catch(() => {});
+      throw error;
     }
   }
 
