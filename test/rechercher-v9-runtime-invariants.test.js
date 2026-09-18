@@ -118,7 +118,7 @@ test('writable bridge backpressure is awaited instead of queueing', async () => 
   const pending = streamAudioToPython({
     audioSource: [Buffer.alloc(4)],
     maxPayloadSize: 8,
-    bridge: { writeAudioChunk: writable.write.bind(writable) }
+    bridge: { writeAudioChunk: writable.write.bind(writable), once: writable.once.bind(writable), off: writable.off.bind(writable) }
   });
   await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(writes, 4);
