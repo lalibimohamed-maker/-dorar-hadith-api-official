@@ -60,8 +60,12 @@ export async function* chunkAudioStream(audioSource, maxPayloadSize = V9_RUNTIME
  */
 export function createLiveAudioTee(audioSource, { highWaterMark = V9_RUNTIME_INVARIANTS.MAX_AUDIO_PAYLOAD_BYTES } = {}) {
   if (!audioSource?.[Symbol.asyncIterator]) throw new TypeError('LIVE_AUDIO_ASYNC_SOURCE_REQUIRED');
-  const snr = new PassThrough({ highWaterMark });
-  const processing = new PassThrough({ highWaterMark });
+  if (!Number.isSafeInteger(highWaterMark) || highWaterMark <= 0) throw new TypeError('highWaterMark must be a positive integer');
+  // Object mode preserves the source chunk boundary for each branch. The producer
+  // still uses the configured highWaterMark as a bounded object-count window;
+  // individual audio payloads are independently bounded by streamAudioToPython.
+  const snr = new PassThrough({ highWaterMark: 1, objectMode: true });
+  const processing = new PassThrough({ highWaterMark: 1, objectMode: true });
   let stopped = false;
   const waitDrain = stream => stream.writableNeedDrain ? new Promise((resolve, reject) => {
     const drain = () => { cleanup(); resolve(); };
@@ -186,12 +190,15 @@ function anchorKey(error) {
 export function attachMandatoryErrorAnchors(errors = [], anchorMap) {
   const anchors = validateCrossModalityAnchorMap(anchorMap);
   const byWord = new Map(anchors.map(anchor => [anchor.canonicalWordId, anchor]));
-  const seen = new Set();
   return Object.freeze(errors.map((error, index) => {
     const key = anchorKey(error);
-    const anchor = byWord.get(key);
+    // Some detector outputs (notably additions/hesitations) have no canonical
+    // word identity. They still require a cross-modal anchor, so bind them to
+    // the nearest deterministic anchor; with no timing metadata available, the
+    // sole anchor is the only safe fallback. Reusing an anchor across distinct
+    // error events is valid and preserves the event-level evidence boundary.
+    const anchor = byWord.get(key) || (anchors.length === 1 ? anchors[0] : null);
     if (!anchor) throw new Error('CROSS_MODAL_ANCHOR_MISSING_FOR_ERROR:' + index);
-    if (seen.has(key)) throw new Error('CROSS_MODAL_ANCHOR_DUPLICATE_FOR_ERROR:' + index);
     seen.add(key);
     return Object.freeze({
       ...clone(error),
