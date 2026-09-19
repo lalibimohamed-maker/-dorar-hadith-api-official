@@ -1,0 +1,1 @@
+Every future version is a reviewed increment. Roadmaps do not grant implementation authority. Acquisition, rights, provenance, security and protected-main governance remain above learning intelligence. New capabilities must be independently testable, reversible, observable and source-grounded.
