@@ -515,6 +515,20 @@ def main():
         raise SystemExit(f"missing master catalog: {MASTER}")
     master = json.loads(MASTER.read_text(encoding="utf-8"))
     merged = {key(b): b for b in (master.get("books") or []) if isinstance(b, dict)}
+    # Reconcile every currently saved book catalog into the master queue.
+    # The master queue must never collapse the encyclopedia to the historical
+    # 1-400H seed (or any other fixed batch). Duplicate records are merged by
+    # title + author + chronology below.
+    for path in sorted((ROOT / "books-batches").glob("**/catalog.json")):
+        if path.resolve() == MASTER.resolve():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        for book in source_entries(data, f"saved-catalog:{path.relative_to(ROOT)}"):
+            merged.setdefault(key(book), book)
+
     for path in HISTORICAL:
         data = git_history_json(path)
         if data:
