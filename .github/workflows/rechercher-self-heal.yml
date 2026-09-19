@@ -1,6 +1,7 @@
 name: Rechercher — Self-Heal Guardian
 
 on:
+  # workflow-run-justification: runs only after completed CI/security workflows to inspect the associated PR head and apply verified safe repairs
   workflow_run:
     workflows:
       - CI
