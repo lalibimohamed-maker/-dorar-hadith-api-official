@@ -142,7 +142,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add artifacts/governance/vault-release.json \
+          git add artifacts/governance/plaintext-pdf-sha256.txt artifacts/governance/pdf-storage-policy.txt \
             books-batches/salaf-01-400h/developer-review-manifest.json \
             books-batches/salaf-01-400h/master-discovery-additions-2026.json \
             books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
@@ -151,11 +151,10 @@ jobs:
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
           git checkout "$ACQ_COMMIT" -- \
-            artifacts/governance/vault-release.json \
             books-batches/salaf-01-400h/developer-review-manifest.json \
             books-batches/salaf-01-400h/master-discovery-additions-2026.json \
             books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
-          git add artifacts/governance/vault-release.json \
+          git add artifacts/governance/plaintext-pdf-sha256.txt artifacts/governance/pdf-storage-policy.txt \
             books-batches/salaf-01-400h/developer-review-manifest.json \
             books-batches/salaf-01-400h/master-discovery-additions-2026.json \
             books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
