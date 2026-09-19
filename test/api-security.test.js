@@ -24,7 +24,7 @@ test("API key rate identity is separated from IP identity", () => {
 test("rate limiter stays bounded with O(1) FIFO eviction", () => {
   const limit = createRateLimiter({ max: 1, windowMs: 60_000, prefix: "capacity" });
   for (let i = 0; i < 50_000; i += 1) {
-    assert.equal(limit(request({}, `198.51.100.${i % 250}`, `/?client=${i}`)).allowed, true);
+    assert.equal(limit(request({ "x-api-key": `capacity-key-${i}` }, "198.51.100.10", `/?client=${i}`)).allowed, true);
   }
   assert.equal(limit(request({}, "203.0.113.1", "/?client=overflow")).allowed, true);
 });
