@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "1.0.0",
+  "locale": "ru",
+  "purpose": "Rights-aware source routing for Russian-speaking readers.",
+  "policy": {
+    "primaryForRussianReaders": true,
+    "preserveOriginalLanguage": true,
+    "preferRussianDownloadWhenAvailable": true,
+    "officialSourceNavigationBeforeRepublishing": true,
+    "rightsRequiredForRehosting": true,
+    "noEndorsementByInclusion": true,
+    "keepSourceAttribution": true,
+    "neverReplaceArabicCanonicalText": true
+  },
+  "sources": [
+    {
+      "id": "minhadj-ru",
+      "name": "Minhadj — Пророческий путь",
+      "url": "https://www.minhadj.com/index.php",
+      "language": "ru",
+      "priority": 10,
+      "role": "primary-russian-reference",
+      "contentTypes": ["articles", "aqidah", "manhaj", "quran", "tafsir", "hadith", "fiqh", "sirah"],
+      "rightsModel": "source-permission-dependent",
+      "downloadPolicy": "link_or_republish_if_explicitly_permitted"
+    },
+    {
+      "id": "toislam-ru",
+      "name": "К Исламу",
+      "url": "https://toislam.ws/",
+      "language": "ru",
+      "priority": 20,
+      "role": "primary-russian-books-and-learning",
+      "contentTypes": ["books", "pdf", "epub", "aqidah", "fiqh", "hadith", "lessons"],
+      "rightsModel": "source-permission-dependent",
+      "downloadPolicy": "prefer_official_download_link_unless_republication_rights_are_explicit"
+    },
+    {
+      "id": "alhadis-ru",
+      "name": "Alhadis.ru",
+      "url": "https://alhadis.ru/",
+      "language": "ru",
+      "priority": 30,
+      "role": "primary-russian-hadith-reference",
+      "contentTypes": ["books", "hadith", "aqidah", "fiqh", "articles", "audio"],
+      "rightsModel": "source-permission-dependent",
+      "downloadPolicy": "link_or_republish_if_explicitly_permitted"
+    },
+    {
+      "id": "islamqa-ru",
+      "name": "Ислам: вопрос и ответ",
+      "url": "https://islamqa.info/ru",
+      "language": "ru",
+      "priority": 40,
+      "role": "primary-russian-fatwa-and-qa",
+      "contentTypes": ["fatwa", "qa", "aqidah", "hadith", "quran", "fiqh", "books"],
+      "rightsModel": "copyright_and_site_terms",
+      "downloadPolicy": "official_download_or_navigation_only_unless_rights_are_verified"
+    },
+    {
+      "id": "sunnaportal-ru",
+      "name": "Sunna Portal",
+      "url": "https://sunnaportal.com/",
+      "language": "ru",
+      "priority": 50,
+      "role": "primary-russian-sunna-reference",
+      "contentTypes": ["sunnah", "articles", "books", "hadith"],
+      "rightsModel": "source-permission-dependent",
+      "downloadPolicy": "link_or_republish_if_explicitly_permitted"
+    },
+    {
+      "id": "asar-forum-ru",
+      "name": "Asar Forum",
+      "url": "https://asar-forum.com/",
+      "language": "ru",
+      "priority": 60,
+      "role": "secondary-russian-research-reference",
+      "contentTypes": ["forum", "articles", "research", "books"],
+      "rightsModel": "source-permission-dependent",
+      "downloadPolicy": "navigation_first"
+    },
+    {
+      "id": "islamic-books-russian-archive",
+      "name": "Islamic Books Russian Collection",
+      "url": "https://archive.org/details/islamic_books_russian_collection",
+      "language": "ru",
+      "priority": 5,
+      "role": "project_owned_russian_corpus",
+      "contentTypes": ["books", "pdf", "scans"],
+      "rightsModel": "item_and_file_specific",
+      "downloadPolicy": "download_and_ingest_after_item_level_rights_and_integrity_check",
+      "ownershipNote": "Archive.org collection supplied by the project owner; ownership of the collection does not automatically establish redistribution rights for every underlying work."
+    },
+    {
+      "id": "islamenc-global",
+      "name": "Islamic Encyclopedia / Islamic Content in World Languages",
+      "url": "https://s.islamenc.com/",
+      "language": "*",
+      "priority": 70,
+      "role": "global-multilingual-discovery",
+      "contentTypes": ["translated-books", "quran", "hadith", "dawah", "multilingual-content"],
+      "rightsModel": "source_and_service_terms",
+      "downloadPolicy": "prefer_official_service_or_download_and_verify_rights"
+    }
+  ],
+  "routing": {
+    "whenLocale": "ru",
+    "sourceOrder": [
+      "islamic-books-russian-archive",
+      "minhadj-ru",
+      "toislam-ru",
+      "alhadis-ru",
+      "islamqa-ru",
+      "sunnaportal-ru",
+      "asar-forum-ru",
+      "islamenc-global"
+    ],
+    "bookDownloadOrder": [
+      "project_owned_russian_corpus",
+      "official_russian_download",
+      "official_source_navigation",
+      "licensed_republication"
+    ],
+    "fallbackLanguage": "ar"
+  }
+}
