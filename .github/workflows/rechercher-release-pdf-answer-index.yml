@@ -1,0 +1,49 @@
+name: Rechercher — Release PDF Answer Index
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "47 3 * * *"
+permissions:
+  contents: read
+env:
+  DISCOVERED_SHARDS: artifacts/governance/discovered-storage-shards.json
+  INDEX: artifacts/governance/rechercher-release-answer-index.sqlite
+  INDEX_MANIFEST: artifacts/governance/rechercher-release-answer-index.json
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Discover active storage repositories
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          prefix=$(python3 -c 'import json; print(json.load(open("config/rechercher-federated-release-storage.json"))["shard_discovery"]["repository_name_prefix"])')
+          owner=$(python3 -c 'import json; print(json.load(open("config/rechercher-federated-release-storage.json"))["shard_discovery"]["owner"])')
+          gh api --paginate "/users/$owner/repos?per_page=100&sort=full_name" |
+            jq -s --arg prefix "$prefix" 'add | map(select(.name | startswith($prefix))) | map(select(.archived == false)) | map(.full_name) | unique | sort' |
+            jq '{repositories:.}' > "$DISCOVERED_SHARDS"
+          test "$(jq '.repositories|length' "$DISCOVERED_SHARDS")" -ge 1
+      - name: Install PDF extraction engine
+        run: python3 -m pip install --disable-pip-version-check --no-input pymupdf
+      - name: Build page-aware answer index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_release_pdf_index.py --shards "$DISCOVERED_SHARDS" --out "$INDEX" --manifest "$INDEX_MANIFEST"
+      - name: Upload persistent search index artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rechercher-release-pdf-answer-index
+          path: |
+            ${{ env.INDEX }}
+            ${{ env.INDEX_MANIFEST }}
+          retention-days: 30
