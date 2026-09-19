@@ -45,6 +45,7 @@ jobs:
       - name: Preflight matrix storage
         env:
           MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+          SHARD_INDEX: ${{ matrix.shard }}
         run: |
           set -euo pipefail
           test -n "${MATRIX_STORAGE_TOKEN:-}" || { echo "PREFLIGHT_FAIL: RECHERCHER_MATRIX_STORAGE_TOKEN missing"; exit 1; }
@@ -65,7 +66,7 @@ jobs:
           git clone --depth 1 "$storage_url" "$RUNNER_TEMP/matrix-storage-preflight"
           git -C "$RUNNER_TEMP/matrix-storage-preflight" lfs install
           git -C "$RUNNER_TEMP/matrix-storage-preflight" lfs fsck --pointers HEAD
-          git -C "$RUNNER_TEMP/matrix-storage-preflight" push --dry-run origin "HEAD:refs/heads/rechercher-preflight-${GITHUB_RUN_ID}-${{ matrix.shard }}"
+          git -C "$RUNNER_TEMP/matrix-storage-preflight" push --dry-run origin "HEAD:refs/heads/rechercher-preflight-${GITHUB_RUN_ID}-${SHARD_INDEX}"
           rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
           echo "PREFLIGHT_STORAGE_OK repo=$MATRIX_STORAGE_REPO"
       - name: Setup Node 24
