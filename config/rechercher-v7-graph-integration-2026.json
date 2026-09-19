@@ -1,0 +1,59 @@
+{
+  "schema": "rechercher-v7-graph-integration-2026",
+  "version": "7.2.0",
+  "status": "executable-extension",
+  "upstream": [
+    "V6_GLOBAL_SOURCE_INTELLIGENCE",
+    "V7_CLAIM_EVIDENCE_CONTRADICTION",
+    "V7.1_EVIDENCE_GRAPH_FAMILIES"
+  ],
+  "pipeline": [
+    "SOURCE",
+    "WORK",
+    "EDITION",
+    "MANIFESTATION",
+    "PAGE",
+    "PASSAGE",
+    "CLAIM",
+    "EVIDENCE",
+    "CONTRADICTION",
+    "SCHOLAR_REVIEW",
+    "GRAPH",
+    "SEARCH",
+    "LEARNING"
+  ],
+  "graphFamilies": [
+    "ATTRIBUTION",
+    "SCHOLAR",
+    "HADITH_CHAIN",
+    "FIQH_DISAGREEMENT",
+    "MULTILINGUAL_EVIDENCE"
+  ],
+  "publicationGate": {
+    "requiredSourceState": "VERIFIED_SOURCE",
+    "requiredRightsState": "ALLOWED",
+    "requiresPublishableFlag": true,
+    "unknownRightsBlocked": true,
+    "restrictedRightsBlocked": true
+  },
+  "safety": {
+    "requiresSourceProvenance": true,
+    "requiresGraphEndpoints": true,
+    "preservesContradictions": true,
+    "noAiSelfVerification": true,
+    "preservesSourceIdentity": true,
+    "preservesContentHash": true,
+    "preservesOriginalPdf": true,
+    "preservesCanonicalQuranArabic": true,
+    "doesNotModifyAcquisition": true,
+    "doesNotModifyCorpus": true
+  },
+  "search": {
+    "publicDefault": true,
+    "rightsAware": true,
+    "sourceGroundedResults": true,
+    "deterministicTieBreak": true
+  },
+  "downstream": ["GLOBAL_SEARCH", "LEARNING_INTELLIGENCE", "EXPORT"],
+  "acquisitionIsolation": true
+}
