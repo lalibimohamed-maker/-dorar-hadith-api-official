@@ -1,0 +1,81 @@
+name: Rechercher — Global Repository Self-Heal
+on:
+  workflow_dispatch:
+    inputs:
+      max_prs:
+        description: Maximum open PRs to inspect
+        required: false
+        default: "200"
+  schedule:
+    - cron: "7,37 * * * *"
+permissions:
+  # security-justification: required because the controller may push scoped workflow-policy repairs to non-main branches.
+  contents: write
+  # actions-write-justification: required to inspect/retry failed GitHub Actions jobs without bypassing branch protection.
+  actions: write
+  pull-requests: write
+concurrency:
+  group: rechercher-global-repository-self-heal
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout canonical repair policy from main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Configure Git
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          gh auth setup-git
+      - name: Enumerate and diagnose open PR branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          MAX_PRS: ${{ inputs.max_prs || '200' }}
+        run: python3 scripts/global_repository_self_heal.py
+      - name: Audit workflow governance on every branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          while read -r branch; do
+            [ -n "$branch" ] || continue
+            [ "$branch" = "main" ] && continue
+            sha="$(git rev-parse "origin/$branch")"
+            wt="/tmp/self-heal-$(printf '%s' "$branch" | tr '/ ' '__')"
+            rm -rf "$wt"
+            git worktree add --detach "$wt" "$sha" >/dev/null
+            mkdir -p "$wt/scripts"
+            cp scripts/enforce_all_branch_governance.py "$wt/scripts/enforce_all_branch_governance.py"
+            chmod 0755 "$wt/scripts/enforce_all_branch_governance.py"
+            if (cd "$wt" && python3 scripts/enforce_all_branch_governance.py); then
+              status="$(git -C "$wt" status --porcelain --untracked-files=all | awk '$2 ~ /^(\.github\/workflows|scripts)\// {print}')"
+              if [ -n "$status" ]; then
+                current="$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')"
+                if [ "$current" = "$sha" ]; then
+                  git -C "$wt" add .github/workflows scripts 2>/dev/null || true
+                  if ! git -C "$wt" diff --cached --quiet; then
+                    git -C "$wt" commit -m 'chore(governance): self-heal branch workflow policy'
+                    git -C "$wt" push origin "HEAD:refs/heads/$branch"
+                  fi
+                fi
+              fi
+            fi
+            git worktree remove --force "$wt"
+          done < <(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin/ | sort -u)
+      - name: Publish audit report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: global-repository-self-heal-report
+          path: self-heal-report.json
+          if-no-files-found: error
