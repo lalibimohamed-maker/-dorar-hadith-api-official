@@ -1,0 +1,164 @@
+name: Rechercher — Acquire first, store first
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */4 * * *'
+
+permissions:
+  # security-justification: This workflow requires contents: write to persist verified acquisition manifests and release evidence to the protected review branch; it does not bypass protected branches or force-push.
+  contents: write
+
+env:
+  GIT_TERMINAL_PROMPT: '0'
+  REVIEW_BRANCH: 'rechercher/salaf-01-400h-developer-review-acquisition'
+  CATALOG_PATH: 'books-batches/encyclopedia-master/catalog.json'
+
+concurrency:
+  group: rechercher-acquire-first
+  cancel-in-progress: false
+
+jobs:
+  acquire-and-store:
+    name: Acquire actual PDFs into protected review storage
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils
+
+      - name: Materialize central unbounded master catalog
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_materialize_master_catalog.py --root "$GITHUB_WORKSPACE"
+          test -s "$CATALOG_PATH"
+          python3 - "$CATALOG_PATH" <<'PY'
+          import json,sys
+          from pathlib import Path
+          d=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          print('ACQUIRE_FIRST_MASTER_CATALOG records=%d with_sources=%d' % (len(d.get('books',[])), sum(bool(b.get('sources')) for b in d.get('books',[]))))
+          PY
+
+      - name: Restore cumulative discovery registries
+        run: |
+          set -euo pipefail
+          mkdir -p books-batches/salaf-01-400h
+          git fetch origin "$REVIEW_BRANCH" || true
+          restore_registry() {
+            local path="$1"
+            local fallback='{"entries":[]}';
+            if test -s "$path"; then
+              python3 - "$path" <<'PY'
+          import json,sys
+          from pathlib import Path
+          p=Path(sys.argv[1])
+          d=json.loads(p.read_text(encoding='utf-8'))
+          assert isinstance(d,dict) and isinstance(d.get('entries',[]),list)
+          PY
+              return
+            fi
+            if git show "origin/$REVIEW_BRANCH:$path" > "$path" 2>/dev/null; then
+              python3 - "$path" <<'PY'
+          import json,sys
+          from pathlib import Path
+          p=Path(sys.argv[1])
+          d=json.loads(p.read_text(encoding='utf-8'))
+          if not (isinstance(d,dict) and isinstance(d.get('entries',[]),list)):
+              raise SystemExit(1)
+          print('RESTORED_DISCOVERY_REGISTRY', p)
+          PY
+              return
+            fi
+            printf '%s\n' "$fallback" > "$path"
+          }
+          restore_registry books-batches/salaf-01-400h/master-discovery-additions-2026.json
+          restore_registry books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for raw in ('books-batches/salaf-01-400h/master-discovery-additions-2026.json','books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json'):
+              d=json.loads(Path(raw).read_text(encoding='utf-8'))
+              print('DISCOVERY_REGISTRY',raw,'entries=',len(d.get('entries',[])))
+          PY
+
+      - name: Acquire copies — first persistence boundary
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" \
+            --catalog "$CATALOG_PATH" \
+            --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          test -s books-batches/salaf-01-400h/developer-review-manifest.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('books-batches/salaf-01-400h/developer-review-manifest.json').read_text(encoding='utf-8'))
+          c=d.get('counts',{})
+          print('ACQUIRE_FIRST_COUNTS',json.dumps(c,ensure_ascii=False,sort_keys=True))
+          if c.get('acquired_files',0)<1: raise SystemExit('ERROR: zero files acquired; nothing will be persisted.')
+          PY
+
+      - name: Verify acquired PDFs before storage
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(artifacts/developer-review-vault/*.pdf)
+          test "${#files[@]}" -gt 0 || { echo 'ERROR: no acquired PDFs found.'; exit 1; }
+          for f in "${files[@]}"; do
+            head -c 5 "$f" | grep -qx '%PDF-'
+            test -s "$f"
+            qpdf --check "$f"
+            sha256sum "$f"
+          done
+
+      - name: Persist the original PDFs as the sole primary representation
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-acquired-pdfs-${{ github.run_id }}
+          path: artifacts/developer-review-vault/*.pdf
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record PDF-only storage policy
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          sha256sum artifacts/developer-review-vault/*.pdf > artifacts/governance/plaintext-pdf-sha256.txt
+          printf '%s\n' 'storage_policy=primary_representation_is_pdf; no_new_pdf_enc_duplicates=true' > artifacts/governance/pdf-storage-policy.txt
+
+      - name: Persist manifest, discovery memory and release evidence to review branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add artifacts/governance/vault-release.json \
+            books-batches/salaf-01-400h/developer-review-manifest.json \
+            books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          git diff --cached --quiet || git commit -m 'data(rechercher): persist acquisition state and cumulative discovery memory'
+          ACQ_COMMIT=$(git rev-parse HEAD)
+          git fetch origin "$REVIEW_BRANCH"
+          git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
+          git checkout "$ACQ_COMMIT" -- \
+            artifacts/governance/vault-release.json \
+            books-batches/salaf-01-400h/developer-review-manifest.json \
+            books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          git add artifacts/governance/vault-release.json \
+            books-batches/salaf-01-400h/developer-review-manifest.json \
+            books-batches/salaf-01-400h/master-discovery-additions-2026.json \
+            books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
+          git diff --cached --quiet || git commit -m 'data(rechercher): reconcile acquire-first state and discovery memory'
+          git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
+          echo "ACQUIRE_FIRST_PERSISTED=$ACQ_COMMIT"
