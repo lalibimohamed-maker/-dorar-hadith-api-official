@@ -53,7 +53,9 @@ class Registry:
                 "UPDATE tasks SET status='running',worker=?,attempts=attempts+1,updated_at=? WHERE task_id=?",
                 (worker, time.time(), row["task_id"]),
             )
-            return dict(row)
+            claimed = dict(row)
+            claimed["attempts"] = claimed["attempts"] + 1
+            return claimed
 
     def finish(self, task_id: str, status: str, error: str | None = None, bytes_done: int = 0):
         with self.lock, self.conn:
@@ -204,6 +206,7 @@ def main():
     ap.add_argument("--retries", type=int, default=int(os.environ.get("ENGINE_B_RETRIES", "5")))
     ap.add_argument("--backoff-base", type=float, default=float(os.environ.get("ENGINE_B_BACKOFF_BASE", "2")))
     ap.add_argument("--timeout", type=int, default=int(os.environ.get("ENGINE_B_TIMEOUT", "120")))
+    ap.add_argument("--max-attempts", type=int, default=int(os.environ.get("ENGINE_B_MAX_ATTEMPTS", "3")))
     args = ap.parse_args()
     args.workers = max(1, min(args.workers, 32))
     args.connections_per_file = max(1, min(args.connections_per_file, 32))
@@ -224,9 +227,11 @@ def main():
                 print(f"ENGINE_B COMPLETED task={task['task_id']} bytes={result['bytes']} sha256={result['sha256']}", flush=True)
                 local.append({"status": "completed", **result})
             except Exception as exc:
-                reg.finish(task["task_id"], "retry", error=str(exc))
-                print(f"ENGINE_B RETRY task={task['task_id']} error={exc}", flush=True)
-                local.append({"status": "retry", "task_id": task["task_id"], "error": str(exc)})
+                final_failure = task["attempts"] >= args.max_attempts
+                reg.finish(task["task_id"], "failed" if final_failure else "retry", error=str(exc))
+                state = "FAILED" if final_failure else "RETRY"
+                print(f"ENGINE_B {state} task={task['task_id']} attempt={task['attempts']} error={exc}", flush=True)
+                local.append({"status": "failed" if final_failure else "retry", "task_id": task["task_id"], "error": str(exc)})
         return local
 
     with ThreadPoolExecutor(max_workers=args.workers, thread_name_prefix="engine-b-worker") as pool:
@@ -236,7 +241,7 @@ def main():
     out = Path(args.db).with_suffix(".run-summary.json")
     out.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     failed = [x for x in summary if x["status"] != "completed"]
-    print(f"ENGINE_B_SUMMARY completed={len(summary)-len(failed)} retry={len(failed)} total={len(summary)}", flush=True)
+    print(f"ENGINE_B_SUMMARY completed={len(summary)-len(failed)} failed_or_retry={len(failed)} total={len(summary)}", flush=True)
     reg.close()
     return 1 if failed else 0
 
