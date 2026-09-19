@@ -193,6 +193,27 @@ jobs:
           print(f'ONE_COPY_PARTITION_OK count={len(seen)}')
           PY
 
+      - name: Block protected PDFs from public PDF storage
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          protected=[]
+          for manifest in sorted(Path('artifacts').glob('*.manifest.json')):
+              data=json.loads(manifest.read_text(encoding='utf-8'))
+              if data.get('public_download') is not True or data.get('storage_visibility') != 'publication-eligible':
+                  protected.append(str(manifest))
+          if protected:
+              print('PUBLIC_PDF_STORAGE_GUARD=FAIL')
+              print('Protected/rights-unclear PDFs are not permitted in public PDF storage.')
+              print('Route these records to the private Developer Review Vault before persistence.')
+              for item in protected:
+                  print('PROTECTED_MANIFEST='+item)
+              raise SystemExit(1)
+          print('PUBLIC_PDF_STORAGE_GUARD=PASS')
+          PY
+
       - name: Persist verified PDFs to primary LFS storage
         env:
           TARGET_BRANCH: ${{ inputs.target_branch }}
