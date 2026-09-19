@@ -1,0 +1,100 @@
+name: Rechercher — Self-Heal Guardian
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: write
+  checks: read
+
+concurrency:
+  group: rechercher-self-heal-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  diagnose-and-repair:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Inspect failed checks
+        id: inspect
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run list --repo "$REPO" --commit "$HEAD_SHA" --limit 100 --json databaseId,name,status,conclusion > /tmp/runs.json
+          python3 - <<'PY'
+          import json
+          runs=json.load(open('/tmp/runs.json'))
+          failed=[r for r in runs if r.get('conclusion')=='failure']
+          print('failed_runs='+str(len(failed)))
+          for r in failed: print(r['databaseId'], r['name'])
+          PY
+
+      - name: Apply safe infrastructure repairs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          changed=0
+          : > /tmp/failure.log
+          while read -r id; do
+            [ -z "$id" ] && continue
+            gh run view "$id" --repo "$REPO" --log >> /tmp/failure.log 2>&1 || true
+          done < <(python3 -c "import json; print('\\n'.join(str(r['databaseId']) for r in json.load(open('/tmp/runs.json')) if r.get('conclusion')=='failure'))")
+
+          if grep -qi 'workflow must declare top-level permissions' /tmp/failure.log; then
+            while IFS= read -r f; do
+              if ! grep -q '^permissions:[[:space:]]*$' "$f"; then
+                { printf '%s\\n' 'permissions:' '  contents: none'; cat "$f"; } > "$f.tmp"
+                mv "$f.tmp" "$f"
+                git add "$f"
+                changed=1
+              fi
+            done < <(git ls-files '.github/workflows/*.yml' '.github/workflows/*.yaml')
+          fi
+
+          if grep -Eqi 'ubuntu-latest.*(migrat|26)' /tmp/failure.log; then
+            while IFS= read -r f; do
+              if grep -q 'ubuntu-latest' "$f"; then
+                sed -i 's/ubuntu-latest/ubuntu-24.04/g' "$f"
+                git add "$f"
+                changed=1
+              fi
+            done < <(git ls-files '.github/workflows/*.yml' '.github/workflows/*.yaml')
+          fi
+
+          if [ "$changed" -eq 0 ]; then
+            echo 'NO_SAFE_AUTOFIX'
+            exit 0
+          fi
+          git config user.name 'Rechercher Self-Heal'
+          git config user.email 'rechercher-self-heal@users.noreply.github.com'
+          git commit -m 'fix(rechercher): self-heal workflow infrastructure'
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "HEAD:${HEAD_BRANCH}"
+
+      - name: Report unresolved failures
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if grep -qi 'NO_SAFE_AUTOFIX' /tmp/failure.log 2>/dev/null || [ ! -s /tmp/failure.log ]; then exit 0; fi
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "🤖 Rechercher Self-Heal Guardian: unresolved failure detected. The guardian only applies verified safe infrastructure repairs automatically; code/security findings outside its repair rules remain for the next repair cycle." || true
