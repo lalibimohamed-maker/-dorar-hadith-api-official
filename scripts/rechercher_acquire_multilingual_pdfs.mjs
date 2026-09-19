@@ -118,7 +118,7 @@ const summary={schema:'rechercher/multilingual-resource-acquisition/v2',generate
 for(const [key,lang] of languages){
  const rights=rightsForRecord(lang.records);
  const acquisition=rights.status===RIGHTS.REDISTRIBUTABLE?'public':(rights.status===RIGHTS.READ_COPY||rights.status===RIGHTS.READ_ONLY?'research-only':'blocked');
- const entry={language:lang.name,iso:lang.iso,status:'no-eligible-pdf-found',sources_checked:[],files:[],rights:rights.status,rights_conflict:rights.conflict,rights_confidence:rights.confidence,acquisition};
+ const entry={language:lang.name,iso:lang.iso,status:'no-eligible-pdf-found',sources_checked:[],files:[],rights:rights.status,rights_conflict:rights.conflict,rights_confidence:rights.confidence,rights_evidence:rights.evidence,acquisition};
  if(acquisition==='blocked'){ entry.status='rights-blocked'; summary.languages[key]=entry; continue; }
  const hasH=lang.records.some(r=>{
    if(r.provider==='hadeethenc') return true;
