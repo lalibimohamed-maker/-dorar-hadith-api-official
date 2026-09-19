@@ -199,7 +199,6 @@ export function attachMandatoryErrorAnchors(errors = [], anchorMap) {
     // error events is valid and preserves the event-level evidence boundary.
     const anchor = byWord.get(key) || (anchors.length === 1 ? anchors[0] : null);
     if (!anchor) throw new Error('CROSS_MODAL_ANCHOR_MISSING_FOR_ERROR:' + index);
-    seen.add(key);
     return Object.freeze({
       ...clone(error),
       canonicalWordId: anchor.canonicalWordId,
