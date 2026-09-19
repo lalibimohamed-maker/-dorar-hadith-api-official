@@ -62,10 +62,10 @@ jobs:
             research/evidence/global-multilingual/
             artifacts/rechercher/global-multilingual-research/
           if-no-files-found: error
-      - name: Persist Shard 2 evidence to dedicated matrix storage
-        if: matrix.shard == 2 && github.event_name != 'pull_request' || (matrix.shard == 2 && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+      - name: Persist shard evidence to dedicated matrix storage
         env:
           MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+          SHARD_INDEX: ${{ matrix.shard }}
         run: |
           set -euo pipefail
           test -n "$MATRIX_STORAGE_TOKEN"
@@ -79,98 +79,21 @@ jobs:
           SH
           chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
           export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
-          git clone "https://${MATRIX_STORAGE_REPO}.git" .matrix-storage-shard-2
-          mkdir -p .matrix-storage-shard-2/research/evidence/global-multilingual/shards/shard-2
-          mkdir -p .matrix-storage-shard-2/artifacts/rechercher/global-multilingual-research/shards/shard-2
-          cp -a research/evidence/global-multilingual/. .matrix-storage-shard-2/research/evidence/global-multilingual/shards/shard-2/
-          if [ -d artifacts/rechercher/global-multilingual-research ]; then
-            cp -a artifacts/rechercher/global-multilingual-research/. .matrix-storage-shard-2/artifacts/rechercher/global-multilingual-research/shards/shard-2/
-          fi
-          git -C .matrix-storage-shard-2 config user.name "github-actions[bot]"
-          git -C .matrix-storage-shard-2 config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C .matrix-storage-shard-2 add research/evidence/global-multilingual/shards/shard-2 artifacts/rechercher/global-multilingual-research/shards/shard-2
-          if git -C .matrix-storage-shard-2 diff --cached --quiet; then
-            echo "No Shard 2 storage changes."
-          else
-            git -C .matrix-storage-shard-2 commit -m "data(matrix): persist shard 2 multilingual evidence"
-            for attempt in 1 2 3; do
-              git -C .matrix-storage-shard-2 pull --rebase origin main || true
-              if git -C .matrix-storage-shard-2 push origin HEAD:refs/heads/main; then
-                echo "MATRIX_SHARD_2_STORAGE_PUSH_OK attempt=$attempt"
-                break
-              fi
-              if [ "$attempt" -eq 3 ]; then exit 1; fi
-              sleep 3
-            done
-          fi
-
-  aggregate:
-    name: Aggregate 3,192-cell multilingual evidence
-    needs: matrix
-    runs-on: ubuntu-24.04
-    timeout-minutes: 360
-    permissions: {}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Setup Node 24
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Download shard evidence
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          pattern: rechercher-global-multilingual-shard-*
-          path: .
-          merge-multiple: true
-      - name: Validate translation evidence
-        run: node scripts/rechercher_validate_translation_evidence.mjs
-      - name: Validate candidate diagnostics and integrity
-        run: node scripts/rechercher_translation_candidate_diagnostics.mjs
-      - name: Rights and resource gate
-        run: node scripts/rechercher_validate_item_rights.mjs
-      - name: Verify exact 3,192-cell matrix
-        env:
-          EXPECTED_CELL_COUNT: ${{ env.EXPECTED_CELL_COUNT }}
-        run: node scripts/rechercher_verify_global_multilingual_matrix.mjs
-      - name: Build permanent scientific ledger
-        run: node scripts/rechercher_build_scientific_ledger.mjs
-      - name: Persist validated matrix evidence to dedicated storage
-        env:
-          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
-        run: |
-          set -euo pipefail
-          test -n "$MATRIX_STORAGE_TOKEN"
-          cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
-          #!/bin/sh
-          case "$1" in
-            *Username*) printf '%s\n' 'x-access-token' ;;
-            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
-            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
-          esac
-          SH
-          chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
-          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
-          git clone "https://${MATRIX_STORAGE_REPO}.git" .matrix-storage
-          mkdir -p .matrix-storage/research/evidence/global-multilingual .matrix-storage/artifacts/rechercher/global-multilingual-research
-          cp -a research/evidence/global-multilingual/. .matrix-storage/research/evidence/global-multilingual/
-          if [ -d artifacts/rechercher/global-multilingual-research ]; then cp -a artifacts/rechercher/global-multilingual-research/. .matrix-storage/artifacts/rechercher/global-multilingual-research/; fi
-          git -C .matrix-storage config user.name "github-actions[bot]"
-          git -C .matrix-storage config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C .matrix-storage add research/evidence/global-multilingual artifacts/rechercher/global-multilingual-research
-          if git -C .matrix-storage diff --cached --quiet; then echo "No matrix storage changes."; else
-            git -C .matrix-storage commit -m "data(matrix): persist validated 3,192-cell evidence"
-            for attempt in 1 2 3; do
-              git -C .matrix-storage pull --rebase origin main || true
-              if git -C .matrix-storage push origin HEAD:refs/heads/main; then echo "MATRIX_STORAGE_PUSH_OK attempt=$attempt"; break; fi
-              if [ "$attempt" -eq 3 ]; then exit 1; fi
-              sleep 3
+          git clone "https://${MATRIX_STORAGE_REPO}.git" .matrix-storage-shard
+          mkdir -p ".matrix-storage-shard/research/evidence/global-multilingual/shards/shard-${SHARD_INDEX}"
+          mkdir -p ".matrix-storage-shard/artifacts/rechercher/global-multilingual-research/shards/shard-${SHARD_INDEX}"
+          cp -a research/evidence/global-multilingual/. ".matrix-storage-shard/research/evidence/global-multilingual/shards/shard-${SHARD_INDEX}/"
+          if [ -d artifacts/rechercher/global-multilingual-research ]; then cp -a artifacts/rechercher/global-multilingual-research/. ".matrix-storage-shard/artifacts/rechercher/global-multilingual-research/shards/shard-${SHARD_INDEX}/"; fi
+          git -C .matrix-storage-shard config user.name "github-actions[bot]"
+          git -C .matrix-storage-shard config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C .matrix-storage-shard add "research/evidence/global-multilingual/shards/shard-${SHARD_INDEX}" "artifacts/rechercher/global-multilingual-research/shards/shard-${SHARD_INDEX}"
+          if git -C .matrix-storage-shard diff --cached --quiet; then echo "No shard ${SHARD_INDEX} storage changes."; else
+            git -C .matrix-storage-shard commit -m "data(matrix): persist shard ${SHARD_INDEX} multilingual evidence"
+            for attempt in 1 2 3 4 5; do
+              git -C .matrix-storage-shard pull --rebase origin main || true
+              if git -C .matrix-storage-shard push origin HEAD:refs/heads/main; then echo "MATRIX_SHARD_${SHARD_INDEX}_STORAGE_PUSH_OK attempt=$attempt"; break; fi
+              if [ "$attempt" -eq 5 ]; then exit 1; fi
+              sleep 5
             done
           fi
       - name: Upload reproducibility bundle
