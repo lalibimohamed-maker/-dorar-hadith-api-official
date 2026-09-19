@@ -1,28 +1,9 @@
 name: Rechercher — Self-Heal Guardian
 
 on:
-  # workflow-run-justification: runs only after completed CI/security workflows to inspect the associated PR head and apply verified safe repairs
-  workflow_run:
-    workflows:
-      - CI
-      - CodeQL
-      - Security
-      - Workflow Security Gate
-      - GitHub Actions Security Analysis with zizmor
-      - Workflow action pin guard
-      - Security baseline
-      - Dependency Review
-      - OSV-Scanner
-      - Content Ingest Gate
-      - Encyclopedia Completeness Gate
-      - Federated Guardian
-      - Workflow Integrity Check
-      - Rechercher — Global multilingual evidence execution
-      - Rechercher — Multilingual resource acquisition
-      - Rechercher — PDF corpus hygiene
-      - Branch Workflow Governance — Self-Heal
-    types: [completed]
-
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
 permissions:
   contents: write # security-justification: guardian commits only verified workflow-infrastructure repairs to the PR head branch
   actions: write # actions-write-justification: guardian reruns only failed jobs after a verified repair
@@ -33,14 +14,10 @@ concurrency:
 
 jobs:
   diagnose-and-repair:
-    if: github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.pull_requests[0] != null && github.event.workflow_run.head_repository.full_name == github.repository
+    if: true
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
-      PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
-      HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-      HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
-      RUN_ID: ${{ github.event.workflow_run.id }}
       REPO: ${{ github.repository }}
     steps:
       - name: Checkout PR head
@@ -56,13 +33,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh run list --repo "$REPO" --commit "$HEAD_SHA" --limit 100 --json databaseId,name,status,conclusion > /tmp/runs.json
+          gh pr list --repo "$REPO" --state open --json number,headRefName,headSha,headRepository --limit 100 > /tmp/prs.json
           python3 - <<'PY'
           import json
-          runs=json.load(open('/tmp/runs.json'))
-          failed=[r for r in runs if r.get('conclusion')=='failure']
-          print('failed_runs='+str(len(failed)))
-          for r in failed: print(r['databaseId'], r['name'])
+          prs=json.load(open('/tmp/prs.json'))
+          same=[p for p in prs if p.get('headRepository',{}).get('nameWithOwner') == 'lalibimohamed-maker/-dorar-hadith-api-official']
+          json.dump(same,open('/tmp/candidates.json','w'))
+          print('candidate_prs='+str(len(same)))
           PY
 
       - name: Apply safe infrastructure repairs
@@ -73,10 +50,18 @@ jobs:
           set -euo pipefail
           changed=0
           : > /tmp/failure.log
-          while read -r id; do
-            [ -z "$id" ] && continue
-            gh run view "$id" --repo "$REPO" --log >> /tmp/failure.log 2>&1 || true
-          done < <(python3 -c "import json; print('\\n'.join(str(r['databaseId']) for r in json.load(open('/tmp/runs.json')) if r.get('conclusion')=='failure'))")
+          : > /tmp/repair_targets.jsonl
+          python3 - <<'PY'
+          import json, subprocess
+          for pr in json.load(open('/tmp/candidates.json')):
+            runs=json.loads(subprocess.check_output(['gh','run','list','--repo','lalibimohamed-maker/-dorar-hadith-api-official','--commit',pr['headSha'],'--limit','100','--json','databaseId,name,status,conclusion'],text=True))
+            failed=[r for r in runs if r.get('conclusion')=='failure']
+            if failed:
+              print(pr['number'],pr['headRefName'],pr['headSha'])
+              for r in failed:
+                subprocess.run(['gh','run','view',str(r['databaseId']),'--repo','lalibimohamed-maker/-dorar-hadith-api-official','--log'],stdout=open('/tmp/failure.log','a'),stderr=subprocess.STDOUT)
+              open('/tmp/repair_targets.jsonl','a').write(json.dumps(pr)+'\n')
+          PY
 
           if grep -qi 'workflow must declare top-level permissions' /tmp/failure.log; then
             while IFS= read -r f; do
@@ -105,6 +90,7 @@ jobs:
           fi
           git config user.name 'Rechercher Self-Heal'
           git config user.email 'rechercher-self-heal@users.noreply.github.com'
+          HEAD_BRANCH=$(python3 -c 'import json; print(json.loads(open("/tmp/repair_targets.jsonl").readline())["headRefName"])')
           git commit -m 'fix(rechercher): self-heal workflow infrastructure'
           git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "HEAD:${HEAD_BRANCH}"
 
