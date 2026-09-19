@@ -1,0 +1,122 @@
+name: Rechercher — Global multilingual evidence execution
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/rechercher-global-multilingual-execution.yml'
+      - 'scripts/rechercher_execute_global_multilingual_queue.mjs'
+      - 'scripts/rechercher_validate_translation_evidence.mjs'
+      - 'scripts/rechercher_translation_candidate_diagnostics.mjs'
+      - 'scripts/rechercher_validate_item_rights.mjs'
+      - 'scripts/rechercher_verify_global_multilingual_matrix.mjs'
+      - 'config/translation-sources-2026.json'
+      - 'research/evidence/global-multilingual/**'
+  schedule:
+    - cron: '13 2 * * *'
+
+permissions: {}
+
+concurrency:
+  group: rechercher-global-multilingual-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '24'
+  EXPECTED_CELL_COUNT: '3192'
+
+jobs:
+  matrix:
+    name: Execute multilingual evidence matrix shard ${{ matrix.shard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Execute shard
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+          SHARD_COUNT: '3'
+        run: node scripts/rechercher_execute_global_multilingual_queue.mjs --shard-index=${SHARD_INDEX} --shard-count=${SHARD_COUNT}
+      - name: Upload shard evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-global-multilingual-shard-${{ matrix.shard }}
+          path: |
+            research/evidence/global-multilingual/
+            artifacts/rechercher/global-multilingual-research/
+          if-no-files-found: error
+
+  aggregate:
+    name: Aggregate 3,192-cell multilingual evidence
+    needs: matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      # security-justification: write is scoped to the aggregate job because only this job persists the validated permanent scientific ledger; matrix workers remain read-only.
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Download shard evidence
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: rechercher-global-multilingual-shard-*
+          path: .
+          merge-multiple: true
+      - name: Validate translation evidence
+        run: node scripts/rechercher_validate_translation_evidence.mjs
+      - name: Validate candidate diagnostics and integrity
+        run: node scripts/rechercher_translation_candidate_diagnostics.mjs
+      - name: Rights and resource gate
+        run: node scripts/rechercher_validate_item_rights.mjs
+      - name: Verify exact 3,192-cell matrix
+        env:
+          EXPECTED_CELL_COUNT: ${{ env.EXPECTED_CELL_COUNT }}
+        run: node scripts/rechercher_verify_global_multilingual_matrix.mjs
+      - name: Build permanent scientific ledger
+        run: node scripts/rechercher_build_scientific_ledger.mjs
+      - name: Commit permanent scientific ledger
+        env:
+          PR_HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/evidence/global-multilingual
+          if git diff --cached --quiet; then
+            echo "No durable ledger changes to commit."
+            exit 0
+          fi
+          git commit -m "data(rechercher): persist multilingual scientific evidence ledger"
+          git push origin "HEAD:${PR_HEAD_REF}"
+      - name: Upload reproducibility bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-global-multilingual-reproducibility-bundle
+          path: artifacts/rechercher/global-multilingual-research/
+          if-no-files-found: error
