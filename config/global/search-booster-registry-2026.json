@@ -1,0 +1,27 @@
+{
+  "registryId":"din-allah-global-search-booster-registry-2026",
+  "policy":"free-first",
+  "paidCoreDependency":false,
+  "engines":[
+    {"id":"opensearch","role":"hybrid_internal_index","status":"PLANNED_SELF_HOSTED","capabilities":["BM25","vector","hybrid","facets"]},
+    {"id":"typesense-or-meilisearch","role":"fast_autocomplete","status":"PLANNED_SELF_HOSTED","capabilities":["typo_tolerance","autocomplete","filtering","facets"]},
+    {"id":"searxng","role":"external_web_discovery","status":"PLANNED_SELF_HOSTED","capabilities":["metasearch","source_federation"]},
+    {"id":"openalex-crossref-semantic-scholar","role":"academic_discovery","status":"PLANNED_FREE_DISCOVERY","capabilities":["bibliographic_metadata","paper_discovery","doi_metadata"]},
+    {"id":"dorar","role":"specialized_religious_source","status":"EXISTING_SPECIALIZED","capabilities":["hadith","scholarly_source_discovery"]}
+  ],
+  "boosterEngines":[
+    "evidence",
+    "citation",
+    "cross_source_deduplication",
+    "conflict_detection",
+    "temporal_knowledge",
+    "source_health",
+    "search_explanation",
+    "search_quality_evaluation",
+    "ocr_consensus",
+    "translation_quality",
+    "media_transcription"
+  ],
+  "firewalls":["provenance","rights","corpus_boundary","verification","no_silent_overwrite"],
+  "rules":["discovery_is_not_evidence","external_web_results_never_become_authoritative_automatically","original_text_is_preserved","provider_failure_is_not_source_falsehood","all_cached_derived_content_retains_provenance"]
+}
