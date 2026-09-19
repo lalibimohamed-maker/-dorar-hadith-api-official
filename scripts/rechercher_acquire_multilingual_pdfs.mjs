@@ -151,7 +151,7 @@ for(const [key,lang] of languages){
          await fs.rm(resolved,{force:true});
          continue;
        }
-       entry.files.push({url,path:path.relative(ROOT,resolved),bytes:inspected.bytes,sha256:inspected.sha256,content_type:d.contentType,acquisition,rights:rights.status});
+       entry.files.push({url,path:path.relative(ROOT,resolved),bytes:inspected.bytes,sha256:inspected.sha256,content_type:d?.contentType || null,acquisition,rights:rights.status});
      }
    }
  }catch(e){entry.error=String(e.message||e)}
