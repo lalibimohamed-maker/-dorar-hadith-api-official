@@ -197,7 +197,7 @@ export function attachMandatoryErrorAnchors(errors = [], anchorMap) {
     // the nearest deterministic anchor; with no timing metadata available, the
     // sole anchor is the only safe fallback. Reusing an anchor across distinct
     // error events is valid and preserves the event-level evidence boundary.
-    const anchor = byWord.get(key) || (anchors.length === 1 ? anchors[0] : null);
+    const anchor = byWord.get(key) || (!key && anchors.length === 1 ? anchors[0] : null);
     if (!anchor) throw new Error('CROSS_MODAL_ANCHOR_MISSING_FOR_ERROR:' + index);
     return Object.freeze({
       ...clone(error),
