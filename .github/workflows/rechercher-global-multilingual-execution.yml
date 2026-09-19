@@ -67,9 +67,7 @@ jobs:
     needs: matrix
     runs-on: ubuntu-latest
     timeout-minutes: 360
-    permissions:
-      # security-justification: write is scoped to the aggregate job because only this job persists the validated permanent scientific ledger; matrix workers remain read-only.
-      contents: write
+    permissions: {}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
