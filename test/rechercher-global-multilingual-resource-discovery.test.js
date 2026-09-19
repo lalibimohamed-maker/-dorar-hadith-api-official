@@ -40,3 +40,15 @@ test('resource lanes include core Islamic knowledge domains', () => {
     assert.ok(registry.resource_lanes.includes(lane), `missing lane: ${lane}`);
   }
 });
+
+
+test('3192 matrix outputs use a dedicated storage repository', () => {
+  const storage = JSON.parse(fs.readFileSync(
+    path.join(process.cwd(), 'config/rechercher/global-multilingual-storage.json'), 'utf8'
+  ));
+  assert.equal(storage.storage_repository, 'lalibimohamed-maker/dinullah-matrix-3192-storage-01');
+  assert.equal(storage.authentication.secret_name, 'RECHERCHER_MATRIX_STORAGE_TOKEN');
+  assert.equal(storage.contract.matrix_content_isolated_from_main_repository, true);
+  assert.equal(storage.contract.pdf_storage_is_separate_from_matrix_storage, true);
+  assert.equal(storage.scope.source_code, 'excluded');
+});
