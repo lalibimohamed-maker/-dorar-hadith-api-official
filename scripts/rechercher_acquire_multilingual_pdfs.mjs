@@ -83,7 +83,7 @@ for(const [key,lang] of languages){
        if(!resolved.startsWith(path.resolve(dir)+path.sep)) continue;
        await downloadPdf(url,resolved);
        const stat=await fs.stat(resolved);
-       if(stat.size<4 || (await fs.open(resolved,'r')).readFile({encoding:null}).then(b=>b.subarray(0,4).toString())!=='%PDF'){
+       if(stat.size<4 || (await fs.readFile(resolved)).subarray(0,4).toString()!=='%PDF'){
          await fs.rm(resolved,{force:true}); continue;
        }
        entry.files.push({url,path:path.relative(ROOT,resolved),bytes:stat.size,sha256:await sha(resolved),content_type:d.contentType});
