@@ -22,14 +22,22 @@ function allowedUrl(value){
   return u;
 }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const shaFile=async file=>{
+const inspectPdfFile=async file=>{
   const h=createHash('sha256');
   const handle=await fs.open(file,'r');
   try {
     const buf=Buffer.alloc(1024*1024);
-    let position=0;
-    for(;;){ const {bytesRead}=await handle.read(buf,0,buf.length,position); if(!bytesRead) break; h.update(buf.subarray(0,bytesRead)); position+=bytesRead; }
-    return h.digest('hex');
+    let position=0, total=0;
+    let header=null;
+    for(;;){
+      const {bytesRead}=await handle.read(buf,0,buf.length,position);
+      if(!bytesRead) break;
+      if(position===0) header=buf.subarray(0,Math.min(4,bytesRead)).toString();
+      h.update(buf.subarray(0,bytesRead));
+      total+=bytesRead;
+      position+=bytesRead;
+    }
+    return {bytes:total,sha256:h.digest('hex'),isPdf:total>=4 && header==='%PDF'};
   } finally { await handle.close(); }
 };
 const rightsForRecord=records=>{
@@ -128,18 +136,12 @@ for(const [key,lang] of languages){
        const resolved=path.resolve(file);
        if(!resolved.startsWith(path.resolve(dir)+path.sep)) continue;
        await downloadPdf(url,resolved);
-       const handle=await fs.open(resolved,'r');
-       try{
-         const stat=await handle.stat();
-         const header=Buffer.alloc(4);
-         await handle.read(header,0,4,0);
-         if(stat.size<4 || header.toString()!=='%PDF'){
-           await fs.rm(resolved,{force:true});
-           continue;
-         }
-         const sha256=await shaFile(resolved);
-         entry.files.push({url,path:path.relative(ROOT,resolved),bytes:stat.size,sha256,content_type:d.contentType,acquisition,rights:rights.status});
-       }finally{ try{await handle.close()}catch{} }
+       const inspected=await inspectPdfFile(resolved);
+       if(!inspected.isPdf){
+         await fs.rm(resolved,{force:true});
+         continue;
+       }
+       entry.files.push({url,path:path.relative(ROOT,resolved),bytes:inspected.bytes,sha256:inspected.sha256,content_type:d.contentType,acquisition,rights:rights.status});
      }
    }
  }catch(e){entry.error=String(e.message||e)}
