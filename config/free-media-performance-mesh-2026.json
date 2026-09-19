@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "purpose": "Free/open-source self-hosted engine registry for Deen Allah Encyclopedia media quality, performance, and lawful downloads.",
+  "costPolicy": {
+    "software": "free-and-open-source-preferred",
+    "subscription": "none-required",
+    "hosting": "self-hosted",
+    "note": "Free software does not mean zero infrastructure cost. No paid API is required by this registry."
+  },
+  "audio": {
+    "primary": {
+      "id": "deepfilternet",
+      "role": "speech-enhancement-and-noise-suppression",
+      "license": ["MIT", "Apache-2.0"],
+      "mode": "batch-or-realtime-where-supported",
+      "source": "https://github.com/Rikorose/DeepFilterNet"
+    },
+    "secondary": {
+      "id": "rnnoise",
+      "role": "recurrent-neural-noise-suppression",
+      "license": ["BSD-3-Clause"],
+      "mode": "realtime-capable",
+      "source": "https://github.com/xiph/rnnoise"
+    },
+    "postProcessing": {
+      "id": "ffmpeg",
+      "role": "format-normalization-and-audio-filter-pipeline",
+      "license": ["LGPL-2.1-or-later", "GPL-2.0-or-later-depending-on-build"],
+      "source": "https://ffmpeg.org/"
+    }
+  },
+  "image": {
+    "primary": {
+      "id": "real-esrgan",
+      "role": "real-world-super-resolution-and-restoration",
+      "license": ["BSD-3-Clause"],
+      "source": "https://github.com/xinntao/Real-ESRGAN"
+    },
+    "secondary": {
+      "id": "swinir",
+      "role": "super-resolution-denoising-and-restoration",
+      "license": ["Apache-2.0"],
+      "source": "https://github.com/JingyunLiang/SwinIR"
+    },
+    "pipeline": {
+      "id": "8k-plus-upscale",
+      "role": "multi-pass-upscaling-with-quality-gates",
+      "target": "8K-or-higher-when-source-quality-and-hardware-permit",
+      "policy": "never-claim-native-detail-that-the-source-does-not-contain"
+    },
+    "encoding": {
+      "id": "sharp",
+      "role": "fast-image-transcoding-and-AVIF-WebP-delivery",
+      "source": "https://sharp.pixelplumbing.com/"
+    }
+  },
+  "download": {
+    "orchestrator": {
+      "id": "aria2",
+      "role": "multi-source-segmented-downloader",
+      "protocols": ["HTTP", "HTTPS", "FTP", "SFTP", "BitTorrent", "Metalink"],
+      "features": ["resume", "segmented", "multi-source", "checksum-validation", "JSON-RPC"],
+      "license": ["GPL-2.0"],
+      "source": "https://github.com/aria2/aria2"
+    },
+    "webFallback": {
+      "id": "wget2",
+      "role": "modern-web-downloader-fallback",
+      "features": ["parallel-downloads", "HTTP2", "HTTP3-where-supported", "resume"],
+      "license": ["GPL-3.0-or-later"],
+      "source": "https://gitlab.com/gnuwget/wget2"
+    },
+    "protocolClient": {
+      "id": "curl",
+      "role": "universal-protocol-transfer-client",
+      "features": ["HTTP", "HTTPS", "FTP", "SFTP", "SCP", "resume", "redirects"],
+      "license": ["curl-license"],
+      "source": "https://curl.se/"
+    },
+    "mediaExtractor": {
+      "id": "yt-dlp",
+      "role": "authorized-audio-video-media-extraction",
+      "features": ["large-extractor-set", "format-selection", "metadata", "subtitle-download"],
+      "license": ["Unlicense"],
+      "source": "https://github.com/yt-dlp/yt-dlp",
+      "policy": "use-only-where-the-user-has-the-right-to-download-and-the-source-terms-permit-it"
+    },
+    "cloudSync": {
+      "id": "rclone",
+      "role": "cloud-and-remote-storage-transfer",
+      "features": ["multi-provider", "multithread-downloads", "restartable-transfers", "hash-verification", "S3", "WebDAV", "SFTP", "HTTP"],
+      "license": ["MIT"],
+      "source": "https://github.com/rclone/rclone"
+    },
+    "torrentClient": {
+      "id": "qbittorrent",
+      "role": "optional-open-torrent-client-for-lawful-public-or-licensed-distribution",
+      "license": ["GPL-2.0-or-later", "GPL-3.0-or-later-for-binary-distribution"],
+      "source": "https://github.com/qbittorrent/qBittorrent",
+      "policy": "disabled-by-default-for-unknown-rights-and-never-used-to-bypass-access-controls"
+    },
+    "gui": {
+      "id": "motrix",
+      "role": "optional-user-facing-download-manager-ui",
+      "license": ["MIT"],
+      "source": "https://github.com/agalwood/Motrix"
+    }
+  },
+  "downloadPolicy": {
+    "rightsFirst": true,
+    "allowed": ["public-domain", "open-license", "explicit-permission", "source-authorized-download"],
+    "unknownRights": "link-to-original-source-and-do-not-rehost",
+    "accessControls": "never-bypass",
+    "robotsAndTerms": "respect-source-terms-and-applicable-law",
+    "provenance": "preserve-source-url-license-attribution-and-integrity-hash-when-available",
+    "integrity": "verify-checksums-or-signatures-when-provided",
+    "resume": true,
+    "deduplication": true,
+    "parallelism": "bounded-by-source-and-server-policy"
+  },
+  "architecture": {
+    "search": ["meilisearch", "qdrant"],
+    "design": ["penpot"],
+    "build": ["vite-rolldown"],
+    "offline": ["workbox"],
+    "performanceVerification": ["lighthouse", "pagespeed-insights", "webpagetest"],
+    "scientificContentBoundary": "These engines may transform presentation media and transfer files only; they must never rewrite, infer, or replace authoritative Corpus text, provenance, attribution, or rights metadata."
+  },
+  "rightsPolicy": {
+    "modelsAndCode": "verify upstream license and model-specific terms before redistribution",
+    "sourceMedia": "do-not-process-or-rehost-unknown-rights-material-as-authoritative-content",
+    "fallback": "link-to-original-source-when-redistribution-rights-are-unclear"
+  }
+}
