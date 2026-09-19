@@ -7,8 +7,10 @@ on:
       - 'scripts/rechercher_acquire_multilingual_pdfs.mjs'
   schedule:
     - cron: '43 3 * * *'
-permissions:
-  contents: write
+permissions: {}
+
+env:
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
 concurrency:
   group: rechercher-multilingual-pdf-${{ github.ref }}
   cancel-in-progress: false
@@ -68,20 +70,40 @@ jobs:
             openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY               -in "$f" -out "artifacts/rechercher/multilingual-research-vault/$rel.enc"
             rm -f "$f"
           done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.languages))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
-      - name: Persist only redistributable PDFs and encrypted research vault
+      - name: Persist multilingual acquisition outputs to dedicated matrix storage
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
         run: |
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git lfs install
-          git lfs track 'artifacts/rechercher/multilingual-pdf-acquisition/**/*.pdf'
-          git add artifacts/rechercher/multilingual-pdf-acquisition artifacts/rechercher/multilingual-research-vault .gitattributes
-          if git diff --cached --quiet; then
-            echo "No new multilingual resources."
-            exit 0
+          test -n "$MATRIX_STORAGE_TOKEN"
+          cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          git clone "https://${MATRIX_STORAGE_REPO}.git" .matrix-storage
+          mkdir -p .matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition .matrix-storage/artifacts/rechercher/multilingual-research-vault
+          cp -a artifacts/rechercher/multilingual-pdf-acquisition/. .matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition/
+          if [ -d artifacts/rechercher/multilingual-research-vault ]; then cp -a artifacts/rechercher/multilingual-research-vault/. .matrix-storage/artifacts/rechercher/multilingual-research-vault/; fi
+          git -C .matrix-storage config user.name "github-actions[bot]"
+          git -C .matrix-storage config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C .matrix-storage lfs install
+          git -C .matrix-storage lfs track 'artifacts/rechercher/multilingual-pdf-acquisition/**/*.pdf'
+          git -C .matrix-storage add artifacts/rechercher/multilingual-pdf-acquisition artifacts/rechercher/multilingual-research-vault .gitattributes
+          if git -C .matrix-storage diff --cached --quiet; then echo "No new multilingual matrix resources."; else
+            git -C .matrix-storage commit -m "data(matrix): persist multilingual acquisition outputs"
+            for attempt in 1 2 3; do
+              git -C .matrix-storage pull --rebase origin main || true
+              if git -C .matrix-storage lfs fsck --pointers HEAD && git -C .matrix-storage push origin HEAD:refs/heads/main; then echo "MATRIX_PDF_STORAGE_PUSH_OK attempt=$attempt"; break; fi
+              if [ "$attempt" -eq 3 ]; then exit 1; fi
+              sleep 3
+            done
           fi
-          git commit -m "data(rechercher): separate multilingual research and public resources"
-          git push origin "HEAD:${{ github.head_ref || github.ref_name }}"
       - name: Upload acquisition manifest
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
