@@ -1,0 +1,37 @@
+{
+  "version": "2026-08-30",
+  "purpose": "Treat all remote research material as untrusted data while allowing controlled evidence acquisition.",
+  "transport": {
+    "allowedSchemes": ["https"],
+    "redirectLimit": 3,
+    "maxResponseBytes": 33554432,
+    "blockLoopback": true,
+    "blockPrivateNetwork": true,
+    "blockLinkLocal": true,
+    "blockCloudMetadataEndpoints": true,
+    "revalidateRedirectTargets": true
+  },
+  "content": {
+    "remoteTextIsDataNotInstructions": true,
+    "embeddedPromptsAreUntrusted": true,
+    "scriptsNeverExecutedDuringResearch": true,
+    "activeContentSandboxed": true,
+    "attachmentsReScanned": true
+  },
+  "agentBoundary": {
+    "sourceTextCannotInvokeTools": true,
+    "sourceTextCannotOverrideSystemPolicy": true,
+    "sourceTextCannotGrantPrivileges": true,
+    "externalActionsRequireExplicitControllerDecision": true
+  },
+  "validation": [
+    "content-type-check",
+    "size-limit",
+    "malware-scan",
+    "prompt-injection-scan",
+    "provenance-capture",
+    "citation-capture",
+    "output-schema-validation"
+  ],
+  "references": ["OWASP-LLM-Prompt-Injection-Prevention", "NIST-AI-RMF-GenAI"]
+}

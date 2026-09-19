@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "1.0.0",
+  "name": "global-content-cache",
+  "version": "2026-08-30",
+  "purpose": "إعادة استخدام المحتوى والنسخ المشتقة والترجمات وسجل التصفح دون إعادة البحث غير الضروري، مع فصل الذاكرة المحلية للمستخدم عن الذاكرة المشتركة للمحتوى.",
+  "costPolicy": {
+    "freeFirst": true,
+    "noPaidDependencyRequired": true,
+    "localFirst": true,
+    "sharedCacheMayRunOnOpenSourceInfrastructure": true
+  },
+  "cacheLayers": [
+    {
+      "id": "browser-service-worker",
+      "technology": "CacheStorage+ServiceWorker",
+      "purpose": "سرعة الاسترجاع للملفات والردود والصفحات التي سبق استخدامها",
+      "strategy": ["cache-first-for-immutable", "stale-while-revalidate-for-refreshable", "network-first-for-authoritative-refresh"]
+    },
+    {
+      "id": "browser-structured-store",
+      "technology": "IndexedDB",
+      "purpose": "البيانات الوصفية، الفهارس، سجل الزيارة، الترجمات، الروابط، وحالة المعالجة"
+    },
+    {
+      "id": "browser-large-media-store",
+      "technology": "OPFS",
+      "purpose": "الملفات الكبيرة والنسخ المشتقة والوسائط والمعالجة المحلية"
+    },
+    {
+      "id": "shared-content-cache",
+      "technology": "content-addressed-store",
+      "purpose": "نسخة مشتركة قابلة لإعادة الاستخدام للمحتوى المصرح به عبر المستخدمين"
+    },
+    {
+      "id": "translation-cache",
+      "technology": "content-hash+source-version+language+model-version key",
+      "purpose": "حفظ ترجمة المادة بحيث لا تعاد ترجمتها لكل متصفح"
+    },
+    {
+      "id": "derived-edition-cache",
+      "technology": "source-hash+processing-pipeline-version key",
+      "purpose": "إعادة استخدام الطبعة الرقمية المحسنة دون إعادة معالجة الأصل"
+    },
+    {
+      "id": "browser-study-history",
+      "technology": "IndexedDB+Navigation API/History API",
+      "purpose": "تقويم التصفح داخل الموسوعة، مستقل عن سجل المتصفح العام"
+    }
+  ],
+  "identity": {
+    "primaryKey": "contentHash",
+    "editionKey": "contentHash+editionId",
+    "translationKey": "contentHash+editionId+sourceLanguage+targetLanguage+translationModelVersion",
+    "derivedKey": "contentHash+processingPipelineVersion+outputFormat",
+    "mediaVariantKey": "contentHash+mediaType+variant+codecVersion"
+  },
+  "contentClasses": ["book","page","article","hadith","tafsir","fatwa","image","audio","video","document","map","lecture"],
+  "reuseRules": {
+    "reuseBeforeRemoteSearch": true,
+    "reuseBeforeReprocessing": true,
+    "reuseVerifiedTranslation": true,
+    "reuseVerifiedDerivedEdition": true,
+    "staleEntriesMayTriggerBackgroundRevalidation": true,
+    "authoritativeRefreshMayReplaceSharedVariantOnlyAfterVerification": true,
+    "neverTreatCacheAsScientificAuthority": true
+  },
+  "translation": {
+    "cachePerLanguage": true,
+    "cachePerModelVersion": true,
+    "cachePerSourceEdition": true,
+    "retainOriginalText": true,
+    "retainTranslationProvenance": true,
+    "retainUncertainty": true,
+    "allowOfflineReuse": true
+  },
+  "historyCalendar": {
+    "scope": "this-application-only",
+    "recordFields": ["timestamp","localDate","localTime","contentId","contentType","editionId","language","route","title","position","durationViewed","sourceUrl"],
+    "calendarIndex": ["localDate","timestamp"],
+    "reopenMode": "resolve-content-from-cache-by-content-id-first",
+    "fallbackMode": "network-retrieve-only-if-cache-misses",
+    "doNotClaimAccessToBrowserGlobalHistory": true,
+    "privacy": {
+      "defaultLocalOnly": true,
+      "syncOptional": true,
+      "syncRequiresExplicitOptIn": true,
+      "neverStoreSensitiveQueryTextByDefault": true,
+      "userMayClearHistory": true
+    }
+  },
+  "storage": {
+    "estimateQuota": true,
+    "requestPersistenceWhenAvailable": true,
+    "quotaExceededMustEvictLeastValuableCacheFirst": true,
+    "neverDeleteSourceOfRecordFromSharedRepositoryWhenEvictingBrowserCache": true,
+    "contentAddressedDeduplication": true,
+    "chunkLargeMedia": true
+  },
+  "security": {
+    "remoteContentIsUntrusted": true,
+    "cachedRemoteContentCannotInvokeTools": true,
+    "cachePoisoningDetection": true,
+    "integrityHashRequired": true,
+    "rightsStatusRetained": true,
+    "licenseStatusRetained": true
+  },
+  "bookWorkflow": {
+    "sourceHash": true,
+    "derivedEditionCache": true,
+    "readableYellowPaperEdition": true,
+    "searchablePdfCache": true,
+    "docxCache": true,
+    "pptxCache": true,
+    "epubCache": true,
+    "htmlCache": true,
+    "pageRegionProvenance": true
+  }
+}
