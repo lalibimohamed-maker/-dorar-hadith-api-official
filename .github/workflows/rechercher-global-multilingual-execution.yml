@@ -17,9 +17,6 @@ on:
 
 permissions: {}
 
-env:
-  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
-
 concurrency:
   group: rechercher-global-multilingual-${{ github.ref }}
   cancel-in-progress: false
@@ -27,6 +24,7 @@ concurrency:
 env:
   NODE_VERSION: '24'
   EXPECTED_CELL_COUNT: '3192'
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
 
 jobs:
   matrix:
