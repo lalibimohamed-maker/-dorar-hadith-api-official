@@ -3,6 +3,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {spawn} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {resolveRights, RIGHTS} from '../src/book-rights-resolver.js';
 
 const ROOT=process.cwd();
 const ledger=path.join(ROOT,'research/evidence/global-multilingual/scientific-ledger.jsonl');
@@ -21,7 +23,31 @@ function allowedUrl(value){
   return u;
 }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const shaBuffer=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
+const shaFile=async file=>{
+  const h=createHash('sha256');
+  const handle=await fs.open(file,'r');
+  try {
+    const buf=Buffer.alloc(1024*1024);
+    let position=0;
+    for(;;){ const {bytesRead}=await handle.read(buf,0,buf.length,position); if(!bytesRead) break; h.update(buf.subarray(0,bytesRead)); position+=bytesRead; }
+    return h.digest('hex');
+  } finally { await handle.close(); }
+};
+const rightsForRecord=records=>{
+  const evidence=[];
+  for(const r of records){
+    const candidates=[r.rights_evidence,r.rightsEvidence,r.evidence?.rights,r.stages?.flatMap?.(s=>s.evidence?.rights || [])].flat().filter(Boolean);
+    for(const e of candidates){
+      if(typeof e==='string') evidence.push({source:r.provider||r.source_url||'matrix',kind:e});
+      else if(e && typeof e==='object' && e.kind) evidence.push({...e,source:e.source||r.provider||r.source_url||'matrix'});
+    }
+    if(r.redistribution_allowed===true) evidence.push({source:r.provider||'matrix',kind:'explicit-redistribution-permission'});
+    if(r.rights_status==='public-domain') evidence.push({source:r.provider||'matrix',kind:'public-domain'});
+    if(r.rights_status==='verified-redistributable') evidence.push({source:r.provider||'matrix',kind:'explicit-redistribution-permission'});
+    if(r.rights_status==='restricted') evidence.push({source:r.provider||'matrix',kind:'restricted'});
+  }
+  return resolveRights(evidence);
+};
 function safe(s){return String(s||'unknown').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'unknown'}
 function pdfLinks(html,base){
  const out=[],seen=new Set();
@@ -55,7 +81,10 @@ function downloadPdf(url,file){
 }
 const summary={schema:'rechercher/multilingual-resource-acquisition/v2',generated_at:new Date().toISOString(),language_count:languages.size,policy:{redistribution:'only when explicitly verified',research_only:'only when lawful research access is explicitly established; never public',public_repo:'research-only PDFs are forbidden from persistence in this public repository'},languages:{}};
 for(const [key,lang] of languages){
- const entry={language:lang.name,iso:lang.iso,status:'no-eligible-pdf-found',sources_checked:[],files:[],rights:'review-required'};
+ const rights=rightsForRecord(lang.records);
+ const acquisition=rights.status===RIGHTS.REDISTRIBUTABLE?'public':(rights.status===RIGHTS.READ_COPY||rights.status===RIGHTS.READ_ONLY?'research-only':'blocked');
+ const entry={language:lang.name,iso:lang.iso,status:'no-eligible-pdf-found',sources_checked:[],files:[],rights:rights.status,rights_conflict:rights.conflict,rights_confidence:rights.confidence,acquisition};
+ if(acquisition==='blocked'){ entry.status='rights-blocked'; summary.languages[key]=entry; continue; }
  const hasH=lang.records.some(r=>{
    if(r.provider==='hadeethenc') return true;
    return (r.stages||[]).some(s=>{
@@ -87,21 +116,18 @@ for(const [key,lang] of languages){
          const header=Buffer.alloc(4);
          await handle.read(header,0,4,0);
          if(stat.size<4 || header.toString()!=='%PDF'){
-           await handle.close();
            await fs.rm(resolved,{force:true});
            continue;
          }
-         const bytes=await handle.readFile();
-         entry.files.push({url,path:path.relative(ROOT,resolved),bytes:stat.size,sha256:shaBuffer(bytes),content_type:d.contentType});
-       }finally{
-         try{await handle.close()}catch{}
-       }
+         const sha256=await shaFile(resolved);
+         entry.files.push({url,path:path.relative(ROOT,resolved),bytes:stat.size,sha256,content_type:d.contentType,acquisition,rights:rights.status});
+       }finally{ try{await handle.close()}catch{} }
      }
    }
  }catch(e){entry.error=String(e.message||e)}
- if(entry.files.length) entry.status=entry.acquisition==='research-only'?'research-only-acquired':'acquired';
+ if(entry.files.length) entry.status=acquisition==='research-only'?'research-only-acquired':'acquired';
  summary.languages[key]=entry;
 }
 await fs.mkdir(out,{recursive:true});
 await fs.writeFile(path.join(out,'manifest.json'),JSON.stringify(summary,null,2)+'\n');
-console.log(JSON.stringify({language_count:languages.size,searchable_languages:Object.values(summary.languages).filter(x=>x.status==='searchable'||x.acquisition==='search-only').length,acquired_languages:Object.values(summary.languages).filter(x=>x.status==='acquired').length,research_only_acquired:Object.values(summary.languages).filter(x=>x.status==='research-only-acquired').length,total_pdfs:Object.values(summary.languages).reduce((n,x)=>n+x.files.length,0),manifest:path.relative(ROOT,path.join(out,'manifest.json'))}));
+console.log(JSON.stringify({language_count:languages.size,blocked_rights:Object.values(summary.languages).filter(x=>x.status==='rights-blocked').length,acquired_languages:Object.values(summary.languages).filter(x=>x.status==='acquired').length,research_only_acquired:Object.values(summary.languages).filter(x=>x.status==='research-only-acquired').length,total_pdfs:Object.values(summary.languages).reduce((n,x)=>n+x.files.length,0),manifest:path.relative(ROOT,path.join(out,'manifest.json'))}));
