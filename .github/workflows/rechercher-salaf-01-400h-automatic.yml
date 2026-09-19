@@ -17,7 +17,7 @@ concurrency:
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main
+    uses: ./.github/workflows/rechercher-governed-acquisition.yml
     with:
       target_branch: rechercher/encyclopedia-master-unbounded-acquisition
     secrets:
