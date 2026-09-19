@@ -95,6 +95,15 @@ async function get(url){
    return {status:r.status,bytes:Buffer.from(await r.arrayBuffer()),contentType:r.headers.get('content-type')};
  }catch(e){if(i===3) throw e;await sleep(700*(i+1));}}
 }
+async function probePdf(url){
+  const u=allowedUrl(url); if(!u) return null;
+  for(let i=0;i<3;i++){try{
+    const r=await fetch(u,{method:'HEAD',redirect:'manual',headers:{'user-agent':'DinAllah-Rechercher/2.0','accept':'application/pdf,*/*;q=0.1'}});
+    if(r.status===429){await sleep(1000*(i+1));continue}
+    return {status:r.status,contentType:r.headers.get('content-type')};
+  }catch(e){if(i===2)return null;await sleep(500*(i+1));}}
+  return null;
+}
 function downloadPdf(url,file){
  const u=allowedUrl(url); if(!u) return Promise.reject(new Error('untrusted or disallowed HTTPS origin'));
  const args=['--fail','--silent','--show-error','--location','--max-redirs','0','--proto','=https','--output',file,u.href];
@@ -127,8 +136,9 @@ for(const [key,lang] of languages){
    const p=await get(page); if(p.bytes){
      const links=pdfLinks(p.bytes.toString('utf8'),page);
      for(const url of links.slice(0,32)){
-       const d=await get(url); if(!d.bytes) continue;
-       if(d.contentType && !/^application\/pdf(?:\s*;|$)/i.test(d.contentType)) continue;
+       const d=await probePdf(url);
+       if(d && (d.status < 200 || d.status >= 400)) continue;
+       if(d?.contentType && !/^application\/pdf(?:\s*;|$)/i.test(d.contentType)) continue;
        const dir=path.join(out,safe(iso)); await fs.mkdir(dir,{recursive:true});
        const parsed=allowedUrl(url); if(!parsed) continue;
        const name=safe(path.basename(parsed.pathname)); if(name==='unknown') continue;
