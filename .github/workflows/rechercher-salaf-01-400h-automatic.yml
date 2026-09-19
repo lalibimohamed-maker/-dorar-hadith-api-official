@@ -1,6 +1,9 @@
 name: Rechercher — Encyclopedia continuous PDF downloader
 
 on:
+  push:
+    branches:
+      - rechercher/encyclopedia-master-unbounded-acquisition
   workflow_dispatch:
   schedule:
     - cron: '*/5 * * * *'
