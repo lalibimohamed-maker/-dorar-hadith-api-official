@@ -14,7 +14,7 @@ import {
   updateMemorizationState,
   scheduleSpacedMemorization,
   alignMultilingualConcept,
-  createRecitationFeedback,
+  createRecitationFeedback,\n  registerMediaIdentity,
 } from '../src/rechercher-v9-multimodal-recitation-engine.js';
 
 test('V9 contract preserves acquisition, provenance, rights and immutable Quran/PDF boundaries', () => {
@@ -26,7 +26,7 @@ test('V9 contract preserves acquisition, provenance, rights and immutable Quran/
   assert.equal(contract.safety.religiousDecisionAuthority, false);
 });
 
-test('source identity carries work, edition, manifestation, page/passage, rights, provenance and hash', () => {
+test('dialogue is a first-class V9 modality and remains hash-bound', async () => {\n  const engine = createV9MultimodalRecitationEngine();\n  const media = registerMediaIdentity(engine, { mediaId: 'dialogue:1', modality: 'DIALOGUE', contentHash: 'sha256:dialogue' });\n  assert.equal(media.modality, 'DIALOGUE');\n  assert.equal(media.contentHash, 'sha256:dialogue');\n});\n\ntest('source identity carries work, edition, manifestation, page/passage, rights, provenance and hash', () => {
   const identity = createSourceIdentity({
     source_id: 'source:quran:example', work_id: 'work:quran', edition_id: 'edition:hafs', manifestation_id: 'audio:001',
     page_id: 'page:none', passage_id: 'ayah:1:1', language: 'ar', rights: 'ALLOWED', provenance: { provider: 'test' },
