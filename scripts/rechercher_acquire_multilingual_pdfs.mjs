@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {resolveRights, RIGHTS} from '../src/book-rights-resolver.js';
@@ -45,6 +44,25 @@ const rightsForRecord=records=>{
     if(r.rights_status==='public-domain') evidence.push({source:r.provider||'matrix',kind:'public-domain'});
     if(r.rights_status==='verified-redistributable') evidence.push({source:r.provider||'matrix',kind:'explicit-redistribution-permission'});
     if(r.rights_status==='restricted') evidence.push({source:r.provider||'matrix',kind:'restricted'});
+  }
+  // HadeethEnc publishes explicit terms permitting download and republication of its translated content,
+  // subject to attribution, version preservation, no modification, source notification, and updates.
+  // Apply this evidence only to translation records; Arabic canonical/original material remains review-gated.
+  if(records.some(r=>r.provider==='hadeethenc') && !records.some(r=>String(r.language_iso||r.language||'').toLowerCase()==='ar')){
+    evidence.push({
+      source:'HadeethEnc.com',
+      kind:'explicit-redistribution-permission',
+      url:'https://hadeethenc.com/ar/',
+      conditions:[
+        'no-modification-addition-or-deletion',
+        'clear-publisher-and-source-attribution',
+        'mention-version-number',
+        'retain-transcript-information',
+        'notify-source-of-translation-notes',
+        'update-to-latest-source-version',
+        'no-inappropriate-advertising'
+      ]
+    });
   }
   return resolveRights(evidence);
 };
