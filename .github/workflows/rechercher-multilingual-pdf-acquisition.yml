@@ -87,7 +87,7 @@ jobs:
           SH
           chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
           export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
-          git clone "https://${MATRIX_STORAGE_REPO}.git" .matrix-storage
+          git clone "https://github.com/${MATRIX_STORAGE_REPO}.git" .matrix-storage
           mkdir -p .matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition .matrix-storage/artifacts/rechercher/multilingual-research-vault
           cp -a artifacts/rechercher/multilingual-pdf-acquisition/. .matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition/
           if [ -d artifacts/rechercher/multilingual-research-vault ]; then cp -a artifacts/rechercher/multilingual-research-vault/. .matrix-storage/artifacts/rechercher/multilingual-research-vault/; fi
