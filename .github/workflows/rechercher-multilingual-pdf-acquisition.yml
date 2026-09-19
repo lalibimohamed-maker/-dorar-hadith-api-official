@@ -1,0 +1,61 @@
+name: Rechercher — Multilingual PDF acquisition
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'research/evidence/global-multilingual/**'
+      - 'scripts/rechercher_acquire_multilingual_pdfs.mjs'
+  schedule:
+    - cron: '43 3 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: rechercher-multilingual-pdf-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Install PDF validator
+        run: sudo apt-get update && sudo apt-get install -y qpdf
+      - name: Acquire rights-cleared multilingual PDFs
+        run: node scripts/rechercher_acquire_multilingual_pdfs.mjs
+      - name: Validate downloaded PDFs
+        run: |
+          set -euo pipefail
+          find artifacts/rechercher/multilingual-pdf-acquisition -type f -name '*.pdf' -print0 |
+            while IFS= read -r -d '' f; do
+              test "$(head -c 4 "$f")" = "%PDF"
+              qpdf --check "$f"
+              test -s "$f"
+            done
+      - name: Persist multilingual PDF manifest and files
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git lfs install
+          git lfs track 'artifacts/rechercher/multilingual-pdf-acquisition/**/*.pdf'
+          git add artifacts/rechercher/multilingual-pdf-acquisition .gitattributes
+          if git diff --cached --quiet; then
+            echo "No new multilingual PDF files."
+            exit 0
+          fi
+          git commit -m "data(rechercher): persist multilingual rights-cleared PDFs"
+          git push origin "HEAD:${{ github.head_ref || github.ref_name }}"
+      - name: Upload PDF bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-multilingual-rights-cleared-pdfs
+          path: artifacts/rechercher/multilingual-pdf-acquisition
+          if-no-files-found: error
