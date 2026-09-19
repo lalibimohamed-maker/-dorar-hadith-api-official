@@ -2,14 +2,14 @@
 
 ## Storage rule
 
-Developer-review copies that the project is permitted to retain for review are kept as ordinary `.pdf` files in private developer-review storage. The project does not create, retain, decrypt, or publish `*.pdf.enc`, `*.enc`, or other encrypted PDF copies.
+Developer-review copies that the project is permitted to retain for review are kept as ordinary PDF files in private developer-review storage. Rechercher does not create, retain, decrypt, or publish encrypted PDF copies.
 
 ## Availability vs. redistribution
 
-- `availability`: whether a usable copy was actually acquired from a catalogued source.
-- `rights_action`: whether the copy is eligible for public redistribution or must remain private for developer review.
+- availability: whether a usable copy was actually acquired from a catalogued source.
+- rights_action: whether the copy is eligible for public redistribution or must remain private for developer review.
 
-A downloadable/hosted file is not treated as proof of redistribution permission.
+A downloadable or hosted file is not treated as proof of redistribution permission.
 
 ## Retention
 
@@ -21,8 +21,8 @@ Each retained copy records its source URL, byte size, SHA-256, and PDF validatio
 
 ## Public publication
 
-Only copies explicitly marked `verified-redistributable` may enter the public PDF path.
+Only copies explicitly marked verified-redistributable may enter the public PDF path.
 
 ## Encryption policy
 
-`REVIEW_VAULT_KEY` and the `pdf.enc` storage/decryption path are removed from Rechercher. Any encrypted PDF artifact is rejected by the storage hygiene guard.
+Encrypted PDF storage and decryption are removed from Rechercher. The storage guard rejects encrypted artifacts rather than creating or retaining them.
