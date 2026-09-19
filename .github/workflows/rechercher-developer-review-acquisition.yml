@@ -35,13 +35,6 @@ jobs:
           set -euo pipefail
           python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE"
 
-      - name: Preserve the original PDFs for Developer Review
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: rechercher-developer-review-pdfs-${{ github.run_id }}
-          path: artifacts/developer-review-vault/*.pdf
-          if-no-files-found: ignore
-
       - name: Preserve the original PDFs as the sole book representation
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
