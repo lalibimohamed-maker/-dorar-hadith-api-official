@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: write
-  actions: read
+  actions: write
   pull-requests: write
   checks: read
 
@@ -89,6 +89,18 @@ jobs:
           git config user.email 'rechercher-self-heal@users.noreply.github.com'
           git commit -m 'fix(rechercher): self-heal workflow infrastructure'
           git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "HEAD:${HEAD_BRANCH}"
+
+      - name: Re-run failed workflow jobs after repair
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          while read -r id; do
+            [ -z "$id" ] && continue
+            gh run rerun "$id" --failed --repo "$REPO" || true
+          done < <(python3 -c "import json; print('\\n'.join(str(r['databaseId']) for r in json.load(open('/tmp/runs.json')) if r.get('conclusion')=='failure'))")
 
       - name: Report unresolved failures
         if: always()
