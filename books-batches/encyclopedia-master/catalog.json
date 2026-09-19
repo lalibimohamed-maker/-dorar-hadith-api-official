@@ -755,8 +755,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 1,
+        "direct_pdf_candidate_count": 1,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -765,24 +765,25 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Internet Archive"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://archive.org/download/elshandawily9809/%D8%B4%D8%B1%D8%AD%20%D8%A7%D9%84%D9%81%D9%82%D9%87%20%D8%A7%D9%84%D8%A3%D9%83%D8%A8%D8%B1.pdf",
+          "pdf_url": "https://archive.org/download/elshandawily9809/%D8%B4%D8%B1%D8%AD%20%D8%A7%D9%84%D9%81%D9%82%D9%87%20%D8%A7%D9%84%D8%A3%D9%83%D8%A8%D8%B1.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6685,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "elshandawily9809"
+        }
+      ]
     },
     {
       "title": "تفسير ابن جريج",
@@ -1181,7 +1182,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -1191,23 +1192,22 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
-      }
+      },
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%B3%D9%8A%D8%B1_%D8%A3%D8%B9%D9%84%D8%A7%D9%85_%D8%A7%D9%84%D9%86%D8%A8%D9%84%D8%A7%D8%A1/%D9%85%D8%B9%D9%85%D8%B1_%D8%A8%D9%86_%D8%B1%D8%A7%D8%B4%D8%AF",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6383,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ]
     },
     {
       "title": "كتاب معمر بن راشد",
@@ -1394,7 +1394,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -1404,23 +1404,22 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
-      }
+      },
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%B3%D9%8A%D8%B1_%D8%A3%D8%B9%D9%84%D8%A7%D9%85_%D8%A7%D9%84%D9%86%D8%A8%D9%84%D8%A7%D8%A1/%D8%B3%D8%B9%D9%8A%D8%AF_%D8%A8%D9%86_%D8%A3%D8%A8%D9%8A_%D8%B9%D8%B1%D9%88%D8%A8%D8%A9",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.7018,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ]
     },
     {
       "id": "sunan-saeed-ibn-abi-aruba",
@@ -5438,7 +5437,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -5448,23 +5447,22 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
-      }
+      },
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%B3%D9%8A%D8%B1_%D8%A3%D8%B9%D9%84%D8%A7%D9%85_%D8%A7%D9%84%D9%86%D8%A8%D9%84%D8%A7%D8%A1/%D8%B3%D9%81%D9%8A%D8%A7%D9%86_%D8%A8%D9%86_%D8%B9%D9%8A%D9%8A%D9%86%D8%A9",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6923,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ]
     },
     {
       "death_hijri": 198,
@@ -6587,8 +6585,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 1,
+        "direct_pdf_candidate_count": 1,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -6597,24 +6595,25 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Internet Archive"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://archive.org/download/AAlexandrina-028201/028201%20-%20%D8%AF%D9%84%D8%A7%D8%A6%D9%84%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D8%A9.pdf",
+          "pdf_url": "https://archive.org/download/AAlexandrina-028201/028201%20-%20%D8%AF%D9%84%D8%A7%D8%A6%D9%84%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D8%A9.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6491,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "AAlexandrina-028201"
+        }
+      ]
     },
     {
       "death_hijri": 212,
@@ -7127,8 +7126,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 3,
+        "direct_pdf_candidate_count": 2,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -7137,24 +7136,46 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
           "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 3,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%B4%D8%B1%D9%81_%D8%A3%D8%B5%D8%AD%D8%A7%D8%A8_%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6667,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://archive.org/download/AAlexandrina-148423/148423%20-%20%D8%BA%D8%B1%D9%8A%D8%A8%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB.pdf",
+          "pdf_url": "https://archive.org/download/AAlexandrina-148423/148423%20-%20%D8%BA%D8%B1%D9%8A%D8%A8%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6726,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "AAlexandrina-148423"
+        },
+        {
+          "url": "https://archive.org/download/AAlexandrina-150615/150615%20-%20%D8%BA%D8%B1%D9%8A%D8%A8%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB.pdf",
+          "pdf_url": "https://archive.org/download/AAlexandrina-150615/150615%20-%20%D8%BA%D8%B1%D9%8A%D8%A8%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6722,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "AAlexandrina-150615"
+        }
+      ]
     },
     {
       "death_hijri": 224,
@@ -7199,7 +7220,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -7209,23 +7230,22 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
-      }
+      },
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D9%81%D8%B6%D8%A7%D8%A6%D9%84_%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 1.0,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ]
     },
     {
       "death_hijri": 227,
@@ -8257,8 +8277,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 1,
+        "direct_pdf_candidate_count": 1,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -8267,23 +8287,24 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Internet Archive"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
-      }
+      },
+      "sources": [
+        {
+          "url": "https://archive.org/download/mossanaf-Ibn-Abichaiba/%D9%85%D9%82%D8%AF%D9%85%D8%A9%20%D8%AA%D8%AD%D9%82%D9%8A%D9%82%20%D9%85%D8%B5%D9%86%D9%81%20%D8%A7%D8%A8%D9%86%20%D8%A3%D8%A8%D9%8A%20%D8%B4%D9%8A%D8%A8%D8%A9%20.pdf",
+          "pdf_url": "https://archive.org/download/mossanaf-Ibn-Abichaiba/%D9%85%D9%82%D8%AF%D9%85%D8%A9%20%D8%AA%D8%AD%D9%82%D9%8A%D9%82%20%D9%85%D8%B5%D9%86%D9%81%20%D8%A7%D8%A8%D9%86%20%D8%A3%D8%A8%D9%8A%20%D8%B4%D9%8A%D8%A8%D8%A9%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6484,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "mossanaf-Ibn-Abichaiba"
+        }
+      ]
     },
     {
       "death_hijri": 238,
@@ -9124,7 +9145,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 10,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -9134,23 +9155,103 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 10,
         "discovery_version": "global-worldwide-pdf-v2"
-      }
+      },
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%B1%D8%A7%D8%A8%D8%B9",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6486,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%AA%D8%A7%D8%B3%D8%B9",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6486,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%B3%D8%A7%D8%A8%D8%B9",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6486,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%A3%D9%88%D9%84",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6667,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%B9%D8%A7%D8%B4%D8%B1",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6486,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%AB%D8%A7%D9%86%D9%8A",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6486,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%AB%D8%A7%D9%84%D8%AB",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6486,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%B3%D8%A7%D8%AF%D8%B3",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6486,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%AE%D8%A7%D9%85%D8%B3",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6486,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%A7%D9%84%D8%A3%D8%AF%D8%A8_%D8%A7%D9%84%D9%85%D9%81%D8%B1%D8%AF/%D8%A7%D9%84%D8%AC%D8%B2%D8%A1_%D8%A7%D9%84%D8%AB%D8%A7%D9%85%D9%86",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6486,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ]
     },
     {
       "death_hijri": 256,
@@ -10330,8 +10431,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 1,
+        "direct_pdf_candidate_count": 1,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -10340,24 +10441,25 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Internet Archive"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://archive.org/download/AAlexandrina-148423/148423%20-%20%D8%BA%D8%B1%D9%8A%D8%A8%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB.pdf",
+          "pdf_url": "https://archive.org/download/AAlexandrina-148423/148423%20-%20%D8%BA%D8%B1%D9%8A%D8%A8%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6331,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "AAlexandrina-148423"
+        }
+      ]
     },
     {
       "id": "al-radd-ala-al-jahmiyyah-darimi",
@@ -11214,8 +11316,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 2,
+        "direct_pdf_candidate_count": 1,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -11224,24 +11326,35 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
           "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 2,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%AF%D9%84%D8%A7%D8%A6%D9%84_%D8%A7%D9%84%D9%86%D8%A8%D9%88%D8%A9_%D9%84%D9%84%D9%81%D8%B1%D9%8A%D8%A7%D8%A8%D9%8A",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.7273,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        },
+        {
+          "url": "https://archive.org/download/AAlexandrina-028201/028201%20-%20%D8%AF%D9%84%D8%A7%D8%A6%D9%84%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D8%A9.pdf",
+          "pdf_url": "https://archive.org/download/AAlexandrina-028201/028201%20-%20%D8%AF%D9%84%D8%A7%D8%A6%D9%84%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D8%A9.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6199,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "AAlexandrina-028201"
+        }
+      ]
     },
     {
       "death_hijri": 301,
@@ -11286,7 +11399,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -11296,23 +11409,22 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
-      }
+      },
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%AF%D9%84%D8%A7%D8%A6%D9%84_%D8%A7%D9%84%D9%86%D8%A8%D9%88%D8%A9_%D9%84%D9%84%D9%81%D8%B1%D9%8A%D8%A7%D8%A8%D9%8A",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.7273,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ]
     },
     {
       "title": "فضائل القرآن",
@@ -11640,8 +11752,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 14,
+        "direct_pdf_candidate_count": 14,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -11650,24 +11762,168 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Internet Archive"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 14,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/HoorBook0.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/HoorBook0.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%2010%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%2010%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%2011%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%2011%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%2012%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%2012%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%2013%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%2013%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%202%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%202%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%203%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%203%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%204%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%204%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%205%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%205%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%206%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%206%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%207%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%207%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%208%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%208%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%209%20.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9%209%20.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        },
+        {
+          "url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9.pdf",
+          "pdf_url": "https://archive.org/download/noor-book.com_20250705/Noor-Book.com%20%20%D8%A7%D9%84%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B3%D9%86%D9%86%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A6%D9%8A%20%D8%A7%D9%84%D9%83%D8%A8%D8%B1%D9%89%20%D8%B7%20%D8%A7%D9%84%D8%B1%D8%B3%D8%A7%D9%84%D8%A9.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6565,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "noor-book.com_20250705"
+        }
+      ]
     },
     {
       "death_hijri": 303,
@@ -12063,8 +12319,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 1,
+        "direct_pdf_candidate_count": 1,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -12073,24 +12329,25 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Internet Archive"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://archive.org/download/KitabIkhtelafAlFoqahaa/KitabIkhtelafAlFoqahaa.pdf",
+          "pdf_url": "https://archive.org/download/KitabIkhtelafAlFoqahaa/KitabIkhtelafAlFoqahaa.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8273,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "KitabIkhtelafAlFoqahaa"
+        }
+      ]
     },
     {
       "id": "jami-bayan-tabari",
@@ -13738,8 +13995,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 1,
+        "direct_pdf_candidate_count": 1,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -13748,24 +14005,25 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Internet Archive"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://archive.org/download/1995-alaqidah_altahawiya-altahawi/1995-alaqidah_altahawiya-altahawi.pdf",
+          "pdf_url": "https://archive.org/download/1995-alaqidah_altahawiya-altahawi/1995-alaqidah_altahawiya-altahawi.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.7722,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1995-alaqidah_altahawiya-altahawi"
+        }
+      ]
     },
     {
       "death_hijri": 321,
@@ -16920,8 +17178,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 22,
+        "direct_pdf_candidate_count": 22,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -16930,24 +17188,256 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Internet Archive"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 22,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://archive.org/download/00_20250706/00.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/00.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/01.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/01.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/02.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/02.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/03.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/03.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/04.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/04.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/05.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/05.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/06.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/06.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/07.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/07.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/08.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/08.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/09.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/09.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/00_20250706/10.pdf",
+          "pdf_url": "https://archive.org/download/00_20250706/10.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "00_20250706"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%201.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%201.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%2010.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%2010.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%2011.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%2011.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%202.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%202.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%203.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%203.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%204.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%204.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%205.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%205.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%206.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%206.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%207.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%207.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%208.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%208.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        },
+        {
+          "url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%209.pdf",
+          "pdf_url": "https://archive.org/download/1_20260414_20260414_2039/%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84%20%D9%81%D9%8A%20%D8%B6%D8%B9%D9%81%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B1%D8%AC%D8%A7%D9%84%209.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.8,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "1_20260414_20260414_2039"
+        }
+      ]
     },
     {
       "death_hijri": 369,
@@ -17203,8 +17693,8 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
-        "direct_pdf_candidate_count": 0,
+        "source_candidate_count": 1,
+        "direct_pdf_candidate_count": 1,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
         "rights_inference": "forbidden",
@@ -17213,24 +17703,25 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Internet Archive"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
       },
-      "expected_volumes": 1
+      "expected_volumes": 1,
+      "sources": [
+        {
+          "url": "https://archive.org/download/20200626_20200626_1314/%D8%A5%D8%AD%D9%83%D8%A7%D9%85%20%D8%A7%D9%84%D9%81%D8%B5%D9%88%D9%84%20%D9%81%D9%8A%20%D8%A3%D8%AD%D9%83%D8%A7%D9%85%20%D8%A7%D9%84%D8%A3%D8%B5%D9%88%D9%84.pdf",
+          "pdf_url": "https://archive.org/download/20200626_20200626_1314/%D8%A5%D8%AD%D9%83%D8%A7%D9%85%20%D8%A7%D9%84%D9%81%D8%B5%D9%88%D9%84%20%D9%81%D9%8A%20%D8%A3%D8%AD%D9%83%D8%A7%D9%85%20%D8%A7%D9%84%D8%A3%D8%B5%D9%88%D9%84.pdf",
+          "label": "internet-archive-global-discovery",
+          "provider": "Internet Archive",
+          "discovery": "title-author-ranked-search",
+          "match_score": 0.6208,
+          "rights_review_required": true,
+          "discover_pdfs": false,
+          "identifier": "20200626_20200626_1314"
+        }
+      ]
     },
     {
       "id": "tahdhib-lugha-azhari",
@@ -18066,7 +18557,7 @@
             "rights_grant": false
           }
         ],
-        "source_candidate_count": 0,
+        "source_candidate_count": 1,
         "direct_pdf_candidate_count": 0,
         "failures": [],
         "provider_registry_version": "global-worldwide-pdf-v2",
@@ -18076,23 +18567,22 @@
       "source_discovery": {
         "attempted": true,
         "providers": [
-          "DPLA",
-          "Gallica",
-          "Google Books",
-          "HathiTrust",
-          "Internet Archive",
-          "Library of Congress",
-          "Open Library",
-          "Qatar Digital Library",
-          "Waqfeya",
-          "Wikimedia Commons",
-          "Wikisource",
-          "WorldCat"
+          "Wikisource"
         ],
-        "candidate_count": 0,
-        "status": "no-pdf-candidate-found",
+        "candidate_count": 1,
         "discovery_version": "global-worldwide-pdf-v2"
-      }
+      },
+      "sources": [
+        {
+          "url": "https://ar.wikisource.org/wiki/%D8%AA%D8%A7%D8%B1%D9%8A%D8%AE_%D8%A7%D9%84%D8%AE%D9%84%D9%81%D8%A7%D8%A1",
+          "label": "wikisource-global-discovery",
+          "provider": "Wikisource",
+          "discovery": "Arabic Wikisource title search",
+          "match_score": 0.6875,
+          "rights_review_required": true,
+          "discover_pdfs": true
+        }
+      ]
     },
     {
       "death_hijri": 385,
