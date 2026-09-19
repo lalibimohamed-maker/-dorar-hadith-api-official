@@ -1,7 +1,7 @@
 {
   "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v3",
   "primary_repository": "lalibimohamed-maker/-dorar-hadith-api-official",
-  "secondary_storage_repository": "lalibimohamed82-coder/rechercher-pdf-storage",
+  "secondary_storage_repository": "lalibimohamed-maker/dinullah-pdf-storage-01",
   "purpose": "Two connected Git LFS storage pools with one physical PDF copy per book. The pools are complementary, not mirrored.",
   "format": ".pdf",
   "content_addressing": "sha256-for-integrity-only",
@@ -22,8 +22,8 @@
   },
   "activation": {
     "repository_must_exist": true,
-    "write_secret_name": "lalibimohamed-maker/dinullah-pdf-storage-01",
-    "secret_owner": "secondary GitHub account",
+    "write_secret_name": "RECHERCHER_SECONDARY_STORAGE_TOKEN",
+    "secret_owner": "GitHub account with write access to dinullah-pdf-storage-01",
     "write_scope": "repository contents read/write for the secondary storage repository",
     "mandatory": true
   },
