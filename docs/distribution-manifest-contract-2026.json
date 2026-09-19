@@ -1,0 +1,22 @@
+{
+  "version":"2026-08-29",
+  "manifest": {
+    "canonicalContentId":"required",
+    "locale":"required",
+    "contentVersion":"required",
+    "sourceProvenance":"required",
+    "rightsDecision":"required",
+    "checksum":"required",
+    "generator":"required",
+    "generatedAt":"required",
+    "distributionPaths":["web-pwa","offline","release","mirror","peer-assisted"]
+  },
+  "releaseRules": {
+    "unverifiedArtifact":"block",
+    "unknownRights":"block",
+    "missingChecksum":"block",
+    "missingSource":"block",
+    "machineTranslationOnly":"label-draft",
+    "scientificStatusCannotBeRaisedByDistribution":"true"
+  }
+}

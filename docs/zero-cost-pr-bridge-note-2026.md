@@ -1,0 +1,1 @@
+This branch must be merged into the encyclopedia feature branch through pull-request review. Direct writes to the protected branch are intentionally avoided.
