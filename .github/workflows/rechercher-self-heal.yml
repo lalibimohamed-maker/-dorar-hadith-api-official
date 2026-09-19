@@ -80,15 +80,8 @@ jobs:
             exit 0
           fi
 
-          for target in $(python3 - <<'PY'
-          import json
-          for t in json.load(open('/tmp/targets.json')):
-              p=t['pr']
-              print(p['number'],p['headRefName'],p['headSha'])
-          PY
-          ); do
-            set -- $target
-            PR_NUMBER="$1"; HEAD_BRANCH="$2"; HEAD_SHA="$3"
+          while IFS=' ' read -r PR_NUMBER HEAD_BRANCH HEAD_SHA; do
+            [ -n "$PR_NUMBER" ] || continue
             git fetch --no-tags origin "refs/heads/${HEAD_BRANCH}:refs/remotes/origin/${HEAD_BRANCH}"
             git switch --detach "$HEAD_SHA"
 
@@ -136,7 +129,13 @@ jobs:
             git reset --hard HEAD
             git clean -fd
             echo "SELF_HEAL_REPAIRED_PR=$PR_NUMBER"
-          done
+          done < <(python3 - <<'PY'
+          import json
+          for t in json.load(open('/tmp/targets.json')):
+              p=t['pr']
+              print(p['number'],p['headRefName'],p['headSha'])
+          PY
+          )
 
       - name: Report
         if: always()
