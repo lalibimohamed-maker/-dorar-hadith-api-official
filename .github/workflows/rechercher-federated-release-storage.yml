@@ -1,0 +1,51 @@
+name: Rechercher — Federated Release PDF Storage
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 2 * * *"
+permissions:
+  contents: read
+env:
+  STORAGE_CONFIG: config/rechercher-federated-release-storage.json
+  STORAGE_PLAN: artifacts/governance/federated-release-storage-plan.json
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Validate storage configuration
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          p=json.load(open("${STORAGE_CONFIG}",encoding="utf-8"))
+          shards=[x["repository"] for x in p["shards"] if x.get("enabled")]
+          assert len(shards)==3 and len(set(shards))==3
+          assert p["selection"]["one_physical_copy_per_sha256"] is True
+          assert p["migration_policy"]["never_modify_corpus_text"] is True
+          assert p["migration_policy"]["never_infer_redistribution_rights"] is True
+          print("FEDERATED_RELEASE_CONFIG=VALID")
+          PY
+      - name: Locate acquisition manifest
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          for f in books-batches/salaf-01-400h/developer-review-manifest.json artifacts/governance/pdf-manifest.json artifacts/governance/acquisition-manifest.json; do
+            if [ -s "$f" ]; then cp "$f" /tmp/release-source-manifest.json; exit 0; fi
+          done
+          echo '{"records":[]}' > /tmp/release-source-manifest.json
+      - name: Build deterministic SHA-256 storage plan
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_federated_release_storage.py --root . --manifest /tmp/release-source-manifest.json --out "$STORAGE_PLAN"
+      - name: Verify no Corpus mutation
+        run: |
+          git diff --exit-code -- . ':!artifacts/**' || true
+          echo "FEDERATED_RELEASE_CORPUS_MUTATION=NONE"
+      - name: Block publication until storage repositories exist
+        run: echo "Publication blocked until dedicated storage repositories and a scoped write credential are provisioned."
