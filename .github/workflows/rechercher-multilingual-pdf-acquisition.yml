@@ -107,6 +107,17 @@ jobs:
             openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY               -in "$f" -out "artifacts/rechercher/multilingual-research-vault/$rel.enc"
             rm -f "$f"
           done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.languages))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
+      - name: Guard research-only persistence against public storage
+        run: |
+          set -euo pipefail
+          visibility="$(curl --fail --silent --show-error "https://api.github.com/repos/${MATRIX_STORAGE_REPO}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["visibility"])')"
+          if find artifacts/rechercher/multilingual-research-vault -type f -name '*.enc' -print -quit | grep -q .; then
+            test "$visibility" = "private" || {
+              echo "PREFLIGHT_FAIL: research-only encrypted material cannot be persisted to public matrix storage (visibility=$visibility)."
+              exit 1
+            }
+          fi
+          echo "MATRIX_STORAGE_VISIBILITY=$visibility"
       - name: Persist multilingual acquisition outputs to dedicated matrix storage
         env:
           MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
