@@ -42,18 +42,27 @@ jobs:
           set -euo pipefail
           python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE"
 
-      - name: Encrypt retained copies
+      - name: Preserve Developer Review PDFs for review
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-developer-review-pdfs-${{ github.run_id }}
+          path: artifacts/developer-review-vault/*.pdf
+          if-no-files-found: ignore
+
+      - name: Encrypt retained copies without deleting review PDFs
         env:
           REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
           shopt -s nullglob
-          for f in artifacts/developer-review-vault/*.pdf; do
+          files=(artifacts/developer-review-vault/*.pdf)
+          for f in "${files[@]}"; do
+            out="$f.enc"
             openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
-              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$f.enc"
-            rm -f -- "$f"
+              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
+            test -s "$out"
+            echo "Encrypted vault copy created: $out; plaintext review copy intentionally retained for this Developer Review run."
           done
-
       - name: Persist encrypted vault and manifest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
