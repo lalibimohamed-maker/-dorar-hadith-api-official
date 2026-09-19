@@ -1,4 +1,4 @@
-name: Rechercher — Multilingual PDF acquisition
+name: Rechercher — Multilingual resource acquisition
 on:
   workflow_dispatch:
   pull_request:
@@ -27,35 +27,64 @@ jobs:
         with:
           node-version: 24
       - name: Install PDF validator
-        run: sudo apt-get update && sudo apt-get install -y qpdf
-      - name: Acquire rights-cleared multilingual PDFs
+        run: sudo apt-get update && sudo apt-get install -y qpdf openssl
+      - name: Acquire multilingual resources
         run: node scripts/rechercher_acquire_multilingual_pdfs.mjs
-      - name: Validate downloaded PDFs
+      - name: Validate acquired PDFs
         run: |
           set -euo pipefail
+          manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+          test -s "$manifest"
           find artifacts/rechercher/multilingual-pdf-acquisition -type f -name '*.pdf' -print0 |
             while IFS= read -r -d '' f; do
               test "$(head -c 4 "$f")" = "%PDF"
               qpdf --check "$f"
               test -s "$f"
             done
-      - name: Persist multilingual PDF manifest and files
+      - name: Separate research-only PDFs from public material
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "${REVIEW_VAULT_KEY:-}" || {
+            echo "REVIEW_VAULT_KEY is required before research-only PDFs may be persisted."
+            exit 1
+          }
+          node <<'NODE'
+          const fs=require('fs');
+          const m=JSON.parse(fs.readFileSync('artifacts/rechercher/multilingual-pdf-acquisition/manifest.json','utf8'));
+          for (const e of Object.values(m.languages)) {
+            if (e.acquisition !== 'research-only') continue;
+            for (const f of e.files || []) {
+              if (f.path.endsWith('.pdf')) f.research_only=true;
+            }
+          }
+          fs.writeFileSync('artifacts/rechercher/multilingual-pdf-acquisition/manifest.json', JSON.stringify(m,null,2)+'\n');
+          NODE
+          mkdir -p artifacts/rechercher/multilingual-research-vault
+          while IFS= read -r -d '' f; do
+            rel="${f#artifacts/rechercher/multilingual-pdf-acquisition/}"
+            mkdir -p "artifacts/rechercher/multilingual-research-vault/$(dirname "$rel")"
+            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY               -in "$f" -out "artifacts/rechercher/multilingual-research-vault/$rel.enc"
+            rm -f "$f"
+          done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.languages))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
+      - name: Persist only redistributable PDFs and encrypted research vault
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git lfs install
           git lfs track 'artifacts/rechercher/multilingual-pdf-acquisition/**/*.pdf'
-          git add artifacts/rechercher/multilingual-pdf-acquisition .gitattributes
+          git add artifacts/rechercher/multilingual-pdf-acquisition artifacts/rechercher/multilingual-research-vault .gitattributes
           if git diff --cached --quiet; then
-            echo "No new multilingual PDF files."
+            echo "No new multilingual resources."
             exit 0
           fi
-          git commit -m "data(rechercher): persist multilingual rights-cleared PDFs"
+          git commit -m "data(rechercher): separate multilingual research and public resources"
           git push origin "HEAD:${{ github.head_ref || github.ref_name }}"
-      - name: Upload PDF bundle
+      - name: Upload acquisition manifest
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: rechercher-multilingual-rights-cleared-pdfs
-          path: artifacts/rechercher/multilingual-pdf-acquisition
+          name: rechercher-multilingual-acquisition-manifest
+          path: artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
           if-no-files-found: error
