@@ -32,7 +32,9 @@
     "test:corpus-boundary": "node --test test/corpus-write-boundary.test.js",
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
-    "test:review-expiry": "node --test test/review-expiry.test.js"
+    "test:review-expiry": "node --test test/review-expiry.test.js",
+    "test:multilingual-network": "node --test test/rechercher-multilingual-source-network.test.js",
+    "generate:multilingual-network": "node scripts/rechercher-multilingual-source-network.mjs"
   },
   "engines": {
     "node": ">=20"

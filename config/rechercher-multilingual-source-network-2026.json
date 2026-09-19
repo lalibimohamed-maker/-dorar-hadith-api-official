@@ -1,0 +1,65 @@
+{
+  "schema": "rechercher/multilingual-source-network/v1",
+  "version": "2026.09",
+  "phase": {"initial_languages": 23, "domains_per_language": 24, "initial_cells": 552, "expansion": "unbounded"},
+  "languages": [
+    {"id":"ar","name":"Arabic","role":"source-and-learning"},
+    {"id":"en","name":"English","role":"learning-and-source"},
+    {"id":"ru","name":"Russian","role":"learning-and-source"},
+    {"id":"fr","name":"French","role":"learning-and-source"},
+    {"id":"tr","name":"Turkish","role":"learning-and-source"},
+    {"id":"ur","name":"Urdu","role":"learning-and-source"},
+    {"id":"fa","name":"Persian","role":"learning-and-source"},
+    {"id":"id","name":"Indonesian","role":"learning-and-source"},
+    {"id":"ms","name":"Malay","role":"learning-and-source"},
+    {"id":"de","name":"German","role":"learning-and-source"},
+    {"id":"es","name":"Spanish","role":"learning-and-source"},
+    {"id":"pt","name":"Portuguese","role":"learning-and-source"},
+    {"id":"it","name":"Italian","role":"learning-and-source"},
+    {"id":"zh","name":"Chinese","role":"learning-and-source"},
+    {"id":"ja","name":"Japanese","role":"learning-and-source"},
+    {"id":"ko","name":"Korean","role":"learning-and-source"},
+    {"id":"bn","name":"Bengali","role":"learning-and-source"},
+    {"id":"sw","name":"Swahili","role":"learning-and-source"},
+    {"id":"ha","name":"Hausa","role":"learning-and-source"},
+    {"id":"ta","name":"Tamil","role":"learning-and-source"},
+    {"id":"wo","name":"Wolof","role":"learning-and-source"},
+    {"id":"bm","name":"Bambara","role":"learning-and-source"},
+    {"id":"bs","name":"Bosnian","role":"learning-and-source"}
+  ],
+  "domains": [
+    "quran","tafsir","hadith","hadith-commentary","aqidah","fiqh","usul-al-fiqh","fatwa",
+    "seerah","shamail","sahabah","tabiin-and-salaf","scholars-and-rijal","islamic-history",
+    "classical-books","modern-books","translations","terminology","dawah-and-education","libraries-and-catalogues",
+    "scholarly-articles","manuscripts-and-editions","audio-and-recitation","encyclopedias-and-reference"
+  ],
+  "pipeline": [
+    "primary-or-institutional-source","api","corpus","structured-web","scholarly-dataset",
+    "translation-metadata","provenance","rights","verification"
+  ],
+  "translation_states": [
+    "source-verified","institutionally-reviewed","scholarly","provenance-complete","candidate","machine-translated","unverified"
+  ],
+  "canonical_separation": {
+    "canonical_arabic_quran": "immutable-source-layer",
+    "translation": "separate-record-referencing-canonical-verse",
+    "machine_translation": "separate-record-never-promoted-automatically"
+  },
+  "quran_foundation": {
+    "enabled": true,
+    "adapter": "content-api-v4",
+    "sync_groups": ["translations","tafsirs","word_by_word_translations","word_by_word_transliterations"],
+    "auth": "backend-only-client-credentials",
+    "credentials": {"client_id_env":"QF_CLIENT_ID","client_secret_env":"QF_CLIENT_SECRET"},
+    "base_urls": {"production":"https://apis.quran.foundation","prelive":"https://apis-prelive.quran.foundation"},
+    "provenance_required": true,
+    "rights_required": true
+  },
+  "expansion": {
+    "language_ceiling": null,
+    "discovery_sources": ["institutional-catalogues","library-metadata","scholarly-datasets","translation-catalogues","structured-web","publisher-catalogues"],
+    "rule": "Every newly verified language is added as a new independent lane across all 24 domains; missing translations become translation-needed rather than being discarded."
+  },
+  "rights_policy": "Discovery does not imply redistribution. Public full-text acquisition requires item/source-level rights or explicit permission.",
+  "corpus_boundary": "This registry and its derived queues are a system-layer index. They do not replace, rewrite, or mix into the canonical corpus."
+}
