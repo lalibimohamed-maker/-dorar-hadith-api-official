@@ -1,32 +1,34 @@
 # Developer Review Acquisition
 
-## Non-destructive rule
+## Storage rule
 
-The 01–400H master catalog is the authoritative inventory of discovered works and sources. A source is never removed from the catalog because a copy is unavailable, restricted, or rights are uncertain.
+Developer-review copies that the project is permitted to retain for review are kept as ordinary PDF files in **durable private developer-review storage**. They are never stored in the public encyclopedia repository, the public PDF storage repository, or a temporary GitHub Actions artifact.
+
+GitHub Actions artifacts are transient transfer/diagnostic objects only. They are not the retention layer for restricted review PDFs.
 
 ## Availability vs. redistribution
 
-The pipeline records two independent facts:
+- availability: whether a usable copy was actually acquired from a catalogued source.
+- rights_action: whether the copy is eligible for public redistribution or must remain private for developer review.
 
-- `availability`: whether a usable copy was actually acquired from a catalogued source.
-- `rights_action`: whether the catalog currently supports public redistribution or the copy must remain in the developer review vault.
-
-A downloadable/hosted file is not treated as proof of redistribution permission.
+A downloadable or hosted file is not treated as proof of redistribution permission.
 
 ## Retention
 
-Successful research copies are retained. Restricted or rights-unverified copies are encrypted before persistence using the repository secret `REVIEW_VAULT_KEY`. Plaintext copies are never committed to the repository by this workflow.
+Restricted or rights-unverified copies may be retained as ordinary PDFs only when the project has the right to access and retain them for review. They remain outside public PDF storage and are not exposed through the encyclopedia.
 
-The acquisition step does not delete a successful source copy. The only plaintext removal performed by the workflow is removal of the already-encrypted local staging file after encryption, so that the retained encrypted copy is the durable record.
+The retention target is **durable private storage**, not a fixed GitHub Actions artifact lifetime. If durable private storage is unavailable, Rechercher must fail closed rather than silently downgrade the copy to temporary artifact retention.
 
 ## Verification
 
-Each retained copy records its source URL, byte size, SHA-256, and PDF validation result. Edition identity remains tied to the catalog record; a different edition must not silently replace the requested edition.
+Each retained copy records its source URL, byte size, SHA-256, and PDF validation result. Edition identity remains tied to the catalog record.
 
-## Open-access copies
+## Public publication
 
-Copies whose catalog rights status is `verified-redistributable` remain eligible for the normal governed public-acquisition path. This developer-review path exists so that rights uncertainty does not cause loss of research evidence.
+Only copies explicitly marked `verified-redistributable` may enter the public PDF path.
 
-## Security
+## Encryption policy
 
-`REVIEW_VAULT_KEY` must be configured as a GitHub Actions secret. It must never be placed in source files, commits, issue comments, or chat messages.
+An encrypted input may still be encountered during acquisition/recovery. When the authorized `REVIEW_VAULT_KEY` is available, Rechercher converts that input to an ordinary validated `.pdf`, verifies it, and deletes the encrypted input.
+
+Rechercher never creates a new encrypted retention copy and never uses `.pdf.enc`, `.enc`, or `.encrypted` as the final storage format.

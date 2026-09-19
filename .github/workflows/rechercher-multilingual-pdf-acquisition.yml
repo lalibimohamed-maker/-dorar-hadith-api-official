@@ -1,0 +1,166 @@
+name: Rechercher — Multilingual resource acquisition
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/rechercher-multilingual-pdf-acquisition.yml'
+      - 'research/evidence/global-multilingual/**'
+      - 'scripts/rechercher_acquire_multilingual_pdfs.mjs'
+  schedule:
+    - cron: '43 3 * * *'
+permissions:
+  contents: none
+
+env:
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
+concurrency:
+  group: rechercher-multilingual-pdf-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preflight storage and required secrets
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}" || { echo "PREFLIGHT_FAIL: RECHERCHER_MATRIX_STORAGE_TOKEN missing"; exit 1; }
+          [[ "$MATRIX_STORAGE_REPO" =~ ^[^/]+/[^/]+$ ]] || { echo "PREFLIGHT_FAIL: invalid MATRIX_STORAGE_REPO"; exit 1; }
+          storage_url="https://github.com/${MATRIX_STORAGE_REPO}.git"
+          cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          test -n "$(git ls-remote "$storage_url" HEAD)"
+          rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
+          git clone --depth 1 "$storage_url" "$RUNNER_TEMP/matrix-storage-preflight"
+          git -C "$RUNNER_TEMP/matrix-storage-preflight" lfs install
+          git -C "$RUNNER_TEMP/matrix-storage-preflight" lfs fsck --pointers HEAD
+          git -C "$RUNNER_TEMP/matrix-storage-preflight" push --dry-run origin "HEAD:refs/heads/rechercher-preflight-${GITHUB_RUN_ID}"
+          rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
+          echo "PREFLIGHT_STORAGE_OK repo=$MATRIX_STORAGE_REPO"
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Install PDF validator
+        run: sudo apt-get update && sudo apt-get install -y qpdf openssl
+      - name: Preflight PDF tooling
+        run: |
+          set -euo pipefail
+          node --version
+          qpdf --version
+          openssl version
+          git lfs version
+      - name: Acquire multilingual resources
+        run: node scripts/rechercher_acquire_multilingual_pdfs.mjs
+      - name: Validate acquired PDFs
+        run: |
+          set -euo pipefail
+          manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+          test -s "$manifest"
+          find artifacts/rechercher/multilingual-pdf-acquisition -type f -name '*.pdf' -print0 |
+            while IFS= read -r -d '' f; do
+              test "$(head -c 4 "$f")" = "%PDF"
+              qpdf --check "$f"
+              test -s "$f"
+            done
+      - name: Separate research-only PDFs from public material
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const m=JSON.parse(fs.readFileSync('artifacts/rechercher/multilingual-pdf-acquisition/manifest.json','utf8'));
+          for (const e of Object.values(m.languages)) {
+            if (e.acquisition !== 'research-only') continue;
+            for (const f of e.files || []) {
+              if (f.path.endsWith('.pdf')) f.research_only=true;
+            }
+          }
+          fs.writeFileSync('artifacts/rechercher/multilingual-pdf-acquisition/manifest.json', JSON.stringify(m,null,2)+'\n');
+          NODE
+          mkdir -p artifacts/rechercher/multilingual-research-vault
+          while IFS= read -r -d '' f; do
+            rel="${f#artifacts/rechercher/multilingual-pdf-acquisition/}"
+            mkdir -p "artifacts/rechercher/multilingual-research-vault/$(dirname "$rel")"
+            cp -a "$f" "artifacts/rechercher/multilingual-research-vault/$rel"
+            rm -f "$f"
+          done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.languages))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
+          echo "RESEARCH_ONLY_STORAGE=PRIVATE_DURABLE_STORAGE_REQUIRED"
+
+      - name: Require durable private review storage for restricted PDFs
+        run: |
+          set -euo pipefail
+          if find artifacts/rechercher/multilingual-research-vault -type f -name '*.pdf' -print -quit | grep -q .; then
+            echo "ERROR: restricted developer-review PDFs were acquired, but no durable private developer-review storage is configured."
+            echo "GitHub Actions artifacts are temporary and are not an acceptable retention layer."
+            exit 1
+          fi
+          echo "No restricted developer-review PDFs require persistence."
+
+      - name: Reject encrypted review artifacts
+        run: |
+          set -euo pipefail
+          if find artifacts/rechercher -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo "ERROR: encrypted review artifacts are not retained."
+            exit 1
+          fi
+
+      - name: Persist multilingual acquisition outputs to dedicated matrix storage
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$MATRIX_STORAGE_TOKEN"
+          cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          git clone "https://github.com/${MATRIX_STORAGE_REPO}.git" .matrix-storage
+          mkdir -p .matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition
+          cp -a artifacts/rechercher/multilingual-pdf-acquisition/. .matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition/
+          git -C .matrix-storage config user.name "github-actions[bot]"
+          git -C .matrix-storage config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C .matrix-storage lfs install
+          git -C .matrix-storage lfs track 'artifacts/rechercher/multilingual-pdf-acquisition/**/*.pdf'
+          git -C .matrix-storage add artifacts/rechercher/multilingual-pdf-acquisition .gitattributes
+          if git -C .matrix-storage diff --cached --quiet; then echo "No new multilingual matrix resources."; else
+            git -C .matrix-storage commit -m "data(matrix): persist multilingual acquisition outputs"
+            for attempt in 1 2 3; do
+              git -C .matrix-storage pull --rebase origin main || true
+              if git -C .matrix-storage lfs fsck --pointers HEAD && git -C .matrix-storage push origin HEAD:refs/heads/main; then echo "MATRIX_PDF_STORAGE_PUSH_OK attempt=$attempt"; break; fi
+              if [ "$attempt" -eq 3 ]; then exit 1; fi
+              sleep 3
+            done
+            git fetch origin main
+            expected="$(git rev-parse HEAD)"
+            actual="$(git rev-parse origin/main)"
+            test "$expected" = "$actual"
+            git lfs fsck --pointers origin/main
+            echo "MATRIX_PDF_STORAGE_POST_PUSH_OK sha=$actual"
+          fi
+      - name: Upload acquisition manifest
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-multilingual-acquisition-manifest
+          path: artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+          if-no-files-found: error

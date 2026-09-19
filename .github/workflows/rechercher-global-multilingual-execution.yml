@@ -1,0 +1,136 @@
+name: Rechercher — Global multilingual evidence execution
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/rechercher-global-multilingual-execution.yml'
+      - 'scripts/rechercher_execute_global_multilingual_queue.mjs'
+      - 'scripts/rechercher_validate_translation_evidence.mjs'
+      - 'scripts/rechercher_translation_candidate_diagnostics.mjs'
+      - 'scripts/rechercher_validate_item_rights.mjs'
+      - 'scripts/rechercher_verify_global_multilingual_matrix.mjs'
+      - 'config/translation-sources-2026.json'
+      - 'research/evidence/global-multilingual/**'
+  schedule:
+    - cron: '13 2 * * *'
+
+permissions:
+  contents: none
+
+concurrency:
+  group: rechercher-global-multilingual-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '24'
+  EXPECTED_CELL_COUNT: '3192'
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
+
+jobs:
+  matrix:
+    name: Execute multilingual evidence matrix shard ${{ matrix.shard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preflight matrix storage
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}" || { echo "PREFLIGHT_FAIL: RECHERCHER_MATRIX_STORAGE_TOKEN missing"; exit 1; }
+          [[ "$MATRIX_STORAGE_REPO" =~ ^[^/]+/[^/]+$ ]] || { echo "PREFLIGHT_FAIL: invalid MATRIX_STORAGE_REPO"; exit 1; }
+          storage_url="https://github.com/${MATRIX_STORAGE_REPO}.git"
+          cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          test -n "$(git ls-remote "$storage_url" HEAD)"
+          rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
+          git clone --depth 1 "$storage_url" "$RUNNER_TEMP/matrix-storage-preflight"
+          git -C "$RUNNER_TEMP/matrix-storage-preflight" lfs install
+          git -C "$RUNNER_TEMP/matrix-storage-preflight" lfs fsck --pointers HEAD
+          git -C "$RUNNER_TEMP/matrix-storage-preflight" push --dry-run origin "HEAD:refs/heads/rechercher-preflight-${GITHUB_RUN_ID}-${SHARD_INDEX}"
+          rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
+          echo "PREFLIGHT_STORAGE_OK repo=$MATRIX_STORAGE_REPO"
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Execute shard
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+          SHARD_COUNT: '3'
+        run: node scripts/rechercher_execute_global_multilingual_queue.mjs --shard-index=${SHARD_INDEX} --shard-count=${SHARD_COUNT}
+      - name: Upload shard evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-global-multilingual-shard-${{ matrix.shard }}
+          path: |
+            research/evidence/global-multilingual/
+            artifacts/rechercher/global-multilingual-research/
+          if-no-files-found: error
+      - name: Persist shard evidence to dedicated matrix storage
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          test -n "$MATRIX_STORAGE_TOKEN"
+          cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          git clone "https://github.com/${MATRIX_STORAGE_REPO}.git" .matrix-storage-shard
+          mkdir -p ".matrix-storage-shard/research/evidence/global-multilingual/shards/shard-${SHARD_INDEX}"
+          mkdir -p ".matrix-storage-shard/artifacts/rechercher/global-multilingual-research/shards/shard-${SHARD_INDEX}"
+          cp -a research/evidence/global-multilingual/. ".matrix-storage-shard/research/evidence/global-multilingual/shards/shard-${SHARD_INDEX}/"
+          if [ -d artifacts/rechercher/global-multilingual-research ]; then cp -a artifacts/rechercher/global-multilingual-research/. ".matrix-storage-shard/artifacts/rechercher/global-multilingual-research/shards/shard-${SHARD_INDEX}/"; fi
+          git -C .matrix-storage-shard config user.name "github-actions[bot]"
+          git -C .matrix-storage-shard config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C .matrix-storage-shard add "research/evidence/global-multilingual/shards/shard-${SHARD_INDEX}" "artifacts/rechercher/global-multilingual-research/shards/shard-${SHARD_INDEX}"
+          if git -C .matrix-storage-shard diff --cached --quiet; then echo "No shard ${SHARD_INDEX} storage changes."; else
+            git -C .matrix-storage-shard commit -m "data(matrix): persist shard ${SHARD_INDEX} multilingual evidence"
+            for attempt in 1 2 3 4 5; do
+              git -C .matrix-storage-shard pull --rebase origin main || true
+              if git -C .matrix-storage-shard push origin HEAD:refs/heads/main; then echo "MATRIX_SHARD_${SHARD_INDEX}_STORAGE_PUSH_OK attempt=$attempt"; break; fi
+              if [ "$attempt" -eq 5 ]; then exit 1; fi
+              sleep 5
+            done
+            git fetch origin main
+            expected="$(git rev-parse HEAD)"
+            actual="$(git rev-parse origin/main)"
+            test "$expected" = "$actual"
+            echo "MATRIX_SHARD_${SHARD_INDEX}_STORAGE_POST_PUSH_OK sha=$actual"
+          fi
+      - name: Upload reproducibility bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-global-multilingual-reproducibility-bundle
+          path: artifacts/rechercher/global-multilingual-research/
+          if-no-files-found: error

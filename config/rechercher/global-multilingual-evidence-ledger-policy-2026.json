@@ -1,0 +1,54 @@
+{
+  "schema": "rechercher/global-multilingual-evidence-ledger-policy/v1",
+  "record_class": "permanent_scientific_record",
+  "system_layer_only": true,
+  "corpus_write_direct": false,
+  "artifact_role": "transport_and_reproducibility_bundle_only",
+  "durable_record": {
+    "location": "research/evidence/global-multilingual/",
+    "append_only": true,
+    "immutable_run_records": true,
+    "latest_pointer_allowed": true,
+    "must_include": [
+      "run_id",
+      "commit_sha",
+      "cell_id",
+      "language",
+      "language_iso",
+      "domain",
+      "provider",
+      "source_identity",
+      "source_urls",
+      "observed_evidence",
+      "translation_state",
+      "translation_evidence",
+      "provenance_chain",
+      "rights_evidence",
+      "verification_state",
+      "verification_reasons",
+      "checksums_when_applicable",
+      "timestamps",
+      "retry_and_failure_history"
+    ]
+  },
+  "translation_policy": {
+    "language_presence_is_not_translation_evidence": true,
+    "http_success_is_not_translation_verification": true,
+    "source_verified_requires_explicit_translation_evidence": true,
+    "translation_needed_when_explicit_translation_evidence_is_absent": true,
+    "machine_translation_never_auto_promotes": true,
+    "canonical_arabic_isolated": true
+  },
+  "rights_policy": {
+    "discovery_does_not_equal_redistribution_permission": true,
+    "rights_verified_per_item": true,
+    "unknown_rights_are_not_public_download_permission": true,
+    "rights_evidence_must_identify_source_and_checked_at": true
+  },
+  "verification_policy": {
+    "verification_requires_evidence_not_stage_presence": true,
+    "partial_results_must_remain_partial": true,
+    "failed_or_unrun_stages_must_be_recorded": true,
+    "no_false_verified_state": true
+  }
+}

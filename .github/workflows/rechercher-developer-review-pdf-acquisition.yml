@@ -30,34 +30,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
 
-      - name: Require vault key
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+      - name: Prepare private developer-review PDF workspace
         run: |
           set -euo pipefail
-          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required.'; exit 1; }
-
-      - name: Recover latest encrypted vault as PDFs
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/developer-review-vault artifacts/recovered-vault
-          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt --jq '[.[] | select(.tagName | startswith("rechercher-vault-"))] | sort_by(.createdAt) | last | .tagName')
-          if [ -n "${tag:-}" ] && [ "$tag" != "null" ]; then
-            echo "Recovering $tag"
-            gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern '*.enc' --dir artifacts/recovered-vault
-            shopt -s nullglob
-            for f in artifacts/recovered-vault/*.enc; do
-              out="artifacts/developer-review-vault/$(basename "${f%.enc}")"
-              openssl enc -d -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
-              test "$(head -c 5 "$out")" = '%PDF-'
-              qpdf --check "$out"
-            done
-          else
-            echo 'No previous vault release exists; starting a fresh acquisition.'
-          fi
+          mkdir -p artifacts/developer-review-vault
+          echo 'DEVELOPER_REVIEW_STORAGE=PRIVATE_PLAINTEXT_PDF'
 
       - name: Recover previous engine snapshot
         run: |
@@ -180,26 +157,39 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Upload validated PDFs as developer-review artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: rechercher-validated-pdfs-${{ github.run_id }}
-          path: artifacts/developer-review-pdfs/*.pdf
-          if-no-files-found: error
-          retention-days: 90
-
-      - name: Create encrypted retention copies without deleting PDFs
+      - name: Normalize encrypted review inputs into ordinary PDFs
         env:
           REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
-          mkdir -p artifacts/developer-review-encrypted
-          shopt -s nullglob
-          for f in artifacts/developer-review-pdfs/*.pdf; do
-            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
-              -pass env:REVIEW_VAULT_KEY -in "$f" -out "artifacts/developer-review-encrypted/$(basename "$f").enc"
-          done
-          test -n "$(find artifacts/developer-review-encrypted -name '*.enc' -type f -print -quit)"
+          found=0
+          mkdir -p artifacts/developer-review-vault
+          while IFS= read -r -d '' f; do
+            found=1
+            case "$f" in
+              *.pdf.enc) base="$(basename "${f%.pdf.enc}")" ;;
+              *.enc) base="$(basename "${f%.enc}")" ;;
+              *.encrypted) base="$(basename "${f%.encrypted}")" ;;
+            esac
+            out="artifacts/developer-review-vault/${base}.pdf"
+            python3 scripts/rechercher_decrypt_review_copy.py "$f" "$out"
+            test "$(head -c 5 "$out")" = '%PDF-'
+            qpdf --check "$out"
+            rm -f -- "$f"
+          done < <(find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print0)
+          if [ "$found" -eq 1 ]; then
+            echo 'Encrypted review input normalized to ordinary .pdf; encrypted input is not retained.'
+          else
+            echo 'No encrypted review input encountered.'
+          fi
+
+      - name: Reject encrypted PDF outputs after normalization
+        run: |
+          set -euo pipefail
+          if find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo 'ERROR: encrypted PDF artifacts remain after normalization.'
+            exit 1
+          fi
 
       - name: Publish only verified-redistributable PDFs
         env:
@@ -237,9 +227,9 @@ jobs:
           set -euo pipefail
           python3 scripts/rechercher_audit_event.py \
             --who 'github-actions[bot]' \
-            --what 'developer-review-pdf-acquisition-preserve-and-recover' \
+            --what 'developer-review-pdf-acquisition-private-plaintext' \
             --source 'Rechercher workflow' \
-            --reason 'recover prior vault, preserve validated PDFs, encrypt retention copies without deleting plaintext, publish only verified-redistributable PDFs' \
+            --reason 'retain validated PDFs only in the private developer-review artifact; never encrypt or publish protected copies' \
             --commit "$(git rev-parse HEAD)"
 
       - name: Persist manifests and governance evidence
