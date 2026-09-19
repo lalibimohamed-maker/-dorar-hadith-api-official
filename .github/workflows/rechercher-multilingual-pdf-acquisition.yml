@@ -30,7 +30,6 @@ jobs:
       - name: Preflight storage and required secrets
         env:
           MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
           test -n "${MATRIX_STORAGE_TOKEN:-}" || { echo "PREFLIGHT_FAIL: RECHERCHER_MATRIX_STORAGE_TOKEN missing"; exit 1; }
