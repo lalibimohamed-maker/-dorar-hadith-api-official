@@ -33,7 +33,6 @@ jobs:
         run: |
           set -euo pipefail
           test -n "${MATRIX_STORAGE_TOKEN:-}" || { echo "PREFLIGHT_FAIL: RECHERCHER_MATRIX_STORAGE_TOKEN missing"; exit 1; }
-          test -n "${REVIEW_VAULT_KEY:-}" || { echo "PREFLIGHT_FAIL: REVIEW_VAULT_KEY missing"; exit 1; }
           [[ "$MATRIX_STORAGE_REPO" =~ ^[^/]+/[^/]+$ ]] || { echo "PREFLIGHT_FAIL: invalid MATRIX_STORAGE_REPO"; exit 1; }
           storage_url="https://github.com/${MATRIX_STORAGE_REPO}.git"
           cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
