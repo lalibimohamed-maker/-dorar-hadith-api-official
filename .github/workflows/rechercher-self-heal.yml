@@ -1,34 +1,51 @@
 name: Rechercher — Self-Heal Guardian
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_run:
+    workflows:
+      - CI
+      - CodeQL
+      - Security
+      - Workflow Security Gate
+      - GitHub Actions Security Analysis with zizmor
+      - Workflow action pin guard
+      - Security baseline
+      - Dependency Review
+      - OSV-Scanner
+      - Content Ingest Gate
+      - Encyclopedia Completeness Gate
+      - Federated Guardian
+      - Workflow Integrity Check
+      - Rechercher — Global multilingual evidence execution
+      - Rechercher — Multilingual resource acquisition
+      - Rechercher — PDF corpus hygiene
+      - Branch Workflow Governance — Self-Heal
+    types: [completed]
 
 permissions:
-  contents: write
-  actions: write
-  pull-requests: write
-  checks: read
+  contents: write # security-justification: guardian commits only verified workflow-infrastructure repairs to the PR head branch
+  actions: write # actions-write-justification: guardian reruns only failed jobs after a verified repair
 
 concurrency:
-  group: rechercher-self-heal-${{ github.event.pull_request.number }}
+  group: rechercher-self-heal-${{ github.event.workflow_run.head_sha }}
   cancel-in-progress: false
 
 jobs:
   diagnose-and-repair:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.pull_requests[0] != null && github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
-      PR_NUMBER: ${{ github.event.pull_request.number }}
-      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-      HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+      PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+      HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+      HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
       REPO: ${{ github.repository }}
     steps:
       - name: Checkout PR head
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
 
       - name: Inspect failed checks
