@@ -12,7 +12,7 @@ BUILDER = ROOT / "scripts/rechercher_materialize_master_catalog.py"
 GOVERNED_BUILDER = ROOT / ".governance-source/scripts/rechercher_materialize_master_catalog.py"
 VOLUME_RESOLVER = ROOT / "scripts/rechercher_resolve_volume_evidence.py"
 GOVERNED_VOLUME_RESOLVER = ROOT / ".governance-source/scripts/rechercher_resolve_volume_evidence.py"
-ENGINE = ROOT / "scripts/rechercher_acquisition_engine.py"
+ENGINE = ROOT / "scripts/rechercher_unified_pdf_acquisition.py"
 RETRYABLE_STATUSES = {"blocked-missing-expected-volumes", "partial"}
 
 
@@ -97,7 +97,7 @@ def main() -> int:
     run_checked(VOLUME_RESOLVER)
 
     if not ENGINE.is_file():
-        raise SystemExit(f"missing governed real-PDF acquisition engine: {ENGINE}")
+        raise SystemExit(f"missing unified governed real-PDF acquisition engine: {ENGINE}")
 
     backups = None
     try:
