@@ -39,8 +39,8 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/rechercher_release_pdf_index.py --shards "$DISCOVERED_SHARDS" --out "$INDEX" --manifest "$INDEX_MANIFEST"
-      - name: Upload persistent search index artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload search index artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: rechercher-release-pdf-answer-index
           path: |
