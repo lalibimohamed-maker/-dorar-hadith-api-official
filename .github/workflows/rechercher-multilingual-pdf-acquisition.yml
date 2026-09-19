@@ -13,7 +13,6 @@ permissions:
 
 env:
   MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
-  DEVELOPER_REVIEW_VAULT_REPO: lalibimohamed-maker/dinullah-developer-review-vault
 concurrency:
   group: rechercher-multilingual-pdf-${{ github.ref }}
   cancel-in-progress: false
@@ -100,7 +99,17 @@ jobs:
             cp -a "$f" "artifacts/rechercher/multilingual-research-vault/$rel"
             rm -f "$f"
           done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.languages))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
-          echo "RESEARCH_ONLY_STORAGE=PRIVATE_PLAINTEXT_PDF_ARTIFACT"
+          echo "RESEARCH_ONLY_STORAGE=PRIVATE_DURABLE_STORAGE_REQUIRED"
+
+      - name: Require durable private review storage for restricted PDFs
+        run: |
+          set -euo pipefail
+          if find artifacts/rechercher/multilingual-research-vault -type f -name '*.pdf' -print -quit | grep -q .; then
+            echo "ERROR: restricted developer-review PDFs were acquired, but no durable private developer-review storage is configured."
+            echo "GitHub Actions artifacts are temporary and are not an acceptable retention layer."
+            exit 1
+          fi
+          echo "No restricted developer-review PDFs require persistence."
 
       - name: Reject encrypted review artifacts
         run: |
@@ -109,14 +118,6 @@ jobs:
             echo "ERROR: encrypted review artifacts are not retained."
             exit 1
           fi
-
-      - name: Upload private Developer Review PDFs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a0 # v7.0.1
-        with:
-          name: rechercher-developer-review-pdfs
-          path: artifacts/rechercher/multilingual-research-vault/**/*.pdf
-          if-no-files-found: ignore
-          retention-days: 90
 
       - name: Persist multilingual acquisition outputs to dedicated matrix storage
         env:
