@@ -30,7 +30,14 @@ export function createRateLimiter({ max = DEFAULT_RATE_LIMIT, windowMs = DEFAULT
   const buckets = new Map();
   return (req) => {
     const now = Date.now(); const id = `${prefix}:${rateIdentity(req)}`; let bucket = buckets.get(id);
-    if (!bucket || now - bucket.started >= windowMs) { if (buckets.size >= MAX_RATE_ENTRIES) { for (const [key, value] of buckets) { if (now - value.started >= windowMs) buckets.delete(key); if (buckets.size < MAX_RATE_ENTRIES) break; } } bucket = { started: now, count: 0 }; buckets.set(id, bucket); }
+    if (!bucket || now - bucket.started >= windowMs) {
+      if (buckets.size >= MAX_RATE_ENTRIES && !buckets.has(id)) {
+        const oldestKey = buckets.keys().next().value;
+        if (oldestKey !== undefined) buckets.delete(oldestKey);
+      }
+      bucket = { started: now, count: 0 };
+      buckets.set(id, bucket);
+    }
     bucket.count += 1; const allowed = bucket.count <= max; return { allowed, remaining: Math.max(0, max - bucket.count), retryAfterSeconds: Math.max(1, Math.ceil((bucket.started + windowMs - now) / 1000)) };
   };
 }
@@ -45,6 +52,29 @@ export function corsHeaders(req) {
 export function securityHeaders(req) { return { "x-content-type-options": "nosniff", "referrer-policy": "no-referrer", "x-frame-options": "DENY", "cross-origin-resource-policy": "same-site", ...corsHeaders(req) }; }
 export function requestBodyTooLarge(req, maxBytes = Number(process.env.MAX_REQUEST_BODY_BYTES || 1_048_576)) { const length = Number(req.headers["content-length"] || 0); return Number.isFinite(length) && length > maxBytes; }
 export function requestUrlTooLarge(req, maxBytes = Number(process.env.MAX_URL_BYTES || DEFAULT_MAX_URL_BYTES)) { return Buffer.byteLength(String(req.url || "/"), "utf8") > maxBytes; }
-export function queryArrayTooLarge(req, maxItems = Number(process.env.MAX_QUERY_ARRAY_ITEMS || DEFAULT_MAX_ARRAY_ITEMS)) { const url = new URL(req.url || "/", "http://localhost"); for (const key of ["translationIds", "tafsirIds"]) { const value = url.searchParams.get(key); if (value && value.split(",").filter(Boolean).length > maxItems) return true; } const judgments = url.searchParams.get("judgments"); if (judgments) { try { const parsed = JSON.parse(judgments); if (Array.isArray(parsed) && parsed.length > maxItems) return true; } catch {} } return false; }
+
+export function queryArrayTooLarge(req, maxItems = Number(process.env.MAX_QUERY_ARRAY_ITEMS || DEFAULT_MAX_ARRAY_ITEMS)) {
+  const url = new URL(req.url || "/", "http://localhost");
+  for (const key of ["translationIds", "tafsirIds"]) {
+    const values = url.searchParams.getAll(key);
+    const count = values.flatMap((value) => value.split(",")).filter(Boolean).length;
+    if (count > maxItems) return true;
+  }
+  const judgmentValues = url.searchParams.getAll("judgments");
+  if (judgmentValues.length > 0) {
+    let count = 0;
+    for (const value of judgmentValues) {
+      try {
+        const parsed = JSON.parse(value);
+        if (!Array.isArray(parsed)) return true;
+        count += parsed.length;
+      } catch {
+        return true;
+      }
+    }
+    if (count > maxItems) return true;
+  }
+  return false;
+}
 export function isLoopback(req) { const ip = String(req.socket.remoteAddress || ""); return ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1"; }
 export function protectedPath(pathname) { return pathname === "/internal" || pathname.startsWith("/internal/") || pathname === "/admin" || pathname.startsWith("/admin/") || pathname.startsWith("/rechercher/internal/"); }
