@@ -6,10 +6,14 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+CENTRAL = ROOT / "scripts/rechercher_acquisition_engine.py"
 ENGINE = ROOT / "scripts/rechercher_downloader_engine_b.py"
 REGISTRY = ROOT / "scripts/rechercher_download_task_registry.py"
 CONFIG = ROOT / "config/rechercher-downloader-engine-b.json"
 
+assert CENTRAL.is_file()
+assert "rechercher_downloader_engine_b.py" in CENTRAL.read_text(encoding="utf-8")
+assert "ENGINE_B_ENABLED" in CENTRAL.read_text(encoding="utf-8")
 assert ENGINE.is_file()
 assert REGISTRY.is_file()
 assert CONFIG.is_file()
