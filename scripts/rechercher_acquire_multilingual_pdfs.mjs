@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import {spawn} from 'node:child_process';
 
 const ROOT=process.cwd();
 const ledger=path.join(ROOT,'research/evidence/global-multilingual/scientific-ledger.jsonl');
@@ -42,6 +43,16 @@ async function get(url){
    return {status:r.status,bytes:Buffer.from(await r.arrayBuffer()),contentType:r.headers.get('content-type')};
  }catch(e){if(i===3) throw e;await sleep(700*(i+1));}}
 }
+function downloadPdf(url,file){
+ const u=allowedUrl(url); if(!u) return Promise.reject(new Error('untrusted or disallowed HTTPS origin'));
+ const args=['--fail','--silent','--show-error','--location','--max-redirs','0','--proto','=https','--output',file,u.href];
+ return new Promise((resolve,reject)=>{
+   const p=spawn('curl',args,{stdio:['ignore','ignore','pipe']});
+   let err=''; p.stderr.on('data',b=>{err+=b.toString()});
+   p.on('error',reject);
+   p.on('close',code=>code===0?resolve():reject(new Error(err||'curl failed')));
+ });
+}
 const summary={schema:'rechercher/multilingual-resource-acquisition/v2',generated_at:new Date().toISOString(),language_count:languages.size,policy:{redistribution:'only when explicitly verified',research_only:'only when lawful research access is explicitly established; never public',public_repo:'research-only PDFs are forbidden from persistence in this public repository'},languages:{}};
 for(const [key,lang] of languages){
  const entry={language:lang.name,iso:lang.iso,status:'no-eligible-pdf-found',sources_checked:[],files:[],rights:'review-required'};
@@ -70,8 +81,12 @@ for(const [key,lang] of languages){
        const file=path.join(dir,name);
        const resolved=path.resolve(file);
        if(!resolved.startsWith(path.resolve(dir)+path.sep)) continue;
-       await fs.writeFile(resolved,d.bytes);
-       entry.files.push({url,path:path.relative(ROOT,file),bytes:d.bytes.length,sha256:await sha(file),content_type:d.contentType});
+       await downloadPdf(url,resolved);
+       const stat=await fs.stat(resolved);
+       if(stat.size<4 || (await fs.open(resolved,'r')).readFile({encoding:null}).then(b=>b.subarray(0,4).toString())!=='%PDF'){
+         await fs.rm(resolved,{force:true}); continue;
+       }
+       entry.files.push({url,path:path.relative(ROOT,resolved),bytes:stat.size,sha256:await sha(resolved),content_type:d.contentType});
      }
    }
  }catch(e){entry.error=String(e.message||e)}
