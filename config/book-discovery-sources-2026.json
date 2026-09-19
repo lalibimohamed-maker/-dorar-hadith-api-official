@@ -1,0 +1,70 @@
+{
+  "version": "2026.09.04.1",
+  "purpose": "Discovery registry for Islamic books and bibliographic leads. Discovery does not imply redistribution rights or authoritative-text status.",
+  "policy": {
+    "role": "discovery-and-acquisition-candidate",
+    "deduplicateBeforeAcquisition": true,
+    "preserveProvenance": true,
+    "verifyEditionBeforeIngestion": true,
+    "rightsRequiredForRedistribution": true,
+    "catalogDoesNotImplyFullText": true,
+    "avoidDuplicateCopiesWhenAValidatedCanonicalCopyExists": true
+  },
+  "sources": [
+    {
+      "id": "usul-ai",
+      "nameAr": "أصول (Usul AI)",
+      "url": "https://usul.ai/",
+      "type": "digital-islamic-library",
+      "role": "primary-discovery",
+      "capabilities": ["book-discovery", "islamic-text-search", "historical-islamic-texts"]
+    },
+    {
+      "id": "ketabonline",
+      "nameAr": "جامع الكتب الإسلامية",
+      "url": "https://ketabonline.com/ar/",
+      "type": "digital-islamic-library",
+      "role": "primary-discovery",
+      "capabilities": ["book-discovery", "text-books", "tafsir", "hadith", "aqidah", "fiqh", "book-downloads"]
+    },
+    {
+      "id": "aljamharah",
+      "nameAr": "الجمهرة",
+      "url": "https://islamic-content.com/",
+      "type": "islamic-content-encyclopedia",
+      "role": "primary-discovery-and-reference",
+      "capabilities": ["book-discovery", "quran", "sunnah", "scholars", "terms", "historical-content", "multilingual-content"]
+    },
+    {
+      "id": "maknoon",
+      "nameAr": "مكتبة مكنون المصورة",
+      "url": "https://maknoon.org/",
+      "type": "scanned-islamic-library",
+      "role": "primary-discovery",
+      "capabilities": ["scanned-books", "multi-volume-books", "heritage-books", "hadith", "fiqh", "tafsir", "biographies"]
+    },
+    {
+      "id": "batna1-library-catalog",
+      "nameAr": "فهرس مكتبة جامعة باتنة 1",
+      "url": "https://pmb.univ-batna.dz/opac_bcu/index.php",
+      "type": "university-library-catalog",
+      "role": "bibliographic-discovery",
+      "capabilities": ["bibliographic-discovery", "islamic-sciences", "theses", "printed-books", "academic-research"]
+    },
+    {
+      "id": "batna1-islamic-sciences-library",
+      "nameAr": "مكتبة كلية العلوم الإسلامية - جامعة باتنة 1",
+      "url": "https://fsi.univ-batna.dz/bibliotheque-faculte/",
+      "type": "university-specialized-library",
+      "role": "bibliographic-discovery",
+      "capabilities": ["islamic-sciences", "library-catalog", "theses", "digital-repository"]
+    }
+  ],
+  "acquisitionRules": [
+    "When a discovered work already has a validated canonical copy in the Corpus, do not acquire a duplicate solely because another source lists it.",
+    "Use alternative sources for edition comparison, missing pages, metadata verification, or recovery only when needed.",
+    "A public URL is not sufficient evidence of redistribution permission.",
+    "University catalogs are discovery sources unless the record explicitly provides a lawful open digital copy.",
+    "For scanned works, retain edition, volume, page-count, source URL, retrieval date, and SHA-256 when a file is lawfully acquired."
+  ]
+}
