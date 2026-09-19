@@ -7,7 +7,8 @@ on:
       - 'scripts/rechercher_acquire_multilingual_pdfs.mjs'
   schedule:
     - cron: '43 3 * * *'
-permissions: {}
+permissions:
+  contents: none
 
 env:
   MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
@@ -16,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   acquire:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 360
     steps:
       - name: Checkout
