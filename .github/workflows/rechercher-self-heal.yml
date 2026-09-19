@@ -4,29 +4,29 @@ on:
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:
+
 permissions:
-  contents: write # security-justification: guardian commits only verified workflow-infrastructure repairs to the PR head branch
-  actions: write # actions-write-justification: guardian reruns only failed jobs after a verified repair
+  contents: write # security-justification: guardian applies only allowlisted workflow-infrastructure repairs to same-repository PR branches
+  actions: write # actions-write-justification: guardian may rerun failed jobs only after a repair; no workflow_run privileged trigger is used
 
 concurrency:
-  group: rechercher-self-heal-${{ github.event.workflow_run.head_sha }}
+  group: rechercher-self-heal
   cancel-in-progress: false
 
 jobs:
   diagnose-and-repair:
-    if: true
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       REPO: ${{ github.repository }}
     steps:
-      - name: Checkout PR head
+      - name: Checkout default branch
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
           persist-credentials: false
 
-      - name: Inspect failed checks
+      - name: Discover failed same-repository PR checks
         id: inspect
         env:
           GH_TOKEN: ${{ github.token }}
@@ -35,82 +35,115 @@ jobs:
           set -euo pipefail
           gh pr list --repo "$REPO" --state open --json number,headRefName,headSha,headRepository --limit 100 > /tmp/prs.json
           python3 - <<'PY'
-          import json
+          import json, subprocess
           prs=json.load(open('/tmp/prs.json'))
           same=[p for p in prs if p.get('headRepository',{}).get('nameWithOwner') == 'lalibimohamed-maker/-dorar-hadith-api-official']
-          json.dump(same,open('/tmp/candidates.json','w'))
-          print('candidate_prs='+str(len(same)))
+          targets=[]
+          for pr in same:
+              runs=json.loads(subprocess.check_output([
+                  'gh','run','list','--repo','lalibimohamed-maker/-dorar-hadith-api-official',
+                  '--commit',pr['headSha'],'--limit','100',
+                  '--json','databaseId,name,status,conclusion'
+              ],text=True))
+              failed=[r for r in runs if r.get('conclusion')=='failure']
+              if failed:
+                  targets.append({'pr':pr,'failed':failed})
+          json.dump(targets,open('/tmp/targets.json','w'))
+          print('candidate_prs='+str(len(targets)))
           PY
 
-      - name: Apply safe infrastructure repairs
+      - name: Apply only allowlisted safe infrastructure repairs
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
+          if [ ! -s /tmp/targets.json ]; then
+            echo 'NO_FAILED_SAME_REPO_PR'
+            exit 0
+          fi
           changed=0
           : > /tmp/failure.log
-          : > /tmp/repair_targets.jsonl
           python3 - <<'PY'
           import json, subprocess
-          for pr in json.load(open('/tmp/candidates.json')):
-            runs=json.loads(subprocess.check_output(['gh','run','list','--repo','lalibimohamed-maker/-dorar-hadith-api-official','--commit',pr['headSha'],'--limit','100','--json','databaseId,name,status,conclusion'],text=True))
-            failed=[r for r in runs if r.get('conclusion')=='failure']
-            if failed:
-              print(pr['number'],pr['headRefName'],pr['headSha'])
-              for r in failed:
-                subprocess.run(['gh','run','view',str(r['databaseId']),'--repo','lalibimohamed-maker/-dorar-hadith-api-official','--log'],stdout=open('/tmp/failure.log','a'),stderr=subprocess.STDOUT)
-              open('/tmp/repair_targets.jsonl','a').write(json.dumps(pr)+'\n')
+          targets=json.load(open('/tmp/targets.json'))
+          for t in targets:
+              for r in t['failed']:
+                  subprocess.run([
+                      'gh','run','view',str(r['databaseId']),
+                      '--repo','lalibimohamed-maker/-dorar-hadith-api-official','--log'
+                  ],stdout=open('/tmp/failure.log','a'),stderr=subprocess.STDOUT)
           PY
 
-          if grep -qi 'workflow must declare top-level permissions' /tmp/failure.log; then
-            while IFS= read -r f; do
-              if ! grep -q '^permissions:[[:space:]]*$' "$f"; then
-                { printf '%s\\n' 'permissions:' '  contents: none'; cat "$f"; } > "$f.tmp"
-                mv "$f.tmp" "$f"
-                git add "$f"
-                changed=1
-              fi
-            done < <(git ls-files '.github/workflows/*.yml' '.github/workflows/*.yaml')
-          fi
-
-          if grep -Eqi 'ubuntu-latest.*(migrat|26)' /tmp/failure.log; then
-            while IFS= read -r f; do
-              if grep -q 'ubuntu-latest' "$f"; then
-                sed -i 's/ubuntu-latest/ubuntu-24.04/g' "$f"
-                git add "$f"
-                changed=1
-              fi
-            done < <(git ls-files '.github/workflows/*.yml' '.github/workflows/*.yaml')
-          fi
-
-          if [ "$changed" -eq 0 ]; then
+          if ! grep -qi 'workflow must declare top-level permissions' /tmp/failure.log              && ! grep -Eqi 'ubuntu-latest.*(migrat|26)' /tmp/failure.log; then
             echo 'NO_SAFE_AUTOFIX'
             exit 0
           fi
-          git config user.name 'Rechercher Self-Heal'
-          git config user.email 'rechercher-self-heal@users.noreply.github.com'
-          HEAD_BRANCH=$(python3 -c 'import json; print(json.loads(open("/tmp/repair_targets.jsonl").readline())["headRefName"])')
-          git commit -m 'fix(rechercher): self-heal workflow infrastructure'
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "HEAD:${HEAD_BRANCH}"
 
-      - name: Re-run failed workflow jobs after repair
-        if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          while read -r id; do
-            [ -z "$id" ] && continue
-            gh run rerun "$id" --failed --repo "$REPO" || true
-          done < <(python3 -c "import json; print('\\n'.join(str(r['databaseId']) for r in json.load(open('/tmp/runs.json')) if r.get('conclusion')=='failure'))")
+          for target in $(python3 - <<'PY'
+          import json
+          for t in json.load(open('/tmp/targets.json')):
+              p=t['pr']
+              print(p['number'],p['headRefName'],p['headSha'])
+          PY
+          ); do
+            set -- $target
+            PR_NUMBER="$1"; HEAD_BRANCH="$2"; HEAD_SHA="$3"
+            git fetch --no-tags origin "refs/heads/${HEAD_BRANCH}:refs/remotes/origin/${HEAD_BRANCH}"
+            git switch --detach "$HEAD_SHA"
 
-      - name: Report unresolved failures
+            if grep -qi 'workflow must declare top-level permissions' /tmp/failure.log; then
+              while IFS= read -r f; do
+                if ! grep -q '^permissions:[[:space:]]*$' "$f"; then
+                  { printf '%s\n' 'permissions:' '  contents: none'; cat "$f"; } > "$f.tmp"
+                  mv "$f.tmp" "$f"
+                  git add "$f"
+                  changed=1
+                fi
+              done < <(git ls-files '.github/workflows/*.yml' '.github/workflows/*.yaml')
+            fi
+
+            if grep -Eqi 'ubuntu-latest.*(migrat|26)' /tmp/failure.log; then
+              while IFS= read -r f; do
+                if grep -q 'ubuntu-latest' "$f"; then
+                  sed -i 's/ubuntu-latest/ubuntu-24.04/g' "$f"
+                  git add "$f"
+                  changed=1
+                fi
+              done < <(git ls-files '.github/workflows/*.yml' '.github/workflows/*.yaml')
+            fi
+
+            if git diff --cached --quiet; then
+              echo "NO_CHANGES_PR=$PR_NUMBER"
+              continue
+            fi
+
+            git config user.name 'Rechercher Self-Heal'
+            git config user.email 'rechercher-self-heal@users.noreply.github.com'
+            git commit -m 'fix(rechercher): self-heal workflow infrastructure'
+
+            cat > "$RUNNER_TEMP/git-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$GH_TOKEN" ;;
+            *) printf '%s\n' "$GH_TOKEN" ;;
+          esac
+          SH
+            chmod 700 "$RUNNER_TEMP/git-askpass"
+            export GIT_ASKPASS="$RUNNER_TEMP/git-askpass" GIT_TERMINAL_PROMPT=0
+            git push origin "HEAD:refs/heads/$HEAD_BRANCH"
+            git reset --hard HEAD
+            git clean -fd
+            echo "SELF_HEAL_REPAIRED_PR=$PR_NUMBER"
+          done
+
+      - name: Report
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          if grep -qi 'NO_SAFE_AUTOFIX' /tmp/failure.log 2>/dev/null || [ ! -s /tmp/failure.log ]; then exit 0; fi
-          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "🤖 Rechercher Self-Heal Guardian: unresolved failure detected. The guardian only applies verified safe infrastructure repairs automatically; code/security findings outside its repair rules remain for the next repair cycle." || true
+          if grep -qi 'NO_SAFE_AUTOFIX' /tmp/failure.log 2>/dev/null; then
+            echo 'SELF_HEAL_NO_SAFE_AUTOFIX'
+          fi
