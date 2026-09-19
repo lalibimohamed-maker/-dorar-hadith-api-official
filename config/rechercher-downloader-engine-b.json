@@ -1,0 +1,30 @@
+{
+  "schema": "din-allah/rechercher-downloader-engine-b/v1",
+  "engine": "engine-b",
+  "role": "independent-parallel-downloader",
+  "input": "sqlite-task-registry",
+  "features": {
+    "parallel_files": true,
+    "parallel_byte_ranges": true,
+    "resume": true,
+    "smart_retry": true,
+    "sha256": true,
+    "pdf_magic_check": true,
+    "dedup": true
+  },
+  "defaults": {
+    "workers": 8,
+    "connections_per_file": 8,
+    "chunk_bytes": 8388608,
+    "max_retries": 5,
+    "backoff_base_seconds": 2,
+    "timeout_seconds": 120
+  },
+  "safety": {
+    "proxy_rotation": false,
+    "drm_bypass": false,
+    "rights_decision": "outside-downloader",
+    "source_discovery": "outside-downloader",
+    "corpus_write": false
+  }
+}
