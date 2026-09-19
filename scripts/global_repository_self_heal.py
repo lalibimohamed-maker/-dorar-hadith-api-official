@@ -18,6 +18,10 @@ def gh_api(path, method="GET", data=None):
         raise RuntimeError(p.stderr.strip() or p.stdout.strip())
     return json.loads(p.stdout) if p.stdout.strip() else {}
 
+def gh_log(job_id):
+ p=subprocess.run(["gh","api",f"/repos/{REPO}/actions/jobs/{job_id}/logs"],text=True,capture_output=True)
+ return p.stdout if p.returncode==0 else (p.stdout+p.stderr)
+
 def gh_retry_failed(run_id):
     p=subprocess.run(["gh","run","rerun",str(run_id),"--failed","-R",REPO],text=True,capture_output=True)
     return p.returncode == 0, (p.stdout+p.stderr).strip()
