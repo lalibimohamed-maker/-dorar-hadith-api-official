@@ -81,6 +81,99 @@ jobs:
             exit 1
           fi
 
+name: Rechercher — Developer review PDF acquisition
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Require durable private review storage for retained PDFs
+        run: |
+          set -euo pipefail
+          if find artifacts/developer-review-vault -type f -name '*.pdf' -print -quit | grep -q .; then
+            echo 'ERROR: developer-review PDFs were acquired, but durable private developer-review storage is not configured.'
+            echo 'No temporary GitHub Actions artifact is used as a substitute.'
+            exit 1
+          fi
+          echo 'No developer-review PDFs require persistence.'
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils
+
+      - name: Prepare private plaintext review workspace
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/developer-review-vault artifacts/governance
+
+      - name: Acquire and validate review copies
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE"             --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json             --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json             --discovery books-batches/salaf-01-400h/engine-source-overlay.json
+          test -s books-batches/salaf-01-400h/developer-review-manifest.json
+
+      - name: Validate private review PDFs
+        run: |
+          set -euo pipefail
+          if compgen -G 'artifacts/developer-review-vault/*.pdf' > /dev/null; then
+            for f in artifacts/developer-review-vault/*.pdf; do
+              test "$(head -c 5 "$f")" = '%PDF-'
+              qpdf --check "$f"
+            done
+          fi
+
+      - name: Normalize encrypted review inputs into ordinary PDFs
+        env:
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+        run: |
+          set -euo pipefail
+          found=0
+          mkdir -p artifacts/developer-review-vault
+          while IFS= read -r -d '' f; do
+            found=1
+            base="$(basename "${f%.*}")"
+            case "$f" in
+              *.pdf.enc) base="$(basename "${f%.pdf.enc}")" ;;
+              *.enc) base="$(basename "${f%.enc}")" ;;
+              *.encrypted) base="$(basename "${f%.encrypted}")" ;;
+            esac
+            out="artifacts/developer-review-vault/${base}.pdf"
+            python3 scripts/rechercher_decrypt_review_copy.py "$f" "$out"
+            test "$(head -c 5 "$out")" = '%PDF-'
+            qpdf --check "$out"
+            rm -f -- "$f"
+          done < <(find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print0)
+          if [ "$found" -eq 1 ]; then
+            echo 'Encrypted review input was converted to ordinary .pdf and the encrypted input was removed.'
+          else
+            echo 'No encrypted review input encountered.'
+          fi
+
+      - name: Reject encrypted PDF artifacts after normalization
+        run: |
+          set -euo pipefail
+          if find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo 'ERROR: encrypted PDF artifacts remain after normalization.'
+            exit 1
+          fi
+
       - name: Upload private developer-review PDFs
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
