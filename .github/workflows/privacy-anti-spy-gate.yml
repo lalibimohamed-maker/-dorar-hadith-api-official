@@ -1,0 +1,119 @@
+name: Privacy Anti-Spy Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: privacy-anti-spy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  privacy-anti-spy:
+    name: privacy-anti-spy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate anti-spy policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("config/privacy-anti-spy-policy-2026.json")
+          data = json.loads(p.read_text(encoding="utf-8"))
+          required = {
+              "privacyByDefault": True,
+              "dataMinimization": True,
+              "localFirst": True,
+              "explicitConsent": True,
+              "leastPrivilege": True,
+              "noTrackingByDefault": True,
+              "noFingerprinting": True,
+              "noSilentExternalUpload": True,
+              "thirdPartySdkConsentBound": True,
+              "rawAudioRetentionOffByDefault": True,
+              "rawVideoRetentionOffByDefault": True,
+          }
+          for key, expected in required.items():
+              if data["principles"].get(key) != expected:
+                  raise SystemExit(f"FAIL: privacy principle {key}")
+          print("privacy-policy: PASS")
+          PY
+
+      - name: Inspect changed files for forbidden Corpus edits
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
+          printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -E '^(^|/)Corpus/|(^|/)corpus/|(^|/)data/corpus/'; then
+            echo "FAIL: privacy anti-spy gate refuses Corpus modifications."
+            exit 1
+          fi
+
+      - name: Check privacy-sensitive settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("config/settings-governance-2026.json")
+          data = json.loads(p.read_text(encoding="utf-8"))
+          voice = data["domains"]["voice"]
+          privacy = data["principles"]
+          checks = {
+              "saveRecordings": False,
+              "backgroundListening": False,
+              "serverRecognitionRequiresConsent": True,
+              "localFirstVoice": True,
+              "noSilentExternalUpload": True,
+              "sacredRecitationSeparated": True,
+              "voiceIdentityRequiresAuthorization": True,
+          }
+          for key, expected in checks.items():
+              container = voice if key in voice else privacy
+              if container.get(key) != expected:
+                  raise SystemExit(f"FAIL: {key} expected {expected!r}")
+          print("settings-privacy: PASS")
+          PY
+
+      - name: Scan workflows for unpinned third-party actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          bad=0
+          while IFS= read -r -d '' file; do
+            while IFS= read -r line; do
+              action="$(sed -nE 's/.*uses:[[:space:]]*([^[:space:]#]+).*/\1/p' <<<"$line")"
+              [ -z "$action" ] && continue
+              case "$action" in
+                ./|docker://*) continue ;;
+                */*)
+                  ref="${action##*@}"
+                  if [[ ! "$ref" =~ ^[0-9a-fA-F]{40}$ ]]; then
+                    echo "FAIL: unpinned action: $action in $file"
+                    bad=1
+                  fi
+                  ;;
+              esac
+            done < <(grep -E '^[[:space:]]+uses:[[:space:]]+' "$file" || true)
+          done < <(find .github/workflows -type f \( -name '*.yml' -o -name '*.yaml' \) -print0)
+          [ "$bad" -eq 0 ]
+
+      - name: Gate result
+        run: echo "PRIVACY ANTI-SPY GATE: PASS"

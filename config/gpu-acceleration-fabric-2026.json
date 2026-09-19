@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Vendor-neutral GPU/VRAM acceleration and scheduling fabric for Deen Allah Encyclopedia media and AI workloads.",
+  "costPolicy": {
+    "softwareLicenseCost": "free_open_source_or_open_standard_first",
+    "hardwarePurchaseRequired": false,
+    "cloudGpuRequired": false,
+    "neverBlockCoreExperienceOnPaidGpu": true,
+    "note": "GPU hardware is not claimed to be free; the software stack must retain CPU and compatible-device fallbacks."
+  },
+  "runtime": {
+    "primaryAbstraction": "ONNX Runtime",
+    "nvidia": ["CUDA", "TensorRT"],
+    "amd": ["MIGraphX"],
+    "intel": ["OpenVINO"],
+    "windowsCrossVendor": ["DirectML", "WinML"],
+    "browserCrossVendor": ["WebGPU"],
+    "cpuFallback": ["CPUExecutionProvider", "XNNPACK"]
+  },
+  "memory": {
+    "vrRAMScheduler": true,
+    "memoryBudgeting": true,
+    "tileProcessing": true,
+    "frameChunking": true,
+    "modelLoadUnload": true,
+    "hostPinnedMemoryWhenSupported": true,
+    "oomGuard": true,
+    "reserveSafetyMargin": true,
+    "neverAssumeAllVramIsAvailable": true,
+    "telemetry": ["freeVram", "totalVram", "allocated", "reserved", "peak", "oomEvents", "latencyMs"]
+  },
+  "media": {
+    "decodeEncode": "FFmpeg",
+    "gpuVideoPaths": ["NVDEC/NVENC", "VAAPI", "Intel_QSV", "VideoToolbox", "D3D11/D3D12_where_supported"],
+    "temporalVSR": ["BasicVSR++", "RealBasicVSR", "ST-AVSR"],
+    "arbitraryScale": ["Thera", "EQSR", "UltraSR"],
+    "restoration": ["Real-ESRGAN", "SwinIR", "HAT"],
+    "experimental": ["SparkVSR", "AVSR-Diff", "VOSR"]
+  },
+  "orchestration": {
+    "modes": {
+      "mobile": {"preferLowMemory": true, "maxConcurrentModels": 1},
+      "balanced": {"preferLowLatency": true, "maxConcurrentModels": 2},
+      "projector": {"preferQuality": true, "maxConcurrentModels": 2},
+      "archive": {"preferQuality": true, "maxConcurrentModels": 3}
+    },
+    "rule": "Models collaborate only when diagnostics show a complementary role; never run every model by default.",
+    "stages": ["analyze", "allocate", "decode", "restore", "temporal_consistency", "arbitrary_scale", "quality_check", "encode", "provenance"]
+  },
+  "resolutionTargets": {
+    "8K": true,
+    "12K": true,
+    "16K": true,
+    "24K": true,
+    "meaning": "Target output dimensions only. Synthetic or reconstructed detail must never be presented as native source detail."
+  },
+  "hardwareProfiles": {
+    "high_end": {"example": "RTX 5090 32GB class", "status": "optional_hardware_reference"},
+    "high_vram": {"example": "24GB GPU class", "status": "optional_hardware_reference"},
+    "mid_range": {"status": "supported_with_tiling_and_lower_concurrency"},
+    "integrated_or_mobile": {"status": "supported_where_runtime_allows"},
+    "cpu_only": {"status": "required_fallback"}
+  },
+  "governance": {
+    "modelLicenseRequired": true,
+    "checkpointLicenseCheckedSeparately": true,
+    "provenanceRequired": true,
+    "qualityMetricsRequired": true,
+    "corpusIsolation": true,
+    "privacyGateRequired": true,
+    "globalReadinessGateRequired": true
+  }
+}
