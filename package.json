@@ -22,6 +22,8 @@
     "rijal:batch": "node scripts/run-rijal-ingestion-batch.js",
     "rijal:extract": "node src/rijal-ingestion.js",
     "rijal:validate": "node scripts/validate-rijal-corpus.js",
+    "rechercher:rights-audit": "node scripts/rechercher-rights-audit.mjs",
+    "test:rechercher": "node --test test/rechercher-rights-engine.test.js",
     "test:orchestration": "node test/orchestration-kernel.test.js && node test/orchestration-runtime.test.js",
     "test:search-discovery": "node --test test/search-discovery-federation.test.js",
     "test:rights": "node --test test/book-rights-resolver.test.js",

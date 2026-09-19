@@ -24,3 +24,91 @@ jobs:
       - name: Validate content-ingest policy
         shell: bash
         run: node scripts/content-ingest-gate.mjs
+
+  source-acquisition-evidence:
+    name: Download available Quran and waqf source evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Acquire public-domain Quran manuscript images from The Met
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/quran-manuscripts/images
+          curl --fail --silent --show-error --retry 4 \
+            'https://collectionapi.metmuseum.org/public/collection/v1/search?q=Qur%27an%20Manuscript&hasImages=true' \
+            -o artifacts/quran-manuscripts/search.json
+          jq -r '.objectIDs[]?' artifacts/quran-manuscripts/search.json | head -n 120 > artifacts/quran-manuscripts/object-ids.txt
+          : > artifacts/quran-manuscripts/manifest.jsonl
+          while IFS= read -r object_id; do
+            curl --fail --silent --show-error --retry 4 \
+              "https://collectionapi.metmuseum.org/public/collection/v1/objects/${object_id}" \
+              -o "artifacts/quran-manuscripts/object-${object_id}.json"
+            jq -c 'select(.isPublicDomain == true and (.primaryImage != "" or ((.additionalImages // []) | length > 0))) | {objectID,accessionNumber,title,objectDate,culture,department,isPublicDomain,primaryImage,additionalImages,objectURL}' \
+              "artifacts/quran-manuscripts/object-${object_id}.json" >> artifacts/quran-manuscripts/manifest.jsonl || true
+          done < artifacts/quran-manuscripts/object-ids.txt
+          test -s artifacts/quran-manuscripts/manifest.jsonl
+          jq -s '.' artifacts/quran-manuscripts/manifest.jsonl > artifacts/quran-manuscripts/manifest.json
+          count=0
+          while IFS= read -r url; do
+            count=$((count + 1))
+            base="$(basename "${url%%\?*}")"
+            curl --fail --silent --show-error --retry 4 --location "$url" \
+              -o "artifacts/quran-manuscripts/images/${count}-${base}"
+            test -s "artifacts/quran-manuscripts/images/${count}-${base}"
+          done < <(jq -r '.[].primaryImage, .[].additionalImages[]?' artifacts/quran-manuscripts/manifest.json | head -n 100)
+          find artifacts/quran-manuscripts/images -type f -print0 | sort -z | xargs -0 sha256sum > artifacts/quran-manuscripts/images.sha256
+          echo "Downloaded Quran manuscript images: $count"
+          test "$count" -gt 0
+
+      - name: Acquire Waqfeya books explicitly marked waqf
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/waqfeya-books/pdf
+          cat > artifacts/waqfeya-books/manifest.json <<'JSON'
+          {
+            "rightsPolicy": "The source record itself must explicitly state waqf/free distribution before download. Waqf status is preserved as evidence and is not silently promoted to an unrestricted copyright license.",
+            "books": [
+              {"id":"sahih-bukhari-afkar","title":"صحيح البخاري - ط. الأفكار","sourcePage":"https://www.waqfeya.net/books/صحيح-البخاري-ط-الأفكار-bc1eab2741b746fca5531f69a651bc89","download":"https://archive.org/download/FP54454/54454.pdf","evidence":"طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.","category":"hadith"},
+              {"id":"sunan-abu-dawud-afkar","title":"سنن أبي داود - ط. الأفكار","sourcePage":"https://waqfeya.net/books/سنن-أبي-داود-ط-الأفكار-62b45b4d81704c8794decea85a924b9c","download":"https://archive.org/download/FP54451/54451.pdf","evidence":"طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.","category":"hadith"},
+              {"id":"jami-tirmidhi-afkar","title":"جامع الترمذي = سنن الترمذي - ط. الأفكار","sourcePage":"https://waqfeya.net/books/جامع-الترمذي-سنن-الترمذي-ط-الأفكار-0f02c1074be347a1b5acfdf025268700","download":"https://archive.org/download/FPsutraf/sutraf.pdf","evidence":"طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.","category":"hadith"},
+              {"id":"sunan-ibn-majah-afkar","title":"سنن ابن ماجه = سنن ابن ماجة - ط. الأفكار","sourcePage":"https://waqfeya.net/books/سنن-ابن-ماجه-سنن-ابن-ماجة-ط-الأفكار-13e0aba15694465c9b873e91e5805696","download":"https://archive.org/download/SuibmaafSuibmaaf/suibmaaf.pdf","evidence":"طبع على نفقة الشيخ محمد بن صالح الراجحي - وقف لله تعالى.","category":"hadith"},
+              {"id":"fiqh-islam-bulugh-al-maram-01","title":"فقه الإسلام شرح بلوغ المرام - ج 1","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm01.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-02","title":"فقه الإسلام شرح بلوغ المرام - ج 2","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm02.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-03","title":"فقه الإسلام شرح بلوغ المرام - ج 3","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm03.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-04","title":"فقه الإسلام شرح بلوغ المرام - ج 4","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm04.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-05","title":"فقه الإسلام شرح بلوغ المرام - ج 5","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm05.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-06","title":"فقه الإسلام شرح بلوغ المرام - ج 6","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm06.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-07","title":"فقه الإسلام شرح بلوغ المرام - ج 7","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm07.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-08","title":"فقه الإسلام شرح بلوغ المرام - ج 8","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm08.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-09","title":"فقه الإسلام شرح بلوغ المرام - ج 9","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm09.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"},
+              {"id":"fiqh-islam-bulugh-al-maram-10","title":"فقه الإسلام شرح بلوغ المرام - ج 10","sourcePage":"https://waqfeya.net/books/فقه-الإسلام-شرح-بلوغ-المرام-ط-1-30819b14ce2d40a9aa120f662dfa5b85","download":"https://archive.org/download/FPfisbmfisbm/fisbm10.pdf","evidence":"وقف لله تعالى على طلبة العلم","category":"fiqh"}
+            ]
+          }
+          JSON
+          jq empty artifacts/waqfeya-books/manifest.json
+          while IFS=$'\t' read -r id url; do
+            echo "Downloading $id"
+            curl --fail --location --silent --show-error --retry 5 --connect-timeout 30 --max-time 900 "$url" \
+              -o "artifacts/waqfeya-books/pdf/${id}.pdf"
+            test -s "artifacts/waqfeya-books/pdf/${id}.pdf"
+          done < <(jq -r '.books[] | [.id,.download] | @tsv' artifacts/waqfeya-books/manifest.json)
+          find artifacts/waqfeya-books/pdf -type f -print0 | sort -z | xargs -0 sha256sum > artifacts/waqfeya-books/pdfs.sha256
+          echo "Downloaded Waqfeya source PDFs: $(find artifacts/waqfeya-books/pdf -type f | wc -l | tr -d ' ')"
+
+      - name: Preserve source acquisition evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: source-acquisition-evidence-${{ github.run_id }}
+          path: artifacts
+          if-no-files-found: error
+          retention-days: 30
