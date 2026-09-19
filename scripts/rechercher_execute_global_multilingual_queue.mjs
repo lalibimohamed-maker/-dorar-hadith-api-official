@@ -29,18 +29,40 @@ if (registry.resource_lanes.length !== 24 || matrix.cell_pipeline.length !== 9 |
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const cache = new Map();
 
+// Every outbound request is constrained to a fixed allowlist of research providers.
+// This keeps registry-derived paths/query parameters from turning into arbitrary hosts.
+const TRUSTED_ORIGINS = new Set([
+  'https://quranenc.com',
+  'https://hadeethenc.com',
+  'https://api-docs.quran.foundation',
+  'https://www.alislam.org',
+  'https://tanzil.net',
+  'https://islamhouse.com',
+  'https://archive.org',
+  'https://api.crossref.org'
+]);
+
+function trustedUrl(rawUrl) {
+  const parsed = new URL(rawUrl);
+  if (!TRUSTED_ORIGINS.has(parsed.origin)) {
+    throw new Error('Outbound evidence URL is not allowlisted: ' + parsed.origin);
+  }
+  return parsed.href;
+}
+
 function sha256(bytes) {
   return crypto.createHash('sha256').update(bytes).digest('hex');
 }
 function isoNow() { return new Date().toISOString(); }
 
 async function fetchEvidence(url, {label, maxBytes = 262144, retries = 3} = {}) {
-  if (cache.has(url)) return {...cache.get(url), cached: true};
+  const targetUrl = trustedUrl(url);
+  if (cache.has(targetUrl)) return {...cache.get(targetUrl), cached: true};
   let lastError = null;
   for (let attempt = 0; attempt < retries; attempt += 1) {
     const started = Date.now();
     try {
-      const res = await fetch(url, {
+      const res = await fetch(targetUrl, {
         redirect: 'follow',
         headers: {
           'accept': 'application/json,text/html;q=0.9,*/*;q=0.1',
@@ -51,7 +73,7 @@ async function fetchEvidence(url, {label, maxBytes = 262144, retries = 3} = {}) 
       const sample = bytes.subarray(0, maxBytes);
       const record = {
         label,
-        url,
+        url: targetUrl,
         final_url: res.url,
         http_status: res.status,
         ok: res.ok,
@@ -61,7 +83,7 @@ async function fetchEvidence(url, {label, maxBytes = 262144, retries = 3} = {}) 
         elapsed_ms: Date.now() - started,
         checked_at: isoNow()
       };
-      cache.set(url, record);
+      cache.set(targetUrl, record);
       if (res.status === 429 || res.status >= 500) await sleep(1200 * (attempt + 1));
       return record;
     } catch (error) {
@@ -70,7 +92,7 @@ async function fetchEvidence(url, {label, maxBytes = 262144, retries = 3} = {}) 
     }
   }
   const record = {label, url, http_status: null, ok: false, error: String(lastError?.message || lastError), checked_at: isoNow()};
-  cache.set(url, record);
+  cache.set(targetUrl, record);
   return record;
 }
 
