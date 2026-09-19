@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1.0.1",
+  "catalogId": "scientific-religious-illustration-catalog-2026",
+  "status": "benchmark",
+  "purpose": "Attach relevant, rights-aware scientific images to verified religious/scientific knowledge records in encyclopedia search results.",
+  "searchIntegration": {
+    "enabled": true,
+    "returnVideos": false,
+    "returnScientificVideoDiscovery": false,
+    "returnAudio": false,
+    "attachImagesToKnowledgeCards": true,
+    "neverTreatImageAsScientificEvidence": true
+  },
+  "recordSchema": {
+    "required": ["topicId","title","quranReferences","knowledgeClaims","illustrations","provenance"],
+    "illustrationRequiredFields": ["assetUrl","sourcePage","creator","license","rightsStatus","relevanceReason","claimIds"]
+  },
+  "qualityGates": [
+    "quran_reference_verified",
+    "scientific_claim_source_recorded",
+    "illustration_relevance_explained",
+    "asset_specific_rights_recorded",
+    "source_page_preserved",
+    "provenance_complete",
+    "no_visual_claim_inflation",
+    "image_url_renderable_or_source_link_preserved"
+  ],
+  "records": [
+    {
+      "topicId": "quran-ant-27-18",
+      "title": "النمل في القرآن والعلم",
+      "quranReferences": [
+        {
+          "reference": "27:18",
+          "surah": "النمل",
+          "text": "حَتَّىٰٓ إِذَآ أَتَوْا۟ عَلَىٰ وَادِ ٱلنَّمْلِ قَالَتْ نَمْلَةٌۭ يَـٰٓأَيُّهَا ٱلنَّمْلُ ٱدْخُلُوا۟ مَسَـٰكِنَكُمْ لَا يَحْطِمَنَّكُمْ سُلَيْمَـٰنُ وَجُنُودُهُۥ وَهُمْ لَا يَشْعُرُونَ",
+          "source": "https://quran.com/27:18"
+        }
+      ],
+      "interpretiveLayer": {
+        "sourceRole": "tafsir_and_islamic_context",
+        "note": "The catalog keeps tafsir/context separate from scientific findings; a scientific image cannot establish an exegetical claim."
+      },
+      "knowledgeClaims": [
+        {
+          "claimId": "ant-social-communication",
+          "statement": "Ant colonies use multiple communication cues; chemical and mechanical/vibrational signalling are documented in the scientific literature.",
+          "claimClass": "scientific_observation",
+          "sources": [
+            "https://doi.org/10.1016/S0065-3454(08)60132-1",
+            "https://doi.org/10.1038/s41598-021-84925-z"
+          ]
+        }
+      ],
+      "illustrations": [
+        {
+          "assetId": "ant-macro-adi-2018",
+          "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Ant_Macro.jpg",
+          "sourcePage": "https://commons.wikimedia.org/wiki/File:Ant_Macro.jpg",
+          "creator": "Adi 290117",
+          "license": "CC BY-SA 4.0",
+          "rightsStatus": "open_license_verified_on_source_page",
+          "relevanceReason": "Macro view used only to visually identify and explain ant morphology; it is not evidence for the Quranic claim.",
+          "claimIds": []
+        },
+        {
+          "assetId": "ant-larvae-magomadov-2020",
+          "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Ants_and_their_larvae.jpg",
+          "sourcePage": "https://commons.wikimedia.org/wiki/File:Ants_and_their_larvae.jpg",
+          "creator": "Magomadov Magomed",
+          "license": "CC0 1.0",
+          "rightsStatus": "public_domain_dedication_verified_on_source_page",
+          "relevanceReason": "Shows adult ants with larvae, useful for explaining colony life-cycle context.",
+          "claimIds": []
+        },
+        {
+          "assetId": "ant-nest-larvae-don-horne",
+          "assetUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ants_attending_larvae_in_nest_(NZAC06003285).jpg",
+          "sourcePage": "https://commons.wikimedia.org/wiki/File:Ants_attending_larvae_in_nest_(NZAC06003285).jpg",
+          "creator": "Don Horne / New Zealand Arthropod Collection",
+          "license": "CC BY 4.0",
+          "rightsStatus": "open_license_verified_on_source_page",
+          "relevanceReason": "Shows ants attending larvae in a nest, directly illustrating the colony-care context.",
+          "claimIds": []
+        },
+        {
+          "assetId": "ant-tree-macro-rh",
+          "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Ants_on_tree_macro.jpg",
+          "sourcePage": "https://commons.wikimedia.org/wiki/File:Ants_on_tree_macro.jpg",
+          "creator": "Roger Heslop",
+          "license": "CC BY 4.0",
+          "rightsStatus": "open_license_verified_on_source_page",
+          "relevanceReason": "Environmental macro context for ants moving on vegetation; included as an illustrative, not evidentiary, visual.",
+          "claimIds": []
+        }
+      ],
+      "provenance": {
+        "sourceDiscovery": [
+          "Wikimedia Commons",
+          "PubMed/Crossref-linked scientific literature",
+          "Dorar/Quran source layer"
+        ],
+        "rightsRule": "Every asset is checked individually; catalog inclusion does not imply all external media are reusable.",
+        "lastReviewed": "2026-08-31"
+      }
+    }
+  ]
+}
