@@ -39,11 +39,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Checkout latest governed engine and catalogs from main
+      - name: Checkout the reviewed acquisition engine and catalogs from the persistent target branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: lalibimohamed-maker/-dorar-hadith-api-official
-          ref: main
+          ref: ${{ inputs.target_branch }}
           path: .governance-source
           fetch-depth: 1
           persist-credentials: false
