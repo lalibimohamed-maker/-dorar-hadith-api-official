@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.1.0",
+  "engineId": "din-allah-media-engine-clean-2026",
+  "policy": {
+    "selection": "benchmark_then_review",
+    "noAutomaticAdoption": true,
+    "licenseSnapshotRequired": true,
+    "exactCheckpointRequired": true,
+    "territoryCheckRequired": true,
+    "commercialTermsCheckRequired": true
+  },
+  "evaluationBenchmarks": {
+    "primary": "VBench-2.0",
+    "secondary": ["VBench", "AVGen-Bench"],
+    "useAudioVideoBenchmarkWhenAudioIsGenerated": true
+  },
+  "candidates": [
+    {"id":"wan2.2","family":"Wan 2.2","source":"https://github.com/Wan-Video/Wan2.2","status":"benchmark_candidate","licenseStatus":"review_exact_release","notes":"Public video-generation family; verify exact checkpoint license and hardware profile before production."},
+    {"id":"cogvideox-2b","family":"CogVideoX","source":"https://github.com/zai-org/CogVideo","status":"benchmark_candidate","licenseStatus":"apache_2_0_release_review","notes":"Keep model-specific licensing separate between 2B and 5B releases."},
+    {"id":"cogvideox-5b","family":"CogVideoX","source":"https://github.com/zai-org/CogVideo","status":"benchmark_candidate","licenseStatus":"separate_model_license_review","notes":"Do not infer the 5B terms from the 2B release."},
+    {"id":"hunyuanvideo-1.5","family":"HunyuanVideo 1.5","source":"https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5","status":"rights_gated_candidate","licenseStatus":"tencent_hunyuan_community_license_review","notes":"Community license has territory and use restrictions; not a universal open-source baseline."},
+    {"id":"mochi-1","family":"Mochi 1","source":"https://github.com/genmoai/mochi","status":"benchmark_candidate","licenseStatus":"apache_2_0_release_review","notes":"Use exact published checkpoint and runtime instructions."},
+    {"id":"ltx-2.x","family":"LTX-2","source":"https://github.com/Lightricks/LTX-Video","status":"rights_gated_candidate","licenseStatus":"community_license_review","notes":"Review the exact current license and any commercial/revenue conditions before adoption."},
+    {"id":"kandinsky-5.0-video","family":"Kandinsky 5.0 Video","source":"https://github.com/kandinskylab/kandinsky-5","status":"new_benchmark_candidate","licenseStatus":"mit_repository_verify_weights","notes":"Official project provides video and image generation models. Verify weight and checkpoint terms separately from repository code."},
+    {"id":"minimax-h3","family":"MiniMax H3","source":"https://github.com/MiniMax-AI/MiniMax-H3","status":"territory_and_revenue_gated_candidate","licenseStatus":"minimax_h3_community_license_review","notes":"Current license excludes the EU, UK, South Korea and United States and requires prior written authorization above the stated commercial revenue threshold. Never present this model as globally unrestricted."},
+    {"id":"open-sora-2.0","family":"Open-Sora 2.0","source":"https://github.com/hpcaitech/Open-Sora","status":"new_benchmark_candidate","licenseStatus":"apache_2_0_repository_and_component_review","notes":"Open-Sora publishes an Apache-2.0 project, but the repository also incorporates third-party components with their own licenses. Verify checkpoints, datasets and every dependency before production use."},
+    {"id":"step-video-t2v","family":"Step-Video-T2V","source":"https://github.com/stepfun-ai/Step-Video-T2V","status":"new_benchmark_candidate","licenseStatus":"mit_repository_verify_weights_and_terms","notes":"Official repository contains T2V and related video-generation assets. Verify the exact model-weight and dataset terms before adoption."}
+  ]
+}
