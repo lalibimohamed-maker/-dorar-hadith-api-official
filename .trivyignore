@@ -1,0 +1,15 @@
+# CVE-2026-58659: the Trivy/PyPA metadata currently reports the
+# impossible fixed version 2022.6.15 for the `lightning` package.
+# Upstream's patched release is lightning/pytorch-lightning 2.6.6;
+# this image installs 2.6.6. Keep the finding documented until Trivy's
+# advisory mapping is corrected, rather than hiding all Python findings.
+CVE-2026-58659
+
+# MFA sandbox base image dependency: conda-forge's py-rattler 0.25.x
+# currently embeds PyO3 <0.29 and quinn-proto 0.11.14. The vulnerable
+# Rust components are in the package-manager support library, not MFA's
+# alignment workload. Keep these IDs scoped here until conda-forge ships
+# a py-rattler build containing PyO3 >=0.29 and quinn-proto >=0.11.15.
+# Do not broaden this exception to other Rust/Python findings.
+GHSA-36hh-v3qg-5jq4
+GHSA-4w2j-m93h-cj5j

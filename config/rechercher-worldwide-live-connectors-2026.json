@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "scope": "WORLDWIDE_AND_ALL_ERAS",
+  "temporalScope": { "start": "PROPHETIC_ERA", "end": "PRESENT_AND_FUTURE", "openEnded": true },
+  "connectorOrder": ["IIIF", "OPENITI_KITAB", "LIBRARIES_MANUSCRIPTS", "OPENALEX_CROSSREF_DATACITE", "ARCHIVES", "OPEN_REPOSITORIES", "ISLAMIC_SPECIALIZED", "AUDIO_VIDEO", "FUTURE_SOURCES"],
+  "connectors": {
+    "IIIF": { "live": true, "protocol": "IIIF_PRESENTATION_3", "pdfDiscovery": true },
+    "OPENITI_KITAB": { "live": true, "protocols": ["GitHub_REST", "OpenITI_metadata"], "textAndMetadata": true },
+    "LIBRARIES_MANUSCRIPTS": { "live": true, "protocols": ["HTTPS_JSON", "SRU_OR_IIIF_COMPATIBLE"], "manuscriptIdentity": true },
+    "OPENALEX_CROSSREF_DATACITE": { "live": true, "apis": ["OpenAlex", "Crossref", "DataCite"] },
+    "ARCHIVES": { "live": true, "apis": ["Internet_Archive_AdvancedSearch"] },
+    "OPEN_REPOSITORIES": { "live": true, "adapter": "generic_https_json_search" },
+    "ISLAMIC_SPECIALIZED": { "live": true, "adapter": "configured_https_json_search" },
+    "AUDIO_VIDEO": { "live": true, "adapter": "configured_https_json_search" },
+    "FUTURE_SOURCES": { "live": true, "adapter": "generic_https_extension" }
+  },
+  "resourceIdentity": ["source_id", "work_id", "edition_id", "manifestation_id", "manuscript_id", "page_id", "canvas_id", "passage_id", "evidence_id", "claim_id"],
+  "acquisitionPolicy": {
+    "lawfulAcquisitionIndependentFromPublication": true,
+    "rightsUnknownBlocksPublicDistribution": true,
+    "rightsUnknownDoesNotBlockCatalogingOrLawfulPreservation": true,
+    "originalPdfImmutable": true,
+    "checksumRequiredBeforeRetention": true
+  },
+  "safety": { "noAccessControlBypass": true, "noProxyRotation": true, "noUserAgentRotation": true, "readOnlyDiscovery": true },
+  "nextIntegration": "wire_resource_identity_and_preservation_into_each_connector_and_existing_pdf_acquisition_pipeline"
+}

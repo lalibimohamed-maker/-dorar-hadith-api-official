@@ -1,0 +1,26 @@
+{
+  "id": "rechercher-manuscript-iiif-page-passage-2026",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "stage": "GLOBAL_SOURCE_INTELLIGENCE",
+  "protocol": "IIIF_PRESENTATION_3_0",
+  "capabilities": [
+    "CANVAS_PAGE_IDENTITY",
+    "IMAGE_TEXT_ALIGNMENT",
+    "PASSAGE_PROVENANCE",
+    "OCR_HTR_REVIEW_GATE",
+    "IMMUTABLE_PAGE_SOURCE"
+  ],
+  "policy": {
+    "original_page_image_is_immutable": true,
+    "derived_text_requires_provenance": true,
+    "unreviewed_text_is_not_authoritative": true,
+    "provider_failure_does_not_fail_work": true
+  },
+  "integration_targets": [
+    "V6_GLOBAL_SOURCE_INTELLIGENCE",
+    "V7_GLOBAL_KNOWLEDGE_EVIDENCE_GRAPH",
+    "OCR_HTR",
+    "ACQUISITION",
+    "UNIVERSAL_EXPORT"
+  ]
+}
