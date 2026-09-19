@@ -21,7 +21,7 @@ function allowedUrl(value){
   return u;
 }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const sha=async p=>crypto.createHash('sha256').update(await fs.readFile(p)).digest('hex');
+const shaBuffer=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
 function safe(s){return String(s||'unknown').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'unknown'}
 function pdfLinks(html,base){
  const out=[],seen=new Set();
@@ -73,7 +73,6 @@ for(const [key,lang] of languages){
      const links=pdfLinks(p.bytes.toString('utf8'),page);
      for(const url of links.slice(0,32)){
        const d=await get(url); if(!d.bytes) continue;
-       if(d.bytes.subarray(0,4).toString()!=='%PDF') continue;
        if(d.contentType && !/^application\/pdf(?:\s*;|$)/i.test(d.contentType)) continue;
        const dir=path.join(out,safe(iso)); await fs.mkdir(dir,{recursive:true});
        const parsed=allowedUrl(url); if(!parsed) continue;
@@ -82,11 +81,21 @@ for(const [key,lang] of languages){
        const resolved=path.resolve(file);
        if(!resolved.startsWith(path.resolve(dir)+path.sep)) continue;
        await downloadPdf(url,resolved);
-       const stat=await fs.stat(resolved);
-       if(stat.size<4 || (await fs.readFile(resolved)).subarray(0,4).toString()!=='%PDF'){
-         await fs.rm(resolved,{force:true}); continue;
+       const handle=await fs.open(resolved,'r');
+       try{
+         const stat=await handle.stat();
+         const header=Buffer.alloc(4);
+         await handle.read(header,0,4,0);
+         if(stat.size<4 || header.toString()!=='%PDF'){
+           await handle.close();
+           await fs.rm(resolved,{force:true});
+           continue;
+         }
+         const bytes=await handle.readFile();
+         entry.files.push({url,path:path.relative(ROOT,resolved),bytes:stat.size,sha256:shaBuffer(bytes),content_type:d.contentType});
+       }finally{
+         try{await handle.close()}catch{}
        }
-       entry.files.push({url,path:path.relative(ROOT,resolved),bytes:stat.size,sha256:await sha(resolved),content_type:d.contentType});
      }
    }
  }catch(e){entry.error=String(e.message||e)}
