@@ -17,6 +17,9 @@ on:
 
 permissions: {}
 
+env:
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
+
 concurrency:
   group: rechercher-global-multilingual-${{ github.ref }}
   cancel-in-progress: false
@@ -100,20 +103,38 @@ jobs:
         run: node scripts/rechercher_verify_global_multilingual_matrix.mjs
       - name: Build permanent scientific ledger
         run: node scripts/rechercher_build_scientific_ledger.mjs
-      - name: Commit permanent scientific ledger
+      - name: Persist validated matrix evidence to dedicated storage
         env:
-          PR_HEAD_REF: ${{ github.head_ref }}
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
         run: |
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add research/evidence/global-multilingual
-          if git diff --cached --quiet; then
-            echo "No durable ledger changes to commit."
-            exit 0
+          test -n "$MATRIX_STORAGE_TOKEN"
+          cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          git clone "https://${MATRIX_STORAGE_REPO}.git" .matrix-storage
+          mkdir -p .matrix-storage/research/evidence/global-multilingual .matrix-storage/artifacts/rechercher/global-multilingual-research
+          cp -a research/evidence/global-multilingual/. .matrix-storage/research/evidence/global-multilingual/
+          if [ -d artifacts/rechercher/global-multilingual-research ]; then cp -a artifacts/rechercher/global-multilingual-research/. .matrix-storage/artifacts/rechercher/global-multilingual-research/; fi
+          git -C .matrix-storage config user.name "github-actions[bot]"
+          git -C .matrix-storage config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C .matrix-storage add research/evidence/global-multilingual artifacts/rechercher/global-multilingual-research
+          if git -C .matrix-storage diff --cached --quiet; then echo "No matrix storage changes."; else
+            git -C .matrix-storage commit -m "data(matrix): persist validated 3,192-cell evidence"
+            for attempt in 1 2 3; do
+              git -C .matrix-storage pull --rebase origin main || true
+              if git -C .matrix-storage push origin HEAD:refs/heads/main; then echo "MATRIX_STORAGE_PUSH_OK attempt=$attempt"; break; fi
+              if [ "$attempt" -eq 3 ]; then exit 1; fi
+              sleep 3
+            done
           fi
-          git commit -m "data(rechercher): persist multilingual scientific evidence ledger"
-          git push origin "HEAD:${PR_HEAD_REF}"
       - name: Upload reproducibility bundle
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
