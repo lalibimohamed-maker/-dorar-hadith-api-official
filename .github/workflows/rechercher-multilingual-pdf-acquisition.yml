@@ -107,6 +107,15 @@ jobs:
             openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY               -in "$f" -out "artifacts/rechercher/multilingual-research-vault/$rel.enc"
             rm -f "$f"
           done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.languages))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
+      - name: Developer Review — downloadable encrypted research-only vault
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-developer-review-vault-encrypted
+          path: artifacts/rechercher/multilingual-research-vault
+          if-no-files-found: ignore
+          retention-days: 90
+
       - name: Guard research-only persistence against public storage
         run: |
           set -euo pipefail
