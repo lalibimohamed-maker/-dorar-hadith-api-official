@@ -21,6 +21,14 @@ test("API key rate identity is separated from IP identity", () => {
   assert.equal(limit(request({ "x-api-key": "key-b" })).allowed, true);
 });
 
+test("rate limiter stays bounded with O(1) FIFO eviction", () => {
+  const limit = createRateLimiter({ max: 1, windowMs: 60_000, prefix: "capacity" });
+  for (let i = 0; i < 50_000; i += 1) {
+    assert.equal(limit(request({}, `198.51.100.${i % 250}`, `/?client=${i}`)).allowed, true);
+  }
+  assert.equal(limit(request({}, "203.0.113.1", "/?client=overflow")).allowed, true);
+});
+
 test("oversized request bodies and URLs are rejected", () => {
   assert.equal(requestBodyTooLarge(request({ "content-length": "1048577" }), 1048576), true);
   assert.equal(requestBodyTooLarge(request({ "content-length": "1024" }), 1048576), false);
@@ -28,10 +36,14 @@ test("oversized request bodies and URLs are rejected", () => {
   assert.equal(requestUrlTooLarge(request({}, "127.0.0.1", "/search?q=ok"), 8192), false);
 });
 
-test("batch-like query parameters are bounded", () => {
+test("batch-like query parameters are bounded, including repeated values", () => {
   assert.equal(queryArrayTooLarge(request({}, "127.0.0.1", `/?translationIds=${Array.from({ length: 51 }, (_, i) => i + 1).join(",")}`), 50), true);
   assert.equal(queryArrayTooLarge(request({}, "127.0.0.1", `/?translationIds=${Array.from({ length: 50 }, (_, i) => i + 1).join(",")}`), 50), false);
-  assert.equal(queryArrayTooLarge(request({}, "127.0.0.1", `/?judgments=${encodeURIComponent(JSON.stringify(Array.from({ length: 51 }, () => ({ source: "x" }))) )}`), 50), true);
+  assert.equal(queryArrayTooLarge(request({}, "127.0.0.1", "/?translationIds=1&translationIds=2&translationIds=3"), 50), false);
+  assert.equal(queryArrayTooLarge(request({}, "127.0.0.1", `/?translationIds=${Array.from({ length: 51 }, () => 1).join("&translationIds=")}`), 50), true);
+  assert.equal(queryArrayTooLarge(request({}, "127.0.0.1", `/?judgments=${encodeURIComponent(JSON.stringify(Array.from({ length: 25 }, () => ({ source: "x" }))))}&judgments=${encodeURIComponent(JSON.stringify(Array.from({ length: 26 }, () => ({ source: "y" }))))}`), 50), true);
+  assert.equal(queryArrayTooLarge(request({}, "127.0.0.1", `/?judgments=${encodeURIComponent(JSON.stringify({ source: "x" }))}`), 50), true);
+  assert.equal(queryArrayTooLarge(request({}, "127.0.0.1", "/?judgments=not-json"), 50), true);
 });
 
 test("Cloudflare client identity uses CF-Connecting-IP only from a trusted proxy", () => {
