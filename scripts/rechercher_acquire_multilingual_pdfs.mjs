@@ -12,7 +12,13 @@ for (const line of (await fs.readFile(ledger,'utf8')).split(/\r?\n/)) {
   const r=JSON.parse(line);
   languages.set(r.language_iso || r.language, {name:r.language, iso:r.language_iso, records:(languages.get(r.language_iso || r.language)?.records||[]).concat(r)});
 }
-const allow=new Set(['https://hadeethenc.com','https://islamhouse.com','https://d1.islamhouse.com','https://quranenc.com','https://quran.com','https://api.quran.com']);
+const ALLOWED_ORIGINS=new Set(['https://hadeethenc.com','https://islamhouse.com','https://d1.islamhouse.com','https://quranenc.com','https://quran.com','https://api.quran.com']);
+function allowedUrl(value){
+  let u;
+  try { u=new URL(value); } catch { return null; }
+  if (u.protocol!=='https:' || !ALLOWED_ORIGINS.has(u.origin)) return null;
+  return u;
+}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const sha=async p=>crypto.createHash('sha256').update(await fs.readFile(p)).digest('hex');
 function safe(s){return String(s||'unknown').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'unknown'}
@@ -20,7 +26,7 @@ function pdfLinks(html,base){
  const out=[],seen=new Set();
  const re=/href=["']([^"']+)["']/gi; let m;
  while((m=re.exec(html))){
-   const u=new URL(m[1],base); if(!allow.has(u.origin)) continue;
+   const u=allowedUrl(new URL(m[1],base).href); if(!u) continue;
    if(!/\.pdf(?:\?|$)/i.test(u.pathname+u.search)) continue;
    if(/\.pdf\.enc(?:\?|$)/i.test(u.pathname+u.search)) continue;
    if(!seen.has(u.href)){seen.add(u.href);out.push(u.href)}
@@ -28,7 +34,7 @@ function pdfLinks(html,base){
  return out;
 }
 async function get(url){
- const u=new URL(url); if(!allow.has(u.origin)) throw new Error('untrusted origin '+u.origin);
+ const u=allowedUrl(url); if(!u) throw new Error('untrusted or disallowed HTTPS origin');
  for(let i=0;i<4;i++){try{
    const r=await fetch(u,{headers:{'user-agent':'DinAllah-Rechercher/2.0','accept':'text/html,application/pdf;q=0.9,*/*;q=0.1'}});
    if(r.status===429){await sleep(1500*(i+1));continue}
@@ -39,10 +45,17 @@ async function get(url){
 const summary={schema:'rechercher/multilingual-resource-acquisition/v2',generated_at:new Date().toISOString(),language_count:languages.size,policy:{redistribution:'only when explicitly verified',research_only:'only when lawful research access is explicitly established; never public',public_repo:'research-only PDFs are forbidden from persistence in this public repository'},languages:{}};
 for(const [key,lang] of languages){
  const entry={language:lang.name,iso:lang.iso,status:'no-eligible-pdf-found',sources_checked:[],files:[],rights:'review-required'};
- const hasH=lang.records.some(r=>r.provider==='hadeethenc' || r.stages?.some(s=>s.evidence?.url?.includes('hadeethenc.com')));
+ const hasH=lang.records.some(r=>{
+   if(r.provider==='hadeethenc') return true;
+   return (r.stages||[]).some(s=>{
+     const u=s.evidence?.url;
+     return typeof u==='string' && Boolean(allowedUrl(u)) && new URL(u).origin==='https://hadeethenc.com';
+   });
+ });
  if(!hasH){summary.languages[key]=entry;continue}
- entry.rights='source-terms-permit-download-and-republication';
- const page='https://hadeethenc.com/'+(lang.iso||'ar');
+ const iso=String(lang.iso||'ar').toLowerCase();
+ if(!/^[a-z]{2,3}(?:-[a-z]{2,4})?$/.test(iso)){summary.languages[key]=entry;continue}
+ const page='https://hadeethenc.com/'+encodeURIComponent(iso);
  entry.sources_checked.push(page);
  try{
    const p=await get(page); if(p.bytes){
@@ -50,9 +63,14 @@ for(const [key,lang] of languages){
      for(const url of links.slice(0,32)){
        const d=await get(url); if(!d.bytes) continue;
        if(d.bytes.subarray(0,4).toString()!=='%PDF') continue;
-       const dir=path.join(out,safe(lang.iso||lang.name)); await fs.mkdir(dir,{recursive:true});
-       const name=safe(path.basename(new URL(url).pathname)); const file=path.join(dir,name);
-       await fs.writeFile(file,d.bytes);
+       if(d.contentType && !/^application\/pdf(?:\s*;|$)/i.test(d.contentType)) continue;
+       const dir=path.join(out,safe(iso)); await fs.mkdir(dir,{recursive:true});
+       const parsed=allowedUrl(url); if(!parsed) continue;
+       const name=safe(path.basename(parsed.pathname)); if(name==='unknown') continue;
+       const file=path.join(dir,name);
+       const resolved=path.resolve(file);
+       if(!resolved.startsWith(path.resolve(dir)+path.sep)) continue;
+       await fs.writeFile(resolved,d.bytes);
        entry.files.push({url,path:path.relative(ROOT,file),bytes:d.bytes.length,sha256:await sha(file),content_type:d.contentType});
      }
    }
