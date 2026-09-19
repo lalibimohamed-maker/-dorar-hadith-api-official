@@ -1,0 +1,44 @@
+name: Open Islamic Library Harvest
+
+on:
+  push:
+    branches:
+      - feat/portal-knowledge-v3-2026
+  workflow_dispatch:
+    inputs:
+      start:
+        description: 'PDF catalog offset'
+        required: false
+        default: '0'
+      batch_size:
+        description: 'PDFs per run'
+        required: false
+        default: '10'
+  schedule:
+    - cron: '47 3 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Harvest public-domain classical Islamic book PDFs
+        env:
+          OPEN_LIBRARY_START: ${{ github.event.inputs.start || '0' }}
+          OPEN_LIBRARY_BATCH_SIZE: ${{ github.event.inputs.batch_size || '10' }}
+        run: node scripts/open-islamic-library-harvest.mjs
+      - name: Preserve downloaded books and provenance
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: open-islamic-library-${{ github.run_id }}
+          path: artifacts/open-islamic-library
+          if-no-files-found: warn
+          retention-days: 90

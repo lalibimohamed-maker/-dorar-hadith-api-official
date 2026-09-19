@@ -1,0 +1,52 @@
+{
+  "version": "2026.09.02",
+  "name": "Library access policy",
+  "purpose": "Separate book access inside Deen Allah Encyclopedia from offline redistribution rights.",
+  "packageModes": {
+    "redistributable": {
+      "download": true,
+      "offlineBundle": true,
+      "formats": ["pdf", "epub", "txt", "json", "html"],
+      "requirements": ["public-domain", "explicit-redistribution-permission", "compatible-license", "waqf-with-explicit-redistribution-allowance"]
+    },
+    "reference-only": {
+      "download": false,
+      "offlineBundle": false,
+      "reader": true,
+      "search": true,
+      "copy": "citation-bounded",
+      "sourceAttribution": true,
+      "requirements": ["verified-rights-restricted-source", "lawful-license-for-display", "specific-statutory-basis-where-applicable"]
+    },
+    "external-reader": {
+      "download": false,
+      "offlineBundle": false,
+      "reader": false,
+      "search": false,
+      "copy": false,
+      "sourceAttribution": true,
+      "requirements": ["rights-unclear", "source-prohibits-local-copy", "official-link-only"]
+    }
+  },
+  "referenceVault": {
+    "principle": "A restricted book may be retained for internal research/preservation only when a documented legal basis permits that retention; public GitHub must never contain a restricted full-text copy.",
+    "allowedLegalBasis": [
+      "written-permission",
+      "explicit-license",
+      "public-domain",
+      "compatible-open-license",
+      "specific-library-or-research-exception-verified-for-jurisdiction"
+    ],
+    "otherwise": "Do not download or store the protected full text. Use an approved provider/official reader or a user-supplied lawful copy."
+  },
+  "academicCitation": {
+    "enabled": true,
+    "mustInclude": ["title", "author", "edition", "page-or-location", "source-url"],
+    "note": "Quotation rights vary by jurisdiction and circumstance; the engine must not promise an unlimited quotation right or a fixed word-count safe harbor."
+  },
+  "downloadUi": {
+    "redistributable": "Show download and offline-package controls.",
+    "reference-only": "Hide download controls; show reader, citation, copy-quote and source metadata controls subject to the source terms.",
+    "external-reader": "Show official source link only."
+  }
+}

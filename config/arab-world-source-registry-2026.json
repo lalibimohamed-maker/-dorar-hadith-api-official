@@ -1,0 +1,58 @@
+{
+  "version": "2026.09.02",
+  "purpose": "Federated registry for Arabic-world libraries, royal libraries, Quran institutions and digital heritage repositories.",
+  "rightsRule": "Download into the permanent public corpus only when the source explicitly grants public-domain, CC-compatible or waqf/free redistribution rights. A visible download button alone is not treated as a redistribution license.",
+  "countries": [
+    {"country":"الجزائر","source":"المكتبة الوطنية الجزائرية - المكتبة الرقمية","url":"https://digitallibrary.biblionat.dz/ar","status":"download-available","reuse":"item-specific"},
+    {"country":"مصر","source":"مكتبة الإسكندرية - المكتبة الرقمية DAR","url":"https://dar.bibalex.org/ar/landingPage/landingPage.aspx","status":"download-available","reuse":"item-specific"},
+    {"country":"السعودية","source":"مجمع الملك فهد لطباعة المصحف الشريف","url":"https://qurancomplex.gov.sa/","status":"official-downloads","reuse":"verify-per-item"},
+    {"country":"السعودية","source":"مجمع الملك سلمان العالمي للغة العربية - المكتبة الرقمية","url":"https://library.ksaa.gov.sa/index/book","status":"free-digital-library","reuse":"verify-per-item"},
+    {"country":"السعودية","source":"مركز توثيق سيرة الملك عبدالله بن عبدالعزيز - المكتبة الرقمية","url":"https://kingabdullah.sa/?page_id=693","status":"digital-downloads","reuse":"verify-per-item"},
+    {"country":"الإمارات","source":"مؤسسة محمد بن راشد آل مكتوم للمعرفة - مركز المعرفة الرقمي","url":"https://new.ddl.ae/","status":"free-digital-library","reuse":"verify-per-item"},
+    {"country":"قطر","source":"مكتبة قطر الوطنية - المجموعات الرقمية","url":"https://www.qnl.qa/ar/explore/digital-collections","status":"free-online-digital","reuse":"item-specific"},
+    {"country":"قطر","source":"مكتبة قطر الرقمية QDL","url":"https://www.qdl.qa/","status":"free-digital-downloads","reuse":"item-specific-public-domain"},
+    {"country":"الكويت","source":"المكتبة الوطنية الكويتية - المكتبة الرقمية","url":"https://www.nlk.gov.kw/DigitalLibrary.aspx","status":"digital-library","reuse":"verify-per-item"},
+    {"country":"الكويت","source":"بوابة مكتبات الكويت","url":"https://www.nccal.gov.kw/ar/kuwait-libraries-portal","status":"catalog-and-digital-materials","reuse":"verify-per-item"},
+    {"country":"المغرب","source":"المكتبة الوطنية للمملكة المغربية - الببليوغرافيا الوطنية والمكتبة الرقمية","url":"https://bnrm.ma/bnrm/ar/","status":"digital-bibliography","reuse":"verify-per-item"},
+    {"country":"تونس","source":"المكتبة الوطنية التونسية","url":"https://www.bibliotheque.nat.tn/","status":"digital-collections","reuse":"verify-per-item"},
+    {"country":"موريتانيا","source":"المكتبة الوطنية الموريتانية","url":"https://bnm.gov.mr/","status":"digital-resources","reuse":"verify-per-item"},
+    {"country":"فلسطين","source":"المكتبة الوطنية الفلسطينية","url":"https://nlp.ps/","status":"national-library","reuse":"verify-per-item"},
+    {"country":"سوريا","source":"مكتبة الأسد الوطنية - فهارس المخطوطات","url":"https://waqfeya.net/","status":"catalog-via-waqfeya","reuse":"source-specific"},
+    {"country":"العراق","source":"دار الكتب والوثائق العراقية","url":"https://www.cotaliraq.com/","status":"national-library-source","reuse":"verify-per-item"},
+    {"country":"عُمان","source":"وزارة التراث والسياحة والمكتبات التراثية","url":"https://mht.gov.om/","status":"heritage-source","reuse":"verify-per-item"},
+    {"country":"البحرين","source":"هيئة البحرين للثقافة والآثار - المكتبات والتراث","url":"https://www.culture.gov.bh/","status":"heritage-source","reuse":"verify-per-item"},
+    {"country":"الأردن","source":"دائرة المكتبة الوطنية الأردنية","url":"https://www.nl.gov.jo/","status":"national-library-source","reuse":"verify-per-item"},
+    {"country":"لبنان","source":"دار الكتب الوطنية اللبنانية","url":"https://nla.gov.lb/","status":"national-library-source","reuse":"verify-per-item"},
+    {"country":"ليبيا","source":"دار الكتب الوطنية الليبية","url":"https://www.moc.gov.ly/","status":"national-library-source","reuse":"verify-per-item"},
+    {"country":"اليمن","source":"مكتبة الأوقاف والمخطوطات ومصادر التراث اليمني","url":"https://www.culture.gov.ye/","status":"heritage-source","reuse":"verify-per-item"},
+    {"country":"السودان","source":"دار الوثائق القومية السودانية","url":"https://www.sudan.gov.sd/","status":"heritage-source","reuse":"verify-per-item"}
+  ],
+  "priorityAcquisitionSources": [
+    {
+      "id":"waqfeya",
+      "name":"المكتبة الوقفية",
+      "url":"https://waqfeya.net/",
+      "acquisition":"crawl-book-pages-and-download-only-explicit-waqf/free records",
+      "evidence":"Book pages can explicitly state وقف لله تعالى and expose direct PDF download links."
+    },
+    {
+      "id":"met-open-access",
+      "name":"The Met Open Access",
+      "url":"https://www.metmuseum.org/hubs/open-access",
+      "acquisition":"download public-domain Quran/manuscript images marked Open Access",
+      "license":"CC0 for Open Access public-domain images and collection data"
+    },
+    {
+      "id":"qdl-public-domain",
+      "name":"Qatar Digital Library",
+      "url":"https://www.qdl.qa/",
+      "acquisition":"download only records whose individual Use and reuse section says Public Domain"
+    },
+    {
+      "id":"kfgqpc",
+      "name":"مجمع الملك فهد لطباعة المصحف الشريف",
+      "url":"https://qurancomplex.gov.sa/",
+      "acquisition":"official downloadable Quran editions, fonts, translations and recitations; reuse is classified per published terms rather than inferred"
+    }
+  ]
+}
