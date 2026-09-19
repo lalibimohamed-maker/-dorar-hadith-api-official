@@ -27,43 +27,30 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf git-lfs
           git lfs install --local
-          git lfs track 'artifacts/developer-review-vault/*.enc'
+          git lfs track 'artifacts/developer-review-vault/*.pdf'
           git add .gitattributes
-
-      - name: Require vault key
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
 
       - name: Acquire and validate copies
         run: |
           set -euo pipefail
           python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE"
 
-      - name: Preserve Developer Review PDFs for review
+      - name: Preserve the original PDFs for Developer Review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: rechercher-developer-review-pdfs-${{ github.run_id }}
           path: artifacts/developer-review-vault/*.pdf
           if-no-files-found: ignore
 
-      - name: Encrypt retained copies without deleting review PDFs
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          files=(artifacts/developer-review-vault/*.pdf)
-          for f in "${files[@]}"; do
-            out="$f.enc"
-            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
-              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
-            test -s "$out"
-            echo "Encrypted vault copy created: $out; plaintext review copy intentionally retained for this Developer Review run."
-          done
-      - name: Persist encrypted vault and manifest
+      - name: Preserve the original PDFs as the sole book representation
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-developer-review-pdfs-${{ github.run_id }}
+          path: artifacts/developer-review-vault/*.pdf
+          if-no-files-found: ignore
+          retention-days: 90
+
+      - name: Persist original PDFs and manifest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -71,11 +58,11 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           shopt -s nullglob
-          enc_files=(artifacts/developer-review-vault/*.enc)
+          pdf_files=(artifacts/developer-review-vault/*.pdf)
           git add .gitattributes books-batches/salaf-01-400h/developer-review-manifest.json
-          if [ "${#enc_files[@]}" -gt 0 ]; then git add "${enc_files[@]}"; fi
+          if [ "${#pdf_files[@]}" -gt 0 ]; then git add "${pdf_files[@]}"; fi
           if git diff --cached --quiet; then echo 'No acquisition changes.'; exit 0; fi
-          git commit -m 'data(rechercher): retain encrypted developer review copies'
+          git commit -m 'data(rechercher): retain original PDF developer review copies'
           git fetch origin "$REVIEW_BRANCH"
           git rebase "origin/$REVIEW_BRANCH"
           git -c "http.extraheader=AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
