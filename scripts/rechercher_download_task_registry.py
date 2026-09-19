@@ -78,3 +78,9 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def get_task(db: Path, tid: str):
+    with connect(db) as conn:
+        row = conn.execute("SELECT * FROM tasks WHERE task_id=?", (tid,)).fetchone()
+        return dict(row) if row else None
