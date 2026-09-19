@@ -1,0 +1,73 @@
+name: @Rechercher Rights Discovery Audit
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'src/rechercher-rights-engine.js'
+      - 'scripts/rechercher-rights-audit.mjs'
+      - 'scripts/rechercher-waqfeya-classify-shard.mjs'
+      - 'scripts/rechercher-purge-restricted.mjs'
+      - 'test/rechercher-rights-engine.test.js'
+      - 'test/rechercher-docx-catalog.test.js'
+      - 'config/rechercher-source-catalog-2026.json'
+      - 'data/corpus/rechercher/**'
+  workflow_dispatch:
+    inputs:
+      max_sources:
+        description: 'Maximum source pages to inspect'
+        required: false
+        default: '100'
+        type: string
+      concurrency:
+        description: 'Concurrent source fetches'
+        required: false
+        default: '4'
+        type: string
+  schedule:
+    - cron: '17 2 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Test @Rechercher
+        run: npm run test:rechercher
+      - name: Validate Document (3) link inventory
+        run: node --input-type=module - <<'NODE'
+        import fs from 'node:fs';
+        const d=JSON.parse(fs.readFileSync('data/corpus/rechercher/docx-links-catalog-2026.json','utf8'));
+        if(d.hyperlinkCount!==100 || d.totalUniqueLinks!==61) throw new Error('DOCX link inventory changed unexpectedly');
+        if(!d.links.some(x=>x.url.includes('waqfeya'))) console.log('Waqfeya is not among extracted DOCX hyperlinks; discovery source remains separately configured.');
+        console.log(`DOCX hyperlinks: ${d.hyperlinkCount}; unique URLs: ${d.totalUniqueLinks}`);
+        NODE
+      - name: Audit source catalog
+        env:
+          MAX_SOURCES: ${{ inputs.max_sources || '100' }}
+          CONCURRENCY: ${{ inputs.concurrency || '4' }}
+        run: npm run rechercher:rights-audit
+      - name: Validate audit artifact
+        run: |
+          set -euo pipefail
+          test -s data/corpus/rechercher/source-audit-2026.json
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const d=JSON.parse(fs.readFileSync('data/corpus/rechercher/source-audit-2026.json','utf8'));
+          if(d.engine!=='@Rechercher') throw new Error('Wrong engine marker');
+          if(!Number.isInteger(d.sourceCount)||d.sourceCount<1) throw new Error('No source audit results');
+          for(const r of d.results){if(!r.sourceUrl)throw new Error('Missing source URL');if(!r.rightsDecision)throw new Error(`Missing rights decision for ${r.sourceUrl}`);}
+          console.log(`Audited sources: ${d.sourceCount}`);
+          NODE

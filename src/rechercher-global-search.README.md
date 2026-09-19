@@ -1,0 +1,1 @@
+@Rechercher Global Search Analysts\n\nProvider federation: Internet Archive, Open Library, Google Books, Europeana, Gallica, DPLA, WorldCat; Qatar Digital Library is represented as a IIIF/reference source. Discovery is separate from rights clearance.\n
