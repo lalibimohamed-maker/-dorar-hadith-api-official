@@ -13,6 +13,7 @@ permissions:
 
 env:
   MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
+  DEVELOPER_REVIEW_VAULT_REPO: lalibimohamed-maker/dinullah-developer-review-vault
 concurrency:
   group: rechercher-multilingual-pdf-${{ github.ref }}
   cancel-in-progress: false
@@ -107,26 +108,50 @@ jobs:
             openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY               -in "$f" -out "artifacts/rechercher/multilingual-research-vault/$rel.enc"
             rm -f "$f"
           done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.languages))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
-      - name: Developer Review — downloadable encrypted research-only vault
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: rechercher-developer-review-vault-encrypted
-          path: artifacts/rechercher/multilingual-research-vault
-          if-no-files-found: ignore
-          retention-days: 90
-
       - name: Guard research-only persistence against public storage
         run: |
           set -euo pipefail
-          visibility="$(curl --fail --silent --show-error "https://api.github.com/repos/${MATRIX_STORAGE_REPO}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["visibility"])')"
           if find artifacts/rechercher/multilingual-research-vault -type f -name '*.enc' -print -quit | grep -q .; then
-            test "$visibility" = "private" || {
-              echo "PREFLIGHT_FAIL: research-only encrypted material cannot be persisted to public matrix storage (visibility=$visibility)."
-              exit 1
-            }
+            echo "RESEARCH_ONLY_PUBLIC_STORAGE_GUARD=PASS"
+          else
+            echo "RESEARCH_ONLY_PUBLIC_STORAGE_GUARD=NO_RESEARCH_ONLY_FILES"
           fi
-          echo "MATRIX_STORAGE_VISIBILITY=$visibility"
+
+      - name: Persist Developer Review vault to private repository
+        env:
+          DEVELOPER_REVIEW_VAULT_TOKEN: ${{ secrets.RECHERCHER_DEVELOPER_REVIEW_VAULT_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$DEVELOPER_REVIEW_VAULT_TOKEN"
+          visibility="$(curl --fail --silent --show-error -H "Authorization: Bearer ${DEVELOPER_REVIEW_VAULT_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${DEVELOPER_REVIEW_VAULT_REPO}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["visibility"])')"
+          test "$visibility" = "private" || { echo "PREFLIGHT_FAIL: Developer Review vault must be private (visibility=$visibility)."; exit 1; }
+          cat > "$RUNNER_TEMP/developer-review-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$DEVELOPER_REVIEW_VAULT_TOKEN" ;;
+            *) printf '%s\n' "$DEVELOPER_REVIEW_VAULT_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/developer-review-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/developer-review-askpass" GIT_TERMINAL_PROMPT=0
+          rm -rf .developer-review-vault
+          git clone "https://github.com/${DEVELOPER_REVIEW_VAULT_REPO}.git" .developer-review-vault
+          mkdir -p ".developer-review-vault/research-only/${GITHUB_REPOSITORY}/${GITHUB_SHA}"
+          if find artifacts/rechercher/multilingual-research-vault -type f -name '*.enc' -print -quit | grep -q .; then
+            cp -a artifacts/rechercher/multilingual-research-vault/. ".developer-review-vault/research-only/${GITHUB_REPOSITORY}/${GITHUB_SHA}/"
+            cp artifacts/rechercher/multilingual-pdf-acquisition/manifest.json ".developer-review-vault/research-only/${GITHUB_REPOSITORY}/${GITHUB_SHA}/manifest.json"
+          fi
+          git -C .developer-review-vault config user.name "github-actions[bot]"
+          git -C .developer-review-vault config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C .developer-review-vault add "research-only/${GITHUB_REPOSITORY}/${GITHUB_SHA}"
+          if git -C .developer-review-vault diff --cached --quiet; then
+            echo "No new Developer Review research-only material."
+          else
+            git -C .developer-review-vault commit -m "data(research-only): persist Developer Review vault"
+            git -C .developer-review-vault push origin HEAD:refs/heads/main
+          fi
+
       - name: Persist multilingual acquisition outputs to dedicated matrix storage
         env:
           MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
@@ -144,14 +169,13 @@ jobs:
           chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
           export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
           git clone "https://github.com/${MATRIX_STORAGE_REPO}.git" .matrix-storage
-          mkdir -p .matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition .matrix-storage/artifacts/rechercher/multilingual-research-vault
+          mkdir -p .matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition
           cp -a artifacts/rechercher/multilingual-pdf-acquisition/. .matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition/
-          if [ -d artifacts/rechercher/multilingual-research-vault ]; then cp -a artifacts/rechercher/multilingual-research-vault/. .matrix-storage/artifacts/rechercher/multilingual-research-vault/; fi
           git -C .matrix-storage config user.name "github-actions[bot]"
           git -C .matrix-storage config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C .matrix-storage lfs install
           git -C .matrix-storage lfs track 'artifacts/rechercher/multilingual-pdf-acquisition/**/*.pdf'
-          git -C .matrix-storage add artifacts/rechercher/multilingual-pdf-acquisition artifacts/rechercher/multilingual-research-vault .gitattributes
+          git -C .matrix-storage add artifacts/rechercher/multilingual-pdf-acquisition .gitattributes
           if git -C .matrix-storage diff --cached --quiet; then echo "No new multilingual matrix resources."; else
             git -C .matrix-storage commit -m "data(matrix): persist multilingual acquisition outputs"
             for attempt in 1 2 3; do
