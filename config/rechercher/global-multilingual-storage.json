@@ -1,0 +1,27 @@
+{
+  "schema": "din-allah-encyclopedia/rechercher-global-multilingual-storage/v1",
+  "source_repository": "lalibimohamed-maker/-dorar-hadith-api-official",
+  "storage_repository": "lalibimohamed-maker/dinullah-matrix-3192-storage-01",
+  "purpose": "Dedicated storage boundary for the 3,192-cell global multilingual matrix outputs; matrix data and acquisition artifacts are persisted here without mixing them into the main source repository.",
+  "scope": {
+    "matrix_evidence": "research/evidence/global-multilingual/**",
+    "research_outputs": "artifacts/rechercher/global-multilingual-research/**",
+    "multilingual_acquisition": "artifacts/rechercher/multilingual-pdf-acquisition/**",
+    "manifests": "manifests/**",
+    "rights_and_provenance": "included",
+    "source_code": "excluded",
+    "canonical_corpus": "excluded",
+    "unverified_public_pdf_distribution": "excluded"
+  },
+  "authentication": {
+    "secret_name": "RECHERCHER_MATRIX_STORAGE_TOKEN",
+    "required": true,
+    "write_scope": "contents read/write for dinullah-matrix-3192-storage-01"
+  },
+  "contract": {
+    "one_storage_repository": true,
+    "matrix_content_isolated_from_main_repository": true,
+    "pdf_storage_is_separate_from_matrix_storage": true,
+    "rights_gate_before_public_pdf_persistence": true
+  }
+}
