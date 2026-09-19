@@ -24,14 +24,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p artifacts/governance
-          prefix=$(python3 -c 'import json; print(json.load(open("$"+"{STORAGE_CONFIG}",encoding="utf-8"))["shard_discovery"]["repository_name_prefix"])')
-          owner=$(python3 -c 'import json; print(json.load(open("$"+"{STORAGE_CONFIG}",encoding="utf-8"))["shard_discovery"]["owner"])')
+          prefix=$(python3 -c 'import json; print(json.load(open("${STORAGE_CONFIG}",encoding="utf-8"))["shard_discovery"]["repository_name_prefix"])')
+          owner=$(python3 -c 'import json; print(json.load(open("${STORAGE_CONFIG}",encoding="utf-8"))["shard_discovery"]["owner"])')
           gh api --paginate "/users/$owner/repos?per_page=100&sort=full_name" | jq -s --arg prefix "$prefix" 'add | map(select(.name | startswith($prefix))) | map(select(.archived == false)) | map(.full_name) | unique | sort' > /tmp/shards.json
           count=$(jq 'length' /tmp/shards.json)
-          min=$(python3 -c 'import json; print(json.load(open("$"+"{STORAGE_CONFIG}",encoding="utf-8"))["shard_discovery"]["minimum_enabled_shards"])')
+          min=$(python3 -c 'import json; print(json.load(open("${STORAGE_CONFIG}",encoding="utf-8"))["shard_discovery"]["minimum_enabled_shards"])')
           if [ "$count" -lt "$min" ]; then echo "No sufficient federated storage shards discovered: found=$count minimum=$min" >&2; exit 1; fi
-          jq '{repositories: .}' /tmp/shards.json > "$"+"{DISCOVERED_SHARDS}"
+          jq '{repositories: .}' /tmp/shards.json > "${DISCOVERED_SHARDS}"
           echo "FEDERATED_RELEASE_SHARDS=$count"
           echo "FEDERATED_RELEASE_SHARD_SCALING=AUTOMATIC"
           jq -r '.[]' /tmp/shards.json
@@ -40,8 +39,8 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import json
-          cfg=json.load(open("$"+"{STORAGE_CONFIG}",encoding="utf-8"))
-          shards=json.load(open("$"+"{DISCOVERED_SHARDS}",encoding="utf-8"))["repositories"]
+          cfg=json.load(open("${STORAGE_CONFIG}",encoding="utf-8"))
+          shards=json.load(open("${DISCOVERED_SHARDS}",encoding="utf-8"))["repositories"]
           assert cfg["shard_discovery"]["scale_rule"] == "discover-all-matching-enabled-storage-repositories"
           assert len(shards) == len(set(shards)) and shards
           assert cfg["selection"]["one_physical_copy_per_sha256"] is True
@@ -60,7 +59,7 @@ jobs:
       - name: Build deterministic SHA-256 storage plan
         run: |
           set -euo pipefail
-          python3 scripts/rechercher_federated_release_storage.py --root . --config "$"+"{STORAGE_CONFIG}" --discovered-shards "$"+"{DISCOVERED_SHARDS}" --manifest /tmp/release-source-manifest.json --out "$"+"{STORAGE_PLAN}"
+          python3 scripts/rechercher_federated_release_storage.py --root . --config "$STORAGE_CONFIG" --discovered-shards "$DISCOVERED_SHARDS" --manifest /tmp/release-source-manifest.json --out "$STORAGE_PLAN"
       - name: Verify no Corpus mutation
         run: |
           git diff --exit-code -- . ':!artifacts/**' || true
