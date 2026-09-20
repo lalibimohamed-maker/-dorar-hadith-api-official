@@ -1,11 +1,8 @@
+# workflow-security-justification: workflow_run removed; strict gate is invoked only by trusted manual dispatch to avoid privileged workflow_run execution.
 name: Rechercher — Strict multilingual manifest gate
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - Rechercher — Multilingual resource acquisition
-    types: [completed]
 
 permissions:
   contents: read
@@ -19,21 +16,15 @@ env:
 
 jobs:
   validate:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Resolve acquisition revision
         id: revision
-        env:
-          WORKFLOW_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
-          if [ -n "${WORKFLOW_SHA:-}" ]; then
-            echo "sha=$WORKFLOW_SHA" >> "$GITHUB_OUTPUT"
-          else
-            echo "sha=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
-          fi
+          echo "sha=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
 
       - name: Checkout source revision
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
