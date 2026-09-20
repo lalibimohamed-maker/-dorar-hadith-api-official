@@ -14,5 +14,5 @@ test('source allowlist rejects unregistered origins',()=>{
 });
 
 test('encrypted primary representation is not accepted by policy',()=>{
-  assert.match('book.pdf.enc',/\\.pdf\\.enc$/i);
+  assert.match('book.pdf.enc',/\.pdf\.enc$/i);
 });
