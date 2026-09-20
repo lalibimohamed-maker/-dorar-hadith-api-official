@@ -536,13 +536,15 @@ def main():
     master["policy"] = "unbounded chronological acquisition; no finite book-count target"
     master["books"] = sorted(books, key=chronology)
     master["materialization"] = {
-        "source_of_truth": "this file only",
+        "source_of_truth": "persistent master catalog on the protected Rechercher review branch",
+        "runtime_seed": "loaded from the persistent review-branch catalog before materialization; main checkout is only the execution seed",
         "historical_seed_recovery": "immutable git history",
         "future_source_directory": "books-batches/encyclopedia-master/sources/",
         "deduplication": "title + author + chronology",
         "rights_are_not_inferred": True,
         "real_pdf_is_required_for_acquisition": True,
         "verified_pdfs_are_never_deleted_by_catalog_cleanup": True,
+        "persistence_boundary": "catalog is committed back to the protected review branch after successful acquisition/governance persistence",
         "source_discovery": "global worldwide PDF discovery v2",
         "provider_registry_version": "global-worldwide-pdf-v2",
         "providers": [x["name"] for x in PROVIDER_REGISTRY if x["enabled"]],
