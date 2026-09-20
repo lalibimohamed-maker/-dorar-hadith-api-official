@@ -6,6 +6,7 @@ on:
       - '.github/workflows/rechercher-multilingual-pdf-acquisition.yml'
       - 'research/evidence/global-multilingual/**'
       - 'scripts/rechercher_acquire_multilingual_pdfs.mjs'
+      - 'scripts/rechercher_acquire_multilingual_cell_pdfs.mjs'
       - 'scripts/rechercher_validate_multilingual_manifest.mjs'
   schedule:
     - cron: '43 3 * * *'
@@ -66,8 +67,8 @@ jobs:
           qpdf --version
           openssl version
           git lfs version
-      - name: Acquire multilingual resources
-        run: node scripts/rechercher_acquire_multilingual_pdfs.mjs
+      - name: Acquire multilingual matrix-cell books and PDFs
+        run: node scripts/rechercher_acquire_multilingual_cell_pdfs.mjs
       - name: Validate acquired PDFs
         run: |
           set -euo pipefail
@@ -85,7 +86,7 @@ jobs:
           node <<'NODE'
           const fs=require('fs');
           const m=JSON.parse(fs.readFileSync('artifacts/rechercher/multilingual-pdf-acquisition/manifest.json','utf8'));
-          for (const e of Object.values(m.languages)) {
+          for (const e of Object.values(m.cells || m.languages || {})) {
             if (e.acquisition !== 'research-only') continue;
             for (const f of e.files || []) {
               if (f.path.endsWith('.pdf')) f.research_only=true;
@@ -99,7 +100,7 @@ jobs:
             mkdir -p "artifacts/rechercher/multilingual-research-vault/$(dirname "$rel")"
             cp -a "$f" "artifacts/rechercher/multilingual-research-vault/$rel"
             rm -f "$f"
-          done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.languages))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
+          done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.cells || m.languages || {}))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
           echo "RESEARCH_ONLY_STORAGE=PRIVATE_DURABLE_STORAGE_REQUIRED"
 
       - name: Require durable private review storage for restricted PDFs
@@ -111,6 +112,12 @@ jobs:
             exit 1
           fi
           echo "No restricted developer-review PDFs require persistence."
+
+      - name: Verify cell download inventory
+        run: |
+          set -euo pipefail
+          manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+          node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));const cells=m.cells||m.languages||{};if(m.cell_count!==3192||Object.keys(cells).length!==3192)process.exit(1);for(const [id,e] of Object.entries(cells)){if(e.cell_id!==id||!e.language||!e.domain)process.exit(1)};console.log(`CELL_INVENTORY_OK cells=${Object.keys(cells).length} files=${m.total_files}`)' "$manifest"
 
       - name: Reject encrypted review artifacts
         run: |
