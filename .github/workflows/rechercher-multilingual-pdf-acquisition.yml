@@ -151,11 +151,14 @@ jobs:
               if [ "$attempt" -eq 3 ]; then exit 1; fi
               sleep 3
             done
-            git fetch origin main
-            expected="$(git rev-parse HEAD)"
-            actual="$(git rev-parse origin/main)"
+            # Verify the repository that was actually pushed. The workflow checkout
+            # still points at the source repository, so an unqualified fetch here
+            # would compare against the source repository main branch.
+            git -C .matrix-storage fetch origin main
+            expected="$(git -C .matrix-storage rev-parse HEAD)"
+            actual="$(git -C .matrix-storage rev-parse origin/main)"
             test "$expected" = "$actual"
-            git lfs fsck --pointers origin/main
+            git -C .matrix-storage lfs fsck --pointers origin/main
             echo "MATRIX_PDF_STORAGE_POST_PUSH_OK sha=$actual"
           fi
       - name: Upload acquisition manifest
