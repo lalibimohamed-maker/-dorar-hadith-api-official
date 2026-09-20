@@ -78,52 +78,64 @@ const manifest={
 };
 const downloadedUrls=new Set();let processed=0;
 for(const [cellId,r] of cells){
-  const adapter=adapters.get(String(r.provider||'').toLowerCase());
-  if(!adapter||adapter.status!=='enabled')throw new Error(`No enabled source adapter for ${cellId}: ${r.provider}`);
   const rights=rightsForCell(r);
   const acquisition=rights.status===RIGHTS.REDISTRIBUTABLE?'public':(rights.status===RIGHTS.READ_COPY||rights.status===RIGHTS.READ_ONLY?'research-only':'blocked');
+  const primaryId=String(r.provider||'').toLowerCase();
+  const orderedAdapters=[
+    ...(adapters.has(primaryId)?[adapters.get(primaryId)]:[]),
+    ...[...adapters.values()].filter(a=>a.status==='enabled'&&a.id!==primaryId&&Array.isArray(a.kinds)&&a.kinds.some(k=>['pdf','downloads','books'].includes(k)))
+  ];
+  if(!orderedAdapters.length)throw new Error('No enabled PDF-capable source adapters for '+cellId);
   const entry={
-    cell_id:cellId,language:r.language,language_iso:r.language_iso||null,domain:r.domain,provider:adapter.id,
+    cell_id:cellId,language:r.language,language_iso:r.language_iso||null,domain:r.domain,provider:primaryId||orderedAdapters[0].id,
     status:acquisition==='blocked'?'rights-blocked':'no-eligible-pdf-found',sources_checked:[],evidence_urls:[],files:[],
-    rights:rights.status,rights_conflict:rights.conflict,rights_confidence:rights.confidence,rights_evidence:rights.evidence,acquisition
+    rights:rights.status,rights_conflict:rights.conflict,rights_confidence:rights.confidence,rights_evidence:rights.evidence,acquisition,
+    fallback_attempts:orderedAdapters.map(a=>a.id)
   };
-  const candidates=new Set([adapter.base_url]);
+  const evidenceUrls=new Set();
   for(const s of r.stages||[]){
-    if(s.evidence?.url)candidates.add(s.evidence.url);
-    for(const u of s.evidence?.evidence_urls||[])candidates.add(u);
+    if(s.evidence?.url)evidenceUrls.add(s.evidence.url);
+    for(const u of s.evidence?.evidence_urls||[])evidenceUrls.add(u);
   }
-  for(const url of [...candidates].slice(0,8)){
-    const u=allowedUrl(url);if(!u)continue;
-    entry.sources_checked.push({source:adapter.id,url:u.href,role:'cell-evidence'});
-    entry.evidence_urls.push(u.href);
-    try{
-      const p=await get(u.href);if(!p.bytes)continue;
-      const ct=p.contentType||'';
-      let pdfCandidates=[];
-      if(/^application\/pdf(?:\s*;|$)/i.test(ct)||/^%PDF/.test(p.bytes.subarray(0,4).toString()))pdfCandidates=[p.finalUrl||u.href];
-      else pdfCandidates=pdfLinks(p.bytes.toString('utf8'),p.finalUrl||u.href);
-      for(const pdfUrl of pdfCandidates.slice(0,8)){
-        if(downloadedUrls.has(pdfUrl))continue;
-        const d=await probePdf(pdfUrl);
-        if(d&&(d.status<200||d.status>=400))continue;
-        if(d?.contentType&&!/^application\/pdf(?:\s*;|$)/i.test(d.contentType))continue;
-        const dir=path.join(out,safe(String(r.language_iso||r.language)),safe(String(r.domain)),safe(adapter.id));
-        await fs.mkdir(dir,{recursive:true});
-        const parsed=allowedUrl(pdfUrl);if(!parsed)continue;
-        let name=safe(path.basename(parsed.pathname));if(name==='unknown')name=`${safe(cellId)}.pdf`;
-        if(!name.endsWith('.pdf'))name+='.pdf';
-        const file=path.join(dir,name);
-        await downloadPdf(pdfUrl,file);
-        const inspected=await inspectPdfFile(file);
-        if(!inspected.isPdf){await fs.rm(file,{force:true});continue}
-        downloadedUrls.add(pdfUrl);
-        entry.files.push({cell_id:cellId,source:adapter.id,url:pdfUrl,path:path.relative(ROOT,file),bytes:inspected.bytes,sha256:inspected.sha256,content_type:d?.contentType||ct||null,acquisition,rights:rights.status,domain:r.domain,language_iso:r.language_iso||null});
-        if(entry.files.length>=2)break;
-      }
-    }catch(e){
-      entry.source_errors??=[];entry.source_errors.push({source:adapter.id,url:u.href,error:String(e.message||e)});
-    }
+  for(const adapter of orderedAdapters){
     if(entry.files.length>=2)break;
+    const candidates=new Set([adapter.base_url]);
+    for(const url of evidenceUrls){
+      const parsed=allowedUrl(url);
+      if(parsed && ALLOWED_ORIGINS.has(parsed.origin))candidates.add(parsed.href);
+    }
+    for(const url of [...candidates].slice(0,12)){
+      if(entry.files.length>=2)break;
+      const u=allowedUrl(url);if(!u)continue;
+      entry.sources_checked.push({source:adapter.id,url:u.href,role:adapter.id===primaryId?'primary-cell-evidence':'fallback-source'});
+      entry.evidence_urls.push(u.href);
+      try{
+        const p=await get(u.href);if(!p.bytes)continue;
+        const ct=p.contentType||'';
+        let pdfCandidates=[];
+        if(/^application\/pdf(?:\s*;|$)/i.test(ct)||/^%PDF/.test(p.bytes.subarray(0,4).toString()))pdfCandidates=[p.finalUrl||u.href];
+        else pdfCandidates=pdfLinks(p.bytes.toString('utf8'),p.finalUrl||u.href);
+        for(const pdfUrl of pdfCandidates.slice(0,8)){
+          if(entry.files.length>=2||downloadedUrls.has(pdfUrl))continue;
+          const d=await probePdf(pdfUrl);
+          if(d&&(d.status<200||d.status>=400))continue;
+          if(d?.contentType&&!/^application\/pdf(?:\s*;|$)/i.test(d.contentType))continue;
+          const dir=path.join(out,safe(String(r.language_iso||r.language)),safe(String(r.domain)),safe(adapter.id));
+          await fs.mkdir(dir,{recursive:true});
+          const parsed=allowedUrl(pdfUrl);if(!parsed)continue;
+          let name=safe(path.basename(parsed.pathname));if(name==='unknown')name=cellId.replace(/[^a-zA-Z0-9._-]+/g,'-')+'.pdf';
+          if(!name.endsWith('.pdf'))name+='.pdf';
+          const file=path.join(dir,name);
+          await downloadPdf(pdfUrl,file);
+          const inspected=await inspectPdfFile(file);
+          if(!inspected.isPdf){await fs.rm(file,{force:true});continue}
+          downloadedUrls.add(pdfUrl);
+          entry.files.push({cell_id:cellId,source:adapter.id,url:pdfUrl,path:path.relative(ROOT,file),bytes:inspected.bytes,sha256:inspected.sha256,content_type:d?.contentType||ct||null,acquisition,rights:rights.status,domain:r.domain,language_iso:r.language_iso||null});
+        }
+      }catch(e){
+        entry.source_errors??=[];entry.source_errors.push({source:adapter.id,url:u.href,error:String(e.message||e)});
+      }
+    }
   }
   if(entry.files.length)entry.status=acquisition==='research-only'?'research-only-acquired':'acquired';
   manifest.cells[cellId]=entry;
