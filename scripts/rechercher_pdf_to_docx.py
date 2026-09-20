@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse, hashlib, json, os, re, sys, unicodedata, zipfile
 from pathlib import Path
+
+MIN_DOCX_BYTES=4096
 import xml.etree.ElementTree as ET
 import pymupdf
 from docx import Document
@@ -284,7 +286,9 @@ def main():
                 page_source="\n".join(r["text"] for r in regions if r["kind"]=="digital" and not is_table(r)); page_derived=[]; page_derived_digital=[]
                 for r in regions:
                     original=r["text"]; repair=visual_order_candidate(original); text=repair.get("text",original) if repair["applied"] else original
-                    text=sanitize_xml_text(protect_symbols(text)); page_derived.append(text);\n                    if r["kind"]=="digital" and not is_table(r): page_derived_digital.append(text)\n                    add_text(d,text)
+                    text=sanitize_xml_text(protect_symbols(text)); page_derived.append(text)
+                    if r["kind"]=="digital" and not is_table(r): page_derived_digital.append(text)
+                    add_text(d,text)
                     if repair["applied"]: e["text_repair_applied"]=True
                     pi=pua_info(original)
                     if pi["detected"]: e.setdefault("pua",{"detected":True,"codepoints":[]}); e["pua"]["codepoints"]=sorted(set(e["pua"]["codepoints"]+pi["codepoints"]))
@@ -310,9 +314,9 @@ def main():
             if e["mojibake_detected"]: e["review_status"]="review-required"
             if e.get("pua",{}).get("detected"): e["review_status"]="review-required"
             target=out/(pdf.relative_to(inp).with_suffix(".docx")); target.parent.mkdir(parents=True,exist_ok=True); d.save(target)
-            e["derived_docx"]=str(target); e["derived_docx_sha256"]=sha256(target); e["arabic_alignment_verified"]=bool(digital_chars and not e["text_repair_applied"] and not e.get("mojibake_detected",False))
-            e["quality_validation"]={"docx_package":validate_docx(target),"loss_ratio":e["loss_ratio"],"paragraphs":len(d.paragraphs),"xml_safe":validate_docx(target)}
-            if not e["quality_validation"]["docx_package"]: raise ValueError("DOCX package/XML validation failed")
+            if not validate_docx(target): raise ValueError("DOCX post-conversion sanity check failed: package missing, invalid XML, or size below 4 KiB")
+            e["derived_docx"]=str(target); e["derived_docx_bytes"]=target.stat().st_size; e["derived_docx_sha256"]=sha256(target); e["arabic_alignment_verified"]=bool(digital_chars and not e["text_repair_applied"] and not e.get("mojibake_detected",False))
+            e["quality_validation"]={"docx_package":True,"loss_ratio":e["loss_ratio"],"paragraphs":len(d.paragraphs),"xml_safe":True}
             e["status"]="converted"; doc.close()
         except Exception as x: e["error"]=str(x)
         entries.append(e)
