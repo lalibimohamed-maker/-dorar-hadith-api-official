@@ -14,6 +14,7 @@ const allowedOrigins=new Set(registry.adapters.flatMap(a=>a.origins));
 const errors=[];
 const warnings=[];
 const cells=new Map();
+const EXPECTED_MATRIX_CELL_COUNT=3192;
 
 function error(code,detail){errors.push({code,detail});}
 function warning(code,detail){warnings.push({code,detail});}
@@ -29,7 +30,7 @@ for(const [key,entry] of Object.entries(manifest.languages || {})){
   const records=entry.records || [];
   const cellId=entry.cell_id || entry.cellId || entry.matrix_cell_id || records[0]?.cell_id || records[0]?.cellId;
   addCell(cellId,entry);
-  if(!cellId) warning('cell_id_missing',key);
+  if(!cellId) error('cell_id_missing',key);
 
   for(const file of entry.files || []){
     if(!file.url || !file.source) { error('file_provenance_missing',{key,file}); continue; }
@@ -55,10 +56,13 @@ for(const [key,entry] of Object.entries(manifest.languages || {})){
   }
 }
 
+if(manifest.cell_count === undefined) error('cell_count_not_declared','Manifest must declare cell_count=3192.');
 if(manifest.cell_count !== undefined && manifest.cell_count !== cells.size){
   error('cell_count_mismatch',{declared:manifest.cell_count,observed:cells.size});
 }
-if(manifest.cell_count === undefined) warning('cell_count_not_declared','Manifest must declare cell_count when matrix records are available.');
+if(cells.size !== EXPECTED_MATRIX_CELL_COUNT){
+  error('matrix_cell_count_mismatch',{expected:EXPECTED_MATRIX_CELL_COUNT,observed:cells.size});
+}
 if(manifest.language_count !== undefined && manifest.language_count !== Object.keys(manifest.languages||{}).length){
   error('language_count_mismatch',{declared:manifest.language_count,observed:Object.keys(manifest.languages||{}).length});
 }
