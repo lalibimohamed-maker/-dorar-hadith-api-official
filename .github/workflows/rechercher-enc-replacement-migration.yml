@@ -1,0 +1,94 @@
+name: Rechercher — encrypted PDF replacement-first migration
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install PDF validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf
+
+      - name: Locate latest encrypted Rechercher vault
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/encrypted-vault artifacts/developer-review-vault artifacts/governance
+          tag="$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt --jq '[.[] | select(.tagName | startswith("rechercher-vault-"))] | sort_by(.createdAt) | last | .tagName')"
+          if [ -z "${tag:-}" ] || [ "$tag" = "null" ]; then
+            echo '{"status":"NO_VAULT_RELEASE"}' > artifacts/governance/encrypted-replacement-report.json
+            exit 0
+          fi
+          echo "$tag" > artifacts/governance/source-vault-tag.txt
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern '*.pdf.enc' --dir artifacts/encrypted-vault || true
+
+      - name: Search verified PDF replacements
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_enc_replacement_migration.py \
+            --encrypted-root artifacts/encrypted-vault \
+            --pdf-root artifacts/developer-review-vault \
+            --out artifacts/governance/encrypted-replacement-report.json
+          cat artifacts/governance/encrypted-replacement-report.json
+
+      - name: Delete encrypted release assets only after verified replacement exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -s artifacts/governance/source-vault-tag.txt || exit 0
+          tag="$(cat artifacts/governance/source-vault-tag.txt)"
+          python3 - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          r=json.loads(Path("artifacts/governance/encrypted-replacement-report.json").read_text())
+          for rec in r.get("records", []):
+              if rec.get("status") != "replacement_verified" or not rec.get("deletable"):
+                  continue
+              enc=Path(rec["encrypted"]).name
+              if not Path(rec["replacement_pdf"]).is_file():
+                  raise SystemExit(f"replacement missing: {enc}")
+              print(f"DELETING_ENCRYPTED_AFTER_VERIFIED_REPLACEMENT {enc}")
+              subprocess.run(["gh","release","delete-asset",tag,enc,"--repo",__import__("os").environ["GITHUB_REPOSITORY"],"--yes"],check=True)
+          PY
+
+      - name: Persist verified replacements and audit manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git lfs install
+          git lfs track 'artifacts/developer-review-vault/*.pdf'
+          git add scripts/rechercher_enc_replacement_migration.py artifacts/governance artifacts/developer-review-vault .gitattributes
+          if git diff --cached --quiet; then
+            echo 'No verified replacements found.'
+          else
+            git commit -m 'data(rechercher): replace encrypted vault assets only after verified PDF acquisition'
+            git push origin HEAD
+          fi
+
+      - name: Upload migration report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-encrypted-replacement-migration-${{ github.run_id }}
+          path: artifacts/governance/encrypted-replacement-report.json
+          if-no-files-found: warn
+          retention-days: 90
