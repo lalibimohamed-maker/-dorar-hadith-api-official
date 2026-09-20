@@ -7,6 +7,7 @@ import {resolveRights, RIGHTS} from '../src/book-rights-resolver.js';
 
 const ROOT=process.cwd();
 const ledger=path.join(ROOT,'research/evidence/global-multilingual/scientific-ledger.jsonl');
+const sourceRegistry=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/islamic-source-adapters-2026.json'),'utf8'));
 const out=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const languages=new Map();
 for (const line of (await fs.readFile(ledger,'utf8')).split(/\r?\n/)) {
@@ -14,7 +15,7 @@ for (const line of (await fs.readFile(ledger,'utf8')).split(/\r?\n/)) {
   const r=JSON.parse(line);
   languages.set(r.language_iso || r.language, {name:r.language, iso:r.language_iso, records:(languages.get(r.language_iso || r.language)?.records||[]).concat(r)});
 }
-const ALLOWED_ORIGINS=new Set(['https://hadeethenc.com','https://islamhouse.com','https://d1.islamhouse.com','https://quranenc.com','https://quran.com','https://api.quran.com']);
+const ALLOWED_ORIGINS=new Set(sourceRegistry.adapters.flatMap(a=>a.origins));
 function allowedUrl(value){
   let u;
   try { u=new URL(value); } catch { return null; }
@@ -106,7 +107,7 @@ async function probePdf(url){
 }
 function downloadPdf(url,file){
  const u=allowedUrl(url); if(!u) return Promise.reject(new Error('untrusted or disallowed HTTPS origin'));
- const args=['--fail','--silent','--show-error','--location','--max-redirs','0','--proto','=https','--output',file,u.href];
+ const args=['--fail','--silent','--show-error','--location','--proto','=https','--output',file,u.href];
  return new Promise((resolve,reject)=>{
    const p=spawn('curl',args,{stdio:['ignore','ignore','pipe']});
    let err=''; p.stderr.on('data',b=>{err+=b.toString()});
@@ -120,41 +121,62 @@ for(const [key,lang] of languages){
  const acquisition=rights.status===RIGHTS.REDISTRIBUTABLE?'public':(rights.status===RIGHTS.READ_COPY||rights.status===RIGHTS.READ_ONLY?'research-only':'blocked');
  const entry={language:lang.name,iso:lang.iso,status:'no-eligible-pdf-found',sources_checked:[],files:[],rights:rights.status,rights_conflict:rights.conflict,rights_confidence:rights.confidence,rights_evidence:rights.evidence,acquisition};
  if(acquisition==='blocked'){ entry.status='rights-blocked'; summary.languages[key]=entry; continue; }
- const hasH=lang.records.some(r=>{
-   if(r.provider==='hadeethenc') return true;
-   return (r.stages||[]).some(s=>{
-     const u=s.evidence?.url;
-     return typeof u==='string' && Boolean(allowedUrl(u)) && new URL(u).origin==='https://hadeethenc.com';
-   });
- });
- if(!hasH){summary.languages[key]=entry;continue}
  const iso=String(lang.iso||'ar').toLowerCase();
  if(!/^[a-z]{2,3}(?:-[a-z]{2,4})?$/.test(iso)){summary.languages[key]=entry;continue}
- const page='https://hadeethenc.com/'+encodeURIComponent(iso);
- entry.sources_checked.push(page);
- try{
-   const p=await get(page); if(p.bytes){
-     const links=pdfLinks(p.bytes.toString('utf8'),page);
-     for(const url of links.slice(0,32)){
-       const d=await probePdf(url);
+
+ const sourcePages=[];
+ const registered=new Map(sourceRegistry.adapters.map(a=>[a.id,a]));
+ for(const r of lang.records){
+   const id=String(r.provider||r.source_id||'').toLowerCase();
+   const adapter=registered.get(id);
+   if(adapter && adapter.status==='enabled') sourcePages.push({adapter,url:adapter.base_url});
+ }
+ for(const adapter of sourceRegistry.adapters){
+   if(adapter.status!=='enabled') continue;
+   const canProvidePdf=adapter.kinds?.some(k=>['pdf','download','datasets'].includes(k));
+   if(!canProvidePdf) continue;
+   if(sourcePages.some(x=>x.adapter.id===adapter.id)) continue;
+   sourcePages.push({adapter,url:adapter.base_url});
+ }
+
+ for(const {adapter,url:sourceUrl} of sourcePages){
+   entry.sources_checked.push({source:adapter.id,url:sourceUrl,role:adapter.authority||adapter.source_role||'islamic-source'});
+   try{
+     const p=await get(sourceUrl);
+     if(!p.bytes) continue;
+     const links=pdfLinks(p.bytes.toString('utf8'),sourceUrl);
+     for(const pdfUrl of links.slice(0,32)){
+       const d=await probePdf(pdfUrl);
        if(d && (d.status < 200 || d.status >= 400)) continue;
        if(d?.contentType && !/^application\/pdf(?:\s*;|$)/i.test(d.contentType)) continue;
-       const dir=path.join(out,safe(iso)); await fs.mkdir(dir,{recursive:true});
-       const parsed=allowedUrl(url); if(!parsed) continue;
+       const dir=path.join(out,safe(iso),safe(adapter.id)); await fs.mkdir(dir,{recursive:true});
+       const parsed=allowedUrl(pdfUrl); if(!parsed) continue;
        const name=safe(path.basename(parsed.pathname)); if(name==='unknown') continue;
        const file=path.join(dir,name);
        const resolved=path.resolve(file);
        if(!resolved.startsWith(path.resolve(dir)+path.sep)) continue;
-       await downloadPdf(url,resolved);
+       await downloadPdf(pdfUrl,resolved);
        const inspected=await inspectPdfFile(resolved);
        if(!inspected.isPdf){
          await fs.rm(resolved,{force:true});
          continue;
        }
-       entry.files.push({url,path:path.relative(ROOT,resolved),bytes:inspected.bytes,sha256:inspected.sha256,content_type:d?.contentType || null,acquisition,rights:rights.status});
+       entry.files.push({
+         source:adapter.id,
+         url:pdfUrl,
+         path:path.relative(ROOT,resolved),
+         bytes:inspected.bytes,
+         sha256:inspected.sha256,
+         content_type:d?.contentType||null,
+         acquisition,
+         rights:rights.status
+       });
      }
+   }catch(e){
+     entry.source_errors ??= [];
+     entry.source_errors.push({source:adapter.id,error:String(e.message||e)});
    }
- }catch(e){entry.error=String(e.message||e)}
+ }
  if(entry.files.length) entry.status=acquisition==='research-only'?'research-only-acquired':'acquired';
  summary.languages[key]=entry;
 }
