@@ -185,5 +185,17 @@ jobs:
             books-batches/salaf-01-400h/master-discovery-additions-2026.json \
             books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
           git diff --cached --quiet || git commit -m 'data(rechercher): reconcile acquire-first state and discovery memory'
+          # Checkout disables persisted credentials, so explicitly provide the workflow token
+          # to the final review-branch push. Never allow an interactive credential prompt.
+          cat > "$RUNNER_TEMP/rechercher-review-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$GITHUB_TOKEN" ;;
+            *) printf '%s\n' "$GITHUB_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/rechercher-review-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-review-askpass" GIT_TERMINAL_PROMPT=0
           git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           echo "ACQUIRE_FIRST_PERSISTED=$ACQ_COMMIT"
