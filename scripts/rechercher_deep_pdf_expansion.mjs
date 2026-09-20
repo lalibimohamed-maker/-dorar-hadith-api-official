@@ -20,6 +20,8 @@ const missing=rows.filter(r=>!(cells[r.cell_id]?.files||[]).length);
 console.log(`DEEP_EXPANSION_TARGET cells=${missing.length}/3192`);
 
 const routes=[
+ {id:'islamhouse_api',origin:'https://api3.islamhouse.com',url:(r)=>{const k=process.env.ISLAMHOUSE_API_KEY;if(!k)return null;const lang=r.language_iso||'en';return 'https://api3.islamhouse.com/v3/'+encodeURIComponent(k)+'/main/books/'+lang+'/'+lang+'/1/50/json'}},
+ {id:'islamhouse_catalog',origin:'https://islamhouse.com',url:(r)=>'https://islamhouse.com/'+(r.language_iso||'en')+'/books/'+(r.language_iso||'en')+'/1'},
  {id:'internet_archive',origin:'https://archive.org',url:(r)=>`https://archive.org/advancedsearch.php?q=${encodeURIComponent(`${r.language} Islamic ${r.domain.replaceAll('_',' ')}`)}&fl[]=identifier&fl[]=title&fl[]=description&fl[]=format&fl[]=rights&rows=20&page=1&output=json`},
  {id:'openlibrary',origin:'https://openlibrary.org',url:(r)=>`https://openlibrary.org/search.json?q=${encodeURIComponent(`${r.language} Islamic ${r.domain.replaceAll('_',' ')}`)}&limit=20`},
  {id:'loc',origin:'https://www.loc.gov',url:(r)=>`https://www.loc.gov/books/?q=${encodeURIComponent(`${r.language} Islamic ${r.domain.replaceAll('_',' ')}`)}&fo=json&c=20`},
@@ -27,6 +29,7 @@ const routes=[
  {id:'dpla',origin:'https://api.dp.la',url:(r)=>`https://api.dp.la/v2/items?q=${encodeURIComponent(`${r.language} Islamic ${r.domain.replaceAll('_',' ')}`)}&page_size=20`}
 ];
 const origins=new Set(routes.map(x=>x.origin));
+origins.add('https://d1.islamhouse.com');
 function allow(raw){try{const u=new URL(raw);return u.protocol==='https:'&&origins.has(u.origin)?u:null}catch{return null}}
 async function get(url){
  const u=allow(url); if(!u) return null;
@@ -45,6 +48,35 @@ function links(text,base){
   seen.add(u.href);out.push(u.href);
  } return out;
 }
+
+function islamHouseApiPdfLinks(json,lang){
+ const out=[]; const seen=new Set();
+ const walk=v=>{if(!v||typeof v!=='object')return; if(Array.isArray(v)){for(const x of v)walk(x);return;}
+  if(v.api_url&&/get-item\\//i.test(String(v.api_url))&&v.id){out.push({itemId:v.id,api:String(v.api_url)});}
+  if(v.url&&/\\.pdf(?:[?#]|$)/i.test(String(v.url))&&!seen.has(v.url)){seen.add(v.url);out.push({url:v.url});}
+  if(v.file_url&&/\\.pdf(?:[?#]|$)/i.test(String(v.file_url))&&!seen.has(v.file_url)){seen.add(v.file_url);out.push({url:v.file_url});}
+  for(const x of Object.values(v))walk(x);
+ }; walk(json); return out;
+}
+async function islamHousePdfLinks(page,target,r){
+ const out=[];
+ if(target.startsWith('https://api3.islamhouse.com')){
+  let j; try{j=JSON.parse(page.bytes.toString('utf8'))}catch{return out}
+  const candidates=islamHouseApiPdfLinks(j,r.language_iso||'en');
+  for(const x of candidates.slice(0,15)){
+   if(x.url){out.push(x.url);continue}
+   const lang=r.language_iso||'en'; const u='https://api3.islamhouse.com/v3/'+encodeURIComponent(process.env.ISLAMHOUSE_API_KEY||'')+'/main/get-item/'+x.itemId+'/'+lang+'/json';
+   const detail=await get(u); if(!detail)continue;
+   for(const a of islamHouseApiPdfLinks(JSON.parse(detail.bytes.toString('utf8')),lang)) if(a.url) out.push(a.url);
+  }
+ } else {
+  const html=page.bytes.toString('utf8');
+  const hrefs=[]; const re=/href=["']([^"']+)["']/gi; let m;
+  while((m=re.exec(html))){try{const u=new URL(m[1],page.finalUrl||target);if(u.origin==='https://islamhouse.com'&&u.pathname.includes('/book/')&&!hrefs.includes(u.href))hrefs.push(u.href)}catch{}}
+  for(const u of hrefs.slice(0,15)){const detail=await get(u);if(detail)out.push(...links(detail.bytes.toString('utf8'),detail.finalUrl||u));}
+ }
+ return [...new Set(out)];
+}
 function explicitRights(text){
  return /public domain|creative commons|cc[- ]by|cc0|open access|free download|publicly available|redistribut/i.test(text);
 }
@@ -55,10 +87,10 @@ for(const r of missing){
  const e={cell_id:r.cell_id,language:r.language,language_iso:r.language_iso||null,domain:r.domain,status:'no-pdf-found',sources_checked:[],files:[],policy:'deep discovery; no canonical corpus writes'};
  for(const route of routes){
   if(e.files.length>=2) break;
-  const target=route.url(r); e.sources_checked.push({source:route.id,url:target});
+  const target=route.url(r); e.sources_checked.push({source:route.id,url:target,enabled:!!target}); if(!target) continue;
   const page=await get(target); if(!page||!page.bytes) continue;
   const text=page.bytes.toString('utf8');
-  const candidates=links(text,page.finalUrl||target);
+  const candidates=route.id.startsWith('islamhouse_')?await islamHousePdfLinks(page,target,r):links(text,page.finalUrl||target);
   for(const pdfUrl of candidates.slice(0,12)){
    if(e.files.length>=2) break;
    const dir=path.join(out,safe(r.language_iso||r.language),safe(r.domain),safe(route.id));
