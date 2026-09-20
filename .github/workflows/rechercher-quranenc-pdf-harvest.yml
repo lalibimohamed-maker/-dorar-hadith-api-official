@@ -1,0 +1,62 @@
+name: Rechercher QuranEnc multilingual PDF harvest
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/rechercher-global-multilingual-resource-discovery-v9]
+    paths:
+      - scripts/rechercher_quranenc_pdf_harvester.mjs
+      - .github/workflows/rechercher-quranenc-pdf-harvest.yml
+  schedule:
+    - cron: '17 5 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-quranenc-pdf-harvest
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: Setup Node 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+
+      - name: Install qpdf
+        run: sudo apt-get update && sudo apt-get install -y qpdf
+
+      - name: Harvest QuranEnc PDFs
+        run: node scripts/rechercher_quranenc_pdf_harvester.mjs
+
+      - name: Validate harvested PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          count=0
+          for file in artifacts/rechercher/multilingual-deep-pdf-expansion/**/*.pdf; do
+            test "$(head -c 4 "$file")" = '%PDF'
+            qpdf --check "$file"
+            count=$((count + 1))
+          done
+          echo "QURANENC_VALIDATED_PDFS=$count"
+
+      - name: Upload QuranEnc harvest manifest and PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: rechercher-quranenc-multilingual-pdfs-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            artifacts/rechercher/multilingual-deep-pdf-expansion/quranenc-manifest.json
+            artifacts/rechercher/multilingual-deep-pdf-expansion/*/quran/quranenc/*.pdf
