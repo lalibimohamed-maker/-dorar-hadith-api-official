@@ -12,7 +12,7 @@ test('structural PDF to DOCX emits provenance and preserves source',async()=>{
  const before=await fs.readFile(pdf);
  await run('python3',['scripts/rechercher_pdf_to_docx.py','--input',input,'--output',output,'--manifest',manifest],process.cwd());
  assert.deepEqual(await fs.readFile(pdf),before);
- const m=JSON.parse(await fs.readFile(manifest,'utf8'));assert.equal(m.schema,'rechercher/pdf-to-docx/v2');assert.equal(m.converted,1);assert.equal(m.failed,0);
+ const m=JSON.parse(await fs.readFile(manifest,'utf8'));assert.equal(m.schema,'rechercher/pdf-to-docx/v3');assert.equal(m.converted,1);assert.equal(m.failed,0);
  const d=await fs.readFile(path.join(output,'arabic.docx'));assert.equal(d.subarray(0,2).toString(),'PK');assert.ok(d.includes(Buffer.from('word/document.xml')));
  await fs.rm(root,{recursive:true,force:true});
 });
