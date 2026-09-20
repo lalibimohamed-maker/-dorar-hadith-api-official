@@ -299,7 +299,7 @@ def main():
             if digital_chars==0 and image_pages: kind="scanned"
             elif hybrid_pages or (image_pages and digital_chars): kind="hybrid"
             else: kind="digital-native"
-            e.update(pdf_kind=kind,source_char_count=digital_chars,derived_char_count=derived_chars,derived_digital_char_count=len(derived_digital),page_statistics=pstats,tessdata=tessdata,table_metrics=table_metrics)
+            e.update(pdf_kind=kind,source_char_count=digital_chars,derived_char_count=derived_chars,derived_digital_char_count=len(derived_digital),page_statistics=pstats,vector_fallback_pages=vector_pages,tessdata=tessdata,table_metrics=table_metrics)
             if digital_chars:
                 e["loss_ratio"]=levenshtein_ratio(source_digital,derived_digital)
                 e["comparison_mode"]="normalized-levenshtein"
