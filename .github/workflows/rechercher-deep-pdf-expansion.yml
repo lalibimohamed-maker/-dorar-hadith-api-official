@@ -48,6 +48,7 @@ jobs:
       - name: Deep search missing cells
         env:
           PREVIOUS_MANIFEST: ${{ runner.temp }}/matrix/artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+          ISLAMHOUSE_API_KEY: ${{ secrets.ISLAMHOUSE_API_KEY }}
         run: node scripts/rechercher_deep_pdf_expansion.mjs
       - name: Validate PDFs
         run: |
