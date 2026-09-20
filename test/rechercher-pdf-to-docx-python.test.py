@@ -28,3 +28,10 @@ def test_table_extraction_fallback_is_available():
         def find_tables(self, **kwargs):
             return Finder()
     assert mod.table_bboxes(Page()) == []
+
+if __name__ == "__main__":
+    test_diacritics_are_ignored_only_for_loss_comparison()
+    test_known_ligatures_are_preserved()
+    test_ocr_thread_limit_is_bounded()
+    test_table_extraction_fallback_is_available()
+    print("python PDF-DOCX regression tests: OK")
