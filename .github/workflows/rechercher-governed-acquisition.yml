@@ -3,6 +3,7 @@ name: Rechercher — Central governed PDF acquisition
 # One central downloader for the WHOLE encyclopedia.
 # Storage rule: verified real PDFs are persistent GitHub Release assets.
 # Git LFS is NOT used for PDF persistence. Each release shard contains <=950 PDF assets.
+# security-justification: contents: write is required to publish only verified real-PDF release assets and persist their SHA-256 governance manifest; it does not modify the Corpus.
 permissions:
   contents: write
 
