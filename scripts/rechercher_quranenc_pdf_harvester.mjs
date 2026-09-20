@@ -7,11 +7,11 @@ import { spawn } from 'node:child_process';
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'artifacts/rechercher/multilingual-deep-pdf-expansion');
 const BASE = 'https://quranenc.com';
-const LANGS = ['ar','en','fr','ru','ur','es','id','tr','bn','zh','fa','pt','de','nl','it','ja','ko','vi','sw','so','ha','ms','tl','th','ta','te','ml','kn','gu','mr','pa','as','si','ku','ps','ug','az','uz','kk','ky','tg','tk','sq','bs','sr','bg','ro','hu','cs','sk','uk','el','sv','da','no','fi','am','yo','wo','ff','rw','ln','mg','my','km','ne','prs','ku'];
+const LANGS = ['ar','en','fr','de','es','pt','it','nl','tr','bs','id','tl','sq','bn','ur','fa','vi','zh','ja','ug','hi','si','as','ta','te','ps','ml','ha','ku','nqo','km','uz','ne','rw','ff','az','th','gu','am','lt','kn','da','ka','my','prs','mk','pl','mos','pa','ak','ky','ln','ny','so','sw','om','uk','sv','kbd','sn','sr','tg','aa','hr','ko','lo','mr','yao','yo','ber','bg','ca','cs','cy','el','eo','et','eu','fi','fil','ga','gl','he','hu','hy','is','jv','kk','la','lv','mg','mn','ms','mt','no','or','ro','ru','sk','sl','sm','st','su','tgl','ti','tk','tt','xh','yi','zu','af','be','ceb','co','fy','gd','haw','hmn','ht','ig','jw','lb','mi','nya','sd','smo','snd','stq','sun','tat','xho','zul','ch'];
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const safe = value => String(value || 'unknown').replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'unknown';
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-const pdfRe = /https?:\\/\\/[^\\s"'<>]+?\\.pdf(?:[?#][^\\s"'<>]*)?/gi;
+const pdfRe = /https?:\/\/[^\s"'<>]+?\.pdf(?:[?#][^\s"'<>]*)?/gi;
 
 async function get(url) {
   for (let attempt = 0; attempt < 4; attempt++) {
@@ -19,7 +19,7 @@ async function get(url) {
       const response = await fetch(url, { redirect: 'follow', headers: { 'user-agent': 'DinAllah-Rechercher/2.2', accept: 'text/html,application/json,application/pdf;q=0.9,*/*;q=0.1' } });
       const bytes = Buffer.from(await response.arrayBuffer());
       if (response.status === 429) { await sleep(1500 * (attempt + 1)); continue; }
-      return { status: response.status, bytes, finalUrl: response.url, contentType: response.headers.get('content-type') || '' };
+      return { status: response.status, bytes, finalUrl: response.url };
     } catch { if (attempt === 3) return null; await sleep(800 * (attempt + 1)); }
   }
   return null;
@@ -30,7 +30,7 @@ function extractPdfLinks(text, base) {
   for (const match of text.matchAll(pdfRe)) found.add(match[0].replaceAll('&amp;', '&'));
   const href = /(?:href|data-href|data-url)=["']([^"']+)["']/gi;
   for (const match of text.matchAll(href)) {
-    try { const url = new URL(match[1], base); if (/\\.pdf(?:[?#]|$)/i.test(url.href)) found.add(url.href); } catch {}
+    try { const url = new URL(match[1], base); if (/\.pdf(?:[?#]|$)/i.test(url.href)) found.add(url.href); } catch {}
   }
   return [...found];
 }
@@ -44,7 +44,7 @@ async function download(url, destination) {
 }
 
 await fs.mkdir(OUT, { recursive: true });
-const manifest = { schema: 'rechercher/quranenc-pdf-harvest/v1', generated_at: new Date().toISOString(), languages: LANGS, api: `${BASE}/api/v1/translations/list`, total_files: 0, files: [], translation_records: [], errors: [] };
+const manifest = { schema: 'rechercher/quranenc-pdf-harvest/v2', generated_at: new Date().toISOString(), languages: LANGS, api: `${BASE}/api/v1/translations/list`, total_files: 0, files: [], translation_records: [], errors: [] };
 
 for (const lang of LANGS) {
   const translationApi = `${BASE}/api/v1/translations/list/${lang}/?localization=${lang}`;
