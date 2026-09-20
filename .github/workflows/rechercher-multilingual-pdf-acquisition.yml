@@ -89,7 +89,10 @@ jobs:
           for (const e of Object.values(m.cells || m.languages || {})) {
             if (e.acquisition !== 'research-only') continue;
             for (const f of e.files || []) {
-              if (f.path.endsWith('.pdf')) f.research_only=true;
+              if (!f.path.endsWith('.pdf')) continue;
+              const rel=f.path.replace(/^artifacts\/rechercher\/multilingual-pdf-acquisition\//,'');
+              f.path='artifacts/rechercher/multilingual-research-vault/'+rel;
+              f.research_only=true;
             }
           }
           fs.writeFileSync('artifacts/rechercher/multilingual-pdf-acquisition/manifest.json', JSON.stringify(m,null,2)+'\n');
