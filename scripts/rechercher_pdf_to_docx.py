@@ -6,6 +6,9 @@ import pymupdf
 from docx import Document
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_TABLE_ALIGNMENT, WD_CELL_VERTICAL_ALIGNMENT
+from docx.shared import Inches
 from bidi.algorithm import get_display
 import arabic_reshaper
 
@@ -156,43 +159,87 @@ def table_bboxes(page):
     except Exception:
         return []
 
-def page_regions(page,tessdata):
-    data=page.get_text("dict")
-    blocks=data.get("blocks",[])
+def _extract_text_blocks(page, sort=True):
+    data=page.get_text("dict",sort=sort)
     text_blocks=[]; image_blocks=[]
-    for b in blocks:
+    for b in data.get("blocks",[]):
         bbox=tuple(b.get("bbox",(0,0,0,0)))
         if b.get("type")==0:
             text="\n".join("".join(span.get("text","") for span in line.get("spans",[])) for line in b.get("lines",[])).strip()
             if text: text_blocks.append({"bbox":bbox,"text":text,"kind":"digital"})
         elif b.get("type")==1:
             image_blocks.append({"bbox":bbox,"kind":"image"})
+    return text_blocks,image_blocks
+
+def _order_blocks_reading(blocks,page_width):
+    if len(blocks)<2: return blocks
+    xs=sorted(set(round(b["bbox"][0],1) for b in blocks))
+    gaps=[xs[i+1]-xs[i] for i in range(len(xs)-1)]
+    threshold=max(18.0,page_width*0.045)
+    candidates=[g for g in gaps if g>=threshold]
+    if not candidates: return sorted(blocks,key=lambda b:(b["bbox"][1],b["bbox"][0]))
+    split=max(candidates); cut=xs[gaps.index(split)+1]
+    left=[b for b in blocks if b["bbox"][0]<cut]; right=[b for b in blocks if b["bbox"][0]>=cut]
+    if not left or not right: return sorted(blocks,key=lambda b:(b["bbox"][1],b["bbox"][0]))
+    coverage=lambda g:(max(b["bbox"][2] for b in g)-min(b["bbox"][0] for b in g))/max(1,page_width)
+    if min(coverage(left),coverage(right))<0.22:
+        return sorted(blocks,key=lambda b:(b["bbox"][1],b["bbox"][0]))
+    # Arabic layout: finish the right column top-to-bottom, then the left column.
+    return [b for col in (sorted(right,key=lambda b:(b["bbox"][1],-b["bbox"][0])),
+                          sorted(left,key=lambda b:(b["bbox"][1],-b["bbox"][0]))) for b in col]
+
+def _set_row_cant_split(row):
+    trPr=row._tr.get_or_add_trPr()
+    if trPr.find(qn("w:cantSplit")) is None: trPr.append(OxmlElement("w:cantSplit"))
+
+def _configure_table(tbl,cols):
+    tbl.autofit=False; tbl.alignment=WD_TABLE_ALIGNMENT.RIGHT
+    width=max(1.0,6.5/max(1,cols))
+    for row in tbl.rows:
+        _set_row_cant_split(row)
+        for cell in row.cells:
+            cell.width=Inches(width); cell.vertical_alignment=WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            for para in cell.paragraphs:
+                para.alignment=WD_ALIGN_PARAGRAPH.RIGHT; set_rtl(para,True)
+                for run in para.runs: set_font(run,"Amiri")
+
+def page_regions(page,tessdata):
+    text_blocks,image_blocks=_extract_text_blocks(page,sort=True)
+    drawings=page.get_drawings()
+    vector_fallback=not text_blocks and not image_blocks and bool(drawings)
     out=list(text_blocks); ocr_count=0
-    if image_blocks:
+    if image_blocks or vector_fallback:
         try:
-            tp=page.get_textpage_ocr(language=os.environ.get("RECHERCHER_OCR_LANG","ara"),dpi=int(os.environ.get("RECHERCHER_OCR_DPI","200")),full=False,tessdata=tessdata)
-            ocr_data=page.get_text("dict",textpage=tp)
+            tp=page.get_textpage_ocr(language=os.environ.get("RECHERCHER_OCR_LANG","ara"),
+                                     dpi=int(os.environ.get("RECHERCHER_OCR_DPI","200")),
+                                     full=vector_fallback,tessdata=tessdata)
+            ocr_data=page.get_text("dict",textpage=tp,sort=True)
             for b in ocr_data.get("blocks",[]):
                 if b.get("type")!=0: continue
                 bbox=tuple(b.get("bbox",(0,0,0,0)))
                 text="\n".join("".join(span.get("text","") for span in line.get("spans",[])) for line in b.get("lines",[])).strip()
                 fonts=[span.get("font","") for line in b.get("lines",[]) for span in line.get("spans",[])]
-                if not text or not any("GlyphLessFont" in f for f in fonts): continue
-                if any(bbox_overlap(bbox,t["bbox"])>0.65 for t in text_blocks): continue
-                out.append({"bbox":bbox,"text":text,"kind":"ocr"}); ocr_count+=1
+                if not text or (not vector_fallback and not any("GlyphLessFont" in f for f in fonts)): continue
+                if not vector_fallback and any(bbox_overlap(bbox,t["bbox"])>0.65 for t in text_blocks): continue
+                out.append({"bbox":bbox,"text":text,"kind":"ocr-vector" if vector_fallback else "ocr"}); ocr_count+=1
         except Exception:
             pass
-    out.sort(key=lambda x:(round(x["bbox"][1]/6),-x["bbox"][0]))
-    return out,ocr_count,len(text_blocks),len(image_blocks)
+    return _order_blocks_reading(out,page.rect.width),ocr_count,len(text_blocks),len(image_blocks),vector_fallback
+
 def validate_docx(path):
-    if not zipfile.is_zipfile(path): return False
-    with zipfile.ZipFile(path) as z:
-        names=set(z.namelist())
-        required={"[Content_Types].xml","word/document.xml"}
-        if not required.issubset(names): return False
-        for n in required:
-            ET.fromstring(z.read(n))
-    return True
+    try:
+        p=Path(path)
+        if not p.is_file() or p.stat().st_size < MIN_DOCX_BYTES: return False
+        if not zipfile.is_zipfile(p): return False
+        with zipfile.ZipFile(p) as z:
+            names=set(z.namelist())
+            required={"[Content_Types].xml","word/document.xml"}
+            if not required.issubset(names): return False
+            for n in required: ET.fromstring(z.read(n))
+            ET.fromstring(z.read("word/document.xml"))
+        return True
+    except (OSError, zipfile.BadZipFile, ET.ParseError):
+        return False
 
 def main():
     ap=argparse.ArgumentParser()
@@ -205,7 +252,7 @@ def main():
                 e.update(status="deferred-large-file",reason=f"input exceeds {MAX_INPUT_MB} MiB"); entries.append(e); continue
             e["source_pdf_sha256"]=sha256(pdf); doc=pymupdf.open(pdf); d=Document(); configure_styles(d); tessdata=configure_ocr_environment(); all_source=[]; all_derived=[]; all_derived_digital=[]; table_metrics=[]; pstats=[]
             for page_no,page in enumerate(doc,1):
-                regions,oc,dc,ic=page_regions(page,tessdata)
+                regions,oc,dc,ic,vector_fallback=page_regions(page,tessdata)
                 tables=table_bboxes(page)
                 for table in tables:
                     rows=table.extract()
@@ -224,6 +271,7 @@ def main():
                                 set_rtl(para,is_ar)
                                 for run in para.runs:
                                     set_font(run,"Amiri" if is_ar else "Arial")
+                    _configure_table(tbl,cols)
                     table_metrics.append({
                         "page":page_no,
                         "bbox":[float(x) for x in table.bbox],
@@ -241,8 +289,9 @@ def main():
                     pi=pua_info(original)
                     if pi["detected"]: e.setdefault("pua",{"detected":True,"codepoints":[]}); e["pua"]["codepoints"]=sorted(set(e["pua"]["codepoints"]+pi["codepoints"]))
                 all_source.append(page_source); all_derived.append("\n".join(page_derived)); all_derived_digital.append("\n".join(page_derived_digital))
-                pstats.append({"page":page_no,"digital_blocks":dc,"image_blocks":ic,"ocr_blocks":oc,"ocr_used":oc>0})
+                pstats.append({"page":page_no,"digital_blocks":dc,"image_blocks":ic,"ocr_blocks":oc,"ocr_used":oc>0,"vector_fallback":vector_fallback})
                 e["ocr_used"]=e["ocr_used"] or oc>0
+                if vector_fallback: e["sacred_text_flag"]="requires_review"; e["review_status"]="review-required"
             source_digital="\n".join(all_source); derived_text="\n".join(all_derived); derived_digital="\n".join(all_derived_digital)
             digital_chars=len(source_digital); derived_chars=len(derived_text)
             image_pages=sum(1 for x in pstats if x["image_blocks"] and x["digital_blocks"]==0)
