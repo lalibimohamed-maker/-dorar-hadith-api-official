@@ -6,6 +6,7 @@ on:
       - '.github/workflows/rechercher-multilingual-pdf-acquisition.yml'
       - 'research/evidence/global-multilingual/**'
       - 'scripts/rechercher_acquire_multilingual_pdfs.mjs'
+      - 'scripts/rechercher_validate_multilingual_manifest.mjs'
   schedule:
     - cron: '43 3 * * *'
 permissions:
@@ -161,6 +162,11 @@ jobs:
             git -C .matrix-storage lfs fsck --pointers origin/main
             echo "MATRIX_PDF_STORAGE_POST_PUSH_OK sha=$actual"
           fi
+      - name: Strict multilingual manifest gate
+        run: |
+          set -euo pipefail
+          node scripts/rechercher_validate_multilingual_manifest.mjs artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+
       - name: Upload acquisition manifest
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
