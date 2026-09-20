@@ -205,13 +205,15 @@ def _configure_table(tbl,cols):
                 para.alignment=WD_ALIGN_PARAGRAPH.RIGHT; set_rtl(para,True)
                 for run in para.runs: set_font(run,"Amiri")
 
-def page_regions(page,tessdata):
+def page_regions(page,tessdata=None):
     text_blocks,image_blocks=_extract_text_blocks(page,sort=True)
     drawings=page.get_drawings()
     vector_fallback=not text_blocks and not image_blocks and bool(drawings)
     out=list(text_blocks); ocr_count=0
     if image_blocks or vector_fallback:
         try:
+            if tessdata is None:
+                tessdata=configure_ocr_environment()
             tp=page.get_textpage_ocr(language=os.environ.get("RECHERCHER_OCR_LANG","ara"),
                                      dpi=int(os.environ.get("RECHERCHER_OCR_DPI","200")),
                                      full=vector_fallback,tessdata=tessdata)
@@ -252,9 +254,11 @@ def main():
         try:
             if pdf.stat().st_size>MAX_INPUT_MB*1048576:
                 e.update(status="deferred-large-file",reason=f"input exceeds {MAX_INPUT_MB} MiB"); entries.append(e); continue
-            e["source_pdf_sha256"]=sha256(pdf); doc=pymupdf.open(pdf); d=Document(); configure_styles(d); tessdata=configure_ocr_environment(); all_source=[]; all_derived=[]; all_derived_digital=[]; table_metrics=[]; pstats=[]
+            e["source_pdf_sha256"]=sha256(pdf); doc=pymupdf.open(pdf); d=Document(); configure_styles(d); tessdata=None; all_source=[]; all_derived=[]; all_derived_digital=[]; table_metrics=[]; pstats=[]
             for page_no,page in enumerate(doc,1):
                 regions,oc,dc,ic,vector_fallback=page_regions(page,tessdata)
+                if oc>0 and tessdata is None:
+                    tessdata=discover_tessdata()
                 tables=table_bboxes(page)
                 for table in tables:
                     rows=table.extract()
