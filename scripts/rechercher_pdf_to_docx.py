@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse, hashlib, json, os, re, subprocess, sys, unicodedata, zipfile
+import argparse, hashlib, json, os, re, sys, unicodedata, zipfile
 from pathlib import Path
 import xml.etree.ElementTree as ET
 import pymupdf
@@ -10,6 +10,7 @@ from bidi.algorithm import get_display
 import arabic_reshaper
 
 ARABIC_RE=re.compile(r"[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]")
+ARABIC_DIACRITICS_RE=re.compile(r"[\u0610-\u061a\u064b-\u065f\u0670\u06d6-\u06ed]")
 PUA_RE=re.compile(r"[\ue000-\uf8ff\U000f0000-\U000ffffd\U00100000-\U0010fffd]")
 MOJIBAKE_RE=re.compile(r"(?:Ã.|Ø.|Ù.|â€|ï»¿|�)")
 MAX_INPUT_MB=int(os.environ.get("RECHERCHER_PDF_DOCX_MAX_MB","50"))
@@ -37,6 +38,7 @@ def pua_info(s):
 def norm_for_compare(s):
     s=protect_symbols(s)
     s=unicodedata.normalize("NFC",s)
+    s=ARABIC_DIACRITICS_RE.sub("",s)
     s=re.sub(r"\s+"," ",s).strip()
     return s
 
@@ -91,30 +93,70 @@ def set_font(r,name):
     if rf is None: rf=OxmlElement("w:rFonts"); rPr.append(rf)
     for a in ("ascii","hAnsi","cs","eastAsia"): rf.set(qn("w:"+a),name)
 
+def configure_styles(d):
+    normal=d.styles["Normal"]
+    normal.font.name="Arial"
+    normal._element.rPr.rFonts.set(qn("w:ascii"),"Arial")
+    normal._element.rPr.rFonts.set(qn("w:hAnsi"),"Arial")
+    normal._element.rPr.rFonts.set(qn("w:eastAsia"),"Arial")
+    normal._element.rPr.rFonts.set(qn("w:cs"),"Amiri")
+    try:
+        arabic=d.styles["Rechercher Arabic"]
+    except KeyError:
+        arabic=d.styles.add_style("Rechercher Arabic",1)
+    arabic.font.name="Amiri"
+    arabic._element.rPr.rFonts.set(qn("w:ascii"),"Arial")
+    arabic._element.rPr.rFonts.set(qn("w:hAnsi"),"Arial")
+    arabic._element.rPr.rFonts.set(qn("w:eastAsia"),"Arial")
+    arabic._element.rPr.rFonts.set(qn("w:cs"),"Amiri")
+
+def discover_tessdata():
+    candidates=[]
+    env=os.environ.get("TESSDATA_PREFIX")
+    if env: candidates.append(Path(env))
+    try:
+        detected=pymupdf.get_tessdata()
+        if detected: candidates.append(Path(detected))
+    except Exception:
+        pass
+    candidates += [Path("/usr/share/tesseract-ocr/5/tessdata"),
+                   Path("/usr/share/tesseract-ocr/4.00/tessdata"),
+                   Path("/usr/share/tesseract/tessdata"),
+                   Path("/usr/share/tessdata")]
+    for p in candidates:
+        if (p/"ara.traineddata").is_file():
+            os.environ["TESSDATA_PREFIX"]=str(p)
+            return str(p)
+    raise RuntimeError("Arabic Tesseract data not found: ara.traineddata")
+
+def configure_ocr_environment():
+    tessdata=discover_tessdata()
+    os.environ.setdefault("OMP_THREAD_LIMIT",os.environ.get("RECHERCHER_OCR_THREADS","1"))
+    return tessdata
+
 def add_text(d,text):
     text=sanitize_xml_text(protect_symbols(text))
     if not text.strip(): return
     p=d.add_paragraph(); ar=bool(ARABIC_RE.search(text)); set_rtl(p,ar)
-    r=p.add_run(text); set_font(r,"Amiri" if ar else "Liberation Serif")
+    r=p.add_run(text); set_font(r,"Amiri" if ar else "Arial")
 
 def bbox_overlap(a,b):
     ax0,ay0,ax1,ay1=a; bx0,by0,bx1,by1=b
     ix=max(0,min(ax1,bx1)-max(ax0,bx0)); iy=max(0,min(ay1,by1)-max(ay0,by0))
     return ix*iy/max(1,(ax1-ax0)*(ay1-ay0))
 
-def ocr_image_block(page,bbox):
-    pix=page.get_pixmap(matrix=pymupdf.Matrix(2,2),clip=pymupdf.Rect(*bbox),alpha=False)
-    import tempfile
-    with tempfile.TemporaryDirectory(prefix="rechercher-ocr-") as td:
-        img=Path(td)/"region.png"; pix.save(img)
-        cmd=["tesseract",str(img),"stdout","-l",os.environ.get("RECHERCHER_OCR_LANG","ara"),"--psm","6"]
-        try:
-            p=subprocess.run(cmd,text=True,capture_output=True,check=True,timeout=180)
-            return p.stdout.strip()
-        except Exception:
-            return ""
+def table_bboxes(page):
+    try:
+        finder=page.find_tables()
+        tables=list(finder.tables)
+        if not tables:
+            finder=page.find_tables(strategy="text")
+            tables=list(finder.tables)
+        return tables
+    except Exception:
+        return []
 
-def page_regions(page):
+def page_regions(page,tessdata):
     data=page.get_text("dict")
     blocks=data.get("blocks",[])
     text_blocks=[]; image_blocks=[]
@@ -123,16 +165,25 @@ def page_regions(page):
         if b.get("type")==0:
             text="\n".join("".join(span.get("text","") for span in line.get("spans",[])) for line in b.get("lines",[])).strip()
             if text: text_blocks.append({"bbox":bbox,"text":text,"kind":"digital"})
-        elif b.get("type")==1: image_blocks.append({"bbox":bbox,"kind":"image"})
+        elif b.get("type")==1:
+            image_blocks.append({"bbox":bbox,"kind":"image"})
     out=list(text_blocks); ocr_count=0
-    for ib in image_blocks:
-        if any(bbox_overlap(ib["bbox"],tb["bbox"])>0.65 for tb in text_blocks): continue
-        t=ocr_image_block(page,ib["bbox"])
-        if t:
-            out.append({"bbox":ib["bbox"],"text":t,"kind":"ocr"}); ocr_count+=1
+    if image_blocks:
+        try:
+            tp=page.get_textpage_ocr(language=os.environ.get("RECHERCHER_OCR_LANG","ara"),dpi=int(os.environ.get("RECHERCHER_OCR_DPI","200")),full=False,tessdata=tessdata)
+            ocr_data=page.get_text("dict",textpage=tp)
+            for b in ocr_data.get("blocks",[]):
+                if b.get("type")!=0: continue
+                bbox=tuple(b.get("bbox",(0,0,0,0)))
+                text="\n".join("".join(span.get("text","") for span in line.get("spans",[])) for line in b.get("lines",[])).strip()
+                fonts=[span.get("font","") for line in b.get("lines",[]) for span in line.get("spans",[])]
+                if not text or not any("GlyphLessFont" in f for f in fonts): continue
+                if any(bbox_overlap(bbox,t["bbox"])>0.65 for t in text_blocks): continue
+                out.append({"bbox":bbox,"text":text,"kind":"ocr"}); ocr_count+=1
+        except Exception:
+            pass
     out.sort(key=lambda x:(round(x["bbox"][1]/6),-x["bbox"][0]))
     return out,ocr_count,len(text_blocks),len(image_blocks)
-
 def validate_docx(path):
     if not zipfile.is_zipfile(path): return False
     with zipfile.ZipFile(path) as z:
@@ -152,9 +203,9 @@ def main():
         try:
             if pdf.stat().st_size>MAX_INPUT_MB*1048576:
                 e.update(status="deferred-large-file",reason=f"input exceeds {MAX_INPUT_MB} MiB"); entries.append(e); continue
-            e["source_pdf_sha256"]=sha256(pdf); doc=pymupdf.open(pdf); d=Document(); all_source=[]; all_derived=[]; all_derived_digital=[]; pstats=[]
+            e["source_pdf_sha256"]=sha256(pdf); doc=pymupdf.open(pdf); d=Document(); configure_styles(d); tessdata=configure_ocr_environment(); all_source=[]; all_derived=[]; all_derived_digital=[]; table_metrics=[]; pstats=[]
             for page_no,page in enumerate(doc,1):
-                regions,oc,dc,ic=page_regions(page); page_source="\n".join(r["text"] for r in regions if r["kind"]=="digital"); page_derived=[]; page_derived_digital=[]
+                regions,oc,dc,ic=page_regions(page,tessdata); page_source="\n".join(r["text"] for r in regions if r["kind"]=="digital"); page_derived=[]; page_derived_digital=[]
                 for r in regions:
                     original=r["text"]; repair=visual_order_candidate(original); text=repair.get("text",original) if repair["applied"] else original
                     text=sanitize_xml_text(protect_symbols(text)); page_derived.append(text);\n                    if r["kind"]=="digital": page_derived_digital.append(text)\n                    add_text(d,text)
@@ -171,7 +222,7 @@ def main():
             if digital_chars==0 and image_pages: kind="scanned"
             elif hybrid_pages or (image_pages and digital_chars): kind="hybrid"
             else: kind="digital-native"
-            e.update(pdf_kind=kind,source_char_count=digital_chars,derived_char_count=derived_chars,derived_digital_char_count=len(derived_digital),page_statistics=pstats)
+            e.update(pdf_kind=kind,source_char_count=digital_chars,derived_char_count=derived_chars,derived_digital_char_count=len(derived_digital),page_statistics=pstats,tessdata=tessdata,table_metrics=table_metrics)
             if digital_chars:
                 e["loss_ratio"]=levenshtein_ratio(source_digital,derived_digital)
                 e["comparison_mode"]="normalized-levenshtein"
@@ -188,6 +239,6 @@ def main():
             e["status"]="converted"; doc.close()
         except Exception as x: e["error"]=str(x)
         entries.append(e)
-    m={"schema":"rechercher/pdf-to-docx/v3","converter":"PyMuPDF+python-docx","policy":"derived-only; source PDFs are never modified or deleted","max_input_mb":MAX_INPUT_MB,"visual_order":"conservative python-bidi detector; arabic-reshaper used only for detection scoring","loss_metric":"normalized Levenshtein distance; OCR-only files are not assigned a fabricated loss ratio","hybrid_policy":"digital text blocks first; OCR only non-overlapping image regions; merge by page coordinates","pua_policy":"known Islamic ligatures preserved; unknown PUA is retained and marked review-required","files":entries,"total_pdfs":len(entries),"converted":sum(e["status"]=="converted" for e in entries),"deferred_large_files":sum(e["status"]=="deferred-large-file" for e in entries),"failed":sum(e["status"]=="failed" for e in entries)}
+    m={"schema":"rechercher/pdf-to-docx/v3","converter":"PyMuPDF+python-docx","policy":"derived-only; source PDFs are never modified or deleted","max_input_mb":MAX_INPUT_MB,"visual_order":"conservative python-bidi detector; arabic-reshaper used only for detection scoring","loss_metric":"normalized Levenshtein distance with Arabic diacritics ignored for comparison only; original text is preserved","hybrid_policy":"one partial OCR TextPage per page; OCR blocks merged by coordinates; tables isolated from text-loss metrics","pua_policy":"known Islamic ligatures preserved; unknown PUA is retained and marked review-required","files":entries,"total_pdfs":len(entries),"converted":sum(e["status"]=="converted" for e in entries),"deferred_large_files":sum(e["status"]=="deferred-large-file" for e in entries),"failed":sum(e["status"]=="failed" for e in entries)}
     Path(a.manifest).write_text(json.dumps(m,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"); print(json.dumps({k:m[k] for k in ("total_pdfs","converted","deferred_large_files","failed")},ensure_ascii=False)); return 1 if a.strict and m["failed"] else 0
 if __name__=="__main__": sys.exit(main())
