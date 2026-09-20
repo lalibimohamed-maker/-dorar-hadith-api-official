@@ -45,6 +45,12 @@ jobs:
             echo 'No npm lockfile in repository; using npm install without lockfile.'
             npm install --ignore-scripts --no-package-lock --no-audit --no-fund
           fi
+      - name: Setup Python 3.12 for PDF→DOCX tests
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v6.0.0
+        with:
+          python-version: '3.12'
+      - name: Install PDF→DOCX test dependencies
+        run: python3 -m pip install --disable-pip-version-check --no-cache-dir pymupdf==1.28.2 python-docx==1.2.0 python-bidi==0.6.7 arabic-reshaper==3.0.0
       - name: Syntax check
         run: |
           npm run health
