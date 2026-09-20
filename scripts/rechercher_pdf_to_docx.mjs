@@ -4,77 +4,31 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import os from 'node:os';
-
-const ROOT=process.cwd();
-const args=process.argv.slice(2);
-const arg=(name, fallback)=>{const i=args.indexOf(name); return i>=0 ? args[i+1] : fallback;};
+const ROOT=process.cwd(), args=process.argv.slice(2);
+const arg=(n,d)=>{const i=args.indexOf(n);return i>=0?args[i+1]:d};
 const input=path.resolve(ROOT,arg('--input','artifacts/rechercher/multilingual-deep-pdf-expansion'));
 const output=path.resolve(ROOT,arg('--output','artifacts/rechercher/multilingual-docx-expansion'));
 const manifestOut=path.resolve(ROOT,arg('--manifest',path.join(output,'manifest.json')));
 const strict=args.includes('--strict');
-
-const sha256=b=>createHash('sha256').update(b).digest('hex');
-const rel=p=>path.relative(ROOT,p);
-const run=(cmd,argv)=>new Promise((resolve,reject)=>{
-  const p=spawn(cmd,argv,{stdio:['ignore','pipe','pipe']});
-  let stdout='',stderr=''; p.stdout.on('data',x=>stdout+=x); p.stderr.on('data',x=>stderr+=x);
-  p.on('error',reject); p.on('close',code=>code===0?resolve({stdout,stderr}):reject(new Error(`${cmd} exited ${code}: ${stderr.slice(-4000)}`)));
-});
-async function exists(p){try{await fs.access(p);return true}catch{return false}}
-async function walk(dir){
-  const out=[]; if(!(await exists(dir))) return out;
-  for(const e of await fs.readdir(dir,{withFileTypes:true})){
-    const p=path.join(dir,e.name);
-    if(e.isDirectory()) out.push(...await walk(p));
-    else if(e.isFile() && /\.pdf$/i.test(e.name)) out.push(p);
-  }
-  return out;
+const exists=async p=>{try{await fs.access(p);return true}catch{return false}};
+const run=(cmd,a)=>new Promise((res,rej)=>{const p=spawn(cmd,a,{stdio:['ignore','pipe','pipe']});let o='',e='';p.stdout.on('data',x=>o+=x);p.stderr.on('data',x=>e+=x);p.on('error',rej);p.on('close',c=>c===0?res({o,e}):rej(new Error(cmd+' exited '+c+': '+e.slice(-3000))))});
+async function walk(d){const r=[];if(!(await exists(d)))return r;for(const e of await fs.readdir(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory())r.push(...await walk(p));else if(e.isFile()&&/\.pdf$/i.test(e.name))r.push(p)}return r}
+async function pythonAvailable(){try{await run('python3',['-c','import pymupdf,docx']);return true}catch{return false}}
+async function findLO(){for(const c of ['libreoffice','soffice']){try{await run('sh',['-lc','command -v '+c]);return c}catch{}}return null}
+async function main(){
+ await fs.mkdir(output,{recursive:true});
+ if(await pythonAvailable()){
+  try{await run('python3',[path.join(ROOT,'scripts/rechercher_pdf_to_docx.py'),'--input',input,'--output',output,'--manifest',manifestOut,...(strict?['--strict']:[])]);console.log(JSON.stringify({engine:'PyMuPDF+python-docx',manifest:manifestOut}));return}catch(e){if(strict)throw e}
+ }
+ const lo=await findLO();if(!lo)throw new Error('Neither PyMuPDF/python-docx nor LibreOffice is available');
+ const files=await walk(input),entries=[];
+ for(const pdf of files){
+  const rel=path.relative(input,pdf),dest=path.join(output,rel.replace(/\.pdf$/i,'.docx'));await fs.mkdir(path.dirname(dest),{recursive:true});
+  const b=await fs.readFile(pdf),source=createHash('sha256').update(b).digest('hex'),tmp=await fs.mkdtemp(path.join(os.tmpdir(),'rechercher-lo-')),staged=path.join(tmp,path.basename(pdf));
+  const e={source_pdf:path.relative(ROOT,pdf),source_pdf_sha256:source,derived_docx:path.relative(ROOT,dest),status:'failed',content_policy:'preserve-verbatim',derivation:'libreoffice-fallback',review_status:'review-required',sacred_text_flag:'requires_review',arabic_alignment_verified:false,ocr_used:false};
+  try{await fs.copyFile(pdf,staged);await run(lo,['--headless','--convert-to','docx','--outdir',tmp,staged]);const g=path.join(tmp,path.basename(pdf,'.pdf')+'.docx');if(!(await exists(g)))throw Error('LibreOffice produced no DOCX');await fs.copyFile(g,dest);e.status='converted';e.derived_docx_sha256=createHash('sha256').update(await fs.readFile(dest)).digest('hex')}catch(x){e.error=String(x.message||x)}finally{await fs.rm(tmp,{recursive:true,force:true})}entries.push(e)
+ }
+ const m={schema:'rechercher/pdf-to-docx/v2',converter:'LibreOffice-fallback',policy:'derived-only; source PDFs are never modified or deleted',files:entries,total_pdfs:entries.length,converted:entries.filter(e=>e.status==='converted').length,failed:entries.filter(e=>e.status==='failed').length,deferred_large_files:0};
+ await fs.writeFile(manifestOut,JSON.stringify(m,null,2)+'\n');if(strict&&m.failed)process.exit(1);console.log(JSON.stringify(m));
 }
-function docxLooksValid(buf){
-  return buf.subarray(0,2).toString()==='PK' &&
-    buf.includes(Buffer.from('[Content_Types].xml')) &&
-    buf.includes(Buffer.from('word/document.xml'));
-}
-async function findLibreOffice(){
-  for(const c of ['libreoffice','soffice']) if(await exists(c).catch(()=>false)) return c;
-  try{await run('sh',['-lc','command -v libreoffice || command -v soffice']); return 'libreoffice'}catch{}
-  return null;
-}
-const converter=await findLibreOffice();
-if(!converter) throw new Error('LibreOffice/soffice is required for PDF→DOCX conversion');
-
-const pdfs=await walk(input);
-const result={schema:'rechercher/pdf-to-docx/v1',generated_at:new Date().toISOString(),input_root:rel(input),output_root:rel(output),converter:'LibreOffice',policy:'derived-only; source PDFs are never modified or deleted',total_pdfs:pdfs.length,converted:0,failed:0,files:[]};
-await fs.mkdir(output,{recursive:true});
-const temp=await fs.mkdtemp(path.join(os.tmpdir(),'rechercher-pdf-to-docx-'));
-
-for(const pdf of pdfs){
-  const bytes=await fs.readFile(pdf);
-  const sourceSha=sha256(bytes);
-  const relative=path.relative(input,pdf);
-  const base=relative.replace(/\.pdf$/i,'');
-  const dest=path.join(output,base+'.docx');
-  await fs.mkdir(path.dirname(dest),{recursive:true});
-  const workDir=path.join(temp,sha256(Buffer.from(relative)).slice(0,16));
-  await fs.mkdir(workDir,{recursive:true});
-  const staged=path.join(workDir,path.basename(pdf));
-  await fs.copyFile(pdf,staged);
-  const entry={source_pdf:rel(pdf),source_pdf_sha256:sourceSha,derived_docx:rel(dest),status:'failed',content_policy:'preserve-verbatim',derivation:'pdf-to-docx',review_status:'review-required'};
-  try{
-    await run(converter,['--headless','--convert-to','docx','--outdir',workDir,staged]);
-    const generated=path.join(workDir,path.basename(pdf,'.pdf')+'.docx');
-    if(!(await exists(generated))) throw new Error('LibreOffice produced no DOCX');
-    const docx=await fs.readFile(generated);
-    if(!docxLooksValid(docx)) throw new Error('Output is not a valid DOCX package');
-    await fs.copyFile(generated,dest);
-    entry.bytes=docx.length; entry.sha256=sha256(docx); entry.status='converted';
-    result.converted++;
-  }catch(error){
-    entry.error=String(error.message||error); result.failed++;
-  }
-  result.files.push(entry);
-}
-await fs.rm(temp,{recursive:true,force:true});
-await fs.writeFile(manifestOut,JSON.stringify(result,null,2)+'\n');
-console.log(JSON.stringify({total_pdfs:result.total_pdfs,converted:result.converted,failed:result.failed,manifest:rel(manifestOut)}));
-if(strict && result.failed) process.exit(1);
+await main();
