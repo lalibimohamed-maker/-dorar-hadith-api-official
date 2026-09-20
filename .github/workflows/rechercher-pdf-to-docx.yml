@@ -51,3 +51,19 @@ jobs:
         run: node --test test/rechercher-pdf-to-docx-arabic.test.js
       - name: Run Python engine regression tests
         run: python3 test/rechercher-pdf-to-docx-python.test.py
+      - name: Verify DOCX/manifest outputs
+        if: always()
+        run: |
+          test -d artifacts
+          find artifacts -type f -print
+          find artifacts -type f -name '*.docx' -size +4095c -print
+          find artifacts -type f -name '*.json' -print
+      - name: Upload DOCX and manifest artifacts
+        if: always()
+        uses: actions/upload-artifact@b7c566a3a5d8b9b2d0e9f6d1e7f4b2a9b0f3e6d # v6.0.0
+        with:
+          name: rechercher-pdf-to-docx-v3
+          path: |
+            artifacts/**/*.docx
+            artifacts/**/*.json
+          if-no-files-found: warn
