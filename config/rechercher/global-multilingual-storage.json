@@ -23,6 +23,14 @@
     "matrix_content_isolated_from_main_repository": true,
     "general_pdf_storage_is_separate_from_matrix_storage": true,
     "matrix_scoped_pdf_acquisition_in_matrix_storage": true,
-    "rights_gate_before_public_pdf_persistence": true
+    "rights_gate_before_public_pdf_persistence": true,
+    "research_only_pdf_storage": "private_secondary_storage",
+    "public_matrix_pdf_storage": "only_explicitly_redistributable"
+  },
+  "restricted_storage": {
+    "repository": "lalibimohamed82-coder/rechercher-pdf-storage",
+    "secret_name": "RECHERCHER_SECONDARY_STORAGE_TOKEN",
+    "visibility": "private-required",
+    "purpose": "Durable retention of research-only PDFs that are not cleared for public redistribution; never exposed through the public matrix storage repository."
   }
 }
