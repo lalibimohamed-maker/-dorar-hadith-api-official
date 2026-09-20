@@ -29,6 +29,23 @@ def test_table_extraction_fallback_is_available():
             return Finder()
     assert mod.table_bboxes(Page()) == []
 
+def test_arabic_two_column_order_is_right_column_first():
+    blocks=[
+        {"bbox":(20,100,200,130),"text":"left","kind":"digital"},
+        {"bbox":(420,100,600,130),"text":"right","kind":"digital"},
+    ]
+    ordered=mod._order_blocks_reading(blocks,612)
+    assert ordered[0]["text"]=="right"
+    assert ordered[1]["text"]=="left"
+
+def test_docx_zero_byte_guard():
+    import tempfile
+    p=Path(tempfile.mkstemp(suffix=".docx")[1])
+    try:
+        assert mod.validate_docx(p) is False
+    finally:
+        p.unlink(missing_ok=True)
+
 if __name__ == "__main__":
     test_diacritics_are_ignored_only_for_loss_comparison()
     test_known_ligatures_are_preserved()
