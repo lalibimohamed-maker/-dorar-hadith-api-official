@@ -127,9 +127,8 @@ jobs:
             sha256sum "$f"
           done
 
-      - name: Route and persist each acquired PDF exactly once
+      - name: Persist each acquired PDF exactly once as plaintext
         env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
@@ -138,49 +137,22 @@ jobs:
           test "${#files[@]}" -gt 0
           mkdir -p artifacts/governance
           VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
-          gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher acquired storage ${GITHUB_RUN_ID}" --notes "Acquire-first persistence boundary. Each verified PDF is persisted exactly once: publicly only when the acquisition manifest marks it verified-redistributable; otherwise in the encrypted protected review vault. No second PDF copy is created."
+          gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher acquired storage ${GITHUB_RUN_ID}" --notes "Acquire-first persistence boundary. Each verified PDF is persisted exactly once as a plaintext PDF. No PDF is encrypted into .pdf.enc and no duplicate PDF copy is created."
           : > artifacts/governance/vault-release.jsonl
           for f in "${files[@]}"; do
-            is_public=1
-            python3 - "$f" <<'PY' || is_public=0
-          import json,sys
-          from pathlib import Path
-          manifest=json.loads(Path('books-batches/salaf-01-400h/developer-review-manifest.json').read_text(encoding='utf-8'))
-          rel=str(Path(sys.argv[1]).as_posix())
-          ok=False
-          for rec in manifest.get('records',[]):
-              if rec.get('rights_action') != 'public-eligible':
-                  continue
-              for item in rec.get('acquired',[]) or []:
-                  if item.get('local_path') == rel:
-                      ok=True
-                      break
-              if ok: break
-          raise SystemExit(0 if ok else 1)
-          PY
-            if test "$is_public" -eq 1; then
-              gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
-              printf '%s  %s  public\n' "$(sha256sum "$f" | awk '{print $1}')" "$f" >> artifacts/governance/vault-release.jsonl
-              rm -f -- "$f"
-            else
-              openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "$f.enc"
-              rm -f -- "$f"
-              gh release upload "$VAULT_TAG" "$f.enc" --repo "$GITHUB_REPOSITORY" --clobber
-              printf '%s  %s  protected\n' "$(sha256sum "$f.enc" | awk '{print $1}')" "$f.enc" >> artifacts/governance/vault-release.jsonl
-              rm -f -- "$f.enc"
-            fi
+            gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
+            printf '%s  %s  pdf\\n' "$(sha256sum "$f" | awk '{print $1}')" "$f" >> artifacts/governance/vault-release.jsonl
+            rm -f -- "$f"
           done
           python3 - "$VAULT_TAG" <<'PY'
           import json,os,subprocess,sys
           from pathlib import Path
           tag=sys.argv[1]; assets=[]
           for raw in Path('artifacts/governance/vault-release.jsonl').read_text(encoding='utf-8').splitlines():
-              digest,path,access=raw.split(None,2)
-              assets.append({'sha256':digest,'file':path,'access':access})
+              digest,path,kind=raw.split(None,2)
+              assets.append({'sha256':digest,'file':path,'format':'pdf','access':'developer-and-release'})
           release=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo',os.environ['GITHUB_REPOSITORY'],'--json','url,tagName'],text=True))
-          public_count=sum(a['access']=='public' for a in assets)
-          protected_count=sum(a['access']=='protected' for a in assets)
-          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v3-single-pdf','persistence_boundary':'acquire-first','storage_model':'single-canonical-pdf','release':release,'assets':assets,'counts':{'public':public_count,'protected':protected_count,'total':len(assets)}},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v4-single-plaintext-pdf','persistence_boundary':'acquire-first','storage_model':'single-canonical-plaintext-pdf','encrypted_pdf_format':False,'release':release,'assets':assets,'counts':{'pdf':len(assets),'pdf_enc':0}},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
           rm -f artifacts/governance/vault-release.jsonl
 
