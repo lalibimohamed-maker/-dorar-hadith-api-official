@@ -152,37 +152,37 @@ def main():
         try:
             if pdf.stat().st_size>MAX_INPUT_MB*1048576:
                 e.update(status="deferred-large-file",reason=f"input exceeds {MAX_INPUT_MB} MiB"); entries.append(e); continue
-            e["source_pdf_sha256"]=sha256(pdf); doc=pymupdf.open(pdf); d=Document(); all_source=[]; all_derived=[]; pstats=[]
+            e["source_pdf_sha256"]=sha256(pdf); doc=pymupdf.open(pdf); d=Document(); all_source=[]; all_derived=[]; all_derived_digital=[]; pstats=[]
             for page_no,page in enumerate(doc,1):
-                regions,oc,dc,ic=page_regions(page); page_source="\n".join(r["text"] for r in regions if r["kind"]=="digital"); page_derived=[]
+                regions,oc,dc,ic=page_regions(page); page_source="\n".join(r["text"] for r in regions if r["kind"]=="digital"); page_derived=[]; page_derived_digital=[]
                 for r in regions:
                     original=r["text"]; repair=visual_order_candidate(original); text=repair.get("text",original) if repair["applied"] else original
-                    text=sanitize_xml_text(protect_symbols(text)); page_derived.append(text); add_text(d,text)
+                    text=sanitize_xml_text(protect_symbols(text)); page_derived.append(text);\n                    if r["kind"]=="digital": page_derived_digital.append(text)\n                    add_text(d,text)
                     if repair["applied"]: e["text_repair_applied"]=True
                     pi=pua_info(original)
                     if pi["detected"]: e.setdefault("pua",{"detected":True,"codepoints":[]}); e["pua"]["codepoints"]=sorted(set(e["pua"]["codepoints"]+pi["codepoints"]))
-                all_source.append(page_source); all_derived.append("\n".join(page_derived))
+                all_source.append(page_source); all_derived.append("\n".join(page_derived)); all_derived_digital.append("\n".join(page_derived_digital))
                 pstats.append({"page":page_no,"digital_blocks":dc,"image_blocks":ic,"ocr_blocks":oc,"ocr_used":oc>0})
                 e["ocr_used"]=e["ocr_used"] or oc>0
-            source_digital="\n".join(all_source); derived_text="\n".join(all_derived)
+            source_digital="\n".join(all_source); derived_text="\n".join(all_derived); derived_digital="\n".join(all_derived_digital)
             digital_chars=len(source_digital); derived_chars=len(derived_text)
             image_pages=sum(1 for x in pstats if x["image_blocks"] and x["digital_blocks"]==0)
             hybrid_pages=sum(1 for x in pstats if x["image_blocks"] and x["digital_blocks"])
             if digital_chars==0 and image_pages: kind="scanned"
             elif hybrid_pages or (image_pages and digital_chars): kind="hybrid"
             else: kind="digital-native"
-            e.update(pdf_kind=kind,source_char_count=digital_chars,derived_char_count=derived_chars,page_statistics=pstats)
+            e.update(pdf_kind=kind,source_char_count=digital_chars,derived_char_count=derived_chars,derived_digital_char_count=len(derived_digital),page_statistics=pstats)
             if digital_chars:
-                e["loss_ratio"]=levenshtein_ratio(source_digital,derived_text)
+                e["loss_ratio"]=levenshtein_ratio(source_digital,derived_digital)
                 e["comparison_mode"]="normalized-levenshtein"
-                e["token_metrics"]=token_metrics(source_digital,derived_text)
+                e["token_metrics"]=token_metrics(source_digital,derived_digital)
             else:
                 e["loss_ratio"]=None; e["comparison_mode"]="not-comparable-ocr-only"
             e["mojibake_detected"]=bool(MOJIBAKE_RE.search(derived_text))
             if e["mojibake_detected"]: e["review_status"]="review-required"
             if e.get("pua",{}).get("detected"): e["review_status"]="review-required"
             target=out/(pdf.relative_to(inp).with_suffix(".docx")); target.parent.mkdir(parents=True,exist_ok=True); d.save(target)
-            e["derived_docx"]=str(target); e["derived_docx_sha256"]=sha256(target); e["arabic_alignment_verified"]=not e["text_repair_applied"] or e["review_status"]=="review-required"
+            e["derived_docx"]=str(target); e["derived_docx_sha256"]=sha256(target); e["arabic_alignment_verified"]=bool(digital_chars and not e["text_repair_applied"] and not e.get("mojibake_detected",False))
             e["quality_validation"]={"docx_package":validate_docx(target),"loss_ratio":e["loss_ratio"],"paragraphs":len(d.paragraphs),"xml_safe":validate_docx(target)}
             if not e["quality_validation"]["docx_package"]: raise ValueError("DOCX package/XML validation failed")
             e["status"]="converted"; doc.close()
