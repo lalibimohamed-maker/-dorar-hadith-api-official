@@ -66,7 +66,17 @@ jobs:
           git -C "$RUNNER_TEMP/matrix" config user.name "github-actions[bot]"
           git -C "$RUNNER_TEMP/matrix" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           mkdir -p "$RUNNER_TEMP/matrix/artifacts/rechercher/multilingual-deep-pdf-expansion"
-          cp -a artifacts/rechercher/multilingual-deep-pdf-expansion/. "$RUNNER_TEMP/matrix/artifacts/rechercher/multilingual-deep-pdf-expansion/"
+          node <<'NODE'
+          const fs=require('fs'), path=require('path');
+          const root='artifacts/rechercher/multilingual-deep-pdf-expansion';
+          const m=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8'));
+          for(const e of Object.values(m.cells||{})) for(const f of e.files||[]) {
+            if(f.acquisition!=='public') continue;
+            const src=f.path, rel=src.slice(root.length+1), dst=path.join(process.env.RUNNER_TEMP,'matrix',root,rel);
+            fs.mkdirSync(path.dirname(dst),{recursive:true}); fs.copyFileSync(src,dst);
+          }
+          fs.copyFileSync(path.join(root,'manifest.json'),path.join(process.env.RUNNER_TEMP,'matrix',root,'manifest.json'));
+          NODE
           git -C "$RUNNER_TEMP/matrix" lfs install
           git -C "$RUNNER_TEMP/matrix" lfs track 'artifacts/rechercher/multilingual-deep-pdf-expansion/**/*.pdf'
           git -C "$RUNNER_TEMP/matrix" add artifacts/rechercher/multilingual-deep-pdf-expansion .gitattributes
