@@ -231,10 +231,12 @@ def main():
                         "columns":cols,
                         "source_text":"\n".join(" | ".join((x or "") for x in row) for row in rows)
                     })
-                page_source="\n".join(r["text"] for r in regions if r["kind"]=="digital"); page_derived=[]; page_derived_digital=[]
+                table_rects=[tuple(float(x) for x in t.bbox) for t in tables]
+                is_table=lambda r:any(bbox_overlap(r["bbox"],tb)>0.5 for tb in table_rects)
+                page_source="\n".join(r["text"] for r in regions if r["kind"]=="digital" and not is_table(r)); page_derived=[]; page_derived_digital=[]
                 for r in regions:
                     original=r["text"]; repair=visual_order_candidate(original); text=repair.get("text",original) if repair["applied"] else original
-                    text=sanitize_xml_text(protect_symbols(text)); page_derived.append(text);\n                    if r["kind"]=="digital": page_derived_digital.append(text)\n                    add_text(d,text)
+                    text=sanitize_xml_text(protect_symbols(text)); page_derived.append(text);\n                    if r["kind"]=="digital" and not is_table(r): page_derived_digital.append(text)\n                    add_text(d,text)
                     if repair["applied"]: e["text_repair_applied"]=True
                     pi=pua_info(original)
                     if pi["detected"]: e.setdefault("pua",{"detected":True,"codepoints":[]}); e["pua"]["codepoints"]=sorted(set(e["pua"]["codepoints"]+pi["codepoints"]))
