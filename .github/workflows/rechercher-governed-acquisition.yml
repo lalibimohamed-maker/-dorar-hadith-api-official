@@ -140,14 +140,17 @@ jobs:
             qpdf --check "$f" >/dev/null
           done < <(find artifacts -type f -name '*.pdf' -print0)
 
-      - name: Deterministically partition PDFs across the two pools
+      - name: Route each PDF exactly once by rights (public or protected)
         run: |
           set -euo pipefail
           python3 - <<'PY'
           import hashlib, json, shutil
           from pathlib import Path
-          primary=Path('artifacts'); secondary=Path('.secondary-storage/artifacts')
-          primary.mkdir(parents=True, exist_ok=True); secondary.mkdir(parents=True, exist_ok=True)
+
+          primary=Path('artifacts')
+          secondary=Path('.secondary-storage/artifacts')
+          primary.mkdir(parents=True, exist_ok=True)
+          secondary.mkdir(parents=True, exist_ok=True)
 
           def sha256(path):
               h=hashlib.sha256()
@@ -157,13 +160,19 @@ jobs:
 
           def valid_pdf(path):
               try:
-                  with path.open('rb') as fh: return path.is_file() and path.stat().st_size>0 and fh.read(5)==b'%PDF-'
-              except OSError: return False
+                  with path.open('rb') as fh:
+                      return path.is_file() and path.stat().st_size > 0 and fh.read(5) == b'%PDF-'
+              except OSError:
+                  return False
 
           def route_for(pdf):
-              manifest=pdf.with_suffix('.manifest.json')
+              # The manifest is kept with the acquisition state, never inside
+              # the protected PDF pool. Missing rights evidence fails closed.
+              manifest=primary/(pdf.stem + '.manifest.json')
               if not manifest.exists():
-                  raise SystemExit(f'MISSING_RIGHTS_MANIFEST: {manifest}')
+                  # Existing legacy secondary PDFs without a manifest remain protected;
+                  # they are never promoted to public without explicit rights evidence.
+                  return 'protected'
               data=json.loads(manifest.read_text(encoding='utf-8'))
               visibility=data.get('storage_visibility')
               if visibility == 'publication-eligible' and data.get('public_browser') is True:
@@ -172,17 +181,15 @@ jobs:
                   return 'protected'
               raise SystemExit(f'RIGHTS_ROUTING_BLOCKED: {pdf.name} visibility={visibility!r}')
 
-          # Rights determine the destination; the old hash-based sharding is removed.
-          # Public-eligible files go once to the public primary pool.
-          # Everything else goes once to the protected secondary pool.
-          routes={}
-          for path in sorted(primary.glob('*.pdf')):
-              if not valid_pdf(path): raise SystemExit(f'not a real PDF: {path}')
-              routes[path] = route_for(path)
-
-          for path,route in list(routes.items()):
-              destination_root = primary if route == 'public' else secondary
-              destination = destination_root / path.name
+          # Inspect both pools so a re-run can correct the route without creating
+          # a second PDF copy. Public-eligible -> public primary; otherwise -> protected secondary.
+          candidates=[p for p in sorted(primary.glob('*.pdf'))] + [p for p in sorted(secondary.glob('*.pdf'))]
+          for path in candidates:
+              if not valid_pdf(path):
+                  raise SystemExit(f'not a real PDF: {path}')
+              route=route_for(path)
+              destination_root=primary if route == 'public' else secondary
+              destination=destination_root/path.name
               if destination != path:
                   if destination.exists():
                       if sha256(destination) != sha256(path):
@@ -192,16 +199,20 @@ jobs:
                           continue
                   shutil.move(str(path),str(destination))
 
-          # Remove any stale duplicate copy with the same SHA from the opposite pool.
+          # Final invariant: one SHA-256 == one physical PDF, never both pools.
           seen={}
           for pool,root in (('public',primary),('protected',secondary)):
               for path in sorted(root.glob('*.pdf')):
-                  if not valid_pdf(path): raise SystemExit(f'invalid PDF after routing: {pool}/{path.name}')
-                  sha=sha256(path)
-                  if sha in seen: raise SystemExit(f'DUPLICATE_PDF_COPY: {path.name} already stored in {seen[sha]}')
-                  seen[sha]=f'{pool}/{path.name}'
+                  if not valid_pdf(path):
+                      raise SystemExit(f'invalid PDF after rights routing: {pool}/{path.name}')
+                  digest=sha256(path)
+                  if digest in seen:
+                      raise SystemExit(f'DUPLICATE_PDF_COPY: {path.name} already stored in {seen[digest]}')
+                  seen[digest]=f'{pool}/{path.name}'
 
-          print(f'RIGHTS_ROUTING_OK public={sum(1 for v in seen.values() if v.startswith("public/"))} protected={sum(1 for v in seen.values() if v.startswith("protected/"))} total={len(seen)}')
+          public_count=sum(1 for value in seen.values() if value.startswith('public/'))
+          protected_count=sum(1 for value in seen.values() if value.startswith('protected/'))
+          print(f'RIGHTS_ROUTING_OK public={public_count} protected={protected_count} total={len(seen)}')
           PY
 
       - name: Persist verified PDFs to primary LFS storage
