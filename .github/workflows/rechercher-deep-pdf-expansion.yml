@@ -50,6 +50,16 @@ jobs:
           PREVIOUS_MANIFEST: ${{ runner.temp }}/matrix/artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
           ISLAMHOUSE_API_KEY: ${{ secrets.ISLAMHOUSE_API_KEY }}
         run: node scripts/rechercher_deep_pdf_expansion.mjs
+      - name: Install PDF to DOCX converter
+        run: sudo apt-get update && sudo apt-get install -y libreoffice
+      - name: Derive DOCX from validated PDFs
+        run: node scripts/rechercher_pdf_to_docx.mjs --input artifacts/rechercher/multilingual-deep-pdf-expansion --output artifacts/rechercher/multilingual-docx-expansion --strict
+      - name: Upload PDF to DOCX derivations
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-deep-pdf-docx-expansion
+          path: artifacts/rechercher/multilingual-docx-expansion
+          if-no-files-found: error
       - name: Validate PDFs
         run: |
           set -euo pipefail
