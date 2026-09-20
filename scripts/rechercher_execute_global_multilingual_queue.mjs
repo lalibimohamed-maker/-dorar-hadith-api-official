@@ -6,6 +6,7 @@ const ROOT = process.cwd();
 const registry = JSON.parse(await fs.readFile(path.join(ROOT, 'config/rechercher/global-multilingual-resource-discovery-2026.json'), 'utf8'));
 const matrix = JSON.parse(await fs.readFile(path.join(ROOT, 'config/rechercher/global-multilingual-search-matrix-2026.json'), 'utf8'));
 const expansion = JSON.parse(await fs.readFile(path.join(ROOT, 'config/rechercher/multilingual-resource-expansion-2026.json'), 'utf8'));
+const sourceAdapters = JSON.parse(await fs.readFile(path.join(ROOT, 'config/rechercher/islamic-source-adapters-2026.json'), 'utf8'));
 
 const args = new Map(process.argv.slice(2).map((arg) => {
   const [k, ...rest] = arg.replace(/^--/, '').split('=');
@@ -32,19 +33,17 @@ const cache = new Map();
 // Every outbound request is constrained to a fixed allowlist of research providers.
 // This keeps registry-derived paths/query parameters from turning into arbitrary hosts.
 const TRUSTED_ORIGINS = new Set([
-  'https://quranenc.com',
-  'https://hadeethenc.com',
+  ...sourceAdapters.adapters.flatMap((adapter) => adapter.origins),
   'https://api-docs.quran.foundation',
   'https://www.alislam.org',
   'https://tanzil.net',
-  'https://islamhouse.com',
   'https://archive.org',
   'https://api.crossref.org'
 ]);
 
 function trustedUrl(rawUrl) {
   const parsed = new URL(rawUrl);
-  if (!TRUSTED_ORIGINS.has(parsed.origin)) {
+  if (parsed.protocol !== 'https:' || !TRUSTED_ORIGINS.has(parsed.origin)) {
     throw new Error('Outbound evidence URL is not allowlisted: ' + parsed.origin);
   }
   return parsed.href;
@@ -100,6 +99,7 @@ const evidenceSources = Object.fromEntries(registry.evidence_sources.map((s) => 
 const expansionLanguages = Object.fromEntries(expansion.languages.map((s) => [s.name.toLowerCase(), s]));
 
 const providerRoots = {
+  ...Object.fromEntries(sourceAdapters.adapters.map((adapter) => [adapter.id, adapter.base_url])),
   quranenc: 'https://quranenc.com/en/',
   quran_foundation: 'https://api-docs.quran.foundation/',
   hadeethenc: 'https://hadeethenc.com/ar/',
@@ -108,6 +108,13 @@ const providerRoots = {
   tanzil: 'https://tanzil.net/'
 };
 
+const adapterById = Object.fromEntries(sourceAdapters.adapters.map((adapter) => [adapter.id, adapter]));
+const credentialGated = new Set(
+  sourceAdapters.adapters
+    .filter((adapter) => adapter.api_auth === 'required' || adapter.api_auth === 'required_for_api' || adapter.runtime === 'api_key' || adapter.runtime === 'api_in_development')
+    .map((adapter) => adapter.id)
+);
+
 function languageRecord(name) {
   const hinted = expansionLanguages[name.toLowerCase()];
   return hinted ? {...hinted, name} : {name, iso: null, source: 'islamhouse', status: 'candidate'};
@@ -115,6 +122,8 @@ function languageRecord(name) {
 
 function primaryProvider(language) {
   if (evidenceSources[language.source]) return language.source;
+  if (['quran'].includes(language.domain) && adapterById['quranenc']) return 'quranenc';
+  if (['hadith', 'hadith_explanation', 'sunnah'].includes(language.domain) && adapterById['hadeethenc']) return 'hadeethenc';
   return 'islamhouse';
 }
 
@@ -124,10 +133,20 @@ function sourceUrl(provider, iso) {
   return providerRoots[provider] || providerRoots.islamhouse;
 }
 
-function apiUrl(domain, iso) {
-  if (domain === 'quran' && iso) return `https://quranenc.com/api/v1/translations/list/${encodeURIComponent(iso)}/?localization=en`;
-  if (['hadith', 'hadith_explanation', 'sunnah'].includes(domain) && iso) return `https://hadeethenc.com/${encodeURIComponent(iso)}/`;
-  if (domain === 'tafsir') return 'https://api-docs.quran.foundation/docs/content_apis_versioned/4.0.0/tafsirs/';
+function apiUrl(domain, iso, provider) {
+  if (credentialGated.has(provider)) return null;
+  if (domain === 'quran' && iso && provider === 'quranenc') {
+    return `https://quranenc.com/api/v1/translations/list/${encodeURIComponent(iso)}/?localization=en`;
+  }
+  if (domain === 'quran' && provider === 'alquran-cloud') return 'https://api.alquran.cloud/v1/edition';
+  if (['hadith', 'hadith_explanation', 'sunnah'].includes(domain) && iso && provider === 'hadeethenc') {
+    return `https://hadeethenc.com/${encodeURIComponent(iso)}/`;
+  }
+  if (['hadith', 'sunnah'].includes(domain) && provider === 'sunnah-com') return 'https://sunnah.com/developers';
+  if (domain === 'tafsir' && provider === 'quran_foundation') return 'https://api-docs.quran.foundation/docs/content_apis_versioned/4.0.0/tafsirs/';
+  if (provider === 'qul') return 'https://qul.tarteel.ai/resources';
+  if (provider === 'house-of-islam') return 'https://api.thehouseofislam.com/';
+  if (provider === 'kalimat') return 'https://www.kalimat.dev/';
   return null;
 }
 
@@ -191,9 +210,9 @@ const rows = [];
 let done = 0;
 
 for (const {language, domain} of cells) {
-  const provider = primaryProvider(language);
+  const provider = primaryProvider({...language, domain});
   const primary = await fetchEvidence(sourceUrl(provider, language.iso), {label: 'primary_or_institutional_source'});
-  const apiTarget = apiUrl(domain, language.iso);
+  const apiTarget = apiUrl(domain, language.iso, provider);
   const api = apiTarget ? await fetchEvidence(apiTarget, {label: 'official_api'}) : null;
   const corpus = await fetchEvidence(corpusUrl(language, domain), {label: 'digital_corpus'});
   const structured = await fetchEvidence(structuredUrl(domain, language.iso, provider), {label: 'structured_web'});
