@@ -205,7 +205,33 @@ def main():
                 e.update(status="deferred-large-file",reason=f"input exceeds {MAX_INPUT_MB} MiB"); entries.append(e); continue
             e["source_pdf_sha256"]=sha256(pdf); doc=pymupdf.open(pdf); d=Document(); configure_styles(d); tessdata=configure_ocr_environment(); all_source=[]; all_derived=[]; all_derived_digital=[]; table_metrics=[]; pstats=[]
             for page_no,page in enumerate(doc,1):
-                regions,oc,dc,ic=page_regions(page,tessdata); page_source="\n".join(r["text"] for r in regions if r["kind"]=="digital"); page_derived=[]; page_derived_digital=[]
+                regions,oc,dc,ic=page_regions(page,tessdata)
+                tables=table_bboxes(page)
+                for table in tables:
+                    rows=table.extract()
+                    if not rows:
+                        continue
+                    cols=max(len(r) for r in rows)
+                    tbl=d.add_table(rows=len(rows),cols=cols)
+                    tbl.style="Table Grid"
+                    for ri,row in enumerate(rows):
+                        for ci,val in enumerate(row):
+                            txt=sanitize_xml_text(protect_symbols(val or ""))
+                            cell=tbl.cell(ri,ci)
+                            cell.text=txt
+                            is_ar=bool(ARABIC_RE.search(txt))
+                            for para in cell.paragraphs:
+                                set_rtl(para,is_ar)
+                                for run in para.runs:
+                                    set_font(run,"Amiri" if is_ar else "Arial")
+                    table_metrics.append({
+                        "page":page_no,
+                        "bbox":[float(x) for x in table.bbox],
+                        "rows":len(rows),
+                        "columns":cols,
+                        "source_text":"\n".join(" | ".join((x or "") for x in row) for row in rows)
+                    })
+                page_source="\n".join(r["text"] for r in regions if r["kind"]=="digital"); page_derived=[]; page_derived_digital=[]
                 for r in regions:
                     original=r["text"]; repair=visual_order_candidate(original); text=repair.get("text",original) if repair["applied"] else original
                     text=sanitize_xml_text(protect_symbols(text)); page_derived.append(text);\n                    if r["kind"]=="digital": page_derived_digital.append(text)\n                    add_text(d,text)
