@@ -1,31 +1,32 @@
 {
-  "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v3",
+  "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v4",
   "primary_repository": "lalibimohamed-maker/-dorar-hadith-api-official",
-  "secondary_storage_repository": "lalibimohamed82-coder/rechercher-pdf-storage",
-  "purpose": "Two connected Git LFS storage pools with one physical PDF copy per book. The pools are complementary, not mirrored.",
+  "purpose": "Persistent verified real-PDF storage in GitHub Release assets; acquisition state and manifests remain in the governed review branch.",
   "format": ".pdf",
+  "storage_model": "github-release-assets",
+  "release_asset_limit_per_release": 1000,
+  "operational_shard_limit": 950,
+  "max_asset_size_bytes": 2147483647,
+  "total_release_size_limit": "none",
   "content_addressing": "sha256-for-integrity-only",
   "storage_contract": {
-    "primary": "artifacts/*.pdf",
-    "secondary": "artifacts/*.pdf",
+    "storage": "GitHub Releases",
+    "asset_path": "release asset",
     "one_copy_only": true,
-    "distribution": "Each verified PDF is assigned deterministically to exactly one pool from its SHA-256; it is never copied to the other pool.",
+    "distribution": "Every verified PDF is recorded once by SHA-256 in release-storage-manifest.json.",
     "verified_pdfs_only": true,
     "real_pdf_signature_required": true,
     "qpdf_validation_required": true,
-    "encrypted_files_forbidden": true,
-    "storage_content_only_pdf": true,
-    "sha256_is_not_a_storage_path": true,
+    "encrypted_files_forbidden_in_public_release_storage": true,
+    "corpus_untouched": true,
     "source_provider_not_fixed": true,
     "source_failover": "immediate next independent catalogued source on restriction/failure",
     "no_source_quota": "the engine does not stop after a provider-specific book count"
   },
-  "activation": {
-    "repository_must_exist": true,
-    "write_secret_name": "RECHERCHER_SECONDARY_STORAGE_TOKEN",
-    "secret_owner": "secondary GitHub account",
-    "write_scope": "repository contents read/write for the secondary storage repository",
-    "mandatory": true
+  "migration": {
+    "legacy_lfs_pdfs": "preserve until verified Release asset exists, then remove from governed branch",
+    "legacy_pdf_enc_releases": "preserve; never delete or rewrite",
+    "secondary_lfs_repository": "retired from the governed acquisition path; existing contents are not deleted"
   },
-  "failure_policy": "If a verified PDF cannot be persisted to its assigned pool, the acquisition cycle fails closed. A second PDF copy is never created as a fallback; the book is retried from its sources instead."
+  "failure_policy": "If a verified PDF cannot be uploaded and digest-verified as a Release asset, the acquisition cycle fails closed and the plaintext working PDF is not removed from the persistent state."
 }

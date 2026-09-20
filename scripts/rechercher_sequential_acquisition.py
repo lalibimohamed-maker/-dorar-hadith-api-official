@@ -23,6 +23,16 @@ def run_checked(path: Path, *args: str):
 def acquired_ids() -> set[str]:
     found: set[str] = set()
     artifacts = ROOT / "artifacts"
+    release_manifest = artifacts / "governance" / "release-storage-manifest.json"
+    if release_manifest.is_file():
+        try:
+            release_data = json.loads(release_manifest.read_text(encoding="utf-8"))
+        except Exception:
+            release_data = {}
+        for record in release_data.get("records", []):
+            book_id = record.get("book_id")
+            if book_id:
+                found.add(str(book_id))
     for manifest in artifacts.glob("*.manifest.json"):
         try:
             data = json.loads(manifest.read_text(encoding="utf-8"))
