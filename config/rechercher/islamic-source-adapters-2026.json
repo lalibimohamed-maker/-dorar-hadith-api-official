@@ -1,0 +1,254 @@
+{
+  "schema": "rechercher/islamic-source-adapters/v1",
+  "purpose": "Registry-driven Islamic source adapters. Existing six providers remain enabled; additional verified Islamic providers are additive. AI/search services are discovery and cross-reference tools only and are never treated as the religious source of generated text.",
+  "policy": {
+    "existing_six_preserved": true,
+    "source_must_be_islamic_or_explicitly_islamic_content_provider": true,
+    "ai_is_not_a_religious_source": true,
+    "ai_generated_translation_is_never_promoted": true,
+    "source_evidence_required_before_promotion": true,
+    "rights_verified_per_item": true,
+    "canonical_arabic_separate": true,
+    "human_translation_separate_from_machine_translation": true,
+    "no_new_pdf_enc": true
+  },
+  "adapters": [
+    {
+      "id": "hadeethenc",
+      "name": "HadeethEnc",
+      "base_url": "https://hadeethenc.com/",
+      "origins": [
+        "https://hadeethenc.com"
+      ],
+      "kinds": [
+        "hadith",
+        "hadith_explanation",
+        "translations",
+        "pdf",
+        "api"
+      ],
+      "authority": "primary_islamic_content",
+      "runtime": "public",
+      "status": "enabled"
+    },
+    {
+      "id": "islamhouse",
+      "name": "IslamHouse",
+      "base_url": "https://islamhouse.com/",
+      "origins": [
+        "https://islamhouse.com"
+      ],
+      "kinds": [
+        "books",
+        "articles",
+        "fatwa",
+        "audio",
+        "video",
+        "quran",
+        "hadith",
+        "pdf",
+        "discovery"
+      ],
+      "authority": "islamic_content_platform",
+      "runtime": "public",
+      "status": "enabled"
+    },
+    {
+      "id": "islamhouse-cdn",
+      "name": "d1.islamhouse.com",
+      "base_url": "https://d1.islamhouse.com/",
+      "origins": [
+        "https://d1.islamhouse.com"
+      ],
+      "kinds": [
+        "pdf",
+        "audio",
+        "video",
+        "downloads"
+      ],
+      "authority": "IslamHouse_delivery_origin",
+      "runtime": "public",
+      "status": "enabled"
+    },
+    {
+      "id": "quranenc",
+      "name": "QuranEnc",
+      "base_url": "https://quranenc.com/",
+      "origins": [
+        "https://quranenc.com"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "tafsir",
+        "pdf",
+        "api",
+        "structured_data"
+      ],
+      "authority": "primary_islamic_content",
+      "runtime": "public",
+      "status": "enabled"
+    },
+    {
+      "id": "quran-com",
+      "name": "Quran.com",
+      "base_url": "https://quran.com/",
+      "origins": [
+        "https://quran.com"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "tafsir",
+        "audio",
+        "discovery"
+      ],
+      "authority": "primary_islamic_platform",
+      "runtime": "public",
+      "status": "enabled"
+    },
+    {
+      "id": "quran-api",
+      "name": "Quran.com API",
+      "base_url": "https://api.quran.com/",
+      "origins": [
+        "https://api.quran.com"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "tafsir",
+        "api"
+      ],
+      "authority": "primary_islamic_api",
+      "runtime": "public",
+      "status": "enabled"
+    },
+    {
+      "id": "sunnah-com",
+      "name": "Sunnah.com",
+      "base_url": "https://sunnah.com/",
+      "origins": [
+        "https://sunnah.com"
+      ],
+      "kinds": [
+        "hadith",
+        "sunnah",
+        "collections",
+        "translations",
+        "api",
+        "discovery"
+      ],
+      "authority": "primary_hadith_platform",
+      "runtime": "api_key_or_site",
+      "api_auth": "required_for_api",
+      "offline_dump": "request_based_not_currently_available",
+      "status": "enabled"
+    },
+    {
+      "id": "hadith-api",
+      "name": "Hadith API",
+      "base_url": "https://www.hadithapi.com/",
+      "origins": [
+        "https://www.hadithapi.com"
+      ],
+      "kinds": [
+        "hadith",
+        "collections",
+        "chapters",
+        "grades",
+        "api"
+      ],
+      "authority": "hadith_data_service",
+      "runtime": "api_key",
+      "api_auth": "required",
+      "status": "enabled"
+    },
+    {
+      "id": "alquran-cloud",
+      "name": "Al Quran Cloud",
+      "base_url": "https://alquran.cloud/",
+      "origins": [
+        "https://alquran.cloud",
+        "https://api.alquran.cloud"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "editions",
+        "metadata",
+        "api"
+      ],
+      "authority": "quran_api_provider",
+      "runtime": "public",
+      "status": "enabled"
+    },
+    {
+      "id": "qul",
+      "name": "Quranic Universal Library (QUL)",
+      "base_url": "https://qul.tarteel.ai/",
+      "origins": [
+        "https://qul.tarteel.ai",
+        "https://static-cdn.tarteel.ai"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "tafsir",
+        "recitations",
+        "metadata",
+        "datasets",
+        "download"
+      ],
+      "authority": "islamic_quran_dataset_hub",
+      "runtime": "downloadable_resources",
+      "api": "not_currently_public",
+      "status": "enabled"
+    },
+    {
+      "id": "house-of-islam",
+      "name": "House of Islam for Developers",
+      "base_url": "https://developers.thehouseofislam.com/",
+      "origins": [
+        "https://developers.thehouseofislam.com",
+        "https://api.thehouseofislam.com"
+      ],
+      "kinds": [
+        "quran",
+        "hadith",
+        "tafsir",
+        "dua",
+        "api",
+        "datasets",
+        "discovery"
+      ],
+      "authority": "islamic_content_hub",
+      "runtime": "api_in_development",
+      "source_role": "secondary_compiled_islamic_source",
+      "status": "enabled"
+    },
+    {
+      "id": "kalimat",
+      "name": "Kalimat Islamic APIs",
+      "base_url": "https://www.kalimat.dev/",
+      "origins": [
+        "https://www.kalimat.dev"
+      ],
+      "kinds": [
+        "quran",
+        "hadith",
+        "athkar",
+        "semantic_search",
+        "cross_reference",
+        "api"
+      ],
+      "authority": "islamic_search_provider",
+      "runtime": "api_key",
+      "api_auth": "required",
+      "source_role": "discovery_cross_reference_only",
+      "ai_role": "semantic_discovery_only",
+      "machine_translation": false,
+      "status": "enabled"
+    }
+  ]
+}
