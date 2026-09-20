@@ -1,0 +1,77 @@
+name: Rechercher — deep PDF expansion for missing multilingual cells
+# security-justification: contents: write is required only to persist verified/public or research-only PDF expansion outputs and its audit manifest into the dedicated storage repositories; no Corpus paths are modified.
+on:
+  push:
+    branches:
+      - feat/rechercher-global-multilingual-resource-discovery-v9
+    paths:
+      - 'scripts/rechercher_deep_pdf_expansion.mjs'
+      - 'config/rechercher/**'
+      - 'research/evidence/global-multilingual/**'
+      - '.github/workflows/rechercher-deep-pdf-expansion.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 4 * * *'
+permissions:
+  contents: read
+env:
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
+  SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
+jobs:
+  expand:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Prepare previous manifest
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$MATRIX_STORAGE_TOKEN"
+          cat > "$RUNNER_TEMP/askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in *Username*) echo x-access-token;; *Password*) echo "$MATRIX_STORAGE_TOKEN";; *) echo "$MATRIX_STORAGE_TOKEN";; esac
+          SH
+          chmod 700 "$RUNNER_TEMP/askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/askpass" GIT_TERMINAL_PROMPT=0
+          git clone --depth 1 "https://github.com/$MATRIX_STORAGE_REPO.git" "$RUNNER_TEMP/matrix"
+          test -s "$RUNNER_TEMP/matrix/artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+      - name: Deep search missing cells
+        env:
+          PREVIOUS_MANIFEST: ${{ runner.temp }}/matrix/artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+        run: node scripts/rechercher_deep_pdf_expansion.mjs
+      - name: Validate PDFs
+        run: |
+          set -euo pipefail
+          find artifacts/rechercher/multilingual-deep-pdf-expansion -type f -name '*.pdf' -print0 | while IFS= read -r -d '' f; do test "$(head -c 4 "$f")" = "%PDF"; qpdf --check "$f"; done
+      - name: Persist public expansion to matrix storage
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in *Username*) echo x-access-token;; *Password*) echo "$MATRIX_STORAGE_TOKEN";; *) echo "$MATRIX_STORAGE_TOKEN";; esac
+          SH
+          chmod 700 "$RUNNER_TEMP/askpass"; export GIT_ASKPASS="$RUNNER_TEMP/askpass" GIT_TERMINAL_PROMPT=0
+          git -C "$RUNNER_TEMP/matrix" config user.name "github-actions[bot]"
+          git -C "$RUNNER_TEMP/matrix" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p "$RUNNER_TEMP/matrix/artifacts/rechercher/multilingual-deep-pdf-expansion"
+          cp -a artifacts/rechercher/multilingual-deep-pdf-expansion/. "$RUNNER_TEMP/matrix/artifacts/rechercher/multilingual-deep-pdf-expansion/"
+          git -C "$RUNNER_TEMP/matrix" lfs install
+          git -C "$RUNNER_TEMP/matrix" lfs track 'artifacts/rechercher/multilingual-deep-pdf-expansion/**/*.pdf'
+          git -C "$RUNNER_TEMP/matrix" add artifacts/rechercher/multilingual-deep-pdf-expansion .gitattributes
+          if ! git -C "$RUNNER_TEMP/matrix" diff --cached --quiet; then git -C "$RUNNER_TEMP/matrix" commit -m "data(matrix): persist deep multilingual PDF expansion"; git -C "$RUNNER_TEMP/matrix" pull --rebase origin main || true; git -C "$RUNNER_TEMP/matrix" lfs fsck --pointers HEAD; git -C "$RUNNER_TEMP/matrix" push origin HEAD:refs/heads/main; fi
+      - name: Upload deep expansion manifest
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-deep-pdf-expansion-manifest
+          path: artifacts/rechercher/multilingual-deep-pdf-expansion/manifest.json
+          if-no-files-found: error
