@@ -248,6 +248,10 @@ jobs:
           fi
           git commit -m 'data(rechercher): retain encrypted vault release and governance evidence'
           ACQ_COMMIT=$(git rev-parse HEAD)
+          # The central catalog is materialized for this run only. Restore the tracked
+          # catalog before switching branches so generated catalog state never blocks checkout
+          # and is never accidentally carried into the protected review branch or Corpus.
+          git restore --worktree --staged -- "$CATALOG_PATH" 2>/dev/null || true
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
           git checkout "$ACQ_COMMIT" -- artifacts/governance books-batches/salaf-01-400h/engine-source-overlay.json
