@@ -122,9 +122,9 @@ jobs:
               if [ "$attempt" -eq 5 ]; then exit 1; fi
               sleep 5
             done
-            git fetch origin main
-            expected="$(git rev-parse HEAD)"
-            actual="$(git rev-parse origin/main)"
+            git -C .matrix-storage-shard fetch origin main
+            expected="$(git -C .matrix-storage-shard rev-parse HEAD)"
+            actual="$(git -C .matrix-storage-shard rev-parse origin/main)"
             test "$expected" = "$actual"
             echo "MATRIX_SHARD_${SHARD_INDEX}_STORAGE_POST_PUSH_OK sha=$actual"
           fi
