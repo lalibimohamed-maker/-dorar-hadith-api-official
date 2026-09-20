@@ -74,6 +74,40 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      - name: Persist original PDFs to GitHub Release without encryption
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(artifacts/developer-review-vault/*.pdf)
+          test "${#files[@]}" -gt 0 || { echo 'ERROR: no original PDFs available for release persistence.'; exit 1; }
+          tag="rechercher-vault-${GITHUB_RUN_ID}"
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --notes "Rechercher acquire-first: original PDF files. No encryption and no deletion of primary PDFs."
+          gh release upload "$tag" "${files[@]}" --clobber
+
+          python3 - "$tag" <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          files=sorted(Path("artifacts/developer-review-vault").glob("*.pdf"))
+          rows=[]
+          for f in files:
+              sha=subprocess.check_output(["sha256sum",str(f)],text=True).split()[0]
+              rows.append({"path":str(f),"filename":f.name,"sha256":sha,"bytes":f.stat().st_size,"representation":"original-pdf"})
+          evidence={
+              "schema":"rechercher/pdf-release-evidence/v1",
+              "release_tag":os.environ["tag"] if "tag" in os.environ else "rechercher-vault-"+os.environ["GITHUB_RUN_ID"],
+              "run_id":int(os.environ["GITHUB_RUN_ID"]),
+              "commit":os.environ["GITHUB_SHA"],
+              "encrypted":False,
+              "primary_files_deleted":False,
+              "asset_extension":".pdf",
+              "files":rows,
+          }
+          Path("artifacts/governance").mkdir(parents=True,exist_ok=True)
+          Path("artifacts/governance/vault-release.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          PY
+
       - name: Persist manifest and release evidence to review branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -81,12 +115,12 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add books-batches/salaf-01-400h/developer-review-manifest.json
-          git commit -m 'data(rechercher): persist acquired copies before downstream audits'
+          git add books-batches/salaf-01-400h/developer-review-manifest.json artifacts/governance/vault-release.json
+          git commit -m 'data(rechercher): persist original PDFs and release evidence'
           ACQ_COMMIT=$(git rev-parse HEAD)
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
-          git checkout "$ACQ_COMMIT" -- books-batches/salaf-01-400h/developer-review-manifest.json
+          git checkout "$ACQ_COMMIT" -- books-batches/salaf-01-400h/developer-review-manifest.json artifacts/governance/vault-release.json
           python3 - "$ACQ_COMMIT" <<'PY'
           import json, subprocess, sys
           from pathlib import Path
