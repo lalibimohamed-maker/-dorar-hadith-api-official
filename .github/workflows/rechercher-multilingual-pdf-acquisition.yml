@@ -103,15 +103,56 @@ jobs:
           done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.cells || m.languages || {}))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
           echo "RESEARCH_ONLY_STORAGE=PRIVATE_DURABLE_STORAGE_REQUIRED"
 
-      - name: Require durable private review storage for restricted PDFs
+      - name: Persist research-only PDFs to private secondary storage
+        if: ${{ hashFiles('artifacts/rechercher/multilingual-research-vault/**/*.pdf') != '' }}
+        env:
+          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
         run: |
           set -euo pipefail
-          if find artifacts/rechercher/multilingual-research-vault -type f -name '*.pdf' -print -quit | grep -q .; then
-            echo "ERROR: restricted developer-review PDFs were acquired, but no durable private developer-review storage is configured."
-            echo "GitHub Actions artifacts are temporary and are not an acceptable retention layer."
+          test -n "${SECONDARY_STORAGE_TOKEN:-}" || {
+            echo "ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required for durable research-only PDF retention."
             exit 1
+          }
+          test -n "$SECONDARY_STORAGE_REPO"
+          cat > "$RUNNER_TEMP/secondary-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/secondary-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/secondary-storage-askpass" GIT_TERMINAL_PROMPT=0
+          git clone "https://github.com/${SECONDARY_STORAGE_REPO}.git" .secondary-pdf-storage
+          git -C .secondary-pdf-storage lfs install
+          mkdir -p .secondary-pdf-storage/artifacts/rechercher/multilingual-research-vault
+          cp -a artifacts/rechercher/multilingual-research-vault/. .secondary-pdf-storage/artifacts/rechercher/multilingual-research-vault/
+          git -C .secondary-pdf-storage lfs track 'artifacts/rechercher/multilingual-research-vault/**/*.pdf'
+          git -C .secondary-pdf-storage add artifacts/rechercher/multilingual-research-vault .gitattributes
+          if git -C .secondary-pdf-storage diff --cached --quiet; then
+            echo "No new research-only PDFs."
+          else
+            git -C .secondary-pdf-storage config user.name "github-actions[bot]"
+            git -C .secondary-pdf-storage config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git -C .secondary-pdf-storage commit -m "data(rechercher): retain multilingual research-only PDFs"
+            for attempt in 1 2 3 4 5; do
+              git -C .secondary-pdf-storage pull --rebase origin main || true
+              if git -C .secondary-pdf-storage lfs fsck --pointers HEAD && git -C .secondary-pdf-storage push origin HEAD:refs/heads/main; then
+                echo "SECONDARY_MULTILINGUAL_PDF_STORAGE_PUSH_OK attempt=$attempt"
+                break
+              fi
+              if [ "$attempt" -eq 5 ]; then exit 1; fi
+              sleep 5
+            done
+            git -C .secondary-pdf-storage fetch origin main
+            expected="$(git -C .secondary-pdf-storage rev-parse HEAD)"
+            actual="$(git -C .secondary-pdf-storage rev-parse origin/main)"
+            test "$expected" = "$actual"
+            git -C .secondary-pdf-storage lfs fsck --pointers origin/main
+            echo "SECONDARY_MULTILINGUAL_PDF_STORAGE_POST_PUSH_OK sha=$actual"
           fi
-          echo "No restricted developer-review PDFs require persistence."
 
       - name: Verify cell download inventory
         run: |
