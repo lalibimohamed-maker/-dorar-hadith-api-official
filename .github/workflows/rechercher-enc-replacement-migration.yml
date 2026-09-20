@@ -1,5 +1,7 @@
 name: Rechercher — encrypted PDF replacement-first migration
 
+# security-justification: contents: write is required only to persist verified replacement PDFs and their audit manifest, and to remove a .pdf.enc release asset only after the replacement PDF has passed validation and rights checks.
+
 on:
   workflow_dispatch:
 
