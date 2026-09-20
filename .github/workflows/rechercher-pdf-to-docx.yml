@@ -8,6 +8,7 @@ on:
       - 'requirements-rechercher-pdf-docx.txt'
       - 'test/rechercher-pdf-to-docx.test.js'
       - 'test/rechercher-pdf-to-docx-arabic.test.js'
+      - 'test/rechercher-pdf-to-docx-python.test.py'
       - 'package.json'
       - '.github/workflows/rechercher-pdf-to-docx.yml'
   pull_request:
@@ -48,3 +49,5 @@ jobs:
         run: node --test test/rechercher-pdf-to-docx.test.js
       - name: Run structural Arabic engine regression test
         run: node --test test/rechercher-pdf-to-docx-arabic.test.js
+      - name: Run Python engine regression tests
+        run: python3 -m pytest -q test/rechercher-pdf-to-docx-python.test.py
