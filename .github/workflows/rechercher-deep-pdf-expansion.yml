@@ -57,7 +57,7 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check -r requirements-rechercher-pdf-docx.txt
           sudo apt-get update
-          sudo apt-get install -y libreoffice fonts-hosny-amiri tesseract-ocr tesseract-ocr-ara
+          sudo apt-get install -y libreoffice fonts-hosny-amiri tesseract-ocr tesseract-ocr-ara\n          fc-cache -f -v\n          tesseract --list-langs\n          TESSDATA_PREFIX="$(dirname "$(find /usr/share/tesseract-ocr -type f -name ara.traineddata -print -quit)")"\n          test -f "$TESSDATA_PREFIX/ara.traineddata"\n          echo "TESSDATA_PREFIX=$TESSDATA_PREFIX" >> "$GITHUB_ENV"
       - name: Derive DOCX from validated PDFs
         run: node scripts/rechercher_pdf_to_docx.mjs --input artifacts/rechercher/multilingual-deep-pdf-expansion --output artifacts/rechercher/multilingual-docx-expansion --strict
       - name: Upload PDF to DOCX derivations
