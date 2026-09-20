@@ -1,0 +1,82 @@
+name: Rechercher — Strict multilingual manifest gate
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Rechercher — Multilingual resource acquisition
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-multilingual-manifest-gate-${{ github.event.workflow_run.id || github.ref }}
+  cancel-in-progress: false
+
+env:
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
+
+jobs:
+  validate:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Resolve acquisition revision
+        id: revision
+        env:
+          WORKFLOW_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          if [ -n "${WORKFLOW_SHA:-}" ]; then
+            echo "sha=$WORKFLOW_SHA" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout source revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.revision.outputs.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Fetch durable matrix manifest
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}" || { echo "MATRIX_MANIFEST_GATE_FAIL: storage token missing"; exit 1; }
+          cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          git clone --depth 1 "https://github.com/${MATRIX_STORAGE_REPO}.git" "$RUNNER_TEMP/matrix-storage"
+          manifest="$RUNNER_TEMP/matrix-storage/artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+          test -s "$manifest" || { echo "MATRIX_MANIFEST_GATE_FAIL: durable manifest missing"; exit 1; }
+          mkdir -p artifacts/rechercher/multilingual-pdf-acquisition
+          cp "$manifest" artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+
+      - name: Strictly validate multilingual manifest
+        run: |
+          set -euo pipefail
+          node scripts/rechercher_validate_multilingual_manifest.mjs artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+
+      - name: Upload strict validation result
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-strict-multilingual-manifest-gate
+          path: artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+          if-no-files-found: error
