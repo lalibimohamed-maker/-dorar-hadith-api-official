@@ -177,12 +177,15 @@
       "role": "bibliographic_and_text_discovery",
       "capabilities": [
         "books",
+        "master_metadata",
+        "book_metadata",
+        "book_data",
         "sections",
         "text_discovery"
       ],
-      "status": "discovery-registry",
+      "status": "api-key-configurable",
       "rights": "source-specific",
-      "runtime_note": "Discovery URL connector implemented; no full content API is claimed until an official/documented content interface is verified."
+      "runtime_note": "Executable Shamela v4 API connector implemented with key-gated runtime; no API key is stored in repository. Live calls remain gated on SHAMELA_API_KEY."
     },
     {
       "id": "islamhouse",
