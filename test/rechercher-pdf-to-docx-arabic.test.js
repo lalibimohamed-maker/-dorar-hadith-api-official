@@ -8,7 +8,7 @@ const run=(cmd,args,cwd)=>new Promise((resolve,reject)=>{const p=spawn(cmd,args,
 test('structural PDF to DOCX emits provenance and preserves source',async()=>{
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'rechercher-ar-')),input=path.join(root,'input'),output=path.join(root,'output'),pdf=path.join(input,'arabic.pdf'),manifest=path.join(output,'manifest.json');
  await fs.mkdir(input,{recursive:true});
- await run('python3',['-c','import pymupdf; d=pymupdf.open(); p=d.new_page(); p.insert_text((500,100),"\u0627\u0644\u0644\u0647 \u0631\u062d\u0645\u0629 \u0648\u0633\u0644\u0627\u0645",fontname="helv",fontsize=18); d.save(r"'+pdf.replace(/"/g,'\"')+'")'],process.cwd());
+ await run('python3',['-c','import sys,pymupdf; d=pymupdf.open(); p=d.new_page(); p.insert_text((500,100),"\u0627\u0644\u0644\u0647 \u0631\u062d\u0645\u0629 \u0648\u0633\u0644\u0627\u0645",fontname="helv",fontsize=18); d.save(sys.argv[1])',pdf],process.cwd());
  const before=await fs.readFile(pdf);
  await run('python3',['scripts/rechercher_pdf_to_docx.py','--input',input,'--output',output,'--manifest',manifest],process.cwd());
  assert.deepEqual(await fs.readFile(pdf),before);
