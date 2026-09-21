@@ -77,6 +77,54 @@ const manifest={
   cells:{}
 };
 const downloadedUrls=new Set();let processed=0;
+
+// Language URL Index: derive localized URL variants from the 133 language entries
+// already present in the scientific ledger. This is discovery-only; it never
+// changes the canonical religious text or translation content.
+const LANGUAGE_URL_INDEX=new Map();
+for(const row of rows){
+  const iso=String(row.language_iso||'').trim().toLowerCase();
+  const name=String(row.language||'').trim().toLowerCase();
+  if(!iso) continue;
+  const aliases=new Set([iso]);
+  if(iso.includes('-')) aliases.add(iso.split('-')[0]);
+  if(name) aliases.add(name);
+  LANGUAGE_URL_INDEX.set(iso,[...aliases].filter(Boolean));
+}
+function localizedUrlCandidates(rawUrl, languageIso){
+  const u=allowedUrl(rawUrl);
+  if(!u) return [];
+  const aliases=LANGUAGE_URL_INDEX.get(String(languageIso||'').toLowerCase())||[String(languageIso||'').toLowerCase()];
+  const out=[];
+  const seen=new Set();
+  const add=value=>{
+    const v=allowedUrl(value);
+    if(v && !seen.has(v.href)){seen.add(v.href);out.push(v.href)}
+  };
+  // 1) Existing language/locale query parameters.
+  for(const key of ['lang','language','locale','hl','lng']){
+    const q=new URL(u.href);
+    q.searchParams.set(key,aliases[0]);
+    add(q.href);
+  }
+  // 2) Replace a known locale-like path segment.
+  const parts=u.pathname.split('/').filter(Boolean);
+  for(let i=0;i<parts.length;i++){
+    if(/^[a-z]{2,3}(?:-[a-z]{2})?$/i.test(parts[i]) || /^(?:ar|en|fr|de|es|pt|it|nl|tr|ur|fa|id|ms|bn|hi|ru|zh|ja|ko)$/i.test(parts[i])){
+      for(const alias of aliases){
+        const p=[...parts];p[i]=alias;
+        const q=new URL(u.href);q.pathname='/'+p.join('/')+(u.pathname.endsWith('/')?'/':'');add(q.href);
+      }
+    }
+  }
+  // 3) Common localized-prefix forms used by multilingual Islamic sites.
+  for(const alias of aliases){
+    const q=new URL(u.href);
+    q.pathname='/'+alias+'/'+u.pathname.replace(/^\/+/, '');
+    add(q.href);
+  }
+  return out;
+}
 for(const [cellId,r] of cells){
   const rights=rightsForCell(r);
   const acquisition=rights.status===RIGHTS.REDISTRIBUTABLE?'public':(rights.status===RIGHTS.READ_COPY||rights.status===RIGHTS.READ_ONLY?'research-only':'blocked');
@@ -99,10 +147,14 @@ for(const [cellId,r] of cells){
   }
   for(const adapter of orderedAdapters){
     if(entry.files.length>=2)break;
-    const candidates=new Set([adapter.base_url]);
-    for(const url of evidenceUrls){
-      const parsed=allowedUrl(url);
-      if(parsed && ALLOWED_ORIGINS.has(parsed.origin))candidates.add(parsed.href);
+    const candidates=new Set();
+    // Prefer language-indexed variants before the canonical/base URL.
+    const seedUrls=[adapter.base_url,...evidenceUrls];
+    for(const seed of seedUrls){
+      const parsed=allowedUrl(seed);
+      if(!parsed || !ALLOWED_ORIGINS.has(parsed.origin)) continue;
+      for(const variant of localizedUrlCandidates(parsed.href,r.language_iso||r.language)) candidates.add(variant);
+      candidates.add(parsed.href);
     }
     for(const url of [...candidates].slice(0,12)){
       if(entry.files.length>=2)break;
