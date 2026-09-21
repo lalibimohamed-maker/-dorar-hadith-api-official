@@ -20,7 +20,7 @@ test("OpenITI raw resolver creates release-pinned URL", () => {
   );
 });
 
-test("Shamela remains discovery-only until a documented content API is verified", () => {
+test("Shamela v4 runtime connector is key-gated and executable", () => {
   const info = c.shamelaConnectorInfo();
   assert.equal(info.runtime, "discovery-only");
   assert.match(c.shamelaDiscoveryUrl("ابن تيمية"), /^https:\/\/shamela\.ws\/search\?query=/);
