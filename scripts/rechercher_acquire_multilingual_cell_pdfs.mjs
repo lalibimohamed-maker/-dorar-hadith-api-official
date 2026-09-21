@@ -11,6 +11,7 @@ const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXPECTED=3192;
 const CONCURRENCY=Math.max(1,Math.min(12,Number(process.env.ACQUISITION_CONCURRENCY||8)));
+const MAX_FILES=Math.max(1,Math.min(8,Number(process.env.ACQUISITION_MAX_FILES_PER_CELL||4)));
 const REQUEST_TIMEOUT=15000, DOWNLOAD_TIMEOUT=90000, RESPONSE_LIMIT=12*1024*1024, PDF_LIMIT=750*1024*1024;
 
 const rows=(await fs.readFile(LEDGER,'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
@@ -129,6 +130,9 @@ async function candidateUrls(seed){
     if(new URL(r.finalUrl).origin==='https://archive.org') for(const u of await archivePdfUrls(json)) set.add(u);
   }catch{htmlUrls(text,r.finalUrl,set);}
   return [...set].filter(x=>allow(x)).slice(0,16);
+  })();
+  candidateCache.set(seed,pending);
+  try{return await pending;}catch(e){candidateCache.delete(seed);throw e;}
 }
 
 function evidenceUrls(row){
