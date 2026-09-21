@@ -20,7 +20,7 @@ permissions:
 
 concurrency:
   group: rechercher-global-multilingual-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   NODE_VERSION: '24'

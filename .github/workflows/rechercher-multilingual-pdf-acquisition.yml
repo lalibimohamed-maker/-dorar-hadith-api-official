@@ -17,7 +17,7 @@ env:
   MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
 concurrency:
   group: rechercher-multilingual-pdf-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   acquire:
     runs-on: ubuntu-24.04
