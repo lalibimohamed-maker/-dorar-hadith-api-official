@@ -166,8 +166,9 @@
         "machine_readable_text",
         "author_work_metadata"
       ],
-      "status": "discovery-registry",
-      "rights": "dataset-specific"
+      "status": "runtime-verified",
+      "rights": "dataset-specific",
+      "runtime_note": "Metadata API + release-pinned raw-text resolver implemented with regression tests; dataset-specific rights remain required."
     },
     {
       "id": "shamela",
@@ -180,7 +181,8 @@
         "text_discovery"
       ],
       "status": "discovery-registry",
-      "rights": "source-specific"
+      "rights": "source-specific",
+      "runtime_note": "Discovery URL connector implemented; no full content API is claimed until an official/documented content interface is verified."
     },
     {
       "id": "islamhouse",
@@ -206,6 +208,9 @@
     "runtime_verified_requires_executable_connector_and_tests": true,
     "iiif_runtime_capable_requires_manifest_url": true,
     "catalogue_search_is_distinct_from_manifest_retrieval": true,
-    "rights_verified_per_item": true
+    "rights_verified_per_item": true,
+    "raw_text_requires_source_specific_rights": true,
+    "discovery_only_must_not_be_presented_as_content_connector": true,
+    "corpus_write_never_direct": true
   }
 }
