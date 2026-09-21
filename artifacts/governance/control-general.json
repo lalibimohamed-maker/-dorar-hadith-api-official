@@ -1,12 +1,12 @@
 {
   "schema": "developer-review-acquisition/global-control/v2",
-  "generated_at": "2026-09-11T04:13:14.417048+00:00",
+  "generated_at": "2026-09-21T09:56:10.938023+00:00",
   "scope": "1-400H",
-  "status": "PASS",
+  "status": "HOLD",
   "counts": {
     "checks": 16,
-    "passed": 16,
-    "gaps": 0,
+    "passed": 14,
+    "gaps": 2,
     "encrypted_artifacts": 0
   },
   "checks": [
@@ -14,19 +14,19 @@
       "name": "catalog-present",
       "status": "PASS",
       "severity": "CRITICAL",
-      "detail": "books=45"
+      "detail": "books=247"
     },
     {
       "name": "overlay-present",
-      "status": "PASS",
+      "status": "HOLD",
       "severity": "HIGH",
-      "detail": "entries=215"
+      "detail": "entries=0"
     },
     {
       "name": "governance-coverage",
       "status": "PASS",
       "severity": "CRITICAL",
-      "detail": "catalog=45 governance=45"
+      "detail": "catalog=247 governance=247"
     },
     {
       "name": "governance-identity-separation",
@@ -38,7 +38,7 @@
       "name": "quality-score-present",
       "status": "PASS",
       "severity": "HIGH",
-      "detail": "records=45"
+      "detail": "records=247"
     },
     {
       "name": "six-core-source-health",
@@ -48,9 +48,9 @@
     },
     {
       "name": "deep-worldwide-layer",
-      "status": "PASS",
+      "status": "HOLD",
       "severity": "HIGH",
-      "detail": "sources=12 works=212"
+      "detail": "sources=12 works=0"
     },
     {
       "name": "page-integrity-report",
@@ -107,7 +107,18 @@
       "detail": "records claiming redistribution without verified rights=0"
     }
   ],
-  "gaps": [],
+  "gaps": [
+    {
+      "check": "overlay-present",
+      "severity": "HIGH",
+      "detail": "entries=0"
+    },
+    {
+      "check": "deep-worldwide-layer",
+      "severity": "HIGH",
+      "detail": "sources=12 works=0"
+    }
+  ],
   "artifact_hashes": [],
   "policy": "Fail closed; discovery, identity evidence and bibliographic evidence never grant redistribution rights."
 }
