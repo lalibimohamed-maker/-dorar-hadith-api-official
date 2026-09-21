@@ -1,3 +1,4 @@
+import { openItiConnectorInfo, openItiVersion, openItiRawTextUrl, openItiRawText, openItiConnectorHealth, shamelaDiscoveryUrl, shamelaConnectorInfo } from './rechercher-openiti-shamela.js';
 import { loadCorpus, loadRouting } from './corpus_repository.js';
 import { searchCorpus, resolveConcept } from './corpus_search.js';
 import { buildKnowledgeSections } from './concept_resolver.js';
@@ -91,3 +92,11 @@ export function rechercherIslamHouseBooks(input) { return islamHouseBooks(input)
 export function rechercherGallicaSearch(input) { return gallicaSearch(input); }
 export function rechercherIiifManifest(input) { return fetchIiifManifest(input.provider, input.url, input); }
 export function rechercherIiifConnectorInfo() { return iiifConnectorInfo(); }
+
+export function rechercherOpenItiInfo() { return openItiConnectorInfo(); }
+export function rechercherOpenItiVersion(versionUri, options) { return openItiVersion(versionUri, options); }
+export function rechercherOpenItiRawTextUrl(input) { return openItiRawTextUrl(input); }
+export function rechercherOpenItiRawText(input) { return openItiRawText(input); }
+export function rechercherOpenItiHealth() { return openItiConnectorHealth(); }
+export function rechercherShamelaDiscoveryUrl(query) { return shamelaDiscoveryUrl(query); }
+export function rechercherShamelaInfo() { return shamelaConnectorInfo(); }
