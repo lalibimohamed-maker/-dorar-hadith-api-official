@@ -360,10 +360,13 @@ def acquire(book):
         "volumes": vols, "unified_file": str(unified.relative_to(ROOT)), "unified_bytes": unified.stat().st_size,
         "unified_sha256": sha256(unified), "unified_validation": unified_validation, "unified_quality_gate": unified_quality,
         "acquisition": "acquired", "pdf": "real+validated", "storage": "permanent",
-        "rights_review": state, "acquisition_basis_at_download": book.get("acquisition_status") or book.get("rights_status"),
+        "rights_review": state, "rights_action": "public-eligible" if redistributable else "protected-developer",
+        "acquisition_basis_at_download": book.get("acquisition_status") or book.get("rights_status"),
         "public_browser": redistributable, "public_download": redistributable,
         "developer_private_access": True,
-        "storage_visibility": "private-protected" if not redistributable else "publication-eligible",
+        "developer_public_access": True,
+        "storage_visibility": "publication-eligible" if redistributable else "private-protected",
+        "storage_route": "public-primary" if redistributable else "protected-secondary",
         "browser_publication": "allowed" if redistributable else "blocked-protected-private",
     }
     (ART / f"{safe}.manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

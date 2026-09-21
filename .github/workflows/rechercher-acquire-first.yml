@@ -127,9 +127,8 @@ jobs:
             sha256sum "$f"
           done
 
-      - name: Encrypt and persist acquired copies immediately
+      - name: Persist each acquired PDF exactly once as plaintext
         env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
@@ -137,24 +136,23 @@ jobs:
           files=(artifacts/developer-review-vault/*.pdf)
           test "${#files[@]}" -gt 0
           mkdir -p artifacts/governance
+          VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
+          gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher acquired storage ${GITHUB_RUN_ID}" --notes "Acquire-first persistence boundary. Each verified PDF is persisted exactly once as a plaintext PDF. No PDF is encrypted into .pdf.enc and no duplicate PDF copy is created."
+          : > artifacts/governance/vault-release.jsonl
           for f in "${files[@]}"; do
-            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "$f.enc"
+            gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
+            printf '%s  %s  pdf\\n' "$(sha256sum "$f" | awk '{print $1}')" "$f" >> artifacts/governance/vault-release.jsonl
             rm -f -- "$f"
           done
-          enc=(artifacts/developer-review-vault/*.enc)
-          test "${#enc[@]}" -gt 0
-          VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
-          gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher acquired vault ${GITHUB_RUN_ID}" --notes "Acquire-first persistence boundary. Every asset was downloaded, checked as PDF, hashed, then encrypted before storage."
-          : > artifacts/governance/vault-release.jsonl
-          for f in "${enc[@]}"; do gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber; sha256sum "$f" >> artifacts/governance/vault-release.jsonl; done
           python3 - "$VAULT_TAG" <<'PY'
           import json,os,subprocess,sys
           from pathlib import Path
           tag=sys.argv[1]; assets=[]
           for raw in Path('artifacts/governance/vault-release.jsonl').read_text(encoding='utf-8').splitlines():
-              digest,path=raw.split(None,1); assets.append({'sha256':digest,'file':path})
+              digest,path,kind=raw.split(None,2)
+              assets.append({'sha256':digest,'file':path,'format':'pdf','access':'developer-and-release'})
           release=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo',os.environ['GITHUB_REPOSITORY'],'--json','url,tagName'],text=True))
-          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v1','persistence_boundary':'acquire-first','release':release,'assets':assets},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v4-single-plaintext-pdf','persistence_boundary':'acquire-first','storage_model':'single-canonical-plaintext-pdf','encrypted_pdf_format':False,'release':release,'assets':assets,'counts':{'pdf':len(assets),'pdf_enc':0}},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
           rm -f artifacts/governance/vault-release.jsonl
 
@@ -187,5 +185,17 @@ jobs:
             books-batches/salaf-01-400h/master-discovery-additions-2026.json \
             books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
           git diff --cached --quiet || git commit -m 'data(rechercher): reconcile acquire-first state and discovery memory'
+          # Checkout disables persisted credentials, so explicitly provide the workflow token
+          # to the final review-branch push. Never allow an interactive credential prompt.
+          cat > "$RUNNER_TEMP/rechercher-review-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$GITHUB_TOKEN" ;;
+            *) printf '%s\n' "$GITHUB_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/rechercher-review-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-review-askpass" GIT_TERMINAL_PROMPT=0
           git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           echo "ACQUIRE_FIRST_PERSISTED=$ACQ_COMMIT"

@@ -100,6 +100,7 @@ jobs:
           rm -rf artifacts/permanent-pdfs
           find . -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -delete
           python3 ../scripts/rechercher_pdf_storage_hygiene.py --root "$PWD" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
+          python3 ../scripts/rechercher_pdf_storage_hygiene.py --root "$PWD" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
           mkdir -p ../artifacts
           while IFS= read -r -d '' f; do
             base="$(basename "${f#./}")"
@@ -112,8 +113,10 @@ jobs:
           python3 .governance-source/scripts/rechercher_encyclopedia_catalog_census.py
           python3 .governance-source/scripts/rechercher_dorar_book_index.py --root "$GITHUB_WORKSPACE"
 
-      - name: Clean primary PDF working storage
-        run: python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
+      - name: Canonicalize all primary PDF working storage
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
 
       - name: Acquire PDFs through the single unbounded Hijri chronological queue
         run: |
@@ -140,57 +143,83 @@ jobs:
             qpdf --check "$f" >/dev/null
           done < <(find artifacts -type f -name '*.pdf' -print0)
 
-      - name: Deterministically partition PDFs across the two pools
+      - name: Route each PDF exactly once by rights (public or protected)
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import hashlib, shutil
+          import hashlib, json, shutil
           from pathlib import Path
-          primary=Path('artifacts'); secondary=Path('.secondary-storage/artifacts')
-          primary.mkdir(parents=True, exist_ok=True); secondary.mkdir(parents=True, exist_ok=True)
+
+          primary=Path('artifacts')
+          secondary=Path('.secondary-storage/artifacts')
+          primary.mkdir(parents=True, exist_ok=True)
+          secondary.mkdir(parents=True, exist_ok=True)
+
           def sha256(path):
               h=hashlib.sha256()
               with path.open('rb') as fh:
                   for chunk in iter(lambda: fh.read(1024*1024), b''): h.update(chunk)
               return h.hexdigest()
+
           def valid_pdf(path):
               try:
-                  with path.open('rb') as fh: return path.is_file() and path.stat().st_size>0 and fh.read(5)==b'%PDF-'
-              except OSError: return False
-          files=[]
-          for pool,root in (('primary',primary),('secondary',secondary)):
+                  with path.open('rb') as fh:
+                      return path.is_file() and path.stat().st_size > 0 and fh.read(5) == b'%PDF-'
+              except OSError:
+                  return False
+
+          def route_for(pdf):
+              # The manifest is kept with the acquisition state, never inside
+              # the protected PDF pool. Missing rights evidence fails closed.
+              manifest=primary/(pdf.stem + '.manifest.json')
+              if not manifest.exists():
+                  # Existing legacy secondary PDFs without a manifest remain protected;
+                  # they are never promoted to public without explicit rights evidence.
+                  return 'protected'
+              data=json.loads(manifest.read_text(encoding='utf-8'))
+              visibility=data.get('storage_visibility')
+              if visibility == 'publication-eligible' and data.get('public_browser') is True:
+                  return 'public'
+              if visibility == 'private-protected' and data.get('developer_private_access') is True:
+                  return 'protected'
+              raise SystemExit(f'RIGHTS_ROUTING_BLOCKED: {pdf.name} visibility={visibility!r}')
+
+          # Inspect both pools so a re-run can correct the route without creating
+          # a second PDF copy. Public-eligible -> public primary; otherwise -> protected secondary.
+          candidates=[p for p in sorted(primary.glob('*.pdf'))] + [p for p in sorted(secondary.glob('*.pdf'))]
+          for path in candidates:
+              if not valid_pdf(path):
+                  raise SystemExit(f'not a real PDF: {path}')
+              route=route_for(path)
+              destination_root=primary if route == 'public' else secondary
+              destination=destination_root/path.name
+              if destination != path:
+                  if destination.exists():
+                      if sha256(destination) != sha256(path):
+                          raise SystemExit(f'LOGICAL_PDF_COLLISION: {path.name} conflicts with canonical {destination.name}; refusing a second physical PDF')
+                      path.unlink(missing_ok=True)
+                      continue
+                  shutil.move(str(path),str(destination))
+
+          # Final invariant: one logical book key and one SHA-256 each map to one physical PDF.
+          seen={}
+          logical_seen={}
+          for pool,root in (('public',primary),('protected',secondary)):
               for path in sorted(root.glob('*.pdf')):
                   if not valid_pdf(path):
-                      if pool=='secondary': path.unlink(missing_ok=True); continue
-                      raise SystemExit(f'not a real PDF: {path}')
-                  files.append((pool,path,sha256(path)))
-          groups={}
-          for item in files: groups.setdefault(item[2],[]).append(item)
-          for sha,items in sorted(groups.items()):
-              assigned='primary' if int(sha[0],16)%2==0 else 'secondary'
-              preferred=[x for x in items if x[0]==assigned] or [x for x in items if x[0]=='primary'] or items
-              canonical=sorted(preferred,key=lambda x:str(x[1]))[0]
-              for item in items:
-                  if item!=canonical: item[1].unlink(missing_ok=True)
-              current_pool,current_path,_=canonical; destination_root=primary if assigned=='primary' else secondary; destination=destination_root/current_path.name
-              if current_pool!=assigned:
-                  if destination.exists() and sha256(destination)==sha:
-                      current_path.unlink(missing_ok=True); current_path=destination; current_pool=assigned
-                  else:
-                      if destination.exists() and sha256(destination)!=sha:
-                          destination=destination_root/f'{current_path.stem}--{sha[:12]}{current_path.suffix}'
-                      shutil.move(str(current_path),str(destination)); current_path=destination; current_pool=assigned
-              if current_pool==assigned:
-                  siblings=[p for p in destination_root.glob(f'{current_path.stem}.pdf') if p!=current_path]
-                  if siblings: raise SystemExit(f'unexpected storage collision after canonicalization: {current_path}')
-          seen={}
-          for pool,root in (('primary',primary),('secondary',secondary)):
-              for path in sorted(root.glob('*.pdf')):
-                  if not valid_pdf(path): raise SystemExit(f'invalid PDF after partition: {pool}/{path.name}')
-                  sha=sha256(path)
-                  if sha in seen: raise SystemExit(f'DUPLICATE_PDF_COPY: {path.name} already stored in {seen[sha]}')
-                  seen[sha]=f'{pool}/{path.name}'
-          print(f'ONE_COPY_PARTITION_OK count={len(seen)}')
+                      raise SystemExit(f'invalid PDF after rights routing: {pool}/{path.name}')
+                  digest=sha256(path)
+                  if digest in seen:
+                      raise SystemExit(f'DUPLICATE_PDF_COPY: {path.name} already stored in {seen[digest]}')
+                  seen[digest]=f'{pool}/{path.name}'
+                  key=path.stem.rsplit('--',1)[0] if '--' in path.stem and len(path.stem.rsplit('--',1)[-1])==12 else path.stem
+                  if key in logical_seen:
+                      raise SystemExit(f'DUPLICATE_LOGICAL_BOOK: {path.name} already stored as {logical_seen[key]}')
+                  logical_seen[key]=f'{pool}/{path.name}'
+
+          public_count=sum(1 for value in seen.values() if value.startswith('public/'))
+          protected_count=sum(1 for value in seen.values() if value.startswith('protected/'))
+          print(f'RIGHTS_ROUTING_OK public={public_count} protected={protected_count} total={len(seen)}')
           PY
 
       - name: Persist verified PDFs to primary LFS storage
@@ -278,7 +307,7 @@ jobs:
                   sha=hashlib.sha256(data).hexdigest()
                   if sha in seen: raise SystemExit(f'DUPLICATE_PDF_COPY: {pdf.name} already stored in {seen[sha]}')
                   seen[sha]=f'{pool}/{pdf.name}'
-          Path('artifacts/governance/storage-end-to-end-proof.json').write_text(json.dumps({'status':'VERIFIED','storage_model':'ONE_COPY_ONLY','verified_real_pdfs':len(seen),'primary':'artifacts/*.pdf','secondary':'artifacts/*.pdf','sha256':'integrity_only_not_storage_path','encrypted_final_artifacts':False,'duplicate_pdf_copies':0},indent=2)+'\n',encoding='utf-8')
+          Path('artifacts/governance/storage-end-to-end-proof.json').write_text(json.dumps({'status':'VERIFIED','storage_model':'ONE_COPY_ONLY_RIGHTS_ROUTED','verified_real_pdfs':len(seen),'public_storage':'primary public asset','protected_storage':'secondary developer-access pool','developer_access_public':True,'developer_access_protected':True,'sha256':'integrity_only_not_storage_path','encrypted_final_artifacts':False,'duplicate_pdf_copies':0},indent=2)+'\n',encoding='utf-8')
           print(f'ONE_COPY_STORAGE=VERIFIED count={len(seen)}')
           PY
           git lfs fsck --pointers HEAD
