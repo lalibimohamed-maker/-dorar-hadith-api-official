@@ -17,12 +17,15 @@ function requireShamelaKey() {
   return key;
 }
 
-async function shamelaGet(endpoint, path, { signal } = {}) {
-  const config = shamelaConfig();
+async function shamelaGet(endpoint, path = "", { query = {}, signal } = {}) {
   const key = requireShamelaKey();
   const base = endpoint.replace(/\/+$/, "");
-  const url = new URL(base + "/" + path.replace(/^\/+/, ""));
+  const suffix = String(path || "").replace(/^\/+/, "");
+  const url = new URL(base + (suffix ? "/" + suffix : ""));
   url.searchParams.set("api_key", key);
+  for (const [name, value] of Object.entries(query)) {
+    if (value !== undefined && value !== null) url.searchParams.set(name, String(value));
+  }
   const response = await fetch(url, {
     method: "GET",
     headers: { accept: "application/json", "user-agent": "DinAllah-Rechercher/1.0" },
@@ -43,21 +46,33 @@ export function shamelaRuntimeConfig() {
   };
 }
 
-export async function shamelaMasterMetadata({ version, signal } = {}) {
-  const suffix = version === undefined ? "" : "/" + encodeURIComponent(String(version));
-  return shamelaGet(shamelaConfig().masterPatchEndpoint, suffix, { signal });
+export async function shamelaMasterMetadata({ version = 0, signal } = {}) {
+  if (!Number.isInteger(Number(version)) || Number(version) < 0) {
+    throw new TypeError("version must be a non-negative integer");
+  }
+  return shamelaGet(shamelaConfig().masterPatchEndpoint, "", {
+    query: { version: Number(version) },
+    signal
+  });
 }
 
-export async function shamelaBookMetadata(bookId, { signal } = {}) {
+export async function shamelaBookMetadata(bookId, { majorVersion = 0, minorVersion = 0, signal } = {}) {
   const id = Number(bookId);
   if (!Number.isInteger(id) || id < 1) throw new TypeError("bookId must be a positive integer");
-  return shamelaGet(shamelaConfig().booksEndpoint, String(id), { signal });
+  if (!Number.isInteger(Number(majorVersion)) || Number(majorVersion) < 0) {
+    throw new TypeError("majorVersion must be a non-negative integer");
+  }
+  if (!Number.isInteger(Number(minorVersion)) || Number(minorVersion) < 0) {
+    throw new TypeError("minorVersion must be a non-negative integer");
+  }
+  return shamelaGet(shamelaConfig().booksEndpoint, String(id), {
+    query: { major_release: Number(majorVersion), minor_release: Number(minorVersion) },
+    signal
+  });
 }
 
-export async function shamelaBook(bookId, { signal } = {}) {
-  const id = Number(bookId);
-  if (!Number.isInteger(id) || id < 1) throw new TypeError("bookId must be a positive integer");
-  return shamelaGet(shamelaConfig().booksEndpoint, String(id), { signal });
+export async function shamelaBook(bookId, options = {}) {
+  return shamelaBookMetadata(bookId, options);
 }
 
 function required(value, name) {
@@ -142,6 +157,7 @@ export function shamelaConnectorInfo() {
     corpusWrite: "never-direct",
     apiKeyRequired: true,
     endpoints: { masterMetadata: SHAMELA_DEFAULT_MASTER_ENDPOINT, books: SHAMELA_DEFAULT_BOOKS_ENDPOINT },
-    note: "Runtime API connector is executable and key-gated; no key is stored in source."
+    capabilities: ["master-metadata", "book-release-metadata", "discovery"],
+    note: "Runtime API connector is executable and key-gated; no key is stored in source. Book content requires the source-provided release URL and a separate acquisition/rights step."
   };
 }
