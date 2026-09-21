@@ -16,6 +16,26 @@ for (const line of (await fs.readFile(ledger,'utf8')).split(/\r?\n/)) {
   languages.set(r.language_iso || r.language, {name:r.language, iso:r.language_iso, records:(languages.get(r.language_iso || r.language)?.records||[]).concat(r)});
 }
 const ALLOWED_ORIGINS=new Set(sourceRegistry.adapters.flatMap(a=>a.origins));
+const STATIC_SOURCE_BASE_URLS=Object.freeze({
+  'hadeethenc':'https://hadeethenc.com/',
+  'islamhouse':'https://islamhouse.com/',
+  'islamhouse-cdn':'https://d1.islamhouse.com/',
+  'quranenc':'https://quranenc.com/',
+  'quran-com':'https://quran.com/',
+  'quran-api':'https://api.quran.com/',
+  'sunnah-com':'https://sunnah.com/',
+  'hadith-api':'https://www.hadithapi.com/',
+  'alquran-cloud':'https://alquran.cloud/',
+  'qul':'https://qul.tarteel.ai/',
+  'house-of-islam':'https://developers.thehouseofislam.com/',
+  'kalimat':'https://www.kalimat.dev/',
+  'openiti':'https://openiti.org/',
+  'shamela':'https://shamela.ws/'
+});
+function sourceBaseUrl(adapter){
+  const value=STATIC_SOURCE_BASE_URLS[adapter.id];
+  return value && adapter.status==='enabled' ? value : null;
+}
 function allowedUrl(value){
   let u;
   try { u=new URL(value); } catch { return null; }
@@ -87,8 +107,10 @@ function pdfLinks(html,base){
  }
  return out;
 }
-async function get(url){
- const u=allowedUrl(url); if(!u) throw new Error('untrusted or disallowed HTTPS origin');
+async function get(sourceId){
+ const base=STATIC_SOURCE_BASE_URLS[sourceId];
+ if(!base) throw new Error('untrusted or unregistered source');
+ const u=allowedUrl(base); if(!u) throw new Error('untrusted or disallowed HTTPS origin');
  for(let i=0;i<4;i++){try{
    const r=await fetch(u,{headers:{'user-agent':'DinAllah-Rechercher/2.0','accept':'text/html,application/pdf;q=0.9,*/*;q=0.1'}});
    if(r.status===429){await sleep(1500*(i+1));continue}
@@ -105,13 +127,20 @@ async function probePdf(url){
   }catch(e){if(i===2)return null;await sleep(500*(i+1));}}
   return null;
 }
+function validatePdfPayload(bytes){
+ if(!Buffer.isBuffer(bytes) || bytes.length<5) throw new Error('downloaded payload is empty or too small');
+ if(bytes.subarray(0,5).toString()!=='%PDF-') throw new Error('downloaded payload is not a PDF');
+ const eofWindow=bytes.subarray(Math.max(0,bytes.length-1024)).toString('latin1');
+ if(!/%%EOF\\s*$/.test(eofWindow)) throw new Error('downloaded payload has no PDF EOF marker');
+ return bytes;
+}
 async function downloadPdf(url,file){
  const u=allowedUrl(url); if(!u) throw new Error('untrusted or disallowed HTTPS origin');
  const r=await fetch(u,{redirect:'manual',headers:{'user-agent':'DinAllah-Rechercher/2.0','accept':'application/pdf,*/*;q=0.1'}});
  if(!r.ok) throw new Error('PDF download failed with HTTP '+r.status);
  const final=allowedUrl(r.url || u.href);
  if(!final) throw new Error('PDF redirect target is not an approved HTTPS origin');
- const bytes=Buffer.from(await r.arrayBuffer());
+ const bytes=validatePdfPayload(Buffer.from(await r.arrayBuffer()));
  await fs.writeFile(file,bytes);
 }
 const summary={schema:'rechercher/multilingual-resource-acquisition/v2',generated_at:new Date().toISOString(),language_count:languages.size,policy:{redistribution:'only when explicitly verified',research_only:'only when lawful research access is explicitly established; never public',public_repo:'research-only PDFs are forbidden from persistence in this public repository'},languages:{}};
@@ -128,20 +157,20 @@ for(const [key,lang] of languages){
  for(const r of lang.records){
    const id=String(r.provider||r.source_id||'').toLowerCase();
    const adapter=registered.get(id);
-   if(adapter && adapter.status==='enabled') sourcePages.push({adapter,url:adapter.base_url});
+   if(adapter && adapter.status==='enabled') const baseUrl=sourceBaseUrl(adapter);\n   if(baseUrl) sourcePages.push({adapter,url:baseUrl});
  }
  for(const adapter of sourceRegistry.adapters){
    if(adapter.status!=='enabled') continue;
    const canProvidePdf=adapter.kinds?.some(k=>['pdf','download','datasets'].includes(k));
    if(!canProvidePdf) continue;
    if(sourcePages.some(x=>x.adapter.id===adapter.id)) continue;
-   sourcePages.push({adapter,url:adapter.base_url});
+   const baseUrl=sourceBaseUrl(adapter);\n   if(baseUrl) sourcePages.push({adapter,url:baseUrl});
  }
 
  for(const {adapter,url:sourceUrl} of sourcePages){
    entry.sources_checked.push({source:adapter.id,url:sourceUrl,role:adapter.authority||adapter.source_role||'islamic-source'});
    try{
-     const p=await get(sourceUrl);
+     const p=await get(adapter.id);
      if(!p.bytes) continue;
      const links=pdfLinks(p.bytes.toString('utf8'),sourceUrl);
      for(const pdfUrl of links.slice(0,32)){
