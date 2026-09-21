@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: rechercher-multilingual-manifest-gate-${{ github.event.workflow_run.id || github.ref }}
+  group: rechercher-multilingual-manifest-gate-${{ github.ref }}
   cancel-in-progress: false
 
 env:
