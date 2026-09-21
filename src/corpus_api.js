@@ -15,6 +15,7 @@ import { listQuranTranslations, getQuranTranslation, getQuranFoundationTranslati
 import { syncQuranFoundation } from './quran-foundation-sync.js';
 import { searchDorar } from './dorar-client.js';
 import { getSunnahCollections, getSunnahCollection, getSunnahHadiths, getSunnahHadithByRefs, getSunnahHadithByUrns } from './sunnah-client.js';
+import { hadeethEncApiInfo, hadeethEncLanguages, hadeethEncCategories, hadeethEncRootCategories, hadeethEncList, hadeethEncHadith } from './hadeethenc-client.js';
 
 export function search(query, options = {}) {
   const records = loadCorpus();
@@ -69,3 +70,10 @@ export function sunnahHadithRefs(refs, options) { return getSunnahHadithByRefs(r
 export function sunnahHadithUrns(urns, options) { return getSunnahHadithByUrns(urns, options); }
 export function sunnahCollections(options) { return getSunnahCollections(options); }
 export function sunnahCollection(collection, options) { return getSunnahCollection(collection, options); }
+
+export function hadeethEncInfo() { return hadeethEncApiInfo(); }
+export function hadeethEncLanguagesList() { return hadeethEncLanguages(); }
+export function hadeethEncCategoriesList(language) { return hadeethEncCategories(language); }
+export function hadeethEncRootCategoriesList(language) { return hadeethEncRootCategories(language); }
+export function hadeethEncHadithList(input) { return hadeethEncList(input); }
+export function hadeethEncHadithRecord(input) { return hadeethEncHadith(input); }
