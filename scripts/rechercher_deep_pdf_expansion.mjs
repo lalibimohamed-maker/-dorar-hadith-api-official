@@ -60,12 +60,14 @@ function islamHouseApiPdfLinks(json,lang){
 }
 async function islamHousePdfLinks(page,target,r){
  const out=[];
- const targetUrl=allow(target);\n if(targetUrl && targetUrl.origin==='https://api3.islamhouse.com'){
+ const targetUrl=allow(target);
+ if(targetUrl && targetUrl.origin==='https://api3.islamhouse.com'){
   let j; try{j=JSON.parse(page.bytes.toString('utf8'))}catch{return out}
   const candidates=islamHouseApiPdfLinks(j,r.language_iso||'en');
   for(const x of candidates.slice(0,15)){
    if(x.url){out.push(x.url);continue}
-   const lang=r.language_iso||'en'; const u=new URL('https://api3.islamhouse.com/v3/');\n   u.pathname += encodeURIComponent(process.env.ISLAMHOUSE_API_KEY||'')+'/main/get-item/'+encodeURIComponent(String(x.itemId))+'/'+encodeURIComponent(lang)+'/json';
+   const lang=r.language_iso||'en'; const u=new URL('https://api3.islamhouse.com/v3/');
+   u.pathname += encodeURIComponent(process.env.ISLAMHOUSE_API_KEY||'')+'/main/get-item/'+encodeURIComponent(String(x.itemId))+'/'+encodeURIComponent(lang)+'/json';
    const detail=await get(u); if(!detail)continue;
    for(const a of islamHouseApiPdfLinks(JSON.parse(detail.bytes.toString('utf8')),lang)) if(a.url) out.push(a.url);
   }
@@ -114,5 +116,6 @@ for(const r of missing){
  result.research_only_files+=e.files.filter(x=>x.acquisition==='research-only').length;
  if(result.attempted_cells%25===0)console.log(`DEEP_EXPANSION_PROGRESS completed=${result.attempted_cells}/${missing.length} files=${result.total_files}`);
 }
-await fs.writeFile(path.join(out,'manifest.json'),JSON.stringify(result,null,2)+'\n');
+await fs.writeFile(path.join(out,'manifest.json'),JSON.stringify(result,null,2)+'
+');
 console.log(JSON.stringify({input_cells:result.input_cells,attempted_cells:result.attempted_cells,total_files:result.total_files,public_files:result.public_files,research_only_files:result.research_only_files}));
