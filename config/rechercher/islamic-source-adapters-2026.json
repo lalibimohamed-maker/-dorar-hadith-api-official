@@ -277,6 +277,47 @@
       "ai_role": "semantic_discovery_only",
       "machine_translation": false,
       "status": "enabled"
+    },
+    {
+      "id": "openiti",
+      "name": "OpenITI",
+      "base_url": "https://openiti.org/",
+      "origins": [
+        "https://openiti.org",
+        "https://github.com/OpenITI",
+        "https://raw.githubusercontent.com/OpenITI"
+      ],
+      "kinds": [
+        "machine_readable_text",
+        "author_work_metadata",
+        "toc",
+        "provenance"
+      ],
+      "authority": "scholarly_corpus",
+      "runtime": "metadata-api-and-raw-release",
+      "status": "runtime-verified",
+      "api_base_url": "https://dev-kitab-metadata-api.azurewebsites.net",
+      "api_auth": "none",
+      "release_policy": "dataset-specific; verify release metadata and rights before redistribution"
+    },
+    {
+      "id": "shamela",
+      "name": "Shamela",
+      "base_url": "https://shamela.ws/",
+      "origins": [
+        "https://shamela.ws"
+      ],
+      "kinds": [
+        "books",
+        "sections",
+        "text_discovery",
+        "bibliography"
+      ],
+      "authority": "bibliographic_and_text_discovery",
+      "runtime": "discovery-only",
+      "status": "enabled",
+      "api_auth": "not-verified",
+      "release_policy": "source-specific; no public-content connector is claimed until an official/documented content interface is verified"
     }
   ],
   "runtime_policy": {
