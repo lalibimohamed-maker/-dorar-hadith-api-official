@@ -2,6 +2,7 @@
 """Governed wrapper for the central real-PDF acquisition engine."""
 from __future__ import annotations
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -14,6 +15,7 @@ VOLUME_RESOLVER = ROOT / "scripts/rechercher_resolve_volume_evidence.py"
 GOVERNED_VOLUME_RESOLVER = ROOT / ".governance-source/scripts/rechercher_resolve_volume_evidence.py"
 ENGINE = ROOT / "scripts/rechercher_acquisition_engine.py"
 RETRYABLE_STATUSES = {"blocked-missing-expected-volumes", "partial"}
+MAX_BOOKS_PER_RUN = max(1, min(int(os.environ.get("RECHERCHER_MAX_BOOKS_PER_RUN", "8")), 16))
 
 
 def run_checked(path: Path, *args: str):
@@ -39,9 +41,9 @@ def acquired_ids() -> set[str]:
 
 
 def prepare_pending_only_catalog(acquired: set[str]):
-    """Temporarily expose only pending books; restore all catalogs afterward."""
+    """Temporarily expose only a bounded pending batch; restore all catalogs afterward."""
     catalogs = sorted((ROOT / "books-batches").glob("**/catalog.json"))
-    if not acquired or not catalogs:
+    if not catalogs:
         return None
     backup_root = ROOT / ".rechercher-catalog-backup"
     backup_root.mkdir(parents=True, exist_ok=True)
@@ -52,24 +54,32 @@ def prepare_pending_only_catalog(acquired: set[str]):
         backup.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(catalog), str(backup))
         backups.append((catalog, backup))
-    master_original = next((b for c, b in backups if c == ROOT / "books-batches/encyclopedia-master/catalog.json"), None)
+    master_original = next(
+        (b for c, b in backups if c == ROOT / "books-batches/encyclopedia-master/catalog.json"),
+        None,
+    )
     if master_original is None:
         raise RuntimeError("materialized master catalog missing")
     data = json.loads(master_original.read_text(encoding="utf-8"))
     pending = [b for b in data.get("books", []) if str(b.get("id") or "") not in acquired]
+    pending_before_limit = len(pending)
+    pending = pending[:MAX_BOOKS_PER_RUN]
     filtered = dict(data)
     filtered["books"] = pending
     filtered["queue_filter"] = {
-        "mode": "pending-only",
-        "skipped_acquired": len(data.get("books", [])) - len(pending),
-        "pending": len(pending),
+        "mode": "pending-only-bounded",
+        "skipped_acquired": len(data.get("books", [])) - pending_before_limit,
+        "pending_before_batch_limit": pending_before_limit,
+        "pending_batch": len(pending),
+        "batch_limit": MAX_BOOKS_PER_RUN,
         "manifest_gate": "acquired + real+validated + unified_file exists",
     }
     master = ROOT / "books-batches/encyclopedia-master/catalog.json"
     master.parent.mkdir(parents=True, exist_ok=True)
     master.write_text(json.dumps(filtered, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"ACQUIRED_QUEUE_SKIPPED={len(data.get('books', [])) - len(pending)}", flush=True)
-    print(f"ACQUIRED_QUEUE_PENDING={len(pending)}", flush=True)
+    print(f"ACQUIRED_QUEUE_SKIPPED={len(data.get('books', [])) - pending_before_limit}", flush=True)
+    print(f"ACQUIRED_QUEUE_PENDING_TOTAL={pending_before_limit}", flush=True)
+    print(f"ACQUIRED_QUEUE_BATCH={len(pending)} LIMIT={MAX_BOOKS_PER_RUN}", flush=True)
     return backups
 
 
@@ -84,8 +94,6 @@ def restore_catalogs(backups):
 
 
 def main() -> int:
-    # Always take the builder/resolver from the reviewed main checkout. The
-    # target branch is persistent state, not the source of executable policy.
     if not GOVERNED_BUILDER.is_file():
         raise SystemExit(f"missing governed master catalog materializer: {GOVERNED_BUILDER}")
     shutil.copy2(GOVERNED_BUILDER, BUILDER)
@@ -102,7 +110,11 @@ def main() -> int:
     backups = None
     try:
         backups = prepare_pending_only_catalog(acquired_ids())
-        engine_result = subprocess.run([sys.executable, str(ENGINE), *sys.argv[1:]], cwd=ROOT, check=False)
+        engine_result = subprocess.run(
+            [sys.executable, str(ENGINE), *sys.argv[1:]],
+            cwd=ROOT,
+            check=False,
+        )
     finally:
         restore_catalogs(backups)
 
@@ -122,9 +134,15 @@ def main() -> int:
     acquired = sum(1 for item in items if item.get("status") == "acquired")
     terminal_failures = statuses - RETRYABLE_STATUSES - {"acquired"}
     if statuses and not terminal_failures:
-        print(f"ACQUISITION_PROGRESS_OK acquired={acquired} retryable={retryable} total={len(items)}", flush=True)
+        print(
+            f"ACQUISITION_PROGRESS_OK acquired={acquired} retryable={retryable} total={len(items)}",
+            flush=True,
+        )
         if retryable:
-            print(f"RETRYABLE_ACQUISITION_GAPS={retryable} (kept pending for the next scheduled pass)", flush=True)
+            print(
+                f"RETRYABLE_ACQUISITION_GAPS={retryable} (kept pending for the next scheduled pass)",
+                flush=True,
+            )
         return 0
     return engine_result.returncode
 
