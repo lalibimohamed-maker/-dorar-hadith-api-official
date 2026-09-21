@@ -11,6 +11,7 @@ env:
   RECHERCHER_MAX_BOOK_WORKERS: 3
   RECHERCHER_MAX_BOOKS_PER_RUN: 8
   RECHERCHER_CATALOG_GLOB: books-batches/**/catalog.json
+  RECHERCHER_PUBLIC_PDF_STORAGE_REPO: lalibimohamed-maker/dinullah-pdf-storage-01
   RECHERCHER_SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
 
 on:
@@ -21,8 +22,11 @@ on:
         required: true
         type: string
     secrets:
+      RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN:
+        description: 'Required write token for the public PDF Release storage repository.'
+        required: true
       RECHERCHER_SECONDARY_STORAGE_TOKEN:
-        description: 'Required write token for the secondary PDF storage repository.'
+        description: 'Required write token for the protected PDF Release storage repository.'
         required: true
 
 jobs:
@@ -31,6 +35,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     env:
+      PUBLIC_PDF_STORAGE_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
       SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
     steps:
       - name: Checkout persistent chronological acquisition state
@@ -74,15 +79,20 @@ jobs:
           print('ACQUISITION_ENGINE_SOURCE=governed-main')
           PY
 
-      - name: Verify protected Release destination
+      - name: Verify public and protected Release destinations
         env:
-          GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
-          SECONDARY_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
+          PUBLIC_GH_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
+          PUBLIC_REPO: ${{ env.RECHERCHER_PUBLIC_PDF_STORAGE_REPO }}
+          PROTECTED_GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          PROTECTED_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
         run: |
           set -euo pipefail
-          test -n "$GH_TOKEN"
-          gh repo view "$SECONDARY_REPO" >/dev/null
-          echo "PROTECTED_RELEASE_DESTINATION=READY repository=$SECONDARY_REPO"
+          test -n "$PUBLIC_GH_TOKEN"
+          test -n "$PROTECTED_GH_TOKEN"
+          GH_TOKEN="$PUBLIC_GH_TOKEN" gh repo view "$PUBLIC_REPO" >/dev/null
+          GH_TOKEN="$PROTECTED_GH_TOKEN" gh repo view "$PROTECTED_REPO" >/dev/null
+          echo "PUBLIC_RELEASE_DESTINATION=READY repository=$PUBLIC_REPO"
+          echo "PROTECTED_RELEASE_DESTINATION=READY repository=$PROTECTED_REPO"
 
       - name: Build census and discovery index
         run: |
@@ -129,9 +139,10 @@ jobs:
 
       - name: Publish each verified PDF to exactly one rights-gated Release
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          GH_TOKEN: ${ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }
-          SECONDARY_REPO: ${ env.RECHERCHER_SECONDARY_STORAGE_REPO }
+          PUBLIC_GH_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
+          PROTECTED_GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          PUBLIC_REPO: ${{ env.RECHERCHER_PUBLIC_PDF_STORAGE_REPO }}
+          SECONDARY_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
         run: |
           set -euo pipefail
           mkdir -p artifacts/governance
@@ -151,8 +162,10 @@ jobs:
 
           ensure_release() {
             local repo="$1" tag="$2" title="$3" notes="$4"
-            if ! gh release view "$tag" --repo "$repo" >/dev/null 2>&1; then
-              gh release create "$tag" --repo "$repo" --target main --title "$title" --notes "$notes"
+            local token="$PUBLIC_GH_TOKEN"
+            test "$repo" = "$SECONDARY_REPO" && token="$PROTECTED_GH_TOKEN"
+            if ! GH_TOKEN="$token" gh release view "$tag" --repo "$repo" >/dev/null 2>&1; then
+              GH_TOKEN="$token" gh release create "$tag" --repo "$repo" --target main --title "$title" --notes "$notes"
             fi
           }
 
@@ -165,19 +178,19 @@ jobs:
             sha="$(sha256sum "$f" | awk '{print $1}')"
 
             if is_public_eligible "$manifest"; then
-              ensure_release "$GITHUB_REPOSITORY" "$public_tag" "Rechercher public PDFs $(date -u +%Y-%m-%d)" "Rights-gated public PDF assets. Canonical plaintext PDFs only. Provenance and rights metadata remain in the main repository; Corpus is not modified."
-              if gh release view "$public_tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fxq "$name"; then
+              ensure_release "$PUBLIC_REPO" "$public_tag" "Rechercher public PDFs $(date -u +%Y-%m-%d)" "Rights-gated public PDF assets. Canonical plaintext PDFs only. Provenance and rights metadata remain in the main repository; Corpus is not modified."
+              if GH_TOKEN="$PUBLIC_GH_TOKEN" gh release view "$public_tag" --repo "$PUBLIC_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$name"; then
                 echo "RELEASE_ASSET_ALREADY_PRESENT route=public file=$name"
               else
-                gh release upload "$public_tag" "$f" --repo "$GITHUB_REPOSITORY" --clobber=false
-                printf '%s\n' "{\"file\":\"$name\",\"sha256\":\"$sha\",\"release\":\"$public_tag\",\"route\":\"public\",\"repository\":\"$GITHUB_REPOSITORY\"}" >> artifacts/governance/release-assets.jsonl
+                GH_TOKEN="$PUBLIC_GH_TOKEN" gh release upload "$public_tag" "$f" --repo "$PUBLIC_REPO" --clobber=false
+                printf '%s\n' "{\"file\":\"$name\",\"sha256\":\"$sha\",\"release\":\"$public_tag\",\"route\":\"public\",\"repository\":\"$PUBLIC_REPO\"}" >> artifacts/governance/release-assets.jsonl
               fi
             else
               ensure_release "$SECONDARY_REPO" "$protected_tag" "Rechercher protected PDFs $(date -u +%Y-%m-%d)" "Protected developer-access PDF assets. Canonical plaintext PDFs only. Missing or non-public rights evidence stays protected; provenance and rights metadata remain in the main repository; Corpus is not modified."
-              if gh release view "$protected_tag" --repo "$SECONDARY_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$name"; then
+              if GH_TOKEN="$PROTECTED_GH_TOKEN" gh release view "$protected_tag" --repo "$SECONDARY_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$name"; then
                 echo "RELEASE_ASSET_ALREADY_PRESENT route=protected file=$name"
               else
-                gh release upload "$protected_tag" "$f" --repo "$SECONDARY_REPO" --clobber=false
+                GH_TOKEN="$PROTECTED_GH_TOKEN" gh release upload "$protected_tag" "$f" --repo "$SECONDARY_REPO" --clobber=false
                 printf '%s\n' "{\"file\":\"$name\",\"sha256\":\"$sha\",\"release\":\"$protected_tag\",\"route\":\"protected\",\"repository\":\"$SECONDARY_REPO\"}" >> artifacts/governance/release-assets.jsonl
               fi
             fi
@@ -236,7 +249,7 @@ jobs:
                       h.update(chunk)
               return h.hexdigest()
           seen={}
-          for pool, root in [('primary', Path('artifacts')), ('secondary', Path('.secondary-storage/artifacts'))]:
+          for pool, root in [('primary', Path('artifacts'))]:
               for pdf in sorted(root.glob('*.pdf')):
                   if pointer(pdf):
                       continue
