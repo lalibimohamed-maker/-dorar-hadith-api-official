@@ -157,14 +157,18 @@ for(const [key,lang] of languages){
  for(const r of lang.records){
    const id=String(r.provider||r.source_id||'').toLowerCase();
    const adapter=registered.get(id);
-   if(adapter && adapter.status==='enabled') const baseUrl=sourceBaseUrl(adapter);\n   if(baseUrl) sourcePages.push({adapter,url:baseUrl});
+   if(adapter && adapter.status==='enabled'){
+     const baseUrl=sourceBaseUrl(adapter);
+     if(baseUrl) sourcePages.push({adapter,url:baseUrl});
+   }
  }
  for(const adapter of sourceRegistry.adapters){
    if(adapter.status!=='enabled') continue;
    const canProvidePdf=adapter.kinds?.some(k=>['pdf','download','datasets'].includes(k));
    if(!canProvidePdf) continue;
    if(sourcePages.some(x=>x.adapter.id===adapter.id)) continue;
-   const baseUrl=sourceBaseUrl(adapter);\n   if(baseUrl) sourcePages.push({adapter,url:baseUrl});
+   const baseUrl=sourceBaseUrl(adapter);
+   if(baseUrl) sourcePages.push({adapter,url:baseUrl});
  }
 
  for(const {adapter,url:sourceUrl} of sourcePages){
