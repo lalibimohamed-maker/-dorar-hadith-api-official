@@ -20,8 +20,8 @@ function requireShamelaKey() {
 async function shamelaGet(endpoint, path, { signal } = {}) {
   const config = shamelaConfig();
   const key = requireShamelaKey();
-  const base = endpoint.replace(/\\/+$/, "");
-  const url = new URL(base + "/" + path.replace(/^\\/+/, ""));
+  const base = endpoint.replace(/\/+$/, "");
+  const url = new URL(base + "/" + path.replace(/^\/+/, ""));
   url.searchParams.set("api_key", key);
   const response = await fetch(url, {
     method: "GET",
@@ -59,7 +59,6 @@ export async function shamelaBook(bookId, { signal } = {}) {
   if (!Number.isInteger(id) || id < 1) throw new TypeError("bookId must be a positive integer");
   return shamelaGet(shamelaConfig().booksEndpoint, String(id), { signal });
 }
-
 
 function required(value, name) {
   if (value === undefined || value === null || value === "") throw new TypeError(name + " is required");
