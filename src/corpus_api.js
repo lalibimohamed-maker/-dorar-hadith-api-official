@@ -15,6 +15,7 @@ import { listQuranTranslations, getQuranTranslation, getQuranFoundationTranslati
 import { syncQuranFoundation } from './quran-foundation-sync.js';
 import { searchDorar } from './dorar-client.js';
 import { getSunnahCollections, getSunnahCollection, getSunnahHadiths, getSunnahHadithByRefs, getSunnahHadithByUrns } from './sunnah-client.js';
+import { islamHouseConnectorInfo, islamHouseCategories, islamHouseCategoryItems, islamHouseItem, islamHouseItemTranslations, islamHouseAvailableLanguages, islamHouseLatest, islamHouseBooks, gallicaSearch, fetchIiifManifest, iiifConnectorInfo, sourceConnectorHealth } from './rechercher-source-connectors.js';
 import { hadeethEncApiInfo, hadeethEncLanguages, hadeethEncCategories, hadeethEncRootCategories, hadeethEncList, hadeethEncHadith } from './hadeethenc-client.js';
 
 export function search(query, options = {}) {
@@ -77,3 +78,16 @@ export function hadeethEncCategoriesList(language) { return hadeethEncCategories
 export function hadeethEncRootCategoriesList(language) { return hadeethEncRootCategories(language); }
 export function hadeethEncHadithList(input) { return hadeethEncList(input); }
 export function hadeethEncHadithRecord(input) { return hadeethEncHadith(input); }
+
+export function rechercherSourceConnectorHealth() { return sourceConnectorHealth(); }
+export function rechercherIslamHouseInfo() { return islamHouseConnectorInfo(); }
+export function rechercherIslamHouseCategories(language) { return islamHouseCategories(language); }
+export function rechercherIslamHouseCategoryItems(input) { return islamHouseCategoryItems(input); }
+export function rechercherIslamHouseItem(itemId, language) { return islamHouseItem(itemId, language); }
+export function rechercherIslamHouseItemTranslations(itemId, language) { return islamHouseItemTranslations(itemId, language); }
+export function rechercherIslamHouseAvailableLanguages(contentType, language) { return islamHouseAvailableLanguages(contentType, language); }
+export function rechercherIslamHouseLatest(input) { return islamHouseLatest(input); }
+export function rechercherIslamHouseBooks(input) { return islamHouseBooks(input); }
+export function rechercherGallicaSearch(input) { return gallicaSearch(input); }
+export function rechercherIiifManifest(input) { return fetchIiifManifest(input.provider, input.url, input); }
+export function rechercherIiifConnectorInfo() { return iiifConnectorInfo(); }
