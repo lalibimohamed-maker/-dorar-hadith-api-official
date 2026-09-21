@@ -118,7 +118,8 @@ async function archivePdfUrls(json){
 }
 
 async function candidateUrls(seed){
-  const r=await fetchBytes(seed);
+  if(candidateCache.has(seed)) return candidateCache.get(seed);
+  const pending=(async()=>{const r=await fetchBytes(seed);
   if(!r.bytes) return [];
   if(isPdfUrl(r.finalUrl)||/^application\/pdf/i.test(r.contentType)) return [r.finalUrl];
   const set=new Set(), text=r.bytes.toString('utf8');
@@ -193,7 +194,7 @@ const manifest={
   },
   source_counts:{},cells:{}
 };
-const claimed=new Set(),seenSeeds=new Set(),started=Date.now();
+const claimed=new Set(),candidateCache=new Map(),started=Date.now();
 
 async function downloadPdf(url,dest){
   const u=allow(url);if(!u)throw new Error('untrusted PDF');
@@ -234,15 +235,13 @@ async function processCell(row){
   for(const id of ids.slice(0,8)){
     const a=adapters.get(id);
     for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});
-    if(a){if(a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}
+    if(a){const direct=urls.some(x=>sourceOf(x)===id);if(!direct&&a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}
   }
   const localSeen=new Set();
   for(const seed of seeds){
     if(entry.files.length>=MAX_FILES||localSeen.has(seed.url)||!allow(seed.url)) break;
     localSeen.add(seed.url);
     entry.sources_checked.push({source:seed.id,url:seed.url,role:seed.role});
-    if(seenSeeds.has(seed.url)) continue;
-    seenSeeds.add(seed.url);
     let candidates=[];
     try{candidates=await candidateUrls(seed.url);}catch(e){entry.source_errors.push({source:seed.id,url:seed.url,error:String(e.message||e)});continue;}
     for(const candidate of candidates){
