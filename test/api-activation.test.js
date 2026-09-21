@@ -16,3 +16,11 @@ test("Sunnah.com is registered as a runtime connector without automatic acquisit
   assert.equal(sunnah.acquisition, false);
   assert.equal(apiActivationReady("sunnah-com", "verification"), true);
 });
+
+
+test("HadeethEnc is fully activated through the governed lifecycle", () => {
+  const h = apiActivation("hadeethenc-api");
+  for (const stage of ["registered","implemented","runtime","rechercher","verification","acquisition","release","search_encyclopedia"]) assert.equal(h[stage], true);
+  assert.equal(h.auth, "public-api");
+  assert.equal(h.capabilities.includes("hadith-record"), true);
+});
