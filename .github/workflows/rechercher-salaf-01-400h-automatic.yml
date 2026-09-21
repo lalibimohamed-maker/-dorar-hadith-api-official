@@ -13,19 +13,20 @@ on:
 permissions:
   contents: write
 
-# All callers write to the same secondary LFS repository. A shared group is
-# mandatory so different acquisition queues can never race on secondary/main.
+# All callers share the same rights-gated Release destinations. A shared group is
+# mandatory so different acquisition queues cannot race on persistence state.
 concurrency:
-  group: rechercher-secondary-lfs-persistence
+  group: rechercher-release-persistence
   cancel-in-progress: false
 
 jobs:
   download:
     name: Continuous whole-encyclopedia PDF download
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@a1626c18cec22169306927af58c27c8c34ed160c # governed acquisition workflow
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@ea793f5b1d52a3ea7595767f7cd7a0701971bd65 # governed acquisition workflow
     with:
       target_branch: rechercher/encyclopedia-master-unbounded-acquisition
     secrets:
+      RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
       RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
     permissions:
       contents: write
