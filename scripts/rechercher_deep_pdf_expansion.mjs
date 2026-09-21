@@ -41,10 +41,10 @@ async function get(url){
  }catch(e){if(i===2)return null;await sleep(700*(i+1))}}
 }
 function links(text,base){
- const out=[],seen=new Set(),re=/https?:\\/\\/[^\\s"'<>]+|href=["']([^"']+)["']/gi; let m;
+ const out=[],seen=new Set(),re=/https?:\/\/[^\s"'<>]+|href=["']([^"']+)["']/gi; let m;
  while((m=re.exec(text))){
   const raw=m[1]||m[0]; let u; try{u=new URL(raw,base)}catch{continue}
-  if(u.protocol!=='https:'||!/\\.pdf(?:[?#]|$)/i.test(u.href)||seen.has(u.href))continue;
+  if(u.protocol!=='https:'||!/.pdf(?:[?#]|$)/i.test(u.href)||seen.has(u.href))continue;
   seen.add(u.href);out.push(u.href);
  } return out;
 }
@@ -52,9 +52,9 @@ function links(text,base){
 function islamHouseApiPdfLinks(json,lang){
  const out=[]; const seen=new Set();
  const walk=v=>{if(!v||typeof v!=='object')return; if(Array.isArray(v)){for(const x of v)walk(x);return;}
-  if(v.api_url&&/get-item\\//i.test(String(v.api_url))&&v.id){out.push({itemId:v.id,api:String(v.api_url)});}
-  if(v.url&&/\\.pdf(?:[?#]|$)/i.test(String(v.url))&&!seen.has(v.url)){seen.add(v.url);out.push({url:v.url});}
-  if(v.file_url&&/\\.pdf(?:[?#]|$)/i.test(String(v.file_url))&&!seen.has(v.file_url)){seen.add(v.file_url);out.push({url:v.file_url});}
+  if(v.api_url&&/get-item\//i.test(String(v.api_url))&&v.id){out.push({itemId:v.id,api:String(v.api_url)});}
+  if(v.url&&/.pdf(?:[?#]|$)/i.test(String(v.url))&&!seen.has(v.url)){seen.add(v.url);out.push({url:v.url});}
+  if(v.file_url&&/.pdf(?:[?#]|$)/i.test(String(v.file_url))&&!seen.has(v.file_url)){seen.add(v.file_url);out.push({url:v.file_url});}
   for(const x of Object.values(v))walk(x);
  }; walk(json); return out;
 }
