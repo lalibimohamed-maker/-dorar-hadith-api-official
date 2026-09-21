@@ -314,16 +314,26 @@
         "bibliography"
       ],
       "authority": "bibliographic_and_text_discovery",
-      "runtime": "discovery-only",
-      "status": "enabled",
-      "api_auth": "not-verified",
-      "release_policy": "source-specific; no public-content connector is claimed until an official/documented content interface is verified"
+      "runtime": "api-key-configurable",
+      "status": "connector-verified-key-gated",
+      "api_auth": "required",
+      "release_policy": "source-specific; no public-content connector is claimed until an official/documented content interface is verified",
+      "api_key_env": "SHAMELA_API_KEY",
+      "api_base_url": "https://shamela.ws",
+      "api_endpoints": {
+        "master_metadata": "/api/master_patch",
+        "book_metadata": "/api/books/{bookId}",
+        "book_data": "/api/books/{bookId}"
+      },
+      "verification": "Open-source Shamela v4 connector contract verified; live runtime requires a Shamela API key and configured endpoint access"
     }
   ],
   "runtime_policy": {
     "runtime_verified_requires_executable_connector_and_tests": true,
     "rights_verified_per_item": true,
     "canonical_arabic_separate": true,
-    "ai_is_not_a_religious_source": true
+    "ai_is_not_a_religious_source": true,
+    "shamela_api_key_must_never_be_committed": true,
+    "discovery_and_content_connector_are_distinct": true
   }
 }
