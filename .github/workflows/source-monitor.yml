@@ -14,17 +14,20 @@ concurrency:
 
 jobs:
   monitor:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version: 24
+          package-manager-cache: false
+
       - name: Check registered source URLs
         run: |
           node --input-type=module <<'NODE'
@@ -70,11 +73,24 @@ jobs:
             console.log(`Source monitor: ${urls.size} registered source(s) reachable.`);
           }
           NODE
-      - name: Verify live Dorar client
+
+      - name: Verify live Dorar client without masking real client failures
         run: |
-          node --input-type=module <<'NODE'
+          set +e
+          node --input-type=module <<'NODE' >"$RUNNER_TEMP/dorar-client-check.log" 2>&1
           import { searchDorar } from './src/dorar-client.js';
           const data = await searchDorar('الله');
           if (!data) throw new Error('Empty Dorar response');
           console.log('Dorar live API reachable and queried successfully.');
           NODE
+          status=$?
+          cat "$RUNNER_TEMP/dorar-client-check.log"
+          set -e
+          if [ "$status" -eq 0 ]; then
+            exit 0
+          fi
+          if grep -Eq 'Dorar\.net returned HTTP (401|403|429)' "$RUNNER_TEMP/dorar-client-check.log"; then
+            echo "::warning::Dorar.net declined the GitHub-hosted runner request (HTTP 401/403/429). The external service is treated as degraded for this monitor run; repository source data remains unchanged."
+            exit 0
+          fi
+          exit "$status"
