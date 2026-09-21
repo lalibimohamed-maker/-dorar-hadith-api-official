@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const c = await import("../src/rechercher-source-connectors.js");
+const c = await import("../src/rechercher-openiti-shamela.js");
 
 test("OpenITI connector exposes metadata/raw runtime", () => {
   const info = c.openItiConnectorInfo();
@@ -22,6 +22,11 @@ test("OpenITI raw resolver creates release-pinned URL", () => {
 
 test("Shamela v4 runtime connector is key-gated and executable", () => {
   const info = c.shamelaConnectorInfo();
-  assert.equal(info.runtime, "discovery-only");
+  assert.equal(info.runtime, "api-key-configurable");
+  assert.equal(info.apiKeyRequired, true);
+  assert.equal(c.shamelaRuntimeConfig().configured, false);
+  assert.equal(c.shamelaRuntimeConfig().apiKey, undefined);
   assert.match(c.shamelaDiscoveryUrl("ابن تيمية"), /^https:\/\/shamela\.ws\/search\?query=/);
+  assert.throws(() => c.shamelaBookMetadata(1), /SHAMELA_API_KEY is required/);
+  assert.throws(() => c.shamelaBookMetadata(0), /bookId must be a positive integer/);
 });
