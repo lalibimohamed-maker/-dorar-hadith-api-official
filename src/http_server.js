@@ -3,6 +3,16 @@ import { URL } from 'node:url';
 import * as api from './corpus_api.js';
 function json(res,status,body){res.writeHead(status,{'content-type':'application/json; charset=utf-8'});res.end(JSON.stringify(body));}
 export function server(){return http.createServer((req,res)=>{const url=new URL(req.url,'http://localhost');try{
+  if(req.method==='GET'&&url.pathname==='/api/v1/apis') return json(res,200,api.apiRegistry());
+  if(req.method==='GET'&&url.pathname.startsWith('/api/v1/apis/')) return json(res,200,api.apiConnector(decodeURIComponent(url.pathname.slice('/api/v1/apis/'.length))));
+  if(req.method==='GET'&&url.pathname==='/api/v1/quran/ayah') return json(res,200,await api.quranAyah({verseKey:url.searchParams.get('verseKey'),translationIds:url.searchParams.get('translations')?.split(',').filter(Boolean)||[],tafsirIds:url.searchParams.get('tafsirs')?.split(',').filter(Boolean)||[],language:url.searchParams.get('lang')||'en',words:url.searchParams.get('words')==='true'}));
+  if(req.method==='GET'&&url.pathname==='/api/v1/quran/translations') return json(res,200,await api.quranTranslations(url.searchParams.get('lang')||undefined));
+  if(req.method==='GET'&&url.pathname==='/api/v1/quran/translation') return json(res,200,await api.quranTranslation({translationKey:url.searchParams.get('key'),surah:url.searchParams.get('surah'),ayah:url.searchParams.get('ayah')||undefined}));
+  if(req.method==='GET'&&url.pathname==='/api/v1/dorar/search') return json(res,200,await api.dorarSearch(url.searchParams.get('q')||''));
+  if(req.method==='GET'&&url.pathname==='/api/v1/sunnah/search') return json(res,200,await api.sunnahSearch(url.searchParams.get('q')||''));
+  if(req.method==='GET'&&url.pathname==='/api/v1/sunnah/collections') return json(res,200,await api.sunnahCollections());
+  if(req.method==='GET'&&url.pathname.startsWith('/api/v1/sunnah/collections/')) return json(res,200,await api.sunnahCollection(decodeURIComponent(url.pathname.slice('/api/v1/sunnah/collections/'.length))));
+  if(req.method==='GET'&&url.pathname==='/api/v1/quran/sync') return json(res,200,await api.quranFoundationSync({resources:url.searchParams.get('resources')?.split(',').filter(Boolean)||[],syncToken:url.searchParams.get('syncToken')||null}));
   if(req.method==='GET'&&url.pathname==='/api/v1/search') return json(res,200,api.search(url.searchParams.get('q')||'',{language:url.searchParams.get('lang')||'ar',bilingual:url.searchParams.get('bilingual')==='true',comparative:url.searchParams.get('comparative')==='true'}));
   if(req.method==='GET'&&url.pathname==='/api/v1/encyclopedia/search') return json(res,200,api.encyclopediaSearch(url.searchParams.get('q')||'',{language:url.searchParams.get('lang')||'ar',verifiedOnly:url.searchParams.get('verifiedOnly')==='true'}));
   if(req.method==='GET'&&url.pathname.startsWith('/api/v1/encyclopedia/source/')) return json(res,200,api.encyclopediaSource(decodeURIComponent(url.pathname.slice('/api/v1/encyclopedia/source/'.length))));

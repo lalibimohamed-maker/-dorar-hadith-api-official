@@ -9,6 +9,12 @@ import { routeTransactionQuestion, buildTransactionLesson, listTransactionTopics
 import { searchEncyclopedia, getEncyclopediaSourceInfo, getEncyclopediaDomainInfo } from './encyclopedia-api.js';
 import { hadithSource, hadithSources, validateHadith, narratorProfile, compareNarratorJudgmentsSafe, narratorGrade, rijalBooks } from './hadith-research.js';
 import { validateNarratorRecord, summarizeNarratorEvidence, compareNarratorStatements } from './rijal-evidence.js';
+import { apiActivationRegistry, apiActivation } from './api-activation.js';
+import { getQuranAyah } from './quran-ayah.js';
+import { listQuranTranslations, getQuranTranslation, getQuranFoundationTranslation } from './quran-translations.js';
+import { syncQuranFoundation } from './quran-foundation-sync.js';
+import { searchDorar } from './dorar-client.js';
+import { searchSunnah, getSunnahCollections, getSunnahCollection } from './sunnah-client.js';
 
 export function search(query, options = {}) {
   const records = loadCorpus();
@@ -49,3 +55,15 @@ export function transactionLearning({ topic, question, language='ar' } = {}) {
   const selected = topic || routing.topicId;
   return { routing, topics: listTransactionTopics(), lesson: selected ? buildTransactionLesson(selected, { language }) : null };
 }
+
+export function apiRegistry() { return apiActivationRegistry(); }
+export function apiConnector(id) { return apiActivation(id); }
+export function quranAyah(input) { return getQuranAyah(input); }
+export function quranTranslations(language) { return listQuranTranslations(language); }
+export function quranTranslation(input) { return getQuranTranslation(input); }
+export function quranFoundationTranslation(input) { return getQuranFoundationTranslation(input); }
+export function quranFoundationSync(input) { return syncQuranFoundation(input); }
+export function dorarSearch(query, options) { return searchDorar(query, options); }
+export function sunnahSearch(query, options) { return searchSunnah(query, options); }
+export function sunnahCollections(options) { return getSunnahCollections(options); }
+export function sunnahCollection(collection, options) { return getSunnahCollection(collection, options); }
