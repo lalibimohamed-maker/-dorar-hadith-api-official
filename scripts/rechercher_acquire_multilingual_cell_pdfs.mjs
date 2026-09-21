@@ -29,10 +29,11 @@ const origins=new Set(), originSource=new Map();
 function addOrigin(id,value){
   try{
     const u=new URL(value);
-    if(u.protocol==='https:'&&!u.origin.startsWith('https://www.google.com')){
-      origins.add(u.origin);
-      if(!originSource.has(u.origin)) originSource.set(u.origin,id);
-    }
+    if(u.protocol!=='https:'||u.username||u.password) return;
+    const host=u.hostname.toLowerCase();
+    if(host==='google.com'||host.endsWith('.google.com')) return;
+    origins.add(u.origin);
+    if(!originSource.has(u.origin)) originSource.set(u.origin,id);
   }catch{}
 }
 for(const a of adapters.values()){
