@@ -1,144 +1,33 @@
 {
   "version": "2026.25",
   "policy": {
-    "lifecycle": [
-      "registered",
-      "implemented",
-      "runtime",
-      "rechercher",
-      "verification",
-      "acquisition",
-      "release",
-      "search_encyclopedia"
-    ],
+    "lifecycle": ["registered","implemented","runtime","rechercher","verification","acquisition","release","search_encyclopedia"],
     "corpus_write": "never-direct",
     "storage_write": "rights-and-provenance-gated"
   },
   "connectors": [
     {
-      "id": "quran-foundation",
-      "registered": true,
-      "implemented": true,
-      "runtime": true,
-      "rechercher": true,
-      "verification": true,
-      "acquisition": false,
-      "release": false,
-      "search_encyclopedia": true,
-      "capabilities": [
-        "quran-text",
-        "translations",
-        "tafsir",
-        "search",
-        "audio",
-        "word-level-data",
-        "content-sync"
-      ],
-      "auth": "backend-credentials",
-      "canonical_policy": "arabic-quran-remains-separate-from-translations"
+      "id": "quran-foundation","registered":true,"implemented":true,"runtime":true,"rechercher":true,"verification":true,"acquisition":false,"release":false,"search_encyclopedia":true,
+      "capabilities":["quran-text","translations","tafsir","search","audio","word-level-data","content-sync"],"auth":"backend-credentials",
+      "canonical_policy":"arabic-quran-remains-separate-from-translations"
     },
     {
-      "id": "quranenc",
-      "registered": true,
-      "implemented": true,
-      "runtime": true,
-      "rechercher": true,
-      "verification": true,
-      "acquisition": false,
-      "release": false,
-      "search_encyclopedia": true,
-      "capabilities": [
-        "translations",
-        "translation-catalogue"
-      ],
-      "auth": "public-api"
+      "id": "quranenc","registered":true,"implemented":true,"runtime":true,"rechercher":true,"verification":true,"acquisition":false,"release":false,"search_encyclopedia":true,
+      "capabilities":["translations","translation-catalogue"],"auth":"public-api"
     },
     {
-      "id": "dorar-hadith",
-      "registered": true,
-      "implemented": true,
-      "runtime": true,
-      "rechercher": true,
-      "verification": true,
-      "acquisition": false,
-      "release": false,
-      "search_encyclopedia": true,
-      "capabilities": [
-        "hadith-search",
-        "grading",
-        "source-location",
-        "scholarly-comments"
-      ],
-      "auth": "public-api"
+      "id": "dorar-hadith","registered":true,"implemented":true,"runtime":true,"rechercher":true,"verification":true,"acquisition":false,"release":false,"search_encyclopedia":true,
+      "capabilities":["hadith-search","grading","source-location","scholarly-comments"],"auth":"public-api"
     },
     {
-      "id": "sunnah-com",
-      "registered": true,
-      "implemented": true,
-      "runtime": true,
-      "rechercher": true,
-      "verification": true,
-      "acquisition": false,
-      "release": false,
-      "search_encyclopedia": true,
-      "capabilities": [
-        "hadith-collections",
-        "hadith-records"
-      ],
-      "auth": "api-key",
-      "availability": "portion-of-data"
+      "id": "sunnah-com","registered":true,"implemented":true,"runtime":true,"rechercher":true,"verification":true,"acquisition":false,"release":false,"search_encyclopedia":true,
+      "capabilities":["hadith-collections","hadith-records"],"auth":"api-key","availability":"portion-of-data"
     },
     {
-      "id": "hadeethenc-api",
-      "registered": true,
-      "implemented": true,
-      "runtime": true,
-      "rechercher": true,
-      "verification": true,
-      "acquisition": true,
-      "release": true,
-      "search_encyclopedia": true,
-      "capabilities": [
-        "languages",
-        "categories",
-        "hadith-list",
-        "hadith-record",
-        "hadith-explanation",
-        "translations",
-        "source-reference",
-        "provenance",
-        "pdf-downloads"
-      ],
-      "auth": "public-api",
-      "availability": "public-api-and-download-catalogue",
-      "rights_gate": "required-before-Corpus-or-public-release",
-      "canonical_policy": "original-arabic-hadith-and-human-translations-remain-distinct; never machine-retranslate-source-text"
-    },
-    {
-      "id": "hadeethenc-api",
-      "registered": true,
-      "implemented": true,
-      "runtime": true,
-      "rechercher": true,
-      "verification": true,
-      "acquisition": true,
-      "release": true,
-      "search_encyclopedia": true,
-      "capabilities": [
-        "languages",
-        "categories",
-        "hadith-list",
-        "hadith-record",
-        "hadith-explanation",
-        "translations",
-        "source-reference",
-        "provenance",
-        "pdf-downloads"
-      ],
-      "auth": "public-api",
-      "availability": "public-api-and-download-catalogue",
-      "rights_gate": "required-before-Corpus-or-public-release",
-      "canonical_policy": "original-arabic-hadith-and-human-translations-remain-distinct; never machine-retranslate-source-text"
+      "id": "hadeethenc-api","registered":true,"implemented":true,"runtime":true,"rechercher":true,"verification":true,"acquisition":true,"release":true,"search_encyclopedia":true,
+      "capabilities":["languages","categories","hadith-list","hadith-record","hadith-explanation","translations","source-reference","provenance","pdf-downloads"],"auth":"public-api",
+      "availability":"public-api-and-download-catalogue","rights_gate":"required-before-Corpus-or-public-release",
+      "canonical_policy":"original-arabic-hadith-and-human-translations-remain-distinct; never machine-retranslate-source-text"
     }
   ]
 }
