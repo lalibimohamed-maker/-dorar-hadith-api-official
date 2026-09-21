@@ -12,7 +12,7 @@ const manifestOut=path.resolve(ROOT,arg('--manifest',path.join(output,'manifest.
 const strict=args.includes('--strict');
 const exists=async p=>{try{await fs.access(p);return true}catch{return false}};
 const run=(cmd,a)=>new Promise((res,rej)=>{
- if(!path.isAbsolute(cmd) || !new Set(['/usr/bin/python3','/usr/bin/libreoffice','/usr/bin/soffice']).has(cmd))
+ if(!path.isAbsolute(cmd) || !['/usr/bin/python3','/usr/bin/libreoffice','/usr/bin/soffice'].includes(cmd))
    return rej(new Error('unsupported executable'));
  const p=spawn(cmd,a,{stdio:['ignore','pipe','pipe']});let o='',e='';
  p.stdout.on('data',x=>o+=x);p.stderr.on('data',x=>e+=x);p.on('error',rej);
