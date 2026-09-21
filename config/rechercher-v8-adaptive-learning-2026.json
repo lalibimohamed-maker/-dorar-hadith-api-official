@@ -1,0 +1,85 @@
+{
+  "stage": "V8_AUTONOMOUS_ADAPTIVE_LEARNING",
+  "version": "8.0.0",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "pipeline": [
+    "DIAGNOSE",
+    "LEARN",
+    "EXAMPLE",
+    "RETRIEVE",
+    "APPLY",
+    "CORRECT",
+    "RETRIEVE_AGAIN",
+    "TRANSFER",
+    "TEST",
+    "MASTER"
+  ],
+  "learner_model": [
+    "mastery",
+    "confidence",
+    "attempts",
+    "successes",
+    "failures",
+    "prerequisite_gaps",
+    "misconceptions",
+    "learning_history",
+    "goals"
+  ],
+  "adaptive_decisions": [
+    "what_to_review",
+    "which_prerequisite_to_review",
+    "source_selection",
+    "example_selection",
+    "question_difficulty",
+    "training_order",
+    "retrieval_timing",
+    "transfer_practice",
+    "retest_scheduling",
+    "advance_or_reteach"
+  ],
+  "source_policy": {
+    "rights_required": "ALLOWED",
+    "evidence_required": true,
+    "provenance_required": true,
+    "ai_synthesis_is_not_authoritative": true,
+    "scholar_review_remains_required": true
+  },
+  "religious_authority_boundary": {
+    "adaptive_engine_decides_truth": false,
+    "adaptive_engine_decides_fatwa": false,
+    "adaptive_engine_decides_source_status": false,
+    "adaptive_engine_organizes_learning_only": true,
+    "source_and_scholar_policy_remains_authoritative": true
+  },
+  "safety": {
+    "acquisition_independent": true,
+    "original_pdf_immutable": true,
+    "canonical_quran_arabic_immutable": true,
+    "rights_unknown_not_publishable": true,
+    "no_access_control_bypass": true,
+    "no_proxy_rotation": true,
+    "no_user_agent_rotation": true
+  },
+  "evaluation": {
+    "must_measure": [
+      "immediate_retrieval",
+      "delayed_retrieval",
+      "transfer",
+      "mastery",
+      "time_to_mastery",
+      "retention",
+      "calibration",
+      "intervention_outcome",
+      "learner_burden"
+    ],
+    "no_general_effectiveness_claim_without_real_data": true,
+    "pilot_before_policy_promotion": true
+  },
+  "research_basis": {
+    "knowledge_graph_personalization": true,
+    "adaptive_learning_path_optimization": true,
+    "retrieval_practice": true,
+    "cognitive_offloading_risk": true,
+    "multimodal_learning": true
+  }
+}

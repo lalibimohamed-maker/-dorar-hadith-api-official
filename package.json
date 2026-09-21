@@ -26,15 +26,19 @@
     "test:search-discovery": "node --test test/search-discovery-federation.test.js",
     "test:rights": "node --test test/book-rights-resolver.test.js",
     "test:library-editions": "node --test test/library-edition-registry.test.js",
-    "test:source-refresh": "node --test test/source-refresh-quarantine.test.js",
-    "test:source-refresh-history": "node --test test/source-refresh-history.test.js",
-    "test:source-audit": "node --test test/source-audit-trail.test.js",
-    "test:corpus-boundary": "node --test test/corpus-write-boundary.test.js",
-    "test:review-boundary": "node --test test/review-queue-boundary.test.js",
-    "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
-    "test:review-expiry": "node --test test/review-expiry.test.js"
+    "test:source-refresh": "node test/source-refresh-quarantine.test.js",
+    "test:source-refresh-history": "node test/source-refresh-history.test.js",
+    "test:source-audit": "node test/source-audit-trail.test.js",
+    "test:corpus-boundary": "node test/corpus-write-boundary.test.js",
+    "test:review-boundary": "node test/review-queue-boundary.test.js",
+    "test:reviewer-separation": "node test/reviewer-separation.test.js",
+    "test:review-expiry": "node test/review-expiry.test.js",
+    "test:rechercher-global-completion": "node --test test/rechercher-global-v1-v8-completion-engine.test.js",
+    "test:rechercher-global-v1-v31plus": "node --test test/rechercher-global-v1-v31plus-completion-engine.test.js",
+    "test:rechercher-v9": "node --test test/rechercher-v9-multimodal-recitation-engine.test.js",
+    "test:rechercher-operational-scale-guards": "node --test test/rechercher-operational-scale-guards.test.js",
+    "test:rechercher-iiif": "node --test test/rechercher-iiif-connector.test.js",
+    "test:rechercher-worldwide-connectors": "node --test test/rechercher-worldwide-connector-suite.test.js"
   },
-  "engines": {
-    "node": ">=20"
-  }
+  "engines": { "node": ">=24" }
 }

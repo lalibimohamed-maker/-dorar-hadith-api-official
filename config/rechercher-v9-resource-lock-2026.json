@@ -1,0 +1,45 @@
+{
+  "schemaVersion":"1.0.0",
+  "purpose":"Reproducible resource inventory for V9 Multimodal Islamic Learning and Recitation Intelligence",
+  "retrievalPolicy":"Official project documentation/repositories first; versions pinned by deployment image or package lock; no opaque external runtime is trusted.",
+  "standards":[
+    {"id":"iiif-presentation-3","url":"https://iiif.io/api/presentation/3.0/","use":"manifest/canvas/image/audio/video/annotation alignment"},
+    {"id":"w3c-web-annotation","url":"https://www.w3.org/TR/annotation-model/","use":"fine-grained annotation and evidence targets"},
+    {"id":"w3c-prov","url":"https://www.w3.org/TR/prov-dm/","use":"provenance entities, activities and agents"},
+    {"id":"premis-3","url":"https://www.loc.gov/standards/premis/v3/","use":"preservation events, rights, agents and fixity"},
+    {"id":"frbr-wemi","use":"work/expression/manifestation/item identity and translation relations"},
+    {"id":"nist-zero-trust","url":"https://www.nist.gov/publications/zero-trust-architecture","use":"sandbox trust boundary"}
+  ],
+  "engines":[
+    {"id":"ffmpeg","url":"https://ffmpeg.org/","use":["normalization","demux","audio extraction","video segmentation"]},
+    {"id":"ocrmypdf","url":"https://ocrmypdf.readthedocs.io/","use":["PDF OCR","text-layer creation"]},
+    {"id":"tesseract","url":"https://github.com/tesseract-ocr/tesseract","use":["OCR"]},
+    {"id":"pymupdf","url":"https://pymupdf.readthedocs.io/","use":["PDF rendering","text extraction","page geometry"]},
+    {"id":"pypdfium2","url":"https://pypi.org/project/pypdfium2/","use":["PDFium rendering"]},
+    {"id":"pdfbox","url":"https://pdfbox.apache.org/","version":"3.0.8","use":["PDF extraction","validation","preflight"]},
+    {"id":"opencv","url":"https://opencv.org/","use":["image features","video frames"]},
+    {"id":"librosa","url":"https://librosa.org/","use":["audio features","spectral/temporal analysis"]},
+    {"id":"whisper","url":"https://github.com/openai/whisper","use":["ASR"]},
+    {"id":"faster-whisper","url":"https://github.com/SYSTRAN/faster-whisper","use":["efficient ASR"]},
+    {"id":"whisperx","url":"https://github.com/m-bain/whisperX","use":["word timestamps","alignment"]},
+    {"id":"montreal-forced-aligner","url":"https://github.com/MontrealCorpusTools/Montreal-Forced-Aligner","use":["phonetic forced alignment"],"runtime":"dedicated conda sandbox"},
+    {"id":"sentence-transformers","url":"https://github.com/UKPLab/sentence-transformers","use":["text embeddings","semantic similarity"]},
+    {"id":"transformers","url":"https://github.com/huggingface/transformers","use":["multimodal model adapters"]}
+  ],
+  "v9Domains":[
+    "text","pdf","manuscript","image","audio","recitation","video","dialogue",
+    "verse_alignment","word_alignment","recitation_tracking","memorization_state",
+    "tajweed_candidate_detection","repetition_analysis","hesitation_detection",
+    "omission_detection","addition_detection","substitution_detection","feedback","spaced_memorization"
+  ],
+  "safety":[
+    "canonical Quran Arabic is immutable",
+    "original media is immutable",
+    "derived artifacts retain input hashes",
+    "rights UNKNOWN or RESTRICTED is not publishable",
+    "recitation output is learning assistance and candidate evidence, not infallible religious authority",
+    "authoritative religious judgment requires qualified human review",
+    "Python workers receive media only and cannot access Graph/database/credentials",
+    "model feedback is append-only and cannot auto-deploy a model"
+  ]
+}

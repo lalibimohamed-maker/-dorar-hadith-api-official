@@ -1,0 +1,51 @@
+{
+  "id": "rechercher-global-work-reconciliation-2026",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "stage": "GLOBAL_SOURCE_INTELLIGENCE",
+  "purpose": "Resolve one intellectual work across multilingual catalogs, editions and manifestations without replacing immutable source material.",
+  "capabilities": [
+    "WORK_IDENTITY_RECONCILIATION",
+    "EDITION_RECONCILIATION",
+    "MANIFESTATION_RANKING",
+    "PROVENANCE_GATED_MATCHING",
+    "RIGHTS_GATED_SELECTION",
+    "IMMUTABLE_SOURCE_PROTECTION",
+    "RECONCILIATION_TRACE"
+  ],
+  "source_families": [
+    "national_libraries",
+    "university_libraries",
+    "scholarly_graphs",
+    "islamic_corpora",
+    "manuscript_repositories",
+    "digital_heritage",
+    "open_repositories",
+    "iiif"
+  ],
+  "selection_policy": {
+    "identity_before_download": true,
+    "quality_ranked_manifestations": true,
+    "fallback_on_provider_failure": true,
+    "negative_evidence_is_not_nonexistence": true,
+    "unknown_rights_publishable": false
+  },
+  "immutable_fields": [
+    "sourceIdentity",
+    "contentHash",
+    "canonicalQuranArabic",
+    "originalPdf"
+  ],
+  "integration_targets": [
+    "V6_GLOBAL_SOURCE_INTELLIGENCE",
+    "V7_GLOBAL_KNOWLEDGE_EVIDENCE_GRAPH",
+    "ACQUISITION",
+    "PDF_VALIDATION",
+    "OCR_HTR",
+    "UNIVERSAL_EXPORT"
+  ],
+  "external_research_basis": {
+    "openalex": "Works, authors, sources, institutions, topics and open-access discovery",
+    "crossref": "Works, DOI, references, licenses and full-text link metadata",
+    "iiif": "Manifest, Canvas and annotation-based digital object interoperability"
+  }
+}

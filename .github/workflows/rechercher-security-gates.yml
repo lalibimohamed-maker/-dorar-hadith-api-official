@@ -1,0 +1,196 @@
+name: Rechercher — Security gates
+
+on:
+  push:
+    branches:
+      - feat/rechercher-operational-engines-installation-2026
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-security:
+    name: Python security (Bandit)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Install Bandit
+        run: python -m pip install --disable-pip-version-check 'bandit>=1.8,<2'
+      - name: Run Bandit on repository Python engines
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' PY_FILES < <(
+            find . -type f -name '*.py' \
+              -not -path './.git/*' \
+              -not -path './node_modules/*' \
+              -not -path '*/tests/*' \
+              -not -path './test/*' \
+              -print0
+          )
+          if ((${#PY_FILES[@]} == 0)); then
+            echo 'No Python source files found; Bandit gate is not applicable.'
+            exit 0
+          fi
+          echo 'Bandit policy: HIGH severity findings are blocking; lower-severity findings remain visible in the advisory report.'
+          bandit -r "${PY_FILES[@]}" -x '*/tests/*,*/test/*' -f json -o bandit-report.json --severity-level low || true
+          bandit -r "${PY_FILES[@]}" -x '*/tests/*,*/test/*' --severity-level high
+      - name: Upload Bandit report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-bandit-report
+          path: bandit-report.json
+          if-no-files-found: ignore
+
+  container-security:
+    name: Container security (Trivy)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pull pinned Trivy image
+        run: docker pull ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9
+      - name: Trivy IaC / Dockerfile scan
+        run: |
+          docker run --rm -v "$PWD:/workspace:ro" ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 config --severity HIGH,CRITICAL --exit-code 1 /workspace
+      - name: Build Python sandbox image
+        run: docker build -f Dockerfile.rechercher-python-sandbox -t rechercher-python-sandbox:security .
+      - name: Scan Python sandbox image
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$HOME/.cache/trivy:/root/.cache/" \
+            -v "$PWD:/workspace:ro" \
+            ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 \
+            image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed --ignorefile /workspace/.trivyignore rechercher-python-sandbox:security
+      - name: Build MFA sandbox image
+        run: docker build -f Dockerfile.rechercher-mfa-sandbox -t rechercher-mfa-sandbox:security .
+      - name: Scan MFA sandbox image
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$HOME/.cache/trivy:/root/.cache/" \
+            -v "$PWD:/workspace:ro" \
+            ghcr.io/aquasecurity/trivy:0.74.0@sha256:ee940acbf1f58ebadb42d01434ce4609530bf1b52536afbd1eee66cd7123c5c9 \
+            image --severity HIGH,CRITICAL --exit-code 1 --ignore-unfixed --ignorefile /workspace/.trivyignore rechercher-mfa-sandbox:security
+
+  api-dast:
+    name: API DAST (OWASP ZAP)
+    runs-on: ubuntu-24.04
+    needs: [python-security, container-security]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Start local API under test
+        shell: bash
+        run: |
+          set -euo pipefail
+          PORT=3000 npm start > /tmp/deen-allah-api.log 2>&1 &
+          echo $! > /tmp/deen-allah-api.pid
+          for _ in {1..60}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/health >/tmp/api-health.json; then
+              cat /tmp/api-health.json
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/deen-allah-api.log
+          exit 1
+      - name: Run OWASP ZAP baseline scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          # ZAP -l accepts alert status levels (PASS/IGNORE/INFO/WARN/FAIL),
+          # not vulnerability severities. HIGH is therefore invalid.
+          # Keep the baseline scan warning-tolerant, then enforce the intended
+          # HIGH-risk gate from the generated JSON report.
+          # The ZAP container runs as the non-root `zap` user. The checkout
+          # workspace is owned by the GitHub runner user, so mounting it directly
+          # at /zap/wrk can make ZAP unable to create its reports (EACCES).
+          # Use a dedicated runner-temp work directory with container-writable
+          # permissions, then copy the reports back into the workspace.
+          ZAP_WORKDIR="$RUNNER_TEMP/zap-work"
+          rm -rf "$ZAP_WORKDIR"
+          mkdir -p "$ZAP_WORKDIR"
+          chmod 0777 "$ZAP_WORKDIR"
+
+          docker run --rm --network host -v "$ZAP_WORKDIR:/zap/wrk:rw" \
+            zaproxy/zap-stable@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa \
+            zap-baseline.py \
+              -t http://127.0.0.1:3000 \
+              -r /zap/wrk/zap-report.html \
+              -J /zap/wrk/zap-report.json \
+              -l WARN \
+              -I
+
+          cp "$ZAP_WORKDIR/zap-report.html" "$PWD/zap-report.html"
+          cp "$ZAP_WORKDIR/zap-report.json" "$PWD/zap-report.json"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("zap-report.json")
+          if not report.is_file():
+              raise SystemExit("ZAP JSON report was not generated")
+
+          data = json.loads(report.read_text(encoding="utf-8"))
+          high = []
+          for site in data.get("site", []):
+              for alert in site.get("alerts", []):
+                  if str(alert.get("riskcode", "")).strip() == "3":
+                      high.append({
+                          "name": alert.get("name", "unknown"),
+                          "url": alert.get("url", ""),
+                          "count": alert.get("count", 0),
+                          "pluginid": alert.get("pluginid", ""),
+                      })
+
+          if high:
+              print("ZAP HIGH-risk alerts detected:")
+              for item in high:
+                  print(json.dumps(item, ensure_ascii=False))
+              raise SystemExit(1)
+
+          print("ZAP HIGH-risk gate passed: no riskcode=3 alerts.")
+          PY
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-zap-report
+          path: |
+            zap-report.html
+            zap-report.json
+          if-no-files-found: ignore
+      - name: Stop local API
+        if: always()
+        run: |
+          if [ -f /tmp/deen-allah-api.pid ]; then
+            kill "$(cat /tmp/deen-allah-api.pid)" || true
+          fi
