@@ -140,7 +140,7 @@ function apiUrl(domain, iso, provider) {
   }
   if (domain === 'quran' && provider === 'alquran-cloud') return 'https://api.alquran.cloud/v1/edition';
   if (['hadith', 'hadith_explanation', 'sunnah'].includes(domain) && iso && provider === 'hadeethenc') {
-    return `https://hadeethenc.com/${encodeURIComponent(iso)}/`;
+    return `https://hadeethenc.com/api/v1/categories/roots/?language=${encodeURIComponent(iso)}`;
   }
   if (['hadith', 'sunnah'].includes(domain) && provider === 'sunnah-com') return 'https://sunnah.com/developers';
   if (domain === 'tafsir' && provider === 'quran_foundation') return 'https://api-docs.quran.foundation/docs/content_apis_versioned/4.0.0/tafsirs/';
