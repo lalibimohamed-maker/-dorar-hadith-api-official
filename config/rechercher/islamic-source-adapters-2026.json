@@ -323,9 +323,9 @@
       "api_endpoints": {
         "master_metadata": "/api/master_patch",
         "book_metadata": "/api/books/{bookId}",
-        "book_data": "/api/books/{bookId}"
+        "book_release_metadata": "/api/books/{bookId}"
       },
-      "verification": "Open-source Shamela v4 connector contract verified; live runtime requires a Shamela API key and configured endpoint access"
+      "verification": "Open-source Shamela v4 connector contract verified: master metadata uses version and book metadata uses major_release/minor_release; live runtime requires a Shamela API key and configured endpoint access"
     }
   ],
   "runtime_policy": {
