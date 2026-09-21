@@ -1,4 +1,4 @@
-import { openItiConnectorInfo, openItiVersion, openItiRawTextUrl, openItiRawText, openItiConnectorHealth, shamelaDiscoveryUrl, shamelaConnectorInfo } from './rechercher-openiti-shamela.js';
+import { openItiConnectorInfo, openItiVersion, openItiRawTextUrl, openItiRawText, openItiConnectorHealth, shamelaDiscoveryUrl, shamelaConnectorInfo, shamelaRuntimeConfig, shamelaMasterMetadata, shamelaBookMetadata, shamelaBook } from './rechercher-openiti-shamela.js';
 import { loadCorpus, loadRouting } from './corpus_repository.js';
 import { searchCorpus, resolveConcept } from './corpus_search.js';
 import { buildKnowledgeSections } from './concept_resolver.js';
@@ -100,3 +100,7 @@ export function rechercherOpenItiRawText(input) { return openItiRawText(input); 
 export function rechercherOpenItiHealth() { return openItiConnectorHealth(); }
 export function rechercherShamelaDiscoveryUrl(query) { return shamelaDiscoveryUrl(query); }
 export function rechercherShamelaInfo() { return shamelaConnectorInfo(); }
+export function rechercherShamelaRuntimeConfig() { return shamelaRuntimeConfig(); }
+export function rechercherShamelaMasterMetadata(input) { return shamelaMasterMetadata(input); }
+export function rechercherShamelaBookMetadata(bookId, options) { return shamelaBookMetadata(bookId, options); }
+export function rechercherShamelaBook(bookId, options) { return shamelaBook(bookId, options); }
