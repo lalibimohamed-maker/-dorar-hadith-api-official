@@ -1,0 +1,94 @@
+{
+  "version": "2026.9",
+  "matrix": {
+    "languagesCount": 132,
+    "domainsCount": 24,
+    "cellCount": 3168,
+    "cellFormula": "132 * 24",
+    "expansion": "cartesian-product",
+    "materialization": "runtime-or-audit-export"
+  },
+  "languages": [
+    "ar","en","fr","es","de","tr","ur","id","ms","bn","hi","ru","fa","zh","sw","ha","pt","it","ja","ko",
+    "ps","ku","so","am","yo","wo","ff","bm","dz","ug","kk","ky","uz","tg","tk","az","tt","ba","cv","ce","av","os",
+    "sd","pa","gu","mr","ne","si","ta","te","ml","kn","or","as","my","th","vi","km","lo","fil","tl","jv","su","ceb",
+    "mg","rw","rn","lg","ny","sn","st","zu","xh","af","ti","om","ig","ak","ee","tw","ln","kg","lua","ber","kab","mt",
+    "sq","bs","hr","sr","mk","bg","ro","hu","pl","cs","sk","sl","uk","be","lt","lv","et","fi","sv","da","no","nl","el",
+    "he","hy","ka","iw","eo","ia","yi","fj","bi","to","sm","mi","ban","ace","min","bug","mad","mak","bjn","war","ilo","pam",
+    "tet","pap","nan","hak","wuu","yue"
+  ],
+  "domains": [
+    "quran",
+    "quran-tafsir",
+    "quran-sciences",
+    "hadith",
+    "hadith-commentary",
+    "hadith-sciences",
+    "aqidah",
+    "fiqh",
+    "usul-al-fiqh",
+    "sirah",
+    "shamail",
+    "islamic-history",
+    "biographies",
+    "fatwa",
+    "islamic-terminology",
+    "arabic-linguistics",
+    "ethics-and-tazkiyah",
+    "dawah",
+    "islamic-education",
+    "islamic-law-and-judiciary",
+    "comparative-religions",
+    "islamic-manuscripts-and-books",
+    "scholarly-research",
+    "islamic-institutions-and-archives"
+  ],
+  "pipeline": [
+    "primary-or-institutional-source",
+    "api",
+    "corpus",
+    "structured-web",
+    "scholarly-dataset",
+    "translation-metadata",
+    "provenance",
+    "rights",
+    "verification"
+  ],
+  "translationStatuses": [
+    "source-verified",
+    "institutionally-reviewed",
+    "scholarly",
+    "provenance-complete",
+    "candidate",
+    "unverified"
+  ],
+  "rightsPolicy": {
+    "publicSourceDoesNotGrantRedistribution": true,
+    "redistributionPermissionNotGranted": "discovery-and-indexing-allowed; verification-acquisition-only-when-source-access-and-internal-use-are-explicitly-permitted; public-redistribution-blocked",
+    "unknownRights": "metadata-and-source-link; internal-verification-subject-to-access-conditions",
+    "restrictedAccess": "blocked",
+    "publicDownload": "requires-explicit-redistribution-basis"
+  },
+  "quranCanonicalSeparation": {
+    "arabicCanonicalText": "separate",
+    "translations": "metadata-linked-but-never-substituted-for-canonical-arabic",
+    "translationConfidence": "per-record-status"
+  },
+  "perCellContract": {
+    "required": [
+      "language",
+      "domain",
+      "primaryOrInstitutionalSources",
+      "apiCandidates",
+      "corpusCandidates",
+      "structuredWebCandidates",
+      "scholarlyDatasets",
+      "translationMetadata",
+      "provenance",
+      "rights",
+      "verification"
+    ],
+    "noSilentPromotion": true,
+    "noArabicCanonicalMerge": true
+  }
+}
