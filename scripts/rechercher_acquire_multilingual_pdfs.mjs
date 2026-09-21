@@ -150,8 +150,8 @@ for(const [key,lang] of languages){
        if(d?.contentType && !/^application\/pdf(?:\s*;|$)/i.test(d.contentType)) continue;
        const dir=path.join(out,safe(iso),safe(adapter.id)); await fs.mkdir(dir,{recursive:true});
        const parsed=allowedUrl(pdfUrl); if(!parsed) continue;
-       const name=safe(path.basename(parsed.pathname)); if(name==='unknown') continue;
-       const file=path.join(dir,name);
+       const sequence=String(entry.files.length+1).padStart(4,'0');
+       const file=path.join(dir,`pdf-${sequence}.pdf`);
        const resolved=path.resolve(file);
        if(!resolved.startsWith(path.resolve(dir)+path.sep)) continue;
        await downloadPdf(pdfUrl,resolved);
