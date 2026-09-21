@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0",
+  "engine_id": "RECHERCHER_UNIVERSAL_FORMAT_EXPORT_ENGINE",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "purpose": "Preserve a canonical research/master representation while allowing lawful user-requested exports of books, research results, and learning artifacts into suitable formats and languages.",
+  "core_rule": "SOURCE_MASTER_IS_IMMUTABLE; EXPORTS_ARE_DERIVED_ARTIFACTS",
+  "input_assets": [
+    "PDF",
+    "DOCX",
+    "PPTX",
+    "ODT",
+    "HTML",
+    "EPUB",
+    "TXT",
+    "MARKDOWN",
+    "TEI",
+    "JATS",
+    "IIIF_MANIFEST",
+    "IIIF_CANVAS",
+    "PAGE_IMAGES",
+    "MANUSCRIPT_IMAGES",
+    "OCR_TEXT",
+    "RESEARCH_RESULT",
+    "LEARNING_ARTIFACT"
+  ],
+  "output_formats": [
+    "PDF",
+    "PDF_A",
+    "PDF_UA_WHEN_SUPPORTED",
+    "DOCX",
+    "PPTX",
+    "ODT",
+    "EPUB",
+    "HTML",
+    "TXT",
+    "MARKDOWN",
+    "RTF",
+    "TEI",
+    "JATS"
+  ],
+  "source_to_pdf": {
+    "supported_inputs": ["DOCX", "ODT", "HTML", "EPUB", "IMAGE_SEQUENCE", "IIIF_MANIFEST", "OCR_TEXT", "MARKDOWN", "TEI", "JATS"],
+    "image_sequence_policy": "Preserve page order, page identity, dimensions, and original images; generate a page-faithful PDF when rights permit.",
+    "manuscript_policy": "Generate a PDF from page images/IIIF canvases without silently replacing the manuscript images with OCR text.",
+    "ocr_policy": "OCR is a derivative/search layer and must remain distinguishable from the authoritative page image.",
+    "validation": ["PDF_SIGNATURE", "PAGE_COUNT", "IMAGE_INTEGRITY", "TEXT_LAYER_IF_PRESENT", "QPDF_CHECK", "SHA256", "PROVENANCE", "RIGHTS"]
+  },
+  "universal_export": {
+    "user_selectable": true,
+    "formats": ["PDF", "DOCX", "PPTX", "ODT", "EPUB", "HTML", "TXT", "MARKDOWN", "RTF", "TEI", "JATS"],
+    "preserve_citations": true,
+    "preserve_source_links": true,
+    "preserve_page_references": true,
+    "preserve_provenance": true,
+    "preserve_rights_metadata": true,
+    "derived_artifact_hash": true,
+    "never_mutate_master": true
+  },
+  "research_export": {
+    "enabled": true,
+    "exports": ["research_report", "search_results", "evidence_report", "bibliography", "citation_bundle", "learning_notes", "study_cards"],
+    "language": "USER_SELECTED",
+    "format": "USER_SELECTED",
+    "source_language_preserved": true,
+    "translation_provenance_required": true
+  },
+  "multilingual_export": {
+    "enabled": true,
+    "interface_language": "SEPARATE",
+    "learning_language": "SEPARATE",
+    "source_language": "PRESERVED",
+    "output_language": "USER_SELECTED",
+    "translation_modes": ["SOURCE_PRESERVING", "TRANSLATION_WITH_SOURCE", "TRANSLATION_ONLY_WHEN_ALLOWED", "BILINGUAL", "MULTILINGUAL_PARALLEL"],
+    "terminology_policy": "Preserve canonical Arabic terminology when no exact equivalent exists; expose translation provenance and equivalence class.",
+    "equivalence_classes": ["EXACT", "CLOSE", "HISTORICAL", "SCHOOL_SPECIFIC", "TRANSLATION_VARIANT", "NO_EXACT_EQUIVALENT"]
+  },
+  "format_engine_adapters": {
+    "pandoc": {
+      "role": "Textual and structured-document conversion; PDF/DOCX/PPTX/ODT/EPUB/HTML/RTF/TEI/JATS pathways",
+      "sandbox_required_for_untrusted_input": true
+    },
+    "iiif": {
+      "role": "Page-faithful manuscript/image acquisition and rendering bridge",
+      "presentation_version": "3.0",
+      "manifest_canvas_annotation_preserved": true
+    },
+    "native_office_renderer": {
+      "role": "Optional higher-fidelity rendering adapter for complex DOCX/PPTX/ODT layouts",
+      "status": "ADAPTER_CONTRACT_ONLY"
+    }
+  },
+  "quality_policy": {
+    "do_not_promote_derivative_to_source": true,
+    "do_not_overwrite_original_pdf": true,
+    "do_not_drop_pages": true,
+    "do_not_silently_translate_canonical_quran_arabic": true,
+    "do_not_publish_rights_unknown": true,
+    "do_not_publish_restricted": true,
+    "do_not_publish_without_explicit_permission_when_required": true,
+    "revalidate_every_export": true,
+    "record_conversion_tool_and_version": true,
+    "record_source_hash": true,
+    "record_output_hash": true,
+    "record_conversion_trace": true
+  },
+  "download_selection": {
+    "browser_capability_independent": true,
+    "offer_multiple_legal_formats": true,
+    "recommend_pdf_for_page_faithful_books": true,
+    "recommend_docx_for_editable_text": true,
+    "recommend_pptx_for_presentations_and_research_slides": true,
+    "offer_epub_for_reflowable_reading": true,
+    "offer_html_for_browser_reading": true,
+    "offer_original_or_best_available_copy_when_permitted": true
+  },
+  "fallback": {
+    "conversion_failure_does_not_delete_source": true,
+    "unsupported_format_falls_back_to_available_formats": true,
+    "source_failure_does_not_fail_work": true
+  },
+  "observability": ["EXPORT_REQUEST", "INPUT_IDENTITY", "INPUT_HASH", "OUTPUT_FORMAT", "OUTPUT_LANGUAGE", "TOOL_VERSION", "PAGES_IN", "PAGES_OUT", "WARNINGS", "VALIDATION", "OUTPUT_HASH", "RIGHTS_DECISION"],
+  "governance": {
+    "authoritative_content_review_required": true,
+    "AI_TRANSLATION_LABEL_REQUIRED": true,
+    "derived_export_label_required": true,
+    "human_review_for_authoritative_use": true
+  }
+}

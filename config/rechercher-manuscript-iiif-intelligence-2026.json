@@ -1,0 +1,34 @@
+{
+  "id": "rechercher-manuscript-iiif-intelligence-2026",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "stage": "GLOBAL_SOURCE_INTELLIGENCE",
+  "protocol": "IIIF_PRESENTATION_3_0",
+  "capabilities": [
+    "MANIFEST_DISCOVERY",
+    "CANVAS_PAGE_IDENTITY",
+    "IMAGE_SERVICE_LINKING",
+    "PAGE_TEXT_ALIGNMENT",
+    "OCR_HTR_PROVENANCE",
+    "MANIFESTATION_QUALITY_RANKING",
+    "RIGHTS_GATED_PUBLICATION"
+  ],
+  "principles": {
+    "original_page_image_is_immutable": true,
+    "text_is_derived_until_reviewed": true,
+    "alignment_requires_provenance": true,
+    "unknown_rights_publishable": false,
+    "provider_failure_does_not_fail_work": true
+  },
+  "integration_targets": [
+    "V6_GLOBAL_SOURCE_INTELLIGENCE",
+    "V7_GLOBAL_KNOWLEDGE_EVIDENCE_GRAPH",
+    "ACQUISITION",
+    "OCR_HTR",
+    "UNIVERSAL_EXPORT"
+  ],
+  "external_basis": {
+    "iiif": "Presentation 3.0 Manifest/Canvas/Annotation and interoperable digital objects",
+    "openalex": "Work and source discovery for scholarly identity reconciliation",
+    "crossref": "Bibliographic metadata, licenses, references and full-text link discovery"
+  }
+}
