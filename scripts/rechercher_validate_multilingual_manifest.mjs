@@ -9,7 +9,7 @@ const master=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01
 const manifest=JSON.parse(await fs.readFile(manifestPath,'utf8'));
 const adapters=new Map(registry.adapters.map(a=>[a.id,a])),sources=new Map((master.sources||[]).map(s=>[s.id,s]));
 const known=new Set([...adapters.keys(),...sources.keys()]),allowedOrigins=new Set();
-const add=v=>{try{const u=new URL(v);if(u.protocol==='https:'&&!u.origin.startsWith('https://www.google.com'))allowedOrigins.add(u.origin);}catch{}};
+const add=v=>{try{const u=new URL(v);if(u.protocol==='https:')allowedOrigins.add(u.origin);}catch{}};
 for(const a of adapters.values()){for(const o of a.origins||[])add(o);add(a.base_url);add(a.api_base_url);}
 for(const s of sources.values())add(s.url);
 const cells=manifest.cells||manifest.languages||{},errors=[],warnings=[],err=(code,detail)=>errors.push({code,detail});
