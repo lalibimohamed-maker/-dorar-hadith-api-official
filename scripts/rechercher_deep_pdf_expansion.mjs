@@ -60,12 +60,12 @@ function islamHouseApiPdfLinks(json,lang){
 }
 async function islamHousePdfLinks(page,target,r){
  const out=[];
- if(target.startsWith('https://api3.islamhouse.com')){
+ const targetUrl=allow(target);\n if(targetUrl && targetUrl.origin==='https://api3.islamhouse.com'){
   let j; try{j=JSON.parse(page.bytes.toString('utf8'))}catch{return out}
   const candidates=islamHouseApiPdfLinks(j,r.language_iso||'en');
   for(const x of candidates.slice(0,15)){
    if(x.url){out.push(x.url);continue}
-   const lang=r.language_iso||'en'; const u='https://api3.islamhouse.com/v3/'+encodeURIComponent(process.env.ISLAMHOUSE_API_KEY||'')+'/main/get-item/'+x.itemId+'/'+lang+'/json';
+   const lang=r.language_iso||'en'; const u=new URL('https://api3.islamhouse.com/v3/');\n   u.pathname += encodeURIComponent(process.env.ISLAMHOUSE_API_KEY||'')+'/main/get-item/'+encodeURIComponent(String(x.itemId))+'/'+encodeURIComponent(lang)+'/json';
    const detail=await get(u); if(!detail)continue;
    for(const a of islamHouseApiPdfLinks(JSON.parse(detail.bytes.toString('utf8')),lang)) if(a.url) out.push(a.url);
   }
