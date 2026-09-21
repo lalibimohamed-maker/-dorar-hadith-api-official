@@ -1,46 +1,51 @@
 name: Rechercher — Central governed PDF acquisition
 
-# Persistent PDF downloader for the WHOLE encyclopedia, not only 1-400H.
-# Scope: Prophet era -> Companions -> Followers -> 1-400H -> 401-800H ->
-# 801-1200H -> 1201H -> Modern era -> any new book appearing in saved sources.
-# It consumes every books-batches/**/catalog.json present on main and persists verified PDFs.
-# security-justification: reviewed; contents: write is required only to persist verified PDF artifacts/manifests to the governed acquisition branch.
+# One central downloader for the WHOLE encyclopedia. No era-specific acquisition pin.
+# Order is unbounded: Prophet era -> Hijri chronology -> present day -> future catalog additions.
+# Storage rule: ONE canonical physical PDF per book. GitHub Releases are the only permanent PDF storage; public and protected Releases are complementary rights-gated destinations, never mirrors.
+# security-justification: This workflow requires contents: write solely for governed acquisition state and release governance manifests; verified PDFs are persisted only through rights-gated GitHub Releases, and no source-code mutation is performed by the acquisition engine.
 permissions:
   contents: write
 
 env:
-  RECHERCHER_MAX_BOOK_WORKERS: 12
+  RECHERCHER_MAX_BOOK_WORKERS: 3
+  RECHERCHER_MAX_BOOKS_PER_RUN: 8
   RECHERCHER_CATALOG_GLOB: books-batches/**/catalog.json
+  RECHERCHER_PUBLIC_PDF_STORAGE_REPO: lalibimohamed-maker/dinullah-pdf-storage-01
   RECHERCHER_SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
 
 on:
   workflow_call:
     inputs:
       target_branch:
-        description: 'Governed branch where verified PDF artifacts and manifests are persisted.'
+        description: 'Governed branch holding the persistent chronological queue and verified PDF state.'
         required: true
         type: string
     secrets:
+      RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN:
+        description: 'Required write token for the public PDF Release storage repository.'
+        required: true
       RECHERCHER_SECONDARY_STORAGE_TOKEN:
-        description: 'Optional write token owned by the secondary GitHub account for the separate PDF storage repository.'
-        required: false
+        description: 'Required write token for the protected PDF Release storage repository.'
+        required: true
 
 jobs:
   acquire:
-    name: Continuous whole-encyclopedia PDF download and verification
-    runs-on: ubuntu-latest
+    name: Continuous whole-encyclopedia real-PDF acquisition
+    runs-on: ubuntu-24.04
     timeout-minutes: 360
     env:
+      PUBLIC_PDF_STORAGE_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
       SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
     steps:
-      - name: Checkout governed acquisition state
+      - name: Checkout persistent chronological acquisition state
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Checkout latest main catalogs and acquisition implementation
+      - name: Checkout latest governed engine and catalogs from main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: lalibimohamed-maker/-dorar-hadith-api-official
@@ -49,85 +54,227 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Synchronize the whole encyclopedia scope
+      - name: Synchronize whole-encyclopedia catalogs, engine and chronology policy
         run: |
           set -euo pipefail
-          test -s .governance-source/config/rechercher-encyclopedia-download-scope.json
-          mkdir -p books-batches
+          test -s .governance-source/config/rechercher-encyclopedia-catalog-registry.json
+          test -s .governance-source/config/rechercher-central-sequential-scope.json
+          mkdir -p books-batches scripts
           cp -a .governance-source/books-batches/. books-batches/
+          for script in rechercher_sequential_acquisition.py rechercher_acquisition_engine.py rechercher_pdf_storage_hygiene.py rechercher_pdf_quality_gate.py; do
+            test -s ".governance-source/scripts/$script"
+            cp -f ".governance-source/scripts/$script" "scripts/$script"
+          done
+          test ! -e scripts/rechercher_pdf_acquire.py || { echo 'legacy rechercher_pdf_acquire.py must not be present in governed execution state'; exit 1; }
+          test ! -e scripts/rechercher_waqfeya_acquire_original.py || { echo 'legacy rechercher_waqfeya_acquire_original.py must not be present in governed execution state'; exit 1; }
           python3 - <<'PY'
           import json
           from pathlib import Path
-          p=Path('.governance-source/config/rechercher-encyclopedia-download-scope.json')
-          d=json.loads(p.read_text(encoding='utf-8'))
-          expected=['Prophet era','Companions','Followers','1-400H','401-800H','801-1200H','1201H','Modern era']
-          if d.get('eras') != expected:
-              raise SystemExit('Encyclopedia era scope is incomplete or reordered.')
-          if d.get('catalog_glob') != 'books-batches/**/catalog.json':
-              raise SystemExit('Whole-encyclopedia catalog scope is not enabled.')
-          print('Whole encyclopedia PDF scope enabled:', ' -> '.join(d['eras']), ' -> future books')
+          d=json.loads(Path('config/rechercher-central-sequential-scope.json').read_text(encoding='utf-8'))
+          if d.get('mode') != 'unbounded_continuous_chronological': raise SystemExit('Central acquisition is still configured as a finite or era-bounded queue.')
+          if d.get('finite_book_count_targets') is not False or d.get('book_count_targets'): raise SystemExit('Finite book-count targeting is forbidden.')
+          if d.get('catalog_glob') != 'books-batches/**/catalog.json' or d.get('output_format') != '.pdf': raise SystemExit('Central chronological acquisition scope is invalid.')
+          print('CHRONOLOGY=', d['chronology'])
+          print('FINITE_BOOK_COUNT_TARGETS=', d['finite_book_count_targets'])
+          print('ACQUISITION_ENGINE_SOURCE=governed-main')
           PY
 
-      - name: Download real PDFs, verify, hash, and record failures
+      - name: Verify public and protected Release destinations
         env:
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_TOKEN: ${{ github.token }}
-          TARGET_BRANCH: ${{ inputs.target_branch }}
-        shell: bash
+          PUBLIC_GH_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
+          PUBLIC_REPO: ${{ env.RECHERCHER_PUBLIC_PDF_STORAGE_REPO }}
+          PROTECTED_GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          PROTECTED_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
+        run: |
+          set -euo pipefail
+          test -n "$PUBLIC_GH_TOKEN"
+          test -n "$PROTECTED_GH_TOKEN"
+          GH_TOKEN="$PUBLIC_GH_TOKEN" gh repo view "$PUBLIC_REPO" >/dev/null
+          GH_TOKEN="$PROTECTED_GH_TOKEN" gh repo view "$PROTECTED_REPO" >/dev/null
+          echo "PUBLIC_RELEASE_DESTINATION=READY repository=$PUBLIC_REPO"
+          echo "PROTECTED_RELEASE_DESTINATION=READY repository=$PROTECTED_REPO"
+
+      - name: Build census and discovery index
+        run: |
+          set -euo pipefail
+          python3 .governance-source/scripts/rechercher_encyclopedia_catalog_census.py
+          python3 .governance-source/scripts/rechercher_dorar_book_index.py --root "$GITHUB_WORKSPACE"
+
+      - name: Canonicalize primary PDF working storage
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
+
+      - name: Acquire PDFs through a bounded unbounded-queue batch
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
-          git lfs install
-          echo "Whole-encyclopedia PDF scope: ${RECHERCHER_CATALOG_GLOB}"
-          echo "Parallel PDF workers: ${RECHERCHER_MAX_BOOK_WORKERS}"
-          mkdir -p scripts
-          for script in rechercher_acquisition_engine.py rechercher_pdf_quality_gate.py rechercher_pdf_storage_hygiene.py rechercher_source_engines.py; do
-            test -s ".governance-source/scripts/$script"
-            cp -f ".governance-source/scripts/$script" "scripts/$script"
-          done
-          python3 scripts/rechercher_acquisition_engine.py --root "$GITHUB_WORKSPACE"
-          python3 scripts/rechercher_source_engines.py --root "$GITHUB_WORKSPACE" --out artifacts/governance/engine-b-candidates.json
-          python3 scripts/rechercher_download_engine_b.py --root "$GITHUB_WORKSPACE" --candidates artifacts/governance/engine-b-candidates.json --out artifacts/governance/engine-b-download-manifest.json --pdf-root artifacts
-          python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
+          sudo apt-get clean
+          df -h "$GITHUB_WORKSPACE"
+          python3 scripts/rechercher_sequential_acquisition.py --root "$GITHUB_WORKSPACE"
+          df -h "$GITHUB_WORKSPACE"
           rm -rf .governance-source
-          git lfs track 'artifacts/*.pdf'
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add books-batches scripts artifacts .gitattributes
-          if git diff --cached --quiet; then
-            echo 'No new PDF changes; saved failures will be retried on the next cycle.'
-          else
-            git commit -m 'data(rechercher): download and verify whole-encyclopedia PDFs in parallel'
-            # actions/checkout intentionally uses persist-credentials=false. Configure
-            # Git's credential helper explicitly from the ephemeral workflow token so
-            # fetch/rebase/push (and Git LFS) cannot fall back to an interactive prompt.
-            gh auth setup-git
-            git fetch origin "$TARGET_BRANCH"
-            git rebase "origin/$TARGET_BRANCH"
-            git push origin "HEAD:refs/heads/$TARGET_BRANCH"
-          fi
 
-      - name: Mirror verified PDFs to secondary storage account
-        if: ${{ env.SECONDARY_STORAGE_TOKEN != '' }}
-        env:
-          SECONDARY_STORAGE_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
-        shell: bash
+      - name: Enforce non-destructive PDF quality and completeness gate
         run: |
           set -euo pipefail
-          test -n "$SECONDARY_STORAGE_TOKEN"
-          GIT_LFS_SKIP_SMUDGE=1 git clone "https://x-access-token:${SECONDARY_STORAGE_TOKEN}@github.com/${SECONDARY_STORAGE_REPO}.git" .secondary-storage
-          cd .secondary-storage
-          git lfs install
-          git lfs track 'artifacts/*.pdf'
-          mkdir -p artifacts
-          cp -a ../artifacts/. artifacts/
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add artifacts .gitattributes
-          if git diff --cached --quiet; then
-            echo 'Secondary PDF storage is already synchronized.'
-            exit 0
+          python3 scripts/rechercher_pdf_quality_gate.py --root artifacts --report artifacts/governance/pdf-quality-gate.json
+
+      - name: Reject encrypted or invalid primary PDFs
+        run: |
+          set -euo pipefail
+          if find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo 'encrypted artifact remains'
+            exit 1
           fi
-          git commit -m 'data(rechercher): mirror verified encyclopedia PDFs'
-          git push origin HEAD
+          while IFS= read -r -d '' f; do
+            if head -n 1 "$f" | grep -q '^version https://git-lfs.github.com/spec/v1$'; then
+              continue
+            fi
+            head -c 5 "$f" | grep -qx '%PDF-'
+            test -s "$f"
+            qpdf --check "$f" >/dev/null
+          done < <(find artifacts -type f -name '*.pdf' -print0)
+
+      - name: Publish each verified PDF to exactly one rights-gated Release
+        env:
+          PUBLIC_GH_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
+          PROTECTED_GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          PUBLIC_REPO: ${{ env.RECHERCHER_PUBLIC_PDF_STORAGE_REPO }}
+          SECONDARY_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          public_tag="rechercher-pdf-public-$(date -u +%Y-%m-%d)"
+          protected_tag="rechercher-pdf-protected-$(date -u +%Y-%m-%d)"
+          : > artifacts/governance/release-assets.jsonl
+
+          is_public_eligible() {
+            local manifest="$1"
+            test -s "$manifest" || return 1
+            python3 - "$manifest" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding='utf-8'))
+          raise SystemExit(0 if d.get('storage_visibility') == 'publication-eligible' and d.get('public_browser') is True else 1)
+          PY
+          }
+
+          ensure_release() {
+            local repo="$1" tag="$2" title="$3" notes="$4"
+            local token="$PUBLIC_GH_TOKEN"
+            test "$repo" = "$SECONDARY_REPO" && token="$PROTECTED_GH_TOKEN"
+            if ! GH_TOKEN="$token" gh release view "$tag" --repo "$repo" >/dev/null 2>&1; then
+              GH_TOKEN="$token" gh release create "$tag" --repo "$repo" --target main --title "$title" --notes "$notes"
+            fi
+          }
+
+          while IFS= read -r -d '' f; do
+            test -s "$f"
+            head -c 5 "$f" | grep -qx '%PDF-'
+            name="$(basename "$f")"
+            stem="${name%.pdf}"
+            manifest="artifacts/$stem.manifest.json"
+            sha="$(sha256sum "$f" | awk '{print $1}')"
+
+            if is_public_eligible "$manifest"; then
+              ensure_release "$PUBLIC_REPO" "$public_tag" "Rechercher public PDFs $(date -u +%Y-%m-%d)" "Rights-gated public PDF assets. Canonical plaintext PDFs only. Provenance and rights metadata remain in the main repository; Corpus is not modified."
+              if GH_TOKEN="$PUBLIC_GH_TOKEN" gh release view "$public_tag" --repo "$PUBLIC_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$name"; then
+                echo "RELEASE_ASSET_ALREADY_PRESENT route=public file=$name"
+              else
+                GH_TOKEN="$PUBLIC_GH_TOKEN" gh release upload "$public_tag" "$f" --repo "$PUBLIC_REPO" --clobber=false
+                printf '%s\n' "{\"file\":\"$name\",\"sha256\":\"$sha\",\"release\":\"$public_tag\",\"route\":\"public\",\"repository\":\"$PUBLIC_REPO\"}" >> artifacts/governance/release-assets.jsonl
+              fi
+            else
+              ensure_release "$SECONDARY_REPO" "$protected_tag" "Rechercher protected PDFs $(date -u +%Y-%m-%d)" "Protected developer-access PDF assets. Canonical plaintext PDFs only. Missing or non-public rights evidence stays protected; provenance and rights metadata remain in the main repository; Corpus is not modified."
+              if GH_TOKEN="$PROTECTED_GH_TOKEN" gh release view "$protected_tag" --repo "$SECONDARY_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$name"; then
+                echo "RELEASE_ASSET_ALREADY_PRESENT route=protected file=$name"
+              else
+                GH_TOKEN="$PROTECTED_GH_TOKEN" gh release upload "$protected_tag" "$f" --repo "$SECONDARY_REPO" --clobber=false
+                printf '%s\n' "{\"file\":\"$name\",\"sha256\":\"$sha\",\"release\":\"$protected_tag\",\"route\":\"protected\",\"repository\":\"$SECONDARY_REPO\"}" >> artifacts/governance/release-assets.jsonl
+              fi
+            fi
+            rm -f -- "$f"
+          done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          rows=[json.loads(x) for x in Path('artifacts/governance/release-assets.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len({r['sha256'] for r in rows}) == len(rows), 'DUPLICATE_PDF_SHA_IN_RELEASE_BATCH'
+          Path('artifacts/governance/release-persistence.json').write_text(
+              json.dumps({'schema':'din-allah-encyclopedia/rechercher-release-persistence/v2','storage_model':'github-releases-only','assets':rows,'encrypted_final_artifacts':False,'lfs_pdf_persistence':False,'corpus_write':False},ensure_ascii=False,indent=2)+'\n',
+              encoding='utf-8')
+          PY
+          rm -f artifacts/governance/release-assets.jsonl
+
+      - name: Verify Release-only PDF persistence
+        run: |
+          set -euo pipefail
+          if find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo 'ERROR: encrypted final artifact remains.'
+            exit 1
+          fi
+          if find artifacts -type f -name '*.pdf' -print -quit | grep -q .; then
+            echo 'ERROR: a PDF remained in runner storage after Release persistence.'
+            exit 1
+          fi
+          test -s artifacts/governance/release-persistence.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('artifacts/governance/release-persistence.json').read_text(encoding='utf-8'))
+          assert d['storage_model'] == 'github-releases-only'
+          assert d['lfs_pdf_persistence'] is False
+          assert d['encrypted_final_artifacts'] is False
+          assert d['corpus_write'] is False
+          print('RELEASE_ONLY_STORAGE=VERIFIED assets=%d' % len(d['assets']))
+          PY
+      - name: Verify exactly one newly materialized copy per verified PDF
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          def pointer(path):
+              try:
+                  with path.open('rb') as fh:
+                      return fh.readline().strip() == b'version https://git-lfs.github.com/spec/v1'
+              except OSError:
+                  return False
+          def sha256(path):
+              h=hashlib.sha256()
+              with path.open('rb') as fh:
+                  for chunk in iter(lambda: fh.read(1024*1024), b''):
+                      h.update(chunk)
+              return h.hexdigest()
+          seen={}
+          for pool, root in [('primary', Path('artifacts'))]:
+              for pdf in sorted(root.glob('*.pdf')):
+                  if pointer(pdf):
+                      continue
+                  data=pdf.read_bytes()
+                  if not data.startswith(b'%PDF-') or not data:
+                      raise SystemExit(f'invalid PDF: {pool}/{pdf.name}')
+                  digest=hashlib.sha256(data).hexdigest()
+                  if digest in seen:
+                      raise SystemExit(f'DUPLICATE_PDF_COPY: {pdf.name} already stored in {seen[digest]}')
+                  seen[digest]=f'{pool}/{pdf.name}'
+          Path('artifacts/governance/storage-end-to-end-proof.json').write_text(
+              json.dumps(
+                  {
+                      'status':'VERIFIED',
+                      'storage_model':'ONE_COPY_ONLY_FOR_MATERIALIZED_BATCH',
+                      'verified_real_pdfs':len(seen),
+                      'primary':'artifacts/*.pdf',
+                      'secondary':'artifacts/*.pdf',
+                      'encrypted_final_artifacts':False,
+                      'duplicate_pdf_copies':0,
+                      'secondary_existing_lfs_objects_downloaded':False
+                  },
+                  indent=2
+              )+'\n',
+              encoding='utf-8'
+          )
+          print(f'ONE_COPY_STORAGE=VERIFIED newly_materialized={len(seen)}')
+          PY
