@@ -9,7 +9,9 @@ export function server(){return http.createServer((req,res)=>{const url=new URL(
   if(req.method==='GET'&&url.pathname==='/api/v1/quran/translations') return json(res,200,await api.quranTranslations(url.searchParams.get('lang')||undefined));
   if(req.method==='GET'&&url.pathname==='/api/v1/quran/translation') return json(res,200,await api.quranTranslation({translationKey:url.searchParams.get('key'),surah:url.searchParams.get('surah'),ayah:url.searchParams.get('ayah')||undefined}));
   if(req.method==='GET'&&url.pathname==='/api/v1/dorar/search') return json(res,200,await api.dorarSearch(url.searchParams.get('q')||''));
-  if(req.method==='GET'&&url.pathname==='/api/v1/sunnah/search') return json(res,200,await api.sunnahSearch(url.searchParams.get('q')||''));
+  if(req.method==='GET'&&url.pathname==='/api/v1/sunnah/hadiths') return json(res,200,await api.sunnahHadiths({collection:url.searchParams.get('collection')||undefined,bookNumber:url.searchParams.get('bookNumber')||undefined,chapterId:url.searchParams.get('chapterId')||undefined,hadithNumber:url.searchParams.get('hadithNumber')||undefined,limit:url.searchParams.get('limit')||undefined,page:url.searchParams.get('page')||undefined}));
+  if(req.method==='GET'&&url.pathname==='/api/v1/sunnah/refs') return json(res,200,await api.sunnahHadithRefs((url.searchParams.get('refs')||'').split(',').filter(Boolean)));
+  if(req.method==='GET'&&url.pathname==='/api/v1/sunnah/urns') return json(res,200,await api.sunnahHadithUrns((url.searchParams.get('urns')||'').split(',').filter(Boolean)));
   if(req.method==='GET'&&url.pathname==='/api/v1/sunnah/collections') return json(res,200,await api.sunnahCollections());
   if(req.method==='GET'&&url.pathname.startsWith('/api/v1/sunnah/collections/')) return json(res,200,await api.sunnahCollection(decodeURIComponent(url.pathname.slice('/api/v1/sunnah/collections/'.length))));
   if(req.method==='GET'&&url.pathname==='/api/v1/quran/sync') return json(res,200,await api.quranFoundationSync({resources:url.searchParams.get('resources')?.split(',').filter(Boolean)||[],syncToken:url.searchParams.get('syncToken')||null}));

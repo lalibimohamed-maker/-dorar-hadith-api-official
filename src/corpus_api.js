@@ -14,7 +14,7 @@ import { getQuranAyah } from './quran-ayah.js';
 import { listQuranTranslations, getQuranTranslation, getQuranFoundationTranslation } from './quran-translations.js';
 import { syncQuranFoundation } from './quran-foundation-sync.js';
 import { searchDorar } from './dorar-client.js';
-import { searchSunnah, getSunnahCollections, getSunnahCollection } from './sunnah-client.js';
+import { getSunnahCollections, getSunnahCollection, getSunnahHadiths, getSunnahHadithByRefs, getSunnahHadithByUrns } from './sunnah-client.js';
 
 export function search(query, options = {}) {
   const records = loadCorpus();
@@ -64,6 +64,8 @@ export function quranTranslation(input) { return getQuranTranslation(input); }
 export function quranFoundationTranslation(input) { return getQuranFoundationTranslation(input); }
 export function quranFoundationSync(input) { return syncQuranFoundation(input); }
 export function dorarSearch(query, options) { return searchDorar(query, options); }
-export function sunnahSearch(query, options) { return searchSunnah(query, options); }
+export function sunnahHadiths(input) { return getSunnahHadiths(input); }
+export function sunnahHadithRefs(refs, options) { return getSunnahHadithByRefs(refs, options); }
+export function sunnahHadithUrns(urns, options) { return getSunnahHadithByUrns(urns, options); }
 export function sunnahCollections(options) { return getSunnahCollections(options); }
 export function sunnahCollection(collection, options) { return getSunnahCollection(collection, options); }
