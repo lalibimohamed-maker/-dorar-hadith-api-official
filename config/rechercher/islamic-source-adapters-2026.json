@@ -25,11 +25,27 @@
         "hadith_explanation",
         "translations",
         "pdf",
-        "api"
+        "api",
+        "languages",
+        "categories",
+        "hadith_list",
+        "hadith_record",
+        "provenance"
       ],
       "authority": "primary_islamic_content",
-      "runtime": "public",
-      "status": "enabled"
+      "runtime": "public-api",
+      "status": "enabled",
+      "api_base_url": "https://hadeethenc.com/api/v1",
+      "api_endpoints": {
+        "languages": "/languages",
+        "categories": "/categories/list/?language={language}",
+        "roots": "/categories/roots/?language={language}",
+        "hadith_list": "/hadeeths/list/?language={language}&category_id={category_id}&page={page}&per_page={per_page}",
+        "hadith_one": "/hadeeths/one/?language={language}&id={id}"
+      },
+      "api_auth": "none",
+      "acquisition": "existing-hadeethenc-pdf-harvester",
+      "release_policy": "translations may be republished only when HadeethEnc terms/version/attribution requirements are preserved; verify current terms at acquisition/release time"
     },
     {
       "id": "islamhouse",
