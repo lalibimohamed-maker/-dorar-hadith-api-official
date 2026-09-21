@@ -107,7 +107,7 @@ function localizedUrlCandidates(rawUrl, languageIso){
   // This is discovery-only; the original seed URL remains as a fallback.
   for(const alias of aliases){
     const q=new URL(u.href);
-    q.pathname='/'+alias+'/'+u.pathname.replace(/^\\/+/, '');
+    q.pathname='/'+alias+'/'+u.pathname.replace(/^\/+/, '');
     add(q.href);
   }
   // 2) If the seed already contains a locale segment, replace it with LANG.
