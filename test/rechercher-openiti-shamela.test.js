@@ -16,17 +16,17 @@ test("OpenITI raw resolver blocks traversal", () => {
 test("OpenITI raw resolver creates release-pinned URL", () => {
   assert.equal(
     c.openItiRawTextUrl({ release: "v2025.1.9", path: "data/0728IbnTaymiyya/0728IbnTaymiyya.MajmucFatawa/0728IbnTaymiyya.MajmucFatawa.JK000381-ara1" }),
-    "https://raw.githubusercontent.com/OpenITI/RELEASE/v2025.1.9/data/0728IbnTaymiyya/0728IbnTaymiyya.MajmucFatawa/0728IbnTaymiyya.MajmucFatawa.JK000381-ara1"
+    "https://raw.githubusercontent.com/OpenITI/RELEASE/v2025.1.9/data/0728IbnTaymiyya/0728IbnTaymiyya.MajmucFatawa.JK000381-ara1"
   );
 });
 
-test("Shamela v4 runtime connector is key-gated and executable", () => {
+test("Shamela v4 runtime connector is key-gated and executable", async () => {
   const info = c.shamelaConnectorInfo();
   assert.equal(info.runtime, "api-key-configurable");
   assert.equal(info.apiKeyRequired, true);
   assert.equal(c.shamelaRuntimeConfig().configured, false);
   assert.equal(c.shamelaRuntimeConfig().apiKey, undefined);
   assert.match(c.shamelaDiscoveryUrl("ابن تيمية"), /^https:\/\/shamela\.ws\/search\?query=/);
-  assert.throws(() => c.shamelaBookMetadata(1), /SHAMELA_API_KEY is required/);
-  assert.throws(() => c.shamelaBookMetadata(0), /bookId must be a positive integer/);
+  await assert.rejects(() => c.shamelaBookMetadata(1), /SHAMELA_API_KEY is required/);
+  await assert.rejects(() => c.shamelaBookMetadata(0), /bookId must be a positive integer/);
 });
