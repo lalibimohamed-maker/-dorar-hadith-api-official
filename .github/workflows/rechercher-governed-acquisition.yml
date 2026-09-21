@@ -100,6 +100,7 @@ jobs:
           rm -rf artifacts/permanent-pdfs
           find . -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -delete
           python3 ../scripts/rechercher_pdf_storage_hygiene.py --root "$PWD" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
+          python3 ../scripts/rechercher_pdf_storage_hygiene.py --root "$PWD" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
           mkdir -p ../artifacts
           while IFS= read -r -d '' f; do
             base="$(basename "${f#./}")"
@@ -112,8 +113,10 @@ jobs:
           python3 .governance-source/scripts/rechercher_encyclopedia_catalog_census.py
           python3 .governance-source/scripts/rechercher_dorar_book_index.py --root "$GITHUB_WORKSPACE"
 
-      - name: Clean primary PDF working storage
-        run: python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
+      - name: Canonicalize all primary PDF working storage
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
 
       - name: Acquire PDFs through the single unbounded Hijri chronological queue
         run: |
@@ -193,14 +196,14 @@ jobs:
               if destination != path:
                   if destination.exists():
                       if sha256(destination) != sha256(path):
-                          destination=destination_root/f'{path.stem}--{sha256(path)[:12]}{path.suffix}'
-                      else:
-                          path.unlink(missing_ok=True)
-                          continue
+                          raise SystemExit(f'LOGICAL_PDF_COLLISION: {path.name} conflicts with canonical {destination.name}; refusing a second physical PDF')
+                      path.unlink(missing_ok=True)
+                      continue
                   shutil.move(str(path),str(destination))
 
-          # Final invariant: one SHA-256 == one physical PDF, never both pools.
+          # Final invariant: one logical book key and one SHA-256 each map to one physical PDF.
           seen={}
+          logical_seen={}
           for pool,root in (('public',primary),('protected',secondary)):
               for path in sorted(root.glob('*.pdf')):
                   if not valid_pdf(path):
@@ -209,6 +212,10 @@ jobs:
                   if digest in seen:
                       raise SystemExit(f'DUPLICATE_PDF_COPY: {path.name} already stored in {seen[digest]}')
                   seen[digest]=f'{pool}/{path.name}'
+                  key=path.stem.rsplit('--',1)[0] if '--' in path.stem and len(path.stem.rsplit('--',1)[-1])==12 else path.stem
+                  if key in logical_seen:
+                      raise SystemExit(f'DUPLICATE_LOGICAL_BOOK: {path.name} already stored as {logical_seen[key]}')
+                  logical_seen[key]=f'{pool}/{path.name}'
 
           public_count=sum(1 for value in seen.values() if value.startswith('public/'))
           protected_count=sum(1 for value in seen.values() if value.startswith('protected/'))
