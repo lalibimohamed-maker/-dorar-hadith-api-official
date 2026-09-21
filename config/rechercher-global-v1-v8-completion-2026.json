@@ -1,0 +1,45 @@
+{
+  "engine": "rechercher-global-v1-v8-completion",
+  "version": "1.0.0",
+  "target": "V1_V8_GLOBAL_OPERATIONAL_COMPLETENESS",
+  "rule": "COMPLETE is evidence-based and cannot be asserted by documentation alone.",
+  "stages": {
+    "V1_FOUNDATION": ["discovery", "identity", "provenance", "rights", "evidence"],
+    "V2_FEDERATION": ["source_federation", "multilingual_alignment", "adaptive_scheduling", "manifests", "reproducibility"],
+    "V3_DOMAIN_LEARNING": ["quran", "hadith", "fiqh", "tafsir", "sirah", "arabic"],
+    "V4_LEARNING_INTELLIGENCE": ["cognitive_diagnosis", "retrieval", "feedback", "transfer", "teach_back", "metacognition"],
+    "V5_GLOBAL_RESEARCH": ["global_discovery", "research_trace", "manuscript_readiness", "edition_readiness", "multimodal_alignment"],
+    "V6_GLOBAL_SOURCE_INTELLIGENCE": ["source_registry", "identity_deduplication", "rights_evaluation", "provenance_validation", "edition_manifest_linking"],
+    "V7_EVIDENCE_GRAPH": ["claims", "evidence", "contradictions", "scholar_review", "attribution_graph", "scholar_graph", "hadith_chain_graph", "fiqh_disagreement_graph", "multilingual_evidence_graph"],
+    "V8_ADAPTIVE_LEARNING": ["learner_state", "prerequisite_diagnosis", "misconception_detection", "source_selection", "adaptive_difficulty", "retrieval_loop", "transfer", "mastery", "spaced_review"]
+  },
+  "global_gates": ["unit_tests", "integration_tests", "full_ci", "security_gates", "governance_gates", "rights_gate", "provenance_gate", "immutability_gate", "ai_review_gate", "continuous_evolution_gate"],
+  "source_registry_policy": {
+    "required": ["sourceId", "sourceType", "accessMode", "adapterStatus", "rightsStatus", "provenance", "healthStatus"],
+    "publishable_requires": ["adapterStatus=READY", "rightsStatus=ALLOWED", "provenance"],
+    "blocked_rights": ["UNKNOWN", "RESTRICTED", "EXPLICIT_PERMISSION_REQUIRED"],
+    "user_priority_sources": [
+      "OpenITI / KITAB", "Jamharat al-Ulum", "Internet Archive", "Wikimedia Commons", "Open Library", "Library of Congress", "Google Books", "Crossref", "NYU ACO", "Smithsonian", "Princeton PUL", "British Library / EAP", "Gallica / BnF", "Bodleian", "Cambridge", "Vatican", "Kairawan", "Al-Furqan", "Qatar Digital Library", "Waqfeya", "Shamela", "alifta", "IslamHouse", "HadithEnc", "Terminology Encyclopedia", "minhadj.com", "alhadis.ru", "sunnaportal.com", "islamqa.info/ru", "islamhouse.com/ru", "alquran.islam.gov.qa"
+    ]
+  },
+  "immutable_invariants": ["original_pdf", "canonical_quran_arabic", "source_identity", "content_hash"],
+  "safety_invariants": {
+    "ai_cannot_self_verify": true,
+    "rights_unknown_or_restricted_not_publishable": true,
+    "acquisition_independent_from_learning": true,
+    "no_proxy_or_user_agent_rotation": true,
+    "no_anti_blocking": true,
+    "disagreements_remain_explicit": true,
+    "absence_is_not_proof": true
+  },
+  "continuous_evolution": {
+    "cycle": ["DISCOVER", "IDENTIFY", "DEDUPLICATE", "VERIFY_SOURCE", "CHECK_RIGHTS", "ACQUIRE_OR_REFERENCE", "VALIDATE", "EXTRACT", "ALIGN", "GRAPH", "EVIDENCE", "REVIEW", "PUBLISH_IF_ALLOWED", "MEASURE_GAPS", "RESEARCH_AGAIN"],
+    "new_sources_must_enter_registry_before_use": true,
+    "completion_is_recomputed_after_each_capability_change": true
+  },
+  "current_policy": {
+    "pr": 530,
+    "state": "DRAFT_NOT_MERGED",
+    "global_complete_claim": false
+  }
+}

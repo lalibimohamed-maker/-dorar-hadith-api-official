@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "stage": "V9_MULTIMODAL_ISLAMIC_LEARNING",
+  "connector": "rechercher-iiif-connector",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "standard": "IIIF Presentation API 3.0",
+  "supports": ["Manifest", "Canvas", "Image", "Sound", "Video", "Text", "PDF rendering", "Content Search"],
+  "operations": ["fetchManifest", "searchContent", "createAcquisitionCandidate"],
+  "policy": {
+    "readOnly": true,
+    "httpsOnly": true,
+    "noAccessControlBypass": true,
+    "acquisitionIndependentFromPublication": true,
+    "rightsUnknownBlocksPublicDistributionOnly": true,
+    "originalPdfImmutable": true
+  },
+  "integration": {
+    "resourceIdentity": "source_id/work_id/edition_id/manifestation_id/manuscript_id/page_id/canvas_id/passage_id/evidence_id/claim_id",
+    "preservationEvents": ["ACQUISITION", "VALIDATION", "CHECKSUM", "PRESERVATION"],
+    "pdfRetention": "lawful PDF candidates remain eligible for acquisition and validation; publication remains rights-gated"
+  },
+  "researchBasis": {
+    "iiifPresentationApi": "3.0.0",
+    "iiifContentSearchApi": "2.0.0"
+  },
+  "nextConnector": "OpenITI_KITAB"
+}

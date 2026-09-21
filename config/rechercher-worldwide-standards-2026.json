@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "standards": {
+    "IIIF_PRESENTATION": "3.0",
+    "W3C_WEB_ANNOTATION": "Recommendation",
+    "W3C_PROV_O": "Recommendation",
+    "PREMIS": "3.0",
+    "RO_CRATE": "1.2",
+    "DATACITE": "4.7",
+    "JSON_LD": "1.1",
+    "FAIR": "Principles"
+  },
+  "resource_model": ["source","work","edition","manifestation","manuscript","page","canvas","passage","evidence","claim"],
+  "preservation_model": ["object","event","rights","agent"],
+  "research_package": {"enabled": true,"format": "RO-CRATE-1.2","provenance": true,"machine_readable": true},
+  "citation": {"persistent_identifiers": true,"datacite_compatible": true}
+}
