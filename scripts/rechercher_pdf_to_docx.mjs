@@ -11,14 +11,20 @@ const output=path.resolve(ROOT,arg('--output','artifacts/rechercher/multilingual
 const manifestOut=path.resolve(ROOT,arg('--manifest',path.join(output,'manifest.json')));
 const strict=args.includes('--strict');
 const exists=async p=>{try{await fs.access(p);return true}catch{return false}};
-const run=(cmd,a)=>new Promise((res,rej)=>{const p=spawn(cmd,a,{stdio:['ignore','pipe','pipe']});let o='',e='';p.stdout.on('data',x=>o+=x);p.stderr.on('data',x=>e+=x);p.on('error',rej);p.on('close',c=>c===0?res({o,e}):rej(new Error(cmd+' exited '+c+': '+e.slice(-3000))))});
+const run=(cmd,a)=>new Promise((res,rej)=>{
+ if(!path.isAbsolute(cmd) || !/^(?:\\/usr\\/bin\\/python3|\\/usr\\/bin\\/libreoffice|\\/usr\\/bin\\/soffice)$/.test(cmd))
+   return rej(new Error('unsupported executable'));
+ const p=spawn(cmd,a,{stdio:['ignore','pipe','pipe']});let o='',e='';
+ p.stdout.on('data',x=>o+=x);p.stderr.on('data',x=>e+=x);p.on('error',rej);
+ p.on('close',c=>c===0?res({o,e}):rej(new Error(cmd+' exited '+c+': '+e.slice(-3000))));
+});
 async function walk(d){const r=[];if(!(await exists(d)))return r;for(const e of await fs.readdir(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory())r.push(...await walk(p));else if(e.isFile()&&/\.pdf$/i.test(e.name))r.push(p)}return r}
-async function pythonAvailable(){try{await run('python3',['-c','import pymupdf,docx']);return true}catch{return false}}
-async function findLO(){for(const c of ['libreoffice','soffice']){try{await run('sh',['-lc','command -v '+c]);return c}catch{}}return null}
+async function pythonAvailable(){try{await run('/usr/bin/python3',['-c','import pymupdf,docx']);return true}catch{return false}}
+async function findLO(){for(const c of ['/usr/bin/libreoffice','/usr/bin/soffice']){try{await fs.access(c);return c}catch{}}return null}
 async function main(){
  await fs.mkdir(output,{recursive:true});
  if(await pythonAvailable()){
-  try{await run('python3',[path.join(ROOT,'scripts/rechercher_pdf_to_docx.py'),'--input',input,'--output',output,'--manifest',manifestOut,...(strict?['--strict']:[])]);console.log(JSON.stringify({engine:'PyMuPDF+python-docx',manifest:manifestOut}));return}catch(e){if(strict)throw e}
+  try{await run('/usr/bin/python3',[path.join(ROOT,'scripts/rechercher_pdf_to_docx.py'),'--input',input,'--output',output,'--manifest',manifestOut,...(strict?['--strict']:[])]);console.log(JSON.stringify({engine:'PyMuPDF+python-docx',manifest:manifestOut}));return}catch(e){if(strict)throw e}
  }
  const lo=await findLO();if(!lo)throw new Error('Neither PyMuPDF/python-docx nor LibreOffice is available');
  const files=await walk(input),entries=[];
