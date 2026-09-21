@@ -101,26 +101,31 @@ function localizedUrlCandidates(rawUrl, languageIso){
     const v=allowedUrl(value);
     if(v && !seen.has(v.href)){seen.add(v.href);out.push(v.href)}
   };
-  // 1) Existing language/locale query parameters.
-  for(const key of ['lang','language','locale','hl','lng']){
+  // 1) Canonical multilingual path rule: /LANG/ is always the FIRST
+  // language-specific candidate for every source adapter.
+  // Example: https://example.org/ar/books -> https://example.org/fr/books
+  // This is discovery-only; the original seed URL remains as a fallback.
+  for(const alias of aliases){
     const q=new URL(u.href);
-    q.searchParams.set(key,aliases[0]);
+    q.pathname='/'+alias+'/'+u.pathname.replace(/^\\/+/, '');
     add(q.href);
   }
-  // 2) Replace a known locale-like path segment.
+  // 2) If the seed already contains a locale segment, replace it with LANG.
   const parts=u.pathname.split('/').filter(Boolean);
   for(let i=0;i<parts.length;i++){
-    if(/^[a-z]{2,3}(?:-[a-z]{2})?$/i.test(parts[i]) || /^(?:ar|en|fr|de|es|pt|it|nl|tr|ur|fa|id|ms|bn|hi|ru|zh|ja|ko)$/i.test(parts[i])){
+    if(/^[a-z]{2,3}(?:-[a-z]{2})?$/i.test(parts[i])){
       for(const alias of aliases){
         const p=[...parts];p[i]=alias;
-        const q=new URL(u.href);q.pathname='/'+p.join('/')+(u.pathname.endsWith('/')?'/':'');add(q.href);
+        const q=new URL(u.href);
+        q.pathname='/'+p.join('/')+(u.pathname.endsWith('/')?'/':'');
+        add(q.href);
       }
     }
   }
-  // 3) Common localized-prefix forms used by multilingual Islamic sites.
-  for(const alias of aliases){
+  // 3) Query-parameter variants are secondary fallbacks only.
+  for(const key of ['lang','language','locale','hl','lng']){
     const q=new URL(u.href);
-    q.pathname='/'+alias+'/'+u.pathname.replace(/^\/+/, '');
+    q.searchParams.set(key,aliases[0]);
     add(q.href);
   }
   return out;
