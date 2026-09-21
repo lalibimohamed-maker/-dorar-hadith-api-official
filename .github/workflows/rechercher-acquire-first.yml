@@ -16,8 +16,9 @@ concurrency:
 jobs:
   acquire-and-store:
     name: Delegate to the central governed real-PDF acquisition
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@636bd721b0715f61b0073ea90aae2e8eee8c15c9
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@ea793f5b1d52a3ea7595767f7cd7a0701971bd65
     with:
       target_branch: rechercher/salaf-01-400h-developer-review-acquisition
     secrets:
+      RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
       RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
