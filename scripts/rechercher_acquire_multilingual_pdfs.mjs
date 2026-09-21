@@ -105,15 +105,14 @@ async function probePdf(url){
   }catch(e){if(i===2)return null;await sleep(500*(i+1));}}
   return null;
 }
-function downloadPdf(url,file){
- const u=allowedUrl(url); if(!u) return Promise.reject(new Error('untrusted or disallowed HTTPS origin'));
- const args=['--fail','--silent','--show-error','--location','--proto','=https','--output',file,u.href];
- return new Promise((resolve,reject)=>{
-   const p=spawn('curl',args,{stdio:['ignore','ignore','pipe']});
-   let err=''; p.stderr.on('data',b=>{err+=b.toString()});
-   p.on('error',reject);
-   p.on('close',code=>code===0?resolve():reject(new Error(err||'curl failed')));
- });
+async function downloadPdf(url,file){
+ const u=allowedUrl(url); if(!u) throw new Error('untrusted or disallowed HTTPS origin');
+ const r=await fetch(u,{redirect:'manual',headers:{'user-agent':'DinAllah-Rechercher/2.0','accept':'application/pdf,*/*;q=0.1'}});
+ if(!r.ok) throw new Error('PDF download failed with HTTP '+r.status);
+ const final=allowedUrl(r.url || u.href);
+ if(!final) throw new Error('PDF redirect target is not an approved HTTPS origin');
+ const bytes=Buffer.from(await r.arrayBuffer());
+ await fs.writeFile(file,bytes);
 }
 const summary={schema:'rechercher/multilingual-resource-acquisition/v2',generated_at:new Date().toISOString(),language_count:languages.size,policy:{redistribution:'only when explicitly verified',research_only:'only when lawful research access is explicitly established; never public',public_repo:'research-only PDFs are forbidden from persistence in this public repository'},languages:{}};
 for(const [key,lang] of languages){
