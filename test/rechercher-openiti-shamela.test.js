@@ -16,7 +16,7 @@ test("OpenITI raw resolver blocks traversal", () => {
 test("OpenITI raw resolver creates release-pinned URL", () => {
   assert.equal(
     c.openItiRawTextUrl({ release: "v2025.1.9", path: "data/0728IbnTaymiyya/0728IbnTaymiyya.MajmucFatawa/0728IbnTaymiyya.MajmucFatawa.JK000381-ara1" }),
-    "https://raw.githubusercontent.com/OpenITI/RELEASE/v2025.1.9/data/0728IbnTaymiyya/0728IbnTaymiyya.MajmucFatawa.JK000381-ara1"
+    "https://raw.githubusercontent.com/OpenITI/RELEASE/v2025.1.9/data/0728IbnTaymiyya/0728IbnTaymiyya.MajmucFatawa/0728IbnTaymiyya.MajmucFatawa.JK000381-ara1"
   );
 });
 
