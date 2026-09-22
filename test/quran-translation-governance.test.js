@@ -32,6 +32,16 @@ test("Quran translation catalog contains the persisted QuranEnc coverage without
   }
 });
 
+test("KFGQPC official institutional editions are present but publication-blocked", () => {
+  const kfgqpc = catalog.editions.filter((edition) => edition.source_id === "kfgqpc");
+  assert.equal(kfgqpc.length, 11);
+  assert.ok(kfgqpc.every((edition) => edition.primary_source_verification?.status === "primary_source_verified"));
+  assert.ok(kfgqpc.every((edition) => edition.rights_verification?.status === "pending"));
+  assert.ok(kfgqpc.every((edition) => edition.text_integrity_status === "pending"));
+  assert.ok(kfgqpc.every((edition) => edition.matrix_eligibility === "blocked_pending_rights_and_integrity"));
+  assert.ok(kfgqpc.every((edition) => edition.acquisition_status === "not_acquired"));
+});
+
 test("verified primary-source provenance does not silently grant redistribution rights", () => {
   for (const edition of catalog.editions) {
     if (edition.primary_source_verification?.status === "primary_source_verified") {
