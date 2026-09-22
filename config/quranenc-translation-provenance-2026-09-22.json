@@ -180,7 +180,20 @@
       "provenance_class": "catalog_verified_primary_source_verification_pending",
       "primary_source": "QuranEnc official translation catalog API",
       "verification_status": "catalog_exists; publisher/institution must be read from live API metadata and then verified against primary source",
-      "ai_source": false
+      "ai_source": false,
+      "primary_source_verification": {
+        "status": "primary_source_verified",
+        "official_url": "https://www.aiitc.net/en/homepage/",
+        "evidence_url": "https://www.aiitc.net/en/category/opinion-en/",
+        "country": "Albania",
+        "verified_at": "2026-09-22",
+        "notes": "AIITC's official site lists 'The Magnificent Qur’an and its Meanings in Albanian' based on Prof. Hasan I. Nahit's translation and identifies AIITC as publisher."
+      },
+      "rights_verification": {
+        "status": "pending",
+        "evidence_url": "https://www.aiitc.net/en/category/opinion-en/",
+        "notes": "Publication provenance is verified; redistribution permission for Deen Allah remains pending."
+      }
     },
     {
       "translation_key": "bosnian_rwwad",
@@ -598,7 +611,15 @@
       "provenance_class": "catalog_verified_primary_source_verification_pending",
       "primary_source": "QuranEnc official translation catalog API",
       "verification_status": "catalog_exists; publisher/institution must be read from live API metadata and then verified against primary source",
-      "ai_source": false
+      "ai_source": false,
+      "primary_source_verification": {
+        "status": "primary_source_candidate_identity_pending",
+        "official_url": "https://isengesho.com/en",
+        "evidence_url": "https://www.minijust.gov.rw/index.php?eID=dumpFile&f=77060&t=dumpFile&token=0a72c9f36e0694e727af1c50eeb47f730ca327e3",
+        "country": "Rwanda",
+        "verified_at": "2026-09-22",
+        "notes": "Current official Rwanda Muslim Community evidence was found, but the QuranEnc edition uses the older/different label 'Rwanda Muslim Association'; exact identity continuity remains to be confirmed."
+      }
     },
     {
       "translation_key": "ikirundi_gehiti",
@@ -644,6 +665,7 @@
   "next_step": "Resolve each candidate against the issuing institution's primary official source, capture country, publisher/institution URL, edition/version, rights evidence, and verification timestamp before eligible matrix admission.",
   "primary_source_verification_progress": {
     "verified_editions": [
+      "albanian_nahi",
       "indonesian_affairs",
       "indonesian_complex"
     ],
@@ -667,7 +689,6 @@
       "azeri_musayev",
       "macedonian_group",
       "albanian_rwwad",
-      "albanian_nahi",
       "bosnian_rwwad",
       "bosnian_mihanovich",
       "serbian_rwwad",
