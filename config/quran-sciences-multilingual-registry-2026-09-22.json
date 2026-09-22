@@ -215,7 +215,10 @@
           "tajweed"
         ],
         "status": "official-documentation-verified",
-        "access_note": "Production content requires approved app permissions; pre-live content is limited to Al-Fatihah and Al-Baqarah."
+        "base_url": "https://apis.quran.foundation",
+        "endpoint_example": "/content/api/v4/chapters",
+        "authentication": "OAuth2 client_credentials; content scope; x-auth-token and x-client-id",
+        "access_note": "Production content requires approved app access; pre-live is limited to Al-Fatihah and Al-Baqarah."
       },
       {
         "api_id": "quran-foundation-search-api-v1",
@@ -225,29 +228,41 @@
           "chapter-juz-page-search"
         ],
         "status": "official-documentation-verified",
-        "access_note": "Search is a permission-gated API surface."
+        "base_url": "https://apis.quran.foundation",
+        "access_note": "Permission-gated search API."
       },
       {
-        "api_id": "quranenc-translation-api-v1",
+        "api_id": "tafasir-online-developer-api",
+        "provider": "الجامع التاريخي لتفسير القرآن الكريم",
         "scope": [
-          "translation-catalog",
-          "translations",
-          "footnotes",
-          "translation-audio"
+          "quran-text",
+          "tafsir-books",
+          "book-content",
+          "riwayat"
         ],
-        "status": "official-documentation-verified",
-        "access_note": "Translation republication is permitted only under QuranEnc's stated no-modification, attribution, versioning and update conditions."
+        "status": "official-developer-api-verified",
+        "documentation": "https://www.tafasir.online/ar/developer",
+        "authentication": "API_Key",
+        "endpoint_verification": "partial",
+        "access_note": "Official developer page documents API access and API_Key registration, but the concrete transport endpoint should not be inferred until exposed by the official developer contract."
       },
       {
-        "api_id": "diyanet-open-source-quran-api",
+        "api_id": "alquran-cloud-api-v1",
+        "provider": "Al Quran Cloud / Islamic Network",
         "scope": [
           "quran",
-          "tafsir",
-          "tajweed-learning",
-          "recitation"
+          "translations",
+          "audio",
+          "recitations",
+          "edition-catalog"
         ],
-        "status": "official-api-service-verified",
-        "access_note": "Keep rights restricted until independent-product permission is established."
+        "status": "official-api-documentation-verified",
+        "base_url": "https://api.alquran.cloud/v1",
+        "endpoint_example": "/surah/1/en.sahih",
+        "authentication": "keyless-public",
+        "source_provenance": "Al Quran Cloud terms state Quran text/audio were originally retrieved from GlobalQuran.com; Arabic text is sourced from various sources including Tanzil.net and Quran Academy.",
+        "rights_note": "Arabic Quran text may be reproduced/stored/displayed for non-commercial use under current terms; translations/recitations retain source-specific rights and attribution requirements.",
+        "access_note": "Free/keyless with soft per-IP rate limiting; higher-throughput/full-corpus mirror use should follow the service's contact/fair-use process."
       }
     ],
     "integration_rule": "API contracts remain service-layer records. Each content edition/reading/translation remains independently provenance- and rights-verified before acquisition or Corpus admission."
