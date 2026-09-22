@@ -7,6 +7,8 @@ const ROOT = process.cwd();
 const CONFIG = path.join(ROOT, "config/quran-institutional-acquisition-2026-09-22.json");
 const OUT = path.join(ROOT, "artifacts/quran-institutional-acquisition");
 const MAX_BYTES = 300 * 1024 * 1024;
+const FETCH_TIMEOUT_MS = 45_000;
+const FETCH_ATTEMPTS = 2;
 
 function sha256(data) {
   return crypto.createHash("sha256").update(data).digest("hex");
@@ -21,6 +23,37 @@ function validRar(data) {
   return data.length >= 7 &&
     data[0] === 0x52 && data[1] === 0x61 && data[2] === 0x72 &&
     data[3] === 0x21 && data[4] === 0x1a && data[5] === 0x07;
+}
+function classifyError(error) {
+  const message = String(error?.message || error || "");
+  if (/fetch failed|timeout|timed out|ETIMEDOUT|ECONNRESET|ENETUNREACH|EAI_AGAIN|ENOTFOUND|network|HTTP 5\d\d/i.test(message)) {
+    return "network_unavailable";
+  }
+  return "validation_or_source_error";
+}
+async function fetchBytes(url) {
+  let lastError;
+  for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const response = await fetch(url, {
+        redirect: "follow",
+        signal: controller.signal,
+        headers: { accept: "application/pdf,application/octet-stream,*/*" }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const bytes = Buffer.from(await response.arrayBuffer());
+      if (bytes.length > MAX_BYTES) throw new Error(`asset exceeds ${MAX_BYTES} bytes`);
+      return bytes;
+    } catch (error) {
+      lastError = error;
+      if (attempt < FETCH_ATTEMPTS) await new Promise(resolve => setTimeout(resolve, 1500));
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw lastError;
 }
 
 const config = JSON.parse(await fs.readFile(CONFIG, "utf8"));
@@ -38,14 +71,7 @@ for (const edition of config.editions) {
     status: "not_acquired"
   };
   try {
-    const response = await fetch(edition.asset_url, {
-      redirect: "follow",
-      headers: { accept: "application/pdf,application/octet-stream,*/*" }
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const bytes = Buffer.from(await response.arrayBuffer());
-    if (bytes.length > MAX_BYTES) throw new Error(`asset exceeds ${MAX_BYTES} bytes`);
-
+    const bytes = await fetchBytes(edition.asset_url);
     if (edition.asset_kind === "pdf" && !validPdf(bytes)) {
       throw new Error("expected PDF signature %PDF-");
     }
@@ -73,13 +99,15 @@ for (const edition of config.editions) {
     record.status = "acquired_research_only";
   } catch (error) {
     record.error = String(error?.message || error);
+    record.error_class = classifyError(error);
   }
   record.elapsed_ms = Date.now() - started;
+  await fs.mkdir(path.join(OUT, edition.language_iso_code), { recursive: true });
   await fs.writeFile(
     path.join(OUT, edition.language_iso_code, `${edition.edition_id}.metadata.json`),
     JSON.stringify(record, null, 2) + "\n",
     "utf8"
-  ).catch(() => {});
+  );
   results.push(record);
 }
 
@@ -93,14 +121,18 @@ const manifest = {
   edition_count: results.length,
   acquired_editions: results.filter(x => x.status === "acquired_research_only").length,
   failed_editions: results.filter(x => x.status !== "acquired_research_only").length,
+  network_unavailable_editions: results.filter(x => x.error_class === "network_unavailable").length,
+  validation_or_source_error_editions: results.filter(x => x.error_class === "validation_or_source_error").length,
   languages: [...new Set(results.map(x => x.language_iso_code))],
   editions: results
 };
 await fs.writeFile(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", "utf8");
-if (manifest.acquired_editions === 0) process.exitCode = 1;
+if (manifest.validation_or_source_error_editions > 0) process.exitCode = 1;
 console.log(JSON.stringify({
   edition_count: manifest.edition_count,
   acquired_editions: manifest.acquired_editions,
   failed_editions: manifest.failed_editions,
+  network_unavailable_editions: manifest.network_unavailable_editions,
+  validation_or_source_error_editions: manifest.validation_or_source_error_editions,
   languages: manifest.languages
 }, null, 2));
