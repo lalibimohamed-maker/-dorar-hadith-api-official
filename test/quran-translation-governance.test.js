@@ -43,6 +43,9 @@ test("KFGQPC official institutional editions are present but publication-blocked
   const kannada = kfgqpc.find((edition) => edition.edition_id === "kfgqpc-kannada");
   assert.ok(kannada);
   assert.equal(kannada.language_iso_code, "kn");
+  assert.equal(kannada.asset_url_status, "official_file_confirmed");
+  assert.equal(kannada.asset_kind, "pdf");
+  assert.ok(kannada.asset_urls.includes("https://qurancomplex.gov.sa/wp-content/uploads/isdarat/translations/kannada-1.pdf"));
 });
 
 test("verified primary-source provenance does not silently grant redistribution rights", () => {
