@@ -324,6 +324,87 @@
         ],
         "provenance_note": "Official JAKIM page documents the approved Smart Quran application and named reciters; no public API contract was verified in this scan."
       }
-    ]
+    ],
+    "recitation_contract": {
+      "status": "official-api-documentation-verified",
+      "provider": "Quran Foundation / Quran.com",
+      "chapter_reciters_endpoint_family": "/chapter_recitations/{reciter_id} and related audio endpoints",
+      "ayah_recitations_endpoint_family": "/quran/recitations/{recitation_id} and related resources",
+      "metadata_rule": "Keep chapter-reciter IDs distinct from ayah-by-ayah recitation IDs; preserve qirat/style metadata when returned.",
+      "rights_rule": "Verify redistribution rights separately from API access."
+    }
+  },
+  "qiraat_verification_matrix": {
+    "verification_date": "2026-09-22",
+    "policy": "The Ten Canonical Readings are tracked separately. A reading is not marked resource-verified merely because a general source describes the Ten Readings. Each reading/riwaya requires its own primary-source evidence before acquisition or Corpus admission.",
+    "canonical_readings": [
+      {
+        "reader": "Nafi",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Ibn Kathir",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Abu Amr",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Ibn Amir",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Asim",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Hamza",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Al-Kisai",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Abu Jafar",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Yaqub",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Khalaf al-Ashir",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      }
+    ],
+    "primary_source_evidence": {
+      "quran_com_ten_readings_guide": {
+        "status": "official-site-documentation-verified",
+        "role": "establishes the Ten Readings as a distinct canonical-reading set and documents reader/transmitter presentation",
+        "does_not_prove": "individual downloadable/API data contract or redistribution rights for every reading"
+      },
+      "quran_foundation_content_api_v4": {
+        "status": "official-api-contract-verified",
+        "role": "canonical content, translations, tafsir, recitations and related content API",
+        "qiraat_api_status": "not-verified-as-ten-readings-api"
+      },
+      "king_fahd_complex": {
+        "status": "official-developer-data-verified",
+        "role": "digital Quran resources",
+        "individually_verified_readings": [
+          "Hafs",
+          "Warsh",
+          "Qalun",
+          "Al-Susi"
+        ],
+        "ten_readings_complete": false
+      }
+    },
+    "riwaya_rule": "Reader-level evidence must not be conflated with transmitter/riwaya-level evidence. Register the transmitter, resource/edition, upstream source, file/API endpoint, rights and checksum independently.",
+    "recitation_rule": "For audio, store reader, style, qiraat/riwaya when supplied by the official source, source resource ID and licensing/redistribution state. Quran Foundation's official API exposes reciter records with a qirat field, but that API contract alone is not a rights grant.",
+    "tajweed_rule": "Tajweed annotations and colored Mushaf representations remain a separate layer from canonical Arabic text and from qiraat-specific variants.",
+    "tafseer_rule": "Tafsir records must preserve author, language, resource/edition ID and upstream provenance; an API provider is not itself the scholarly author."
   }
 }
