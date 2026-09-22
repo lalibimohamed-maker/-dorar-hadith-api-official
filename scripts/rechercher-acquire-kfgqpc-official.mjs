@@ -253,7 +253,7 @@ for (const edition of config.editions) {
     } catch (error) {
       const errorMessage = String(error?.message || error);
       result.candidates.push({ asset_url: assetUrl, status: "asset_error", error: errorMessage });
-      if (/proxy HTTP 5\\d\\d|HTTP 5\\d\\d|fetch failed|aborted|abort|timeout|timed out|ETIMEDOUT|ECONNRESET|ENETUNREACH|EAI_AGAIN|ENOTFOUND/i.test(errorMessage)) {
+      if (/proxy HTTP 5\d\d|HTTP 5\d\d|fetch failed|aborted|abort|timeout|timed out|ETIMEDOUT|ECONNRESET|ENETUNREACH|EAI_AGAIN|ENOTFOUND/i.test(errorMessage)) {
         networkUnavailable = true;
       }
     }
