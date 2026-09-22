@@ -134,6 +134,55 @@
       "corpus_write": "forbidden-direct",
       "adapter_status": "registry-ready; endpoint contract documented",
       "verification_status": "official-api-documentation-verified"
+    },
+    {
+      "id": "tafasir-online-developer-api",
+      "provider": "الجامع التاريخي لتفسير القرآن الكريم",
+      "country": "SA",
+      "homepage": "https://www.tafasir.online/",
+      "documentation": "https://www.tafasir.online/ar/developer",
+      "access": [
+        "official-api"
+      ],
+      "authentication": "API_Key",
+      "capabilities": [
+        "quran-text",
+        "tafsir-books",
+        "book-content",
+        "riwayat"
+      ],
+      "endpoint_status": "official-api-contract-page-verified; concrete endpoint partial",
+      "rights_status": "not-assumed-from-api-access",
+      "integration_status": "registry-ready-as-restricted-official-api",
+      "corpus_write": "forbidden-direct",
+      "provenance_required": true
+    },
+    {
+      "id": "alquran-cloud-api-v1",
+      "provider": "Al Quran Cloud / Islamic Network",
+      "country": "international",
+      "homepage": "https://alquran.cloud/",
+      "documentation": "https://alquran.cloud/api",
+      "api_version": "v1",
+      "base_url": "https://api.alquran.cloud/v1",
+      "access": [
+        "official-api"
+      ],
+      "authentication": "keyless-public",
+      "capabilities": [
+        "quran",
+        "translations",
+        "audio",
+        "recitations",
+        "edition-catalog"
+      ],
+      "source_provenance": "Service terms state Quran text/audio were originally retrieved from GlobalQuran.com; Arabic Quran text is currently described as sourced from various sources including Tanzil.net and Quran Academy.",
+      "rights_status": "source-specific; Arabic text non-commercial reproduction permitted under current terms; translations and recitations retain their own rights/attribution conditions",
+      "rate_limit": "soft per-IP rate limit",
+      "endpoint_example": "GET /surah/1/en.sahih",
+      "corpus_write": "forbidden-direct",
+      "provenance_required": true,
+      "verification_status": "official-api-documentation-and-terms-verified"
     }
   ],
   "official_specialized_targets": [
