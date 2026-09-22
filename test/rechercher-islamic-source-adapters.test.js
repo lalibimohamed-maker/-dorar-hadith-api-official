@@ -41,3 +41,19 @@ test('all registered origins are HTTPS and uniquely owned by their adapter',()=>
     }
   }
 });
+
+
+test('verified translation sources carry scoped redistribution evidence without opening Arabic canonical text',()=>{
+  for(const id of ['hadeethenc','quranenc']){
+    const a=r.adapters.find(x=>x.id===id);
+    assert.equal(a.rights_policy.kind,'explicit-redistribution-permission');
+    assert.equal(a.rights_policy.scope,'translated_content');
+    assert.ok(a.rights_policy.evidence_url.startsWith('https://'));
+    assert.deepEqual(a.rights_policy.exclude_language_iso,['ar']);
+  }
+});
+
+test('runtime-verified providers remain eligible for discovery while rights remain per-item',()=>{
+  assert.equal(r.adapters.find(x=>x.id==='islamhouse').status,'runtime-verified');
+  assert.equal(r.adapters.find(x=>x.id==='openiti').status,'runtime-verified');
+});
