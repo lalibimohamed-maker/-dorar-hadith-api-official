@@ -199,5 +199,57 @@
     "ten_qiraat_must_be_individually_verified": true,
     "no_ai_substitution_for_missing_religious_sources": true
   },
-  "last_updated": "2026-09-22"
+  "last_updated": "2026-09-22",
+  "api_surface_expansion": {
+    "last_verified": "2026-09-22",
+    "official_api_contracts": [
+      {
+        "api_id": "quran-foundation-content-api-v4",
+        "scope": [
+          "canonical-quran",
+          "translations",
+          "tafsir",
+          "audio",
+          "recitations",
+          "mushaf",
+          "tajweed"
+        ],
+        "status": "official-documentation-verified",
+        "access_note": "Production content requires approved app permissions; pre-live content is limited to Al-Fatihah and Al-Baqarah."
+      },
+      {
+        "api_id": "quran-foundation-search-api-v1",
+        "scope": [
+          "quran-search",
+          "verse-search",
+          "chapter-juz-page-search"
+        ],
+        "status": "official-documentation-verified",
+        "access_note": "Search is a permission-gated API surface."
+      },
+      {
+        "api_id": "quranenc-translation-api-v1",
+        "scope": [
+          "translation-catalog",
+          "translations",
+          "footnotes",
+          "translation-audio"
+        ],
+        "status": "official-documentation-verified",
+        "access_note": "Translation republication is permitted only under QuranEnc's stated no-modification, attribution, versioning and update conditions."
+      },
+      {
+        "api_id": "diyanet-open-source-quran-api",
+        "scope": [
+          "quran",
+          "tafsir",
+          "tajweed-learning",
+          "recitation"
+        ],
+        "status": "official-api-service-verified",
+        "access_note": "Keep rights restricted until independent-product permission is established."
+      }
+    ],
+    "integration_rule": "API contracts remain service-layer records. Each content edition/reading/translation remains independently provenance- and rights-verified before acquisition or Corpus admission."
+  }
 }
