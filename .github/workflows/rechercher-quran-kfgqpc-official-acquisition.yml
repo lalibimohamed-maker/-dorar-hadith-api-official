@@ -1,0 +1,38 @@
+name: Rechercher — KFGQPC official translation asset acquisition
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "config/quran-official-saudi-kfgqpc-translation-registry-2026-09-22.json"
+      - "config/quran-multisource-translation-catalog-2026-09-22.json"
+      - "config/quran-kfgqpc-official-acquisition-2026-09-22.json"
+      - "scripts/rechercher-acquire-kfgqpc-official.mjs"
+      - "test/quran-kfgqpc-official-acquisition.test.js"
+      - ".github/workflows/rechercher-quran-kfgqpc-official-acquisition.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-kfgqpc-official:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+      - name: Acquire official KFGQPC assets
+        run: node scripts/rechercher-acquire-kfgqpc-official.mjs
+      - name: Validate KFGQPC acquisition manifest
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('artifacts/quran-kfgqpc-official-acquisition/manifest.json','utf8')); if(m.edition_count!==1) process.exit(1); if(m.acquired_editions!==1) process.exit(1); if(m.failed_editions!==0) process.exit(1); if(m.corpus_write!==false || m.ai_generated_translation!==false || m.canonical_arabic_separate!==true) process.exit(1); console.log('KFGQPC acquisition manifest OK', m.languages.join(','));"
+      - name: Upload research-only KFGQPC acquisition
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: quran-kfgqpc-official-acquisition
+          path: artifacts/quran-kfgqpc-official-acquisition
+          retention-days: 90
