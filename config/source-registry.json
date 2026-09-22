@@ -132,7 +132,9 @@
       ],
       "apiStatus": "documented-v4-oauth2",
       "corpusWrite": "forbidden-direct",
-      "provenanceRequired": true
+      "provenanceRequired": true,
+      "apiBase": "https://apis.quran.foundation",
+      "rightsNote": "API access does not itself grant redistribution rights; QF content/raw API data have source terms and storage/redistribution restrictions."
     },
     {
       "id": "moia-sa",
@@ -562,6 +564,52 @@
       ],
       "apiStatus": "documented-v1",
       "rightsStatus": "redistribution-permitted-subject-to-source-terms",
+      "corpusWrite": "forbidden-direct",
+      "provenanceRequired": true
+    },
+    {
+      "id": "tafasir-online-developer-api",
+      "nameAr": "الجامع التاريخي لتفسير القرآن الكريم - خدمات المطورين",
+      "country": "السعودية",
+      "category": "tafsir",
+      "url": "https://www.tafasir.online/ar/developer",
+      "role": "official-api",
+      "coverage": [
+        "quran-text",
+        "tafsir-books",
+        "book-content",
+        "riwayat"
+      ],
+      "access": [
+        "official-api"
+      ],
+      "apiStatus": "documented-api-key; endpoint-partial",
+      "authentication": "API_Key",
+      "rightsStatus": "not-assumed-from-api-access",
+      "corpusWrite": "forbidden-direct",
+      "provenanceRequired": true
+    },
+    {
+      "id": "alquran-cloud",
+      "nameAr": "Al Quran Cloud / Islamic Network",
+      "country": "international",
+      "category": "quran",
+      "url": "https://alquran.cloud/",
+      "role": "open-api-supporting",
+      "coverage": [
+        "quran",
+        "translations",
+        "audio",
+        "recitations",
+        "edition-catalog"
+      ],
+      "access": [
+        "official-api"
+      ],
+      "apiStatus": "documented-v1-keyless",
+      "apiBase": "https://api.alquran.cloud/v1",
+      "sourceProvenance": "GlobalQuran.com and other attributed sources including Tanzil.net and Quran Academy",
+      "rightsStatus": "source-specific; see service terms",
       "corpusWrite": "forbidden-direct",
       "provenanceRequired": true
     }
