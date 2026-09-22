@@ -12,7 +12,8 @@
   },
   "allowed_hosts": [
     "epub.qurancomplex.gov.sa",
-    "download.qurancomplex.gov.sa"
+    "download.qurancomplex.gov.sa",
+    "qurancomplex.gov.sa"
   ],
   "editions": [
     {
@@ -30,7 +31,14 @@
       "max_bytes": 4294967296,
       "rights_verification": "pending",
       "text_integrity_status": "pending",
-      "public_publishable": false
+      "public_publishable": false,
+      "asset_urls": [
+        "https://qurancomplex.gov.sa/wp-content/uploads/isdarat/translations/kannada-1.pdf"
+      ],
+      "asset_kind": "pdf",
+      "asset_source": "official_kfgqpc_web_published_pdf",
+      "asset_url_status": "official_file_confirmed",
+      "asset_verification": "pdf_signature_sha256"
     }
   ]
 }
