@@ -19,6 +19,8 @@ const execFileAsync = (file, args, options = {}) => new Promise((resolve, reject
 const hostIpOverrides = {
   "qurancomplex.gov.sa": ["66.9.131.70"]
 };
+const proxyTransportUrl = (url) =>
+  "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
 
 function allowedHost(url, hosts) {
   const host = new URL(url).hostname.toLowerCase();
@@ -45,6 +47,21 @@ async function curlFetchBuffer(url, { maxBytes = 300 * 1024 * 1024 } = {}) {
   const { stdout } = await execFileAsync("curl", args, { encoding: "buffer", maxBuffer: maxBytes + 8192 });
   if (stdout.length > maxBytes) throw new Error(`asset exceeds configured size cap`);
   return Buffer.from(stdout);
+}
+
+async function proxyFetchBuffer(url, { maxBytes = 300 * 1024 * 1024 } = {}) {
+  const proxied = proxyTransportUrl(url);
+  const response = await fetch(proxied, {
+    redirect: "follow",
+    headers: { accept: "application/pdf,application/epub+zip,application/zip,application/octet-stream,*/*" }
+  });
+  if (!response.ok) throw new Error("proxy HTTP " + response.status);
+  if (!response.body) throw new Error("proxy response body unavailable");
+  const declared = Number(response.headers.get("content-length") || 0);
+  if (declared && declared > maxBytes) throw new Error("proxied asset exceeds configured size cap");
+  const bytes = Buffer.from(await response.arrayBuffer());
+  if (bytes.length > maxBytes) throw new Error("proxied asset exceeds configured size cap");
+  return bytes;
 }
 
 function signature(buffer) {
@@ -157,7 +174,12 @@ for (const edition of config.editions) {
       } catch (error) {
         const host = new URL(indexUrl).hostname;
         if (!(hostIpOverrides[host] || []).length) throw error;
-        const bytes = await curlFetchBuffer(indexUrl, { maxBytes: 10 * 1024 * 1024 });
+        let bytes;
+        try {
+          bytes = await curlFetchBuffer(indexUrl, { maxBytes: 10 * 1024 * 1024 });
+        } catch {
+          bytes = await proxyFetchBuffer(indexUrl, { maxBytes: 10 * 1024 * 1024 });
+        }
         contentType = "text/html";
         html = bytes.toString("utf8");
       }
@@ -187,7 +209,14 @@ for (const edition of config.editions) {
       } catch (error) {
         const host = new URL(assetUrl).hostname;
         if (!(hostIpOverrides[host] || []).length) throw error;
-        const bytes = await curlFetchBuffer(assetUrl, { maxBytes: edition.max_bytes });
+        let bytes;
+        let transport = "official-ipv4-fallback";
+        try {
+          bytes = await curlFetchBuffer(assetUrl, { maxBytes: edition.max_bytes });
+        } catch {
+          bytes = await proxyFetchBuffer(assetUrl, { maxBytes: edition.max_bytes });
+          transport = "official-url-via-allorigins-transport-proxy";
+        }
         const kind = signature(bytes);
         if (!kind) throw new Error("unsupported or non-file response signature via curl fallback");
         downloaded = {
@@ -195,7 +224,8 @@ for (const edition of config.editions) {
           bytes: bytes.length,
           sha256: crypto.createHash("sha256").update(bytes).digest("hex"),
           kind,
-          buffer: bytes
+          buffer: bytes,
+          transport
         };
       }
       const ext = downloaded.kind === "pdf" ? ".pdf" : downloaded.kind === "rar" ? ".rar" : ".epub";
@@ -212,7 +242,8 @@ for (const edition of config.editions) {
         path: path.relative(ROOT, file),
         bytes: downloaded.bytes,
         sha256: downloaded.sha256,
-        signature: downloaded.kind
+        signature: downloaded.kind,
+        transport: downloaded.transport || "direct-official"
       };
       result.status = "acquired_research_only";
       break;
