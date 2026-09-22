@@ -289,7 +289,8 @@ async function processCell(row){
   const localSeen=new Set();
   let rightsApprovedSources=0;
   for(const seed of seeds){
-    if(entry.files.length>=MAX_FILES||localSeen.has(seed.url)||!allow(seed.url)) break;
+    if(entry.files.length>=MAX_FILES) break;
+    if(localSeen.has(seed.url)||!allow(seed.url)) continue;
     localSeen.add(seed.url);
     const sourceAdapter=adapters.get(seed.id);
     const sourceRights=sourceRightsFor(sourceAdapter,row,urls);
