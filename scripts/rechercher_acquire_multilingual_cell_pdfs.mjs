@@ -48,6 +48,24 @@ function sourceOf(url){try{return originSource.get(new URL(url).origin)||null;}c
 function allow(url){try{const u=new URL(url);return u.protocol==='https:'&&!u.username&&!u.password&&origins.has(u.origin)?u:null;}catch{return null;}}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const safe=s=>String(s||'unknown').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'unknown';
+function sourceActive(adapter){
+  return ['enabled','runtime-verified'].includes(String(adapter?.status||''));
+}
+function adapterRelevant(adapter,row){
+  const domain=String(row.domain||'').toLowerCase();
+  const kinds=new Set((adapter?.kinds||[]).map(x=>String(x).toLowerCase()));
+  if(domain==='pdf') return kinds.has('pdf')||kinds.has('downloads')||kinds.has('download');
+  if(domain==='books') return kinds.has('books');
+  if(domain==='articles') return kinds.has('articles');
+  if(domain==='hadith_explanation') return kinds.has('hadith_explanation');
+  if(domain==='hadith'||domain==='sunnah') return kinds.has(domain)||kinds.has('hadith');
+  if(domain==='quran') return kinds.has('quran');
+  if(domain==='tafsir') return kinds.has('tafsir');
+  if(domain==='audio') return kinds.has('audio');
+  if(domain==='video') return kinds.has('video');
+  if(domain==='structured_metadata'||domain==='provenance'||domain==='rights'||domain==='verification') return true;
+  return true;
+}
 
 async function fetchBytes(url,timeout=REQUEST_TIMEOUT,max=RESPONSE_LIMIT){
   const u=allow(url); if(!u) throw new Error('untrusted source');
@@ -259,7 +277,7 @@ async function processCell(row){
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
-  for(const a of adapters.values()) if(a.status==='enabled'&&a.kinds?.some(k=>['pdf','downloads','download','datasets'].includes(k))) push(a.id);
+  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)&&a.kinds?.some(k=>['pdf','downloads','download','datasets'].includes(k))) push(a.id);
   const limitedIds=ids.slice(0,MAX_SOURCES_PER_CELL);
   entry.source_candidates=limitedIds.slice();
   const seeds=[];
