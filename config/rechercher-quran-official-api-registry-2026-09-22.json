@@ -620,5 +620,114 @@
       ]
     }
   ],
-  "last_updated": "2026-09-22"
+  "last_updated": "2026-09-22",
+  "radar_scan": {
+    "scan_date": "2026-09-22",
+    "method": "Official-first radial discovery: government/institutional domains, developer/API/open-data terms, then endpoint/rights verification. Non-official aggregators are discovery leads only and are never promoted to official_api.",
+    "findings": [
+      {
+        "id": "uae-awqaf-digital-services",
+        "provider": "General Authority of Islamic Affairs and Endowments",
+        "country": "AE",
+        "official_url": "https://mobileappapi.awqaf.gov.ae/",
+        "access_type": [
+          "official-digital-service"
+        ],
+        "api_status": "official-service-surface-found; Quran-specific API not verified",
+        "role": [
+          "institutional-digital-services"
+        ],
+        "action": "keep-on-radar; do not label as Quran API"
+      },
+      {
+        "id": "kuwait-awqaf-quran",
+        "provider": "Ministry of Awqaf and Islamic Affairs, Kuwait",
+        "country": "KW",
+        "official_url": "https://www.awqaf.gov.kw/quran",
+        "access_type": [
+          "official-web",
+          "official-quran-sector"
+        ],
+        "api_status": "not-verified",
+        "role": [
+          "quran",
+          "tajweed",
+          "tafsir",
+          "hadith-education"
+        ],
+        "action": "search developer/open-data/API surfaces separately"
+      },
+      {
+        "id": "quran-foundation-content-v4-tafsir",
+        "provider": "Quran Foundation / Quran.com",
+        "country": "international",
+        "official_url": "https://api-docs.quran.com/docs/content_apis_versioned/4.0.0/tafsir/",
+        "access_type": [
+          "official-api"
+        ],
+        "api_status": "verified",
+        "role": [
+          "tafsir"
+        ],
+        "capabilities": [
+          "list-tafsirs",
+          "verse-tafsir",
+          "surah",
+          "juz",
+          "mushaf-page",
+          "hizb",
+          "ruku",
+          "manzil",
+          "pagination"
+        ],
+        "verification_note": "Official API exposes structured tafsir records including resource id, author, language, verse key and pagination."
+      },
+      {
+        "id": "quran-foundation-developer-console",
+        "provider": "Quran Foundation / Quran.com",
+        "country": "international",
+        "official_url": "https://api-docs.quran.com/",
+        "access_type": [
+          "official-developer-platform"
+        ],
+        "api_status": "verified",
+        "role": [
+          "api-app-registration",
+          "oauth",
+          "content-api",
+          "search-api"
+        ],
+        "verification_note": "Official docs require creating an app in Developer Console and distinguish content APIs from user/OAuth APIs."
+      }
+    ],
+    "negative_findings": [
+      "No public Quran API was verified for Kuwait Ministry of Awqaf during this scan.",
+      "No Quran-specific public API was verified from the UAE digital service endpoint during this scan.",
+      "No official public Quran API was verified for Qatar/Egypt/Morocco/Algeria from the searched official-domain queries; keep them as institutional discovery targets rather than API claims.",
+      "King Fahd developer resource URL timed out during direct fetch in this scan; previous registry evidence remains marked developer-data verified but public API unverified."
+    ],
+    "discovery_leads_not_official": [
+      {
+        "id": "quranbench-api",
+        "url": "https://quranbench.com/api",
+        "classification": "independent-research-api",
+        "status": "discovery-lead-only",
+        "note": "Useful versioned/checksummed research API, but not an institutional/government API."
+      },
+      {
+        "id": "i-muslim-api",
+        "url": "https://i-muslim.com/id/downloads",
+        "classification": "independent-open-data-api",
+        "status": "discovery-lead-only",
+        "note": "Useful API/data lead with per-item licensing, but not an official institutional source; third-party translations remain rights-sensitive."
+      }
+    ],
+    "governance_rules": [
+      "Do not promote a discovery lead to official_api without primary-source verification.",
+      "Do not treat an official website or mobile service as proof of an API.",
+      "Do not treat API access as redistribution permission.",
+      "Keep Quran canonical text, translations, tafsir, tajweed annotations, qiraat and audio as separate content classes.",
+      "Ten Qiraat remain individually sourced and verified; never synthesize missing readings."
+    ]
+  }
 }
