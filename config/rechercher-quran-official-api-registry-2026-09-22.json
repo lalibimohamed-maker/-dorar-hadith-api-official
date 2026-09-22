@@ -59,8 +59,8 @@
         "notes": "Official API exposes text_uthmani_tajweed and Tajweed-colored Mushaf variants."
       },
       "qiraat_api": {
-        "status": "not-verified-as-ten-readings-api",
-        "notes": "Official Quran.com material documents the Ten Readings feature, while the public API documentation reviewed here does not establish a dedicated Ten Readings API endpoint. Do not label this as a Ten Readings API until an endpoint/data contract is verified."
+        "status": "qirat-metadata-verified; ten-reading-content-completeness-pending",
+        "notes": "Official chapter-reciter resources expose qirat metadata and official recitation/resource families exist. Do not claim complete Ten Canonical Readings production coverage until authorized production resources are enumerated."
       },
       "canonical_text_policy": "Arabic Quran text remains distinct from translations, tafsir, tajweed annotations, and qiraat-specific representations",
       "integration_status": "adapter-present; production credentials/access still require verification",
@@ -672,23 +672,29 @@
           "tafsir",
           "audio",
           "recitations",
+          "chapter_reciters",
           "pages",
           "juz",
           "hizb",
           "ruku",
           "manzil",
+          "rub_el_hizb",
           "search"
         ],
         "specialized_capabilities": [
           "uthmani_tajweed",
           "tajweed_colored_mushaf",
-          "mushaf_variants"
+          "mushaf_variants",
+          "word_level_fields",
+          "qirat_metadata",
+          "content_sync"
         ],
         "production_access": "requires approved production permissions/credentials",
         "rights_status": "terms-required; API access is not treated as redistribution permission",
         "corpus_write_policy": "forbidden-direct",
         "adapter_status": "registry-ready; existing Quran Foundation sync path present in Rechercher",
-        "verification_status": "official-documentation-verified"
+        "verification_status": "official-documentation-verified",
+        "endpoint_contract": "https://apis.quran.foundation/content/api/v4"
       },
       {
         "api_id": "diyanet-open-source-quran-api",
@@ -1045,5 +1051,48 @@
     "correction": "The earlier registry treatment understated the documented Content API surface. Official v4 documentation explicitly covers Quran text, verses, translations, tafsir, audio, recitations, chapter reciters, pages, juz, hizb, ruku, manzil and related resources, and chapter-reciter records expose qirat metadata.",
     "remaining_verification_boundary": "The documentation establishes the API contract and qirat metadata field, but does not by itself prove that every one of the Ten Canonical Readings is available as a complete production dataset. That requires enumerating the production resource records after authorized access.",
     "governance": "API access remains separate from redistribution rights and scholarly provenance."
+  },
+  "quran_foundation_primary_service_contract": {
+    "service_id": "quran-foundation-quran-core-v4",
+    "provider_source_id": "source:quran-foundation",
+    "provider": "Quran Foundation / Quran.com",
+    "purpose": "Primary official service contract for Quran Core. This layer records the programmable source surface; it does not write directly to Corpus.",
+    "source_of_truth": "Quran Foundation official Content API v4 documentation",
+    "api_base": "https://apis.quran.foundation/content/api/v4",
+    "authentication": {
+      "flow": "OAuth2 client_credentials",
+      "scope": "content",
+      "required_headers": [
+        "x-auth-token",
+        "x-client-id"
+      ],
+      "production_access": "approved production credentials/permissions required",
+      "prelive_scope": "Al-Fatihah and Al-Baqarah only"
+    },
+    "quran_core_scope": {
+      "canonical_text": "Quran text resources",
+      "chapters": "chapter metadata",
+      "verses": "verse records",
+      "structural_navigation": [
+        "pages",
+        "juz",
+        "hizb",
+        "ruku",
+        "manzil",
+        "rub_el_hizb"
+      ],
+      "tajweed_representation": "text_uthmani_tajweed and related Mushaf/Tajweed representations",
+      "recitation_and_audio": "separate recitation/audio resource families",
+      "translations": "separate translation resources",
+      "tafsir": "separate tafsir resources",
+      "search": "separate Search API family"
+    },
+    "provenance_rule": "Arabic canonical text remains a separate content class. Translations, tafsir, tajweed representations, recitations and qiraat metadata are never silently merged into canonical text.",
+    "acquisition_rule": "Rechercher may acquire or synchronize only after endpoint access, resource identity, provenance and rights are verified.",
+    "corpus_write_policy": "forbidden-direct",
+    "rights_rule": "API access does not itself grant redistribution rights; apply resource/source-specific terms before public storage or publication.",
+    "sync_rule": "Use official Content Sync/resource snapshots where available instead of repeatedly rebuilding a local copy from ad-hoc requests.",
+    "ai_rule": "AI may assist indexing, matching and discovery only; it cannot generate or replace Quran text, translations, tafsir or qiraat as authoritative source content.",
+    "verification_status": "official-documentation-verified"
   }
 }
