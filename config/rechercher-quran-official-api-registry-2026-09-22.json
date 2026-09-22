@@ -498,5 +498,127 @@
       "jakim-smart-quran"
     ],
     "important_rights_finding": "Diyanet's official developer page explicitly restricts its API/content to contribution to that project and says it cannot be used for independent products; Rechercher must therefore register it for source research/integration review, not assume redistribution permission."
-  }
+  },
+  "api_registry": {
+    "purpose": "Machine-facing registry of official APIs. Website/source registries remain separate and are linked by stable source_id/provider identifiers.",
+    "separation_rule": "API records describe programmable interfaces and access contracts; source records describe institutions, websites, repositories and human-facing resources. Do not collapse either layer.",
+    "records": [
+      {
+        "api_id": "quran-foundation-content-api-v4",
+        "provider_source_id": "source:quran-foundation",
+        "provider": "Quran Foundation / Quran.com",
+        "official_api_base": "https://apis.quran.foundation",
+        "documentation": "https://api-docs.quran.com/docs/api-reference/",
+        "api_version": "v4",
+        "authentication": "OAuth2 client_credentials",
+        "scope": "content",
+        "capabilities": [
+          "quran",
+          "chapters",
+          "verses",
+          "translations",
+          "tafsir",
+          "audio",
+          "recitations",
+          "pages",
+          "juz",
+          "hizb",
+          "ruku",
+          "manzil",
+          "search"
+        ],
+        "specialized_capabilities": [
+          "uthmani_tajweed",
+          "tajweed_colored_mushaf",
+          "mushaf_variants"
+        ],
+        "production_access": "requires approved production permissions/credentials",
+        "rights_status": "terms-required; API access is not treated as redistribution permission",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "registry-ready; existing Quran Foundation sync path present in Rechercher",
+        "verification_status": "official-documentation-verified"
+      },
+      {
+        "api_id": "diyanet-open-source-quran-api",
+        "provider_source_id": "source:diyanet-tr",
+        "provider": "Presidency of Religious Affairs of Türkiye (Diyanet)",
+        "official_api_base": "https://acikkaynakkuran-dev.diyanet.gov.tr/",
+        "documentation": "https://acikkaynakkuran.diyanet.gov.tr/developers",
+        "authentication": "GitHub account login to obtain API key",
+        "capabilities": [
+          "quran",
+          "tafsir",
+          "tajweed-learning",
+          "recitation"
+        ],
+        "rights_status": "restricted-for-independent-products",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "registry-only; adapter/access contract requires separate verification",
+        "verification_status": "official-api-service-verified"
+      },
+      {
+        "api_id": "sunnah-com-api",
+        "provider_source_id": "source:sunnah-com",
+        "provider": "Sunnah.com",
+        "official_api_base": "https://sunnah.stoplight.io/docs/api/",
+        "documentation": "https://beta.sunnah.com/developers",
+        "authentication": "API key requested through official GitHub issue process",
+        "capabilities": [
+          "hadith",
+          "collections",
+          "hadith-metadata"
+        ],
+        "access_status": "API exists; key/access must be requested and verified before production use",
+        "rights_status": "access/redistribution terms require verification",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "existing sunnah client path present in Rechercher; credentials not assumed",
+        "verification_status": "official-api-existence-verified"
+      },
+      {
+        "api_id": "hadeethenc-api",
+        "provider_source_id": "source:hadeethenc",
+        "provider": "Encyclopedia of Translated Prophetic Hadiths (HadeethEnc)",
+        "official_api_base": "https://hadeethenc.com/",
+        "documentation": "https://hadeethenc.com/en/",
+        "capabilities": [
+          "hadith",
+          "explanations",
+          "translations",
+          "language-resources"
+        ],
+        "access_status": "official Developers API is exposed; exact endpoint/auth contract requires endpoint-level verification",
+        "rights_status": "translation redistribution is permitted subject to stated source/version/no-modification conditions",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "existing HadeethEnc client/harvester path present in Rechercher",
+        "verification_status": "official-developer-surface-verified; endpoint-contract-pending"
+      }
+    ]
+  },
+  "source_api_links": [
+    {
+      "source_id": "source:quran-foundation",
+      "api_ids": [
+        "quran-foundation-content-api-v4"
+      ]
+    },
+    {
+      "source_id": "source:diyanet-tr",
+      "api_ids": [
+        "diyanet-open-source-quran-api"
+      ]
+    },
+    {
+      "source_id": "source:sunnah-com",
+      "api_ids": [
+        "sunnah-com-api"
+      ]
+    },
+    {
+      "source_id": "source:hadeethenc",
+      "api_ids": [
+        "hadeethenc-api"
+      ]
+    }
+  ],
+  "last_updated": "2026-09-22"
 }
