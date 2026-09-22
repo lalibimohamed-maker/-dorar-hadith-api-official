@@ -134,3 +134,12 @@ jobs:
           name: rechercher-global-multilingual-reproducibility-bundle
           path: artifacts/rechercher/global-multilingual-research/
           if-no-files-found: error
+
+
+  acquire-multilingual-pdfs:
+    name: Acquire and persist PDFs from the verified 3,192-cell ledger
+    needs: matrix
+    uses: ./.github/workflows/rechercher-multilingual-pdf-acquisition.yml
+    secrets:
+      RECHERCHER_MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
