@@ -140,6 +140,13 @@
       "concordance",
       "search",
       "lexical/morphological evidence"
+    ],
+    "mushaf": [
+      "page/layout metadata",
+      "Mushaf representations",
+      "Uthmani presentation",
+      "Tajweed/colored representations where source-provided",
+      "resource-level provenance"
     ]
   },
   "integration_contract": {
@@ -160,6 +167,10 @@
     {
       "id": "quran-canonical",
       "role": "canonical Quran text and metadata"
+    },
+    {
+      "id": "quran-mushaf",
+      "role": "Mushaf pages, layout and presentation resources kept separate from canonical text"
     },
     {
       "id": "quran-translations",
@@ -406,5 +417,25 @@
     "recitation_rule": "For audio, store reader, style, qiraat/riwaya when supplied by the official source, source resource ID and licensing/redistribution state. Quran Foundation's official API exposes reciter records with a qirat field, but that API contract alone is not a rights grant.",
     "tajweed_rule": "Tajweed annotations and colored Mushaf representations remain a separate layer from canonical Arabic text and from qiraat-specific variants.",
     "tafseer_rule": "Tafsir records must preserve author, language, resource/edition ID and upstream provenance; an API provider is not itself the scholarly author."
+  },
+  "mushaf_service_contract": {
+    "service_id": "quran-foundation-mushaf-resources-v4",
+    "provider_source_id": "source:quran-foundation",
+    "role": "Second sequential Quran layer: Mushaf/page/layout representations over the separately governed canonical Quran Core.",
+    "upstream_contract": "quran-foundation-content-api-v4",
+    "scope": [
+      "pages",
+      "mushaf/page-layout metadata",
+      "Uthmani representations",
+      "tajweed representation where explicitly returned",
+      "Mushaf variants/resources where individually identified"
+    ],
+    "separation_rule": "Mushaf presentation/layout resources must not replace or mutate the canonical Quran text record.",
+    "provenance_rule": "Every Mushaf resource keeps its own resource/edition identity and upstream provenance.",
+    "rights_rule": "API availability is not redistribution permission; verify rights for each resource before public storage or publication.",
+    "acquisition_rule": "Acquire only after official endpoint/resource identity and access are verified; preserve source identifiers and retrieval metadata.",
+    "corpus_write_policy": "forbidden-direct",
+    "ai_rule": "AI cannot generate, reconstruct, or silently normalize a Mushaf representation as authoritative source content.",
+    "verification_status": "official-documentation-surface-verified; resource-level enumeration pending authorized production access"
   }
 }
