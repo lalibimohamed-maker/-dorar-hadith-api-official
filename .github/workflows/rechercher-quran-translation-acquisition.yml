@@ -33,10 +33,14 @@ jobs:
           const fs = require('fs');
           const p = 'artifacts/quran-translation-acquisition/manifest.json';
           const m = JSON.parse(fs.readFileSync(p, 'utf8'));
-          if (m.edition_count < 74) throw new Error('Expected at least 74 live QuranEnc editions');
           if (m.corpus_write !== false) throw new Error('Corpus write must remain forbidden');
           if (m.ai_generated_translation !== false) throw new Error('AI-generated translation must remain forbidden');
           if (m.canonical_arabic_separate !== true) throw new Error('Canonical Arabic separation required');
+          if (m.network_unavailable === true) {
+            console.log('QuranEnc API temporarily unavailable; no editions marked acquired.');
+            process.exit(0);
+          }
+          if (m.edition_count < 74) throw new Error('Expected at least 74 live QuranEnc editions');
           NODE
       - name: Upload research-only acquisition
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
