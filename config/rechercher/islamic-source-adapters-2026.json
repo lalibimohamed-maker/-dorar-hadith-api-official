@@ -45,7 +45,14 @@
       },
       "api_auth": "none",
       "acquisition": "existing-hadeethenc-pdf-harvester",
-      "release_policy": "translations may be republished only when HadeethEnc terms/version/attribution requirements are preserved; verify current terms at acquisition/release time"
+      "release_policy": "translations may be republished only when HadeethEnc terms/version/attribution requirements are preserved; verify current terms at acquisition/release time",
+      "rights_policy": {
+        "kind": "explicit-redistribution-permission",
+        "scope": "translated_content",
+        "evidence_url": "https://hadeethenc.com/en/",
+        "exclude_language_iso": ["ar"],
+        "conditions": ["no-modification-addition-or-deletion","publisher-and-source-attribution","version-number","retain-transcript-information","notify-source-of-translation-notes","update-to-latest-source-version","no-inappropriate-advertising"]
+      }
     },
     {
       "id": "islamhouse",
@@ -115,7 +122,14 @@
       ],
       "authority": "primary_islamic_content",
       "runtime": "public",
-      "status": "enabled"
+      "status": "enabled",
+      "rights_policy": {
+        "kind": "explicit-redistribution-permission",
+        "scope": "translated_content",
+        "evidence_url": "https://quranenc.com/en/home",
+        "exclude_language_iso": ["ar"],
+        "conditions": ["no-modification-addition-or-deletion","publisher-and-source-attribution","version-number","retain-transcript-information","notify-source-of-translation-notes","update-to-latest-source-version","no-inappropriate-advertising"]
+      }
     },
     {
       "id": "quran-com",
