@@ -20,7 +20,10 @@
       "country": "international",
       "homepage": "https://quran.com/",
       "documentation": "https://api-docs.quran.com/docs/content_apis_versioned/4.0.0/content-apis/",
-      "access": ["official-api", "official-sdk"],
+      "access": [
+        "official-api",
+        "official-sdk"
+      ],
       "api_version": "v4",
       "authentication": "OAuth2 client_credentials",
       "scope": "content",
@@ -69,9 +72,20 @@
       "country": "SA",
       "homepage": "https://qurancomplex.gov.sa/",
       "developer_resources": "https://qurancomplex.gov.sa/en/techquran/dev/",
-      "access": ["official-web", "official-developer-download"],
+      "access": [
+        "official-web",
+        "official-developer-download"
+      ],
       "api_status": "not-verified-as-public-api",
-      "developer_formats": ["JSON", "XML", "SQL", "CSV", "HTML5", "TXT", "PDF"],
+      "developer_formats": [
+        "JSON",
+        "XML",
+        "SQL",
+        "CSV",
+        "HTML5",
+        "TXT",
+        "PDF"
+      ],
       "coverage": [
         "Quran text",
         "Uthmani data",
@@ -85,7 +99,12 @@
       ],
       "qiraat_scope": {
         "status": "partial-official-data-verified",
-        "verified_readings": ["Hafs", "Warsh", "Qalun", "Al-Susi"],
+        "verified_readings": [
+          "Hafs",
+          "Warsh",
+          "Qalun",
+          "Al-Susi"
+        ],
         "ten_readings_complete": false,
         "notes": "This registry must not claim the complete Ten Readings from the developer page until all ten are individually verified."
       },
@@ -100,9 +119,17 @@
       "country": "international",
       "homepage": "https://quran.com/",
       "qiraat_resource": "https://quran.com/ar/explore/a-brief-guide-to-the-ten-readings-qiraat",
-      "access": ["official-web", "official-feature"],
+      "access": [
+        "official-web",
+        "official-feature"
+      ],
       "api_status": "not-yet-verified-for-dedicated-ten-qiraat-endpoint",
-      "role": ["ten-qiraat", "readers", "transmitters", "reading-comparison"],
+      "role": [
+        "ten-qiraat",
+        "readers",
+        "transmitters",
+        "reading-comparison"
+      ],
       "integration_rule": "Register as a qiraat evidence source only after the underlying data representation, provenance, and rights are verified."
     },
     {
@@ -111,9 +138,16 @@
       "country": "SA",
       "homepage": "https://qurancomplex.gov.sa/",
       "developer_resources": "https://qurancomplex.gov.sa/en/techquran/dev/",
-      "access": ["official-developer-download", "official-educational-resource"],
+      "access": [
+        "official-developer-download",
+        "official-educational-resource"
+      ],
       "api_status": "not-verified-as-public-api",
-      "role": ["tajweed", "tajweed-rules", "tajweed-education"],
+      "role": [
+        "tajweed",
+        "tajweed-rules",
+        "tajweed-education"
+      ],
       "integration_rule": "Treat downloadable developer data and educational material separately from any future API adapter."
     },
     {
@@ -122,19 +156,107 @@
       "country": "QA",
       "homepage": "https://alquran.islam.gov.qa/",
       "known_resource": "https://alquran.islam.gov.qa/droos/Sections.html",
-      "access": ["official-web"],
+      "access": [
+        "official-web"
+      ],
       "api_status": "not-yet-verified",
       "dataset_status": "not-yet-verified",
-      "role": ["quran", "tajweed", "recitation", "education"]
+      "role": [
+        "quran",
+        "tajweed",
+        "recitation",
+        "education"
+      ]
     },
     {
       "id": "ksu-ayat",
       "provider": "King Saud University Ayat",
       "country": "SA",
       "homepage": "https://quran.ksu.edu.sa/",
-      "access": ["official-web"],
+      "access": [
+        "official-web"
+      ],
       "api_status": "not-yet-verified",
-      "role": ["quran", "mushaf-images", "translations", "tafsir", "recitations", "Warsh"]
+      "role": [
+        "quran",
+        "mushaf-images",
+        "translations",
+        "tafsir",
+        "recitations",
+        "Warsh"
+      ]
+    },
+    {
+      "id": "diyanet-open-source-quran-api",
+      "provider": "Presidency of Religious Affairs of Türkiye (Diyanet)",
+      "country": "TR",
+      "homepage": "https://acikkaynakkuran.diyanet.gov.tr/",
+      "api_service": "https://acikkaynakkuran-dev.diyanet.gov.tr/",
+      "access": [
+        "official-api",
+        "official-open-source-project"
+      ],
+      "api_status": "verified",
+      "authentication": "GitHub account login to obtain API key",
+      "rights_status": "restricted-for-independent-products",
+      "capabilities": [
+        "quran",
+        "tafsir",
+        "tajweed-learning",
+        "recitation"
+      ],
+      "notes": "Official developer page states API access is provided for contributing to this project and cannot be used for independent applications; bulk transfer/republication/source-file requests are not accepted."
+    },
+    {
+      "id": "diyanet-tafsir-portal",
+      "provider": "Presidency of Religious Affairs of Türkiye (Diyanet)",
+      "country": "TR",
+      "homepage": "https://kuran.diyanet.gov.tr/Tefsir",
+      "access": [
+        "official-web"
+      ],
+      "api_status": "not-verified",
+      "dataset_status": "not-verified",
+      "role": [
+        "tafsir",
+        "quran"
+      ]
+    },
+    {
+      "id": "ksu-ayat-tafsir-qiraat-tajweed",
+      "provider": "King Saud University Ayat",
+      "country": "SA",
+      "homepage": "https://quran.ksu.edu.sa/",
+      "access": [
+        "official-web"
+      ],
+      "api_status": "not-verified-as-public-api",
+      "dataset_status": "not-verified",
+      "role": [
+        "tafsir",
+        "tajweed",
+        "Hafs",
+        "Warsh",
+        "recitations"
+      ],
+      "notes": "Official Ayat interface explicitly exposes Hafs, Warsh, Tajweed and multiple tafsir resources; this does not establish a public API."
+    },
+    {
+      "id": "jakim-smart-quran",
+      "provider": "Department of Islamic Development Malaysia (JAKIM)",
+      "country": "MY",
+      "homepage": "https://www.islam.gov.my/en/quran-hadith/smart-quran",
+      "access": [
+        "official-institutional-app"
+      ],
+      "api_status": "not-verified",
+      "dataset_status": "not-verified",
+      "role": [
+        "quran",
+        "recitation",
+        "translations"
+      ],
+      "notes": "Official JAKIM page documents the approved Smart Quran application and its Quran/audio content; no public API was established by this search."
     }
   ],
   "ten_qiraat_target": {
@@ -175,37 +297,177 @@
       "country": "QA",
       "homepage": "https://alquran.islam.gov.qa/",
       "known_resource": "https://alquran.islam.gov.qa/droos/Sections.html",
-      "access": ["official-web"],
+      "access": [
+        "official-web"
+      ],
       "api_status": "not-yet-verified",
       "dataset_status": "not-yet-verified",
-      "role": ["quran", "tajweed", "recitation", "education"]
+      "role": [
+        "quran",
+        "tajweed",
+        "recitation",
+        "education"
+      ]
     },
     {
       "id": "ksu-ayat",
       "provider": "King Saud University Ayat",
       "country": "SA",
       "homepage": "https://quran.ksu.edu.sa/",
-      "access": ["official-web"],
+      "access": [
+        "official-web"
+      ],
       "api_status": "not-yet-verified",
-      "role": ["quran", "mushaf-images", "translations", "tafsir", "recitations", "Warsh"]
+      "role": [
+        "quran",
+        "mushaf-images",
+        "translations",
+        "tafsir",
+        "recitations",
+        "Warsh"
+      ]
     }
   ],
   "country_search_queue": [
-    {"country":"SA","priority":"high","targets":["King Fahd Complex","Ministry of Islamic Affairs","King Saud University","Islamic University of Madinah","Imam Muhammad ibn Saud Islamic University"]},
-    {"country":"QA","priority":"high","targets":["Ministry of Awqaf Quran services","AlQuran","Quran lessons"]},
-    {"country":"KW","priority":"medium","targets":["Ministry of Awqaf","Kuwait National Library","Islamic manuscripts/library services"]},
-    {"country":"AE","priority":"medium","targets":["General Authority of Islamic Affairs and Endowments","UAE Quran services"]},
-    {"country":"BH","priority":"medium","targets":["Ministry of Justice Islamic Affairs and Waqf Quran services"]},
-    {"country":"OM","priority":"medium","targets":["Ministry of Endowments and Religious Affairs Quran services"]},
-    {"country":"JO","priority":"medium","targets":["Ministry of Awqaf Quran services","Jordanian official Quran resources"]},
-    {"country":"EG","priority":"medium","targets":["Al-Azhar","Ministry of Awqaf Quran services","Egyptian Quran digitization resources"]},
-    {"country":"MA","priority":"medium","targets":["Ministry of Endowments and Islamic Affairs","Mohammed VI Institute Quran resources"]},
-    {"country":"DZ","priority":"medium","targets":["Ministry of Religious Affairs and Wakfs","Algerian Quran resources"]},
-    {"country":"TN","priority":"medium","targets":["Ministry of Religious Affairs Quran resources"]},
-    {"country":"TR","priority":"medium","targets":["Diyanet Quran services"]},
-    {"country":"MY","priority":"medium","targets":["JAKIM Quran services","official Quran datasets/APIs"]},
-    {"country":"ID","priority":"medium","targets":["Ministry of Religious Affairs Quran services","official Quran datasets/APIs"]},
-    {"country":"PK","priority":"medium","targets":["Ministry/religious institutions Quran digital resources","official Quran datasets/APIs"]}
+    {
+      "country": "TR",
+      "priority": "high",
+      "targets": [
+        "Diyanet Open Source Quran API",
+        "Diyanet Quran Portal",
+        "Diyanet tafsir resources"
+      ]
+    },
+    {
+      "country": "MY",
+      "priority": "high",
+      "targets": [
+        "JAKIM Smart Quran",
+        "official Quran datasets/APIs"
+      ]
+    },
+    {
+      "country": "SA",
+      "priority": "high",
+      "targets": [
+        "King Fahd Complex",
+        "Ministry of Islamic Affairs",
+        "King Saud University",
+        "Islamic University of Madinah",
+        "Imam Muhammad ibn Saud Islamic University"
+      ]
+    },
+    {
+      "country": "QA",
+      "priority": "high",
+      "targets": [
+        "Ministry of Awqaf Quran services",
+        "AlQuran",
+        "Quran lessons"
+      ]
+    },
+    {
+      "country": "KW",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Awqaf",
+        "Kuwait National Library",
+        "Islamic manuscripts/library services"
+      ]
+    },
+    {
+      "country": "AE",
+      "priority": "medium",
+      "targets": [
+        "General Authority of Islamic Affairs and Endowments",
+        "UAE Quran services"
+      ]
+    },
+    {
+      "country": "BH",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Justice Islamic Affairs and Waqf Quran services"
+      ]
+    },
+    {
+      "country": "OM",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Endowments and Religious Affairs Quran services"
+      ]
+    },
+    {
+      "country": "JO",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Awqaf Quran services",
+        "Jordanian official Quran resources"
+      ]
+    },
+    {
+      "country": "EG",
+      "priority": "medium",
+      "targets": [
+        "Al-Azhar",
+        "Ministry of Awqaf Quran services",
+        "Egyptian Quran digitization resources"
+      ]
+    },
+    {
+      "country": "MA",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Endowments and Islamic Affairs",
+        "Mohammed VI Institute Quran resources"
+      ]
+    },
+    {
+      "country": "DZ",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Religious Affairs and Wakfs",
+        "Algerian Quran resources"
+      ]
+    },
+    {
+      "country": "TN",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Religious Affairs Quran resources"
+      ]
+    },
+    {
+      "country": "TR",
+      "priority": "medium",
+      "targets": [
+        "Diyanet Quran services"
+      ]
+    },
+    {
+      "country": "MY",
+      "priority": "medium",
+      "targets": [
+        "JAKIM Quran services",
+        "official Quran datasets/APIs"
+      ]
+    },
+    {
+      "country": "ID",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Religious Affairs Quran services",
+        "official Quran datasets/APIs"
+      ]
+    },
+    {
+      "country": "PK",
+      "priority": "medium",
+      "targets": [
+        "Ministry/religious institutions Quran digital resources",
+        "official Quran datasets/APIs"
+      ]
+    }
   ],
   "required_record_fields": [
     "source_id",
@@ -223,5 +485,18 @@
     "provenance_policy",
     "corpus_write_policy",
     "last_verified_at"
-  ]
+  ],
+  "discovery_results": {
+    "verified_api_sources": [
+      "diyanet-open-source-quran-api",
+      "quran-foundation-content-api-v4"
+    ],
+    "verified_institutional_resources": [
+      "king-fahd-complex-developer-resources",
+      "qatar-ministry-quran",
+      "ksu-ayat",
+      "jakim-smart-quran"
+    ],
+    "important_rights_finding": "Diyanet's official developer page explicitly restricts its API/content to contribution to that project and says it cannot be used for independent products; Rechercher must therefore register it for source research/integration review, not assume redistribution permission."
+  }
 }
