@@ -16,8 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: 24
           cache: npm
@@ -31,13 +33,13 @@ jobs:
           const fs = require('fs');
           const p = 'artifacts/quran-translation-acquisition/manifest.json';
           const m = JSON.parse(fs.readFileSync(p, 'utf8'));
-          if (m.edition_count !== 74) throw new Error('Expected 74 editions');
+          if (m.edition_count < 74) throw new Error('Expected at least 74 live QuranEnc editions');
           if (m.corpus_write !== false) throw new Error('Corpus write must remain forbidden');
           if (m.ai_generated_translation !== false) throw new Error('AI-generated translation must remain forbidden');
           if (m.canonical_arabic_separate !== true) throw new Error('Canonical Arabic separation required');
           NODE
       - name: Upload research-only acquisition
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: quranenc-translation-acquisition
           path: artifacts/quran-translation-acquisition
