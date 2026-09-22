@@ -26,6 +26,16 @@ async function getBinary(url) {
   return data;
 }
 
+function validateSignature(kind, data) {
+  const pdf = data.subarray(0, 5).toString("ascii") === "%PDF-";
+  const zip = data.length >= 4 && data[0] === 0x50 && data[1] === 0x4b;
+  const sqlite = data.subarray(0, 16).toString("ascii") === "SQLite format 3\\u0000";
+  if (kind.startsWith("pdf") && !pdf) throw new Error("downloaded PDF candidate lacks %PDF- signature");
+  if (kind === "sqlite_zip" && !zip) throw new Error("downloaded SQLite ZIP candidate lacks ZIP signature");
+  if (kind === "sqlite" && !sqlite) throw new Error("downloaded SQLite candidate lacks SQLite signature");
+  if (kind === "epub" && !zip) throw new Error("downloaded EPUB candidate lacks ZIP signature");
+}
+
 async function mapLimit(items, worker, limit) {
   const results = new Array(items.length);
   let next = 0;
@@ -78,7 +88,7 @@ const editions = official.translations.map((x) => ({
   matrix_eligibility: "blocked_pending_verification"
 }));
 
-if (editions.length !== 74) throw new Error(`Expected 74 live QuranEnc editions, found ${editions.length}`);
+if (editions.length < 74) throw new Error(`Expected at least 74 live QuranEnc editions, found ${editions.length}`);
 
 await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
@@ -101,6 +111,7 @@ const editionResults = await mapLimit(editions, async (edition) => {
   for (const [kind, url] of candidates) {
     try {
       const data = await getBinary(url);
+      validateSignature(kind, data);
       const ext = kind.startsWith("pdf") ? ".pdf" : kind === "sqlite_zip" ? ".zip" : kind === "sqlite" ? ".sqlite" : ".epub";
       const file = path.join(dir, `${edition.edition_id}${kind === "pdf" ? "" : `.${kind}`}${ext}`);
       await fs.writeFile(file, data);
@@ -153,6 +164,7 @@ const manifest = {
   corpus_write: false,
   rights_verification_required_before_publication: true,
   edition_count: editionResults.length,
+  minimum_expected_editions: 74,
   acquired_editions: editionResults.filter((x) => x.acquired).length,
   not_acquired_editions: editionResults.filter((x) => !x.acquired).length,
   language_count: new Set(editionResults.map((x) => x.language_iso_code)).size,
