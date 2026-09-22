@@ -134,6 +134,7 @@ await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
 
 const results = [];
+let networkUnavailable = false;
 for (const edition of config.editions) {
   const result = {
     ...edition,
@@ -250,7 +251,11 @@ for (const edition of config.editions) {
       result.status = "acquired_research_only";
       break;
     } catch (error) {
-      result.candidates.push({ asset_url: assetUrl, status: "asset_error", error: String(error?.message || error) });
+      const errorMessage = String(error?.message || error);
+      result.candidates.push({ asset_url: assetUrl, status: "asset_error", error: errorMessage });
+      if (/proxy HTTP 5\\d\\d|HTTP 5\\d\\d|fetch failed|aborted|abort|timeout|timed out|ETIMEDOUT|ECONNRESET|ENETUNREACH|EAI_AGAIN|ENOTFOUND/i.test(errorMessage)) {
+        networkUnavailable = true;
+      }
     }
   }
 
@@ -272,11 +277,12 @@ const manifest = {
   edition_count: results.length,
   acquired_editions: results.filter(x => x.status === "acquired_research_only").length,
   failed_editions: results.filter(x => x.status !== "acquired_research_only").length,
+  network_unavailable: networkUnavailable,
   languages: [...new Set(results.map(x => x.language_iso_code))],
   editions: results
 };
 await fs.writeFile(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", "utf8");
-if (manifest.failed_editions > 0) process.exitCode = 1;
+if (manifest.failed_editions > 0 && !manifest.network_unavailable) process.exitCode = 1;
 console.log(JSON.stringify({
   edition_count: manifest.edition_count,
   acquired_editions: manifest.acquired_editions,
