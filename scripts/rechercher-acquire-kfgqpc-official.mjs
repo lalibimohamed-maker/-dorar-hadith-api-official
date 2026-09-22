@@ -3,15 +3,48 @@ import fs from "node:fs/promises";
 import { createWriteStream } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { execFile } from "node:child_process";
 import { Readable } from "node:stream";
 
 const ROOT = process.cwd();
 const CONFIG = path.join(ROOT, "config/quran-kfgqpc-official-acquisition-2026-09-22.json");
 const OUT = path.join(ROOT, "artifacts/quran-kfgqpc-official-acquisition");
+const execFileAsync = (file, args, options = {}) => new Promise((resolve, reject) => {
+  execFile(file, args, { ...options, maxBuffer: 16 * 1024 * 1024 }, (error, stdout, stderr) => {
+    if (error) { error.stdout = stdout; error.stderr = stderr; reject(error); return; }
+    resolve({ stdout, stderr });
+  });
+});
+
+const hostIpOverrides = {
+  "qurancomplex.gov.sa": ["66.9.131.70"]
+};
 
 function allowedHost(url, hosts) {
   const host = new URL(url).hostname.toLowerCase();
   return hosts.includes(host) && new URL(url).protocol === "https:";
+}
+
+async function curlFetchBuffer(url, { maxBytes = 300 * 1024 * 1024 } = {}) {
+  const parsed = new URL(url);
+  const args = [
+    "-4",
+    "--fail",
+    "--location",
+    "--silent",
+    "--show-error",
+    "--retry", "3",
+    "--retry-delay", "2",
+    "--connect-timeout", "20",
+    "--max-time", "180",
+    "--header", "Accept: application/pdf,application/epub+zip,application/zip,application/octet-stream,text/html,*/*"
+  ];
+  const ips = hostIpOverrides[parsed.hostname] || [];
+  for (const ip of ips) args.push("--resolve", `${parsed.hostname}:443:${ip}`);
+  args.push(url);
+  const { stdout } = await execFileAsync("curl", args, { encoding: "buffer", maxBuffer: maxBytes + 8192 });
+  if (stdout.length > maxBytes) throw new Error(`asset exceeds configured size cap`);
+  return Buffer.from(stdout);
 }
 
 function signature(buffer) {
@@ -109,15 +142,26 @@ for (const edition of config.editions) {
       continue;
     }
     try {
-      const response = await fetch(indexUrl, {
-        redirect: "follow",
-        headers: { accept: "text/html,application/xhtml+xml,*/*" }
-      });
-      if (!response.ok) throw new Error("HTTP " + response.status);
-      const contentType = (response.headers.get("content-type") || "").toLowerCase();
-      const finalUrl = response.url;
+      let html;
+      let finalUrl = indexUrl;
+      let contentType = "";
+      try {
+        const response = await fetch(indexUrl, {
+          redirect: "follow",
+          headers: { accept: "text/html,application/xhtml+xml,*/*" }
+        });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        contentType = (response.headers.get("content-type") || "").toLowerCase();
+        finalUrl = response.url;
+        html = await response.text();
+      } catch (error) {
+        const host = new URL(indexUrl).hostname;
+        if (!(hostIpOverrides[host] || []).length) throw error;
+        const bytes = await curlFetchBuffer(indexUrl, { maxBytes: 10 * 1024 * 1024 });
+        contentType = "text/html";
+        html = bytes.toString("utf8");
+      }
       if (contentType.includes("text/html") || finalUrl.endsWith("/")) {
-        const html = await response.text();
         const candidateUrls = candidatesFromHtml(html, finalUrl);
         if (candidateUrls.length === 0) {
           result.candidates.push({ index_url: indexUrl, final_url: finalUrl, status: "index_ok_no_supported_asset_links" });
@@ -137,12 +181,32 @@ for (const edition of config.editions) {
   const assetUrls = [...new Set(result.candidates.filter(x => x.status === "discovered").map(x => x.asset_url))];
   for (const assetUrl of assetUrls) {
     try {
-      const downloaded = await downloadAndHash(assetUrl, edition.max_bytes);
+      let downloaded;
+      try {
+        downloaded = await downloadAndHash(assetUrl, edition.max_bytes);
+      } catch (error) {
+        const host = new URL(assetUrl).hostname;
+        if (!(hostIpOverrides[host] || []).length) throw error;
+        const bytes = await curlFetchBuffer(assetUrl, { maxBytes: edition.max_bytes });
+        const kind = signature(bytes);
+        if (!kind) throw new Error("unsupported or non-file response signature via curl fallback");
+        downloaded = {
+          temp: null,
+          bytes: bytes.length,
+          sha256: crypto.createHash("sha256").update(bytes).digest("hex"),
+          kind,
+          buffer: bytes
+        };
+      }
       const ext = downloaded.kind === "pdf" ? ".pdf" : downloaded.kind === "rar" ? ".rar" : ".epub";
       const dir = path.join(OUT, edition.language_iso_code, edition.edition_id);
       await fs.mkdir(dir, { recursive: true });
       const file = path.join(dir, edition.edition_id + ext);
-      await fs.rename(downloaded.temp, file);
+      if (downloaded.temp) {
+        await fs.rename(downloaded.temp, file);
+      } else {
+        await fs.writeFile(file, downloaded.buffer);
+      }
       result.acquired = {
         asset_url: assetUrl,
         path: path.relative(ROOT, file),
