@@ -96,6 +96,13 @@ for (const edition of config.editions) {
   const discoveryUrls = [];
   if (edition.official_page) discoveryUrls.push(edition.official_page);
   discoveryUrls.push(...edition.asset_index_urls);
+  for (const assetUrl of (edition.asset_urls || [])) {
+    if (allowedHost(assetUrl, config.allowed_hosts)) {
+      result.candidates.push({ source_url: "explicit_official_asset", asset_url: assetUrl, status: "discovered" });
+    } else {
+      result.candidates.push({ source_url: "explicit_official_asset", asset_url: assetUrl, status: "rejected_host" });
+    }
+  }
   for (const indexUrl of discoveryUrls) {
     if (!allowedHost(indexUrl, config.allowed_hosts)) {
       result.candidates.push({ index_url: indexUrl, status: "rejected_host" });
