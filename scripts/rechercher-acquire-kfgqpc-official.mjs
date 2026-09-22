@@ -144,8 +144,10 @@ for (const edition of config.editions) {
     candidates: []
   };
   const discoveryUrls = [];
-  if (edition.official_page) discoveryUrls.push(edition.official_page);
-  discoveryUrls.push(...edition.asset_index_urls);
+  if (!(edition.asset_urls && edition.asset_urls.length)) {
+    if (edition.official_page) discoveryUrls.push(edition.official_page);
+    discoveryUrls.push(...edition.asset_index_urls);
+  }
   for (const assetUrl of (edition.asset_urls || [])) {
     if (allowedHost(assetUrl, config.allowed_hosts)) {
       result.candidates.push({ source_url: "explicit_official_asset", asset_url: assetUrl, status: "discovered" });
