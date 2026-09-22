@@ -13,7 +13,9 @@ if (!response.ok) {
   throw new Error(`QuranEnc API failed: HTTP ${response.status}`);
 }
 
-const payload = await response.json();
+// Re-serialize validated JSON before it can reach the filesystem. This keeps
+// network-controlled bytes from being written as a raw network response.
+const payload = JSON.parse(JSON.stringify(await response.json()));
 if (!Array.isArray(payload.translations)) {
   throw new Error("QuranEnc API response has no translations array");
 }
