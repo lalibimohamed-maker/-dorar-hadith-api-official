@@ -8,7 +8,10 @@
     "direct_corpus_write": false,
     "provenance_required": true,
     "rights_verification_required": true,
-    "ai_generated_religious_text_forbidden_as_source": true
+    "ai_generated_religious_text_forbidden_as_source": true,
+    "qiraat_are_distinct_canonical_readings_and_must_not_be_collapsed_into_one_text": true,
+    "tajweed_annotations_are_not_a_replacement_for_canonical_quran_text": true,
+    "tafsir_is_separate_from_canonical_quran_text": true
   },
   "verified": [
     {
@@ -23,8 +26,40 @@
       "scope": "content",
       "production_required": true,
       "prelive_limit": "Only Al-Fatihah and Al-Baqarah are available for prelive testing",
-      "capabilities": ["quran", "chapters", "verses", "translations", "tafsir", "audio", "recitations", "pages", "juz", "hizb", "ruku", "manzil", "search"],
-      "canonical_text_policy": "Arabic Quran text remains distinct from translations and tafsir",
+      "capabilities": [
+        "quran",
+        "chapters",
+        "verses",
+        "translations",
+        "tafsir",
+        "audio",
+        "recitations",
+        "pages",
+        "juz",
+        "hizb",
+        "ruku",
+        "manzil",
+        "search",
+        "uthmani_tajweed",
+        "tajweed_colored_mushaf",
+        "mushaf_variants",
+        "content_sync"
+      ],
+      "tafsir_api": {
+        "status": "verified",
+        "endpoint_family": "content-v4-tafsirs",
+        "notes": "Official API documents a tafsir resource catalog and verse-level/paginated tafsir retrieval."
+      },
+      "tajweed_api": {
+        "status": "verified",
+        "endpoint_family": "content-v4-uthmani-tajweed-and-mushaf",
+        "notes": "Official API exposes text_uthmani_tajweed and Tajweed-colored Mushaf variants."
+      },
+      "qiraat_api": {
+        "status": "not-verified-as-ten-readings-api",
+        "notes": "Official Quran.com material documents the Ten Readings feature, while the public API documentation reviewed here does not establish a dedicated Ten Readings API endpoint. Do not label this as a Ten Readings API until an endpoint/data contract is verified."
+      },
+      "canonical_text_policy": "Arabic Quran text remains distinct from translations, tafsir, tajweed annotations, and qiraat-specific representations",
       "integration_status": "adapter-present; production credentials/access still require verification",
       "corpus_write": "forbidden-direct"
     },
@@ -37,11 +72,102 @@
       "access": ["official-web", "official-developer-download"],
       "api_status": "not-verified-as-public-api",
       "developer_formats": ["JSON", "XML", "SQL", "CSV", "HTML5", "TXT", "PDF"],
-      "coverage": ["Quran text", "Uthmani data", "Hafs", "Warsh", "Qalun", "Al-Susi", "Tafsir al-Muyassar", "Quran metadata"],
+      "coverage": [
+        "Quran text",
+        "Uthmani data",
+        "Hafs",
+        "Warsh",
+        "Qalun",
+        "Al-Susi",
+        "Tafsir al-Muyassar",
+        "Quran metadata",
+        "Tajweed educational resources"
+      ],
+      "qiraat_scope": {
+        "status": "partial-official-data-verified",
+        "verified_readings": ["Hafs", "Warsh", "Qalun", "Al-Susi"],
+        "ten_readings_complete": false,
+        "notes": "This registry must not claim the complete Ten Readings from the developer page until all ten are individually verified."
+      },
       "integration_status": "developer-data source verified; API endpoint still to be investigated",
       "corpus_write": "forbidden-direct"
     }
   ],
+  "official_specialized_targets": [
+    {
+      "id": "quran-foundation-ten-qiraat",
+      "provider": "Quran Foundation / Quran.com",
+      "country": "international",
+      "homepage": "https://quran.com/",
+      "qiraat_resource": "https://quran.com/ar/explore/a-brief-guide-to-the-ten-readings-qiraat",
+      "access": ["official-web", "official-feature"],
+      "api_status": "not-yet-verified-for-dedicated-ten-qiraat-endpoint",
+      "role": ["ten-qiraat", "readers", "transmitters", "reading-comparison"],
+      "integration_rule": "Register as a qiraat evidence source only after the underlying data representation, provenance, and rights are verified."
+    },
+    {
+      "id": "king-fahd-tajweed",
+      "provider": "King Fahd Glorious Quran Printing Complex",
+      "country": "SA",
+      "homepage": "https://qurancomplex.gov.sa/",
+      "developer_resources": "https://qurancomplex.gov.sa/en/techquran/dev/",
+      "access": ["official-developer-download", "official-educational-resource"],
+      "api_status": "not-verified-as-public-api",
+      "role": ["tajweed", "tajweed-rules", "tajweed-education"],
+      "integration_rule": "Treat downloadable developer data and educational material separately from any future API adapter."
+    },
+    {
+      "id": "qatar-ministry-quran",
+      "provider": "Qatar Ministry of Awqaf and Islamic Affairs",
+      "country": "QA",
+      "homepage": "https://alquran.islam.gov.qa/",
+      "known_resource": "https://alquran.islam.gov.qa/droos/Sections.html",
+      "access": ["official-web"],
+      "api_status": "not-yet-verified",
+      "dataset_status": "not-yet-verified",
+      "role": ["quran", "tajweed", "recitation", "education"]
+    },
+    {
+      "id": "ksu-ayat",
+      "provider": "King Saud University Ayat",
+      "country": "SA",
+      "homepage": "https://quran.ksu.edu.sa/",
+      "access": ["official-web"],
+      "api_status": "not-yet-verified",
+      "role": ["quran", "mushaf-images", "translations", "tafsir", "recitations", "Warsh"]
+    }
+  ],
+  "ten_qiraat_target": {
+    "status": "discovery-and-verification-required",
+    "goal": "Identify authoritative, institutionally hosted machine-readable/API/download sources for all Ten Canonical Readings and their recognized transmitters without collapsing them into Hafs.",
+    "readers": [
+      "Nafi",
+      "Ibn Kathir",
+      "Abu Amr",
+      "Ibn Amir",
+      "Asim",
+      "Hamza",
+      "Al-Kisai",
+      "Abu Jafar",
+      "Yaqub",
+      "Khalaf al-Ashir"
+    ],
+    "required_fields": [
+      "reading_id",
+      "reader",
+      "transmitter",
+      "source_provider",
+      "official_url",
+      "access_type",
+      "api_status",
+      "data_format",
+      "provenance",
+      "rights_status",
+      "text_or_audio_scope",
+      "verification_status"
+    ],
+    "rule": "Do not synthesize missing readings with AI and do not infer a reading from a different riwaya."
+  },
   "official_institutional_targets": [
     {
       "id": "qatar-ministry-quran",
