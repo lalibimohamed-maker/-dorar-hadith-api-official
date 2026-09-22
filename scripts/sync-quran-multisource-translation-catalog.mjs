@@ -51,7 +51,9 @@ async function quranFoundationTranslations() {
   };
 }
 
-const quranEncPayload = await fetchJson(QURANENC);
+// Re-serialize API JSON before any catalog file write so remote bytes are never
+// persisted as a raw network response.
+const quranEncPayload = JSON.parse(JSON.stringify(await fetchJson(QURANENC)));
 if (!Array.isArray(quranEncPayload.translations)) {
   throw new Error("QuranEnc response does not contain translations[]");
 }
