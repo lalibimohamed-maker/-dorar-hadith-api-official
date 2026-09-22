@@ -10,6 +10,8 @@ const ADAPTERS=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/is
 const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01-400h/master-global-source-registry-seed-2026-09.json'),'utf8'));
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXPECTED=3192;
+const MAX_SOURCES_PER_CELL=24;
+const MAX_PDF_CANDIDATES_PER_SOURCE=16;
 const CONCURRENCY=Math.max(1,Math.min(12,Number(process.env.ACQUISITION_CONCURRENCY||8)));
 const MAX_FILES=Math.max(1,Math.min(8,Number(process.env.ACQUISITION_MAX_FILES_PER_CELL||4)));
 const REQUEST_TIMEOUT=15000, DOWNLOAD_TIMEOUT=90000, RESPONSE_LIMIT=12*1024*1024, PDF_LIMIT=750*1024*1024;
@@ -168,6 +170,28 @@ function rightsFor(row){
   }
   return resolveRights(e);
 }
+function sourceRightsFor(adapter,row,urls){
+  const evidence=[];
+  const rowProvider=String(row.provider||'').toLowerCase();
+  const scopedSourceEvidence=urls.some(u=>sourceOf(u)===adapter?.id)||rowProvider===String(adapter?.id||'').toLowerCase();
+  if(scopedSourceEvidence){
+    const rowRights=rightsFor(row);
+    evidence.push(...(rowRights.evidence||[]));
+  }
+  const policy=adapter?.rights_policy;
+  const language=String(row.language_iso||row.language||'').toLowerCase();
+  const excluded=new Set((policy?.exclude_language_iso||[]).map(x=>String(x).toLowerCase()));
+  if(policy?.kind && policy?.evidence_url && !excluded.has(language)){
+    evidence.push({
+      source:adapter.id,
+      kind:policy.kind,
+      url:policy.evidence_url,
+      scope:policy.scope||'source_policy',
+      conditions:policy.conditions||[]
+    });
+  }
+  return resolveRights(evidence);
+}
 function acquisitionType(r){
   if(r.status===RIGHTS.REDISTRIBUTABLE&&!r.conflict) return 'public';
   if(r.status===RIGHTS.READ_COPY||r.status===RIGHTS.READ_ONLY) return 'research-only';
@@ -224,32 +248,48 @@ async function downloadPdf(url,dest){
 }
 
 async function processCell(row){
-  const urls=evidenceUrls(row),rights=rightsFor(row),type=acquisitionType(rights);
+  const urls=evidenceUrls(row),rowRights=rightsFor(row);
   const entry={
     cell_id:row.cell_id,language:row.language,language_iso:row.language_iso||null,domain:row.domain,
-    provider:row.provider||sourceOf(urls[0]||''),status:type==='blocked'?'rights-blocked':'no-eligible-pdf-found',
-    sources_checked:[],evidence_urls:urls,files:[],rights:rights.status,rights_conflict:rights.conflict,
-    rights_confidence:rights.confidence,rights_evidence:rights.evidence,acquisition:type,source_errors:[]
+    provider:row.provider||sourceOf(urls[0]||''),status:'no-eligible-pdf-found',
+    sources_checked:[],evidence_urls:urls,files:[],rights:rowRights.status,rights_conflict:rowRights.conflict,
+    rights_confidence:rowRights.confidence,rights_evidence:rowRights.evidence,acquisition:'blocked',source_errors:[],
+    source_candidates:[],rights_approved_sources:[],rights_blocked_sources:[]
   };
-  if(type==='blocked'){manifest.total_blocked_cells++;manifest.cells[row.cell_id]=entry;return;}
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
   for(const a of adapters.values()) if(a.status==='enabled'&&a.kinds?.some(k=>['pdf','downloads','download','datasets'].includes(k))) push(a.id);
+  const limitedIds=ids.slice(0,MAX_SOURCES_PER_CELL);
+  entry.source_candidates=limitedIds.slice();
   const seeds=[];
-  for(const id of ids.slice(0,8)){
+  for(const id of limitedIds){
     const a=adapters.get(id);
     for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});
     if(a){const direct=urls.some(x=>sourceOf(x)===id);if(!direct&&a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}
   }
   const localSeen=new Set();
+  let rightsApprovedSources=0;
   for(const seed of seeds){
     if(entry.files.length>=MAX_FILES||localSeen.has(seed.url)||!allow(seed.url)) break;
     localSeen.add(seed.url);
-    entry.sources_checked.push({source:seed.id,url:seed.url,role:seed.role});
+    const sourceAdapter=adapters.get(seed.id);
+    const sourceRights=sourceRightsFor(sourceAdapter,row,urls);
+    const sourceType=acquisitionType(sourceRights);
+    entry.sources_checked.push({
+      source:seed.id,url:seed.url,role:seed.role,
+      rights:sourceRights.status,rights_confidence:sourceRights.confidence,
+      rights_evidence:sourceRights.evidence
+    });
+    if(sourceType==='blocked'){
+      entry.rights_blocked_sources.push(seed.id);
+      continue;
+    }
+    rightsApprovedSources++;
+    if(!entry.rights_approved_sources.includes(seed.id)) entry.rights_approved_sources.push(seed.id);
     let candidates=[];
     try{candidates=await candidateUrls(seed.url);}catch(e){entry.source_errors.push({source:seed.id,url:seed.url,error:String(e.message||e)});continue;}
-    for(const candidate of candidates){
+    for(const candidate of candidates.slice(0,MAX_PDF_CANDIDATES_PER_SOURCE)){
       if(entry.files.length>=MAX_FILES||!isPdfUrl(candidate)) continue;
       const pdf=allow(candidate)?.href;if(!pdf||claimed.has(pdf)) continue;
       claimed.add(pdf);
@@ -262,17 +302,29 @@ async function processCell(row){
         await fs.rename(temp,final);
         entry.files.push({
           cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:r.finalUrl,path:path.relative(ROOT,final),
-          bytes:r.bytes,sha256:r.sha256,content_type:r.contentType,acquisition:type,rights:rights.status,
+          bytes:r.bytes,sha256:r.sha256,content_type:r.contentType,acquisition:sourceType,rights:sourceRights.status,
           domain:row.domain,language_iso:row.language_iso||null,provenance:seed.id+':'+seed.url,promoteToCorpus:false
         });
         manifest.total_files++;
-        if(type==='public')manifest.total_public_files++;
-        if(type==='research-only')manifest.total_research_only_files++;
+        if(sourceType==='public')manifest.total_public_files++;
+        if(sourceType==='research-only')manifest.total_research_only_files++;
         manifest.source_counts[sourceId]=(manifest.source_counts[sourceId]||0)+1;
       }catch(e){claimed.delete(pdf);entry.source_errors.push({source:seed.id,url:pdf,error:String(e.message||e)});}
     }
   }
-  if(entry.files.length) entry.status=type==='research-only'?'research-only-acquired':'acquired';
+  if(entry.files.length){
+    const hasResearch=entry.files.some(f=>f.acquisition==='research-only');
+    const hasPublic=entry.files.some(f=>f.acquisition==='public');
+    entry.status=hasResearch?'research-only-acquired':'acquired';
+    entry.acquisition=hasPublic?'public':'research-only';
+  }else if(rightsApprovedSources===0){
+    entry.status='rights-blocked';
+    entry.acquisition='blocked';
+    manifest.total_blocked_cells++;
+  }else{
+    entry.status='no-eligible-pdf-found';
+    entry.acquisition='blocked';
+  }
   manifest.cells[row.cell_id]=entry;
 }
 
