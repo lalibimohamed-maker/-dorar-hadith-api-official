@@ -33,7 +33,8 @@
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
     "test:review-expiry": "node --test test/review-expiry.test.js",
-    "quranenc:sync": "node scripts/sync-quranenc-translation-provenance.mjs"
+    "quranenc:sync": "node scripts/sync-quranenc-translation-provenance.mjs",
+    "quran:catalog:sync": "node scripts/sync-quran-multisource-translation-catalog.mjs"
   },
   "engines": {
     "node": ">=20"
