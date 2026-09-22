@@ -150,7 +150,7 @@ async function candidateUrls(seed){
     deepUrls(json,r.finalUrl,set);
     if(new URL(r.finalUrl).origin==='https://archive.org') for(const u of await archivePdfUrls(json)) set.add(u);
   }catch{htmlUrls(text,r.finalUrl,set);}
-  return [...set].filter(x=>allow(x)).slice(0,16);
+  return [...set].filter(x=>allow(x)).slice(0,MAX_PDF_CANDIDATES_PER_SOURCE);
   })();
   candidateCache.set(seed,pending);
   try{return await pending;}catch(e){candidateCache.delete(seed);throw e;}
