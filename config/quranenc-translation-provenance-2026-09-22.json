@@ -268,7 +268,20 @@
       "provenance_class": "catalog_verified_primary_source_verification_pending",
       "primary_source": "QuranEnc official translation catalog API",
       "verification_status": "catalog_exists; publisher/institution must be read from live API metadata and then verified against primary source",
-      "ai_source": false
+      "ai_source": false,
+      "primary_source_verification": {
+        "status": "primary_source_verified",
+        "official_url": "https://pustakalajnah.kemenag.go.id/",
+        "evidence_url": "https://pustakalajnah.kemenag.go.id/detail/135",
+        "country": "Indonesia",
+        "verified_at": "2026-09-22",
+        "notes": "Kementerian Agama/Lajnah primary catalog documents Al-Qur'an dan Terjemahannya; QuranEnc API description explicitly identifies the Ministry of Religious Affairs for this edition."
+      },
+      "rights_verification": {
+        "status": "pending",
+        "evidence_url": "https://pustakalajnah.kemenag.go.id/info-lpmq/unduhan/terjemah-al-quran.html",
+        "notes": "Primary source confirms official publication/download presence; redistribution rights for republication in Deen Allah still require asset-level verification."
+      }
     },
     {
       "translation_key": "indonesian_complex",
@@ -276,7 +289,20 @@
       "provenance_class": "catalog_verified_primary_source_verification_pending",
       "primary_source": "QuranEnc official translation catalog API",
       "verification_status": "catalog_exists; publisher/institution must be read from live API metadata and then verified against primary source",
-      "ai_source": false
+      "ai_source": false,
+      "primary_source_verification": {
+        "status": "primary_source_verified",
+        "official_url": "https://pustakalajnah.kemenag.go.id/",
+        "evidence_url": "https://pustakalajnah.kemenag.go.id/detail/135",
+        "country": "Indonesia",
+        "verified_at": "2026-09-22",
+        "notes": "Kementerian Agama/Lajnah primary catalog documents Al-Qur'an dan Terjemahannya; QuranEnc API description explicitly identifies the Ministry of Religious Affairs for this edition."
+      },
+      "rights_verification": {
+        "status": "pending",
+        "evidence_url": "https://pustakalajnah.kemenag.go.id/info-lpmq/unduhan/terjemah-al-quran.html",
+        "notes": "Primary source confirms official publication/download presence; redistribution rights for republication in Deen Allah still require asset-level verification."
+      }
     },
     {
       "translation_key": "tagalog_rwwad",
@@ -615,5 +641,85 @@
       "ai_source": false
     }
   ],
-  "next_step": "Resolve each candidate against the issuing institution's primary official source, capture country, publisher/institution URL, edition/version, rights evidence, and verification timestamp before eligible matrix admission."
+  "next_step": "Resolve each candidate against the issuing institution's primary official source, capture country, publisher/institution URL, edition/version, rights evidence, and verification timestamp before eligible matrix admission.",
+  "primary_source_verification_progress": {
+    "verified_editions": [
+      "indonesian_affairs",
+      "indonesian_complex"
+    ],
+    "pending_editions": [
+      "english_rwwad",
+      "english_saheeh",
+      "english_hilali_khan",
+      "french_rashid",
+      "french_montada",
+      "spanish_garcia",
+      "spanish_montada_eu",
+      "spanish_montada_latin",
+      "portuguese_nasr",
+      "german_rwwad",
+      "german_bubenheim",
+      "romanian_project",
+      "dutch_center",
+      "turkish_rwwad",
+      "turkish_shaban",
+      "turkish_shahin",
+      "azeri_musayev",
+      "macedonian_group",
+      "albanian_rwwad",
+      "albanian_nahi",
+      "bosnian_rwwad",
+      "bosnian_mihanovich",
+      "serbian_rwwad",
+      "croatian_rwwad",
+      "lithuanian_rwwad",
+      "uzbek_rwwad",
+      "uzbek_mansour",
+      "tajik_arifi",
+      "kyrgyz_hakimov",
+      "indonesian_sabiq",
+      "tagalog_rwwad",
+      "bisayan_rwwad",
+      "maguindanao_rwwad",
+      "chinese_suliman",
+      "chinese_makin",
+      "uyghur_saleh",
+      "japanese_saeedsato",
+      "vietnamese_rwwad",
+      "thai_rwwad",
+      "khmer_rwwad",
+      "khmer_cambodia",
+      "persian_ih",
+      "kurdish_bamoki",
+      "pashto_rwwad",
+      "urdu_junagarhi",
+      "hindi_omari",
+      "telugu_muhammad",
+      "gujarati_omari",
+      "malayalam_kunhi",
+      "kannada_hamza",
+      "assamese_rafeeq",
+      "punjabi_arif",
+      "tamil_omar_brief",
+      "tamil_omar",
+      "tamil_baqavi",
+      "sinhalese_mahir",
+      "swahili_rwwad",
+      "swahili_barawani",
+      "somali_yacob",
+      "amharic_zain",
+      "amharic_sadiq",
+      "yoruba_mikail",
+      "hausa_gummi",
+      "oromo_ababor",
+      "afar_hamza",
+      "ankobambara_dayyan",
+      "kinyarwanda_assoc",
+      "ikirundi_gehiti",
+      "moore_rwwad",
+      "asante_harun",
+      "fulani_rwwad",
+      "lingala_zakaria"
+    ]
+  }
 }
