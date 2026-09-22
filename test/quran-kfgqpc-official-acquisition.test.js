@@ -16,6 +16,9 @@ test("KFGQPC Kannada is anchored to official publication and download hosts", ()
   assert.ok(edition);
   assert.equal(edition.language_iso_code, "kn");
   assert.equal(edition.official_page, "https://qurancomplex.gov.sa/en/kfgqpc-quran-translate-kannada/");
+  assert.deepEqual(edition.asset_urls, [
+    "https://qurancomplex.gov.sa/wp-content/uploads/isdarat/translations/kannada-1.pdf"
+  ]);
   assert.deepEqual(edition.asset_index_urls, [
     "https://epub.qurancomplex.gov.sa/issues/translations/kannada/",
     "https://download.qurancomplex.gov.sa/issues/translations/kannada/"
