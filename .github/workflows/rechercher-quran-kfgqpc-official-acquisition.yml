@@ -29,7 +29,36 @@ jobs:
         run: node scripts/rechercher-acquire-kfgqpc-official.mjs
       - name: Validate KFGQPC acquisition manifest
         run: |
-          node --input-type=module -e "import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('artifacts/quran-kfgqpc-official-acquisition/manifest.json','utf8')); if(m.edition_count!==1) process.exit(1); if(m.network_unavailable===true) { console.log("KFGQPC official server/proxy temporarily unavailable; no asset marked acquired."); process.exit(0); } if(m.acquired_editions!==1) process.exit(1); if(m.failed_editions!==0) process.exit(1); if(m.corpus_write!==false || m.ai_generated_translation!==false || m.canonical_arabic_separate!==true) process.exit(1); console.log('KFGQPC acquisition manifest OK', m.languages.join(','));"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const m = JSON.parse(
+            fs.readFileSync(
+              'artifacts/quran-kfgqpc-official-acquisition/manifest.json',
+              'utf8'
+            )
+          );
+
+          if (m.edition_count !== 1) process.exit(1);
+
+          if (m.network_unavailable === true) {
+            console.log('KFGQPC official server/proxy temporarily unavailable; no asset marked acquired.');
+            process.exit(0);
+          }
+
+          if (m.acquired_editions !== 1) process.exit(1);
+          if (m.failed_editions !== 0) process.exit(1);
+
+          if (
+            m.corpus_write !== false ||
+            m.ai_generated_translation !== false ||
+            m.canonical_arabic_separate !== true
+          ) {
+            process.exit(1);
+          }
+
+          console.log('KFGQPC acquisition manifest OK', m.languages.join(','));
+          NODE
       - name: Upload research-only KFGQPC acquisition
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
