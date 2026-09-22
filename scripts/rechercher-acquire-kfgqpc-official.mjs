@@ -23,12 +23,19 @@ function signature(buffer) {
 
 function candidatesFromHtml(html, baseUrl) {
   const found = new Set();
-  for (const match of html.matchAll(/(?:href|src)\s*=\s*["']([^"']+)["']/gi)) {
+  const add = (raw) => {
     try {
-      const url = new URL(match[1], baseUrl);
-      if (/\.(pdf|epub|zip|rar)(?:[?#].*)?$/i.test(url.pathname)) found.add(url.href);
+      const url = new URL(raw, baseUrl);
+      if (!allowedHost(url.href, config.allowed_hosts)) return;
+      if (/\.(pdf|epub|zip|rar)(?:[?#].*)?$/i.test(url.pathname) ||
+          /(?:download|file|document|publication|translation)/i.test(url.pathname + url.search)) {
+        found.add(url.href);
+      }
     } catch {}
-  }
+  };
+  for (const match of html.matchAll(/(?:href|src)\s*=\s*["']([^"']+)["']/gi)) add(match[1]);
+  for (const match of html.matchAll(/(?:https?:)?\/\/[^\s"'<>]+/gi)) add(match[0]);
+  for (const match of html.matchAll(/(?:src|href)\s*:\s*["']([^"']+)["']/gi)) add(match[1]);
   return [...found];
 }
 
@@ -86,7 +93,10 @@ for (const edition of config.editions) {
     status: "not_acquired",
     candidates: []
   };
-  for (const indexUrl of edition.asset_index_urls) {
+  const discoveryUrls = [];
+  if (edition.official_page) discoveryUrls.push(edition.official_page);
+  discoveryUrls.push(...edition.asset_index_urls);
+  for (const indexUrl of discoveryUrls) {
     if (!allowedHost(indexUrl, config.allowed_hosts)) {
       result.candidates.push({ index_url: indexUrl, status: "rejected_host" });
       continue;
@@ -103,15 +113,14 @@ for (const edition of config.editions) {
         const html = await response.text();
         const candidateUrls = candidatesFromHtml(html, finalUrl);
         if (candidateUrls.length === 0) {
-          result.candidates.push({ index_url: indexUrl, status: "index_ok_no_supported_asset_links" });
+          result.candidates.push({ index_url: indexUrl, final_url: finalUrl, status: "index_ok_no_supported_asset_links" });
           continue;
         }
         for (const assetUrl of candidateUrls) {
-          if (!allowedHost(assetUrl, config.allowed_hosts)) continue;
-          result.candidates.push({ asset_url: assetUrl, status: "discovered" });
+          result.candidates.push({ source_url: indexUrl, asset_url: assetUrl, status: "discovered" });
         }
       } else if (allowedHost(finalUrl, config.allowed_hosts)) {
-        result.candidates.push({ asset_url: finalUrl, status: "discovered" });
+        result.candidates.push({ source_url: indexUrl, asset_url: finalUrl, status: "discovered" });
       }
     } catch (error) {
       result.candidates.push({ index_url: indexUrl, status: "index_error", error: String(error?.message || error) });
@@ -168,5 +177,11 @@ console.log(JSON.stringify({
   edition_count: manifest.edition_count,
   acquired_editions: manifest.acquired_editions,
   failed_editions: manifest.failed_editions,
-  languages: manifest.languages
+  languages: manifest.languages,
+  details: results.map(x => ({
+    edition_id: x.edition_id,
+    status: x.status,
+    candidate_count: x.candidates.length,
+    candidates: x.candidates
+  }))
 }, null, 2));
