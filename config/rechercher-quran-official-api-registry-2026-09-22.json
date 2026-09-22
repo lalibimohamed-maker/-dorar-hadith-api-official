@@ -728,6 +728,95 @@
       "Do not treat API access as redistribution permission.",
       "Keep Quran canonical text, translations, tafsir, tajweed annotations, qiraat and audio as separate content classes.",
       "Ten Qiraat remain individually sourced and verified; never synthesize missing readings."
+    ],
+    "government_open_data_api_gateways": [
+      {
+        "id": "morocco-national-open-data-api",
+        "provider": "Morocco National Open Data Portal",
+        "country": "MA",
+        "official_url": "https://data.gov.ma/ar/دليل-واجهة-برمجة-التطبيقات",
+        "api_status": "verified",
+        "api_type": "CKAN API",
+        "role": [
+          "dataset-discovery",
+          "metadata",
+          "download"
+        ],
+        "religious_api_status": "no religion-specific API verified in this scan",
+        "rights_note": "Portal states public datasets are made available for free reuse subject to its terms."
+      },
+      {
+        "id": "qatar-open-data-api",
+        "provider": "State of Qatar Open Data",
+        "country": "QA",
+        "official_url": "https://www.data.gov.qa/",
+        "api_status": "verified",
+        "api_type": "Explore API 2.1",
+        "role": [
+          "dataset-discovery",
+          "records",
+          "exports"
+        ],
+        "religious_api_status": "no religion-specific API verified in this scan",
+        "rights_note": "Individual dataset terms must be checked before reuse."
+      },
+      {
+        "id": "bahrain-open-data-api",
+        "provider": "Bahrain Open Data Portal",
+        "country": "BH",
+        "official_url": "https://www.data.gov.bh/api-console/explore/v2.1/",
+        "api_status": "verified",
+        "api_type": "Opendatasoft Explore API v2.1",
+        "role": [
+          "dataset-catalog",
+          "records",
+          "exports",
+          "DCAT"
+        ],
+        "religious_api_status": "no religion-specific API verified in this scan",
+        "rights_note": "Useful institutional discovery gateway; individual dataset licensing still requires verification."
+      },
+      {
+        "id": "oman-data-portal-api",
+        "provider": "Oman National Centre for Statistics and Information",
+        "country": "OM",
+        "official_url": "https://data.gov.om/",
+        "api_status": "verified",
+        "api_type": [
+          "REST",
+          "SDMX"
+        ],
+        "role": [
+          "dataset-discovery",
+          "metadata",
+          "data",
+          "raw-data",
+          "SDMX"
+        ],
+        "religious_api_status": "no religion-specific API verified in this scan",
+        "rights_note": "Official portal states public data are governed by the Open Government License, subject to its terms."
+      },
+      {
+        "id": "kuwait-cait-api-platform",
+        "provider": "Central Agency for Information Technology (Kuwait)",
+        "country": "KW",
+        "official_url": "https://developer.api.cait.gov.kw/get-started?language=ar",
+        "api_status": "verified",
+        "api_type": "government API product platform",
+        "role": [
+          "api-product-discovery",
+          "application-registration",
+          "test-and-production-access"
+        ],
+        "religious_api_status": "Quran-specific product not verified in this scan",
+        "rights_note": "API products require account/approval; credentials must never be stored in the registry."
+      }
+    ],
+    "next_radial_targets": [
+      "Search each government API gateway for Quran, Hadith, Tafsir, Fiqh, Fatwa, Waqf, manuscripts, Islamic libraries, Arabic corpora, recitation and religious education datasets.",
+      "Inspect national university developer portals separately from ministry websites.",
+      "For every discovered API, verify primary documentation, authentication, endpoint contract, rate limits, terms, rights and provenance before marking verified.",
+      "Keep independent APIs and community datasets in a separate discovery-leads class; never relabel them as official."
     ]
   }
 }
