@@ -10,10 +10,31 @@ const API_BASE = "https://quranenc.com/api/v1";
 const OFFICIAL_LIST = `${API_BASE}/translations/list`;
 const MAX_FILE_BYTES = 300 * 1024 * 1024;
 
-async function getJson(url) {
-  const response = await fetch(url, { headers: { accept: "application/json" } });
-  if (!response.ok) throw new Error(`${response.status} ${url}`);
-  return response.json();
+const REQUEST_TIMEOUT_MS = 45000;
+const LIST_ATTEMPTS = 4;
+
+function classifyNetwork(error) {
+  const message = String(error?.message || error || "");
+  return /fetch failed|timeout|timed out|ETIMEDOUT|ECONNRESET|ENETUNREACH|EAI_AGAIN|ENOTFOUND|HTTP 5\\d\\d/i.test(message)
+    ? "network_unavailable"
+    : "source_or_validation_error";
+}
+
+async function getJson(url, attempts = LIST_ATTEMPTS) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch(url, { headers: { accept: "application/json" }, signal: controller.signal });
+      if (!response.ok) throw new Error(`${response.status} ${url}`);
+      return response.json();
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, 1500 * attempt));
+    } finally { clearTimeout(timer); }
+  }
+  throw lastError;
 }
 
 async function getBinary(url) {
@@ -58,7 +79,31 @@ const bootstrap = new Map(
     .map((e) => [e.edition_id, e])
 );
 
-const official = JSON.parse(JSON.stringify(await getJson(OFFICIAL_LIST)));
+let official;
+let list_error = null;
+try { official = JSON.parse(JSON.stringify(await getJson(OFFICIAL_LIST))); }
+catch (error) { list_error = { error: String(error?.message || error), classification: classifyNetwork(error) }; }
+
+if (list_error) {
+  const manifest = {
+    schema_version: "2026-09-22",
+    purpose: "Research-only QuranEnc acquisition; transient API outages must not be confused with missing editions.",
+    source: "QuranEnc official API",
+    canonical_arabic_separate: true,
+    ai_generated_translation: false,
+    corpus_write: false,
+    edition_count: 0,
+    acquired_editions: 0,
+    not_acquired_editions: 0,
+    network_unavailable: list_error.classification === "network_unavailable",
+    network_error: list_error
+  };
+  await fs.rm(OUT, { recursive: true, force: true });
+  await fs.mkdir(OUT, { recursive: true });
+  await fs.writeFile(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", "utf8");
+  console.log(JSON.stringify(manifest, null, 2));
+  process.exit(list_error.classification === "network_unavailable" ? 0 : 1);
+}
 if (!Array.isArray(official.translations)) throw new Error("QuranEnc response missing translations[]");
 
 const editions = official.translations.map((x) => ({
