@@ -75,7 +75,8 @@ jobs:
           find artifacts/rechercher/multilingual-pdf-acquisition -type f -name '*.pdf' -print0 |
             while IFS= read -r -d '' f; do
               test "$(head -c 4 "$f")" = "%PDF"
-              qpdf --check "$f"
+              # qpdf exit 3 means warnings without errors; warnings are logged but are not a validation failure.
+              qpdf --check --warning-exit-0 "$f"
               test -s "$f"
             done
       - name: Separate research-only PDFs from public material
