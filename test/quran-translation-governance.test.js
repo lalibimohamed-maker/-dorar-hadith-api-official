@@ -34,12 +34,15 @@ test("Quran translation catalog contains the persisted QuranEnc coverage without
 
 test("KFGQPC official institutional editions are present but publication-blocked", () => {
   const kfgqpc = catalog.editions.filter((edition) => edition.source_id === "kfgqpc");
-  assert.equal(kfgqpc.length, 11);
+  assert.equal(kfgqpc.length, 12);
   assert.ok(kfgqpc.every((edition) => edition.primary_source_verification?.status === "primary_source_verified"));
   assert.ok(kfgqpc.every((edition) => edition.rights_verification?.status === "pending"));
   assert.ok(kfgqpc.every((edition) => edition.text_integrity_status === "pending"));
   assert.ok(kfgqpc.every((edition) => edition.matrix_eligibility === "blocked_pending_rights_and_integrity"));
   assert.ok(kfgqpc.every((edition) => edition.acquisition_status === "not_acquired"));
+  const kannada = kfgqpc.find((edition) => edition.edition_id === "kfgqpc-kannada");
+  assert.ok(kannada);
+  assert.equal(kannada.language_iso_code, "kn");
 });
 
 test("verified primary-source provenance does not silently grant redistribution rights", () => {
