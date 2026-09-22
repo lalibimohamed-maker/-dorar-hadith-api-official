@@ -32,7 +32,8 @@ test("KFGQPC Kannada is anchored to official publication and download hosts", ()
 test("KFGQPC acquisition is restricted to official hosts and preserves governance boundaries", () => {
   assert.deepEqual(config.allowed_hosts.sort(), [
     "download.qurancomplex.gov.sa",
-    "epub.qurancomplex.gov.sa"
+    "epub.qurancomplex.gov.sa",
+    "qurancomplex.gov.sa"
   ]);
   assert.equal(config.policy.corpus_write_forbidden, true);
   assert.equal(config.policy.ai_generated_translation_forbidden, true);
