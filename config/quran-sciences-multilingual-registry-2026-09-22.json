@@ -89,7 +89,8 @@
       "verification_status"
     ],
     "rule": "A language is not marked covered merely because quran.ai or Quran.com exists. Coverage requires an individually identified edition/resource and verified provenance and rights.",
-    "fallback": "When no verified Quran resource exists for a language/cell, record the gap rather than generating an AI translation and presenting it as Quran source material."
+    "fallback": "When no verified Quran resource exists for a language/cell, record the gap rather than generating an AI translation and presenting it as Quran source material.",
+    "translation_rule": "Translation coverage is edition-level: identify language, translation resource ID, author/institution, upstream provenance and rights before marking a cell covered."
   },
   "quran_sciences_taxonomy": {
     "canonical_text": [
@@ -174,7 +175,7 @@
     },
     {
       "id": "quran-translations",
-      "role": "multilingual translation editions and provenance"
+      "role": "verified multilingual translation editions, language metadata, edition provenance and rights"
     },
     {
       "id": "quran-tafsir",
@@ -210,7 +211,8 @@
     "ten_qiraat_must_be_individually_verified": true,
     "no_ai_substitution_for_missing_religious_sources": true,
     "no_api_claim_without_endpoint_contract": true,
-    "provenance_must_follow_actual_upstream": true
+    "provenance_must_follow_actual_upstream": true,
+    "translation_integrity": "Preserve vetted source translation text and footnotes; no automatic browser retranslation and no AI substitution."
   },
   "last_updated": "2026-09-22",
   "api_surface_expansion": {
@@ -437,5 +439,54 @@
     "corpus_write_policy": "forbidden-direct",
     "ai_rule": "AI cannot generate, reconstruct, or silently normalize a Mushaf representation as authoritative source content.",
     "verification_status": "official-documentation-surface-verified; resource-level enumeration pending authorized production access"
+  },
+  "translation_service_contract": {
+    "service_id": "quran-foundation-translations-v4",
+    "provider_source_id": "source:quran-foundation",
+    "role": "Third sequential Quran layer: verified translation editions kept separate from canonical Arabic Quran text.",
+    "upstream_contract": "quran-foundation-content-api-v4",
+    "scope": [
+      "translation resource catalog",
+      "language catalog",
+      "full-translation retrieval",
+      "surah-level translation retrieval",
+      "ayah-level translation retrieval",
+      "verse-range translation retrieval",
+      "translation metadata",
+      "translation footnotes"
+    ],
+    "endpoint_contract": {
+      "resources_translations": "/content/api/v4/resources/translations",
+      "resources_languages": "/content/api/v4/resources/languages",
+      "single_translation": "/content/api/v4/translations/{translation_id}",
+      "surah_translations": "/content/api/v4/translations/{resource_id}/by_chapter/{chapter_number}",
+      "ayah_translations": "/content/api/v4/translations/{resource_id}/by_ayah/{ayah_key}",
+      "verse_range": "/content/api/v4/verses/by_range",
+      "auth": "OAuth2 client_credentials; content scope; x-auth-token and x-client-id",
+      "pagination": "translation list/surah/ayah routes support paginated responses; verse-range supports per_page up to 50"
+    },
+    "translation_record_identity": [
+      "resource_id",
+      "resource_name",
+      "id",
+      "language_id",
+      "language_name",
+      "verse_key",
+      "chapter_id",
+      "verse_number",
+      "juz_number",
+      "hizb_number",
+      "page_number",
+      "rub_el_hizb_number",
+      "ruku_number",
+      "manzil_number"
+    ],
+    "rights_rule": "API availability is not redistribution permission. Rights and attribution must be verified for each translation edition/resource before public storage or publication.",
+    "provenance_rule": "Every translation remains an edition-level record with author/institution, language, resource ID, upstream source, retrieval metadata, rights state and verification state.",
+    "separation_rule": "Translations must never overwrite, normalize, or substitute for the canonical Arabic Quran record.",
+    "integrity_rule": "Do not use automatic browser translation on vetted Quran translation text; preserve the source translation text and footnotes as returned by the official resource.",
+    "ai_rule": "AI may assist indexing, matching and discovery, but may not generate or silently retranslate an authoritative Quran translation.",
+    "corpus_write_policy": "forbidden-direct",
+    "verification_status": "official-documentation-contract-verified; individual edition/resource rights and provenance verification remains required"
   }
 }
