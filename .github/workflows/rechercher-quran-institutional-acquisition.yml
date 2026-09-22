@@ -1,0 +1,37 @@
+name: Rechercher — official institutional Quran translation acquisition
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "config/quran-official-institutional-translation-registry-2026-09-22.json"
+      - "config/quran-institutional-acquisition-2026-09-22.json"
+      - "scripts/rechercher-acquire-quran-institutional.mjs"
+      - "test/quran-institutional-translation-registry.test.js"
+      - ".github/workflows/rechercher-quran-institutional-acquisition.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-institutional-quran:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+      - name: Acquire official institutional assets
+        run: node scripts/rechercher-acquire-quran-institutional.mjs
+      - name: Validate institutional acquisition manifest
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('artifacts/quran-institutional-acquisition/manifest.json','utf8')); if(m.edition_count!==3) process.exit(1); if(m.corpus_write!==false || m.ai_generated_translation!==false || m.canonical_arabic_separate!==true) process.exit(1); if(m.failed_editions!==0) process.exit(1); console.log('Institutional acquisition manifest OK', m.acquired_editions, m.languages.join(','));"
+      - name: Upload research-only institutional acquisition
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: quran-institutional-translation-acquisition
+          path: artifacts/quran-institutional-acquisition
+          retention-days: 90
