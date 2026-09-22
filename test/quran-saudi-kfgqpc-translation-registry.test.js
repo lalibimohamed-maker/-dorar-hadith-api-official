@@ -15,10 +15,10 @@ test("KFGQPC official translation registry is governance-safe", () => {
   assert.equal(registry.policy.ai_generated_translation_forbidden, true);
   assert.equal(registry.policy.corpus_write_forbidden, true);
   assert.equal(registry.policy.rights_verification_required, true);
-  assert.equal(registry.language_editions.length, 11);
+  assert.equal(registry.language_editions.length, 12);
 
   const codes = new Set(registry.language_editions.map((x) => x.language_iso_code));
-  for (const code of ["de","ber","en","tr","prs","ru","sw","zh","fr","ff","ne"]) {
+  for (const code of ["de","ber","en","tr","prs","ru","sw","zh","fr","ff","ne","kn"]) {
     assert.ok(codes.has(code), code);
   }
 
