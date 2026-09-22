@@ -1,0 +1,44 @@
+name: Rechercher — Quran multilingual translation acquisition
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "config/quran-multisource-translation-catalog-2026-09-22.json"
+      - "scripts/rechercher-acquire-quranenc-translations.mjs"
+      - ".github/workflows/rechercher-quran-translation-acquisition.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-quranenc-translations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Acquire all catalogued QuranEnc editions
+        run: node scripts/rechercher-acquire-quranenc-translations.mjs
+        env:
+          QURANENC_CONCURRENCY: 6
+      - name: Validate research-only manifest
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'artifacts/quran-translation-acquisition/manifest.json';
+          const m = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (m.edition_count !== 74) throw new Error('Expected 74 editions');
+          if (m.corpus_write !== false) throw new Error('Corpus write must remain forbidden');
+          if (m.ai_generated_translation !== false) throw new Error('AI-generated translation must remain forbidden');
+          if (m.canonical_arabic_separate !== true) throw new Error('Canonical Arabic separation required');
+          NODE
+      - name: Upload research-only acquisition
+        uses: actions/upload-artifact@v4
+        with:
+          name: quranenc-translation-acquisition
+          path: artifacts/quran-translation-acquisition
+          retention-days: 90
