@@ -515,7 +515,15 @@
       "coverage_rule": "Enumerate actual translation editions from the catalog endpoint; never infer coverage from the language directory alone.",
       "integrity_rule": "Preserve the source translation and footnotes unchanged; retain translation key/version/last_update and source attribution.",
       "rights_rule": "QuranEnc states that translation content may be downloaded/re-published subject to its terms; each acquired edition must retain the applicable version and attribution requirements.",
-      "ai_rule": "No AI-generated or AI-retranslated Quran translation may be inserted when a verified source translation is unavailable."
+      "ai_rule": "No AI-generated or AI-retranslated Quran translation may be inserted when a verified source translation is unavailable.",
+      "catalog_snapshot": {
+        "snapshot_date": "2026-09-22",
+        "catalog_file": "config/quranenc-translation-catalog-2026-09-22.json",
+        "api_endpoint": "https://quranenc.com/api/v1/translations/list",
+        "translation_edition_count": 74,
+        "unique_language_count": 45,
+        "note": "The live API snapshot returned 74 translation editions across 45 language ISO codes. QuranEnc's broader '+80 Languages' site figure must not be converted into 80+ Quran translation languages without edition-level API evidence."
+      }
     },
     "official_country_translation_program": {
       "role": "Search and verify translations issued or formally supervised by ministries, national Quran complexes, official Islamic affairs bodies, universities, and recognized scholarly institutions in Muslim-majority countries.",
