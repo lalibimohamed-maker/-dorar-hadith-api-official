@@ -1039,5 +1039,11 @@
       "Keep independent APIs and community datasets in a separate discovery-leads class; never relabel them as official.",
       "Verify QuranEnc translation inventory language-by-language and register edition/version/provenance records separately from the API contract."
     ]
+  },
+  "quran_foundation_coverage_correction": {
+    "verified_on": "2026-09-22",
+    "correction": "The earlier registry treatment understated the documented Content API surface. Official v4 documentation explicitly covers Quran text, verses, translations, tafsir, audio, recitations, chapter reciters, pages, juz, hizb, ruku, manzil and related resources, and chapter-reciter records expose qirat metadata.",
+    "remaining_verification_boundary": "The documentation establishes the API contract and qirat metadata field, but does not by itself prove that every one of the Ten Canonical Readings is available as a complete production dataset. That requires enumerating the production resource records after authorized access.",
+    "governance": "API access remains separate from redistribution rights and scholarly provenance."
   }
 }
