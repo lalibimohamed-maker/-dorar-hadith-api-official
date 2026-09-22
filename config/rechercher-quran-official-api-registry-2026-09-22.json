@@ -110,6 +110,30 @@
       },
       "integration_status": "developer-data source verified; API endpoint still to be investigated",
       "corpus_write": "forbidden-direct"
+    },
+    {
+      "id": "quranenc-translation-api",
+      "provider": "QuranEnc.com",
+      "country": "international",
+      "homepage": "https://quranenc.com/",
+      "documentation": "https://quranenc.com/ar/home/api",
+      "access": [
+        "official-api"
+      ],
+      "api_version": "v1",
+      "authentication": "public HTTP API; no credential requirement documented on the API reference",
+      "capabilities": [
+        "translation-catalog",
+        "sura-translation",
+        "aya-translation",
+        "translation-footnotes",
+        "translation-audio"
+      ],
+      "rights_status": "redistribution-permitted-subject-to-source-terms",
+      "rights_note": "The official API page states translations may be downloaded and republished subject to no modification, clear attribution to QuranEnc.com, version identification, preservation of transcript information, source notification of notes, updating to newer versions, and no inappropriate advertising.",
+      "corpus_write": "forbidden-direct",
+      "adapter_status": "registry-ready; endpoint contract documented",
+      "verification_status": "official-api-documentation-verified"
     }
   ],
   "official_specialized_targets": [
@@ -489,7 +513,8 @@
   "discovery_results": {
     "verified_api_sources": [
       "diyanet-open-source-quran-api",
-      "quran-foundation-content-api-v4"
+      "quran-foundation-content-api-v4",
+      "quranenc-translation-api"
     ],
     "verified_institutional_resources": [
       "king-fahd-complex-developer-resources",
@@ -591,6 +616,50 @@
         "corpus_write_policy": "forbidden-direct",
         "adapter_status": "existing HadeethEnc client/harvester path present in Rechercher",
         "verification_status": "official-developer-surface-verified; endpoint-contract-pending"
+      },
+      {
+        "api_id": "quran-foundation-search-api-v1",
+        "provider_source_id": "source:quran-foundation",
+        "provider": "Quran Foundation / Quran.com",
+        "official_api_base": "https://apis.quran.foundation",
+        "documentation": "https://api-docs.quran.com/docs/search_apis_versioned/1.0.0/search-controller-search/",
+        "api_version": "v1",
+        "authentication": "app credentials from backend / official SDK",
+        "capabilities": [
+          "quran-search",
+          "verse-search",
+          "chapter-navigation",
+          "juz-navigation",
+          "page-navigation",
+          "quick-search",
+          "advanced-search",
+          "exact-match"
+        ],
+        "production_access": "permission-gated according to Developer Console/API documentation",
+        "rights_status": "terms-required; API access is not treated as redistribution permission",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "registry-ready; endpoint contract verified",
+        "verification_status": "official-api-documentation-verified"
+      },
+      {
+        "api_id": "quranenc-translation-api-v1",
+        "provider_source_id": "source:quranenc",
+        "provider": "QuranEnc.com",
+        "official_api_base": "https://quranenc.com/api/v1",
+        "documentation": "https://quranenc.com/ar/home/api",
+        "api_version": "v1",
+        "authentication": "public HTTP API; no credential requirement documented",
+        "capabilities": [
+          "translations-list",
+          "sura-translation",
+          "aya-translation",
+          "footnotes",
+          "translation-audio"
+        ],
+        "rights_status": "redistribution-permitted-subject-to-source-terms",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "registry-ready; translation API endpoints documented",
+        "verification_status": "official-api-documentation-verified"
       }
     ]
   },
@@ -617,6 +686,12 @@
       "source_id": "source:hadeethenc",
       "api_ids": [
         "hadeethenc-api"
+      ]
+    },
+    {
+      "source_id": "source:quranenc",
+      "api_ids": [
+        "quranenc-translation-api-v1"
       ]
     }
   ],
@@ -698,6 +773,23 @@
           "search-api"
         ],
         "verification_note": "Official docs require creating an app in Developer Console and distinguish content APIs from user/OAuth APIs."
+      },
+      {
+        "id": "quranenc-translation-api",
+        "provider": "QuranEnc.com",
+        "country": "international",
+        "official_url": "https://quranenc.com/ar/home/api",
+        "access_type": [
+          "official-api"
+        ],
+        "api_status": "verified",
+        "role": [
+          "translations",
+          "translation-catalog",
+          "footnotes",
+          "translation-audio"
+        ],
+        "verification_note": "Official API documentation exposes v1 translation list, sura and aya endpoints; official terms permit republication subject to explicit conditions."
       }
     ],
     "negative_findings": [
@@ -727,7 +819,8 @@
       "Do not treat an official website or mobile service as proof of an API.",
       "Do not treat API access as redistribution permission.",
       "Keep Quran canonical text, translations, tafsir, tajweed annotations, qiraat and audio as separate content classes.",
-      "Ten Qiraat remain individually sourced and verified; never synthesize missing readings."
+      "Ten Qiraat remain individually sourced and verified; never synthesize missing readings.",
+      "QuranEnc translations remain translation resources, not canonical Arabic Quran text; preserve source/version metadata and the stated no-modification conditions."
     ],
     "government_open_data_api_gateways": [
       {
@@ -816,7 +909,8 @@
       "Search each government API gateway for Quran, Hadith, Tafsir, Fiqh, Fatwa, Waqf, manuscripts, Islamic libraries, Arabic corpora, recitation and religious education datasets.",
       "Inspect national university developer portals separately from ministry websites.",
       "For every discovered API, verify primary documentation, authentication, endpoint contract, rate limits, terms, rights and provenance before marking verified.",
-      "Keep independent APIs and community datasets in a separate discovery-leads class; never relabel them as official."
+      "Keep independent APIs and community datasets in a separate discovery-leads class; never relabel them as official.",
+      "Verify QuranEnc translation inventory language-by-language and register edition/version/provenance records separately from the API contract."
     ]
   }
 }
