@@ -346,8 +346,19 @@
       "original_source_url": null,
       "license_or_permission_evidence": null,
       "text_integrity_status": "pending",
-      "primary_source_verification": "pending",
-      "rights_verification": "pending",
+      "primary_source_verification": {
+        "status": "primary_source_verified",
+        "official_url": "https://www.aiitc.net/en/homepage/",
+        "evidence_url": "https://www.aiitc.net/en/category/opinion-en/",
+        "country": "Albania",
+        "verified_at": "2026-09-22",
+        "notes": "AIITC's official site identifies the institute and lists 'The Magnificent Qur’an and its Meanings in Albanian' as based on Prof. Hasan I. Nahit's translation and published by AIITC."
+      },
+      "rights_verification": {
+        "status": "pending",
+        "evidence_url": "https://www.aiitc.net/en/category/opinion-en/",
+        "notes": "Official publication provenance is established; permission/redistribution terms for republication in Deen Allah still require asset-level verification."
+      },
       "matrix_eligibility": "blocked_pending_verification"
     },
     {
@@ -1081,7 +1092,14 @@
       "original_source_url": null,
       "license_or_permission_evidence": null,
       "text_integrity_status": "pending",
-      "primary_source_verification": "pending",
+      "primary_source_verification": {
+        "status": "primary_source_candidate_identity_pending",
+        "official_url": "https://isengesho.com/en",
+        "evidence_url": "https://www.minijust.gov.rw/index.php?eID=dumpFile&f=77060&t=dumpFile&token=0a72c9f36e0694e727af1c50eeb47f730ca327e3",
+        "country": "Rwanda",
+        "verified_at": "2026-09-22",
+        "notes": "The current Rwanda Muslim Community (RMC) official site identifies the umbrella Muslim organization in Rwanda, while Rwanda's Official Gazette records Rwanda Muslim Community as a legal organization. The QuranEnc edition is labeled 'Rwanda Muslim Association'; exact organizational-name continuity must be confirmed before primary-source verification is upgraded."
+      },
       "rights_verification": "pending",
       "matrix_eligibility": "blocked_pending_verification"
     },
@@ -1164,6 +1182,8 @@
   "summary": {
     "quranenc_bootstrap_editions": 74,
     "quran_foundation_live_editions": 0,
-    "total_materialized_editions": 74
+    "total_materialized_editions": 74,
+    "primary_source_verified_editions": 1,
+    "primary_source_candidate_identity_pending": 1
   }
 }
