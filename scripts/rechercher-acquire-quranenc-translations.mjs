@@ -15,7 +15,7 @@ const LIST_ATTEMPTS = 4;
 
 function classifyNetwork(error) {
   const message = String(error?.message || error || "");
-  return /fetch failed|timeout|timed out|ETIMEDOUT|ECONNRESET|ENETUNREACH|EAI_AGAIN|ENOTFOUND|HTTP 5\\d\\d/i.test(message)
+  return /fetch failed|aborted|abort|timeout|timed out|ETIMEDOUT|ECONNRESET|ENETUNREACH|EAI_AGAIN|ENOTFOUND|HTTP 4\\d\\d|HTTP 5\\d\\d/i.test(message)
     ? "network_unavailable"
     : "source_or_validation_error";
 }
