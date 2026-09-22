@@ -102,7 +102,26 @@
         "developer-data"
       ],
       "apiStatus": "not-yet-verified",
-      "datasetStatus": "official-developer-resources-verified"
+      "datasetStatus": "official-developer-resources-verified",
+      "developerFormats": [
+        "XML",
+        "JSON",
+        "SQL",
+        "CSV",
+        "HTML5",
+        "TXT",
+        "PDF"
+      ],
+      "developerScope": [
+        "Uthmani",
+        "Hafs",
+        "Warsh",
+        "Qalun",
+        "Al-Susi",
+        "Tafsir al-Muyassar",
+        "metadata"
+      ],
+      "provenanceRule": "Do not infer a public API from developer download resources."
     },
     {
       "id": "quranfoundation",
@@ -611,6 +630,48 @@
       "sourceProvenance": "GlobalQuran.com and other attributed sources including Tanzil.net and Quran Academy",
       "rightsStatus": "source-specific; see service terms",
       "corpusWrite": "forbidden-direct",
+      "provenanceRequired": true
+    },
+    {
+      "id": "ksu-ayat",
+      "nameAr": "مشروع المصحف الإلكتروني بجامعة الملك سعود - آيات",
+      "country": "السعودية",
+      "category": "quran",
+      "url": "https://quran.ksu.edu.sa/",
+      "role": "official-institutional-resource",
+      "coverage": [
+        "Hafs",
+        "Warsh",
+        "Tajweed",
+        "colored Tajweed Mushaf",
+        "tafsir",
+        "recitations",
+        "search"
+      ],
+      "access": [
+        "official-web",
+        "institutional-resource"
+      ],
+      "apiStatus": "not-yet-verified",
+      "provenanceNote": "KSU page attributes images to King Fahd Complex, Quran text/translations to Tanzil.net, tafsir to mosshaf.com, and recitations to Verse by Verse Quran."
+    },
+    {
+      "id": "jakim-smart-quran",
+      "nameAr": "Smart Quran - JAKIM",
+      "country": "ماليزيا",
+      "category": "quran",
+      "url": "https://www.islam.gov.my/en/quran-hadith/smart-quran",
+      "role": "official-institutional-app",
+      "coverage": [
+        "Madinah V2 Mushaf",
+        "Malay translation",
+        "English translation",
+        "recitations"
+      ],
+      "access": [
+        "official-app"
+      ],
+      "apiStatus": "not-yet-verified",
       "provenanceRequired": true
     }
   ],
