@@ -1,0 +1,101 @@
+{
+  "registry_version": "2026-09-22",
+  "purpose": "Official Quran API and developer-source discovery for Rechercher. This registry records access capabilities without granting Corpus write authority.",
+  "policy": {
+    "canonical_arabic_text_is_separate_from_translations": true,
+    "api_access_does_not_equal_redistribution_rights": true,
+    "source_identity_does_not_certify_each_item": true,
+    "direct_corpus_write": false,
+    "provenance_required": true,
+    "rights_verification_required": true,
+    "ai_generated_religious_text_forbidden_as_source": true
+  },
+  "verified": [
+    {
+      "id": "quran-foundation-content-api-v4",
+      "provider": "Quran Foundation / Quran.com",
+      "country": "international",
+      "homepage": "https://quran.com/",
+      "documentation": "https://api-docs.quran.com/docs/content_apis_versioned/4.0.0/content-apis/",
+      "access": ["official-api", "official-sdk"],
+      "api_version": "v4",
+      "authentication": "OAuth2 client_credentials",
+      "scope": "content",
+      "production_required": true,
+      "prelive_limit": "Only Al-Fatihah and Al-Baqarah are available for prelive testing",
+      "capabilities": ["quran", "chapters", "verses", "translations", "tafsir", "audio", "recitations", "pages", "juz", "hizb", "ruku", "manzil", "search"],
+      "canonical_text_policy": "Arabic Quran text remains distinct from translations and tafsir",
+      "integration_status": "adapter-present; production credentials/access still require verification",
+      "corpus_write": "forbidden-direct"
+    },
+    {
+      "id": "king-fahd-complex-developer-resources",
+      "provider": "King Fahd Glorious Quran Printing Complex",
+      "country": "SA",
+      "homepage": "https://qurancomplex.gov.sa/",
+      "developer_resources": "https://qurancomplex.gov.sa/en/techquran/dev/",
+      "access": ["official-web", "official-developer-download"],
+      "api_status": "not-verified-as-public-api",
+      "developer_formats": ["JSON", "XML", "SQL", "CSV", "HTML5", "TXT", "PDF"],
+      "coverage": ["Quran text", "Uthmani data", "Hafs", "Warsh", "Qalun", "Al-Susi", "Tafsir al-Muyassar", "Quran metadata"],
+      "integration_status": "developer-data source verified; API endpoint still to be investigated",
+      "corpus_write": "forbidden-direct"
+    }
+  ],
+  "official_institutional_targets": [
+    {
+      "id": "qatar-ministry-quran",
+      "provider": "Qatar Ministry of Awqaf and Islamic Affairs",
+      "country": "QA",
+      "homepage": "https://alquran.islam.gov.qa/",
+      "known_resource": "https://alquran.islam.gov.qa/droos/Sections.html",
+      "access": ["official-web"],
+      "api_status": "not-yet-verified",
+      "dataset_status": "not-yet-verified",
+      "role": ["quran", "tajweed", "recitation", "education"]
+    },
+    {
+      "id": "ksu-ayat",
+      "provider": "King Saud University Ayat",
+      "country": "SA",
+      "homepage": "https://quran.ksu.edu.sa/",
+      "access": ["official-web"],
+      "api_status": "not-yet-verified",
+      "role": ["quran", "mushaf-images", "translations", "tafsir", "recitations", "Warsh"]
+    }
+  ],
+  "country_search_queue": [
+    {"country":"SA","priority":"high","targets":["King Fahd Complex","Ministry of Islamic Affairs","King Saud University","Islamic University of Madinah","Imam Muhammad ibn Saud Islamic University"]},
+    {"country":"QA","priority":"high","targets":["Ministry of Awqaf Quran services","AlQuran","Quran lessons"]},
+    {"country":"KW","priority":"medium","targets":["Ministry of Awqaf","Kuwait National Library","Islamic manuscripts/library services"]},
+    {"country":"AE","priority":"medium","targets":["General Authority of Islamic Affairs and Endowments","UAE Quran services"]},
+    {"country":"BH","priority":"medium","targets":["Ministry of Justice Islamic Affairs and Waqf Quran services"]},
+    {"country":"OM","priority":"medium","targets":["Ministry of Endowments and Religious Affairs Quran services"]},
+    {"country":"JO","priority":"medium","targets":["Ministry of Awqaf Quran services","Jordanian official Quran resources"]},
+    {"country":"EG","priority":"medium","targets":["Al-Azhar","Ministry of Awqaf Quran services","Egyptian Quran digitization resources"]},
+    {"country":"MA","priority":"medium","targets":["Ministry of Endowments and Islamic Affairs","Mohammed VI Institute Quran resources"]},
+    {"country":"DZ","priority":"medium","targets":["Ministry of Religious Affairs and Wakfs","Algerian Quran resources"]},
+    {"country":"TN","priority":"medium","targets":["Ministry of Religious Affairs Quran resources"]},
+    {"country":"TR","priority":"medium","targets":["Diyanet Quran services"]},
+    {"country":"MY","priority":"medium","targets":["JAKIM Quran services","official Quran datasets/APIs"]},
+    {"country":"ID","priority":"medium","targets":["Ministry of Religious Affairs Quran services","official Quran datasets/APIs"]},
+    {"country":"PK","priority":"medium","targets":["Ministry/religious institutions Quran digital resources","official Quran datasets/APIs"]}
+  ],
+  "required_record_fields": [
+    "source_id",
+    "country",
+    "provider",
+    "official_url",
+    "access_type",
+    "api_status",
+    "authentication",
+    "rate_limits",
+    "terms_url",
+    "rights_status",
+    "content_scope",
+    "language_or_qiraat_scope",
+    "provenance_policy",
+    "corpus_write_policy",
+    "last_verified_at"
+  ]
+}
