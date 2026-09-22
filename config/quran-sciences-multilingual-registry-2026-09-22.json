@@ -488,5 +488,79 @@
     "ai_rule": "AI may assist indexing, matching and discovery, but may not generate or silently retranslate an authoritative Quran translation.",
     "corpus_write_policy": "forbidden-direct",
     "verification_status": "official-documentation-contract-verified; individual edition/resource rights and provenance verification remains required"
+  },
+  "translation_network_policy": {
+    "objective": "Expand Quran translation coverage beyond the currently observed Quran Foundation inventory without using AI-generated Quran translations.",
+    "priority_order": [
+      "official_or_governmental_ Islamic_institutional_translation",
+      "QuranEnc_verified_translation_edition",
+      "other_primary_source_or_scholarly_translation_with_explicit_provenance",
+      "AI_only_discovery_or_matching; never authoritative translation"
+    ],
+    "quran_foundation": {
+      "role": "primary API service where its translation editions are available",
+      "observed_unique_translation_languages": 12,
+      "rule": "Do not treat this inventory as the global language ceiling."
+    },
+    "quranenc": {
+      "service_id": "quranenc-translations-api-v1",
+      "source_url": "https://quranenc.com",
+      "api_base": "https://quranenc.com/api/v1",
+      "translation_catalog_endpoint": "/translations/list",
+      "language_filter_endpoint": "/translations/list/{language}",
+      "translation_sura_endpoint": "/translation/sura/{translation_key}/{sura_number}",
+      "translation_ayah_endpoint": "/translation/aya/{translation_key}/{sura_number}/{aya_number}",
+      "verified_capability": "official API documentation exposes a catalog of available translation editions and language filtering.",
+      "current_public_scope": "QuranEnc currently advertises 80+ languages; this is a discovery/availability statement, not a claim that every advertised language has a complete translation.",
+      "coverage_rule": "Enumerate actual translation editions from the catalog endpoint; never infer coverage from the language directory alone.",
+      "integrity_rule": "Preserve the source translation and footnotes unchanged; retain translation key/version/last_update and source attribution.",
+      "rights_rule": "QuranEnc states that translation content may be downloaded/re-published subject to its terms; each acquired edition must retain the applicable version and attribution requirements.",
+      "ai_rule": "No AI-generated or AI-retranslated Quran translation may be inserted when a verified source translation is unavailable."
+    },
+    "official_country_translation_program": {
+      "role": "Search and verify translations issued or formally supervised by ministries, national Quran complexes, official Islamic affairs bodies, universities, and recognized scholarly institutions in Muslim-majority countries.",
+      "verification_rule": "A country is not marked covered until a primary institutional source identifies the translation, language, edition/resource, responsible institution and provenance.",
+      "priority_countries": [
+        "SA",
+        "TR",
+        "ID",
+        "MY",
+        "PK",
+        "BD",
+        "EG",
+        "JO",
+        "MA",
+        "DZ",
+        "TN",
+        "AE",
+        "QA",
+        "KW",
+        "OM",
+        "BH"
+      ],
+      "known_verified_example": {
+        "country": "ID",
+        "institution": "Ministry of Religious Affairs of the Republic of Indonesia",
+        "translation": "Indonesian Translation - Ministry of Religious Affairs",
+        "source": "QuranEnc",
+        "status": "source-edition-verified; institutional provenance identified",
+        "note": "QuranEnc identifies the edition as issued by Indonesia's Ministry of Religious Affairs and developed under supervision of the Rowwad Translation Center."
+      },
+      "api_rule": "An institutional website or application is not labeled as a public API unless its official documentation exposes an API contract."
+    },
+    "coverage_states": [
+      "verified_official_institutional_translation",
+      "verified_quranenc_translation",
+      "verified_scholarly_translation",
+      "candidate_requires_primary_source_verification",
+      "language_present_but_translation_not_verified",
+      "no_verified_translation_found"
+    ],
+    "forbidden_states": [
+      "ai_generated_authoritative_translation",
+      "ai_retranslation_of_vetted_translation",
+      "language_directory_equals_translation_coverage"
+    ],
+    "133x24_rule": "For each language/content cell, use an individually identified translation edition and source. If none exists, record the gap; do not synthesize a translation."
   }
 }
