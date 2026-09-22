@@ -197,7 +197,9 @@
     "provenance_required_per_item": true,
     "language_coverage_must_be_edition_level": true,
     "ten_qiraat_must_be_individually_verified": true,
-    "no_ai_substitution_for_missing_religious_sources": true
+    "no_ai_substitution_for_missing_religious_sources": true,
+    "no_api_claim_without_endpoint_contract": true,
+    "provenance_must_follow_actual_upstream": true
   },
   "last_updated": "2026-09-22",
   "api_surface_expansion": {
@@ -265,6 +267,63 @@
         "access_note": "Free/keyless with soft per-IP rate limiting; higher-throughput/full-corpus mirror use should follow the service's contact/fair-use process."
       }
     ],
-    "integration_rule": "API contracts remain service-layer records. Each content edition/reading/translation remains independently provenance- and rights-verified before acquisition or Corpus admission."
+    "integration_rule": "API contracts remain service-layer records. Each content edition/reading/translation remains independently provenance- and rights-verified before acquisition or Corpus admission.",
+    "institutional_resource_verification": [
+      {
+        "id": "king-fahd-digital-mushaf-formats",
+        "provider": "King Fahd Glorious Quran Printing Complex",
+        "status": "official-developer-data-verified",
+        "api_status": "not-verified-as-public-api",
+        "formats": [
+          "XML",
+          "JSON",
+          "SQL",
+          "CSV",
+          "HTML5",
+          "TXT",
+          "PDF"
+        ],
+        "verified_scope": [
+          "Uthmani Quran text",
+          "Hafs",
+          "Warsh",
+          "Qalun",
+          "Al-Susi",
+          "Tafsir al-Muyassar",
+          "metadata"
+        ],
+        "provenance_note": "Official complex technical guide documents digital Quran formats and developer-oriented resources; do not convert these downloads into an API claim."
+      },
+      {
+        "id": "ksu-ayat",
+        "provider": "King Saud University - Ayat Electronic Quran Project",
+        "status": "official-institutional-resource-verified",
+        "api_status": "not-verified-as-public-api",
+        "verified_scope": [
+          "Hafs",
+          "Warsh",
+          "Tajweed",
+          "colored Tajweed Mushaf",
+          "tafsir",
+          "recitations",
+          "search"
+        ],
+        "provenance_note": "KSU page explicitly attributes Quran images to King Fahd Complex, Quran text/translations to Tanzil.net, tafsir to mosshaf.com, and recitation audio to Verse by Verse Quran; therefore KSU must not be represented as the upstream source for those assets."
+      },
+      {
+        "id": "jakim-smart-quran",
+        "provider": "JAKIM / Smart Quran",
+        "country": "MY",
+        "status": "official-institutional-app-verified",
+        "api_status": "not-verified-as-public-api",
+        "verified_scope": [
+          "Madinah V2 Mushaf",
+          "Malay translation",
+          "English translation",
+          "recitations"
+        ],
+        "provenance_note": "Official JAKIM page documents the approved Smart Quran application and named reciters; no public API contract was verified in this scan."
+      }
+    ]
   }
 }
