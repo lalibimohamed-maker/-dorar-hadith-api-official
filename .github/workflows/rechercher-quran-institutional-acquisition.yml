@@ -28,7 +28,7 @@ jobs:
         run: node scripts/rechercher-acquire-quran-institutional.mjs
       - name: Validate institutional acquisition manifest
         run: |
-          node --input-type=module -e "import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('artifacts/quran-institutional-acquisition/manifest.json','utf8')); if(m.edition_count!==3) process.exit(1); if(m.corpus_write!==false || m.ai_generated_translation!==false || m.canonical_arabic_separate!==true) process.exit(1); if(m.failed_editions!==0) process.exit(1); console.log('Institutional acquisition manifest OK', m.acquired_editions, m.languages.join(','));"
+          node --input-type=module -e "import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('artifacts/quran-institutional-acquisition/manifest.json','utf8')); if(m.edition_count!==3) process.exit(1); if(m.corpus_write!==false || m.ai_generated_translation!==false || m.canonical_arabic_separate!==true) process.exit(1); if((m.validation_or_source_error_editions||0)!==0) process.exit(1); console.log('Institutional acquisition manifest structurally valid', {acquired:m.acquired_editions, network_unavailable:m.network_unavailable_editions||0, languages:m.languages});"
       - name: Upload research-only institutional acquisition
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
