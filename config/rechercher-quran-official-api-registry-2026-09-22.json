@@ -1094,5 +1094,67 @@
     "sync_rule": "Use official Content Sync/resource snapshots where available instead of repeatedly rebuilding a local copy from ad-hoc requests.",
     "ai_rule": "AI may assist indexing, matching and discovery only; it cannot generate or replace Quran text, translations, tafsir or qiraat as authoritative source content.",
     "verification_status": "official-documentation-verified"
+  },
+  "translation_expansion_contract": {
+    "goal": "Expand Quran translation acquisition beyond the current Quran Foundation inventory using primary institutional and verified QuranEnc editions; never use AI as a translation source.",
+    "services": [
+      {
+        "service_id": "quranenc-translations-api-v1",
+        "provider": "QuranEnc",
+        "source_url": "https://quranenc.com",
+        "api_base": "https://quranenc.com/api/v1",
+        "endpoint_contract": {
+          "list_all": "/translations/list",
+          "list_by_language": "/translations/list/{language}",
+          "sura": "/translation/sura/{translation_key}/{sura_number}",
+          "ayah": "/translation/aya/{translation_key}/{sura_number}/{aya_number}"
+        },
+        "status": "official-api-documentation-verified",
+        "scope": "translation edition catalog and Quran meaning translations",
+        "coverage_rule": "Catalog enumeration is authoritative for actual available editions; language directories alone are not proof of a translation.",
+        "integrity_rule": "Preserve translation text, footnotes, translation key, version and last_update; no automatic retranslation.",
+        "rights_rule": "Follow QuranEnc terms/policies and retain required publisher/source/version attribution per edition.",
+        "ai_rule": "AI is discovery/matching only and cannot author, replace or retranslate an authoritative Quran translation.",
+        "language_scope_note": "QuranEnc currently advertises 80+ languages; the registry must enumerate actual editions and not convert that headline into an 80+ complete-translation claim."
+      }
+    ],
+    "institutional_translation_priority": {
+      "rule": "Prefer translations issued or formally supervised by ministries, national Quran complexes, official Islamic affairs bodies, universities and recognized scholarly institutions when a primary source can verify the edition.",
+      "priority_countries": [
+        "SA",
+        "TR",
+        "ID",
+        "MY",
+        "PK",
+        "BD",
+        "EG",
+        "JO",
+        "MA",
+        "DZ",
+        "TN",
+        "AE",
+        "QA",
+        "KW",
+        "OM",
+        "BH"
+      ],
+      "example_verified": {
+        "country": "ID",
+        "institution": "Ministry of Religious Affairs of the Republic of Indonesia",
+        "source": "QuranEnc",
+        "status": "verified edition provenance",
+        "translation": "Indonesian Translation - Ministry of Religious Affairs"
+      },
+      "api_constraint": "Institutional website/app presence does not imply an API. API status requires official endpoint documentation."
+    },
+    "translation_admission_states": [
+      "verified_official_institutional_translation",
+      "verified_quranenc_translation",
+      "verified_scholarly_translation",
+      "candidate_requires_primary_source_verification",
+      "language_present_but_translation_not_verified",
+      "no_verified_translation_found"
+    ],
+    "forbidden": "AI-generated Quran translation as authoritative source"
   }
 }
