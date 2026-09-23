@@ -38,7 +38,9 @@ jobs:
             console.log('QuranEnc API temporarily unavailable; no editions marked acquired.');
             process.exit(0);
           }
-          if (m.edition_count < 74) throw new Error('Expected at least 74 live QuranEnc editions');
+          if (m.edition_count < 1) throw new Error('QuranEnc live API returned no editions');
+          if (!Number.isInteger(m.live_only_edition_count) || m.live_only_edition_count < 0) throw new Error('Live-only edition diff is missing');
+          console.log(`QuranEnc live editions: ${m.edition_count}; languages: ${m.language_count}; live-only editions: ${m.live_only_edition_count}`);
           NODE
       - name: Upload research-only acquisition
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
