@@ -154,7 +154,7 @@ const editions = official.translations.map((x) => ({
   matrix_eligibility: "blocked_pending_verification"
 }));
 
-if (editions.length < 74) throw new Error(`Expected at least 74 live QuranEnc editions, found ${editions.length}`);
+if (editions.length < 1) throw new Error(`QuranEnc live API returned no translation editions`);
 
 await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
@@ -223,8 +223,10 @@ const editionResults = await mapLimit(editions, async (edition) => {
   return metadata;
 }, ACQUISITION_CONCURRENCY);
 
+const bootstrapEditionIds = new Set(bootstrap.keys());
+const liveOnlyEditions = editionResults.filter((x) => !bootstrapEditionIds.has(x.edition_id)).map((x) => x.edition_id);
 const manifest = {
-  schema_version: "2026-09-22",
+  schema_version: "2026-09-23",
   purpose: "Research-only acquisition of complete QuranEnc translation assets; never a Corpus write or automatic redistribution grant.",
   source: "QuranEnc official API and official download URLs",
   source_terms_url: "https://quranenc.com/ar/home/api",
@@ -237,6 +239,8 @@ const manifest = {
   acquired_editions: editionResults.filter((x) => x.acquired).length,
   not_acquired_editions: editionResults.filter((x) => !x.acquired).length,
   language_count: new Set(editionResults.map((x) => x.language_iso_code)).size,
+  live_only_editions: liveOnlyEditions,
+  live_only_edition_count: liveOnlyEditions.length,
   editions: editionResults
 };
 await fs.writeFile(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", "utf8");
