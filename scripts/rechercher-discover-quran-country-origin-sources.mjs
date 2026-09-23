@@ -7,6 +7,16 @@ const CONFIG=path.join(ROOT,"config/quran-country-origin-source-registry-2026-09
 const OUT=path.join(ROOT,"artifacts/quran-country-origin-source-discovery");
 const TIMEOUT_MS=20000;
 
+const TRUSTED_DISCOVERY_URLS = Object.freeze({
+  "bd-quran-gov-bd": ["https://quran.gov.bd/", "https://quran.gov.bd/home/ebook_download.html"],
+  "tr-diyanet-kuran": ["https://kuran.diyanet.gov.tr/", "https://kuran.diyanet.gov.tr/Yayinlar", "https://dijital.diyanet.gov.tr/Kitaplik/kuran-kitapligi"],
+  "id-kemenag-lajnah": ["https://pustakalajnah.kemenag.go.id/", "https://lajnah.kemenag.go.id/info-lpmq/unduhan/terjemah-al-quran.html"],
+  "ma-ministry-habous-mohammedan-mushaf": ["https://habous.gov.ma/fr/component/content/article/6558-la-mise-en-ligne-de-al-moshaf-almohammadi.html"],
+  "my-jakim-smart-quran": ["https://www.islam.gov.my/ms/quran-hadith/smart-quran"],
+  "ir-moshaf-quran-publishing-center": ["https://moshaf.org/", "https://moshaf.org/fa/about/", "https://shop.moshaf.org/product/search/brand/168-quran-publishing-center-%D9%85%D8%B1%D9%83%D8%B2-%D8%B7%D8%A8%D8%B9-%D9%88-%D9%86%D8%B4%D8%B1-%D9%82%D8%B1%D8%A2%D9%86-%DA%A9%D8%B1%DB%8C%D9%85"],
+  "sa-kfgqpc-country-origin": ["https://qurancomplex.gov.sa/en/kfgqpc/kfq-structure/"]
+});
+
 async function probe(url){
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),TIMEOUT_MS);
@@ -24,7 +34,8 @@ await fs.mkdir(OUT,{recursive:true});
 const sources=[];
 for(const source of config.sources){
   const probes=[];
-  for(const url of source.discovery_urls) probes.push(await probe(url));
+  const urls = TRUSTED_DISCOVERY_URLS[source.source_id] || [];
+  for(const url of urls) probes.push(await probe(url));
   sources.push({...source,probes});
 }
 const manifest={
