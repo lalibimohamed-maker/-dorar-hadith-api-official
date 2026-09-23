@@ -2,6 +2,9 @@ name: Rechercher — official institutional Quran translation acquisition
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'rechercher-quran-official-api-registry-2026-09-22'
 
 permissions:
   contents: read
