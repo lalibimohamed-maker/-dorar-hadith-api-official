@@ -12,7 +12,7 @@ permissions:
 jobs:
   acquire-kfgqpc-official:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -22,6 +22,8 @@ jobs:
           node-version: 24
       - name: Acquire official KFGQPC assets
         run: node scripts/rechercher-acquire-kfgqpc-official.mjs
+        env:
+          KFGQPC_CONCURRENCY: 3
       - name: Validate KFGQPC acquisition manifest
         run: |
           node --input-type=module <<'NODE'
