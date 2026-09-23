@@ -50,8 +50,18 @@
         "kind": "explicit-redistribution-permission",
         "scope": "translated_content",
         "evidence_url": "https://hadeethenc.com/en/",
-        "exclude_language_iso": ["ar"],
-        "conditions": ["no-modification-addition-or-deletion","publisher-and-source-attribution","version-number","retain-transcript-information","notify-source-of-translation-notes","update-to-latest-source-version","no-inappropriate-advertising"]
+        "exclude_language_iso": [
+          "ar"
+        ],
+        "conditions": [
+          "no-modification-addition-or-deletion",
+          "publisher-and-source-attribution",
+          "version-number",
+          "retain-transcript-information",
+          "notify-source-of-translation-notes",
+          "update-to-latest-source-version",
+          "no-inappropriate-advertising"
+        ]
       }
     },
     {
@@ -127,8 +137,18 @@
         "kind": "explicit-redistribution-permission",
         "scope": "translated_content",
         "evidence_url": "https://quranenc.com/en/home",
-        "exclude_language_iso": ["ar"],
-        "conditions": ["no-modification-addition-or-deletion","publisher-and-source-attribution","version-number","retain-transcript-information","notify-source-of-translation-notes","update-to-latest-source-version","no-inappropriate-advertising"]
+        "exclude_language_iso": [
+          "ar"
+        ],
+        "conditions": [
+          "no-modification-addition-or-deletion",
+          "publisher-and-source-attribution",
+          "version-number",
+          "retain-transcript-information",
+          "notify-source-of-translation-notes",
+          "update-to-latest-source-version",
+          "no-inappropriate-advertising"
+        ]
       }
     },
     {
@@ -340,6 +360,88 @@
         "book_release_metadata": "/api/books/{bookId}"
       },
       "verification": "Open-source Shamela v4 connector contract verified: master metadata uses version and book metadata uses major_release/minor_release; live runtime requires a Shamela API key and configured endpoint access"
+    },
+    {
+      "id": "kfgqpc",
+      "name": "King Fahd Glorious Quran Printing Complex",
+      "base_url": "https://qurancomplex.gov.sa/",
+      "origins": [
+        "https://qurancomplex.gov.sa",
+        "https://epub.qurancomplex.gov.sa",
+        "https://download.qurancomplex.gov.sa"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "quran-sciences",
+        "pdf",
+        "download"
+      ],
+      "authority": "official_quran_institution",
+      "runtime": "public",
+      "status": "enabled",
+      "release_policy": "Verify item-level redistribution rights at acquisition time; prefer official Complex-hosted assets."
+    },
+    {
+      "id": "tanzil",
+      "name": "Tanzil Quran Project",
+      "base_url": "https://tanzil.net/",
+      "origins": [
+        "https://tanzil.net"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "metadata",
+        "pdf",
+        "download"
+      ],
+      "authority": "quran_text_and_translation_source",
+      "runtime": "public",
+      "status": "enabled",
+      "release_policy": "Preserve Tanzil attribution and apply the stated terms; verify translation-specific rights before redistribution."
+    },
+    {
+      "id": "ksu-ayat",
+      "name": "King Saud University Ayat",
+      "base_url": "https://quran.ksu.edu.sa/",
+      "origins": [
+        "https://quran.ksu.edu.sa"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "tafsir",
+        "recitations",
+        "pdf",
+        "download"
+      ],
+      "authority": "official_university_quran_project",
+      "runtime": "public",
+      "status": "enabled",
+      "release_policy": "Verify item-level rights before public redistribution."
+    },
+    {
+      "id": "quran-foundation",
+      "name": "Quran Foundation Content API",
+      "base_url": "https://api-docs.quran.foundation/",
+      "origins": [
+        "https://api-docs.quran.foundation",
+        "https://api.quran.com",
+        "https://apis.quran.foundation"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "tafsir",
+        "api",
+        "metadata"
+      ],
+      "authority": "primary_quran_api",
+      "runtime": "api-key-or-public-docs",
+      "api_auth": "required_for_content",
+      "status": "enabled",
+      "release_policy": "Use official API/content terms and credentials where required; API access is not itself redistribution permission."
     }
   ],
   "runtime_policy": {
@@ -348,6 +450,7 @@
     "canonical_arabic_separate": true,
     "ai_is_not_a_religious_source": true,
     "shamela_api_key_must_never_be_committed": true,
-    "discovery_and_content_connector_are_distinct": true
+    "discovery_and_content_connector_are_distinct": true,
+    "source_enumeration_for_acquisition": "All active source adapters relevant to a matrix cell must be inspected; PDF capability is discovered from the source at runtime and is not used as a prefilter."
   }
 }
