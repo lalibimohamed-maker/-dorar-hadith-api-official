@@ -74,6 +74,7 @@ function candidatesFromHtml(html, baseUrl) {
 }
 
 const config = JSON.parse(await fs.readFile(CONFIG, "utf8"));
+const seenSha256 = new Map();
 await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
 
@@ -101,6 +102,7 @@ async function acquireEdition(edition) {
   }
 
   // Do not truncate official candidates: every discovered official asset URL must be tested.
+  const assetUrls = [...discovered];
   for (const assetUrl of assetUrls) {
     const temp = path.join(OUT, `.asset-${crypto.randomBytes(8).toString("hex")}`);
     try {
@@ -108,12 +110,22 @@ async function acquireEdition(edition) {
       await curlToFile(assetUrl, temp, 120);
       const meta = await sha256AndSignature(temp);
       if (meta.bytes > edition.max_bytes) throw new Error("asset exceeds configured size cap");
+      const duplicateOf = seenSha256.get(meta.sha256);
+      if (duplicateOf) {
+        result.acquired = {asset_url:assetUrl,path:duplicateOf.path,...meta,transport:"curl-official",deduplicated:true,duplicate_of:duplicateOf.edition_id};
+        result.status = "acquired_research_only";
+        result.candidates.push({asset_url:assetUrl,status:"duplicate_sha256",sha256:meta.sha256,duplicate_of:duplicateOf.edition_id});
+        await fs.rm(temp,{force:true});
+        break;
+      }
       const ext = meta.signature === "pdf" ? ".pdf" : meta.signature === "rar" ? ".rar" : ".epub";
       const dir = path.join(OUT, language, editionId);
       await fs.mkdir(dir,{recursive:true});
       const file = path.join(dir, editionId + ext);
       await fs.rename(temp,file);
-      result.acquired = {asset_url:assetUrl,path:path.relative(ROOT,file),...meta,transport:"curl-official"};
+      const relativePath = path.relative(ROOT,file);
+      seenSha256.set(meta.sha256,{edition_id:editionId,path:relativePath});
+      result.acquired = {asset_url:assetUrl,path:relativePath,...meta,transport:"curl-official"};
       result.status = "acquired_research_only";
       break;
     } catch (e) {
