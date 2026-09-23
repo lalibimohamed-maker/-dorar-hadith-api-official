@@ -1,0 +1,206 @@
+{
+  "schema": "rechercher/quran-unified-inventory/v1",
+  "generated_at": "2026-09-23",
+  "purpose": "Cross-PR reconciliation inventory for Quran translation assets from PR #541 and PR #558. This is a System-layer evidence ledger; it does not write to Corpus.",
+  "rules": {
+    "language_overlap_is_not_file_duplicate": true,
+    "physical_deduplication_requires_exact_sha256": true,
+    "rights_required_before_public_redistribution": true,
+    "corpus_write": false,
+    "ai_generated_translation": false,
+    "canonical_arabic_separate": true,
+    "sha256_unknown_must_not_be_invented": true
+  },
+  "sources": [
+    {
+      "pr": 541,
+      "role": "matrix acquisition",
+      "known_pdf_count": 44,
+      "known_language_count": 22,
+      "storage": "dinullah-matrix-3192-storage-01 Releases",
+      "sha256_status": "not yet reconciled from physical assets"
+    },
+    {
+      "pr": 558,
+      "role": "Quran source/API acquisition",
+      "quranenc_catalog_editions": 74,
+      "quranenc_catalog_languages": 55,
+      "institutional_acquired_editions": 3,
+      "institutional_languages": [
+        "bn",
+        "tr",
+        "id"
+      ],
+      "storage": "GitHub Actions artifacts; not yet promoted to durable Releases",
+      "sha256_status": "pending artifact extraction"
+    }
+  ],
+  "reconciliation": {
+    "catalog_level_assets": 121,
+    "formula": "44 + 74 + 3 = 121",
+    "prior_run_reported_quranenc_acquired_editions": 75,
+    "discrepancy": "QuranEnc catalog snapshot records 74 editions, while an earlier acquisition result reported 75 acquired editions. This must be resolved from the exact workflow artifact before declaring the physical total.",
+    "previously_reported_physical_total_if_75_is_confirmed": 122,
+    "unique_language_union": 56,
+    "language_overlap_between_541_and_558": 22,
+    "new_languages_from_558_over_541": 34
+  },
+  "p541_languages": [
+    [
+      "am",
+      "Amharic",
+      1
+    ],
+    [
+      "as",
+      "Assamese",
+      2
+    ],
+    [
+      "az",
+      "Azerbaijani",
+      2
+    ],
+    [
+      "bs",
+      "Bosnian",
+      2
+    ],
+    [
+      "zh",
+      "Chinese",
+      2
+    ],
+    [
+      "nl",
+      "Dutch",
+      2
+    ],
+    [
+      "fr",
+      "French",
+      3
+    ],
+    [
+      "de",
+      "German",
+      2
+    ],
+    [
+      "ja",
+      "Japanese",
+      1
+    ],
+    [
+      "lt",
+      "Lithuanian",
+      2
+    ],
+    [
+      "mk",
+      "Macedonian",
+      1
+    ],
+    [
+      "pt",
+      "Portuguese",
+      2
+    ],
+    [
+      "ro",
+      "Romanian",
+      2
+    ],
+    [
+      "sr",
+      "Serbian",
+      2
+    ],
+    [
+      "es",
+      "Spanish",
+      2
+    ],
+    [
+      "sw",
+      "Swahili",
+      2
+    ],
+    [
+      "tl",
+      "Tagalog",
+      3
+    ],
+    [
+      "te",
+      "Telugu",
+      3
+    ],
+    [
+      "tr",
+      "Turkish",
+      2
+    ],
+    [
+      "uz",
+      "Uzbek",
+      3
+    ],
+    [
+      "vi",
+      "Vietnamese",
+      2
+    ],
+    [
+      "yo",
+      "Yoruba",
+      1
+    ]
+  ],
+  "p558_new_languages": [
+    "aa",
+    "ak",
+    "bn",
+    "ceb",
+    "en",
+    "fa",
+    "ff",
+    "gu",
+    "ha",
+    "hi",
+    "hr",
+    "id",
+    "km",
+    "kn",
+    "ku",
+    "ky",
+    "ln",
+    "ml",
+    "mdh",
+    "mos",
+    "nqo",
+    "om",
+    "pa",
+    "ps",
+    "rn",
+    "rw",
+    "si",
+    "so",
+    "sq",
+    "ta",
+    "tg",
+    "th",
+    "ug",
+    "ur"
+  ],
+  "next_reconciliation": [
+    "Download the exact QuranEnc acquisition artifact and institutional artifact from the successful #558 workflow run.",
+    "Extract every PDF filename, byte size and SHA-256.",
+    "Obtain the #541 44-PDF physical release inventory and hash every asset.",
+    "Join all rows by exact SHA-256; only exact SHA matches are physical duplicates.",
+    "For same-language/different-SHA rows retain both editions and provenance.",
+    "Classify rights before any promotion from #558 artifacts to durable Releases.",
+    "Publish the final deduplicated inventory as a System evidence manifest, then map eligible rows to #541 matrix cells."
+  ],
+  "status": "reconciliation_pending_exact_physical_hashes"
+}
