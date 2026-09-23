@@ -2,11 +2,6 @@ name: Rechercher — Quran multilingual translation acquisition
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "config/quran-multisource-translation-catalog-2026-09-22.json"
-      - "scripts/rechercher-acquire-quranenc-translations.mjs"
-      - ".github/workflows/rechercher-quran-translation-acquisition.yml"
 
 permissions:
   contents: read
