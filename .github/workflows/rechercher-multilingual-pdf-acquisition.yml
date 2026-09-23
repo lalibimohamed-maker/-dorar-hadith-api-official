@@ -213,19 +213,54 @@ jobs:
               for row in rows: fp.write("\t".join(map(str,row))+"\n")
           print(f"PUBLIC_RELEASE_INPUTS pdfs={len(rows)}")
           PY
+          # Global SHA-256 release deduplication: inspect every existing Release asset digest
+          # before creating a new release. GitHub exposes the asset digest on the Releases API.
+          declare -A existing_sha=()
+          while IFS=$'\t' read -r digest release_tag asset_name; do
+            [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
+          done < <(
+            gh api --paginate \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/$MATRIX_STORAGE_REPO/releases?per_page=100" \
+              --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
+          )
+          echo "MATRIX_EXISTING_SHA_COUNT=${#existing_sha[@]}"
+
           mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f -name '*.pdf' -print | sort)
           total="${#assets[@]}"
           if [ "$total" -eq 0 ]; then
             echo "No public redistributable PDFs to persist."
             exit 0
           fi
+
+          new_assets=()
+          duplicate_count=0
+          for file in "${assets[@]}"; do
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            digest="sha256:$sha"
+            if [ -n "${existing_sha[$digest]+x}" ]; then
+              echo "MATRIX_DEDUP_SKIP sha256=$sha existing=${existing_sha[$digest]} file=$(basename "$file")"
+              duplicate_count=$((duplicate_count+1))
+              continue
+            fi
+            new_assets+=( "$file" )
+          done
+          total_new="${#new_assets[@]}"
+          echo "MATRIX_RELEASE_INPUTS total=$total new=$total_new duplicates_skipped=$duplicate_count"
+          if [ "$total_new" -eq 0 ]; then
+            echo "MATRIX_RELEASE_NOOP all_public_pdfs_already_persisted=true"
+            rm -rf "$release_root"
+            exit 0
+          fi
+
           max_assets=900
           part=0
-          for ((i=0; i<total; i+=max_assets)); do
+          total_releases=0
+          for ((i=0; i<total_new; i+=max_assets)); do
             part=$((part+1))
             tag="rechercher-multilingual-public-${GITHUB_RUN_ID}-$(printf '%03d' "$part")"
             end=$((i+max_assets))
-            if [ "$end" -gt "$total" ]; then end="$total"; fi
+            if [ "$end" -gt "$total_new" ]; then end="$total_new"; fi
             notes="$release_root/notes-${part}.md"
             {
               echo "# Rechercher public multilingual PDF matrix"
@@ -234,12 +269,25 @@ jobs:
               echo "Only manifest entries classified as public are included."
               echo "Canonical plaintext PDFs only; no LFS and no encrypted PDF artifacts."
               echo "Asset count: $((end-i))."
+              echo "Global SHA-256 deduplication is enforced against all existing Releases before upload."
             } > "$notes"
             gh release create "$tag" --repo "$MATRIX_STORAGE_REPO" --title "Rechercher multilingual public PDFs — part $part" --notes-file "$notes" --latest=false
             for ((j=i; j<end; j++)); do
-              gh release upload "$tag" "${assets[$j]}" --repo "$MATRIX_STORAGE_REPO"
+              file="${new_assets[$j]}"
+              sha="$(sha256sum "$file" | awk '{print $1}')"
+              digest="sha256:$sha"
+              if gh api --silent --fail "/repos/$MATRIX_STORAGE_REPO/releases" >/dev/null 2>&1; then
+                if gh api --paginate -H "Accept: application/vnd.github+json" "/repos/$MATRIX_STORAGE_REPO/releases?per_page=100" \
+                  --jq '.[] | .assets[]? | .digest // empty' | grep -Fxq "$digest"; then
+                  echo "MATRIX_DEDUP_RACE_SKIP sha256=$sha file=$(basename "$file")"
+                  continue
+                fi
+              fi
+              gh release upload "$tag" "$file" --repo "$MATRIX_STORAGE_REPO"
+              echo "MATRIX_PDF_UPLOADED sha256=$sha file=$(basename "$file") tag=$tag"
             done
             gh release view "$tag" --repo "$MATRIX_STORAGE_REPO" --json tagName,isDraft,assets,url
+            total_releases=$((total_releases+1))
             echo "MATRIX_PDF_RELEASE_OK part=$part assets=$((end-i)) tag=$tag"
           done
           rm -rf "$release_root"
