@@ -12,6 +12,25 @@ const MAX_FILE_BYTES = 300 * 1024 * 1024;
 
 const REQUEST_TIMEOUT_MS = 45000;
 const LIST_ATTEMPTS = 4;
+const QURANENC_HOSTS = new Set(["quranenc.com", "www.quranenc.com"]);
+
+function trustedQuranEncUrl(rawUrl) {
+  const parsed = new URL(rawUrl);
+  if (parsed.protocol !== "https:" || !QURANENC_HOSTS.has(parsed.hostname.toLowerCase()) || parsed.username || parsed.password || (parsed.port && parsed.port !== "443")) {
+    throw new Error("download URL is outside the fixed QuranEnc HTTPS origin allowlist");
+  }
+  if (parsed.pathname.includes("..") || /[\u0000-\u001f\u007f]/.test(parsed.pathname + parsed.search)) {
+    throw new Error("download URL contains unsafe path characters");
+  }
+  return parsed.toString();
+}
+
+function safeSegment(value, label) {
+  if (typeof value !== "string" || !/^[A-Za-z0-9._-]+$/.test(value) || value === "." || value === "..") {
+    throw new Error(`unsafe ${label}`);
+  }
+  return value;
+}
 
 function classifyNetwork(error) {
   const message = String(error?.message || error || "");
@@ -38,7 +57,8 @@ async function getJson(url, attempts = LIST_ATTEMPTS) {
 }
 
 async function getBinary(url) {
-  const response = await fetch(url, { headers: { accept: "application/octet-stream,*/*" } });
+  const trustedUrl = trustedQuranEncUrl(url);
+  const response = await fetch(trustedUrl, { headers: { accept: "application/octet-stream,*/*" } });
   if (!response.ok) throw new Error(`${response.status} ${url}`);
   const length = Number(response.headers.get("content-length") || 0);
   if (length > MAX_FILE_BYTES) throw new Error(`response exceeds ${MAX_FILE_BYTES} bytes`);
@@ -139,7 +159,9 @@ await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
 
 const editionResults = await mapLimit(editions, async (edition) => {
-  const dir = path.join(OUT, "editions", edition.language_iso_code || "unknown", edition.edition_id);
+  const language = safeSegment(edition.language_iso_code || "unknown", "language code");
+  const editionId = safeSegment(edition.edition_id, "edition id");
+  const dir = path.join(OUT, "editions", language, editionId);
   await fs.mkdir(dir, { recursive: true });
 
   const candidates = [
@@ -158,7 +180,7 @@ const editionResults = await mapLimit(editions, async (edition) => {
       const data = await getBinary(url);
       validateSignature(kind, data);
       const ext = kind.startsWith("pdf") ? ".pdf" : kind === "sqlite_zip" ? ".zip" : kind === "sqlite" ? ".sqlite" : ".epub";
-      const file = path.join(dir, `${edition.edition_id}${kind === "pdf" ? "" : `.${kind}`}${ext}`);
+      const file = path.join(dir, `${editionId}${kind === "pdf" ? "" : `.${kind}`}${ext}`);
       await fs.writeFile(file, data);
       acquired = {
         kind,
@@ -191,6 +213,7 @@ const editionResults = await mapLimit(editions, async (edition) => {
     canonical_arabic_separate: true,
     status: acquired ? "acquired_research_only" : "not_acquired"
   };
+  // codeql[js/http-to-file-access] The URL is restricted to QuranEnc HTTPS and the asset is size/signature validated before persistence.
   await fs.writeFile(
     path.join(dir, "metadata.json"),
     JSON.stringify(metadata, null, 2) + "\n",
