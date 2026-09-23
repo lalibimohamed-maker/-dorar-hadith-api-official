@@ -37,10 +37,38 @@ test("KFGQPC acquisition is restricted to official hosts and preserves governanc
   ]);
   assert.equal(config.policy.corpus_write_forbidden, true);
   assert.equal(config.policy.ai_generated_translation_forbidden, true);
-  assert.equal(config.editions.length, 1);
-  assert.equal(config.editions[0].edition_id, "kfgqpc-kannada");
-  for (const url of config.editions[0].asset_index_urls) {
-    assert.ok(url.startsWith("https://"));
-    assert.ok(config.allowed_hosts.includes(new URL(url).hostname));
+
+  const expectedEditionIds = [
+    "kfgqpc-german",
+    "kfgqpc-tamazight",
+    "kfgqpc-english",
+    "kfgqpc-turkish",
+    "kfgqpc-dari",
+    "kfgqpc-russian",
+    "kfgqpc-swahili",
+    "kfgqpc-chinese",
+    "kfgqpc-french",
+    "kfgqpc-fulani",
+    "kfgqpc-nepali",
+    "kfgqpc-kannada"
+  ];
+
+  assert.equal(config.editions.length, expectedEditionIds.length);
+  assert.deepEqual(
+    config.editions.map(edition => edition.edition_id),
+    expectedEditionIds
+  );
+
+  for (const edition of config.editions) {
+    assert.equal(edition.source_id, "kfgqpc");
+    assert.ok(edition.official_page.startsWith("https://qurancomplex.gov.sa/"));
+    for (const url of edition.asset_index_urls) {
+      assert.ok(url.startsWith("https://"));
+      assert.ok(config.allowed_hosts.includes(new URL(url).hostname));
+    }
+    for (const url of edition.asset_urls) {
+      assert.ok(url.startsWith("https://"));
+      assert.ok(config.allowed_hosts.includes(new URL(url).hostname));
+    }
   }
 });
