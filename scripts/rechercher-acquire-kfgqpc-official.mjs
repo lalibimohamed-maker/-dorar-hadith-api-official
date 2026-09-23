@@ -72,43 +72,16 @@ function candidatesFromHtml(html, baseUrl) {
 }
 
 async function downloadAndHash(url, maxBytes) {
-  const response = await fetch(url, {
-    redirect: "follow",
-    headers: { accept: "application/pdf,application/epub+zip,application/zip,application/octet-stream,text/html,*/*" }
-  });
-  if (!response.ok) throw new Error("HTTP " + response.status);
-  if (!response.body) throw new Error("response body unavailable");
-  const declared = Number(response.headers.get("content-length") || 0);
-  if (declared && declared > maxBytes) throw new Error("asset exceeds configured size cap");
-  const temp = path.join(OUT, ".tmp-" + crypto.randomBytes(8).toString("hex"));
-  const file = createWriteStream(temp);
-  const hash = crypto.createHash("sha256");
-  let bytes = 0;
-  let first = Buffer.alloc(0);
-  try {
-    for await (const chunk of Readable.fromWeb(response.body)) {
-      const buf = Buffer.from(chunk);
-      bytes += buf.length;
-      if (bytes > maxBytes) throw new Error("asset exceeds configured size cap");
-      if (first.length < 8192) first = Buffer.concat([first, buf.subarray(0, 8192 - first.length)]);
-      hash.update(buf);
-      if (!file.write(buf)) await new Promise((resolve, reject) => {
-        file.once("drain", resolve);
-        file.once("error", reject);
-      });
-    }
-    await new Promise((resolve, reject) => { file.end(resolve); file.once("error", reject); });
-    const kind = signature(first);
-    if (!kind) {
-      const prefix = first.subarray(0, 32).toString("hex");
-      throw new Error("unsupported or non-file response signature: " + prefix);
-    }
-    return { temp, bytes, sha256: hash.digest("hex"), kind };
-  } catch (error) {
-    file.destroy();
-    await fs.rm(temp, { force: true });
-    throw error;
+  const buffer = await curlFetchBuffer(url, { maxBytes });
+  const kind = signature(buffer);
+  if (!kind) {
+    const prefix = buffer.subarray(0, 32).toString("hex");
+    throw new Error("unsupported or non-file response signature: " + prefix);
   }
+  const temp = path.join(OUT, ".tmp-" + crypto.randomBytes(8).toString("hex"));
+  await fs.writeFile(temp, buffer);
+  const sha256 = crypto.createHash("sha256").update(buffer).digest("hex");
+  return { temp, bytes: buffer.length, sha256, kind, transport: "curl-official" };
 }
 
 const config = JSON.parse(await fs.readFile(CONFIG, "utf8"));
@@ -156,15 +129,11 @@ for (const edition of config.editions) {
   }
   for (const indexUrl of discoveryUrls) {
     try {
-      const response = await fetch(indexUrl, {
-        redirect: "follow",
-        headers: { accept: "text/html,application/xhtml+xml,*/*" }
-      });
-      result.candidates.push({ index_url: indexUrl, final_url: response.url, status: response.ok ? "index_reachable" : "index_http_error", http_status: response.status });
-      if (response.ok) {
-        const html = await response.text();
-        if (html.length <= 10_000_000) {
-          for (const candidateUrl of candidatesFromHtml(html, response.url)) {
+      const indexBuffer = await curlFetchBuffer(indexUrl, { maxBytes: 10_000_000 });
+      const html = indexBuffer.toString("utf8");
+      result.candidates.push({ index_url: indexUrl, final_url: indexUrl, status: "index_reachable", transport: "curl-official" });
+      if (html.length <= 10_000_000) {
+          for (const candidateUrl of candidatesFromHtml(html, indexUrl)) {
             discoveredAssetUrls.add(candidateUrl);
             result.candidates.push({ index_url: indexUrl, asset_url: candidateUrl, status: "asset_discovered_from_official_page" });
           }
