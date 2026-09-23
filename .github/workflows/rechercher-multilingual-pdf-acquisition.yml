@@ -156,6 +156,7 @@ jobs:
             asset="${sha}_${base}"
             cp -f "$file" "$release_root/$asset"
             gh release upload "$tag" "$release_root/$asset" --repo "$SECONDARY_STORAGE_REPO"
+            existing_sha["$digest"]="$tag/$asset"
             rm -f "$release_root/$asset"
           done < "$release_root/files.nul"
           gh release view "$tag" --repo "$SECONDARY_STORAGE_REPO" --json tagName,isDraft,assets,url
@@ -323,7 +324,6 @@ jobs:
               continue
             fi
             new_count=$((new_count+1))
-            existing_sha["$digest"]="pending/$(basename "$file")"
           done < "$release_root/files.nul"
           echo "SECONDARY_RELEASE_INPUTS total=$count new=$new_count duplicates_skipped=$duplicate_count"
           if [ "$new_count" -eq 0 ]; then
@@ -334,7 +334,8 @@ jobs:
           while IFS= read -r -d '' file; do
             sha="$(sha256sum "$file" | awk '{print $1}')"
             digest="sha256:$sha"
-            if [ -n "${existing_sha[$digest]+x}" ] && [[ "${existing_sha[$digest]}" != pending/* ]]; then
+            if [ -n "${existing_sha[$digest]+x}" ]; then
+              echo "SECONDARY_DEDUP_SKIP sha256=$sha existing=${existing_sha[$digest]} file=$(basename "$file")"
               continue
             fi
             sha="$(sha256sum "$file" | awk '{print $1}')"
