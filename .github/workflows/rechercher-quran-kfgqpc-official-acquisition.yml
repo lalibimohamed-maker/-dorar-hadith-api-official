@@ -2,14 +2,6 @@ name: Rechercher — KFGQPC official translation asset acquisition
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "config/quran-official-saudi-kfgqpc-translation-registry-2026-09-22.json"
-      - "config/quran-multisource-translation-catalog-2026-09-22.json"
-      - "config/quran-kfgqpc-official-acquisition-2026-09-22.json"
-      - "scripts/rechercher-acquire-kfgqpc-official.mjs"
-      - "test/quran-kfgqpc-official-acquisition.test.js"
-      - ".github/workflows/rechercher-quran-kfgqpc-official-acquisition.yml"
 
 permissions:
   contents: read
