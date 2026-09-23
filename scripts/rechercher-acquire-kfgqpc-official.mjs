@@ -140,7 +140,6 @@ for (const edition of config.editions) {
         } else {
           result.candidates.push({ index_url: indexUrl, status: "index_skipped_too_large" });
         }
-      }
     } catch (error) {
       result.candidates.push({ index_url: indexUrl, status: "index_error", error: String(error?.message || error) });
     }
