@@ -34,14 +34,16 @@ jobs:
             )
           );
 
-          if (m.edition_count !== 1) process.exit(1);
+          const expectedEditionCount = 12;
+
+          if (m.edition_count !== expectedEditionCount) process.exit(1);
 
           if (m.network_unavailable === true) {
             console.log('KFGQPC official server/proxy temporarily unavailable; no asset marked acquired.');
             process.exit(0);
           }
 
-          if (m.acquired_editions !== 1) process.exit(1);
+          if (m.acquired_editions !== expectedEditionCount) process.exit(1);
           if (m.failed_editions !== 0) process.exit(1);
 
           if (
