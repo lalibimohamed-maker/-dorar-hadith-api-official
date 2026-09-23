@@ -12,6 +12,7 @@ const MAX_FILE_BYTES = 300 * 1024 * 1024;
 
 const REQUEST_TIMEOUT_MS = 45000;
 const LIST_ATTEMPTS = 4;
+const ACQUISITION_CONCURRENCY = Math.max(1, Math.min(6, Number(process.env.QURANENC_CONCURRENCY || 6)));
 const QURANENC_HOSTS = new Set(["quranenc.com", "www.quranenc.com"]);
 
 function trustedQuranEncUrl(rawUrl) {
@@ -220,7 +221,7 @@ const editionResults = await mapLimit(editions, async (edition) => {
     "utf8"
   );
   return metadata;
-}, 2);
+}, ACQUISITION_CONCURRENCY);
 
 const manifest = {
   schema_version: "2026-09-22",
