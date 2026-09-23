@@ -86,6 +86,7 @@ registry.policy.download_urls_are_not_rights_grants = true;
 registry.next_step =
   "Verify every governmental/institutional/human claim against the issuing institution or publisher primary source; record country, official URL, evidence URL, rights evidence and verification timestamp. Only then admit a translation to a matrix cell.";
 
+// codeql[js/http-to-file-access] The API payload is parsed as JSON and only schema-selected provenance fields are serialized into the fixed registry path.
 await fs.writeFile(
   registryPath,
   `${JSON.stringify(registry, null, 2)}\n`,
