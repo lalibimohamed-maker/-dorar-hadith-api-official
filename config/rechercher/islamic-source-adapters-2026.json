@@ -646,6 +646,205 @@
       "source_role": "primary_research_and_api",
       "api_base_url": "https://dorar.net/api",
       "release_policy": "Use official API/site terms and verify item-level redistribution rights before public release."
+    },
+    {
+      "id": "islamenc",
+      "name": "Islamic Content Encyclopedia (IslamEnc)",
+      "base_url": "https://islamenc.com/",
+      "origins": [
+        "https://islamenc.com"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "tafsir",
+        "hadith",
+        "hadith-encyclopedia",
+        "books",
+        "encyclopedias",
+        "api",
+        "multilingual",
+        "discovery"
+      ],
+      "authority": "multilingual_islamic_content_encyclopedia",
+      "runtime": "public_web_and_api",
+      "status": "enabled",
+      "source_role": "primary_multilingual_content_and_discovery",
+      "verification": "Official site states it provides Quran translations/tafsir, verified scholarly books, hadith/rulings encyclopedias, 100+ languages and an API.",
+      "release_policy": "Verify item-level rights before redistribution."
+    },
+    {
+      "id": "dar-alifta-egypt",
+      "name": "Dar al-Ifta al-Misriyyah",
+      "base_url": "https://www.dar-alifta.org/",
+      "origins": [
+        "https://www.dar-alifta.org"
+      ],
+      "kinds": [
+        "fatwa",
+        "fiqh",
+        "aqidah",
+        "quran",
+        "hadith",
+        "articles",
+        "research",
+        "multilingual",
+        "discovery"
+      ],
+      "authority": "official_egyptian_fatwa_institution",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "official_fatwa_and_research",
+      "verification": "Official site identifies Dar al-Ifta Egypt as a governmental non-profit organization and provides online fatwa services.",
+      "release_policy": "Institutional publication does not by itself grant redistribution permission; verify item-level rights."
+    },
+    {
+      "id": "alifta-sa",
+      "name": "General Presidency for Scholarly Research and Ifta",
+      "base_url": "https://alifta.gov.sa/",
+      "origins": [
+        "https://alifta.gov.sa"
+      ],
+      "kinds": [
+        "fatwa",
+        "aqidah",
+        "fiqh",
+        "hadith",
+        "quran",
+        "research",
+        "publications",
+        "books",
+        "discovery"
+      ],
+      "authority": "official_saudi_fatwa_institution",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "official_fatwa_and_publications",
+      "verification": "Official site provides the Permanent Committee for Fatwa, Senior Scholars Secretariat and Islamic Research publications.",
+      "release_policy": "Verify item-level rights before redistribution."
+    },
+    {
+      "id": "zad-academy",
+      "name": "Zad Academy",
+      "base_url": "https://zad-academy.com/",
+      "origins": [
+        "https://zad-academy.com",
+        "https://www.zad.tv"
+      ],
+      "kinds": [
+        "aqidah",
+        "tafsir",
+        "hadith",
+        "fiqh",
+        "seerah",
+        "arabic",
+        "education",
+        "courses",
+        "discovery"
+      ],
+      "authority": "sunni_islamic_education_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "education_and_discovery",
+      "verification": "Official academy material describes a two-year distance program covering aqidah, tafsir, hadith, fiqh, seerah, Arabic and Islamic upbringing.",
+      "release_policy": "Course availability does not imply redistribution rights; verify item-level terms."
+    },
+    {
+      "id": "tarteel",
+      "name": "Tarteel",
+      "base_url": "https://tarteel.ai/",
+      "origins": [
+        "https://tarteel.ai",
+        "https://support.tarteel.ai"
+      ],
+      "kinds": [
+        "quran",
+        "recitation",
+        "memorization",
+        "tajwid_support",
+        "app",
+        "api",
+        "discovery"
+      ],
+      "authority": "quran_technology_platform",
+      "runtime": "public_app_and_docs",
+      "status": "enabled",
+      "source_role": "quran_technology_and_discovery_only",
+      "ai_role": "recitation_assistance_only",
+      "verification": "Official support documentation covers Quran text integrity, app features and developer resources.",
+      "release_policy": "Do not treat AI features as religious-source evidence; verify content/data rights before redistribution."
+    },
+    {
+      "id": "tebyan-academy",
+      "name": "Tebyan Academy",
+      "base_url": "https://tebyanacademy.com/",
+      "origins": [
+        "https://tebyanacademy.com"
+      ],
+      "kinds": [
+        "quran",
+        "tajwid",
+        "recitation",
+        "education",
+        "courses",
+        "discovery"
+      ],
+      "authority": "quran_education_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "quran_education_and_discovery",
+      "verification": "Official site describes Quran and Tajweed education using a classical Tajweed curriculum.",
+      "release_policy": "Course/site availability does not grant redistribution permission; verify item-level rights."
+    },
+    {
+      "id": "rasoulallah",
+      "name": "Rasoulallah.net",
+      "base_url": "https://rasoulallah.net/",
+      "origins": [
+        "https://rasoulallah.net"
+      ],
+      "kinds": [
+        "seerah",
+        "shamail",
+        "hadith",
+        "sunnah",
+        "books",
+        "audio",
+        "video",
+        "articles",
+        "multilingual",
+        "discovery"
+      ],
+      "authority": "prophetic_biography_and_sunnah_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "seerah_sunnah_and_discovery",
+      "verification": "Official site exposes seerah, books, audio/video and multilingual interfaces.",
+      "release_policy": "Verify item-level rights before redistribution."
+    },
+    {
+      "id": "zekr",
+      "name": "Zekr Project",
+      "base_url": "https://zekr.org/",
+      "origins": [
+        "https://zekr.org",
+        "https://github.com/vdemir/zekr"
+      ],
+      "kinds": [
+        "quran",
+        "translations",
+        "recitations",
+        "study_software",
+        "open_source",
+        "metadata",
+        "discovery"
+      ],
+      "authority": "open_source_quran_study_project",
+      "runtime": "open_source_repository",
+      "status": "enabled",
+      "source_role": "technical_resource_and_discovery_only",
+      "verification": "Project source identifies Zekr as an open-source Quran study project; bundled resources carry separate licenses and must not be conflated.",
+      "release_policy": "Respect GPL and each bundled resource's separate license; verify translation-specific rights."
     }
   ],
   "runtime_policy": {
