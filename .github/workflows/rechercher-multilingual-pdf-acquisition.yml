@@ -315,14 +315,16 @@ jobs:
           echo "SECONDARY_EXISTING_SHA_COUNT=${#existing_sha[@]}"
           new_count=0
           duplicate_count=0
+          declare -A batch_sha=()
           while IFS= read -r -d '' file; do
             sha="$(sha256sum "$file" | awk '{print $1}')"
             digest="sha256:$sha"
-            if [ -n "${existing_sha[$digest]+x}" ]; then
-              echo "SECONDARY_DEDUP_SKIP sha256=$sha existing=${existing_sha[$digest]} file=$(basename "$file")"
+            if [ -n "${existing_sha[$digest]+x}" ] || [ -n "${batch_sha[$digest]+x}" ]; then
+              echo "SECONDARY_DEDUP_SKIP sha256=$sha file=$(basename "$file")"
               duplicate_count=$((duplicate_count+1))
               continue
             fi
+            batch_sha["$digest"]=1
             new_count=$((new_count+1))
           done < "$release_root/files.nul"
           echo "SECONDARY_RELEASE_INPUTS total=$count new=$new_count duplicates_skipped=$duplicate_count"
