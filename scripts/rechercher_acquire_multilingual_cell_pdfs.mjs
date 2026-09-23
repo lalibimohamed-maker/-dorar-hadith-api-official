@@ -10,10 +10,11 @@ const ADAPTERS=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/is
 const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01-400h/master-global-source-registry-seed-2026-09.json'),'utf8'));
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXPECTED=3192;
-const MAX_SOURCES_PER_CELL=24;
-const MAX_PDF_CANDIDATES_PER_SOURCE=16;
+const MAX_DISCOVERY_DEPTH=Math.max(1,Math.min(6,Number(process.env.ACQUISITION_DISCOVERY_DEPTH||4)));
+const MAX_DISCOVERY_URLS_PER_SOURCE=Math.max(25,Math.min(500,Number(process.env.ACQUISITION_DISCOVERY_URLS_PER_SOURCE||250)));
+const MAX_PDF_CANDIDATES_PER_SOURCE=Math.max(8,Math.min(200,Number(process.env.ACQUISITION_MAX_PDF_CANDIDATES_PER_SOURCE||100)));
 const CONCURRENCY=Math.max(1,Math.min(12,Number(process.env.ACQUISITION_CONCURRENCY||8)));
-const MAX_FILES=Math.max(1,Math.min(8,Number(process.env.ACQUISITION_MAX_FILES_PER_CELL||4)));
+const MAX_FILES=Math.max(1,Math.min(20,Number(process.env.ACQUISITION_MAX_FILES_PER_CELL||8)));
 const REQUEST_TIMEOUT=15000, DOWNLOAD_TIMEOUT=90000, RESPONSE_LIMIT=12*1024*1024, PDF_LIMIT=750*1024*1024;
 
 const rows=(await fs.readFile(LEDGER,'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
@@ -141,16 +142,32 @@ async function archivePdfUrls(json){
 
 async function candidateUrls(seed){
   if(candidateCache.has(seed)) return candidateCache.get(seed);
-  const pending=(async()=>{const r=await fetchBytes(seed);
-  if(!r.bytes) return [];
-  if(isPdfUrl(r.finalUrl)||/^application\/pdf/i.test(r.contentType)) return [r.finalUrl];
-  const set=new Set(), text=r.bytes.toString('utf8');
-  try{
-    const json=JSON.parse(text);
-    deepUrls(json,r.finalUrl,set);
-    if(new URL(r.finalUrl).origin==='https://archive.org') for(const u of await archivePdfUrls(json)) set.add(u);
-  }catch{htmlUrls(text,r.finalUrl,set);}
-  return [...set].filter(x=>allow(x)).slice(0,MAX_PDF_CANDIDATES_PER_SOURCE);
+  const pending=(async()=>{
+    const queue=[{url:seed,depth:0}],visited=new Set(),pdfs=new Set(),sourceOrigin=new URL(seed).origin;
+    while(queue.length && visited.size<MAX_DISCOVERY_URLS_PER_SOURCE && pdfs.size<MAX_PDF_CANDIDATES_PER_SOURCE){
+      const item=queue.shift();
+      if(visited.has(item.url)||item.depth>MAX_DISCOVERY_DEPTH) continue;
+      visited.add(item.url);
+      let r;
+      try{r=await fetchBytes(item.url);}catch{continue;}
+      if(!r.bytes) continue;
+      const final=allow(r.finalUrl);
+      if(!final||final.origin!==sourceOrigin) continue;
+      if(isPdfUrl(r.finalUrl)||/^application\/pdf/i.test(r.contentType)){pdfs.add(r.finalUrl);continue;}
+      const discovered=new Set(),text=r.bytes.toString('utf8');
+      try{
+        const json=JSON.parse(text);
+        deepUrls(json,r.finalUrl,discovered);
+        if(final.origin==='https://archive.org') for(const u of await archivePdfUrls(json)) discovered.add(u);
+      }catch{htmlUrls(text,r.finalUrl,discovered);}
+      for(const u of discovered){
+        const trusted=allow(u);
+        if(!trusted||trusted.origin!==sourceOrigin) continue;
+        if(isPdfUrl(u)){pdfs.add(u);continue;}
+        if(item.depth<MAX_DISCOVERY_DEPTH && !visited.has(u) && !queue.some(x=>x.url===u)) queue.push({url:u,depth:item.depth+1});
+      }
+    }
+    return [...pdfs];
   })();
   candidateCache.set(seed,pending);
   try{return await pending;}catch(e){candidateCache.delete(seed);throw e;}
@@ -277,8 +294,8 @@ async function processCell(row){
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
-  // Inspect every active source relevant to the cell. A source does not need to advertise a PDF kind: its official API/page may expose a PDF download discovered at runtime.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);
-  const limitedIds=ids.slice(0,MAX_SOURCES_PER_CELL);
+  // Inspect every active relevant source and recursively follow trusted same-origin API/pages until PDF assets are found.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);
+  const limitedIds=[...new Set(ids)];
   entry.source_candidates=limitedIds.slice();
   const seeds=[];
   for(const id of limitedIds){
@@ -308,7 +325,7 @@ async function processCell(row){
     if(!entry.rights_approved_sources.includes(seed.id)) entry.rights_approved_sources.push(seed.id);
     let candidates=[];
     try{candidates=await candidateUrls(seed.url);}catch(e){entry.source_errors.push({source:seed.id,url:seed.url,error:String(e.message||e)});continue;}
-    for(const candidate of candidates.slice(0,MAX_PDF_CANDIDATES_PER_SOURCE)){
+    for(const candidate of candidates){
       if(entry.files.length>=MAX_FILES||!isPdfUrl(candidate)) continue;
       const pdf=allow(candidate)?.href;if(!pdf||claimed.has(pdf)) continue;
       claimed.add(pdf);
