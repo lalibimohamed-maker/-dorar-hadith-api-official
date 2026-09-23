@@ -845,6 +845,161 @@
       "source_role": "technical_resource_and_discovery_only",
       "verification": "Project source identifies Zekr as an open-source Quran study project; bundled resources carry separate licenses and must not be conflated.",
       "release_policy": "Respect GPL and each bundled resource's separate license; verify translation-specific rights."
+    },
+    {
+      "id": "imam-shatibi",
+      "name": "Imam Shatibi Institute",
+      "base_url": "https://www.shatibi.co.uk/",
+      "origins": [
+        "https://www.shatibi.co.uk"
+      ],
+      "kinds": [
+        "quran",
+        "tajwid",
+        "qiraat",
+        "ijazah",
+        "hifz",
+        "education",
+        "courses",
+        "seerah",
+        "discovery"
+      ],
+      "authority": "quran_education_institute",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "quran_recitation_and_education",
+      "verification": "Official institute site documents Quran memorization, Tajweed, Qira'at and Ijazah-oriented study, with UK branches and distance-learning options.",
+      "release_policy": "Educational access does not grant redistribution rights; verify item-level rights before public release."
+    },
+    {
+      "id": "international-open-university",
+      "name": "International Open University (IOU)",
+      "base_url": "https://iou.edu.gm/",
+      "origins": [
+        "https://iou.edu.gm",
+        "https://libraries.iou.edu.gm"
+      ],
+      "kinds": [
+        "islamic-studies",
+        "quran",
+        "hadith",
+        "fiqh",
+        "aqidah",
+        "arabic",
+        "education",
+        "courses",
+        "academic-library",
+        "discovery"
+      ],
+      "authority": "online_university",
+      "runtime": "public_website_and_library",
+      "status": "enabled",
+      "source_role": "academic_education_and_discovery",
+      "verification": "Official IOU pages document online Islamic Studies programs and an institutional digital library/repository; the university also states its current licensing status in The Gambia.",
+      "release_policy": "Course/library access does not itself grant redistribution rights; verify item-level rights and library terms."
+    },
+    {
+      "id": "about-islam",
+      "name": "About Islam",
+      "base_url": "https://aboutislam.net/",
+      "origins": [
+        "https://aboutislam.net"
+      ],
+      "kinds": [
+        "dawah",
+        "new_muslim",
+        "faith",
+        "fiqh",
+        "quran",
+        "hadith",
+        "articles",
+        "media",
+        "discovery"
+      ],
+      "authority": "mainstream_islamic_dawah_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "dawah_and_discovery",
+      "verification": "Official About Islam page describes the project as an online dawah initiative presenting mainstream Islam and supporting Muslims, new Muslims and youth.",
+      "release_policy": "Verify item-level rights and current site terms before redistribution."
+    },
+    {
+      "id": "bayyinah-tv",
+      "name": "Bayyinah TV",
+      "base_url": "https://bayyinah.tv/",
+      "origins": [
+        "https://bayyinah.tv"
+      ],
+      "kinds": [
+        "quran",
+        "tafsir",
+        "arabic",
+        "education",
+        "courses",
+        "video",
+        "discovery"
+      ],
+      "authority": "quran_education_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "quran_education_and_discovery",
+      "verification": "Official Bayyinah TV site provides Quran, tafsir and Arabic learning programs and describes its video lesson library.",
+      "release_policy": "Course/video availability does not grant redistribution permission; verify item-level terms."
+    },
+    {
+      "id": "muslim-central",
+      "name": "Muslim Central",
+      "base_url": "https://muslimcentral.com/",
+      "origins": [
+        "https://muslimcentral.com"
+      ],
+      "kinds": [
+        "audio",
+        "podcasts",
+        "video",
+        "quran",
+        "duas",
+        "hadith",
+        "seerah",
+        "media",
+        "discovery"
+      ],
+      "authority": "islamic_audio_media_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "audio_media_and_discovery",
+      "verification": "Official site provides Islamic audio podcasts, series, video playlists, radio and Quran Central services.",
+      "release_policy": "Platform availability does not imply redistribution permission; verify item-level rights for each recording."
+    },
+    {
+      "id": "yaqeen-institute",
+      "name": "Yaqeen Institute for Islamic Research",
+      "base_url": "https://yaqeeninstitute.org/",
+      "origins": [
+        "https://yaqeeninstitute.org",
+        "https://journals.yaqeeninstitute.org"
+      ],
+      "kinds": [
+        "research",
+        "quran",
+        "hadith",
+        "fiqh",
+        "aqidah",
+        "seerah",
+        "history",
+        "social-research",
+        "data",
+        "papers",
+        "books",
+        "videos",
+        "discovery"
+      ],
+      "authority": "islamic_research_institute",
+      "runtime": "public_website_and_datasets",
+      "status": "enabled",
+      "source_role": "research_and_discovery",
+      "verification": "Official site provides research papers, reports, datasets and educational materials on Quran, hadith, Islamic law, history and contemporary Muslim topics; its FAQ states that papers are free to read/share/cite for academic and educational use.",
+      "release_policy": "Record the exact item license/terms and preserve attribution; free access does not automatically mean unrestricted redistribution of every asset."
     }
   ],
   "runtime_policy": {
