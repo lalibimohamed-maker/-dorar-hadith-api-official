@@ -143,6 +143,7 @@ async function downloadPdf(url,file){
  const bytes=validatePdfPayload(Buffer.from(await r.arrayBuffer()));
  await fs.writeFile(file,bytes);
 }
+const seenPdfSha256=new Map();
 const summary={schema:'rechercher/multilingual-resource-acquisition/v2',generated_at:new Date().toISOString(),language_count:languages.size,policy:{redistribution:'only when explicitly verified',research_only:'only when lawful research access is explicitly established; never public',public_repo:'research-only PDFs are forbidden from persistence in this public repository'},languages:{}};
 for(const [key,lang] of languages){
  const rights=rightsForRecord(lang.records);
@@ -193,6 +194,16 @@ for(const [key,lang] of languages){
          await fs.rm(resolved,{force:true});
          continue;
        }
+       const duplicateOf=seenPdfSha256.get(inspected.sha256);
+       if(duplicateOf){
+         await fs.rm(resolved,{force:true});
+         entry.files.push({
+           source:adapter.id,url:pdfUrl,sha256:inspected.sha256,bytes:inspected.bytes,
+           acquisition,rights:rights.status,deduplicated:true,duplicate_of:duplicateOf.path
+         });
+         continue;
+       }
+       seenPdfSha256.set(inspected.sha256,{language:iso,source:adapter.id,path:path.relative(ROOT,resolved)});
        entry.files.push({
          source:adapter.id,
          url:pdfUrl,
