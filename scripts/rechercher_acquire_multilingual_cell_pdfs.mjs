@@ -241,7 +241,7 @@ const manifest={
   },
   source_counts:{},cells:{}
 };
-const claimed=new Set(),candidateCache=new Map(),started=Date.now();
+const claimed=new Set(),seenPdfSha256=new Map(),candidateCache=new Map(),started=Date.now();
 
 async function downloadPdf(url,dest){
   const u=allow(url);if(!u)throw new Error('untrusted PDF');
@@ -317,10 +317,23 @@ async function processCell(row){
       const temp=path.join(dir,safe(row.cell_id)+'-'+createHash('sha1').update(pdf).digest('hex').slice(0,12)+'.pdf');
       try{
         const r=await downloadPdf(pdf,temp),base=safe(path.basename(new URL(r.finalUrl).pathname))||'document.pdf';
+        const duplicateOf=seenPdfSha256.get(r.sha256);
+        if(duplicateOf){
+          await fs.rm(temp,{force:true});
+          entry.files.push({
+            cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:r.finalUrl,
+            bytes:r.bytes,sha256:r.sha256,content_type:r.contentType,acquisition:sourceType,rights:sourceRights.status,
+            domain:row.domain,language_iso:row.language_iso||null,provenance:seed.id+':'+seed.url,
+            promoteToCorpus:false,deduplicated:true,duplicate_of:duplicateOf.path
+          });
+          continue;
+        }
         const final=path.join(dir,safe(row.cell_id)+'__'+r.sha256.slice(0,16)+'__'+(base.endsWith('.pdf')?base:base+'.pdf'));
         await fs.rename(temp,final);
+        const relativeFinal=path.relative(ROOT,final);
+        seenPdfSha256.set(r.sha256,{cell_id:row.cell_id,path:relativeFinal});
         entry.files.push({
-          cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:r.finalUrl,path:path.relative(ROOT,final),
+          cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:r.finalUrl,path:relativeFinal,
           bytes:r.bytes,sha256:r.sha256,content_type:r.contentType,acquisition:sourceType,rights:sourceRights.status,
           domain:row.domain,language_iso:row.language_iso||null,provenance:seed.id+':'+seed.url,promoteToCorpus:false
         });
