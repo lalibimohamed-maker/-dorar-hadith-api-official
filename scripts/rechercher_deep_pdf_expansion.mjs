@@ -116,6 +116,5 @@ for(const r of missing){
  result.research_only_files+=e.files.filter(x=>x.acquisition==='research-only').length;
  if(result.attempted_cells%25===0)console.log(`DEEP_EXPANSION_PROGRESS completed=${result.attempted_cells}/${missing.length} files=${result.total_files}`);
 }
-await fs.writeFile(path.join(out,'manifest.json'),JSON.stringify(result,null,2)+'
-');
+await fs.writeFile(path.join(out,'manifest.json'),JSON.stringify(result,null,2)+'\n');
 console.log(JSON.stringify({input_cells:result.input_cells,attempted_cells:result.attempted_cells,total_files:result.total_files,public_files:result.public_files,research_only_files:result.research_only_files}));
