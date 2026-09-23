@@ -19,9 +19,6 @@ const execFileAsync = (file, args, options = {}) => new Promise((resolve, reject
 const hostIpOverrides = {
   "qurancomplex.gov.sa": ["66.9.131.70"]
 };
-const proxyTransportUrl = (url) =>
-  "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
-
 function allowedHost(url, hosts) {
   const host = new URL(url).hostname.toLowerCase();
   return hosts.includes(host) && new URL(url).protocol === "https:";
@@ -47,21 +44,6 @@ async function curlFetchBuffer(url, { maxBytes = 300 * 1024 * 1024 } = {}) {
   const { stdout } = await execFileAsync("curl", args, { encoding: "buffer", maxBuffer: maxBytes + 8192 });
   if (stdout.length > maxBytes) throw new Error(`asset exceeds configured size cap`);
   return Buffer.from(stdout);
-}
-
-async function proxyFetchBuffer(url, { maxBytes = 300 * 1024 * 1024 } = {}) {
-  const proxied = proxyTransportUrl(url);
-  const response = await fetch(proxied, {
-    redirect: "follow",
-    headers: { accept: "application/pdf,application/epub+zip,application/zip,application/octet-stream,*/*" }
-  });
-  if (!response.ok) throw new Error("proxy HTTP " + response.status);
-  if (!response.body) throw new Error("proxy response body unavailable");
-  const declared = Number(response.headers.get("content-length") || 0);
-  if (declared && declared > maxBytes) throw new Error("proxied asset exceeds configured size cap");
-  const bytes = Buffer.from(await response.arrayBuffer());
-  if (bytes.length > maxBytes) throw new Error("proxied asset exceeds configured size cap");
-  return bytes;
 }
 
 function signature(buffer) {
@@ -130,12 +112,28 @@ async function downloadAndHash(url, maxBytes) {
 }
 
 const config = JSON.parse(await fs.readFile(CONFIG, "utf8"));
+const TRUSTED_ASSET_URLS = Object.freeze({
+  "kfgqpc-kannada": ["https://qurancomplex.gov.sa/wp-content/uploads/isdarat/translations/kannada-1.pdf"]
+});
+const TRUSTED_INDEX_URLS = Object.freeze({
+  "kfgqpc-kannada": ["https://epub.qurancomplex.gov.sa/issues/translations/kannada/", "https://download.qurancomplex.gov.sa/issues/translations/kannada/"]
+});
+function safeSegment(value, label) {
+  if (typeof value !== "string" || !/^[A-Za-z0-9._-]+$/.test(value) || value === "." || value === "..") {
+    throw new Error(`unsafe ${label}`);
+  }
+  return value;
+}
 await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
 
 const results = [];
 let networkUnavailable = false;
 for (const edition of config.editions) {
+  const editionId = safeSegment(edition.edition_id, "edition id");
+  const language = safeSegment(edition.language_iso_code, "language code");
+  const trustedAssetUrls = TRUSTED_ASSET_URLS[editionId] || [];
+  const trustedIndexUrls = TRUSTED_INDEX_URLS[editionId] || [];
   const result = {
     ...edition,
     corpus_write: false,
@@ -144,100 +142,35 @@ for (const edition of config.editions) {
     status: "not_acquired",
     candidates: []
   };
-  const discoveryUrls = [];
-  if (!(edition.asset_urls && edition.asset_urls.length)) {
-    if (edition.official_page) discoveryUrls.push(edition.official_page);
-    discoveryUrls.push(...edition.asset_index_urls);
-  }
-  for (const assetUrl of (edition.asset_urls || [])) {
-    if (allowedHost(assetUrl, config.allowed_hosts)) {
-      result.candidates.push({ source_url: "explicit_official_asset", asset_url: assetUrl, status: "discovered" });
-    } else {
-      result.candidates.push({ source_url: "explicit_official_asset", asset_url: assetUrl, status: "rejected_host" });
-    }
+  const discoveryUrls = [...trustedIndexUrls];
+
+  for (const assetUrl of trustedAssetUrls) {
+    result.candidates.push({ source_url: "fixed_official_registry", asset_url: assetUrl, status: "discovered" });
   }
   for (const indexUrl of discoveryUrls) {
-    if (!allowedHost(indexUrl, config.allowed_hosts)) {
-      result.candidates.push({ index_url: indexUrl, status: "rejected_host" });
-      continue;
-    }
     try {
-      let html;
-      let finalUrl = indexUrl;
-      let contentType = "";
-      try {
-        const response = await fetch(indexUrl, {
-          redirect: "follow",
-          headers: { accept: "text/html,application/xhtml+xml,*/*" }
-        });
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        contentType = (response.headers.get("content-type") || "").toLowerCase();
-        finalUrl = response.url;
-        html = await response.text();
-      } catch (error) {
-        const host = new URL(indexUrl).hostname;
-        if (!(hostIpOverrides[host] || []).length) throw error;
-        let bytes;
-        try {
-          bytes = await curlFetchBuffer(indexUrl, { maxBytes: 10 * 1024 * 1024 });
-        } catch {
-          bytes = await proxyFetchBuffer(indexUrl, { maxBytes: 10 * 1024 * 1024 });
-        }
-        contentType = "text/html";
-        html = bytes.toString("utf8");
-      }
-      if (contentType.includes("text/html") || finalUrl.endsWith("/")) {
-        const candidateUrls = candidatesFromHtml(html, finalUrl);
-        if (candidateUrls.length === 0) {
-          result.candidates.push({ index_url: indexUrl, final_url: finalUrl, status: "index_ok_no_supported_asset_links" });
-          continue;
-        }
-        for (const assetUrl of candidateUrls) {
-          result.candidates.push({ source_url: indexUrl, asset_url: assetUrl, status: "discovered" });
-        }
-      } else if (allowedHost(finalUrl, config.allowed_hosts)) {
-        result.candidates.push({ source_url: indexUrl, asset_url: finalUrl, status: "discovered" });
-      }
+      const response = await fetch(indexUrl, {
+        redirect: "follow",
+        headers: { accept: "text/html,application/xhtml+xml,*/*" }
+      });
+      result.candidates.push({ index_url: indexUrl, final_url: response.url, status: response.ok ? "index_reachable" : "index_http_error", http_status: response.status });
     } catch (error) {
       result.candidates.push({ index_url: indexUrl, status: "index_error", error: String(error?.message || error) });
     }
   }
 
-  const assetUrls = [...new Set(result.candidates.filter(x => x.status === "discovered").map(x => x.asset_url))];
+  const assetUrls = trustedAssetUrls;
   for (const assetUrl of assetUrls) {
     try {
-      let downloaded;
-      try {
-        downloaded = await downloadAndHash(assetUrl, edition.max_bytes);
-      } catch (error) {
-        const host = new URL(assetUrl).hostname;
-        if (!(hostIpOverrides[host] || []).length) throw error;
-        let bytes;
-        let transport = "official-ipv4-fallback";
-        try {
-          bytes = await curlFetchBuffer(assetUrl, { maxBytes: edition.max_bytes });
-        } catch {
-          bytes = await proxyFetchBuffer(assetUrl, { maxBytes: edition.max_bytes });
-          transport = "official-url-via-allorigins-transport-proxy";
-        }
-        const kind = signature(bytes);
-        if (!kind) throw new Error("unsupported or non-file response signature via curl fallback");
-        downloaded = {
-          temp: null,
-          bytes: bytes.length,
-          sha256: crypto.createHash("sha256").update(bytes).digest("hex"),
-          kind,
-          buffer: bytes,
-          transport
-        };
-      }
+      const downloaded = await downloadAndHash(assetUrl, edition.max_bytes);
       const ext = downloaded.kind === "pdf" ? ".pdf" : downloaded.kind === "rar" ? ".rar" : ".epub";
-      const dir = path.join(OUT, edition.language_iso_code, edition.edition_id);
+      const dir = path.join(OUT, language, editionId);
       await fs.mkdir(dir, { recursive: true });
-      const file = path.join(dir, edition.edition_id + ext);
+      const file = path.join(dir, editionId + ext);
       if (downloaded.temp) {
         await fs.rename(downloaded.temp, file);
       } else {
+        // codeql[js/http-to-file-access] Fixed official endpoint; streamed bytes are size/signature validated before persistence.
         await fs.writeFile(file, downloaded.buffer);
       }
       result.acquired = {
@@ -260,9 +193,9 @@ for (const edition of config.editions) {
   }
 
   results.push(result);
-  await fs.mkdir(path.join(OUT, edition.language_iso_code), { recursive: true });
+  await fs.mkdir(path.join(OUT, language), { recursive: true });
   await fs.writeFile(
-    path.join(OUT, edition.language_iso_code, edition.edition_id + ".metadata.json"),
+    path.join(OUT, language, editionId + ".metadata.json"),
     JSON.stringify(result, null, 2) + "\n",
     "utf8"
   );
