@@ -18,8 +18,12 @@ for (const file of files) {
   for (const line of text.split(/\r?\n/)) {
     const m = line.match(/^\s*uses:\s*([^\s#]+)\s*(?:#.*)?$/);
     if (m) {
-      const ref = m[1].split("@")[1];
-      if (!ref || !sha40.test(ref)) add(file, `Action is not pinned to a full 40-character SHA: ${m[1]}`);
+      const target = m[1];
+      // Local reusable workflows (./.github/workflows/...) are resolved from the same commit;
+      // they do not use an @ref and therefore cannot be pinned with an external SHA.
+      if (target.startsWith("./")) continue;
+      const ref = target.split("@")[1];
+      if (!ref || !sha40.test(ref)) add(file, `Action is not pinned to a full 40-character SHA: ${target}`);
     }
   }
 
