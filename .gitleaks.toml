@@ -1,0 +1,8 @@
+# Gitleaks policy for known non-secret public evidence URLs.
+# This exact Rwanda Ministry of Justice download token is embedded in a
+# publicly accessible Official Gazette evidence URL. It is not an API key,
+# credential, password, or authentication secret.
+
+[[allowlists]]
+description = "Public Rwanda Official Gazette evidence URL token"
+regexes = ['0a72c9f36e0694e727af1c50eeb47f730ca327e3']
