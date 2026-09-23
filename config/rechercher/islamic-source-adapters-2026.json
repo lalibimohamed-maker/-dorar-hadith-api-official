@@ -1,6 +1,6 @@
 {
   "schema": "rechercher/islamic-source-adapters/v1",
-  "purpose": "Registry-driven Islamic source adapters. Existing six providers remain enabled; additional verified Islamic providers are additive. AI/search services are discovery and cross-reference tools only and are never treated as the religious source of generated text.",
+  "purpose": "Registry-driven Islamic source adapters. Existing providers remain enabled; additional verified Sunni-oriented and broad Islamic providers are additive. AI/search services are discovery and cross-reference tools only and are never treated as the religious source of generated text.",
   "policy": {
     "existing_six_preserved": true,
     "source_must_be_islamic_or_explicitly_islamic_content_provider": true,
@@ -10,7 +10,9 @@
     "rights_verified_per_item": true,
     "canonical_arabic_separate": true,
     "human_translation_separate_from_machine_translation": true,
-    "no_new_pdf_enc": true
+    "no_new_pdf_enc": true,
+    "additional_sunni_sources_added": true,
+    "source_provenance_preserved": true
   },
   "adapters": [
     {
@@ -441,6 +443,209 @@
       "api_auth": "required_for_content",
       "status": "enabled",
       "release_policy": "Use official API/content terms and credentials where required; API access is not itself redistribution permission."
+    },
+    {
+      "id": "islamqa-info",
+      "name": "IslamQA.info",
+      "base_url": "https://islamqa.info/",
+      "origins": [
+        "https://islamqa.info"
+      ],
+      "kinds": [
+        "fatwa",
+        "aqidah",
+        "quran",
+        "hadith",
+        "fiqh",
+        "usul-al-fiqh",
+        "seerah",
+        "books",
+        "articles",
+        "discovery"
+      ],
+      "authority": "Sunni_islamic_knowledge_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "primary_research_and_discovery",
+      "methodology_note": "The site states that it promotes Ahl al-Sunnah wa'l-Jama'ah and draws on the four Sunni madhhabs and other scholars.",
+      "release_policy": "Website availability does not imply redistribution permission; verify item-level rights before public release."
+    },
+    {
+      "id": "islamweb",
+      "name": "Islamweb",
+      "base_url": "https://www.islamweb.net/",
+      "origins": [
+        "https://www.islamweb.net"
+      ],
+      "kinds": [
+        "fatwa",
+        "aqidah",
+        "quran",
+        "hadith",
+        "fiqh",
+        "seerah",
+        "articles",
+        "books",
+        "audio",
+        "video",
+        "discovery"
+      ],
+      "authority": "official_islamic_knowledge_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "primary_research_and_discovery",
+      "methodology_note": "Islamweb states that it follows Ahl al-Sunnah wa al-Jama'ah in belief and practice; its service agreement identifies the site with Qatar's Ministry of Awqaf and Islamic Affairs.",
+      "release_policy": "Verify item-level rights and applicable site terms before public redistribution."
+    },
+    {
+      "id": "islamqa-org",
+      "name": "IslamQA.org",
+      "base_url": "https://islamqa.org/",
+      "origins": [
+        "https://islamqa.org"
+      ],
+      "kinds": [
+        "fatwa",
+        "fiqh",
+        "quran",
+        "hadith",
+        "aqidah",
+        "quran-sciences",
+        "hadith-sciences",
+        "discovery",
+        "bibliography"
+      ],
+      "authority": "sunni_madhhab_aggregator",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "aggregated_scholar_archive",
+      "methodology_note": "The site states that it aggregates answers from official scholar/institution websites across Hanafi, Shafi'i, Maliki and Hanbali schools.",
+      "release_policy": "Preserve original scholar/institution provenance; verify rights at original-source and item level before redistribution."
+    },
+    {
+      "id": "seekers-guidance",
+      "name": "SeekersGuidance",
+      "base_url": "https://seekersguidance.org/",
+      "origins": [
+        "https://seekersguidance.org"
+      ],
+      "kinds": [
+        "fiqh",
+        "aqidah",
+        "hadith",
+        "quran",
+        "tafsir",
+        "tazkiyah",
+        "articles",
+        "courses",
+        "books",
+        "discovery"
+      ],
+      "authority": "mainstream_sunni_knowledge_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "scholarly_education_and_discovery",
+      "methodology_note": "SeekersGuidance states that it follows mainstream Sunni Islam, including the four Sunni schools of law and Sunni theological traditions.",
+      "release_policy": "Educational availability does not itself grant redistribution rights; verify item-level terms/permission."
+    },
+    {
+      "id": "alukah",
+      "name": "Alukah",
+      "base_url": "https://www.alukah.net/",
+      "origins": [
+        "https://www.alukah.net",
+        "https://api.alukah.net"
+      ],
+      "kinds": [
+        "books",
+        "articles",
+        "quran",
+        "tafsir",
+        "hadith",
+        "fiqh",
+        "aqidah",
+        "pdf",
+        "translations",
+        "discovery"
+      ],
+      "authority": "islamic_scholarly_network",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "scholarly_content_and_discovery",
+      "release_policy": "Verify item-level rights and site notices before public redistribution."
+    },
+    {
+      "id": "islamway",
+      "name": "Islamway",
+      "base_url": "https://www.islamway.net/",
+      "origins": [
+        "https://www.islamway.net"
+      ],
+      "kinds": [
+        "audio",
+        "video",
+        "articles",
+        "books",
+        "quran",
+        "hadith",
+        "fiqh",
+        "aqidah",
+        "discovery"
+      ],
+      "authority": "islamic_content_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "discovery_and_content",
+      "release_policy": "Verify current site terms and item-level rights before redistribution."
+    },
+    {
+      "id": "islammessage",
+      "name": "IslamMessage.org",
+      "base_url": "https://islammessage.org/",
+      "origins": [
+        "https://islammessage.org"
+      ],
+      "kinds": [
+        "books",
+        "articles",
+        "audio",
+        "video",
+        "quran",
+        "sunnah",
+        "new_muslim",
+        "discovery"
+      ],
+      "authority": "sunni_islamic_content_platform",
+      "runtime": "public_website",
+      "status": "enabled",
+      "source_role": "content_and_discovery",
+      "methodology_note": "The site's About page explicitly describes itself as Ahl al-Sunnah and provides books, videos, audio and articles.",
+      "release_policy": "Verify item-level rights before public redistribution."
+    },
+    {
+      "id": "dorar",
+      "name": "Dorar.net",
+      "base_url": "https://dorar.net/",
+      "origins": [
+        "https://dorar.net"
+      ],
+      "kinds": [
+        "hadith",
+        "hadith-grading",
+        "fiqh",
+        "aqidah",
+        "quran",
+        "ethics",
+        "fatwa",
+        "api",
+        "discovery"
+      ],
+      "authority": "sunni_islamic_encyclopedia",
+      "runtime": "public_website_and_api",
+      "status": "enabled",
+      "source_role": "primary_research_and_api",
+      "api_base_url": "https://dorar.net/api",
+      "release_policy": "Use official API/site terms and verify item-level redistribution rights before public release."
     }
   ],
   "runtime_policy": {
