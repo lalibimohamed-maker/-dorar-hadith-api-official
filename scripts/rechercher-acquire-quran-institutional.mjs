@@ -10,6 +10,19 @@ const MAX_BYTES = 300 * 1024 * 1024;
 const FETCH_TIMEOUT_MS = 45_000;
 const FETCH_ATTEMPTS = 2;
 
+const TRUSTED_ASSET_URLS = Object.freeze({
+  "bangla-government-quran-digital": "https://www.quran.gov.bd/quran/pdf/abe/fabe.pdf",
+  "diyanet-turkish-meal": "https://dijital.diyanet.gov.tr/File/Download?id=430&path=430_1.pdf",
+  "kemenag-indonesian-2019": "https://web.lpmqkemenag.id/unduhan/terjemah-al-quran.html?download=3%3Aterjemah-tahun-2019"
+});
+
+function safeSegment(value, label) {
+  if (typeof value !== "string" || !/^[A-Za-z0-9._-]+$/.test(value) || value === "." || value === "..") {
+    throw new Error(`unsafe ${label}`);
+  }
+  return value;
+}
+
 function sha256(data) {
   return crypto.createHash("sha256").update(data).digest("hex");
 }
@@ -63,6 +76,10 @@ await fs.mkdir(OUT, { recursive: true });
 const results = [];
 for (const edition of config.editions) {
   const started = Date.now();
+  const editionId = safeSegment(edition.edition_id, "edition id");
+  const language = safeSegment(edition.language_iso_code, "language code");
+  const assetUrl = TRUSTED_ASSET_URLS[editionId];
+  if (!assetUrl) throw new Error(`no fixed trusted asset URL for ${editionId}`);
   const record = {
     ...edition,
     corpus_write: false,
@@ -71,7 +88,7 @@ for (const edition of config.editions) {
     status: "not_acquired"
   };
   try {
-    const bytes = await fetchBytes(edition.asset_url);
+    const bytes = await fetchBytes(assetUrl);
     if (edition.asset_kind === "pdf" && !validPdf(bytes)) {
       throw new Error("expected PDF signature %PDF-");
     }
@@ -85,9 +102,10 @@ for (const edition of config.editions) {
     }
 
     const ext = edition.asset_kind === "pdf" ? ".pdf" : ".rar";
-    const dir = path.join(OUT, edition.language_iso_code, edition.edition_id);
+    const dir = path.join(OUT, language, editionId);
     await fs.mkdir(dir, { recursive: true });
-    const file = path.join(dir, `${edition.edition_id}${ext}`);
+    const file = path.join(dir, `${editionId}${ext}`);
+    // codeql[js/http-to-file-access] Fixed official endpoint; size, signature and hash are validated before persistence.
     await fs.writeFile(file, bytes);
 
     record.acquired = {
@@ -102,9 +120,9 @@ for (const edition of config.editions) {
     record.error_class = classifyError(error);
   }
   record.elapsed_ms = Date.now() - started;
-  await fs.mkdir(path.join(OUT, edition.language_iso_code), { recursive: true });
+  await fs.mkdir(path.join(OUT, language), { recursive: true });
   await fs.writeFile(
-    path.join(OUT, edition.language_iso_code, `${edition.edition_id}.metadata.json`),
+    path.join(OUT, language, `${editionId}.metadata.json`),
     JSON.stringify(record, null, 2) + "\n",
     "utf8"
   );
