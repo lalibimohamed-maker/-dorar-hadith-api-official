@@ -70,7 +70,7 @@ function candidatesFromHtml(html, baseUrl) {
   };
   for (const m of html.matchAll(/(?:href|src)\s*=\s*["']([^"']+)["']/gi)) add(m[1]);
   for (const m of html.matchAll(/(?:https?:)?\/\/[^\s"'<>]+/gi)) add(m[0]);
-  return [...found].slice(0, 25);
+  return [...found];
 }
 
 const config = JSON.parse(await fs.readFile(CONFIG, "utf8"));
@@ -100,7 +100,7 @@ async function acquireEdition(edition) {
     }
   }
 
-  const assetUrls = [...discovered].slice(0, 25);
+  // Do not truncate official candidates: every discovered official asset URL must be tested.
   for (const assetUrl of assetUrls) {
     const temp = path.join(OUT, `.asset-${crypto.randomBytes(8).toString("hex")}`);
     try {
