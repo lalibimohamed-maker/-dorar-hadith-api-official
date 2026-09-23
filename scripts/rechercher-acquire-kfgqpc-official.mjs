@@ -90,12 +90,18 @@ async function acquireEdition(edition) {
       if (!allowedHost(indexUrl, config.allowed_hosts)) throw new Error("index host/protocol rejected");
       const tmp = path.join(OUT, `.index-${crypto.randomBytes(6).toString("hex")}`);
       await curlToFile(indexUrl, tmp, 45);
-      const stat = await fs.stat(tmp);
-      if (stat.size > 10_000_000) throw new Error("index exceeds 10 MB cap");
-      const html = await fs.readFile(tmp, "utf8");
-      await fs.rm(tmp, { force:true });
-      result.candidates.push({index_url:indexUrl,status:"index_reachable",transport:"curl-official"});
-      for (const u of candidatesFromHtml(html,indexUrl)) discovered.add(u);
+      // Keep validation and reading on the same open descriptor to avoid a TOCTOU race.
+      const handle = await fs.open(tmp, "r");
+      try {
+        const stat = await handle.stat();
+        if (stat.size > 10_000_000) throw new Error("index exceeds 10 MB cap");
+        const html = await handle.readFile("utf8");
+        result.candidates.push({index_url:indexUrl,status:"index_reachable",transport:"curl-official"});
+        for (const u of candidatesFromHtml(html,indexUrl)) discovered.add(u);
+      } finally {
+        await handle.close();
+        await fs.rm(tmp, { force:true });
+      }
     } catch (e) {
       result.candidates.push({index_url:indexUrl,status:"index_error",error:String(e?.message||e)});
     }
