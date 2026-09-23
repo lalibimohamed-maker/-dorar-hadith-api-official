@@ -10,7 +10,7 @@ const ADAPTERS=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/is
 const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01-400h/master-global-source-registry-seed-2026-09.json'),'utf8'));
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXPECTED=3192;
-const MAX_SOURCES_PER_CELL=24;
+const MAX_SOURCES_PER_CELL=64;
 const MAX_PDF_CANDIDATES_PER_SOURCE=16;
 const CONCURRENCY=Math.max(1,Math.min(12,Number(process.env.ACQUISITION_CONCURRENCY||8)));
 const MAX_FILES=Math.max(1,Math.min(8,Number(process.env.ACQUISITION_MAX_FILES_PER_CELL||4)));
@@ -277,7 +277,7 @@ async function processCell(row){
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
-  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)&&a.kinds?.some(k=>['pdf','downloads','download','datasets'].includes(k))) push(a.id);
+  // Inspect every active source relevant to the cell. A source does not need to advertise a PDF kind: its official API/page may expose a PDF download discovered at runtime.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);
   const limitedIds=ids.slice(0,MAX_SOURCES_PER_CELL);
   entry.source_candidates=limitedIds.slice();
   const seeds=[];
