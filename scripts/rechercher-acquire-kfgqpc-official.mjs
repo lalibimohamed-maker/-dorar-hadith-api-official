@@ -112,12 +112,15 @@ async function downloadAndHash(url, maxBytes) {
 }
 
 const config = JSON.parse(await fs.readFile(CONFIG, "utf8"));
-const TRUSTED_ASSET_URLS = Object.freeze({
-  "kfgqpc-kannada": ["https://qurancomplex.gov.sa/wp-content/uploads/isdarat/translations/kannada-1.pdf"]
-});
-const TRUSTED_INDEX_URLS = Object.freeze({
-  "kfgqpc-kannada": ["https://epub.qurancomplex.gov.sa/issues/translations/kannada/", "https://download.qurancomplex.gov.sa/issues/translations/kannada/"]
-});
+function uniqueStrings(values) {
+  return [...new Set((values || []).filter((value) => typeof value === "string" && value.trim()))];
+}
+function trustedAssetUrlsFor(edition) {
+  return uniqueStrings(edition.asset_urls);
+}
+function trustedIndexUrlsFor(edition) {
+  return uniqueStrings(edition.asset_index_urls);
+}
 function safeSegment(value, label) {
   if (typeof value !== "string" || !/^[A-Za-z0-9._-]+$/.test(value) || value === "." || value === "..") {
     throw new Error(`unsafe ${label}`);
@@ -132,8 +135,8 @@ let networkUnavailable = false;
 for (const edition of config.editions) {
   const editionId = safeSegment(edition.edition_id, "edition id");
   const language = safeSegment(edition.language_iso_code, "language code");
-  const trustedAssetUrls = TRUSTED_ASSET_URLS[editionId] || [];
-  const trustedIndexUrls = TRUSTED_INDEX_URLS[editionId] || [];
+  const trustedAssetUrls = trustedAssetUrlsFor(edition);
+  const trustedIndexUrls = trustedIndexUrlsFor(edition);
   const result = {
     ...edition,
     corpus_write: false,
@@ -142,7 +145,11 @@ for (const edition of config.editions) {
     status: "not_acquired",
     candidates: []
   };
-  const discoveryUrls = [...trustedIndexUrls];
+  const discoveryUrls = uniqueStrings([
+    ...trustedIndexUrls,
+    edition.official_page
+  ]);
+  const discoveredAssetUrls = new Set(trustedAssetUrls);
 
   for (const assetUrl of trustedAssetUrls) {
     result.candidates.push({ source_url: "fixed_official_registry", asset_url: assetUrl, status: "discovered" });
@@ -154,12 +161,23 @@ for (const edition of config.editions) {
         headers: { accept: "text/html,application/xhtml+xml,*/*" }
       });
       result.candidates.push({ index_url: indexUrl, final_url: response.url, status: response.ok ? "index_reachable" : "index_http_error", http_status: response.status });
+      if (response.ok) {
+        const html = await response.text();
+        if (html.length <= 10_000_000) {
+          for (const candidateUrl of candidatesFromHtml(html, response.url)) {
+            discoveredAssetUrls.add(candidateUrl);
+            result.candidates.push({ index_url: indexUrl, asset_url: candidateUrl, status: "asset_discovered_from_official_page" });
+          }
+        } else {
+          result.candidates.push({ index_url: indexUrl, status: "index_skipped_too_large" });
+        }
+      }
     } catch (error) {
       result.candidates.push({ index_url: indexUrl, status: "index_error", error: String(error?.message || error) });
     }
   }
 
-  const assetUrls = trustedAssetUrls;
+  const assetUrls = [...discoveredAssetUrls];
   for (const assetUrl of assetUrls) {
     try {
       const downloaded = await downloadAndHash(assetUrl, edition.max_bytes);
