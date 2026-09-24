@@ -156,7 +156,6 @@ const editions = official.translations.map((x) => ({
 
 if (editions.length < 1) throw new Error(`QuranEnc live API returned no translation editions`);
 
-await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
 
 const editionResults = await mapLimit(editions, async (edition) => {
@@ -164,6 +163,17 @@ const editionResults = await mapLimit(editions, async (edition) => {
   const editionId = safeSegment(edition.edition_id, "edition id");
   const dir = path.join(OUT, "editions", language, editionId);
   await fs.mkdir(dir, { recursive: true });
+
+  // Resume from the latest persisted acquisition artifact. A validated existing asset is never re-downloaded.
+  const existingMetadataPath = path.join(dir, "metadata.json");
+  try {
+    const existing = JSON.parse(await fs.readFile(existingMetadataPath, "utf8"));
+    if (existing.status === "acquired_research_only" && existing.acquired?.path) {
+      const absolute = path.join(ROOT, existing.acquired.path);
+      await fs.access(absolute);
+      return { ...existing, resumed: true };
+    }
+  } catch {}
 
   const candidates = [
     ["pdf", edition.download_urls.pdf],
@@ -241,7 +251,9 @@ const manifest = {
   language_count: new Set(editionResults.map((x) => x.language_iso_code)).size,
   live_only_editions: liveOnlyEditions,
   live_only_edition_count: liveOnlyEditions.length,
-  editions: editionResults
+  editions: editionResults,
+  last_completed_language: [...editionResults].reverse().find(x => x.status === "acquired_research_only")?.language_iso_code || null,
+  resume_supported: true
 };
 await fs.writeFile(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", "utf8");
 console.log(JSON.stringify({
