@@ -8,7 +8,9 @@ const ROOT=process.cwd();
 const LEDGER=path.join(ROOT,'research/evidence/global-multilingual/scientific-ledger.jsonl');
 const ADAPTERS=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/islamic-source-adapters-2026.json'),'utf8'));
 const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01-400h/master-global-source-registry-seed-2026-09.json'),'utf8'));
+const WORLDWIDE=JSON.parse(await fs.readFile(path.join(ROOT,'research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json'),'utf8'));
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
+const EXISTING_INVENTORY=process.env.ACQUISITION_EXISTING_INVENTORY||path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition/existing-release-inventory.json');
 const EXPECTED=3192;
 const MAX_SOURCES_PER_CELL=Math.max(1,Math.min(256,Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||256)));
 const MAX_DISCOVERY_DEPTH=Math.max(1,Math.min(6,Number(process.env.ACQUISITION_DISCOVERY_DEPTH||4)));
@@ -29,6 +31,12 @@ if(cells.size!==EXPECTED) throw new Error('expected '+EXPECTED+' cells, found '+
 
 const adapters=new Map(ADAPTERS.adapters.map(x=>[x.id,x]));
 const master=new Map((MASTER.sources||[]).map(x=>[x.id,x]));
+const worldwide=new Map((WORLDWIDE.sources||[]).map(x=>[String(x.id),x]));
+let existingInventory={cells:[],sha256:[]};
+try{existingInventory=JSON.parse(await fs.readFile(EXISTING_INVENTORY,'utf8'));}catch{}
+const existingCells=new Set((existingInventory.cells||[]).map(String));
+const existingSha=new Set((existingInventory.sha256||[]).map(x=>String(x).replace(/^sha256:/,'')));
+console.log('ACQUISITION_RESUME existing_cells='+existingCells.size+' existing_sha256='+existingSha.size);
 const origins=new Set(), originSource=new Map();
 function addOrigin(id,value){
   try{
@@ -46,12 +54,22 @@ for(const a of adapters.values()){
   addOrigin(a.id,a.api_base_url);
 }
 for(const s of master.values()) addOrigin(s.id,s.url);
+for(const s of worldwide.values()) addOrigin(s.id,s.url);
 function sourceOf(url){try{return originSource.get(new URL(url).origin)||null;}catch{return null;}}
 function allow(url){try{const u=new URL(url);return u.protocol==='https:'&&!u.username&&!u.password&&origins.has(u.origin)?u:null;}catch{return null;}}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const safe=s=>String(s||'unknown').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'unknown';
 function sourceActive(adapter){
   return ['enabled','runtime-verified'].includes(String(adapter?.status||''));
+}
+function worldwideRelevant(source,row){
+  const text=String(source?.category||'')+' '+String(source?.name||'')+' '+String(source?.scope||'');
+  const hay=text.toLowerCase(),domain=String(row.domain||'').toLowerCase();
+  if(domain==='quran'||domain==='tafsir') return /quran|tafsir|translation|islamic source|islamic knowledge|research|library|manuscript|corpus|api/.test(hay);
+  if(domain==='hadith'||domain==='sunnah'||domain==='hadith_explanation') return /hadith|sunnah|islamic|research|library|manuscript|corpus|api/.test(hay);
+  if(domain==='books') return /book|library|manuscript|corpus|archive|repository|openiti|catalog|islamic/.test(hay);
+  if(domain==='fiqh'||domain==='fatawa'||domain==='aqidah'||domain==='sirah') return /fiqh|fatwa|aqidah|sirah|islamic|scholar|research|library|book/.test(hay);
+  return /islamic|quran|hadith|library|manuscript|catalog|research|corpus|api|book/.test(hay);
 }
 function adapterRelevant(adapter,row){
   const domain=String(row.domain||'').toLowerCase();
@@ -295,7 +313,12 @@ async function processCell(row){
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
-  // Inspect every active adapter AND every active master-registry source relevant to the cell.\n  // The full registered source pool is inspected; there is no 24-source shortlist.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);\n  for(const s of master.values()){\n    const sid=String(s.id||'').trim();\n    const active=!s.status || ['enabled','active','runtime-verified'].includes(String(s.status).toLowerCase());\n    if(!sid||!active) continue;\n    const kinds=(s.kinds||s.capabilities||[]).map(x=>String(x).toLowerCase());\n    if(adapterRelevant({kinds},row)) push(sid);\n  }\n  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);\n  entry.source_candidates=limitedIds.slice();\n  const seeds=[];\n  for(const id of limitedIds){\n    const a=adapters.get(id);\n    const m=master.get(id);\n    for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});\n    if(a){const direct=urls.some(x=>sourceOf(x)===id);if(!direct&&a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}\n    if(m){const mu=String(m.url||m.base_url||'');if(mu)seeds.push({id,url:mu,role:'master-registry'});}\n  }
+  // Inspect every active adapter AND every active master-registry source relevant to the cell.\n  // The full registered source pool is inspected; there is no 24-source shortlist.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);\n  for(const s of master.values()){\n    const sid=String(s.id||'').trim();\n    const active=!s.status || ['enabled','active','runtime-verified'].includes(String(s.status).toLowerCase());\n    if(!sid||!active) continue;\n    const kinds=(s.kinds||s.capabilities||[]).map(x=>String(x).toLowerCase());\n    if(adapterRelevant({kinds},row)) push(sid);\n  }\n  for(const s of worldwide.values()){
+    const sid=String(s.id||'').trim();
+    if(!sid||!worldwideRelevant(s,row)) continue;
+    push(sid);
+  }
+  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);\n  entry.source_candidates=limitedIds.slice();\n  const seeds=[];\n  for(const id of limitedIds){\n    const a=adapters.get(id);\n    const m=master.get(id);\n    for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});\n    if(a){const direct=urls.some(x=>sourceOf(x)===id);if(!direct&&a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}\n    if(m){const mu=String(m.url||m.base_url||'');if(mu)seeds.push({id,url:mu,role:'master-registry'});}\n  }
   const localSeen=new Set();
   let rightsApprovedSources=0;
   for(const seed of seeds){
