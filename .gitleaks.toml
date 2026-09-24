@@ -1,0 +1,14 @@
+# Gitleaks false-positive allowlist for a public government download URL token
+# The matched token is a URL parameter in historical provenance evidence, not an
+# application credential. The current files no longer need to carry the token.
+
+[[allowlists]]
+description = "Rwanda MINIJUST tokenized Gazette evidence URL recorded in historical commits"
+paths = [
+  '''config/quran-multisource-translation-catalog-2026-09-22\\.json''',
+  '''config/quranenc-translation-provenance-2026-09-22\\.json'''
+]
+regexTarget = "match"
+regexes = [
+  '''https://www\\.minijust\\.gov\\.rw/index\\.php\\?eID=dumpFile&f=77060&t=dumpFile&token=0a72c9f36e0694e727af1c50eeb47f730ca327e3'''
+]
