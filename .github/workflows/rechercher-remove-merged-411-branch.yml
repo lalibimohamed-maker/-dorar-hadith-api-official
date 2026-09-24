@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize]
 
 permissions:
+  # security-justification: contents: write is required only to remove the obsolete merged #411 branch; no source content or Corpus data is modified.
   contents: write
 
 jobs:
