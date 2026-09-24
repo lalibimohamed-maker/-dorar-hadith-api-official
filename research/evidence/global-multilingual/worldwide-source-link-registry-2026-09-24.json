@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 373,
-    "rights_review_required": 373,
-    "new_global_links_added_2026_09_24": 246,
+    "links": 374,
+    "rights_review_required": 374,
+    "new_global_links_added_2026_09_24": 247,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -6715,6 +6715,28 @@
       ],
       "priority": "HIGH",
       "legacy_source_id": "waqfeya_foreign_dictionaries"
+    },
+    {
+      "id": "world-374",
+      "category": "Islamic source hub",
+      "name": "IslamEnc — Islamic encyclopedias and services hub",
+      "url": "https://s.islamenc.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Verified source/discovery hub. It indexes multiple IslamEnc-related services including QuranEnc, HadeethEnc, TerminologyEnc, Islamcontent, IslamHouse/enc, Saadi Tafsir and developer/API services. Hub registration does not grant redistribution rights; item-level terms remain required.",
+      "capabilities": [
+        "multilingual_dawah",
+        "quran",
+        "hadith",
+        "islamic_terminology",
+        "multilingual_islamic_content",
+        "tafsir",
+        "developer_apis",
+        "source_discovery"
+      ],
+      "verification_status": "web-verified",
+      "verification_url": "https://s.islamenc.com/"
     }
   ],
   "notes": [
@@ -6745,6 +6767,7 @@
     "2026-09-24 cross-continent continuation: added McGill Islamic Studies digital collections and specialized archive, SLUB Dresden Oriental Manuscripts, Brazil National Digital Library and manuscript catalogue, University of Toronto Kairouan Manuscript Project, and Digital Walters open manuscript endpoint.",
     "2026-09-24 deep cross-continent radar: added Russia NLR Islamic/early Quran, Türkiye Manuscripts Institution, Georgia Arabic manuscript catalogue, McGill, SLUB Dresden, Harvard IHP, OPenn Muslim World, and University of Melbourne Middle Eastern Manuscripts.",
     "2026-09-24: imported 87 unique URLs present in PR #411 and absent from PR #561, preserving their original source/role/rights notes and marking every imported entry review_required. The import is registry-only and does not authorize acquisition, redistribution, or Corpus writes.",
-    "2026-09-24: URL-level deduplication was performed against the current #561 registry before import; repeated #411 URLs were added only once."
+    "2026-09-24: URL-level deduplication was performed against the current #561 registry before import; repeated #411 URLs were added only once.",
+    "2026-09-24: added the verified IslamEnc worldwide Islamic-encyclopedia/services hub (https://s.islamenc.com/) as a distinct source-discovery endpoint. Its child services remain separately governed where applicable; hub inclusion does not grant redistribution rights."
   ]
 }
