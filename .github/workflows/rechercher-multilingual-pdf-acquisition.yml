@@ -115,89 +115,92 @@ jobs:
           echo "RESEARCH_ONLY_STORAGE=PRIVATE_DURABLE_STORAGE_REQUIRED"
 
       - name: Persist research-only PDFs to protected GitHub Releases
-        if: \${{ hashFiles('artifacts/rechercher/multilingual-research-vault/**/*.pdf') != '' }}
         env:
-          SECONDARY_STORAGE_TOKEN: \${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
           SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
         run: |
           set -euo pipefail
-          test -n "\${SECONDARY_STORAGE_TOKEN:-}" || {
-            echo "ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required for durable research-only PDF retention."
-            exit 1
-          }
-          export GH_TOKEN="\$SECONDARY_STORAGE_TOKEN"
-          release_root="\$RUNNER_TEMP/research-release"
-          rm -rf "\$release_root"
-          mkdir -p "\$release_root"
-          find artifacts/rechercher/multilingual-research-vault -type f -name '*.pdf' -print0 > "\$release_root/files.nul"
-          count=0
-          while IFS= read -r -d '' file; do
-            test "\$(head -c 5 "\$file")" = "%PDF-"
-            count=\$((count+1))
-          done < "\$release_root/files.nul"
-          if [ "\$count" -eq 0 ]; then
+          if ! find artifacts/rechercher/multilingual-research-vault -type f -name "*.pdf" -print -quit | grep -q .; then
             echo "No research-only PDFs to persist."
             exit 0
           fi
-          tag="rechercher-multilingual-protected-\${GITHUB_RUN_ID}"
-          notes="\$release_root/notes.md"
+          test -n "${SECONDARY_STORAGE_TOKEN:-}" || {
+            echo "ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required for durable research-only PDF retention."
+            exit 1
+          }
+          export GH_TOKEN="$SECONDARY_STORAGE_TOKEN"
+          release_root="$RUNNER_TEMP/research-release"
+          rm -rf "$release_root"
+          mkdir -p "$release_root"
+          find artifacts/rechercher/multilingual-research-vault -type f -name '*.pdf' -print0 > "$release_root/files.nul"
+          count=0
+          while IFS= read -r -d '' file; do
+            test "$(head -c 5 "$file")" = "%PDF-"
+            count=$((count+1))
+          done < "$release_root/files.nul"
+          if [ "$count" -eq 0 ]; then
+            echo "No research-only PDFs to persist."
+            exit 0
+          fi
+          tag="rechercher-multilingual-protected-${GITHUB_RUN_ID}"
+          notes="$release_root/notes.md"
           {
             echo "# Rechercher protected multilingual PDFs"
             echo
             echo "Research-only PDFs retained for developer/research review."
             echo "No Corpus write. No public publication."
             echo "Canonical plaintext PDFs only; encrypted extensions are forbidden."
-          } > "\$notes"
+          } > "$notes"
 
           declare -A existing_sha=()
-          while IFS=\$'\t' read -r digest release_tag asset_name; do
-            [ -n "\$digest" ] && existing_sha["\$digest"]="\$release_tag/\$asset_name"
+          while IFS=$'\t' read -r digest release_tag asset_name; do
+            [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
           done < <(
             gh api --paginate -H "Accept: application/vnd.github+json" \
-              "/repos/\$SECONDARY_STORAGE_REPO/releases?per_page=100" \
+              "/repos/$SECONDARY_STORAGE_REPO/releases?per_page=100" \
               --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
           )
-          echo "SECONDARY_EXISTING_SHA_COUNT=\${#existing_sha[@]}"
+          echo "SECONDARY_EXISTING_SHA_COUNT=${#existing_sha[@]}"
 
           new_count=0
           duplicate_count=0
           declare -A batch_sha=()
           while IFS= read -r -d '' file; do
-            sha="\$(sha256sum "\$file" | awk '{print \$1}')"
-            digest="sha256:\$sha"
-            if [ -n "\${existing_sha[\$digest]+x}" ] || [ -n "\${batch_sha[\$digest]+x}" ]; then
-              echo "SECONDARY_DEDUP_SKIP sha256=\$sha file=\$(basename "\$file")"
-              duplicate_count=\$((duplicate_count+1))
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            digest="sha256:$sha"
+            if [ -n "${existing_sha[$digest]+x}" ] || [ -n "${batch_sha[$digest]+x}" ]; then
+              echo "SECONDARY_DEDUP_SKIP sha256=$sha file=$(basename "$file")"
+              duplicate_count=$((duplicate_count+1))
               continue
             fi
-            batch_sha["\$digest"]=1
-            new_count=\$((new_count+1))
-          done < "\$release_root/files.nul"
-          echo "SECONDARY_RELEASE_INPUTS total=\$count new=\$new_count duplicates_skipped=\$duplicate_count"
-          if [ "\$new_count" -eq 0 ]; then
+            batch_sha["$digest"]=1
+            new_count=$((new_count+1))
+          done < "$release_root/files.nul"
+          echo "SECONDARY_RELEASE_INPUTS total=$count new=$new_count duplicates_skipped=$duplicate_count"
+          if [ "$new_count" -eq 0 ]; then
             echo "SECONDARY_RELEASE_NOOP all_research_only_pdfs_already_persisted=true"
-            rm -rf "\$release_root"
+            rm -rf "$release_root"
             exit 0
           fi
 
-          gh release create "\$tag" --repo "\$SECONDARY_STORAGE_REPO" --title "Rechercher protected multilingual PDFs — \$tag" --notes-file "\$notes" --latest=false
+          gh release create "$tag" --repo "$SECONDARY_STORAGE_REPO" --title "Rechercher protected multilingual PDFs — $tag" --notes-file "$notes" --latest=false
           while IFS= read -r -d '' file; do
-            sha="\$(sha256sum "\$file" | awk '{print \$1}')"
-            digest="sha256:\$sha"
-            if [ -n "\${existing_sha[\$digest]+x}" ]; then
-              echo "SECONDARY_DEDUP_SKIP sha256=\$sha existing=\${existing_sha[\$digest]} file=\$(basename "\$file")"
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            digest="sha256:$sha"
+            if [ -n "${existing_sha[$digest]+x}" ]; then
+              echo "SECONDARY_DEDUP_SKIP sha256=$sha existing=${existing_sha[$digest]} file=$(basename "$file")"
               continue
             fi
-            base="\$(basename "\$file")"
-            asset="\${sha}_\${base}"
-            cp -f "\$file" "\$release_root/\$asset"
-            gh release upload "\$tag" "\$release_root/\$asset" --repo "\$SECONDARY_STORAGE_REPO"
-            rm -f "\$release_root/\$asset"
-            existing_sha["\$digest"]="\$tag/\$asset"
-          done < "\$release_root/files.nul"
-          gh release view "\$tag" --repo "\$SECONDARY_STORAGE_REPO" --json tagName,isDraft,assets,url
-          rm -rf "\$release_root"
-          echo "SECONDARY_MULTILINGUAL_PDF_RELEASE_OK assets=\$new_count tag=\$tag"
+            base="$(basename "$file")"
+            asset="${sha}_${base}"
+            cp -f "$file" "$release_root/$asset"
+            gh release upload "$tag" "$release_root/$asset" --repo "$SECONDARY_STORAGE_REPO"
+            rm -f "$release_root/$asset"
+            existing_sha["$digest"]="$tag/$asset"
+          done < "$release_root/files.nul"
+          gh release view "$tag" --repo "$SECONDARY_STORAGE_REPO" --json tagName,isDraft,assets,url
+          rm -rf "$release_root"
+          echo "SECONDARY_MULTILINGUAL_PDF_RELEASE_OK assets=$new_count tag=$tag"
 
       - name: Verify cell download inventory
         run: |
