@@ -5,8 +5,10 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 111,
-    "rights_review_required": 111
+    "links": 127,
+    "rights_review_required": 127,
+    "new_global_links_added_2026_09_24": 16,
+    "previous_snapshot_links": 111
   },
   "rules": [
     "URL is a discovery/source endpoint, not proof of item-level rights.",
@@ -1125,6 +1127,305 @@
       "rights_status": "review_required",
       "source_pr": "541_or_558",
       "notes": "Discovery link; API/source access does not itself grant redistribution rights."
+    },
+    {
+      "id": "world-112",
+      "category": "Global manuscript union catalog",
+      "name": "Digital Scriptorium",
+      "url": "https://digital-scriptorium.org/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://digital-scriptorium.org/",
+      "capabilities": [
+        "manuscript_catalogue",
+        "linked_open_data",
+        "institutional_discovery"
+      ],
+      "notes": "Cross-institutional premodern manuscript discovery across North American member institutions; not a blanket redistribution license."
+    },
+    {
+      "id": "world-113",
+      "category": "Global manuscript catalog",
+      "name": "Digital Scriptorium Catalog",
+      "url": "https://search.digital-scriptorium.org/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://search.digital-scriptorium.org/",
+      "capabilities": [
+        "manuscript_search",
+        "linked_open_data",
+        "metadata_discovery"
+      ],
+      "notes": "Search portal for manuscript records aggregated from member institutions; item-level rights remain separate."
+    },
+    {
+      "id": "world-114",
+      "category": "Digital library",
+      "name": "Digital Bodleian",
+      "url": "https://digital.bodleian.ox.ac.uk/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.bodleian.ox.ac.uk/node/1568816",
+      "capabilities": [
+        "manuscript_images",
+        "rare_books",
+        "digital_collections"
+      ],
+      "notes": "Bodleian digital collections; public availability of images does not by itself establish redistribution rights for every item."
+    },
+    {
+      "id": "world-115",
+      "category": "Academic digital library",
+      "name": "Yale Arabic and Middle Eastern Electronic Library (AMEEL)",
+      "url": "https://web.library.yale.edu/digital-collections/arabic-and-middle-eastern-electronic-library",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://web.library.yale.edu/digital-collections/arabic-and-middle-eastern-electronic-library",
+      "capabilities": [
+        "arabic_full_text",
+        "ocr",
+        "manuscript_catalogues",
+        "periodicals"
+      ],
+      "notes": "Yale describes approximately 350,000 pages of searchable full text, including Arabic, plus historical manuscript catalogues; access/rights vary during migration."
+    },
+    {
+      "id": "world-116",
+      "category": "Arabic manuscripts",
+      "name": "NYPL Arabic Manuscripts Digital Collection",
+      "url": "https://digitalcollections.nypl.org/collections/29ba5830-c6bb-012f-6243-58d385a7bc34",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://digitalcollections.nypl.org/collections/29ba5830-c6bb-012f-6243-58d385a7bc34",
+      "capabilities": [
+        "arabic_manuscripts",
+        "quran_manuscripts",
+        "religious_treatises",
+        "digital_images"
+      ],
+      "notes": "Collection includes Arabic manuscripts from the 7th to late 19th century, including Qur'an items, religious works, law and history."
+    },
+    {
+      "id": "world-117",
+      "category": "Arabic manuscripts archive",
+      "name": "NYPL Archives & Manuscripts — Arabic manuscripts collection",
+      "url": "https://archives.nypl.org/mss/116",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://archives.nypl.org/mss/116",
+      "capabilities": [
+        "finding_aid",
+        "manuscript_metadata",
+        "digital_assets"
+      ],
+      "notes": "Finding aid for MssCol 116; portions are digitized and the collection has 517 listed image assets."
+    },
+    {
+      "id": "world-118",
+      "category": "Islamic manuscripts",
+      "name": "University of Michigan Islamic Manuscripts",
+      "url": "https://www.lib.umich.edu/collections/collecting-areas/special-collections/islamic-manuscripts/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.lib.umich.edu/collections/collecting-areas/special-collections/islamic-manuscripts/",
+      "capabilities": [
+        "quran",
+        "quran_sciences",
+        "hadith",
+        "fiqh",
+        "theology",
+        "islamic_manuscripts"
+      ],
+      "notes": "More than 1,100 volumes and about 1,800 texts, primarily Arabic, Persian and Ottoman Turkish; many are available via HathiTrust."
+    },
+    {
+      "id": "world-119",
+      "category": "West African Islamic manuscripts",
+      "name": "Library of Congress — Islamic Manuscripts from Mali",
+      "url": "https://www.loc.gov/collections/islamic-manuscripts-from-mali/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.loc.gov/collections/islamic-manuscripts-from-mali/about-this-collection/",
+      "capabilities": [
+        "islamic_manuscripts",
+        "timbuktu",
+        "west_african_arabic_tradition",
+        "digitized_manuscripts"
+      ],
+      "notes": "Over 30 digitized manuscripts from Timbuktu collections; rights must be checked per item."
+    },
+    {
+      "id": "world-120",
+      "category": "Islamic manuscript preservation",
+      "name": "Hill Museum & Manuscript Library — Islamic Manuscripts",
+      "url": "https://hmml.org/collections/islamic/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://hmml.org/collections/islamic/",
+      "capabilities": [
+        "islamic_manuscripts",
+        "west_africa",
+        "ethiopia",
+        "jerusalem_gaza",
+        "yemen",
+        "south_asia",
+        "bosnia"
+      ],
+      "notes": "Global Islamic manuscript holdings spanning multiple regions; discovery/digitization service, not blanket reuse authorization."
+    },
+    {
+      "id": "world-121",
+      "category": "Southeast Asian Islamic manuscripts",
+      "name": "DREAMSEA",
+      "url": "https://hmml.org/research/dreamsea/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://hmml.org/research/dreamsea/",
+      "capabilities": [
+        "islamic_manuscripts",
+        "southeast_asia",
+        "multilingual_manuscripts",
+        "digital_images"
+      ],
+      "notes": "Digital repository project covering Islamic and Buddhist manuscripts across Indonesia, Laos, Thailand, Malaysia and Vietnam."
+    },
+    {
+      "id": "world-122",
+      "category": "Southeast Asian manuscript catalog",
+      "name": "DREAMSEA Manuscripts Catalog",
+      "url": "https://www.hmmlcloud.org/dreamsea/manuscripts.php",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.hmmlcloud.org/dreamsea/manuscripts.php",
+      "capabilities": [
+        "manuscript_search",
+        "language_filtering",
+        "subject_filtering",
+        "iiif_discovery"
+      ],
+      "notes": "Searchable DREAMSEA catalog; individual records can expose IIIF manifests, languages, subjects and page counts."
+    },
+    {
+      "id": "world-123",
+      "category": "European oriental manuscripts",
+      "name": "Staatsbibliothek zu Berlin Digital Collections",
+      "url": "https://digital.staatsbibliothek-berlin.de/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://staatsbibliothek-berlin.de/en/about-the-library/departments/orient/projects/translate-to-english-digitalisierung",
+      "capabilities": [
+        "arabic_manuscripts",
+        "yemeni_manuscripts",
+        "islamic_manuscripts",
+        "digital_images"
+      ],
+      "notes": "SBB documents digitized Arabic/Yemeni and Islamic manuscript holdings; use item-level terms for release decisions."
+    },
+    {
+      "id": "world-124",
+      "category": "Islamic scientific manuscripts",
+      "name": "Islamic Scientific Manuscripts Initiative (ISMI)",
+      "url": "https://ismi.mpiwg-berlin.mpg.de/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://ismi.mpiwg-berlin.mpg.de/",
+      "capabilities": [
+        "scientific_manuscripts",
+        "arabic",
+        "persian",
+        "turkish",
+        "manuscript_metadata"
+      ],
+      "notes": "Specialized discovery and metadata for Islamic scientific manuscripts in multiple languages."
+    },
+    {
+      "id": "world-125",
+      "category": "British manuscript catalogue",
+      "name": "British Library Archives and Manuscripts Catalogue",
+      "url": "https://searcharchives.bl.uk/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://searcharchives.bl.uk/",
+      "capabilities": [
+        "oriental_manuscripts",
+        "arabic",
+        "persian",
+        "ottoman_turkish",
+        "endangered_archives"
+      ],
+      "notes": "Interim catalogue covering Oriental Manuscripts and Endangered Archives material; not all items are digitized or currently available."
+    },
+    {
+      "id": "world-126",
+      "category": "Malay world manuscript research",
+      "name": "Malay World Manuscript Research Centre (PPMAM)",
+      "url": "https://www.ukm.my/atma/en/ppmam-introduction/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.ukm.my/atma/en/ppmam-introduction/",
+      "capabilities": [
+        "malay_manuscripts",
+        "jawi",
+        "arabic",
+        "islamic_religious_texts",
+        "manuscript_research"
+      ],
+      "notes": "UKM research centre for Malay Jawi manuscripts; documents a worldwide research scope and manuscript holdings in libraries, archives and museums."
+    },
+    {
+      "id": "world-127",
+      "category": "Southeast Asian manuscript repository",
+      "name": "UKM Learning and Research Repository — Manuscripts Collection",
+      "url": "https://ptsldigital.ukm.my/jspui/handle/123456789/388864",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "global-expansion-2026-09-24",
+      "verification_status": "web-verified",
+      "verification_url": "https://ptsldigital.ukm.my/jspui/handle/123456789/388864",
+      "capabilities": [
+        "manuscript_metadata",
+        "malay",
+        "jawi",
+        "arabic",
+        "quran_related",
+        "fiqh",
+        "hadith"
+      ],
+      "notes": "78-item manuscript collection; catalogue includes religious works such as Tajwid, Hadith and Hanafi fiqh; file access varies by item."
     }
+  ],
+  "notes": [
+    "This expanded snapshot is not an exhaustive census of all global sources.",
+    "The 15 additions in this revision were checked against PR #541 and PR #558 diffs and the repository main-branch code search before insertion."
   ]
 }
