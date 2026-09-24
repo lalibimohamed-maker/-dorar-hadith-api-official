@@ -34,7 +34,7 @@ const master=new Map((MASTER.sources||[]).map(x=>[x.id,x]));
 const worldwide=new Map((WORLDWIDE.sources||[]).map(x=>[String(x.id),x]));
 let existingInventory={cells:[],sha256:[]};
 try{existingInventory=JSON.parse(await fs.readFile(EXISTING_INVENTORY,'utf8'));}catch{}
-const normalizeCellId=value=>String(value||'').trim().replace(/\\./g,':').replace(/\\s+/g,' ').toLowerCase();
+const normalizeCellId=value=>String(value||'').trim().replace(/\./g,':').replace(/\s+/g,' ').toLowerCase();
 const cellIdByNormalized=new Map([...cells.keys()].map(id=>[normalizeCellId(id),id]));
 const rawExistingCells=(existingInventory.cells||[]).map(String);
 const existingCells=new Set();
