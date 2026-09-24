@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 374,
-    "rights_review_required": 374,
-    "new_global_links_added_2026_09_24": 247,
+    "links": 375,
+    "rights_review_required": 375,
+    "new_global_links_added_2026_09_24": 248,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -1541,7 +1541,15 @@
       "scope": "candidate-source",
       "rights_status": "review_required",
       "source_pr": "561",
-      "notes": "Licensed Saudi association for multilingual Islamic content; official site states multilingual production and free electronic availability. Item-level terms still govern redistribution."
+      "notes": "Official Islamic Content Association site. Registered already as a distinct organization/source from the IslamContent content platform; its existence does not grant redistribution rights, and item-level terms remain required.",
+      "verification_status": "web-verified",
+      "verification_url": "https://islamiccontent.org/",
+      "capabilities": [
+        "multilingual_islamic_content",
+        "source_organization",
+        "terminology",
+        "translation_support"
+      ]
     },
     {
       "id": "world-136",
@@ -6737,6 +6745,30 @@
       ],
       "verification_status": "web-verified",
       "verification_url": "https://s.islamenc.com/"
+    },
+    {
+      "id": "world-375",
+      "category": "Multilingual Islamic content",
+      "name": "IslamContent — Multilingual Islamic Content Encyclopedia",
+      "url": "https://islamcontent.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Official multilingual content platform. Current site exposes books, Quran, hadith, articles, fatawa and other Islamic media, with a large language catalogue. Platform registration is a discovery/source record only; item-level licensing and redistribution terms remain mandatory.",
+      "capabilities": [
+        "multilingual_islamic_content",
+        "multilingual_books",
+        "quran",
+        "hadith",
+        "fatawa",
+        "articles",
+        "audio",
+        "video",
+        "source_discovery"
+      ],
+      "verification_status": "web-verified",
+      "verification_url": "https://islamcontent.com/",
+      "language_count_current_site": 130
     }
   ],
   "notes": [
@@ -6768,6 +6800,7 @@
     "2026-09-24 deep cross-continent radar: added Russia NLR Islamic/early Quran, Türkiye Manuscripts Institution, Georgia Arabic manuscript catalogue, McGill, SLUB Dresden, Harvard IHP, OPenn Muslim World, and University of Melbourne Middle Eastern Manuscripts.",
     "2026-09-24: imported 87 unique URLs present in PR #411 and absent from PR #561, preserving their original source/role/rights notes and marking every imported entry review_required. The import is registry-only and does not authorize acquisition, redistribution, or Corpus writes.",
     "2026-09-24: URL-level deduplication was performed against the current #561 registry before import; repeated #411 URLs were added only once.",
-    "2026-09-24: added the verified IslamEnc worldwide Islamic-encyclopedia/services hub (https://s.islamenc.com/) as a distinct source-discovery endpoint. Its child services remain separately governed where applicable; hub inclusion does not grant redistribution rights."
+    "2026-09-24: added the verified IslamEnc worldwide Islamic-encyclopedia/services hub (https://s.islamenc.com/) as a distinct source-discovery endpoint. Its child services remain separately governed where applicable; hub inclusion does not grant redistribution rights.",
+    "2026-09-24: added https://islamcontent.com/ as a distinct multilingual Islamic-content platform. The already-registered https://islamiccontent.org/ (world-135) was not duplicated and was enriched with current web-verification metadata."
   ]
 }
