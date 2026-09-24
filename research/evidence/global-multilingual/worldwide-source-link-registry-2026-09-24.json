@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 405,
-    "rights_review_required": 405,
-    "new_global_links_added_2026_09_24": 278,
+    "links": 410,
+    "rights_review_required": 410,
+    "new_global_links_added_2026_09_24": 283,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -7308,6 +7308,106 @@
       "notes": "Added from the supplied source list as an Islamic research and studies endpoint. Registration is discovery-only; item-level rights and redistribution terms remain subject to verification.",
       "verification_status": "verification_pending",
       "verification_url": "https://iicss.iq"
+    },
+    {
+      "id": "world-406",
+      "category": "Sunni Islamic bibliography",
+      "name": "الفهرس الكبير لمؤلفات أهل السنة والجماعة",
+      "url": "https://islamic-books-index.com",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Current source verified. A Sunni-oriented bibliography/catalog covering creed, hadith, fiqh, tafsir, biographies and related fields; the site exposes book and category indexes. Discovery-only; item-level rights remain mandatory.",
+      "capabilities": [
+        "sunni_bibliography",
+        "aqidah",
+        "hadith",
+        "fiqh",
+        "tafsir",
+        "book_catalog",
+        "pdf_discovery"
+      ],
+      "verification_status": "web-verified",
+      "verification_url": "https://islamic-books-index.com"
+    },
+    {
+      "id": "world-408",
+      "category": "Arabic knowledge platform with Islamic studies",
+      "name": "بالعربية",
+      "url": "https://bilarabiya.net",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Current endpoint verified. The platform includes Islamic-studies content and book/PDF-related material; retain as a discovery source rather than assuming redistribution permission.",
+      "capabilities": [
+        "islamic_studies",
+        "arabic_knowledge",
+        "books",
+        "research",
+        "pdf_discovery"
+      ],
+      "verification_status": "web-verified",
+      "verification_url": "https://bilarabiya.net"
+    },
+    {
+      "id": "world-409",
+      "category": "Sunni books and refutation archive",
+      "name": "شبكة الدفاع عن السنة",
+      "url": "https://www.dd-sunnah.net",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Current endpoint verified. The site exposes books, creed, hadith/fiqh, Sunni heritage and translated books; item-level rights and provenance remain mandatory.",
+      "capabilities": [
+        "sunni_books",
+        "aqidah",
+        "hadith",
+        "fiqh",
+        "refutations",
+        "translated_books"
+      ],
+      "verification_status": "web-verified",
+      "verification_url": "https://dd-sunnah.net/forum/index.php"
+    },
+    {
+      "id": "world-410",
+      "category": "Islamic sciences foundation / library index",
+      "name": "مؤسسة العلوم الإسلامية — FIT EU",
+      "url": "https://fit-eu.org",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Endpoint is live but current automated access is protected by a verification page; retain as a discovery candidate pending direct content/provenance verification.",
+      "capabilities": [
+        "islamic_sciences",
+        "library_index",
+        "book_catalog",
+        "source_discovery"
+      ],
+      "verification_status": "verification_pending",
+      "verification_url": "https://fit-eu.org"
+    },
+    {
+      "id": "world-411",
+      "category": "Official scholar archive",
+      "name": "موقع الشيخ عبد العزيز بن باز",
+      "url": "https://binbaz.org.sa",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Official site under the Abdulaziz bin Baz Charitable Foundation. It provides the scholar's books, fatwas, lectures and other scholarly legacy. The site's stated reuse condition requires attribution to the source; item-level terms remain mandatory.",
+      "capabilities": [
+        "scholar_archive",
+        "fatwa",
+        "aqidah",
+        "hadith",
+        "fiqh",
+        "books",
+        "audio",
+        "video"
+      ],
+      "verification_status": "web-verified",
+      "verification_url": "https://binbaz.org.sa/about"
     }
   ],
   "notes": [
@@ -7342,6 +7442,7 @@
     "2026-09-24: added the verified IslamEnc worldwide Islamic-encyclopedia/services hub (https://s.islamenc.com/) as a distinct source-discovery endpoint. Its child services remain separately governed where applicable; hub inclusion does not grant redistribution rights.",
     "2026-09-24: added https://islamcontent.com/ as a distinct multilingual Islamic-content platform. The already-registered https://islamiccontent.org/ (world-135) was not duplicated and was enriched with current web-verification metadata.",
     "2026-09-24: added the supplied Sunnah, Islamic encyclopedia, multilingual-content, library, Quran, terminology and publisher endpoints. Existing exact URLs were deduplicated; all new entries remain review_required.",
-    "2026-09-24 batch-2 canonical merge: three previously absent supplied endpoints were added (taaseel.com, bfdm.journals.ekb.eg, iicss.iq). muslim-library.com and islamweb.net were already registered in the canonical registry, while sunnah.global was already registered as world-378; none was duplicated."
+    "2026-09-24 batch-2 canonical merge: three previously absent supplied endpoints were added (taaseel.com, bfdm.journals.ekb.eg, iicss.iq). muslim-library.com and islamweb.net were already registered in the canonical registry, while sunnah.global was already registered as world-378; none was duplicated.",
+    "2026-09-24 Sunni-source expansion: added the verified Sunni bibliography Islamic Books Index, Sunni defense/book network, FIT-EU Islamic Sciences Foundation candidate, Bin Baz official archive, and the verified Arabic knowledge platform BilArabiya. Dar Al-Zaman was already registered as world-394 and was not duplicated."
   ]
 }
