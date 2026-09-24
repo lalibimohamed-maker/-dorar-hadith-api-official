@@ -8,3 +8,5 @@ test('acquisition uses bounded parallelism and timeouts',()=>{assert.ok(s.includ
 test('Corpus and translation boundaries remain closed',()=>{assert.ok(s.includes('corpus_write:false'));assert.ok(s.includes('promoteToCorpus:false'));assert.ok(s.includes('canonical_arabic_separate:true'));assert.ok(s.includes('machine_translation_never_promoted:true'));});
 
 test('acquisition resumes from durable Release inventory instead of re-downloading acquired cells',()=>{assert.ok(s.includes('ACQUISITION_EXISTING_INVENTORY'));assert.ok(s.includes('existingCells'));assert.ok(s.includes("status:'already-acquired'"));assert.match(s,/filter\(row=>!existingCells\.has/);});
+
+test('resume normalizes legacy Release cell identifiers to ledger cell IDs',()=>{assert.ok(s.includes('normalizeCellId'));assert.ok(s.includes('cellIdByNormalized'));assert.ok(s.includes('rawExistingCells'));});
