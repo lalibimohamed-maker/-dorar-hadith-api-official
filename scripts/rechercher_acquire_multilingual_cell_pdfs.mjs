@@ -11,6 +11,11 @@ const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01
 const WORLDWIDE=JSON.parse(await fs.readFile(path.join(ROOT,'research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json'),'utf8'));
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXISTING_INVENTORY=process.env.ACQUISITION_EXISTING_INVENTORY||path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition/existing-release-inventory.json');
+let existingInventory={cells:[],sha256:[]};
+try{existingInventory=JSON.parse(await fs.readFile(EXISTING_INVENTORY,'utf8'));}catch{}
+const existingCells=new Set((existingInventory.cells||[]).map(String));
+const existingSha=new Set((existingInventory.sha256||[]).map(x=>String(x).replace(/^sha256:/,'')));
+console.log('ACQUISITION_RESUME existing_cells='+existingCells.size+' existing_sha256='+existingSha.size);
 const EXPECTED=3192;
 const MAX_SOURCES_PER_CELL=Math.max(1,Math.min(256,Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||256)));
 const MAX_DISCOVERY_DEPTH=Math.max(1,Math.min(6,Number(process.env.ACQUISITION_DISCOVERY_DEPTH||4)));
@@ -311,6 +316,28 @@ const manifest={
   source_counts:{},cells:{}
 };
 const claimed=new Set(),seenPdfSha256=new Map(),candidateCache=new Map(),started=Date.now();
+function markAlreadyAcquired(row){
+  manifest.cells[row.cell_id]={
+    cell_id:row.cell_id,
+    language:row.language,
+    language_iso:row.language_iso||null,
+    domain:row.domain,
+    provider:row.provider||null,
+    status:'already-acquired',
+    sources_checked:[],
+    evidence_urls:evidenceUrls(row),
+    files:[],
+    rights:'already-persisted',
+    rights_conflict:false,
+    rights_confidence:1,
+    rights_evidence:[{source:'matrix-release-inventory',kind:'already-persisted'}],
+    acquisition:'public',
+    source_errors:[],
+    source_candidates:[],
+    rights_approved_sources:[],
+    rights_blocked_sources:[]
+  };
+}
 
 async function downloadPdf(url,dest){
   const u=allow(url);if(!u)throw new Error('untrusted PDF');
@@ -421,6 +448,17 @@ async function processCell(row){
       try{
         const r=await downloadPdf(pdf,temp),base=safe(path.basename(new URL(r.finalUrl).pathname))||'document.pdf';
         const duplicateOf=seenPdfSha256.get(r.sha256);
+        const durableDuplicate=existingSha.has(r.sha256);
+        if(durableDuplicate){
+          await fs.rm(temp,{force:true});
+          entry.files.push({
+            cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:r.finalUrl,
+            bytes:r.bytes,sha256:r.sha256,content_type:r.contentType,acquisition:sourceType,rights:sourceRights.status,
+            domain:row.domain,language_iso:row.language_iso||null,provenance:seed.id+':'+seed.url,
+            promoteToCorpus:false,deduplicated:true,duplicate_of:'durable-release-inventory'
+          });
+          continue;
+        }
         if(duplicateOf){
           await fs.rm(temp,{force:true});
           entry.files.push({
@@ -463,7 +501,10 @@ async function processCell(row){
   manifest.cells[row.cell_id]=entry;
 }
 
-const list=[...cells.values()];let next=0,done=0;
+const allRows=[...cells.values()];
+const list=allRows.filter(row=>!existingCells.has(String(row.cell_id)));
+for(const row of allRows) if(existingCells.has(String(row.cell_id))) markAlreadyAcquired(row);
+let next=0,done=allRows.length-list.length;
 async function worker(){
   while(true){
     const i=next++;if(i>=list.length)return;const row=list[i];
@@ -475,13 +516,13 @@ async function worker(){
       manifest.total_blocked_cells++;
     }
     done++;
-    if(done%25===0||done===list.length){
+    if(done%25===0||done===allRows.length){
       const elapsed=(Date.now()-started)/1000,rate=done/Math.max(elapsed,.001);
       console.log('ACQUISITION_PROGRESS completed='+done+'/'+list.length+' files='+manifest.total_files+' rate='+rate.toFixed(2)+'cells/s');
     }
   }
 }
-console.log('ACQUISITION_START cells='+list.length+' concurrency='+CONCURRENCY+' requestTimeoutMs='+REQUEST_TIMEOUT+' downloadTimeoutMs='+DOWNLOAD_TIMEOUT);
+console.log('ACQUISITION_START cells='+allRows.length+' pending='+list.length+' already_acquired='+done+' concurrency='+CONCURRENCY+' requestTimeoutMs='+REQUEST_TIMEOUT+' downloadTimeoutMs='+DOWNLOAD_TIMEOUT);
 await fs.mkdir(OUT,{recursive:true});
 await Promise.all(Array.from({length:CONCURRENCY},()=>worker()));
 manifest.completed_at=new Date().toISOString();manifest.elapsed_ms=Date.now()-started;
