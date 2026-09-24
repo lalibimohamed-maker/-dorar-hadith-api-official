@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   acquire-quranenc-translations:
@@ -18,6 +19,21 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+      - name: Restore previous acquisition checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "artifacts/quran-translation-acquisition"
+          artifact_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=quranenc-translation-acquisition&per_page=100" --jq '[.artifacts[] | select(.expired == false and .workflow_run.id != ${GITHUB_RUN_ID})] | sort_by(.created_at) | last | .id // empty')"
+          if [ -n "$artifact_id" ]; then
+            echo "Restoring acquisition checkpoint artifact $artifact_id"
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" > /tmp/previous-acquisition.zip
+            unzip -q /tmp/previous-acquisition.zip -d "artifacts/quran-translation-acquisition"
+            rm -f /tmp/previous-acquisition.zip
+          else
+            echo "No previous checkpoint artifact found; starting from the first pending language."
+          fi
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: 24
