@@ -6,8 +6,10 @@ const ROOT=process.cwd();
 const manifestPath=process.argv[2]||path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition/manifest.json');
 const registry=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/islamic-source-adapters-2026.json'),'utf8'));
 const master=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01-400h/master-global-source-registry-seed-2026-09.json'),'utf8'));
+const worldwide=JSON.parse(await fs.readFile(path.join(ROOT,'research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json'),'utf8'));
 const manifest=JSON.parse(await fs.readFile(manifestPath,'utf8'));
-const adapters=new Map(registry.adapters.map(a=>[a.id,a])),sources=new Map((master.sources||[]).map(s=>[s.id,s]));
+const adapters=new Map(registry.adapters.map(a=>[a.id,a])),
+  sources=new Map([...((master.sources||[]).map(s=>[s.id,s])),...((worldwide.sources||[]).map(s=>[s.id,s]))]);
 const known=new Set([...adapters.keys(),...sources.keys()]),allowedOrigins=new Set();
 const add=v=>{try{const u=new URL(v);if(u.protocol==='https:')allowedOrigins.add(u.origin);}catch{}};
 for(const a of adapters.values()){for(const o of a.origins||[])add(o);add(a.base_url);add(a.api_base_url);}
