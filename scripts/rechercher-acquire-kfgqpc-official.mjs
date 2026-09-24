@@ -75,12 +75,20 @@ function candidatesFromHtml(html, baseUrl) {
 
 const config = JSON.parse(await fs.readFile(CONFIG, "utf8"));
 const seenSha256 = new Map();
-await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
 
 async function acquireEdition(edition) {
   const editionId = safeSegment(edition.edition_id, "edition id");
   const language = safeSegment(edition.language_iso_code, "language code");
+  const existingMetadataPath = path.join(OUT, language, editionId + ".metadata.json");
+  try {
+    const existing = JSON.parse(await fs.readFile(existingMetadataPath, "utf8"));
+    if (existing.status === "acquired_research_only" && existing.acquired?.path) {
+      await fs.access(path.join(ROOT, existing.acquired.path));
+      if (existing.acquired.sha256) seenSha256.set(existing.acquired.sha256, { edition_id: editionId, path: existing.acquired.path });
+      return { ...existing, resumed: true };
+    }
+  } catch {}
   const result = { ...edition, corpus_write:false, ai_generated_translation:false, canonical_arabic_separate:true, status:"not_acquired", candidates:[] };
   const discovered = new Set(uniqueStrings(edition.asset_urls));
   const indexes = uniqueStrings([edition.official_page, ...(edition.asset_index_urls || [])]);
@@ -171,7 +179,9 @@ const manifest = {
   failed_editions:results.filter(r=>r.status!=="acquired_research_only").length,
   network_unavailable:networkUnavailable,
   languages:[...new Set(results.map(r=>r.language_iso_code))],
-  editions:results
+  editions:results,
+  last_completed_language: [...results].reverse().find(x => x.status === "acquired_research_only")?.language_iso_code || null,
+  resume_supported: true
 };
 await fs.writeFile(path.join(OUT,"manifest.json"),JSON.stringify(manifest,null,2)+"\n","utf8");
 console.log(JSON.stringify({
