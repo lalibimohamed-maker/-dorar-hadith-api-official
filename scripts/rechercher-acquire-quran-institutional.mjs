@@ -70,7 +70,6 @@ async function fetchBytes(url) {
 }
 
 const config = JSON.parse(await fs.readFile(CONFIG, "utf8"));
-await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
 
 const results = [];
@@ -78,6 +77,15 @@ for (const edition of config.editions) {
   const started = Date.now();
   const editionId = safeSegment(edition.edition_id, "edition id");
   const language = safeSegment(edition.language_iso_code, "language code");
+  const existingMetadataPath = path.join(OUT, language, editionId + ".metadata.json");
+  try {
+    const existing = JSON.parse(await fs.readFile(existingMetadataPath, "utf8"));
+    if (existing.status === "acquired_research_only" && existing.acquired?.path) {
+      await fs.access(path.join(ROOT, existing.acquired.path));
+      results.push({ ...existing, resumed: true });
+      continue;
+    }
+  } catch {}
   const assetUrl = TRUSTED_ASSET_URLS[editionId];
   if (!assetUrl) throw new Error(`no fixed trusted asset URL for ${editionId}`);
   const record = {
@@ -142,7 +150,9 @@ const manifest = {
   network_unavailable_editions: results.filter(x => x.error_class === "network_unavailable").length,
   validation_or_source_error_editions: results.filter(x => x.error_class === "validation_or_source_error").length,
   languages: [...new Set(results.map(x => x.language_iso_code))],
-  editions: results
+  editions: results,
+  last_completed_language: [...results].reverse().find(x => x.status === "acquired_research_only")?.language_iso_code || null,
+  resume_supported: true
 };
 await fs.writeFile(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", "utf8");
 if (manifest.validation_or_source_error_editions > 0) process.exitCode = 1;
