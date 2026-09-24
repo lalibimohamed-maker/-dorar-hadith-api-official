@@ -346,7 +346,26 @@ async function processCell(row){
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
-  // Inspect every active adapter AND every active master-registry source relevant to the cell.\n  // The full registered source pool is inspected; there is no 24-source shortlist.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);\n  for(const s of master.values()){\n    const sid=String(s.id||'').trim();\n    const active=!s.status || ['enabled','active','runtime-verified'].includes(String(s.status).toLowerCase());\n    if(!sid||!active) continue;\n    const kinds=(s.kinds||s.capabilities||[]).map(x=>String(x).toLowerCase());\n    if(adapterRelevant({kinds},row)) push(sid);\n  }\n  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);\n  entry.source_candidates=limitedIds.slice();\n  const seeds=[];\n  for(const id of limitedIds){\n    const a=adapters.get(id);\n    const m=master.get(id);\n    for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});\n    if(a){const direct=urls.some(x=>sourceOf(x)===id);if(!direct&&a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}\n    if(m){const mu=String(m.url||m.base_url||'');if(mu)seeds.push({id,url:mu,role:'master-registry'});}\n  }
+  // Inspect every active adapter AND every active master-registry source relevant to the cell.
+  // The full registered source pool is inspected; there is no 24-source shortlist.
+  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);
+  for(const s of master.values()){
+    const sid=String(s.id||'').trim();
+    const active=!s.status || ['enabled','active','runtime-verified'].includes(String(s.status).toLowerCase());
+    if(!sid||!active) continue;
+    const kinds=(s.kinds||s.capabilities||[]).map(x=>String(x).toLowerCase());
+    if(adapterRelevant({kinds},row)) push(sid);
+  }
+  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);
+  entry.source_candidates=limitedIds.slice();
+  const seeds=[];
+  for(const id of limitedIds){
+    const a=adapters.get(id);
+    const m=master.get(id);
+    for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});
+    if(a){const direct=urls.some(x=>sourceOf(x)===id);if(!direct&&a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}
+    if(m){const mu=String(m.url||m.base_url||'');if(mu)seeds.push({id,url:mu,role:'master-registry'});}
+  }
   const localSeen=new Set();
   let rightsApprovedSources=0;
   for(const seed of seeds){
