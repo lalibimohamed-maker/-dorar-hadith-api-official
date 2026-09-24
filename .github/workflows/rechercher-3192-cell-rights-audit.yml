@@ -1,0 +1,63 @@
+name: Rechercher — 3,192-cell source rights audit
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/rechercher_audit_3192_cell_rights.mjs'
+      - 'config/rechercher/**'
+  schedule:
+    - cron: '43 3 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-3192-rights-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Audit source rights across all 3,192 cells
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+
+      - name: Audit all cells and registered sources
+        env:
+          RIGHTS_AUDIT_CONCURRENCY: '8'
+          RIGHTS_AUDIT_TIMEOUT_MS: '15000'
+        run: node scripts/rechercher_audit_3192_cell_rights.mjs
+
+      - name: Validate 3,192-cell output
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s research/evidence/global-multilingual/rights-audit/summary.json
+          test -s research/evidence/global-multilingual/rights-audit/source-rights-audit.json
+          test -s research/evidence/global-multilingual/rights-audit/cell-rights-audit.jsonl
+          node - <<'NODE'
+          const fs=require('fs');
+          const s=JSON.parse(fs.readFileSync('research/evidence/global-multilingual/rights-audit/summary.json','utf8'));
+          if(s.expected_cells!==3192 || s.audited_cells!==3192) throw new Error(JSON.stringify(s));
+          if(!Number.isInteger(s.source_count) || s.source_count<1) throw new Error('no sources');
+          console.log(JSON.stringify(s));
+          NODE
+
+      - name: Upload rights audit evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-3192-cell-rights-audit-${{ github.run_id }}
+          path: research/evidence/global-multilingual/rights-audit/
+          if-no-files-found: error
+          retention-days: 30
