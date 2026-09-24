@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 154,
-    "rights_review_required": 154,
-    "new_global_links_added_2026_09_24": 27,
+    "links": 159,
+    "rights_review_required": 159,
+    "new_global_links_added_2026_09_24": 32,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -1834,6 +1834,149 @@
         "German"
       ],
       "notes": "German-language Sunni-oriented discovery source; its official about page describes Quran, Sunnah, hadith, books and free downloads. It is useful for German-language matrix cells, but it is not itself a multilingual source, so it is recorded as a language-specific lane rather than a global multilingual provider."
+    },
+    {
+      "id": "world-159",
+      "category": "Multilingual Sunni Islamic library",
+      "name": "Australian Islamic Library",
+      "url": "https://www.australianislamiclibrary.org/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.australianislamiclibrary.org/all-hadith-books.html",
+      "capabilities": [
+        "hadith",
+        "seerah",
+        "aqeedah",
+        "fiqh",
+        "fatawa",
+        "world_languages",
+        "multilingual_books",
+        "pdf"
+      ],
+      "languages": [
+        "English",
+        "Arabic",
+        "Urdu",
+        "German",
+        "and other languages"
+      ],
+      "notes": "Site provides Hadith books in multiple languages and dedicated world-languages, fiqh, aqeedah and fatawa sections. Individual download/copyright terms must be verified before redistribution."
+    },
+    {
+      "id": "world-160",
+      "category": "Multilingual hadith",
+      "name": "Hadith Hub GO",
+      "url": "https://hadith-hub-go.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://hadith-hub-go.com/",
+      "capabilities": [
+        "hadith",
+        "offline_dataset",
+        "multilingual",
+        "kutub_al_sittah",
+        "musnad_ahmad"
+      ],
+      "languages": [
+        "Arabic",
+        "English",
+        "Bengali",
+        "French",
+        "Indonesian",
+        "Russian",
+        "Tamil",
+        "Turkish",
+        "Urdu"
+      ],
+      "notes": "Official site states 12 hadith collections and 9 languages, with the full text held offline. Treat as a discovery/structured-data source; redistribution rights for translations/data require verification."
+    },
+    {
+      "id": "world-161",
+      "category": "Multilingual hadith",
+      "name": "Al-Hadith Bibliothèque Islam",
+      "url": "https://lehadith.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://play.google.com/store/apps/details?id=com.lehadith.twa",
+      "capabilities": [
+        "hadith",
+        "multilingual",
+        "hadith_search",
+        "offline_reading"
+      ],
+      "languages": [
+        "Arabic",
+        "French",
+        "English",
+        "Bengali",
+        "Urdu",
+        "Indonesian",
+        "Russian",
+        "Tamil",
+        "Turkish"
+      ],
+      "notes": "Current app listing states 12 hadith collections, 50,000+ hadith and translations in 9 languages. Source/data licensing and bulk extraction must be verified before acquisition."
+    },
+    {
+      "id": "world-162",
+      "category": "Multilingual hadith",
+      "name": "Hadith Tabsera",
+      "url": "https://hadethtabsera.org/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://hadethtabsera.org/",
+      "capabilities": [
+        "hadith",
+        "sunnah",
+        "english",
+        "somali",
+        "arabic",
+        "scholarly_explanations"
+      ],
+      "languages": [
+        "Arabic",
+        "English",
+        "Somali"
+      ],
+      "notes": "Official site presents Arabic narrations with English and Somali translations and scholarly explanations; open-access claim is site-level and does not by itself settle redistribution of every underlying translation."
+    },
+    {
+      "id": "world-163",
+      "category": "Multilingual hadith reference",
+      "name": "Islamtics Hadith Library",
+      "url": "https://islamtics.com/hadith/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://islamtics.com/hadith/bukhari/",
+      "capabilities": [
+        "hadith",
+        "bukhari",
+        "multilingual_search",
+        "hadith_books"
+      ],
+      "languages": [
+        "Arabic",
+        "English",
+        "Bengali",
+        "German",
+        "French",
+        "Indonesian",
+        "Russian",
+        "Tamil",
+        "Turkish",
+        "Urdu"
+      ],
+      "notes": "Current hadith pages expose Sahih al-Bukhari in 10 languages. Use as a discovery/reference lane; verify translation provenance and redistribution rights before downloading into public storage."
     }
   ],
   "notes": [
@@ -1843,6 +1986,7 @@
     "2026-09-24 verification: Tadween Center and Al-Furqan Digital Library were added as verified institutional/discovery sources. Their presence in the registry does not grant redistribution rights; item-level terms remain required.",
     "2026-09-24 verification: SeekersGuidance, The New Muslim Guide, and Ilmverse were added after checking their official sites. Their inclusion is a source/discovery record, not blanket permission to redistribute underlying content.",
     "2026-09-24 multilingual expansion: IslamLand, Osoulstore, and Explore Islam were added after web verification because they expose multilingual Islamic books/media and downloadable resources. They are discovery/acquisition candidates; item-level rights remain required.",
-    "2026-09-24 multilingual-language expansion: Rasoulallah.net and Zekr were added after primary-source verification; Weg zum Islam was added as a verified German-language acquisition lane. Existing IslamQA/Islamweb/IslamMessage/Tarteel records were enriched with multilingual capabilities where verified."
+    "2026-09-24 multilingual-language expansion: Rasoulallah.net and Zekr were added after primary-source verification; Weg zum Islam was added as a verified German-language acquisition lane. Existing IslamQA/Islamweb/IslamMessage/Tarteel records were enriched with multilingual capabilities where verified.",
+    "2026-09-24 additional multilingual acquisition lanes: Australian Islamic Library, Hadith Hub GO, Al-Hadith Bibliothèque Islam, Hadith Tabsera, and Islamtics Hadith Library were added after current web verification. They expand multilingual hadith coverage; item/data rights remain subject to verification."
   ]
 }
