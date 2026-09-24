@@ -222,14 +222,20 @@ function rightsFor(row){
   }
   return resolveRights(e);
 }
-function sourceRightsFor(adapter,row,urls){
+function sourceRightsFor(adapter,row,urls,masterSource){
   const evidence=[];
   const rowProvider=String(row.provider||'').toLowerCase();
-  const scopedSourceEvidence=urls.some(u=>sourceOf(u)===adapter?.id)||rowProvider===String(adapter?.id||'').toLowerCase();
+  const adapterId=String(adapter?.id||'').toLowerCase();
+  const scopedSourceEvidence=Boolean(adapterId) &&
+    (urls.some(u=>sourceOf(u)===adapterId)||rowProvider===adapterId);
   if(scopedSourceEvidence){
     const rowRights=rightsFor(row);
     evidence.push(...(rowRights.evidence||[]));
   }
+
+  // A source selected by the acquisition engine is itself in scope for its
+  // adapter's explicit rights policy; matrix evidence is not required to
+  // "activate" a first-party adapter policy.
   const policy=adapter?.rights_policy;
   const language=String(row.language_iso||row.language||'').toLowerCase();
   const excluded=new Set((policy?.exclude_language_iso||[]).map(x=>String(x).toLowerCase()));
@@ -240,6 +246,35 @@ function sourceRightsFor(adapter,row,urls){
       url:policy.evidence_url,
       scope:policy.scope||'source_policy',
       conditions:policy.conditions||[]
+    });
+  }
+
+  // PR #561 is a discovery registry. Its rights_status is evidence, not an
+  // automatic redistribution grant. "review_required" therefore remains
+  // unresolved and is preserved in the manifest until independently verified.
+  const registryRights=String(masterSource?.rights_status||'').toLowerCase();
+  const registryUrl=String(masterSource?.url||'');
+  if(masterSource && registryRights){
+    const kindMap={
+      'explicit-redistribution-permission':'explicit-redistribution-permission',
+      'verified-redistributable':'explicit-redistribution-permission',
+      'public-domain':'public-domain',
+      'waqf':'waqf',
+      'read-copy-permission':'read-copy-permission',
+      'read-only-permission':'read-only-permission',
+      'restricted':'restricted',
+      'no-redistribution':'no-redistribution',
+      'copyright-reservation':'copyright-reservation',
+      'takedown':'takedown',
+      'review_required':'review-required'
+    };
+    const kind=kindMap[registryRights]||registryRights;
+    evidence.push({
+      source:String(masterSource.id||'pr-561'),
+      kind,
+      url:registryUrl||undefined,
+      scope:masterSource.scope||'pr-561-registry',
+      notes:masterSource.notes||undefined
     });
   }
   return resolveRights(evidence);
@@ -273,7 +308,7 @@ const manifest={
     discovery_is_not_permission:true,canonical_arabic_separate:true,machine_translation_never_promoted:true,
     no_new_pdf_enc:true,corpus_write:false
   },
-  source_counts:{},cells:{}
+  source_counts:{},source_registry_561_count:MASTER.sources.length,source_registry_561_loaded:true,cells:{}
 };
 const claimed=new Set(),seenPdfSha256=new Map(),candidateCache=new Map(),started=Date.now();
 
@@ -319,7 +354,8 @@ async function processCell(row){
     if(localSeen.has(seed.url)||!allow(seed.url)) continue;
     localSeen.add(seed.url);
     const sourceAdapter=adapters.get(seed.id);
-    const sourceRights=sourceRightsFor(sourceAdapter,row,urls);
+    const sourceMaster=master.get(seed.id);
+    const sourceRights=sourceRightsFor(sourceAdapter,row,urls,sourceMaster);
     const sourceType=acquisitionType(sourceRights);
     entry.sources_checked.push({
       source:seed.id,url:seed.url,role:seed.role,
