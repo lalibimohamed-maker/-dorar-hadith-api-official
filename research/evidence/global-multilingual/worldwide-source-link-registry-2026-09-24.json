@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 150,
-    "rights_review_required": 150,
-    "new_global_links_added_2026_09_24": 23,
+    "links": 153,
+    "rights_review_required": 153,
+    "new_global_links_added_2026_09_24": 26,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -1695,6 +1695,72 @@
         "ai_research"
       ],
       "notes": "Official site states its library covers Quran/Tafsir, hadith, fiqh in all four schools, Seerah and more, with source-linked answers and scholar testing. Treat AI outputs as indexing/research assistance only; underlying-source rights and bulk access require verification."
+    },
+    {
+      "id": "world-153",
+      "category": "Multilingual Islamic PDF library",
+      "name": "IslamLand",
+      "url": "https://www.islamland.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://islamland.com/eng",
+      "capabilities": [
+        "multilingual_dawah",
+        "books",
+        "pdf",
+        "quran",
+        "hadith",
+        "fatwa",
+        "audio",
+        "video"
+      ],
+      "languages_count": 140,
+      "notes": "Official site states that it introduces Islam in more than 140 languages and contains thousands of books, videos and audios. Indexed book pages expose PDF/Word downloads for multiple language paths. Item-level redistribution rights must still be verified."
+    },
+    {
+      "id": "world-154",
+      "category": "Multilingual Islamic PDF library",
+      "name": "Osoulstore",
+      "url": "https://www.osoulstore.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.osoulstore.com/ar",
+      "capabilities": [
+        "multilingual_dawah",
+        "pdf_books",
+        "aqidah",
+        "hadith",
+        "fiqh",
+        "new_muslim",
+        "non_muslim"
+      ],
+      "languages_count": 56,
+      "notes": "Official Osoul bookstore states 704 books in 56 languages, including 611 PDF books, and lists languages spanning African, Asian, European and other language families. Item-level licensing/redistribution terms must be checked before release."
+    },
+    {
+      "id": "world-155",
+      "category": "Multilingual Islamic books and media",
+      "name": "Explore Islam",
+      "url": "https://explore-islam.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://explore-islam.com/",
+      "capabilities": [
+        "multilingual_books",
+        "pdf",
+        "dawah",
+        "quran",
+        "islamic_education",
+        "articles",
+        "videos"
+      ],
+      "notes": "Official Explore Islam pages expose downloadable ebooks in multiple languages; indexed examples include Romanian and English, and site materials document multilingual Islamic books/media. Underlying item rights must be verified before redistribution."
     }
   ],
   "notes": [
@@ -1702,6 +1768,7 @@
     "The 15 additions in this revision were checked against PR #541 and PR #558 diffs and the repository main-branch code search before insertion.",
     "2026-09-24 verification: Alminasa.ai, Hdith.com, King Salman Hadith Complex, and Mubseroon were added as candidate sources after web verification. Claims about unrestricted/open licensing, exact corpus totals, or a KFUPM 'Hadith Cloud Computing' infrastructure were not asserted without verifiable primary evidence.",
     "2026-09-24 verification: Tadween Center and Al-Furqan Digital Library were added as verified institutional/discovery sources. Their presence in the registry does not grant redistribution rights; item-level terms remain required.",
-    "2026-09-24 verification: SeekersGuidance, The New Muslim Guide, and Ilmverse were added after checking their official sites. Their inclusion is a source/discovery record, not blanket permission to redistribute underlying content."
+    "2026-09-24 verification: SeekersGuidance, The New Muslim Guide, and Ilmverse were added after checking their official sites. Their inclusion is a source/discovery record, not blanket permission to redistribute underlying content.",
+    "2026-09-24 multilingual expansion: IslamLand, Osoulstore, and Explore Islam were added after web verification because they expose multilingual Islamic books/media and downloadable resources. They are discovery/acquisition candidates; item-level rights remain required."
   ]
 }
