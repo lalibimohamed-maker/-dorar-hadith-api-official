@@ -224,14 +224,19 @@ function rightsFor(row){
   }
   return resolveRights(e);
 }
-function sourceRightsFor(adapter,row,urls){
+function sourceRightsFor(adapter,row,urls,masterSource,worldwideSource){
   const evidence=[];
   const rowProvider=String(row.provider||'').toLowerCase();
-  const scopedSourceEvidence=urls.some(u=>sourceOf(u)===adapter?.id)||rowProvider===String(adapter?.id||'').toLowerCase();
+  const adapterId=String(adapter?.id||'').toLowerCase();
+  const scopedSourceEvidence=Boolean(adapterId) &&
+    (urls.some(u=>sourceOf(u)===adapterId)||rowProvider===adapterId);
   if(scopedSourceEvidence){
     const rowRights=rightsFor(row);
     evidence.push(...(rowRights.evidence||[]));
   }
+
+  // Explicit adapter policies authorize only the scoped content described
+  // by that policy; selecting an adapter no longer requires cell evidence.
   const policy=adapter?.rights_policy;
   const language=String(row.language_iso||row.language||'').toLowerCase();
   const excluded=new Set((policy?.exclude_language_iso||[]).map(x=>String(x).toLowerCase()));
@@ -242,6 +247,34 @@ function sourceRightsFor(adapter,row,urls){
       url:policy.evidence_url,
       scope:policy.scope||'source_policy',
       conditions:policy.conditions||[]
+    });
+  }
+
+  // PR #561 is discovery metadata. A review-required/unknown status does not
+  // grant redistribution or mirroring permission; it remains fail-closed.
+  for(const source of [masterSource,worldwideSource]){
+    const rightsStatus=String(source?.rights_status||source?.rightsStatus||'').toLowerCase();
+    if(!source||!rightsStatus) continue;
+    const kindMap={
+      'explicit-redistribution-permission':'explicit-redistribution-permission',
+      'verified-redistributable':'explicit-redistribution-permission',
+      'public-domain':'public-domain',
+      'waqf':'waqf',
+      'read-copy-permission':'read-copy-permission',
+      'read-only-permission':'read-only-permission',
+      'restricted':'restricted',
+      'no-redistribution':'no-redistribution',
+      'copyright-reservation':'copyright-reservation',
+      'takedown':'takedown',
+      'review_required':'review-required',
+      'review-required':'review-required'
+    };
+    evidence.push({
+      source:String(source.id||'registry'),
+      kind:kindMap[rightsStatus]||rightsStatus,
+      url:String(source.url||source.evidence_url||''),
+      scope:source.scope||'registry',
+      notes:source.notes||''
     });
   }
   return resolveRights(evidence);
@@ -311,14 +344,49 @@ async function processCell(row){
     source_candidates:[],rights_approved_sources:[],rights_blocked_sources:[]
   };
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
-  if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
+  if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)||worldwide.has(row.provider))) push(row.provider);
   for(const u of urls) push(sourceOf(u));
-  // Inspect every active adapter AND every active master-registry source relevant to the cell.\n  // The full registered source pool is inspected; there is no 24-source shortlist.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);\n  for(const s of master.values()){\n    const sid=String(s.id||'').trim();\n    const active=!s.status || ['enabled','active','runtime-verified'].includes(String(s.status).toLowerCase());\n    if(!sid||!active) continue;\n    const kinds=(s.kinds||s.capabilities||[]).map(x=>String(x).toLowerCase());\n    if(adapterRelevant({kinds},row)) push(sid);\n  }\n  for(const s of worldwide.values()){
+
+  // Inspect every active built-in adapter, legacy master-registry source,
+  // and relevant source from PR #561's worldwide registry.
+  for(const a of adapters.values()){
+    if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);
+  }
+  for(const s of master.values()){
+    const sid=String(s.id||'').trim();
+    const active=!s.status || ['enabled','active','runtime-verified'].includes(String(s.status).toLowerCase());
+    if(!sid||!active) continue;
+    const kinds=(s.kinds||s.capabilities||[]).map(x=>String(x).toLowerCase());
+    if(adapterRelevant({kinds},row)) push(sid);
+  }
+  for(const s of worldwide.values()){
     const sid=String(s.id||'').trim();
     if(!sid||!worldwideRelevant(s,row)) continue;
     push(sid);
   }
-  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);\n  entry.source_candidates=limitedIds.slice();\n  const seeds=[];\n  for(const id of limitedIds){\n    const a=adapters.get(id);\n    const m=master.get(id);\n    for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});\n    if(a){const direct=urls.some(x=>sourceOf(x)===id);if(!direct&&a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}\n    if(m){const mu=String(m.url||m.base_url||'');if(mu)seeds.push({id,url:mu,role:'master-registry'});}\n  }
+
+  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);
+  entry.source_candidates=limitedIds.slice();
+  const seeds=[];
+  for(const id of limitedIds){
+    const a=adapters.get(id);
+    const m=master.get(id);
+    const w=worldwide.get(id);
+    for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});
+    if(a){
+      const direct=urls.some(x=>sourceOf(x)===id);
+      if(!direct&&a.base_url) seeds.push({id,url:a.base_url,role:'adapter-base'});
+      for(const u of apiSeeds(a,row)) seeds.push({id,url:u,role:'official-api'});
+    }
+    if(m){
+      const mu=String(m.url||m.base_url||'');
+      if(mu) seeds.push({id,url:mu,role:'master-registry'});
+    }
+    if(w){
+      const wu=String(w.url||w.base_url||'');
+      if(wu) seeds.push({id,url:wu,role:'worldwide-registry'});
+    }
+  }
   const localSeen=new Set();
   let rightsApprovedSources=0;
   for(const seed of seeds){
@@ -326,7 +394,9 @@ async function processCell(row){
     if(localSeen.has(seed.url)||!allow(seed.url)) continue;
     localSeen.add(seed.url);
     const sourceAdapter=adapters.get(seed.id);
-    const sourceRights=sourceRightsFor(sourceAdapter,row,urls);
+    const sourceMaster=master.get(seed.id);
+    const sourceWorldwide=worldwide.get(seed.id);
+    const sourceRights=sourceRightsFor(sourceAdapter,row,urls,sourceMaster,sourceWorldwide);
     const sourceType=acquisitionType(sourceRights);
     entry.sources_checked.push({
       source:seed.id,url:seed.url,role:seed.role,
