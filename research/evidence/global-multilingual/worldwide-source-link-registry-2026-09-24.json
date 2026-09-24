@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 174,
-    "rights_review_required": 174,
-    "new_global_links_added_2026_09_24": 47,
+    "links": 177,
+    "rights_review_required": 177,
+    "new_global_links_added_2026_09_24": 50,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -2409,6 +2409,79 @@
         "and other collection languages"
       ],
       "notes": "CUDL is a distinct digital-library gateway for Cambridge collections and currently exposes digitized Muhammadan/Islamic manuscript catalogues and folio/transcription records. Individual manuscript image/download rights must be checked at item level; the library gateway itself is not a blanket redistribution license."
+    },
+    {
+      "id": "world-183",
+      "category": "Arabic and Islamic books publisher / multilingual publications",
+      "name": "Noon Books",
+      "url": "https://www.noonbooks.com/",
+      "scope": "publisher-and-book-discovery-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://noonbooks.com/pages/%D9%82%D8%B5%D8%AA%D9%86%D8%A7",
+      "capabilities": [
+        "islamic_books",
+        "arabic_books",
+        "childrens_books",
+        "multilingual_publications",
+        "ebooks",
+        "publisher_catalogue"
+      ],
+      "languages": [
+        "Arabic",
+        "English",
+        "French",
+        "and additional languages"
+      ],
+      "notes": "Current publisher site identifies Noon Books as the Nahed Al-Shawa Cultural Foundation, with books distributed in 50+ countries and translated into 7+ languages. Its Islamic collection includes contemporary titles such as creed books and prophet stories. It is a publisher/catalogue rather than a free PDF repository; acquisition requires item-level permission or applicable license."
+    },
+    {
+      "id": "world-184",
+      "category": "Arabic bibliographic union catalogue",
+      "name": "Arab Union Catalog (AUC)",
+      "url": "https://www.aruc.org/",
+      "scope": "bibliographic-discovery-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.aruc.org/ar",
+      "capabilities": [
+        "union_catalogue",
+        "bibliographic_records",
+        "digital_library_discovery",
+        "libraries",
+        "publishers",
+        "manuscripts_cataloguing"
+      ],
+      "languages": [
+        "Arabic",
+        "English interface availability"
+      ],
+      "notes": "Official site currently exposes the bibliographic database, digital-library collections and country/library portals, and reports 4.2 million bibliographic/authority records, 500 knowledge institutions and 4,512 central/subsidiary libraries across 25 countries. It is a discovery/catalogue source, not itself a blanket PDF download source."
+    },
+    {
+      "id": "world-185",
+      "category": "Legacy Islamic manuscript reference directory",
+      "name": "IslamicManuscripts.info",
+      "url": "http://www.islamicmanuscripts.info/",
+      "scope": "legacy-manuscript-discovery-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "legacy-source-web-archived",
+      "verification_url": "https://www.grac.it/bayt/index.php/templates-4-diacritics/interesting-links",
+      "capabilities": [
+        "islamic_manuscripts",
+        "manuscript_reference_library",
+        "bibliographies",
+        "codicology",
+        "palaeography",
+        "legacy_catalogue_links"
+      ],
+      "languages": [
+        "English"
+      ],
+      "notes": "The supplied domain is no longer reliably live; current web evidence preserves references to its manuscript reference library and materials, including Islamic codicology/palaeography resources. Registered as a legacy discovery/archival pointer only—not as an active acquisition endpoint. Prefer the surviving institutional catalogues and archive copies for actual acquisition."
     }
   ],
   "notes": [
@@ -2424,6 +2497,7 @@
     "2026-09-24 audit continuation: added Download Islamic Religion PDF Ebooks after its current sitemap verified multilingual Islamic-book categories and PDF availability; mixed-source filtering and item-level rights review remain mandatory.",
     "2026-09-24 third audit of the supplied source list: added verified real-world projects that match requested functions—Basaer Academy, Yaqeen Institute, IOU, Bayyinah TV, Muslim Central, AccessibleQuran, Islamic Library Data, and Islamic API by SolimanAnas. Several descriptive names in the supplied list were not added because no sufficiently verifiable official endpoint was established.",
     "2026-09-24 audit of the latest supplied four-source batch: RasoulAllah was already registered; ummah.com currently resolves to Ummah Pay/payment infrastructure and was not added as an Islamic knowledge source. Added Tebian Academy and Nawara Academy after current verification.",
-    "2026-09-24: added Cambridge University Digital Library (CUDL) as a distinct digital-library gateway in addition to the previously registered general Cambridge Library domain, because the user supplied the exact CUDL endpoint and it exposes digitized Islamic/Arabic manuscript catalogue and folio records."
+    "2026-09-24: added Cambridge University Digital Library (CUDL) as a distinct digital-library gateway in addition to the previously registered general Cambridge Library domain, because the user supplied the exact CUDL endpoint and it exposes digitized Islamic/Arabic manuscript catalogue and folio records.",
+    "2026-09-24: added Noon Books, Arab Union Catalog (AUC), and IslamicManuscripts.info as separately typed sources. The latter is explicitly marked legacy/archival because the supplied domain is not reliably live; AUC is a bibliographic discovery source, not a PDF repository."
   ]
 }
