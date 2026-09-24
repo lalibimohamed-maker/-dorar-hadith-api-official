@@ -34,9 +34,18 @@ const master=new Map((MASTER.sources||[]).map(x=>[x.id,x]));
 const worldwide=new Map((WORLDWIDE.sources||[]).map(x=>[String(x.id),x]));
 let existingInventory={cells:[],sha256:[]};
 try{existingInventory=JSON.parse(await fs.readFile(EXISTING_INVENTORY,'utf8'));}catch{}
-const existingCells=new Set((existingInventory.cells||[]).map(String));
+const normalizeCellId=value=>String(value||'').trim().replace(/\\./g,':').replace(/\\s+/g,' ').toLowerCase();
+const cellIdByNormalized=new Map([...cells.keys()].map(id=>[normalizeCellId(id),id]));
+const rawExistingCells=(existingInventory.cells||[]).map(String);
+const existingCells=new Set();
+let unmatchedExistingCells=0;
+for(const token of rawExistingCells){
+  const canonical=cellIdByNormalized.get(normalizeCellId(token));
+  if(canonical) existingCells.add(canonical);
+  else unmatchedExistingCells++;
+}
 const existingSha=new Set((existingInventory.sha256||[]).map(x=>String(x).replace(/^sha256:/,'')));
-console.log('ACQUISITION_RESUME existing_cells='+existingCells.size+' existing_sha256='+existingSha.size);
+console.log('ACQUISITION_RESUME existing_cells='+existingCells.size+' raw_inventory_cells='+rawExistingCells.length+' unmatched_inventory_cells='+unmatchedExistingCells+' existing_sha256='+existingSha.size);
 const origins=new Set(), originSource=new Map();
 function addOrigin(id,value){
   try{
