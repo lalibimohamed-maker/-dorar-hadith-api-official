@@ -1,0 +1,39 @@
+{
+  "schema": "din-allah/rechercher-global-book-acquisition-from-561/v1",
+  "mode": "unbounded_continuous_chronological",
+  "chronology": [
+    "Prophetic era",
+    "Companions",
+    "Followers",
+    "early Islamic generations",
+    "Hijri chronology",
+    "present day",
+    "future catalog additions"
+  ],
+  "source_registry": {
+    "pr": 561,
+    "branch": "feat/rechercher-worldwide-source-link-registry-2026-09-24",
+    "path": "research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json",
+    "runtime_fetch": true,
+    "purpose": "Use the current #561 source registry as a live discovery/provider pool. New registry entries become eligible on the next scheduled acquisition pass."
+  },
+  "acquisition_policy": {
+    "book_identity_required": true,
+    "edition_identity_required": true,
+    "expected_volume_evidence_required": true,
+    "real_pdf_only": true,
+    "sha256_required": true,
+    "rights_gate_required": true,
+    "rights_unknown": "protected_private_review_only",
+    "public_redistribution": "never_inferred_from_source_listing",
+    "corpus_write": false,
+    "ai_generated_translation": false,
+    "duplicate_pdf_policy": "one physical copy per identical SHA-256",
+    "future_sources": "automatically consumed from the current #561 registry without a code change"
+  },
+  "storage": {
+    "protected_repo": "lalibimohamed82-coder/rechercher-pdf-storage",
+    "model": "GitHub Release assets",
+    "public_release": "blocked until item-level redistribution permission is verified"
+  }
+}
