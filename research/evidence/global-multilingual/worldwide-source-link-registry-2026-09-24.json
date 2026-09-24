@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 135,
-    "rights_review_required": 135,
-    "new_global_links_added_2026_09_24": 24,
+    "links": 139,
+    "rights_review_required": 139,
+    "new_global_links_added_2026_09_24": 12,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -1502,10 +1502,51 @@
       "rights_status": "review_required",
       "source_pr": "561",
       "notes": "Official Tafsir Center applications/resources, including Quran applications. API/data rights must be verified per resource."
+    },
+    {
+      "id": "world-137",
+      "category": "Hadith AI research platform",
+      "name": "Alminasa.ai — المنصة الحديثية",
+      "url": "https://alminasa.ai/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Official platform for hadith research; official site and app materials describe interactive/semantic search, hadith-path visualization, narrator information, explanations and hadith grading tools. AI-assisted features are treated as research/indexing signals, not as independent scholarly evidence."
+    },
+    {
+      "id": "world-138",
+      "category": "Hadith digital encyclopedia",
+      "name": "Hdith.com — الموسوعة الحديثية",
+      "url": "https://hdith.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Digital hadith encyclopedia with structured hadith pages, isnad/narrator information, takhrij and scholar judgments visible on indexed pages. Content/licensing and bulk-access terms require item-level verification before redistribution."
+    },
+    {
+      "id": "world-139",
+      "category": "Official Saudi hadith institution",
+      "name": "King Salman Complex for the Noble Prophetic Hadith",
+      "url": "https://hadith.gov.sa/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Official institutional source. Saudi regulations state the Complex serves hadith through collection, classification, verification, study and publication, including multilingual publication and use of modern technologies. Do not assume open/copy-left redistribution without explicit terms."
+    },
+    {
+      "id": "world-140",
+      "category": "Accessibility and Braille infrastructure",
+      "name": "Mubseroon — جمعية العوق البصري الأهلية ببريدة",
+      "url": "https://auq-basry.sa/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Official Saudi association serving people with visual disabilities; its site documents Braille-related tools and a Braille learning platform. The stronger claims about a 45-language Islamic Open-API infrastructure were not independently verified, so they are not encoded as facts."
     }
   ],
   "notes": [
     "This expanded snapshot is not an exhaustive census of all global sources.",
-    "The 15 additions in this revision were checked against PR #541 and PR #558 diffs and the repository main-branch code search before insertion."
+    "The 15 additions in this revision were checked against PR #541 and PR #558 diffs and the repository main-branch code search before insertion.",
+    "2026-09-24 verification: Alminasa.ai, Hdith.com, King Salman Hadith Complex, and Mubseroon were added as candidate sources after web verification. Claims about unrestricted/open licensing, exact corpus totals, or a KFUPM 'Hadith Cloud Computing' infrastructure were not asserted without verifiable primary evidence."
   ]
 }
