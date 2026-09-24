@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 402,
-    "rights_review_required": 402,
-    "new_global_links_added_2026_09_24": 275,
+    "links": 405,
+    "rights_review_required": 405,
+    "new_global_links_added_2026_09_24": 278,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -7272,6 +7272,42 @@
       ],
       "verification_status": "web-verified",
       "verification_url": "https://foulabook.com"
+    },
+    {
+      "id": "world-403",
+      "category": "Islamic publisher and heritage research",
+      "name": "دار التأصيل",
+      "url": "https://www.taaseel.com",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Added from the supplied source list. Discovery-only registration; endpoint, provenance, item-level rights and redistribution terms remain subject to verification.",
+      "verification_status": "verification_pending",
+      "verification_url": "https://www.taaseel.com"
+    },
+    {
+      "id": "world-404",
+      "category": "Academic Islamic studies journal",
+      "name": "مجلة كلية أصول الدين والدعوة بالمنوفية",
+      "url": "https://bfdm.journals.ekb.eg",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Added from the supplied source list as an academic journal/discovery endpoint. Publication access does not itself grant redistribution rights; article/item-level terms remain subject to verification.",
+      "verification_status": "verification_pending",
+      "verification_url": "https://bfdm.journals.ekb.eg"
+    },
+    {
+      "id": "world-405",
+      "category": "Islamic strategic studies center",
+      "name": "المركز الإسلامي للدراسات الاستراتيجية",
+      "url": "https://iicss.iq",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Added from the supplied source list as an Islamic research and studies endpoint. Registration is discovery-only; item-level rights and redistribution terms remain subject to verification.",
+      "verification_status": "verification_pending",
+      "verification_url": "https://iicss.iq"
     }
   ],
   "notes": [
@@ -7305,6 +7341,7 @@
     "2026-09-24: URL-level deduplication was performed against the current #561 registry before import; repeated #411 URLs were added only once.",
     "2026-09-24: added the verified IslamEnc worldwide Islamic-encyclopedia/services hub (https://s.islamenc.com/) as a distinct source-discovery endpoint. Its child services remain separately governed where applicable; hub inclusion does not grant redistribution rights.",
     "2026-09-24: added https://islamcontent.com/ as a distinct multilingual Islamic-content platform. The already-registered https://islamiccontent.org/ (world-135) was not duplicated and was enriched with current web-verification metadata.",
-    "2026-09-24: added the supplied Sunnah, Islamic encyclopedia, multilingual-content, library, Quran, terminology and publisher endpoints. Existing exact URLs were deduplicated; all new entries remain review_required."
+    "2026-09-24: added the supplied Sunnah, Islamic encyclopedia, multilingual-content, library, Quran, terminology and publisher endpoints. Existing exact URLs were deduplicated; all new entries remain review_required.",
+    "2026-09-24 batch-2 source consolidation: three genuinely new endpoints from the supplied six-item batch were merged into the primary registry after URL-level deduplication. Islamweb and the Muslim Library were already registered in the primary registry, and sunnah.global was already registered; none was duplicated."
   ]
 }
