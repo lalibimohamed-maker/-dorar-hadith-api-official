@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 196,
-    "rights_review_required": 196,
-    "new_global_links_added_2026_09_24": 69,
+    "links": 208,
+    "rights_review_required": 208,
+    "new_global_links_added_2026_09_24": 81,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -2999,6 +2999,331 @@
         "Arabic"
       ],
       "notes": "The Islamic University of Madinah launched an official electronic platform for original manuscripts in 2024. Access and copying rights vary by manuscript."
+    },
+    {
+      "id": "world-205",
+      "category": "Bangladesh official Quran portal",
+      "name": "Bangladesh Quran Digital",
+      "url": "https://quran.gov.bd/",
+      "scope": "official-quran-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://quran.gov.bd/",
+      "capabilities": [
+        "quran",
+        "arabic_bangla_english",
+        "quranic_ebook",
+        "audio",
+        "bangla"
+      ],
+      "languages": [
+        "Arabic",
+        "Bangla",
+        "English"
+      ],
+      "notes": "Current official portal exposes Arabic-English and Arabic-Bangla-English Quranic e-books and Quran audio. Useful for Bengali coverage; redistribution rights must be checked."
+    },
+    {
+      "id": "world-206",
+      "category": "Open multilingual Quran API",
+      "name": "Fawaz Quran API",
+      "url": "https://github.com/fawazahmed0/quran-api",
+      "scope": "open-source-quran-api-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://github.com/fawazahmed0/quran-api",
+      "capabilities": [
+        "quran",
+        "translations",
+        "90_plus_languages",
+        "400_plus_translations",
+        "rest_api",
+        "cdn",
+        "json"
+      ],
+      "languages": [
+        "90+ languages"
+      ],
+      "notes": "Open-source repository aggregates 400+ Quran translations in 90+ languages. The repository is Unlicense, but individual translations retain their own provenance/rights requirements and some were OCRed; treat as discovery/structured-source and verify each edition."
+    },
+    {
+      "id": "world-207",
+      "category": "Open multilingual Quran ecosystem",
+      "name": "Ummah Library",
+      "url": "https://github.com/UmmahLibrary/ummah-library",
+      "scope": "open-source-quran-platform",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://github.com/UmmahLibrary/ummah-library",
+      "capabilities": [
+        "quran",
+        "translations",
+        "98_languages",
+        "490_translations",
+        "offline",
+        "rest_api",
+        "tafsir",
+        "hadith"
+      ],
+      "languages": [
+        "~98 languages"
+      ],
+      "notes": "Open-source Quran and Islamic knowledge platform; current README reports a runtime catalogue of about 490 translations across about 98 languages, with offline/API support. Underlying translation rights must be retained separately."
+    },
+    {
+      "id": "world-208",
+      "category": "Structured Quran database",
+      "name": "Gaitco Quran Database",
+      "url": "https://github.com/gaitco/quran-database",
+      "scope": "open-source-quran-dataset",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://github.com/gaitco/quran-database",
+      "capabilities": [
+        "quran",
+        "translations",
+        "metadata",
+        "sqlite",
+        "mysql",
+        "sha256_manifests",
+        "provenance"
+      ],
+      "languages": [
+        "Multiple editions/languages"
+      ],
+      "notes": "Structured Quran database with 134 translation/edition entries, SQLite/MySQL exports, provenance documentation and SHA-256 manifests. Useful for reproducible QA, but translation licenses remain edition-specific."
+    },
+    {
+      "id": "world-209",
+      "category": "Open multilingual Tafsir API",
+      "name": "Tafsir API — spa5k",
+      "url": "https://github.com/spa5k/tafsir_api",
+      "scope": "open-source-tafsir-api-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://github.com/spa5k/tafsir_api",
+      "capabilities": [
+        "tafsir",
+        "122_tafsirs",
+        "multilingual",
+        "rest_api",
+        "cdn",
+        "self_hosting"
+      ],
+      "languages": [
+        "Multiple languages"
+      ],
+      "notes": "Public repository exposes 122 Tafsir resources with multilingual support and several CDN/raw endpoints, and documents self-hosting. Underlying Tafsir texts remain subject to their respective source/licensing conditions."
+    },
+    {
+      "id": "world-210",
+      "category": "Unified Islamic open API",
+      "name": "Bonyan API",
+      "url": "https://github.com/BonyanOSS/Bonyan-API",
+      "scope": "open-source-islamic-api-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://github.com/BonyanOSS/Bonyan-API",
+      "capabilities": [
+        "quran",
+        "tafsir",
+        "azkar",
+        "hadith",
+        "prayer_times",
+        "hijri",
+        "qibla",
+        "multi_source_fallback",
+        "unified_api"
+      ],
+      "languages": [
+        "Arabic",
+        "English",
+        "additional module languages"
+      ],
+      "notes": "Open-source unified API combining Quran, Tafsir, Azkar, Hadith and other Islamic utilities with multi-source fallback. Use for source discovery and integration; upstream rights/provenance must remain explicit."
+    },
+    {
+      "id": "world-211",
+      "category": "Bangladesh and Islamic manuscript library",
+      "name": "Asiatic Society of Bangladesh Library",
+      "url": "https://library.asiaticsociety.org.bd/",
+      "scope": "library-and-manuscript-discovery-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://library.asiaticsociety.org.bd/",
+      "capabilities": [
+        "manuscripts",
+        "books",
+        "journals",
+        "research_materials",
+        "catalogue",
+        "south_asia"
+      ],
+      "languages": [
+        "Bangla",
+        "Arabic",
+        "Persian",
+        "Urdu",
+        "English"
+      ],
+      "notes": "The Asiatic Society of Bangladesh maintains a specialized research library of about 26,000 items including books, journals and manuscripts; access is regulated and copying services are provided under library rules."
+    },
+    {
+      "id": "world-212",
+      "category": "Bangladeshi and South Asian Islamic manuscripts",
+      "name": "Khulna/Bangladesh Manuscript Resources — ASB ecosystem",
+      "url": "https://library.asiaticsociety.org.bd/cgi-bin/koha/opac-search.pl",
+      "scope": "bibliographic-discovery-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://library.asiaticsociety.org.bd/",
+      "capabilities": [
+        "opac",
+        "manuscripts",
+        "books",
+        "arabic",
+        "persian",
+        "urdu",
+        "bangla"
+      ],
+      "languages": [
+        "Bangla",
+        "Arabic",
+        "Persian",
+        "Urdu",
+        "English"
+      ],
+      "notes": "OPAC endpoint for searchable catalogue records. Treated as a bibliographic discovery endpoint rather than a direct redistribution source."
+    },
+    {
+      "id": "world-213",
+      "category": "Bosnian Islamic manuscript digital collection",
+      "name": "National and University Library of Bosnia and Herzegovina — HMML",
+      "url": "https://hmml.org/collections/repositories/bosnia%20and%20herzegovina/nacionalna-i-univerzitetska-biblioteka-bosne-i-hercegovine/",
+      "scope": "manuscript-digital-library-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://hmml.org/collections/repositories/bosnia%20and%20herzegovina/nacionalna-i-univerzitetska-biblioteka-bosne-i-hercegovine/",
+      "capabilities": [
+        "islamic_manuscripts",
+        "arabic",
+        "ottoman_turkish",
+        "persian",
+        "bosnian",
+        "albanian",
+        "digital_surrogates",
+        "catalogue"
+      ],
+      "languages": [
+        "Arabic",
+        "Ottoman Turkish",
+        "Persian",
+        "Bosnian",
+        "Albanian",
+        "Azerbaijani",
+        "Croatian",
+        "Serbian"
+      ],
+      "notes": "HMML collection page reports 1,047 preserved digital surrogates from the National and University Library of Bosnia and Herzegovina, in multiple Islamic and regional languages."
+    },
+    {
+      "id": "world-214",
+      "category": "Bosnian Islamic manuscript collection",
+      "name": "Gazi Husrev-Bey Library Manuscript Fund",
+      "url": "https://ghb.ba/en/fond-rukopisa/",
+      "scope": "manuscript-reference-and-collection-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://ghb.ba/en/fond-rukopisa/",
+      "capabilities": [
+        "manuscripts",
+        "quran",
+        "hadith",
+        "aqeedah",
+        "fiqh",
+        "arabic",
+        "turkish",
+        "persian",
+        "bosnian"
+      ],
+      "languages": [
+        "Arabic",
+        "Turkish",
+        "Persian",
+        "Bosnian"
+      ],
+      "notes": "Official library page reports 10,585 manuscript codices containing about 16,907 works across Islamic sciences and related disciplines. Use as a collection/discovery source; digital copy rights vary by item."
+    },
+    {
+      "id": "world-215",
+      "category": "Bosnian oriental Islamic manuscripts",
+      "name": "Bosniak Institute Oriental-Islamic Manuscripts",
+      "url": "https://www.bosnjackiinstitut.com/library-oriental-islamic-manuscripts-details",
+      "scope": "manuscript-reference-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.bosnjackiinstitut.com/library-oriental-islamic-manuscripts-details",
+      "capabilities": [
+        "manuscripts",
+        "theology",
+        "law",
+        "morals",
+        "philosophy",
+        "history",
+        "arabic",
+        "turkish",
+        "persian",
+        "bosnian"
+      ],
+      "languages": [
+        "Arabic",
+        "Turkish",
+        "Persian",
+        "Bosnian"
+      ],
+      "notes": "Institute reports 1,086 codices containing 1,662 works across theology, law, ethics, lexicography, history and other fields. Register as a manuscript discovery/reference lane; digitized-copy availability varies."
+    },
+    {
+      "id": "world-216",
+      "category": "Indian Islamic manuscript library",
+      "name": "Rampur Raza Library",
+      "url": "https://razalibrary.gov.in/",
+      "scope": "rare-book-and-manuscript-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://culture.gov.in/rampur-raza-library-rampur",
+      "capabilities": [
+        "islamic_manuscripts",
+        "arabic",
+        "persian",
+        "pashto",
+        "urdu",
+        "turkish",
+        "rare_books",
+        "indo_islamic_heritage"
+      ],
+      "languages": [
+        "Arabic",
+        "Persian",
+        "Pashto",
+        "Urdu",
+        "Turkish",
+        "Hindi",
+        "Sanskrit"
+      ],
+      "notes": "Government of India describes the library as holding about 17,000 manuscripts in Arabic, Persian, Pashto, Sanskrit, Urdu, Hindi and Turkish, plus about 60,000 printed books. Digital access and reuse rights vary by item."
     }
   ],
   "notes": [
@@ -3017,6 +3342,7 @@
     "2026-09-24: added Cambridge University Digital Library (CUDL) as a distinct digital-library gateway in addition to the previously registered general Cambridge Library domain, because the user supplied the exact CUDL endpoint and it exposes digitized Islamic/Arabic manuscript catalogue and folio records.",
     "2026-09-24: added Noon Books, Arab Union Catalog (AUC), and IslamicManuscripts.info as separately typed sources. The latter is explicitly marked legacy/archival because the supplied domain is not reliably live; AUC is a bibliographic discovery source, not a PDF repository.",
     "2026-09-24: added DLME via the supplied MED Dialogue page, BnF Bibliothèques d'Orient, the exact supplied University of Illinois MENA manuscript guide, and the actual Princeton Digital Library of Islamic Manuscripts. The Illinois link was retained because it was the exact supplied URL; Princeton was added separately because the description named Princeton.",
-    "2026-09-24 deep global radar pass: added verified manuscript/library lanes across UK/Ireland, Israel, Turkey, Morocco, India, Malaysia and Saudi Arabia, plus official Diyanet/İSAM digital resources. Existing #561 endpoints were deduplicated; item-level rights remain required."
+    "2026-09-24 deep global radar pass: added verified manuscript/library lanes across UK/Ireland, Israel, Turkey, Morocco, India, Malaysia and Saudi Arabia, plus official Diyanet/İSAM digital resources. Existing #561 endpoints were deduplicated; item-level rights remain required.",
+    "2026-09-24 deep radar continuation: added official Bangladesh Quran portal, open multilingual Quran/Tafsir/Islamic APIs and datasets, and additional South Asian/Bosnian manuscript and library lanes after current web verification. Existing provider duplicates were skipped."
   ]
 }
