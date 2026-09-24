@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 426,
-    "rights_review_required": 426,
-    "new_global_links_added_2026_09_24": 299,
+    "links": 430,
+    "rights_review_required": 430,
+    "new_global_links_added_2026_09_24": 303,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -7703,6 +7703,86 @@
         "multilingual_content"
       ],
       "verification_status": "web-verified"
+    },
+    {
+      "id": "world-428",
+      "category": "Islamic platform",
+      "name": "Islam O Pas",
+      "url": "https://www.islamopas.com",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Supplied source-discovery link. Current identity/content and item-level rights should be verified before acquisition or redistribution.",
+      "capabilities": [
+        "islamic_content",
+        "education",
+        "dawah",
+        "multilingual_content"
+      ],
+      "verification_status": "verification_pending",
+      "verification_url": "https://www.islamopas.com"
+    },
+    {
+      "id": "world-429",
+      "category": "European imam organization",
+      "name": "European Council of Imams",
+      "url": "https://euimams.org",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Official European Council of Imams endpoint. The site exposes scholarly articles, fatwas, sermons, media and a books/publications library; inclusion does not grant redistribution rights.",
+      "capabilities": [
+        "scholarly_articles",
+        "fatwa",
+        "sermons",
+        "media",
+        "books",
+        "islamic_education",
+        "european_muslim_resources"
+      ],
+      "verification_status": "web-verified",
+      "verification_url": "https://euimams.org/"
+    },
+    {
+      "id": "world-430",
+      "category": "Finnish Islamic education",
+      "name": "Islamin Usko — Aloittelijalle",
+      "url": "https://www.islaminusko.fi/Aloittelijalle/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Supplied Finnish-language beginner resource endpoint. Retained as a multilingual discovery lane; item-level provenance and rights must be verified before acquisition or redistribution.",
+      "capabilities": [
+        "finnish",
+        "new_muslim_guidance",
+        "islam_introduction",
+        "education",
+        "dawah"
+      ],
+      "verification_status": "verification_pending",
+      "verification_url": "https://www.islaminusko.fi/Aloittelijalle/"
+    },
+    {
+      "id": "world-431",
+      "category": "Scholar translated books",
+      "name": "موقع الشيخ محمد بن صالح بن عثيمين — الكتب المترجمة",
+      "url": "https://binothaimeen.net/ar/booksTranslated/%D8%A7%D9%84%D9%83%D8%AA%D8%A8%2520المترجمة",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Official Ibn Uthaymeen site translated-books endpoint supplied for multilingual book discovery. The site currently exposes translated books in multiple languages; item-level rights and edition provenance remain mandatory.",
+      "capabilities": [
+        "translated_books",
+        "multilingual_content",
+        "books",
+        "aqidah",
+        "fiqh",
+        "hadith",
+        "tafsir",
+        "hajj_umrah"
+      ],
+      "verification_status": "web-verified",
+      "verification_url": "https://binothaimeen.net/"
     }
   ],
   "notes": [
@@ -7739,9 +7819,11 @@
     "2026-09-24: added the supplied Sunnah, Islamic encyclopedia, multilingual-content, library, Quran, terminology and publisher endpoints. Existing exact URLs were deduplicated; all new entries remain review_required.",
     "2026-09-24 batch-2 canonical merge: three previously absent supplied endpoints were added (taaseel.com, bfdm.journals.ekb.eg, iicss.iq). muslim-library.com and islamweb.net were already registered in the canonical registry, while sunnah.global was already registered as world-378; none was duplicated.",
     "2026-09-24 Sunni-source expansion: added the verified Sunni bibliography Islamic Books Index, Sunni defense/book network, FIT-EU Islamic Sciences Foundation candidate, Bin Baz official archive, and the verified Arabic knowledge platform BilArabiya. Dar Al-Zaman was already registered as world-394 and was not duplicated.",
-    "2026-09-24 Sunni scholar-source expansion: added binothaimeen.net, ibnothaimeen.net, Shuwaier books, Ferkous, Bin Baz educational platform, Al-Albani archive, AF.org.sa, J-Eman, Al-Osaimi Google Site, and Al-Abbaad. Exact URL duplicates were checked before insertion; uncertain endpoints remain verification_pending and all entries remain review_required."
+    "2026-09-24 Sunni scholar-source expansion: added binothaimeen.net, ibnothaimeen.net, Shuwaier books, Ferkous, Bin Baz educational platform, Al-Albani archive, AF.org.sa, J-Eman, Al-Osaimi Google Site, and Al-Abbaad. Exact URL duplicates were checked before insertion; uncertain endpoints remain verification_pending and all entries remain review_required.",
+    "2026-09-24: added four supplied multilingual/European Islamic source-discovery endpoints: Islam O Pas, European Council of Imams, IslaminUsko beginner resources, and the official Ibn Uthaymeen translated-books endpoint. All remain review_required; verification status is recorded per source and no redistribution permission is inferred."
   ],
   "change_log": [
-    "2026-09-24: added 6 supplied source-discovery endpoints to the canonical registry: https://saleh.af.org.sa/ar/books?page=1, https://www.sualruhaily.com, https://alshathri.net, https://af.org.sa, https://www.nusuk.sa, https://www.rabita.fi/en#services. All remain review_required; no redistribution permission is inferred."
+    "2026-09-24: added 6 supplied source-discovery endpoints to the canonical registry: https://saleh.af.org.sa/ar/books?page=1, https://www.sualruhaily.com, https://alshathri.net, https://af.org.sa, https://www.nusuk.sa, https://www.rabita.fi/en#services. All remain review_required; no redistribution permission is inferred.",
+    "2026-09-24: added 4 supplied source-discovery endpoints: https://www.islamopas.com, https://euimams.org, https://www.islaminusko.fi/Aloittelijalle/, and the supplied Ibn Uthaymeen translated-books URL. All remain review_required; item-level rights and provenance remain mandatory."
   ]
 }
