@@ -6,6 +6,7 @@ on:
     - cron: "17 */4 * * *"
 
 permissions:
+  # security-justification: contents: write is required to persist governed acquisition progress and protected PDF release evidence; no Corpus write or public redistribution is performed.
   contents: write
 
 concurrency:
@@ -169,7 +170,7 @@ jobs:
           while IFS=$'\t' read -r digest release_tag asset_name; do
             [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
           done < <(
-            gh api --paginate               -H "Accept: application/vnd.github+json"               "/repos/$PROTECTED_STORAGE_REPO/releases?per_page=100"               --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
+            gh api --paginate               -H "Accept: application/vnd.github+json"               "/repos/$PROTECTED_STORAGE_REPO/releases?per_page=100"               --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [ .digest,$tag,.name] | @tsv'
           )
 
           tag="rechercher-global-books-${GITHUB_RUN_ID}"
