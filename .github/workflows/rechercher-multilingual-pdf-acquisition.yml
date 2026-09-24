@@ -74,7 +74,48 @@ jobs:
           node --version
           qpdf --version
           openssl version
+      - name: Build durable acquisition resume inventory from all matrix Releases
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}"
+          export GH_TOKEN="$MATRIX_STORAGE_TOKEN"
+          inventory="$RUNNER_TEMP/existing-release-inventory.json"
+          python3 - "$inventory" <<'PY'
+          import json, os, re, subprocess, sys
+          repo=os.environ["MATRIX_STORAGE_REPO"]
+          raw=subprocess.check_output([
+              "gh","api","--paginate","-H","Accept: application/vnd.github+json",
+              f"/repos/{repo}/releases?per_page=100"
+          ], text=True)
+          releases=json.loads(raw)
+          cells=set()
+          sha256=set()
+          assets=0
+          for rel in releases:
+              for a in rel.get("assets") or []:
+                  if a.get("state") != "uploaded" or not str(a.get("name","")).lower().endswith(".pdf"):
+                      continue
+                  assets += 1
+                  digest=str(a.get("digest") or "")
+                  if digest.startswith("sha256:"):
+                      sha256.add(digest.removeprefix("sha256:"))
+                  name=str(a.get("name") or "")
+                  cell=name.split("__",1)[0].strip()
+                  if cell:
+                      cells.add(cell)
+          data={"schema":"rechercher/multilingual-existing-release-inventory/v1",
+                "repository":repo,"release_count":len(releases),"asset_count":assets,
+                "cells":sorted(cells),"sha256":sorted(sha256)}
+          with open(sys.argv[1],"w",encoding="utf-8") as fp:
+              json.dump(data,fp,ensure_ascii=False,indent=2)
+              fp.write("\n")
+          print(f"MATRIX_RESUME_INVENTORY releases={len(releases)} assets={assets} cells={len(cells)} sha256={len(sha256)}")
+          PY
       - name: Acquire multilingual matrix-cell books and PDFs
+        env:
+          ACQUISITION_EXISTING_INVENTORY: ${{ runner.temp }}/existing-release-inventory.json
         run: node scripts/rechercher_acquire_multilingual_cell_pdfs.mjs
       - name: Validate acquired PDFs
         run: |
