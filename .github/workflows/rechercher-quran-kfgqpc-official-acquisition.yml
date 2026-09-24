@@ -6,6 +6,10 @@ on:
     branches:
       - 'rechercher-quran-official-api-registry-2026-09-22'
 
+concurrency:
+  group: rechercher-quran-kfgqpc-acquisition-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   actions: read
