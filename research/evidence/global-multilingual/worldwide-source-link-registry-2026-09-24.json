@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 153,
-    "rights_review_required": 153,
-    "new_global_links_added_2026_09_24": 26,
+    "links": 154,
+    "rights_review_required": 154,
+    "new_global_links_added_2026_09_24": 27,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -296,7 +296,13 @@
       "scope": "candidate-source",
       "rights_status": "review_required",
       "source_pr": "541_or_558",
-      "notes": "Discovery link; API/source access does not itself grant redistribution rights."
+      "notes": "Discovery link; API/source access does not itself grant redistribution rights.",
+      "capabilities": [
+        "multilingual_dawah",
+        "books",
+        "quran",
+        "hadith"
+      ]
     },
     {
       "id": "world-029",
@@ -306,7 +312,34 @@
       "scope": "candidate-source",
       "rights_status": "review_required",
       "source_pr": "541_or_558",
-      "notes": "Discovery link; API/source access does not itself grant redistribution rights."
+      "notes": "Discovery link; API/source access does not itself grant redistribution rights.",
+      "languages": [
+        "Arabic",
+        "English",
+        "Indonesian",
+        "Turkish",
+        "French",
+        "Urdu",
+        "Bengali",
+        "Russian",
+        "Spanish",
+        "Persian",
+        "Hindi",
+        "German",
+        "Portuguese",
+        "Chinese",
+        "Uyghur",
+        "Tajik",
+        "Tamil"
+      ],
+      "capabilities": [
+        "multilingual_fatwa",
+        "aqidah",
+        "fiqh",
+        "hadith"
+      ],
+      "verification_status": "web-verified",
+      "verification_url": "https://islamqa.info/en/articles/28"
     },
     {
       "id": "world-030",
@@ -346,7 +379,12 @@
       "scope": "candidate-source",
       "rights_status": "review_required",
       "source_pr": "541_or_558",
-      "notes": "Discovery link; API/source access does not itself grant redistribution rights."
+      "notes": "Discovery link; API/source access does not itself grant redistribution rights.",
+      "capabilities": [
+        "multilingual_fatwa",
+        "quran",
+        "hadith"
+      ]
     },
     {
       "id": "world-034",
@@ -476,7 +514,11 @@
       "scope": "candidate-source",
       "rights_status": "review_required",
       "source_pr": "541_or_558",
-      "notes": "Discovery link; API/source access does not itself grant redistribution rights."
+      "notes": "Discovery link; API/source access does not itself grant redistribution rights.",
+      "capabilities": [
+        "quran_translations",
+        "multilingual_quran"
+      ]
     },
     {
       "id": "world-047",
@@ -486,7 +528,11 @@
       "scope": "candidate-source",
       "rights_status": "review_required",
       "source_pr": "541_or_558",
-      "notes": "Discovery link; API/source access does not itself grant redistribution rights."
+      "notes": "Discovery link; API/source access does not itself grant redistribution rights.",
+      "capabilities": [
+        "quran_translations",
+        "multilingual_quran"
+      ]
     },
     {
       "id": "world-048",
@@ -606,7 +652,11 @@
       "scope": "candidate-source",
       "rights_status": "review_required",
       "source_pr": "541_or_558",
-      "notes": "Discovery link; API/source access does not itself grant redistribution rights."
+      "notes": "Discovery link; API/source access does not itself grant redistribution rights.",
+      "capabilities": [
+        "quran_translations",
+        "multilingual_quran"
+      ]
     },
     {
       "id": "world-060",
@@ -1761,6 +1811,29 @@
         "videos"
       ],
       "notes": "Official Explore Islam pages expose downloadable ebooks in multiple languages; indexed examples include Romanian and English, and site materials document multilingual Islamic books/media. Underlying item rights must be verified before redistribution."
+    },
+    {
+      "id": "world-158",
+      "category": "Multilingual Islamic education",
+      "name": "Weg zum Islam",
+      "url": "https://wegzumislam.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://wegzumislam.com/ueber-uns",
+      "capabilities": [
+        "german_islamic_education",
+        "hadith",
+        "quran",
+        "books",
+        "pdf",
+        "dawah"
+      ],
+      "languages": [
+        "German"
+      ],
+      "notes": "German-language Sunni-oriented discovery source; its official about page describes Quran, Sunnah, hadith, books and free downloads. It is useful for German-language matrix cells, but it is not itself a multilingual source, so it is recorded as a language-specific lane rather than a global multilingual provider."
     }
   ],
   "notes": [
@@ -1769,6 +1842,7 @@
     "2026-09-24 verification: Alminasa.ai, Hdith.com, King Salman Hadith Complex, and Mubseroon were added as candidate sources after web verification. Claims about unrestricted/open licensing, exact corpus totals, or a KFUPM 'Hadith Cloud Computing' infrastructure were not asserted without verifiable primary evidence.",
     "2026-09-24 verification: Tadween Center and Al-Furqan Digital Library were added as verified institutional/discovery sources. Their presence in the registry does not grant redistribution rights; item-level terms remain required.",
     "2026-09-24 verification: SeekersGuidance, The New Muslim Guide, and Ilmverse were added after checking their official sites. Their inclusion is a source/discovery record, not blanket permission to redistribute underlying content.",
-    "2026-09-24 multilingual expansion: IslamLand, Osoulstore, and Explore Islam were added after web verification because they expose multilingual Islamic books/media and downloadable resources. They are discovery/acquisition candidates; item-level rights remain required."
+    "2026-09-24 multilingual expansion: IslamLand, Osoulstore, and Explore Islam were added after web verification because they expose multilingual Islamic books/media and downloadable resources. They are discovery/acquisition candidates; item-level rights remain required.",
+    "2026-09-24 multilingual-language expansion: Rasoulallah.net and Zekr were added after primary-source verification; Weg zum Islam was added as a verified German-language acquisition lane. Existing IslamQA/Islamweb/IslamMessage/Tarteel records were enriched with multilingual capabilities where verified."
   ]
 }
