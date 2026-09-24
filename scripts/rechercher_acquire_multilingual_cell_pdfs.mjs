@@ -10,7 +10,7 @@ const ADAPTERS=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/is
 const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01-400h/master-global-source-registry-seed-2026-09.json'),'utf8'));
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXPECTED=3192;
-const MAX_SOURCES_PER_CELL=Math.max(1,Math.min(24,Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||24)));
+const MAX_SOURCES_PER_CELL=Math.max(1,Math.min(256,Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||256)));
 const MAX_DISCOVERY_DEPTH=Math.max(1,Math.min(6,Number(process.env.ACQUISITION_DISCOVERY_DEPTH||4)));
 const MAX_DISCOVERY_URLS_PER_SOURCE=Math.max(25,Math.min(500,Number(process.env.ACQUISITION_DISCOVERY_URLS_PER_SOURCE||250)));
 const MAX_PDF_CANDIDATES_PER_SOURCE=Math.max(8,Math.min(200,Number(process.env.ACQUISITION_MAX_PDF_CANDIDATES_PER_SOURCE||100)));
@@ -295,15 +295,7 @@ async function processCell(row){
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
-  // Inspect every active relevant source and recursively follow trusted same-origin API/pages until PDF assets are found.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);
-  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);
-  entry.source_candidates=limitedIds.slice();
-  const seeds=[];
-  for(const id of limitedIds){
-    const a=adapters.get(id);
-    for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});
-    if(a){const direct=urls.some(x=>sourceOf(x)===id);if(!direct&&a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}
-  }
+  // Inspect every active adapter AND every active master-registry source relevant to the cell.\n  // The full registered source pool is inspected; there is no 24-source shortlist.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);\n  for(const s of master.values()){\n    const sid=String(s.id||'').trim();\n    const active=!s.status || ['enabled','active','runtime-verified'].includes(String(s.status).toLowerCase());\n    if(!sid||!active) continue;\n    const kinds=(s.kinds||s.capabilities||[]).map(x=>String(x).toLowerCase());\n    if(adapterRelevant({kinds},row)) push(sid);\n  }\n  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);\n  entry.source_candidates=limitedIds.slice();\n  const seeds=[];\n  for(const id of limitedIds){\n    const a=adapters.get(id);\n    const m=master.get(id);\n    for(const u of urls.filter(x=>sourceOf(x)===id)) seeds.push({id,url:u,role:'cell-evidence'});\n    if(a){const direct=urls.some(x=>sourceOf(x)===id);if(!direct&&a.base_url)seeds.push({id,url:a.base_url,role:'adapter-base'});for(const u of apiSeeds(a,row))seeds.push({id,url:u,role:'official-api'});}\n    if(m){const mu=String(m.url||m.base_url||'');if(mu)seeds.push({id,url:mu,role:'master-registry'});}\n  }
   const localSeen=new Set();
   let rightsApprovedSources=0;
   for(const seed of seeds){
