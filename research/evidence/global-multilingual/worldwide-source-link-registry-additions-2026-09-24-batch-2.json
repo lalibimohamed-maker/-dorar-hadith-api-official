@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Deduplicated source additions pending canonical registry merge",
+  "source_registry": "worldwide-source-link-registry-2026-09-24.json",
+  "rights_status_default": "review_required",
+  "entries": [
+    {
+      "id": "world-403",
+      "name": "دار التأصيل للبحث العلمي والترجمة والنشر",
+      "url": "https://www.taaseel.com",
+      "scope": "candidate-source",
+      "verification_status": "verification_pending",
+      "capabilities": ["hadith", "sunnah", "scientific_research", "translation", "publishing", "source_discovery"]
+    },
+    {
+      "id": "world-404",
+      "name": "مجلة كلية أصول الدين والدعوة بالمنوفية",
+      "url": "https://bfdm.journals.ekb.eg",
+      "scope": "candidate-source",
+      "verification_status": "verification_pending",
+      "capabilities": ["academic_journals", "islamic_studies", "dawah", "research_papers", "pdf_discovery"]
+    },
+    {
+      "id": "world-405",
+      "name": "المركز الإسلامي للدراسات الاستراتيجية",
+      "url": "https://iicss.iq",
+      "scope": "candidate-source",
+      "verification_status": "verification_pending",
+      "capabilities": ["islamic_studies", "academic_research", "books", "articles", "source_discovery"]
+    },
+    {
+      "id": "world-406",
+      "name": "المكتبة الإسلامية الإلكترونية الشاملة",
+      "url": "https://www.muslim-library.com",
+      "scope": "candidate-source",
+      "verification_status": "verification_pending",
+      "capabilities": ["multilingual_books", "sunnah", "hadith", "translations", "research_papers", "pdf_discovery"]
+    },
+    {
+      "id": "world-407",
+      "name": "إسلام ويب",
+      "url": "https://www.islamweb.net",
+      "scope": "candidate-source",
+      "verification_status": "verification_pending",
+      "capabilities": ["fatwa", "islamic_books", "articles", "quran", "hadith", "source_discovery"]
+    }
+  ],
+  "deduplication": {
+    "skipped_existing": [
+      {
+        "url": "https://sunnah.global",
+        "reason": "Already present in canonical registry as world-378"
+      }
+    ],
+    "exact_url_duplicates_in_this_batch": 0
+  }
+}
