@@ -10,6 +10,7 @@ const ADAPTERS=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/is
 const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01-400h/master-global-source-registry-seed-2026-09.json'),'utf8'));
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXPECTED=3192;
+const MAX_SOURCES_PER_CELL=Math.max(1,Math.min(24,Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||24)));
 const MAX_DISCOVERY_DEPTH=Math.max(1,Math.min(6,Number(process.env.ACQUISITION_DISCOVERY_DEPTH||4)));
 const MAX_DISCOVERY_URLS_PER_SOURCE=Math.max(25,Math.min(500,Number(process.env.ACQUISITION_DISCOVERY_URLS_PER_SOURCE||250)));
 const MAX_PDF_CANDIDATES_PER_SOURCE=Math.max(8,Math.min(200,Number(process.env.ACQUISITION_MAX_PDF_CANDIDATES_PER_SOURCE||100)));
