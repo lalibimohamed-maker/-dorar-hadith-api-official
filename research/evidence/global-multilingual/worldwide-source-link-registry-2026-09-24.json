@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 263,
-    "rights_review_required": 263,
-    "new_global_links_added_2026_09_24": 136,
+    "links": 268,
+    "rights_review_required": 268,
+    "new_global_links_added_2026_09_24": 141,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -4729,6 +4729,146 @@
         "English"
       ],
       "notes": "Official JAKIM sitemap exposes Smart Quran, myHadith, sermon collections, JAKIM publications, Islamic library, open data and legal/religious information services."
+    },
+    {
+      "id": "world-277",
+      "category": "Tajikistan official Islamic library",
+      "name": "Islamic Centre of the Republic of Tajikistan — Library",
+      "url": "https://shuroiulamo.tj/en/library",
+      "scope": "official-islamic-library-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://shuroiulamo.tj/en/library",
+      "capabilities": [
+        "hadith",
+        "fiqh_hanafi",
+        "aqeedah",
+        "seerah",
+        "quran",
+        "dua",
+        "islamic_education",
+        "downloadable_books",
+        "multilingual"
+      ],
+      "languages": [
+        "Tajik",
+        "Russian",
+        "English",
+        "Arabic"
+      ],
+      "notes": "Official Islamic Centre library currently lists downloadable works including Musnad Abu Hanifa, 40 Hadith Makkī, Hanafi fiqh education, Seerah and other Islamic titles. The site interface is multilingual."
+    },
+    {
+      "id": "world-278",
+      "category": "Tajikistan official Islamic publication",
+      "name": "Islamic Centre Tajikistan — Hanafi Islamic Education Download",
+      "url": "https://shuroiulamo.tj/en/library/ids/6",
+      "scope": "official-downloadable-book-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://shuroiulamo.tj/en/library/ids/6",
+      "capabilities": [
+        "fiqh_hanafi",
+        "aqeedah",
+        "quran",
+        "sunnah",
+        "download",
+        "tajik"
+      ],
+      "languages": [
+        "Tajik",
+        "Russian",
+        "English",
+        "Arabic"
+      ],
+      "notes": "Direct downloadable official Islamic Centre publication teaching Islam according to Hanafi fiqh; kept as a distinct direct-item lane because the matrix acquisition workflow can use item endpoints."
+    },
+    {
+      "id": "world-279",
+      "category": "Kazakhstan official rare books and manuscripts",
+      "name": "Kazakhstan Central Scientific Library — Rare Books and Manuscripts",
+      "url": "https://gylymordasy.gov.kz/ru/library/",
+      "scope": "national-scientific-library-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://gylymordasy.gov.kz/ru/library/",
+      "capabilities": [
+        "manuscripts",
+        "rare_books",
+        "oriental_literature",
+        "digitization",
+        "full_text_databases",
+        "electronic_catalogue"
+      ],
+      "languages": [
+        "Kazakh",
+        "Russian",
+        "Arabic-script languages",
+        "Persian",
+        "Arabic",
+        "Turkish"
+      ],
+      "notes": "Central Scientific Library of Kazakhstan reports more than 20,000 manuscripts and scientific publications in 100+ languages, with digitization and full-text database creation as core functions."
+    },
+    {
+      "id": "world-280",
+      "category": "Kazakhstan national manuscript center",
+      "name": "National Center of Manuscripts and Rare Books of Kazakhstan",
+      "url": "https://www.gov.kz/memleket/entities/mam",
+      "scope": "official-national-manuscript-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.gov.kz/memleket/entities/mam",
+      "capabilities": [
+        "manuscripts",
+        "rare_books",
+        "quran",
+        "turkic_heritage",
+        "arabic_script",
+        "digitization",
+        "restoration",
+        "facsimile"
+      ],
+      "languages": [
+        "Kazakh",
+        "Russian",
+        "Arabic",
+        "Persian",
+        "Turkic languages"
+      ],
+      "notes": "Official Kazakhstan culture/government portal for the National Center documents Quranic and Persian/Arabic manuscript preservation, restoration, digitization and facsimile projects."
+    },
+    {
+      "id": "world-281",
+      "category": "Azerbaijan national digital books",
+      "name": "Azerbaijan National Library — Digital Books",
+      "url": "https://web2.anl.az/read/",
+      "scope": "national-digital-library-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://web2.anl.az/read/page.php?bibid=39914&pno=1",
+      "capabilities": [
+        "ebooks",
+        "pdf_downloads",
+        "azerbaijani",
+        "arabic",
+        "persian",
+        "islamic_heritage",
+        "digital_reading"
+      ],
+      "languages": [
+        "Azerbaijani",
+        "Arabic",
+        "Persian",
+        "Russian",
+        "Turkish"
+      ],
+      "notes": "Current Azerbaijan National Library digital reading interface exposes e-books and PDF downloads; collection-level rights are not blanket and must be checked per item."
     }
   ],
   "notes": [
@@ -4753,6 +4893,7 @@
     "2026-09-24 deep-radar wave: added Al-Azhar Digital Library, National Library of Tunisia manuscripts, Bibliotheca Alexandrina manuscript digital projects, WAAMD, HMML Islamic repository index, Khalidi Library, Meyli Foundation and Travnik manuscript collections.",
     "2026-09-24: deep-radar addition of East African, Indonesian and Gaza manuscript collections plus SAVAMA-DCI Timbuktu exhibit. Zaydi-family Yemen collections found during radar were intentionally not added as Sunni-source lanes.",
     "2026-09-24: major government/institutional-country radar wave added 21 verified official endpoints from UAE, Qatar, Kuwait, Oman, Algeria, Egypt, Jordan, Pakistan, Punjab, Indonesia, Maldives, Somalia, Mauritania, Malaysia and Saudi Arabia. Existing parent sources were retained without duplication; specialized sub-endpoints were added where materially useful.",
-    "2026-09-24 government-country sweep continuation: added official country-specific endpoints for Morocco, Oman, Kuwait, Qatar, Algeria, Egypt, Jordan, Pakistan, Indonesia, Maldives, Somalia, Mauritania and Malaysia. Existing #561 duplicates were skipped; official ownership/publication does not automatically imply redistribution rights."
+    "2026-09-24 government-country sweep continuation: added official country-specific endpoints for Morocco, Oman, Kuwait, Qatar, Algeria, Egypt, Jordan, Pakistan, Indonesia, Maldives, Somalia, Mauritania and Malaysia. Existing #561 duplicates were skipped; official ownership/publication does not automatically imply redistribution rights.",
+    "2026-09-24: added official Tajikistan Islamic Centre library/download lanes, Kazakhstan Central Scientific Library and National Manuscript Center, and Azerbaijan National Library digital books. Existing sources were deduplicated."
   ]
 }
