@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 177,
-    "rights_review_required": 177,
-    "new_global_links_added_2026_09_24": 50,
+    "links": 181,
+    "rights_review_required": 181,
+    "new_global_links_added_2026_09_24": 54,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -2482,6 +2482,118 @@
         "English"
       ],
       "notes": "The supplied domain is no longer reliably live; current web evidence preserves references to its manuscript reference library and materials, including Islamic codicology/palaeography resources. Registered as a legacy discovery/archival pointer only—not as an active acquisition endpoint. Prefer the surviving institutional catalogues and archive copies for actual acquisition."
+    },
+    {
+      "id": "world-186",
+      "category": "Middle East digital heritage aggregator",
+      "name": "Digital Library of the Middle East (DLME)",
+      "url": "https://meddialogue.eu/e-library/digital-library-of-the-middle-east/",
+      "scope": "federated-manuscript-and-cultural-heritage-discovery",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://dlme.clir.org/about/",
+      "capabilities": [
+        "manuscripts",
+        "archives",
+        "museum_objects",
+        "digital_heritage",
+        "multilingual_metadata",
+        "federated_search",
+        "mena_collections"
+      ],
+      "languages": [
+        "Arabic",
+        "English"
+      ],
+      "notes": "The supplied MED Dialogue page describes DLME as a federated platform for archives, manuscripts, museum objects, media and archaeological/intangible heritage, with records from the Middle East and North Africa. It is a discovery/aggregation layer; item-level rights and provider links must be followed before acquisition."
+    },
+    {
+      "id": "world-187",
+      "category": "Middle Eastern digital library",
+      "name": "Bibliothèques d'Orient (Libraries of the Middle East)",
+      "url": "https://www.bnf.fr/en/bibliotheques-dorient-libraries-middle-east",
+      "scope": "digital-library-and-manuscript-discovery",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.bnf.fr/en/bibliotheques-dorient-libraries-middle-east",
+      "capabilities": [
+        "manuscripts",
+        "printed_books",
+        "press",
+        "photographs",
+        "maps",
+        "middle_east",
+        "arab_world",
+        "turkish_world",
+        "persian_world",
+        "digital_collections"
+      ],
+      "languages": [
+        "French",
+        "English",
+        "Arabic",
+        "Turkish",
+        "additional editorial languages"
+      ],
+      "notes": "BnF describes Bibliothèques d'Orient as a collaborative curated digital library covering the Arab East and Turkish/Persian worlds. The current French institutional page reports more than 10,000 documents and identifies partner institutions in Egypt, Lebanon, Jerusalem, Istanbul, Erbil and elsewhere. Item-level rights vary by contributing institution."
+    },
+    {
+      "id": "world-188",
+      "category": "MENA manuscript discovery and library guide",
+      "name": "University of Illinois MENA Manuscripts Guide",
+      "url": "https://www.library.illinois.edu/middle-east/middle-east-north-african-studies/manuscripts/",
+      "scope": "manuscript-discovery-guide",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.library.illinois.edu/middle-east/middle-east-north-african-studies/manuscripts/",
+      "capabilities": [
+        "arabic_manuscripts",
+        "west_africa_manuscripts",
+        "islamic_manuscripts_mali",
+        "islamic_medical_manuscripts",
+        "british_library_mena",
+        "princeton_islamic_manuscripts",
+        "michigan_islamic_manuscripts",
+        "wellcome_asian_collection",
+        "west_african_database"
+      ],
+      "languages": [
+        "English"
+      ],
+      "notes": "The exact supplied URL is a University of Illinois research guide. It states that its linked digital collections are free and open access and aggregates access points for Arabic/West African, Mali, Princeton, Michigan, Wellcome and other manuscript collections. It is a discovery hub rather than the underlying item host."
+    },
+    {
+      "id": "world-189",
+      "category": "Princeton Islamic manuscript digital collection",
+      "name": "Princeton Digital Library of Islamic Manuscripts",
+      "url": "https://digital-collections.princeton.edu/collections/islamicmss",
+      "scope": "manuscript-digital-library-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://digital-collections.princeton.edu/collections/islamicmss",
+      "capabilities": [
+        "islamic_manuscripts",
+        "arabic_manuscripts",
+        "persian_manuscripts",
+        "ottoman_turkish",
+        "digital_manuscript_images",
+        "download_pdf",
+        "catalogue"
+      ],
+      "languages": [
+        "Arabic",
+        "Persian",
+        "Ottoman Turkish",
+        "Malay",
+        "English",
+        "Urdu",
+        "Greek"
+      ],
+      "notes": "Added separately because the user's description names Princeton but the supplied URL actually points to the University of Illinois guide. Princeton's current digital collection reports 3,456 items and 7 languages; individual items may expose image files and PDF download options. Rights are determined at item level."
     }
   ],
   "notes": [
@@ -2498,6 +2610,7 @@
     "2026-09-24 third audit of the supplied source list: added verified real-world projects that match requested functions—Basaer Academy, Yaqeen Institute, IOU, Bayyinah TV, Muslim Central, AccessibleQuran, Islamic Library Data, and Islamic API by SolimanAnas. Several descriptive names in the supplied list were not added because no sufficiently verifiable official endpoint was established.",
     "2026-09-24 audit of the latest supplied four-source batch: RasoulAllah was already registered; ummah.com currently resolves to Ummah Pay/payment infrastructure and was not added as an Islamic knowledge source. Added Tebian Academy and Nawara Academy after current verification.",
     "2026-09-24: added Cambridge University Digital Library (CUDL) as a distinct digital-library gateway in addition to the previously registered general Cambridge Library domain, because the user supplied the exact CUDL endpoint and it exposes digitized Islamic/Arabic manuscript catalogue and folio records.",
-    "2026-09-24: added Noon Books, Arab Union Catalog (AUC), and IslamicManuscripts.info as separately typed sources. The latter is explicitly marked legacy/archival because the supplied domain is not reliably live; AUC is a bibliographic discovery source, not a PDF repository."
+    "2026-09-24: added Noon Books, Arab Union Catalog (AUC), and IslamicManuscripts.info as separately typed sources. The latter is explicitly marked legacy/archival because the supplied domain is not reliably live; AUC is a bibliographic discovery source, not a PDF repository.",
+    "2026-09-24: added DLME via the supplied MED Dialogue page, BnF Bibliothèques d'Orient, the exact supplied University of Illinois MENA manuscript guide, and the actual Princeton Digital Library of Islamic Manuscripts. The Illinois link was retained because it was the exact supplied URL; Princeton was added separately because the description named Princeton."
   ]
 }
