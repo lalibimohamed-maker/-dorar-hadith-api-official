@@ -1,0 +1,195 @@
+name: Rechercher — Global books acquisition from PR #561
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */4 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rechercher-global-book-acquisition-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SOURCE_REGISTRY_URL: https://raw.githubusercontent.com/lalibimohamed-maker/-dorar-hadith-api-official/feat/rechercher-worldwide-source-link-registry-2026-09-24/research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json
+  SOURCE_REGISTRY_PR: "561"
+  PROTECTED_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
+
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - name: Checkout acquisition branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install PDF validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils
+
+      - name: Fetch live #561 source registry
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          curl -fsSL --retry 4 --retry-all-errors --connect-timeout 15 --max-time 90             "$SOURCE_REGISTRY_URL"             -o artifacts/governance/source-registry-561.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("artifacts/governance/source-registry-561.json")
+          d=json.loads(p.read_text(encoding="utf-8"))
+          sources=[s for s in d.get("sources",[]) if isinstance(s,dict)]
+          urls=[s.get("url") for s in sources if s.get("url")]
+          if len(sources) < 1:
+              raise SystemExit("SOURCE_REGISTRY_EMPTY")
+          if len(urls) != len(set(urls)):
+              raise SystemExit("SOURCE_REGISTRY_DUPLICATE_URL")
+          if any(s.get("rights_status") != "review_required" for s in sources):
+              raise SystemExit("SOURCE_REGISTRY_RIGHTS_GATE_INVALID")
+          print("SOURCE_REGISTRY_561_OK sources=%d unique_urls=%d" % (len(sources), len(set(urls))))
+          PY
+
+      - name: Materialize unbounded chronological master catalog
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_materialize_master_catalog.py
+          test -s books-batches/encyclopedia-master/catalog.json
+
+      - name: Attach matching PDF candidates from all #561 sources
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_registry_source_bridge.py             --root "$GITHUB_WORKSPACE"             --registry artifacts/governance/source-registry-561.json             --catalog books-batches/encyclopedia-master/catalog.json
+          test -s artifacts/governance/source-registry-561-bridge.json
+
+      - name: Resolve expected volume evidence
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_resolve_volume_evidence.py
+
+      - name: Acquire real PDFs with quality and resume gates
+        env:
+          RECHERCHER_MAX_BOOK_WORKERS: "12"
+        run: |
+          set -euo pipefail
+          set +e
+          python3 scripts/rechercher_acquisition_engine.py
+          rc=$?
+          set -e
+          echo "ACQUISITION_ENGINE_EXIT=$rc" | tee artifacts/governance/global-acquisition-engine-exit.txt
+          test -s artifacts/acquisition-run-summary.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          rows=json.loads(Path("artifacts/acquisition-run-summary.json").read_text(encoding="utf-8"))
+          counts={}
+          for r in rows:
+              counts[r.get("status","unknown")]=counts.get(r.get("status","unknown"),0)+1
+          print("ACQUISITION_STATUS_COUNTS",json.dumps(counts,ensure_ascii=False,sort_keys=True))
+          unexpected=[r for r in rows if r.get("status")=="unexpected-error"]
+          if unexpected:
+              raise SystemExit("UNEXPECTED_ACQUISITION_ERRORS=%d" % len(unexpected))
+          PY
+
+      - name: Validate every retained PDF
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(artifacts/*.pdf)
+          for f in "${files[@]}"; do
+            test "$(head -c 5 "$f")" = "%PDF-"
+            test -s "$f"
+            qpdf --check --warning-exit-0 "$f" >/dev/null
+          done
+          echo "VALID_PDF_COUNT=${#files[@]}"
+
+      - name: Persist acquisition state
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add             config/rechercher-global-book-acquisition-561.json             books-batches/encyclopedia-master/catalog.json             artifacts/governance/source-registry-561.json             artifacts/governance/source-registry-561-bridge.json             artifacts/governance/global-acquisition-engine-exit.txt             artifacts/acquisition-run-summary.json             artifacts/governance/sequential-acquisition/volume-resolution.json
+          if git diff --cached --quiet; then
+            echo "NO_STATE_CHANGES"
+          else
+            git commit -m "data(rechercher): persist global acquisition progress"
+            cat > "$RUNNER_TEMP/askpass.sh" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$GITHUB_TOKEN" ;;
+          esac
+          SH
+            chmod 700 "$RUNNER_TEMP/askpass.sh"
+            GIT_ASKPASS="$RUNNER_TEMP/askpass.sh" GIT_TERMINAL_PROMPT=0 git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Persist acquired PDFs to protected Releases
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(artifacts/*.pdf)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "NO_PDFS_THIS_RUN"
+            exit 0
+          fi
+          test -n "${SECONDARY_STORAGE_TOKEN:-}" || {
+            echo "RECHERCHER_SECONDARY_STORAGE_TOKEN missing; durable protected PDF persistence cannot proceed."
+            exit 1
+          }
+
+          release_root="$RUNNER_TEMP/global-book-release"
+          rm -rf "$release_root"
+          mkdir -p "$release_root"
+
+          declare -A existing_sha=()
+          while IFS=$'\t' read -r digest release_tag asset_name; do
+            [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
+          done < <(
+            gh api --paginate               -H "Accept: application/vnd.github+json"               "/repos/$PROTECTED_STORAGE_REPO/releases?per_page=100"               --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
+          )
+
+          tag="rechercher-global-books-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$PROTECTED_STORAGE_REPO"             --title "Rechercher global books protected — $tag"             --notes "Protected acquisition driven by live PR #561 source registry. No public redistribution grant."             --latest=false
+
+          uploaded=0
+          skipped=0
+          for f in "${files[@]}"; do
+            sha=$(sha256sum "$f" | awk '{print $1}')
+            digest="sha256:$sha"
+            if [ -n "${existing_sha[$digest]+x}" ]; then
+              echo "DEDUP_SKIP sha256=$sha file=$(basename "$f")"
+              skipped=$((skipped+1))
+              continue
+            fi
+            asset="${sha}_$(basename "$f")"
+            cp -f "$f" "$release_root/$asset"
+            gh release upload "$tag" "$release_root/$asset" --repo "$PROTECTED_STORAGE_REPO"
+            existing_sha["$digest"]="$tag/$asset"
+            uploaded=$((uploaded+1))
+          done
+
+          gh release view "$tag" --repo "$PROTECTED_STORAGE_REPO" --json tagName,assets,url
+          echo "PROTECTED_PDF_RELEASE_OK uploaded=$uploaded skipped_duplicates=$skipped"
+          rm -rf "$release_root"
+
+      - name: Upload run evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-global-book-acquisition-${{ github.run_id }}
+          path: |
+            artifacts/governance/
+            artifacts/acquisition-run-summary.json
+            books-batches/encyclopedia-master/catalog.json
+          if-no-files-found: warn
+          retention-days: 30
