@@ -371,6 +371,7 @@ async function processCell(row){
 
   // Inspect every active built-in adapter, legacy master-registry source,
   // and relevant source from PR #561's worldwide registry.
+  // The full registered source pool is inspected; there is no 24-source shortlist.
   for(const a of adapters.values()){
     if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);
   }
