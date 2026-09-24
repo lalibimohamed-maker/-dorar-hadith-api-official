@@ -1,0 +1,25 @@
+name: Rechercher — retire merged PR #411 branch
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Delete legacy merged #411 branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          old_branch="feat/rechercher-master-global-source-registry-2026-09-v2"
+          if gh api "/repos/${GITHUB_REPOSITORY}/git/ref/heads/${old_branch}" >/dev/null 2>&1; then
+            gh api --method DELETE "/repos/${GITHUB_REPOSITORY}/git/refs/heads/${old_branch}"
+            echo "LEGACY_411_BRANCH_DELETED=${old_branch}"
+          else
+            echo "LEGACY_411_BRANCH_ALREADY_ABSENT=${old_branch}"
+          fi
