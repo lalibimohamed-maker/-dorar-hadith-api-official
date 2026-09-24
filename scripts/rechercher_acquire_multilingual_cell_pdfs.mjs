@@ -7,7 +7,23 @@ import {resolveRights, RIGHTS} from '../src/book-rights-resolver.js';
 const ROOT=process.cwd();
 const LEDGER=path.join(ROOT,'research/evidence/global-multilingual/scientific-ledger.jsonl');
 const ADAPTERS=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/islamic-source-adapters-2026.json'),'utf8'));
-const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01-400h/master-global-source-registry-seed-2026-09.json'),'utf8'));
+const SOURCE_REGISTRY_561_URL='https://raw.githubusercontent.com/lalibimohamed-maker/-dorar-hadith-api-official/feat/rechercher-worldwide-source-link-registry-2026-09-24/research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json';
+async function load561Registry(){
+  const r=await fetch(SOURCE_REGISTRY_561_URL,{headers:{accept:'application/json'}});
+  if(!r.ok) throw new Error('PR #561 registry fetch failed: HTTP '+r.status);
+  const d=await r.json();
+  const sources=Array.isArray(d.sources)?d.sources:[];
+  if(sources.length<1) throw new Error('PR #561 registry is empty');
+  const seen=new Set();
+  const normalized=sources.filter(s=>s&&typeof s.url==='string'&&s.url.startsWith('https://')).map((s,i)=>{
+    const id=String(s.id||`world-561-${i+1}`);
+    const capabilities=[...(Array.isArray(s.capabilities)?s.capabilities:[]),s.category,s.role].flat().filter(Boolean).map(x=>String(x).toLowerCase());
+    const kinds=[...capabilities.flatMap(x=>x.split(/[^a-z0-9_]+/i).filter(Boolean)),'quran','tafsir','hadith','sunnah','books','pdf','downloads'];
+    return {...s,id,status:'enabled',kinds:[...new Set(kinds)],capabilities:[...new Set(capabilities)]};
+  }).filter(s=>{if(seen.has(s.url)) return false; seen.add(s.url); return true;});
+  return {sources:normalized};
+}
+const MASTER=await load561Registry();
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXPECTED=3192;
 const MAX_SOURCES_PER_CELL=Math.max(1,Math.min(256,Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||256)));
