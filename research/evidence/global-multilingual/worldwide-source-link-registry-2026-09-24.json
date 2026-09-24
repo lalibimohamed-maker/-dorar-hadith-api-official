@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 146,
-    "rights_review_required": 146,
-    "new_global_links_added_2026_09_24": 19,
+    "links": 148,
+    "rights_review_required": 148,
+    "new_global_links_added_2026_09_24": 21,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -1612,11 +1612,55 @@
       "rights_status": "review_required",
       "source_pr": "561",
       "notes": "Official university domain used as an institutional discovery source. Specific repository/library endpoints and item-level rights require verification before acquisition."
+    },
+    {
+      "id": "world-148",
+      "category": "Hadith research center",
+      "name": "Tadween Center for Hadith Research and Studies — مركز تدوين",
+      "url": "https://tadween.sa/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://tadween.sa/",
+      "capabilities": [
+        "hadith",
+        "hadith_sciences",
+        "theses",
+        "peer_reviewed_research",
+        "manuscripts",
+        "hadith_terms"
+      ],
+      "notes": "Official Tadween Center site; identifies the center as a non-profit endowment registered in Saudi Arabia and lists databases for theses, peer-reviewed research, manuscripts, Sunnah works and hadith terminology. Item/API access and redistribution rights require verification."
+    },
+    {
+      "id": "world-149",
+      "category": "Islamic heritage digital library",
+      "name": "Al-Furqan Islamic Heritage Foundation Digital Library",
+      "url": "https://digitallibrary.al-furqan.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://digitallibrary.al-furqan.com/our_collections",
+      "capabilities": [
+        "islamic_manuscripts",
+        "quran",
+        "quran_sciences",
+        "hadith",
+        "fiqh",
+        "theology",
+        "maqasid",
+        "multilingual_manuscript_catalog",
+        "islamic_written_heritage"
+      ],
+      "notes": "Official Al-Furqan Digital Library gateway. Its collections include manuscripts, World Collections, Maqasid, library references and publications; the platform documents Islamic manuscript and bibliographic records across many countries and languages. It is a discovery/research gateway, not blanket authorization for PDF redistribution; rights must be verified per item."
     }
   ],
   "notes": [
     "This expanded snapshot is not an exhaustive census of all global sources.",
     "The 15 additions in this revision were checked against PR #541 and PR #558 diffs and the repository main-branch code search before insertion.",
-    "2026-09-24 verification: Alminasa.ai, Hdith.com, King Salman Hadith Complex, and Mubseroon were added as candidate sources after web verification. Claims about unrestricted/open licensing, exact corpus totals, or a KFUPM 'Hadith Cloud Computing' infrastructure were not asserted without verifiable primary evidence."
+    "2026-09-24 verification: Alminasa.ai, Hdith.com, King Salman Hadith Complex, and Mubseroon were added as candidate sources after web verification. Claims about unrestricted/open licensing, exact corpus totals, or a KFUPM 'Hadith Cloud Computing' infrastructure were not asserted without verifiable primary evidence.",
+    "2026-09-24 verification: Tadween Center and Al-Furqan Digital Library were added as verified institutional/discovery sources. Their presence in the registry does not grant redistribution rights; item-level terms remain required."
   ]
 }
