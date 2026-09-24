@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 171,
-    "rights_review_required": 171,
-    "new_global_links_added_2026_09_24": 44,
+    "links": 173,
+    "rights_review_required": 173,
+    "new_global_links_added_2026_09_24": 46,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -2323,6 +2323,64 @@
         "English"
       ],
       "notes": "Public GitHub project documents REST endpoints for Quran, 13 hadith collections, Hisn Muslim, Tafsir and audio. Treat API availability as a technical access signal, not a redistribution license for every underlying work."
+    },
+    {
+      "id": "world-180",
+      "category": "Quran and Islamic sciences education",
+      "name": "Tebian Academy",
+      "url": "https://www.tebian.co/",
+      "scope": "educational-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://www.tebian.co/en/page/FAQs",
+      "capabilities": [
+        "quran",
+        "tajweed",
+        "tafsir",
+        "quranic_sciences",
+        "arabic",
+        "fiqh",
+        "seerah",
+        "hadith_sciences",
+        "multilingual_interface"
+      ],
+      "languages": [
+        "Arabic",
+        "English",
+        "French",
+        "Italian"
+      ],
+      "notes": "Current official site documents Quran recitation/Tajweed, Tafsir and Quranic sciences, Arabic, Fiqh, Seerah and Hadith sciences. Site UI is available in Arabic, English, French and Italian. It is an educational provider, not a bulk-PDF repository; content rights require item-level review."
+    },
+    {
+      "id": "world-181",
+      "category": "Free structured Sunni educational discovery",
+      "name": "Nawara Academy",
+      "url": "https://nawaraacademy.com/",
+      "scope": "educational-discovery-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://nawaraacademy.com/",
+      "capabilities": [
+        "aqeedah",
+        "quran",
+        "tafsir",
+        "arabic",
+        "seerah",
+        "fiqh",
+        "hadith_sciences",
+        "islamic_history",
+        "dawah",
+        "islamic_finance",
+        "free_courses",
+        "youtube_curated"
+      ],
+      "languages": [
+        "English"
+      ],
+      "notes": "Current site states that its structured courses are free and span Aqeedah, Quran/Tafsir, Arabic/Quran reading, Seerah, Fiqh, Hadith sciences and other fields. It curates publicly available YouTube lessons from original teachers/institutions; the original channel remains the rights holder, so it is a discovery source rather than a blanket redistribution license."
     }
   ],
   "notes": [
@@ -2336,6 +2394,7 @@
     "2026-09-24 additional multilingual acquisition lanes: Australian Islamic Library, Hadith Hub GO, Al-Hadith Bibliothèque Islam, Hadith Tabsera, and Islamtics Hadith Library were added after current web verification. They expand multilingual hadith coverage; item/data rights remain subject to verification.",
     "2026-09-24 second audit of روابط.docx and adjacent multilingual acquisition lanes: added GlobalQuran.com, Wathakker, AlQuranTranslation.com, Quran Mercy, UrduPoint Islamic Books, HolyBooks.in, and Nuria after current verification. Duplicate underlying files remain governed by SHA-256 deduplication and rights review.",
     "2026-09-24 audit continuation: added Download Islamic Religion PDF Ebooks after its current sitemap verified multilingual Islamic-book categories and PDF availability; mixed-source filtering and item-level rights review remain mandatory.",
-    "2026-09-24 third audit of the supplied source list: added verified real-world projects that match requested functions—Basaer Academy, Yaqeen Institute, IOU, Bayyinah TV, Muslim Central, AccessibleQuran, Islamic Library Data, and Islamic API by SolimanAnas. Several descriptive names in the supplied list were not added because no sufficiently verifiable official endpoint was established."
+    "2026-09-24 third audit of the supplied source list: added verified real-world projects that match requested functions—Basaer Academy, Yaqeen Institute, IOU, Bayyinah TV, Muslim Central, AccessibleQuran, Islamic Library Data, and Islamic API by SolimanAnas. Several descriptive names in the supplied list were not added because no sufficiently verifiable official endpoint was established.",
+    "2026-09-24 audit of the latest supplied four-source batch: RasoulAllah was already registered; ummah.com currently resolves to Ummah Pay/payment infrastructure and was not added as an Islamic knowledge source. Added Tebian Academy and Nawara Academy after current verification."
   ]
 }
