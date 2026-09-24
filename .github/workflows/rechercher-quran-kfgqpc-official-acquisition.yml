@@ -28,7 +28,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "artifacts/quran-kfgqpc-official-acquisition"
-          artifact_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=quran-kfgqpc-official-acquisition&per_page=100" --jq --argjson current "$GITHUB_RUN_ID" --arg branch "$GITHUB_REF_NAME" '[.artifacts[] | select(.expired == false and .workflow_run.id != $current and .workflow_run.head_branch == $branch)] | sort_by(.created_at) | last | .id // empty')"
+          artifacts_json="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=quran-kfgqpc-official-acquisition&per_page=100")"
+          artifact_id="$(printf '%s' "$artifacts_json" | jq -r --arg current "$GITHUB_RUN_ID" --arg branch "$GITHUB_REF_NAME" '[.artifacts[] | select(.expired == false and (.workflow_run.id | tostring) != $current and .workflow_run.head_branch == $branch)] | sort_by(.created_at) | last | .id // empty')"
           if [ -n "$artifact_id" ]; then
             echo "Restoring acquisition checkpoint artifact $artifact_id"
             gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" > /tmp/previous-acquisition.zip
