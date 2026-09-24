@@ -18,7 +18,7 @@ async function load561Registry(){
   const normalized=sources.filter(s=>s&&typeof s.url==='string'&&s.url.startsWith('https://')).map((s,i)=>{
     const id=String(s.id||`world-561-${i+1}`);
     const capabilities=[...(Array.isArray(s.capabilities)?s.capabilities:[]),s.category,s.role].flat().filter(Boolean).map(x=>String(x).toLowerCase());
-    const kinds=[...capabilities.flatMap(x=>x.split(/[^a-z0-9_]+/i).filter(Boolean)),'quran','tafsir','hadith','sunnah','books','pdf','downloads'];
+    const kinds=capabilities.flatMap(x=>x.split(/[^a-z0-9_]+/i).filter(Boolean));
     return {...s,id,status:'enabled',kinds:[...new Set(kinds)],capabilities:[...new Set(capabilities)]};
   }).filter(s=>{if(seen.has(s.url)) return false; seen.add(s.url); return true;});
   return {sources:normalized};
