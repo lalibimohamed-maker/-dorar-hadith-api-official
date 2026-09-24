@@ -296,7 +296,7 @@ async function processCell(row){
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
   // Inspect every active relevant source and recursively follow trusted same-origin API/pages until PDF assets are found.\n  for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);
-  const limitedIds=[...new Set(ids)];
+  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);
   entry.source_candidates=limitedIds.slice();
   const seeds=[];
   for(const id of limitedIds){
