@@ -5,9 +5,9 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 282,
-    "rights_review_required": 282,
-    "new_global_links_added_2026_09_24": 155,
+    "links": 286,
+    "rights_review_required": 286,
+    "new_global_links_added_2026_09_24": 159,
     "previous_snapshot_links": 127
   },
   "rules": [
@@ -5263,6 +5263,124 @@
         "Ottoman Turkish"
       ],
       "notes": "OPenn hosts the Digital Walters manuscript data; the collection includes Quran, prophetic biography, Islamic legal terminology and medical manuscripts. OPenn's general policy releases its hosted material under Public Domain Mark/CC licenses subject to collection-specific terms."
+    },
+    {
+      "id": "world-296",
+      "category": "Russia national Islamic manuscripts",
+      "name": "National Library of Russia — Oriental Manuscripts",
+      "url": "https://nlr.ru/eng/RA2688/oriental-manuscripts",
+      "scope": "national-oriental-manuscript-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://nlr.ru/eng/RA2688/oriental-manuscripts",
+      "capabilities": [
+        "islamic_manuscripts",
+        "quran",
+        "arabic",
+        "persian",
+        "turkic",
+        "ethiopian",
+        "central_asian",
+        "digital_manuscripts",
+        "catalogue"
+      ],
+      "languages": [
+        "Arabic",
+        "Persian",
+        "Turkic languages",
+        "Ethiopian languages",
+        "Central Asian languages",
+        "Russian"
+      ],
+      "notes": "Russia's National Library reports about 28,000 Oriental manuscripts, including more than 2,000 Arabic codices/fragments and early Qurans from the 8th–11th centuries; geography spans Japan/Indonesia to Spain and Ethiopia."
+    },
+    {
+      "id": "world-297",
+      "category": "Russia early Quran digital collection",
+      "name": "National Library of Russia — Early Qur'ans of J.-J. Marcel Collection",
+      "url": "https://expositions.nlr.ru/eng/ex_manus/Koran/",
+      "scope": "early-quran-digital-exhibit",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://expositions.nlr.ru/eng/ex_manus/Koran/",
+      "capabilities": [
+        "early_quran",
+        "8th_11th_century",
+        "quran_manuscripts",
+        "digital_images",
+        "codicology",
+        "paleography",
+        "marcel_collection"
+      ],
+      "languages": [
+        "Arabic",
+        "Russian",
+        "English"
+      ],
+      "notes": "Official NLR digital exhibition documents the preserved Marcel collection of early Qur'anic fragments and provides gallery images and research metadata."
+    },
+    {
+      "id": "world-298",
+      "category": "Türkiye official manuscript portal",
+      "name": "Presidency of Türkiye Manuscripts Institution Portal",
+      "url": "https://portal.yek.gov.tr/main/login?lang_id=en",
+      "scope": "national-islamic-manuscript-catalogue-and-image-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://portal.yek.gov.tr/main/login?lang_id=en",
+      "capabilities": [
+        "manuscript_catalogue",
+        "digital_images",
+        "quran",
+        "hadith",
+        "tafsir",
+        "hanafi_fiqh",
+        "fiqh",
+        "seerah",
+        "aqeedah",
+        "tasawwuf",
+        "arabic",
+        "persian",
+        "ottoman_turkish",
+        "bulk_pose_download"
+      ],
+      "languages": [
+        "Arabic",
+        "Turkish",
+        "Persian",
+        "French",
+        "English",
+        "German"
+      ],
+      "notes": "Official Türkiye Manuscripts Institution portal currently reports 485,038 items with digital images and 373,203 manuscripts; its subject facets include 297.501 Hanafi Fiqh (20,509), Hadith (8,307), Quran (6,470), tafsir, Seerah and devotional works. Portal recently increased maximum pose downloads to 5,000 per request."
+    },
+    {
+      "id": "world-299",
+      "category": "Georgia Arabic manuscript catalogue",
+      "name": "National Parliamentary Library of Georgia — Arabic Manuscripts Catalogue",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/312361",
+      "scope": "national-manuscript-catalogue-and-pdf-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://dspace.nplg.gov.ge/handle/1234/312361",
+      "capabilities": [
+        "arabic_manuscripts",
+        "catalogue_pdf",
+        "manuscript_institute",
+        "digital_library",
+        "caucasus_islamic_history"
+      ],
+      "languages": [
+        "Arabic",
+        "Russian",
+        "Georgian",
+        "English metadata"
+      ],
+      "notes": "National Parliamentary Library of Georgia's repository hosts a 136.82 MB PDF catalogue of Arabic manuscripts from the Kekelidze Institute of Manuscripts."
     }
   ],
   "notes": [
@@ -5290,6 +5408,7 @@
     "2026-09-24 government-country sweep continuation: added official country-specific endpoints for Morocco, Oman, Kuwait, Qatar, Algeria, Egypt, Jordan, Pakistan, Indonesia, Maldives, Somalia, Mauritania and Malaysia. Existing #561 duplicates were skipped; official ownership/publication does not automatically imply redistribution rights.",
     "2026-09-24: added official Tajikistan Islamic Centre library/download lanes, Kazakhstan Central Scientific Library and National Manuscript Center, and Azerbaijan National Library digital books. Existing sources were deduplicated.",
     "2026-09-24 cross-continent radar wave: added ACO, Harvard Islamic Heritage Project, OPenn Manuscripts of the Muslim World, Columbia Muslim World resources, University of Melbourne Middle Eastern Manuscripts, Royal Danish Library Oriental Collection, and ULB Bonn Oriental Manuscripts.",
-    "2026-09-24 cross-continent continuation: added McGill Islamic Studies digital collections and specialized archive, SLUB Dresden Oriental Manuscripts, Brazil National Digital Library and manuscript catalogue, University of Toronto Kairouan Manuscript Project, and Digital Walters open manuscript endpoint."
+    "2026-09-24 cross-continent continuation: added McGill Islamic Studies digital collections and specialized archive, SLUB Dresden Oriental Manuscripts, Brazil National Digital Library and manuscript catalogue, University of Toronto Kairouan Manuscript Project, and Digital Walters open manuscript endpoint.",
+    "2026-09-24 deep cross-continent radar: added Russia NLR Islamic/early Quran, Türkiye Manuscripts Institution, Georgia Arabic manuscript catalogue, McGill, SLUB Dresden, Harvard IHP, OPenn Muslim World, and University of Melbourne Middle Eastern Manuscripts."
   ]
 }
