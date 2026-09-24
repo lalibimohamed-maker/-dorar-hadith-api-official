@@ -11,11 +11,6 @@ const MASTER=JSON.parse(await fs.readFile(path.join(ROOT,'books-batches/salaf-01
 const WORLDWIDE=JSON.parse(await fs.readFile(path.join(ROOT,'research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json'),'utf8'));
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXISTING_INVENTORY=process.env.ACQUISITION_EXISTING_INVENTORY||path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition/existing-release-inventory.json');
-let existingInventory={cells:[],sha256:[]};
-try{existingInventory=JSON.parse(await fs.readFile(EXISTING_INVENTORY,'utf8'));}catch{}
-const existingCells=new Set((existingInventory.cells||[]).map(String));
-const existingSha=new Set((existingInventory.sha256||[]).map(x=>String(x).replace(/^sha256:/,'')));
-console.log('ACQUISITION_RESUME existing_cells='+existingCells.size+' existing_sha256='+existingSha.size);
 const EXPECTED=3192;
 const MAX_SOURCES_PER_CELL=Math.max(1,Math.min(256,Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||256)));
 const MAX_DISCOVERY_DEPTH=Math.max(1,Math.min(6,Number(process.env.ACQUISITION_DISCOVERY_DEPTH||4)));
