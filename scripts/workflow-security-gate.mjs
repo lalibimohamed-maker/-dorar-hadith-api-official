@@ -18,8 +18,12 @@ for (const file of files) {
   for (const line of text.split(/\r?\n/)) {
     const m = line.match(/^\s*uses:\s*([^\s#]+)\s*(?:#.*)?$/);
     if (m) {
-      const ref = m[1].split("@")[1];
-      if (!ref || !sha40.test(ref)) add(file, `Action is not pinned to a full 40-character SHA: ${m[1]}`);
+      const target = m[1];
+      // Local reusable workflows (./.github/workflows/...) are resolved from the same commit;
+      // they do not use an @ref and therefore cannot be pinned with an external SHA.
+      if (target.startsWith("./")) continue;
+      const ref = target.split("@")[1];
+      if (!ref || !sha40.test(ref)) add(file, `Action is not pinned to a full 40-character SHA: ${target}`);
     }
   }
 
@@ -37,9 +41,27 @@ for (const file of files) {
   if (/\b(AWS_SECRET_ACCESS_KEY|OPENAI_API_KEY|GH_TOKEN|GITHUB_TOKEN|NPM_TOKEN|PASSWORD|PRIVATE_KEY)\s*:\s*['"][^$\n]+['"]/i.test(text)) add(file, "possible hard-coded secret detected");
   if (/-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----/.test(text)) add(file, "private key material detected");
 
-  const runBlocks = text.split(/^\s*run:\s*\|?\s*$/m).slice(1);
-  for (const block of runBlocks) {
-    if (/\$\{\{\s*(github\.event\.(pull_request|issue|comment)|github\.head_ref|github\.event\.pull_request\.(title|body))/.test(block)) {
+  // Inspect only the YAML block scalar belonging to each `run:` key. The previous
+  // split-based implementation accidentally scanned everything after the first
+  // run block, so a later safe `github.event.*` expression could be reported as if
+  // it were shell interpolation.
+  const lines = text.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i += 1) {
+    const runMatch = lines[i].match(/^(\s*)run:\s*\|?\s*$/);
+    if (!runMatch) continue;
+    const baseIndent = runMatch[1].length;
+    const block = [];
+    for (let j = i + 1; j < lines.length; j += 1) {
+      const line = lines[j];
+      if (/^\s*$/.test(line)) {
+        block.push(line);
+        continue;
+      }
+      const indent = line.match(/^\s*/)[0].length;
+      if (indent <= baseIndent) break;
+      block.push(line);
+    }
+    if (/\$\{\{\s*(github\.event\.(pull_request|issue|comment)|github\.head_ref|github\.event\.pull_request\.(title|body))/.test(block.join("\n"))) {
       add(file, "untrusted GitHub event data interpolated into a shell run block");
     }
   }

@@ -1,3 +1,4 @@
+import { openItiConnectorInfo, openItiVersion, openItiRawTextUrl, openItiRawText, openItiConnectorHealth, shamelaDiscoveryUrl, shamelaConnectorInfo, shamelaRuntimeConfig, shamelaMasterMetadata, shamelaBookMetadata, shamelaBook } from './rechercher-openiti-shamela.js';
 import { loadCorpus, loadRouting } from './corpus_repository.js';
 import { searchCorpus, resolveConcept } from './corpus_search.js';
 import { buildKnowledgeSections } from './concept_resolver.js';
@@ -9,6 +10,14 @@ import { routeTransactionQuestion, buildTransactionLesson, listTransactionTopics
 import { searchEncyclopedia, getEncyclopediaSourceInfo, getEncyclopediaDomainInfo } from './encyclopedia-api.js';
 import { hadithSource, hadithSources, validateHadith, narratorProfile, compareNarratorJudgmentsSafe, narratorGrade, rijalBooks } from './hadith-research.js';
 import { validateNarratorRecord, summarizeNarratorEvidence, compareNarratorStatements } from './rijal-evidence.js';
+import { apiActivationRegistry, apiActivation } from './api-activation.js';
+import { getQuranAyah } from './quran-ayah.js';
+import { listQuranTranslations, getQuranTranslation, getQuranFoundationTranslation } from './quran-translations.js';
+import { syncQuranFoundation } from './quran-foundation-sync.js';
+import { searchDorar } from './dorar-client.js';
+import { getSunnahCollections, getSunnahCollection, getSunnahHadiths, getSunnahHadithByRefs, getSunnahHadithByUrns } from './sunnah-client.js';
+import { islamHouseConnectorInfo, islamHouseCategories, islamHouseCategoryItems, islamHouseItem, islamHouseItemTranslations, islamHouseAvailableLanguages, islamHouseLatest, islamHouseBooks, gallicaSearch, fetchIiifManifest, iiifConnectorInfo, sourceConnectorHealth } from './rechercher-source-connectors.js';
+import { hadeethEncApiInfo, hadeethEncLanguages, hadeethEncCategories, hadeethEncRootCategories, hadeethEncList, hadeethEncHadith } from './hadeethenc-client.js';
 
 export function search(query, options = {}) {
   const records = loadCorpus();
@@ -49,3 +58,49 @@ export function transactionLearning({ topic, question, language='ar' } = {}) {
   const selected = topic || routing.topicId;
   return { routing, topics: listTransactionTopics(), lesson: selected ? buildTransactionLesson(selected, { language }) : null };
 }
+
+export function apiRegistry() { return apiActivationRegistry(); }
+export function apiConnector(id) { return apiActivation(id); }
+export function quranAyah(input) { return getQuranAyah(input); }
+export function quranTranslations(language) { return listQuranTranslations(language); }
+export function quranTranslation(input) { return getQuranTranslation(input); }
+export function quranFoundationTranslation(input) { return getQuranFoundationTranslation(input); }
+export function quranFoundationSync(input) { return syncQuranFoundation(input); }
+export function dorarSearch(query, options) { return searchDorar(query, options); }
+export function sunnahHadiths(input) { return getSunnahHadiths(input); }
+export function sunnahHadithRefs(refs, options) { return getSunnahHadithByRefs(refs, options); }
+export function sunnahHadithUrns(urns, options) { return getSunnahHadithByUrns(urns, options); }
+export function sunnahCollections(options) { return getSunnahCollections(options); }
+export function sunnahCollection(collection, options) { return getSunnahCollection(collection, options); }
+
+export function hadeethEncInfo() { return hadeethEncApiInfo(); }
+export function hadeethEncLanguagesList() { return hadeethEncLanguages(); }
+export function hadeethEncCategoriesList(language) { return hadeethEncCategories(language); }
+export function hadeethEncRootCategoriesList(language) { return hadeethEncRootCategories(language); }
+export function hadeethEncHadithList(input) { return hadeethEncList(input); }
+export function hadeethEncHadithRecord(input) { return hadeethEncHadith(input); }
+
+export function rechercherSourceConnectorHealth() { return sourceConnectorHealth(); }
+export function rechercherIslamHouseInfo() { return islamHouseConnectorInfo(); }
+export function rechercherIslamHouseCategories(language) { return islamHouseCategories(language); }
+export function rechercherIslamHouseCategoryItems(input) { return islamHouseCategoryItems(input); }
+export function rechercherIslamHouseItem(itemId, language) { return islamHouseItem(itemId, language); }
+export function rechercherIslamHouseItemTranslations(itemId, language) { return islamHouseItemTranslations(itemId, language); }
+export function rechercherIslamHouseAvailableLanguages(contentType, language) { return islamHouseAvailableLanguages(contentType, language); }
+export function rechercherIslamHouseLatest(input) { return islamHouseLatest(input); }
+export function rechercherIslamHouseBooks(input) { return islamHouseBooks(input); }
+export function rechercherGallicaSearch(input) { return gallicaSearch(input); }
+export function rechercherIiifManifest(input) { return fetchIiifManifest(input.provider, input.url, input); }
+export function rechercherIiifConnectorInfo() { return iiifConnectorInfo(); }
+
+export function rechercherOpenItiInfo() { return openItiConnectorInfo(); }
+export function rechercherOpenItiVersion(versionUri, options) { return openItiVersion(versionUri, options); }
+export function rechercherOpenItiRawTextUrl(input) { return openItiRawTextUrl(input); }
+export function rechercherOpenItiRawText(input) { return openItiRawText(input); }
+export function rechercherOpenItiHealth() { return openItiConnectorHealth(); }
+export function rechercherShamelaDiscoveryUrl(query) { return shamelaDiscoveryUrl(query); }
+export function rechercherShamelaInfo() { return shamelaConnectorInfo(); }
+export function rechercherShamelaRuntimeConfig() { return shamelaRuntimeConfig(); }
+export function rechercherShamelaMasterMetadata(input) { return shamelaMasterMetadata(input); }
+export function rechercherShamelaBookMetadata(bookId, options) { return shamelaBookMetadata(bookId, options); }
+export function rechercherShamelaBook(bookId, options) { return shamelaBook(bookId, options); }

@@ -1,0 +1,167 @@
+{
+  "schema": "rechercher/source-graph/v1",
+  "purpose": "System-layer authority and provenance graph for Islamic works, editions, manuscript witnesses, repositories, manifests, pages and passages. It never writes directly to Corpus.",
+  "policy": {
+    "corpus_write": "never-direct",
+    "source_text_must_remain_at_source": true,
+    "ai_is_not_a_source": true,
+    "rights_verified_per_item": true,
+    "canonical_arabic_separate_from_translations": true,
+    "discovery_connector_distinct_from_content_connector": true
+  },
+  "node_types": [
+    "work",
+    "author",
+    "edition",
+    "manuscript_witness",
+    "repository",
+    "identifier",
+    "iiif_manifest",
+    "page_or_folio",
+    "text",
+    "passage",
+    "scholar_statement"
+  ],
+  "edge_types": [
+    "authored_by",
+    "edition_of",
+    "witness_of",
+    "held_by",
+    "identified_by",
+    "has_manifest",
+    "has_page",
+    "contains_text",
+    "contains_passage",
+    "statement_from"
+  ],
+  "connectors": [
+    {
+      "id": "gallica-bnf",
+      "name": "Gallica / BnF",
+      "url": "https://gallica.bnf.fr/",
+      "role": "provenance_and_iiif",
+      "capabilities": ["catalogue_search", "iiif_image", "iiif_presentation", "ocr", "text_extraction", "document_metadata"],
+      "status": "runtime-verified",
+      "rights": "item-level"
+    },
+    {
+      "id": "vhmml",
+      "name": "vHMML",
+      "url": "https://www.vhmml.org/",
+      "role": "manuscript_catalogue_and_iiif",
+      "capabilities": ["manuscript_metadata", "reading_room", "iiif", "downloadable_metadata_json"],
+      "status": "iiif-runtime-capable",
+      "rights": "metadata-cc-by-4.0-where-stated",
+      "runtime_note": "Manifest retrieval is implemented through the allowlisted IIIF connector; provider-specific catalogue search remains separate."
+    },
+    {
+      "id": "fihrist",
+      "name": "Fihrist",
+      "url": "https://www.fihrist.org.uk/",
+      "role": "authority_and_catalogue",
+      "capabilities": ["manuscript_catalogue", "authority_metadata"],
+      "status": "iiif-runtime-capable",
+      "rights": "item-level",
+      "runtime_note": "Manifest retrieval is implemented through the allowlisted IIIF connector; provider-specific catalogue search remains separate."
+    },
+    {
+      "id": "leiden-collections",
+      "name": "Leiden Collections",
+      "url": "https://digitalcollections.universiteitleiden.nl/",
+      "role": "manuscript_and_book_discovery",
+      "capabilities": ["catalogue", "digitized_items"],
+      "status": "iiif-runtime-capable",
+      "rights": "item-level",
+      "runtime_note": "Manifest retrieval is implemented through the allowlisted IIIF connector; provider-specific catalogue search remains separate."
+    },
+    {
+      "id": "princeton",
+      "name": "Princeton University Library",
+      "url": "https://library.princeton.edu/",
+      "role": "manuscript_and_book_discovery",
+      "capabilities": ["catalogue", "digitized_items"],
+      "status": "iiif-runtime-capable",
+      "rights": "item-level",
+      "runtime_note": "Manifest retrieval is implemented through the allowlisted IIIF connector; provider-specific catalogue search remains separate."
+    },
+    {
+      "id": "cambridge",
+      "name": "Cambridge University Library",
+      "url": "https://www.lib.cam.ac.uk/",
+      "role": "manuscript_and_book_discovery",
+      "capabilities": ["catalogue", "digitized_items"],
+      "status": "iiif-runtime-capable",
+      "rights": "item-level",
+      "runtime_note": "Manifest retrieval is implemented through the allowlisted IIIF connector; provider-specific catalogue search remains separate."
+    },
+    {
+      "id": "british-library",
+      "name": "British Library",
+      "url": "https://www.bl.uk/",
+      "role": "manuscript_and_book_discovery",
+      "capabilities": ["catalogue", "digitized_items"],
+      "status": "iiif-runtime-capable",
+      "rights": "item-level",
+      "runtime_note": "Manifest retrieval is implemented through the allowlisted IIIF connector; provider-specific catalogue search remains separate."
+    },
+    {
+      "id": "qdl",
+      "name": "Qatar Digital Library",
+      "url": "https://www.qdl.qa/",
+      "role": "manuscript_and_archive_discovery",
+      "capabilities": ["catalogue", "digitized_items"],
+      "status": "iiif-runtime-capable",
+      "rights": "item-level",
+      "runtime_note": "Manifest retrieval is implemented through the allowlisted IIIF connector; provider-specific catalogue search remains separate."
+    },
+    {
+      "id": "al-furqan",
+      "name": "Al-Furqan Islamic Heritage Foundation",
+      "url": "https://www.al-furqan.com/",
+      "role": "manuscript_and_heritage_authority",
+      "capabilities": ["bibliography", "manuscript_research"],
+      "status": "iiif-runtime-capable",
+      "rights": "item-level",
+      "runtime_note": "Manifest retrieval is implemented through the allowlisted IIIF connector; provider-specific catalogue search remains separate."
+    },
+    {
+      "id": "openiti",
+      "name": "OpenITI",
+      "url": "https://openiti.org/",
+      "role": "early_text_and_authority",
+      "capabilities": ["machine_readable_text", "author_work_metadata"],
+      "status": "runtime-verified",
+      "rights": "dataset-specific",
+      "runtime_note": "Metadata API + release-pinned raw-text resolver implemented with regression tests; dataset-specific rights remain required."
+    },
+    {
+      "id": "shamela",
+      "name": "Shamela",
+      "url": "https://shamela.ws/",
+      "role": "bibliographic_and_release_metadata",
+      "capabilities": ["master_metadata", "book_release_metadata", "text_discovery"],
+      "status": "api-key-configurable",
+      "rights": "source-specific",
+      "runtime_note": "Shamela itself is an existing Source Graph node. The executable v4 connector now matches the documented API contract: master metadata uses version; book metadata uses major_release/minor_release. No API key is stored. Live calls remain gated on SHAMELA_API_KEY. Release URLs/content remain subject to a separate acquisition and per-item rights gate."
+    },
+    {
+      "id": "islamhouse",
+      "name": "IslamHouse",
+      "url": "https://islamhouse.com/read#lang_ar",
+      "role": "multilingual_islamic_content_discovery",
+      "capabilities": ["books", "articles", "fatwas", "audio", "video", "quran", "hadith", "language_catalogue"],
+      "status": "runtime-verified",
+      "rights": "item-level"
+    }
+  ],
+  "runtime_policy": {
+    "no_status_from_name_only": true,
+    "runtime_verified_requires_executable_connector_and_tests": true,
+    "iiif_runtime_capable_requires_manifest_url": true,
+    "catalogue_search_is_distinct_from_manifest_retrieval": true,
+    "rights_verified_per_item": true,
+    "raw_text_requires_source_specific_rights": true,
+    "discovery_only_must_not_be_presented_as_content_connector": true,
+    "corpus_write_never_direct": true
+  }
+}

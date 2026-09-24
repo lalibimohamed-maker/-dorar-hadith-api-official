@@ -5,14 +5,13 @@ on:
   schedule:
     - cron: '0 3 * * *'
 
-# security-justification: the workflow downloads catalogued research copies for developer review, encrypts retained copies with a GitHub secret, and never publishes plaintext restricted copies.
+# security-justification: contents: write is used only for auditable PDF/manifest persistence; new .pdf.enc creation is forbidden.
 permissions:
   contents: write
 
 env:
   GIT_TERMINAL_PROMPT: '0'
   REVIEW_BRANCH: 'rechercher/salaf-01-400h-developer-review-acquisition'
-  CATALOG_PATH: 'books-batches/encyclopedia-master/catalog.json'
 
 jobs:
   acquire:
@@ -25,36 +24,17 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Enforce PDF-only primary storage policy
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_pdf_storage_policy_check.py
+
       - name: Install validators
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
 
-      - name: Require vault key
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
-
-      - name: Materialize central unbounded master catalog
-        run: |
-          set -euo pipefail
-          python3 scripts/rechercher_materialize_master_catalog.py --root "$GITHUB_WORKSPACE"
-          test -s "$CATALOG_PATH"
-          python3 - "$CATALOG_PATH" <<'PY'
-          import json, sys
-          from pathlib import Path
-          p=Path(sys.argv[1])
-          d=json.loads(p.read_text(encoding='utf-8'))
-          books=d.get('books', [])
-          print('DEVELOPER_REVIEW_MASTER_CATALOG', json.dumps({
-              'path': str(p),
-              'records': len(books),
-              'with_sources': sum(bool(b.get('sources')) for b in books),
-          }, ensure_ascii=False, sort_keys=True))
-          PY
 
       - name: Recover previous engine snapshot when available
         run: |
@@ -102,7 +82,6 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/rechercher_developer_review_acquisition.py --root "$GITHUB_WORKSPACE" \
-            --catalog "$CATALOG_PATH" \
             --discovery books-batches/salaf-01-400h/master-discovery-additions-2026.json \
             --discovery books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json \
             --discovery books-batches/salaf-01-400h/engine-source-overlay.json
@@ -141,13 +120,13 @@ jobs:
       - name: Build edition citation knowledge graph
         run: |
           set -euo pipefail
-          python3 scripts/rechercher_graph_build.py --catalog "$CATALOG_PATH" --out artifacts/governance/knowledge-graph.json
+          python3 scripts/rechercher_graph_build.py --catalog books-batches/salaf-01-400h/catalog.json --out artifacts/governance/knowledge-graph.json
 
       - name: Run governance and source-health audit
         run: |
           set -euo pipefail
           python3 scripts/rechercher_governance_audit.py --root "$GITHUB_WORKSPACE" \
-            --catalog "$CATALOG_PATH" \
+            --catalog books-batches/salaf-01-400h/catalog.json \
             --overlay books-batches/salaf-01-400h/engine-source-overlay.json \
             --out artifacts/governance/governance-report.json
           test -s artifacts/governance/governance-report.json
@@ -171,7 +150,7 @@ jobs:
           set -euo pipefail
           python3 scripts/rechercher_control_general.py \
             --root "$GITHUB_WORKSPACE" \
-            --catalog "$CATALOG_PATH" \
+            --catalog books-batches/salaf-01-400h/catalog.json \
             --overlay books-batches/salaf-01-400h/engine-source-overlay.json \
             --governance artifacts/governance/governance-report.json \
             --page-integrity artifacts/governance/page-integrity.json \
@@ -189,47 +168,13 @@ jobs:
             --reason 'multi-engine resolution, deep worldwide federation, acquisition validation, governance and fail-closed global control' \
             --commit "$(git rev-parse HEAD)"
 
-      - name: Encrypt retained copies
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          for f in artifacts/developer-review-vault/*.pdf; do
-            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
-              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$f.enc"
-            rm -f -- "$f"
-          done
-
-      - name: Persist encrypted vault as release assets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          files=(artifacts/developer-review-vault/*.enc)
-          test "${#files[@]}" -gt 0 || { echo 'ERROR: no encrypted vault files were produced.'; exit 1; }
-          VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
-          gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "Rechercher encrypted vault ${GITHUB_RUN_ID}" \
-            --notes "Encrypted developer-review acquisition vault for workflow run ${GITHUB_RUN_ID}. Files are AES-256-CBC encrypted with the repository REVIEW_VAULT_KEY secret."
-          : > artifacts/governance/vault-release.jsonl
-          for f in "${files[@]}"; do
-            gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
-            sha256sum "$f" >> artifacts/governance/vault-release.jsonl
-          done
-          python3 - "$VAULT_TAG" <<'PY'
-          import json, os, subprocess, sys
-          from pathlib import Path
-          tag=sys.argv[1]
-          lines=[]
-          for raw in Path('artifacts/governance/vault-release.jsonl').read_text(encoding='utf-8').splitlines():
-              digest, path=raw.split(None, 1)
-              lines.append({'sha256':digest,'file':path})
-          release=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo',os.environ['GITHUB_REPOSITORY'],'--json','url,tagName'], text=True))
-          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v1','release':release,'assets':lines}, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
-          PY
-          rm -f artifacts/governance/vault-release.jsonl
+      - name: Upload validated PDFs as developer-review artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-developer-review-pdfs-${{ github.run_id }}
+          path: artifacts/developer-review-vault/*.pdf
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Persist manifests and governance evidence
         env:
@@ -248,10 +193,6 @@ jobs:
           fi
           git commit -m 'data(rechercher): retain encrypted vault release and governance evidence'
           ACQ_COMMIT=$(git rev-parse HEAD)
-          # The central catalog is materialized for this run only. Restore the tracked
-          # catalog before switching branches so generated catalog state never blocks checkout
-          # and is never accidentally carried into the protected review branch or Corpus.
-          git restore --worktree --staged -- "$CATALOG_PATH" 2>/dev/null || true
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
           git checkout "$ACQ_COMMIT" -- artifacts/governance books-batches/salaf-01-400h/engine-source-overlay.json
