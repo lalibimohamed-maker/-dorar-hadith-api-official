@@ -1,0 +1,89 @@
+name: Rechercher — KFGQPC official translation asset acquisition
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'rechercher-quran-official-api-registry-2026-09-22'
+
+concurrency:
+  group: rechercher-quran-kfgqpc-acquisition-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  acquire-kfgqpc-official:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Restore previous acquisition checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "artifacts/quran-kfgqpc-official-acquisition"
+          artifacts_json="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=quran-kfgqpc-official-acquisition&per_page=100")"
+          artifact_id="$(printf '%s' "$artifacts_json" | jq -r --arg current "$GITHUB_RUN_ID" --arg branch "$GITHUB_REF_NAME" '[.artifacts[] | select(.expired == false and (.workflow_run.id | tostring) != $current and .workflow_run.head_branch == $branch)] | sort_by(.created_at) | last | .id // empty')"
+          if [ -n "$artifact_id" ]; then
+            echo "Restoring acquisition checkpoint artifact $artifact_id"
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" > /tmp/previous-acquisition.zip
+            unzip -q /tmp/previous-acquisition.zip -d "artifacts/quran-kfgqpc-official-acquisition"
+            rm -f /tmp/previous-acquisition.zip
+          else
+            echo "No previous checkpoint artifact found; starting from the first pending language."
+          fi
+      - name: Install PDF/DOCX validation and conversion tools
+        run: sudo apt-get update && sudo apt-get install -y qpdf poppler-utils libreoffice-writer fonts-noto-core
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+      - name: Acquire official KFGQPC assets
+        run: node scripts/rechercher-acquire-kfgqpc-official.mjs
+        env:
+          KFGQPC_CONCURRENCY: 3
+      - name: Validate KFGQPC acquisition manifest
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const m = JSON.parse(
+            fs.readFileSync(
+              'artifacts/quran-kfgqpc-official-acquisition/manifest.json',
+              'utf8'
+            )
+          );
+
+          const expectedEditionCount = 12;
+
+          if (m.edition_count !== expectedEditionCount) process.exit(1);
+
+          if (m.network_unavailable === true) {
+            console.log('KFGQPC official server/proxy temporarily unavailable; no asset marked acquired.');
+            process.exit(0);
+          }
+
+          if (m.acquired_editions !== expectedEditionCount) process.exit(1);
+          if (m.failed_editions !== 0) process.exit(1);
+
+          if (
+            m.corpus_write !== false ||
+            m.ai_generated_translation !== false ||
+            m.canonical_arabic_separate !== true
+          ) {
+            process.exit(1);
+          }
+
+          console.log('KFGQPC acquisition manifest OK', m.languages.join(','));
+          NODE
+      - name: Upload research-only KFGQPC acquisition
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: quran-kfgqpc-official-acquisition
+          path: artifacts/quran-kfgqpc-official-acquisition
+          retention-days: 90

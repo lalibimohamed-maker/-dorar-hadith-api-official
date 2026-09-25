@@ -1,0 +1,113 @@
+{
+  "schema_version": "2026-09-22",
+  "layer": "System",
+  "purpose": "Official Saudi institutional registry for Quran translation editions published or identified by the King Fahd Glorious Quran Printing Complex (KFGQPC). Metadata-only until asset-level rights and integrity verification pass.",
+  "policy": {
+    "canonical_arabic_separate": true,
+    "ai_generated_translation_forbidden": true,
+    "primary_source_required": true,
+    "rights_verification_required": true,
+    "text_integrity_verification_required": true,
+    "public_corpus_ingestion_requires_verified_status": true,
+    "matrix_admission_requires_all_verifications": true,
+    "corpus_write_forbidden": true
+  },
+  "source": {
+    "source_id": "sa-kfgqpc",
+    "institution": "King Fahd Glorious Quran Printing Complex",
+    "country": "SA",
+    "official_url": "https://qurancomplex.gov.sa/",
+    "evidence_url": "https://qurancomplex.gov.sa/en/kfgqpc/kfq-structure/",
+    "status": "primary_source_verified",
+    "evidence": "KFGQPC's official organizational page states that its Translations Center produces and reviews translations of the meanings of the Quran and lists the language editions below."
+  },
+  "language_editions": [
+    {
+      "edition_id": "kfgqpc-german",
+      "language_iso_code": "de",
+      "language_name": "German"
+    },
+    {
+      "edition_id": "kfgqpc-tamazight",
+      "language_iso_code": "ber",
+      "language_name": "Tamazight"
+    },
+    {
+      "edition_id": "kfgqpc-english",
+      "language_iso_code": "en",
+      "language_name": "English"
+    },
+    {
+      "edition_id": "kfgqpc-turkish",
+      "language_iso_code": "tr",
+      "language_name": "Turkish"
+    },
+    {
+      "edition_id": "kfgqpc-dari",
+      "language_iso_code": "prs",
+      "language_name": "Dari"
+    },
+    {
+      "edition_id": "kfgqpc-russian",
+      "language_iso_code": "ru",
+      "language_name": "Russian"
+    },
+    {
+      "edition_id": "kfgqpc-swahili",
+      "language_iso_code": "sw",
+      "language_name": "Swahili"
+    },
+    {
+      "edition_id": "kfgqpc-chinese",
+      "language_iso_code": "zh",
+      "language_name": "Chinese"
+    },
+    {
+      "edition_id": "kfgqpc-french",
+      "language_iso_code": "fr",
+      "language_name": "French"
+    },
+    {
+      "edition_id": "kfgqpc-fulani",
+      "language_iso_code": "ff",
+      "language_name": "Fulani (Latin script)"
+    },
+    {
+      "edition_id": "kfgqpc-nepali",
+      "language_iso_code": "ne",
+      "language_name": "Nepali"
+    },
+    {
+      "edition_id": "kfgqpc-kannada",
+      "language_iso_code": "kn",
+      "language_name": "Kannada",
+      "official_page": "https://qurancomplex.gov.sa/en/kfgqpc-quran-translate-kannada/",
+      "asset_index_urls": [
+        "https://epub.qurancomplex.gov.sa/issues/translations/kannada/",
+        "https://download.qurancomplex.gov.sa/issues/translations/kannada/"
+      ],
+      "asset_discovery": "server_index",
+      "asset_verification": "pdf_signature_sha256",
+      "acquisition_status": "not_acquired",
+      "rights_verification": "pending",
+      "text_integrity_status": "pending",
+      "matrix_eligibility": "blocked_pending_rights_and_integrity",
+      "asset_urls": [
+        "https://qurancomplex.gov.sa/wp-content/uploads/isdarat/translations/kannada-1.pdf"
+      ],
+      "asset_kind": "pdf",
+      "asset_source": "official_kfgqpc_web_published_pdf",
+      "asset_url_status": "official_file_confirmed"
+    }
+  ],
+  "verification_defaults": {
+    "primary_source_verification": "primary_source_verified",
+    "rights_verification": "pending",
+    "text_integrity_status": "pending",
+    "matrix_eligibility": "blocked_pending_rights_and_integrity",
+    "public_publishable": false,
+    "corpus_write": false,
+    "ai_generated_translation": false
+  },
+  "coverage_note": "The registry establishes official institutional provenance. Kannada is backed by the official KFGQPC publication page and its official epub.qurancomplex.gov.sa/download.qurancomplex.gov.sa publication paths. Asset-level acquisition, rights and integrity remain separate gates."
+}

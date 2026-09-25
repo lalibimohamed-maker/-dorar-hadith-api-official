@@ -6,74 +6,693 @@
     "hadith": "Presence in a musnad or sunan is not itself a declaration of authenticity. Preserve grading and attribution separately."
   },
   "categories": [
-    { "id": "quran", "nameAr": "القرآن وعلومه" },
-    { "id": "tafsir", "nameAr": "التفسير" },
-    { "id": "tadabbur", "nameAr": "التدبر والهدايات" },
-    { "id": "hadith", "nameAr": "الحديث وعلومه" },
-    { "id": "musnads-sunan", "nameAr": "المسانيد والسنن" },
-    { "id": "sirah", "nameAr": "السيرة والمغازي والشمائل" },
-    { "id": "fiqh", "nameAr": "الفقه والمعاملات" },
-    { "id": "usul-fiqh", "nameAr": "أصول الفقه والقواعد" },
-    { "id": "maqasid", "nameAr": "مقاصد الشريعة" },
-    { "id": "aqidah", "nameAr": "العقيدة" },
-    { "id": "biographies", "nameAr": "التراجم والرواة والعلماء" },
-    { "id": "library", "nameAr": "المكتبة الإسلامية" },
-    { "id": "official", "nameAr": "المصادر الرسمية والمؤسسات العلمية" },
-    { "id": "manuscripts", "nameAr": "المخطوطات والفهارس" },
-    { "id": "genealogy", "nameAr": "الأنساب والتاريخ" }
+    {
+      "id": "quran",
+      "nameAr": "القرآن وعلومه"
+    },
+    {
+      "id": "tafsir",
+      "nameAr": "التفسير"
+    },
+    {
+      "id": "tadabbur",
+      "nameAr": "التدبر والهدايات"
+    },
+    {
+      "id": "hadith",
+      "nameAr": "الحديث وعلومه"
+    },
+    {
+      "id": "musnads-sunan",
+      "nameAr": "المسانيد والسنن"
+    },
+    {
+      "id": "sirah",
+      "nameAr": "السيرة والمغازي والشمائل"
+    },
+    {
+      "id": "fiqh",
+      "nameAr": "الفقه والمعاملات"
+    },
+    {
+      "id": "usul-fiqh",
+      "nameAr": "أصول الفقه والقواعد"
+    },
+    {
+      "id": "maqasid",
+      "nameAr": "مقاصد الشريعة"
+    },
+    {
+      "id": "aqidah",
+      "nameAr": "العقيدة"
+    },
+    {
+      "id": "biographies",
+      "nameAr": "التراجم والرواة والعلماء"
+    },
+    {
+      "id": "library",
+      "nameAr": "المكتبة الإسلامية"
+    },
+    {
+      "id": "official",
+      "nameAr": "المصادر الرسمية والمؤسسات العلمية"
+    },
+    {
+      "id": "manuscripts",
+      "nameAr": "المخطوطات والفهارس"
+    },
+    {
+      "id": "genealogy",
+      "nameAr": "الأنساب والتاريخ"
+    }
   ],
   "sources": [
-    { "id": "dorar", "nameAr": "الدرر السنية", "category": "hadith", "url": "https://dorar.net", "role": "primary" },
-    { "id": "shamela", "nameAr": "المكتبة الشاملة", "category": "library", "url": "https://shamela.ws", "role": "supporting" },
-    { "id": "qurancomplex", "nameAr": "مجمع الملك فهد لطباعة المصحف الشريف", "country": "السعودية", "category": "official", "url": "https://qurancomplex.gov.sa/", "role": "official-primary", "coverage": ["quran", "qiraat", "translations", "tafsir", "quran-sciences", "digital-quran"] },
-    { "id": "moia-sa", "nameAr": "وزارة الشؤون الإسلامية والدعوة والإرشاد", "country": "السعودية", "category": "official", "url": "https://moia.gov.sa/", "role": "official-primary", "coverage": ["dawah", "quran", "books", "research", "fatwa-related-guidance"] },
-    { "id": "moia-ebook", "nameAr": "المكتبة الإلكترونية الإسلامية - وزارة الشؤون الإسلامية", "country": "السعودية", "category": "official", "url": "https://ebook.moia.gov.sa/", "role": "official-primary", "coverage": ["islamic-books", "lessons", "hadith", "aqidah", "fiqh"] },
-    { "id": "saudi-libraries", "nameAr": "منصة المكتبات الرقمية السعودية - هيئة المكتبات", "country": "السعودية", "category": "official", "url": "https://libraries.moc.gov.sa/", "role": "official-research", "coverage": ["books", "manuscripts", "research"] },
-    { "id": "king-abdulaziz-public-library", "nameAr": "مكتبة الملك عبدالعزيز العامة", "country": "السعودية", "category": "official", "url": "https://www.kapl.org.sa/", "role": "official-research", "coverage": ["books", "heritage", "arabic-culture", "islamic-studies"] },
-    { "id": "king-fahd-national-library", "nameAr": "مكتبة الملك فهد الوطنية", "country": "السعودية", "category": "official", "url": "https://kfnl.gov.sa/", "role": "official-research", "coverage": ["bibliography", "books", "manuscripts", "national-heritage"] },
-    { "id": "imam-muhammad-university", "nameAr": "جامعة الإمام محمد بن سعود الإسلامية", "country": "السعودية", "category": "official", "url": "https://imamu.edu.sa/", "role": "official-academic", "coverage": ["sharia", "hadith", "fiqh", "aqidah", "quran"] },
-    { "id": "islamic-university-madinah", "nameAr": "الجامعة الإسلامية بالمدينة المنورة", "country": "السعودية", "category": "official", "url": "https://iu.edu.sa/", "role": "official-academic", "coverage": ["sharia", "hadith", "aqidah", "fiqh", "quran"] },
-    { "id": "umm-al-qura", "nameAr": "جامعة أم القرى", "country": "السعودية", "category": "official", "url": "https://uqu.edu.sa/", "role": "official-academic", "coverage": ["quran", "hadith", "fiqh", "sharia", "history"] },
-    { "id": "ksu", "nameAr": "جامعة الملك سعود", "country": "السعودية", "category": "official", "url": "https://ksu.edu.sa/", "role": "official-academic", "coverage": ["research", "arabic", "history", "humanities"] },
-    { "id": "kfcris", "nameAr": "مركز الملك فيصل للبحوث والدراسات الإسلامية", "country": "السعودية", "category": "official", "url": "https://www.kfcris.com/", "role": "official-research", "coverage": ["manuscripts", "history", "islamic-studies", "research"] },
-    { "id": "kuwait-national-library", "nameAr": "مكتبة الكويت الوطنية", "country": "الكويت", "category": "official", "url": "https://www.nlk.gov.kw/", "role": "official-national-library", "coverage": ["bibliography", "books", "manuscripts", "islamic-heritage", "theses"] },
-    { "id": "kuwait-national-library-digital", "nameAr": "المكتبة الرقمية - مكتبة الكويت الوطنية", "country": "الكويت", "category": "official", "url": "https://www.nlk.gov.kw/", "role": "official-digital-library", "coverage": ["catalog", "databases", "national-bibliography"] },
-    { "id": "kuwait-awqaf-manuscripts", "nameAr": "إدارة المخطوطات والمكتبات الإسلامية - وزارة الأوقاف الكويتية", "country": "الكويت", "category": "official", "url": "https://mild.awqaf.gov.kw/", "role": "official-research", "coverage": ["manuscripts", "islamic-libraries", "research-guides"] },
-    { "id": "kuwait-awqaf", "nameAr": "وزارة الأوقاف والشؤون الإسلامية الكويتية", "country": "الكويت", "category": "official", "url": "https://www.awqaf.gov.kw/", "role": "official-primary", "coverage": ["awqaf", "dawah", "islamic-studies"] },
-    { "id": "qatar-ministry-islam", "nameAr": "وزارة الأوقاف والشؤون الإسلامية - دولة قطر", "country": "قطر", "category": "official", "url": "https://www.islam.gov.qa/", "role": "official-primary", "coverage": ["quran", "dawah", "lessons", "islamic-studies"] },
-    { "id": "qatar-quran-lessons", "nameAr": "دروس القرآن الكريم - وزارة الأوقاف القطرية", "category": "quran", "url": "https://alquran.islam.gov.qa/droos/Sections.html", "role": "official-educational", "coverage": ["tajweed", "quran-recitation", "quran-lessons"] },
-    { "id": "qatar-university", "nameAr": "جامعة قطر", "country": "قطر", "category": "official", "url": "https://www.qu.edu.qa/", "role": "official-academic", "coverage": ["sharia", "arabic", "islamic-studies"] },
-    { "id": "quranflash", "nameAr": "QuranFlash", "category": "quran", "url": "https://www.quranflash.com/v2/", "role": "supporting" },
-    { "id": "tafsir-app", "nameAr": "Tafsir.app", "category": "tafsir", "url": "https://tafsir.app", "role": "supporting" },
-    { "id": "altadabbur", "nameAr": "التدبر", "category": "tadabbur", "url": "https://altadabbur.com", "role": "supporting" },
-    { "id": "tadabur-app", "nameAr": "Tadabur.app", "category": "tadabbur", "url": "https://www.tadabur.app", "role": "supporting" },
-    { "id": "muslim-library", "nameAr": "المكتبة الإسلامية - هدايات القرآن", "category": "tadabbur", "url": "https://www.muslim-library.com/arabic/هدايات-القرآن-الكريم/", "role": "supporting" },
-    { "id": "bukhari", "nameAr": "صحيح البخاري", "category": "hadith", "role": "primary-book" },
-    { "id": "muslim", "nameAr": "صحيح مسلم", "category": "hadith", "role": "primary-book" },
-    { "id": "ahmad", "nameAr": "مسند الإمام أحمد", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "abu-yala", "nameAr": "مسند أبي يعلى الموصلي", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "ibn-rahwayh", "nameAr": "مسند إسحاق بن راهويه", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "abu-dawud", "nameAr": "سنن أبي داود", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "tirmidhi", "nameAr": "سنن الترمذي", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "nasai", "nameAr": "سنن النسائي", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "ibn-majah", "nameAr": "سنن ابن ماجه", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "darimi", "nameAr": "سنن الدارمي", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "bayhaqi", "nameAr": "السنن الكبرى ودلائل النبوة للبيهقي", "category": "hadith", "role": "primary-book" },
-    { "id": "ibn-hisham", "nameAr": "السيرة النبوية لابن هشام", "category": "sirah", "role": "primary-book" },
-    { "id": "ibn-sad", "nameAr": "الطبقات الكبرى", "category": "biographies", "role": "primary-book" },
-    { "id": "zad-al-maad", "nameAr": "زاد المعاد", "category": "sirah", "role": "supporting" },
-    { "id": "shamail", "nameAr": "الشمائل المحمدية", "category": "sirah", "role": "primary-book" },
-    { "id": "madhhab-hanafi", "nameAr": "المذهب الحنفي", "category": "fiqh", "role": "school" },
-    { "id": "madhhab-maliki", "nameAr": "المذهب المالكي", "category": "fiqh", "role": "school" },
-    { "id": "madhhab-shafii", "nameAr": "المذهب الشافعي", "category": "fiqh", "role": "school" },
-    { "id": "madhhab-hanbali", "nameAr": "المذهب الحنبلي", "category": "fiqh", "role": "school" },
-    { "id": "usul-thalatha", "nameAr": "الأصول الثلاثة", "category": "aqidah", "role": "text" },
-    { "id": "usul-sitta", "nameAr": "الأصول الستة", "category": "aqidah", "role": "text" },
-    { "id": "qawaid-arbaa", "nameAr": "القواعد الأربع", "category": "aqidah", "role": "text" }
+    {
+      "id": "dorar",
+      "nameAr": "الدرر السنية",
+      "category": "hadith",
+      "url": "https://dorar.net",
+      "role": "primary"
+    },
+    {
+      "id": "shamela",
+      "nameAr": "المكتبة الشاملة",
+      "category": "library",
+      "url": "https://shamela.ws",
+      "role": "supporting"
+    },
+    {
+      "id": "qurancomplex",
+      "nameAr": "مجمع الملك فهد لطباعة المصحف الشريف",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://qurancomplex.gov.sa/",
+      "role": "official-primary",
+      "coverage": [
+        "quran",
+        "qiraat",
+        "translations",
+        "tafsir",
+        "quran-sciences",
+        "digital-quran"
+      ],
+      "access": [
+        "official-web",
+        "developer-data"
+      ],
+      "apiStatus": "not-yet-verified",
+      "datasetStatus": "official-developer-resources-verified",
+      "developerFormats": [
+        "XML",
+        "JSON",
+        "SQL",
+        "CSV",
+        "HTML5",
+        "TXT",
+        "PDF"
+      ],
+      "developerScope": [
+        "Uthmani",
+        "Hafs",
+        "Warsh",
+        "Qalun",
+        "Al-Susi",
+        "Tafsir al-Muyassar",
+        "metadata"
+      ],
+      "provenanceRule": "Do not infer a public API from developer download resources."
+    },
+    {
+      "id": "quranfoundation",
+      "nameAr": "Quran Foundation / Quran.com Content API",
+      "country": "international",
+      "category": "quran",
+      "url": "https://quran.com/",
+      "role": "official-api",
+      "coverage": [
+        "quran",
+        "chapters",
+        "verses",
+        "translations",
+        "tafsir",
+        "audio",
+        "recitations",
+        "pages",
+        "juz",
+        "hizb",
+        "ruku",
+        "manzil",
+        "search"
+      ],
+      "access": [
+        "official-api",
+        "official-sdk"
+      ],
+      "apiStatus": "documented-v4-oauth2",
+      "corpusWrite": "forbidden-direct",
+      "provenanceRequired": true,
+      "apiBase": "https://apis.quran.foundation",
+      "rightsNote": "API access does not itself grant redistribution rights; QF content/raw API data have source terms and storage/redistribution restrictions."
+    },
+    {
+      "id": "moia-sa",
+      "nameAr": "وزارة الشؤون الإسلامية والدعوة والإرشاد",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://moia.gov.sa/",
+      "role": "official-primary",
+      "coverage": [
+        "dawah",
+        "quran",
+        "books",
+        "research",
+        "fatwa-related-guidance"
+      ]
+    },
+    {
+      "id": "moia-ebook",
+      "nameAr": "المكتبة الإلكترونية الإسلامية - وزارة الشؤون الإسلامية",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://ebook.moia.gov.sa/",
+      "role": "official-primary",
+      "coverage": [
+        "islamic-books",
+        "lessons",
+        "hadith",
+        "aqidah",
+        "fiqh"
+      ]
+    },
+    {
+      "id": "saudi-libraries",
+      "nameAr": "منصة المكتبات الرقمية السعودية - هيئة المكتبات",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://libraries.moc.gov.sa/",
+      "role": "official-research",
+      "coverage": [
+        "books",
+        "manuscripts",
+        "research"
+      ]
+    },
+    {
+      "id": "king-abdulaziz-public-library",
+      "nameAr": "مكتبة الملك عبدالعزيز العامة",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://www.kapl.org.sa/",
+      "role": "official-research",
+      "coverage": [
+        "books",
+        "heritage",
+        "arabic-culture",
+        "islamic-studies"
+      ]
+    },
+    {
+      "id": "king-fahd-national-library",
+      "nameAr": "مكتبة الملك فهد الوطنية",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://kfnl.gov.sa/",
+      "role": "official-research",
+      "coverage": [
+        "bibliography",
+        "books",
+        "manuscripts",
+        "national-heritage"
+      ]
+    },
+    {
+      "id": "imam-muhammad-university",
+      "nameAr": "جامعة الإمام محمد بن سعود الإسلامية",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://imamu.edu.sa/",
+      "role": "official-academic",
+      "coverage": [
+        "sharia",
+        "hadith",
+        "fiqh",
+        "aqidah",
+        "quran"
+      ]
+    },
+    {
+      "id": "islamic-university-madinah",
+      "nameAr": "الجامعة الإسلامية بالمدينة المنورة",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://iu.edu.sa/",
+      "role": "official-academic",
+      "coverage": [
+        "sharia",
+        "hadith",
+        "aqidah",
+        "fiqh",
+        "quran"
+      ]
+    },
+    {
+      "id": "umm-al-qura",
+      "nameAr": "جامعة أم القرى",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://uqu.edu.sa/",
+      "role": "official-academic",
+      "coverage": [
+        "quran",
+        "hadith",
+        "fiqh",
+        "sharia",
+        "history"
+      ]
+    },
+    {
+      "id": "ksu",
+      "nameAr": "جامعة الملك سعود",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://ksu.edu.sa/",
+      "role": "official-academic",
+      "coverage": [
+        "research",
+        "arabic",
+        "history",
+        "humanities"
+      ]
+    },
+    {
+      "id": "kfcris",
+      "nameAr": "مركز الملك فيصل للبحوث والدراسات الإسلامية",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://www.kfcris.com/",
+      "role": "official-research",
+      "coverage": [
+        "manuscripts",
+        "history",
+        "islamic-studies",
+        "research"
+      ]
+    },
+    {
+      "id": "kuwait-national-library",
+      "nameAr": "مكتبة الكويت الوطنية",
+      "country": "الكويت",
+      "category": "official",
+      "url": "https://www.nlk.gov.kw/",
+      "role": "official-national-library",
+      "coverage": [
+        "bibliography",
+        "books",
+        "manuscripts",
+        "islamic-heritage",
+        "theses"
+      ]
+    },
+    {
+      "id": "kuwait-national-library-digital",
+      "nameAr": "المكتبة الرقمية - مكتبة الكويت الوطنية",
+      "country": "الكويت",
+      "category": "official",
+      "url": "https://www.nlk.gov.kw/",
+      "role": "official-digital-library",
+      "coverage": [
+        "catalog",
+        "databases",
+        "national-bibliography"
+      ]
+    },
+    {
+      "id": "kuwait-awqaf-manuscripts",
+      "nameAr": "إدارة المخطوطات والمكتبات الإسلامية - وزارة الأوقاف الكويتية",
+      "country": "الكويت",
+      "category": "official",
+      "url": "https://mild.awqaf.gov.kw/",
+      "role": "official-research",
+      "coverage": [
+        "manuscripts",
+        "islamic-libraries",
+        "research-guides"
+      ]
+    },
+    {
+      "id": "kuwait-awqaf",
+      "nameAr": "وزارة الأوقاف والشؤون الإسلامية الكويتية",
+      "country": "الكويت",
+      "category": "official",
+      "url": "https://www.awqaf.gov.kw/",
+      "role": "official-primary",
+      "coverage": [
+        "awqaf",
+        "dawah",
+        "islamic-studies"
+      ]
+    },
+    {
+      "id": "qatar-ministry-islam",
+      "nameAr": "وزارة الأوقاف والشؤون الإسلامية - دولة قطر",
+      "country": "قطر",
+      "category": "official",
+      "url": "https://www.islam.gov.qa/",
+      "role": "official-primary",
+      "coverage": [
+        "quran",
+        "dawah",
+        "lessons",
+        "islamic-studies"
+      ]
+    },
+    {
+      "id": "qatar-quran-lessons",
+      "nameAr": "دروس القرآن الكريم - وزارة الأوقاف القطرية",
+      "category": "quran",
+      "url": "https://alquran.islam.gov.qa/droos/Sections.html",
+      "role": "official-educational",
+      "coverage": [
+        "tajweed",
+        "quran-recitation",
+        "quran-lessons"
+      ],
+      "access": [
+        "official-web"
+      ],
+      "apiStatus": "not-yet-verified"
+    },
+    {
+      "id": "qatar-university",
+      "nameAr": "جامعة قطر",
+      "country": "قطر",
+      "category": "official",
+      "url": "https://www.qu.edu.qa/",
+      "role": "official-academic",
+      "coverage": [
+        "sharia",
+        "arabic",
+        "islamic-studies"
+      ]
+    },
+    {
+      "id": "quranflash",
+      "nameAr": "QuranFlash",
+      "category": "quran",
+      "url": "https://www.quranflash.com/v2/",
+      "role": "supporting"
+    },
+    {
+      "id": "tafsir-app",
+      "nameAr": "Tafsir.app",
+      "category": "tafsir",
+      "url": "https://tafsir.app",
+      "role": "supporting"
+    },
+    {
+      "id": "altadabbur",
+      "nameAr": "التدبر",
+      "category": "tadabbur",
+      "url": "https://altadabbur.com",
+      "role": "supporting"
+    },
+    {
+      "id": "tadabur-app",
+      "nameAr": "Tadabur.app",
+      "category": "tadabbur",
+      "url": "https://www.tadabur.app",
+      "role": "supporting"
+    },
+    {
+      "id": "muslim-library",
+      "nameAr": "المكتبة الإسلامية - هدايات القرآن",
+      "category": "tadabbur",
+      "url": "https://www.muslim-library.com/arabic/هدايات-القرآن-الكريم/",
+      "role": "supporting"
+    },
+    {
+      "id": "bukhari",
+      "nameAr": "صحيح البخاري",
+      "category": "hadith",
+      "role": "primary-book"
+    },
+    {
+      "id": "muslim",
+      "nameAr": "صحيح مسلم",
+      "category": "hadith",
+      "role": "primary-book"
+    },
+    {
+      "id": "ahmad",
+      "nameAr": "مسند الإمام أحمد",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "abu-yala",
+      "nameAr": "مسند أبي يعلى الموصلي",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "ibn-rahwayh",
+      "nameAr": "مسند إسحاق بن راهويه",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "abu-dawud",
+      "nameAr": "سنن أبي داود",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "tirmidhi",
+      "nameAr": "سنن الترمذي",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "nasai",
+      "nameAr": "سنن النسائي",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "ibn-majah",
+      "nameAr": "سنن ابن ماجه",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "darimi",
+      "nameAr": "سنن الدارمي",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "bayhaqi",
+      "nameAr": "السنن الكبرى ودلائل النبوة للبيهقي",
+      "category": "hadith",
+      "role": "primary-book"
+    },
+    {
+      "id": "ibn-hisham",
+      "nameAr": "السيرة النبوية لابن هشام",
+      "category": "sirah",
+      "role": "primary-book"
+    },
+    {
+      "id": "ibn-sad",
+      "nameAr": "الطبقات الكبرى",
+      "category": "biographies",
+      "role": "primary-book"
+    },
+    {
+      "id": "zad-al-maad",
+      "nameAr": "زاد المعاد",
+      "category": "sirah",
+      "role": "supporting"
+    },
+    {
+      "id": "shamail",
+      "nameAr": "الشمائل المحمدية",
+      "category": "sirah",
+      "role": "primary-book"
+    },
+    {
+      "id": "madhhab-hanafi",
+      "nameAr": "المذهب الحنفي",
+      "category": "fiqh",
+      "role": "school"
+    },
+    {
+      "id": "madhhab-maliki",
+      "nameAr": "المذهب المالكي",
+      "category": "fiqh",
+      "role": "school"
+    },
+    {
+      "id": "madhhab-shafii",
+      "nameAr": "المذهب الشافعي",
+      "category": "fiqh",
+      "role": "school"
+    },
+    {
+      "id": "madhhab-hanbali",
+      "nameAr": "المذهب الحنبلي",
+      "category": "fiqh",
+      "role": "school"
+    },
+    {
+      "id": "usul-thalatha",
+      "nameAr": "الأصول الثلاثة",
+      "category": "aqidah",
+      "role": "text"
+    },
+    {
+      "id": "usul-sitta",
+      "nameAr": "الأصول الستة",
+      "category": "aqidah",
+      "role": "text"
+    },
+    {
+      "id": "qawaid-arbaa",
+      "nameAr": "القواعد الأربع",
+      "category": "aqidah",
+      "role": "text"
+    },
+    {
+      "id": "quranenc",
+      "nameAr": "موسوعة القرآن الكريم QuranEnc.com",
+      "country": "international",
+      "category": "quran",
+      "url": "https://quranenc.com/",
+      "role": "official-translation-api",
+      "coverage": [
+        "quran-translations",
+        "translation-catalog",
+        "sura-translation",
+        "aya-translation",
+        "footnotes",
+        "translation-audio"
+      ],
+      "access": [
+        "official-api"
+      ],
+      "apiStatus": "documented-v1",
+      "rightsStatus": "redistribution-permitted-subject-to-source-terms",
+      "corpusWrite": "forbidden-direct",
+      "provenanceRequired": true
+    },
+    {
+      "id": "tafasir-online-developer-api",
+      "nameAr": "الجامع التاريخي لتفسير القرآن الكريم - خدمات المطورين",
+      "country": "السعودية",
+      "category": "tafsir",
+      "url": "https://www.tafasir.online/ar/developer",
+      "role": "official-api",
+      "coverage": [
+        "quran-text",
+        "tafsir-books",
+        "book-content",
+        "riwayat"
+      ],
+      "access": [
+        "official-api"
+      ],
+      "apiStatus": "documented-api-key; endpoint-partial",
+      "authentication": "API_Key",
+      "rightsStatus": "not-assumed-from-api-access",
+      "corpusWrite": "forbidden-direct",
+      "provenanceRequired": true
+    },
+    {
+      "id": "alquran-cloud",
+      "nameAr": "Al Quran Cloud / Islamic Network",
+      "country": "international",
+      "category": "quran",
+      "url": "https://alquran.cloud/",
+      "role": "open-api-supporting",
+      "coverage": [
+        "quran",
+        "translations",
+        "audio",
+        "recitations",
+        "edition-catalog"
+      ],
+      "access": [
+        "official-api"
+      ],
+      "apiStatus": "documented-v1-keyless",
+      "apiBase": "https://api.alquran.cloud/v1",
+      "sourceProvenance": "GlobalQuran.com and other attributed sources including Tanzil.net and Quran Academy",
+      "rightsStatus": "source-specific; see service terms",
+      "corpusWrite": "forbidden-direct",
+      "provenanceRequired": true
+    },
+    {
+      "id": "ksu-ayat",
+      "nameAr": "مشروع المصحف الإلكتروني بجامعة الملك سعود - آيات",
+      "country": "السعودية",
+      "category": "quran",
+      "url": "https://quran.ksu.edu.sa/",
+      "role": "official-institutional-resource",
+      "coverage": [
+        "Hafs",
+        "Warsh",
+        "Tajweed",
+        "colored Tajweed Mushaf",
+        "tafsir",
+        "recitations",
+        "search"
+      ],
+      "access": [
+        "official-web",
+        "institutional-resource"
+      ],
+      "apiStatus": "not-yet-verified",
+      "provenanceNote": "KSU page attributes images to King Fahd Complex, Quran text/translations to Tanzil.net, tafsir to mosshaf.com, and recitations to Verse by Verse Quran."
+    },
+    {
+      "id": "jakim-smart-quran",
+      "nameAr": "Smart Quran - JAKIM",
+      "country": "ماليزيا",
+      "category": "quran",
+      "url": "https://www.islam.gov.my/en/quran-hadith/smart-quran",
+      "role": "official-institutional-app",
+      "coverage": [
+        "Madinah V2 Mushaf",
+        "Malay translation",
+        "English translation",
+        "recitations"
+      ],
+      "access": [
+        "official-app"
+      ],
+      "apiStatus": "not-yet-verified",
+      "provenanceRequired": true
+    }
   ],
   "maqasid": {
     "titleAr": "مقاصد الشريعة",
-    "subsections": ["الضروريات الخمس", "الحاجيات", "التحسينيات", "المقاصد العامة", "المقاصد الخاصة", "المقاصد الجزئية", "القواعد والضوابط", "التطبيقات في العبادات والمعاملات والأسرة"],
-    "daruriyyat": ["حفظ الدين", "حفظ النفس", "حفظ العقل", "حفظ النسل", "حفظ المال"]
+    "subsections": [
+      "الضروريات الخمس",
+      "الحاجيات",
+      "التحسينيات",
+      "المقاصد العامة",
+      "المقاصد الخاصة",
+      "المقاصد الجزئية",
+      "القواعد والضوابط",
+      "التطبيقات في العبادات والمعاملات والأسرة"
+    ],
+    "daruriyyat": [
+      "حفظ الدين",
+      "حفظ النفس",
+      "حفظ العقل",
+      "حفظ النسل",
+      "حفظ المال"
+    ]
   }
 }

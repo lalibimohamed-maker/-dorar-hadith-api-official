@@ -1,0 +1,574 @@
+{
+  "registry_version": "2026-09-22",
+  "scope": "Quran-only service layer for Rechercher",
+  "purpose": "Dedicated registry for the Quran and its sciences, canonical readings, translations, tafsir, tajweed, recitation/audio, morphology and multilingual access. This layer is intentionally isolated from PR #541's 133x24 evidence matrix.",
+  "architecture": {
+    "source": "Quran Foundation / Quran.com and individually verified institutional sources",
+    "service": "quran.ai MCP/service layer",
+    "api": "Official API or verified endpoint contract",
+    "acquisition": "Rechercher adapter with provenance and rights checks",
+    "evidence": "language/edition/reading/resource evidence",
+    "review": "human/source verification",
+    "corpus": "write only through existing governed ingestion; never direct from the service layer"
+  },
+  "separation": {
+    "pr_541": "isolated multilingual 133x24 evidence/matrix execution; do not modify or merge its corpus of evidence into this registry",
+    "pr_558": "dedicated Quran service/API registry and Quran-sciences integration layer",
+    "source_registry": "institutions and human-facing sources remain separate from API/service contracts",
+    "corpus": "no direct writes from APIs, quran.ai, or discovery services"
+  },
+  "quran_ai_service": {
+    "service_id": "quran-ai-mcp",
+    "role": "grounded Quran research service",
+    "upstream_source_id": "source:quran-foundation",
+    "upstream_provider": "Quran Foundation / Quran.com",
+    "classification": "service-layer-over-canonical-source",
+    "canonical_text_rule": "Never replace canonical Arabic Quran text with model-generated text.",
+    "grounding_rule": "Quran text, translations and tafsir must be fetched from canonical/source-backed data before presentation.",
+    "content_classes": [
+      "canonical_quran_text",
+      "translations",
+      "tafsir",
+      "morphology",
+      "word_paradigm",
+      "word_concordance",
+      "search",
+      "recitation_and_audio",
+      "mushaf_metadata"
+    ],
+    "tafsir_rule": "Scholarly interpretation must be grounded in retrieved tafsir and attributed to the retrieved edition/author.",
+    "translation_rule": "Translations remain distinct editions with language, author/provider and provenance; they are not treated as the Arabic Quran.",
+    "ai_rule": "AI may assist discovery, search, matching and reflection only; it is not a source for canonical Quran text, translations, tafsir or qiraat.",
+    "qiraat_rule": "Do not synthesize or infer a canonical reading from another riwaya. Each reading and transmitter must be independently sourced and verified.",
+    "rights_rule": "Availability through quran.ai or an upstream API does not by itself grant redistribution rights.",
+    "corpus_write_policy": "forbidden-direct"
+  },
+  "verified_translation_inventory_from_quran_ai": {
+    "status": "observed-via-grounded-edition-list",
+    "edition_count": 31,
+    "unique_translation_languages": 12,
+    "language_codes": [
+      "de",
+      "en",
+      "es",
+      "fr",
+      "he",
+      "id",
+      "it",
+      "ja",
+      "ru",
+      "sv",
+      "tr",
+      "ur"
+    ],
+    "note": "The edition inventory contains 31 translation editions across the listed languages. Arabic canonical Quran text is a separate content class and is not counted as a translation.",
+    "edition_fields_required": [
+      "edition_id",
+      "language",
+      "code",
+      "title",
+      "author_or_institution",
+      "upstream_source_id",
+      "rights_status",
+      "provenance",
+      "verification_status"
+    ]
+  },
+  "language_alignment_for_133x24": {
+    "status": "integration-target-not-claim-of-133-language-coverage",
+    "matrix_owner": "PR #541",
+    "role_of_558": "Provide verified Quran editions/services that can populate eligible Quran-related cells in the 133x24 matrix without altering the matrix itself.",
+    "cell_identity": [
+      "language",
+      "content_class",
+      "edition_or_resource",
+      "source_provider",
+      "service_or_api",
+      "provenance",
+      "rights_status",
+      "verification_status"
+    ],
+    "rule": "A language is not marked covered merely because quran.ai or Quran.com exists. Coverage requires an individually identified edition/resource and verified provenance and rights.",
+    "fallback": "When no verified Quran resource exists for a language/cell, record the gap rather than generating an AI translation and presenting it as Quran source material.",
+    "translation_rule": "Translation coverage is edition-level: identify language, translation resource ID, author/institution, upstream provenance and rights before marking a cell covered."
+  },
+  "quran_sciences_taxonomy": {
+    "canonical_text": [
+      "Arabic canonical text",
+      "Uthmani representation",
+      "mushaf/page/juz/hizb/ruku/manzil metadata"
+    ],
+    "translations": [
+      "language-specific translations",
+      "institutional translations",
+      "scholarly translations",
+      "edition-level provenance"
+    ],
+    "tafsir": [
+      "tafsir catalog",
+      "verse-level tafsir",
+      "author",
+      "language",
+      "edition/resource id"
+    ],
+    "tajweed": [
+      "Uthmani Tajweed",
+      "Tajweed annotations",
+      "colored Mushaf representations",
+      "Tajweed education"
+    ],
+    "qiraat": [
+      "Nafi",
+      "Ibn Kathir",
+      "Abu Amr",
+      "Ibn Amir",
+      "Asim",
+      "Hamza",
+      "Al-Kisai",
+      "Abu Jafar",
+      "Yaqub",
+      "Khalaf al-Ashir"
+    ],
+    "recitation": [
+      "reader",
+      "riwaya/transmitter",
+      "audio",
+      "recitation provenance"
+    ],
+    "language_and_linguistics": [
+      "morphology",
+      "word paradigm",
+      "concordance",
+      "search",
+      "lexical/morphological evidence"
+    ],
+    "mushaf": [
+      "page/layout metadata",
+      "Mushaf representations",
+      "Uthmani presentation",
+      "Tajweed/colored representations where source-provided",
+      "resource-level provenance"
+    ]
+  },
+  "integration_contract": {
+    "service_to_adapter": "quran.ai/quran.com data is read-only input to a Rechercher adapter",
+    "adapter_to_evidence": "Every item receives source_id/service_id, edition/resource id, language, retrieval metadata, provenance and rights state.",
+    "evidence_to_review": "No item becomes trusted corpus material solely because an API returned it.",
+    "review_to_corpus": "Existing governed ingestion decides whether and where content can enter Corpus.",
+    "forbidden": [
+      "AI-generated Quran text as source",
+      "AI-generated translation presented as an authoritative translation",
+      "AI-generated tafsir presented as scholarly tafsir",
+      "merging qiraat into one canonical text",
+      "direct API writes to Corpus",
+      "using API access as proof of redistribution rights"
+    ]
+  },
+  "quran_only_service_sections": [
+    {
+      "id": "quran-canonical",
+      "role": "canonical Quran text and metadata"
+    },
+    {
+      "id": "quran-mushaf",
+      "role": "Mushaf pages, layout and presentation resources kept separate from canonical text"
+    },
+    {
+      "id": "quran-translations",
+      "role": "verified multilingual translation editions, language metadata, edition provenance and rights"
+    },
+    {
+      "id": "quran-tafsir",
+      "role": "tafsir catalog and verse-level scholarly commentary"
+    },
+    {
+      "id": "quran-tajweed",
+      "role": "tajweed annotations, colored Mushaf and educational resources"
+    },
+    {
+      "id": "quran-qiraat",
+      "role": "Ten Canonical Readings and transmitter-level evidence"
+    },
+    {
+      "id": "quran-recitation",
+      "role": "reciters, riwayat and audio provenance"
+    },
+    {
+      "id": "quran-linguistics",
+      "role": "morphology, paradigms, concordance and lexical search"
+    },
+    {
+      "id": "quran-multilingual-bridge",
+      "role": "verified language/resource candidates for the 133x24 matrix"
+    }
+  ],
+  "verification_policy": {
+    "official_source_first": true,
+    "primary_documentation_required": true,
+    "rights_checked_per_resource": true,
+    "provenance_required_per_item": true,
+    "language_coverage_must_be_edition_level": true,
+    "ten_qiraat_must_be_individually_verified": true,
+    "no_ai_substitution_for_missing_religious_sources": true,
+    "no_api_claim_without_endpoint_contract": true,
+    "provenance_must_follow_actual_upstream": true,
+    "translation_integrity": "Preserve vetted source translation text and footnotes; no automatic browser retranslation and no AI substitution."
+  },
+  "last_updated": "2026-09-22",
+  "api_surface_expansion": {
+    "last_verified": "2026-09-22",
+    "official_api_contracts": [
+      {
+        "api_id": "quran-foundation-content-api-v4",
+        "scope": [
+          "canonical-quran",
+          "translations",
+          "tafsir",
+          "audio",
+          "recitations",
+          "mushaf",
+          "tajweed"
+        ],
+        "status": "official-documentation-verified",
+        "base_url": "https://apis.quran.foundation",
+        "endpoint_example": "/content/api/v4/chapters",
+        "authentication": "OAuth2 client_credentials; content scope; x-auth-token and x-client-id",
+        "access_note": "Production content requires approved app access; pre-live is limited to Al-Fatihah and Al-Baqarah."
+      },
+      {
+        "api_id": "quran-foundation-search-api-v1",
+        "scope": [
+          "quran-search",
+          "verse-search",
+          "chapter-juz-page-search"
+        ],
+        "status": "official-documentation-verified",
+        "base_url": "https://apis.quran.foundation",
+        "access_note": "Permission-gated search API."
+      },
+      {
+        "api_id": "tafasir-online-developer-api",
+        "provider": "الجامع التاريخي لتفسير القرآن الكريم",
+        "scope": [
+          "quran-text",
+          "tafsir-books",
+          "book-content",
+          "riwayat"
+        ],
+        "status": "official-developer-api-verified",
+        "documentation": "https://www.tafasir.online/ar/developer",
+        "authentication": "API_Key",
+        "endpoint_verification": "partial",
+        "access_note": "Official developer page documents API access and API_Key registration, but the concrete transport endpoint should not be inferred until exposed by the official developer contract."
+      },
+      {
+        "api_id": "alquran-cloud-api-v1",
+        "provider": "Al Quran Cloud / Islamic Network",
+        "scope": [
+          "quran",
+          "translations",
+          "audio",
+          "recitations",
+          "edition-catalog"
+        ],
+        "status": "official-api-documentation-verified",
+        "base_url": "https://api.alquran.cloud/v1",
+        "endpoint_example": "/surah/1/en.sahih",
+        "authentication": "keyless-public",
+        "source_provenance": "Al Quran Cloud terms state Quran text/audio were originally retrieved from GlobalQuran.com; Arabic text is sourced from various sources including Tanzil.net and Quran Academy.",
+        "rights_note": "Arabic Quran text may be reproduced/stored/displayed for non-commercial use under current terms; translations/recitations retain source-specific rights and attribution requirements.",
+        "access_note": "Free/keyless with soft per-IP rate limiting; higher-throughput/full-corpus mirror use should follow the service's contact/fair-use process."
+      }
+    ],
+    "integration_rule": "API contracts remain service-layer records. Each content edition/reading/translation remains independently provenance- and rights-verified before acquisition or Corpus admission.",
+    "institutional_resource_verification": [
+      {
+        "id": "king-fahd-digital-mushaf-formats",
+        "provider": "King Fahd Glorious Quran Printing Complex",
+        "status": "official-developer-data-verified",
+        "api_status": "not-verified-as-public-api",
+        "formats": [
+          "XML",
+          "JSON",
+          "SQL",
+          "CSV",
+          "HTML5",
+          "TXT",
+          "PDF"
+        ],
+        "verified_scope": [
+          "Uthmani Quran text",
+          "Hafs",
+          "Warsh",
+          "Qalun",
+          "Al-Susi",
+          "Tafsir al-Muyassar",
+          "metadata"
+        ],
+        "provenance_note": "Official complex technical guide documents digital Quran formats and developer-oriented resources; do not convert these downloads into an API claim."
+      },
+      {
+        "id": "ksu-ayat",
+        "provider": "King Saud University - Ayat Electronic Quran Project",
+        "status": "official-institutional-resource-verified",
+        "api_status": "not-verified-as-public-api",
+        "verified_scope": [
+          "Hafs",
+          "Warsh",
+          "Tajweed",
+          "colored Tajweed Mushaf",
+          "tafsir",
+          "recitations",
+          "search"
+        ],
+        "provenance_note": "KSU page explicitly attributes Quran images to King Fahd Complex, Quran text/translations to Tanzil.net, tafsir to mosshaf.com, and recitation audio to Verse by Verse Quran; therefore KSU must not be represented as the upstream source for those assets."
+      },
+      {
+        "id": "jakim-smart-quran",
+        "provider": "JAKIM / Smart Quran",
+        "country": "MY",
+        "status": "official-institutional-app-verified",
+        "api_status": "not-verified-as-public-api",
+        "verified_scope": [
+          "Madinah V2 Mushaf",
+          "Malay translation",
+          "English translation",
+          "recitations"
+        ],
+        "provenance_note": "Official JAKIM page documents the approved Smart Quran application and named reciters; no public API contract was verified in this scan."
+      }
+    ],
+    "recitation_contract": {
+      "status": "official-api-documentation-verified",
+      "provider": "Quran Foundation / Quran.com",
+      "chapter_reciters_endpoint_family": "/chapter_recitations/{reciter_id} and related audio endpoints",
+      "ayah_recitations_endpoint_family": "/quran/recitations/{recitation_id} and related resources",
+      "metadata_rule": "Keep chapter-reciter IDs distinct from ayah-by-ayah recitation IDs; preserve qirat/style metadata when returned.",
+      "rights_rule": "Verify redistribution rights separately from API access."
+    }
+  },
+  "qiraat_verification_matrix": {
+    "verification_date": "2026-09-22",
+    "policy": "The Ten Canonical Readings are tracked separately. A reading is not marked resource-verified merely because a general source describes the Ten Readings. Each reading/riwaya requires its own primary-source evidence before acquisition or Corpus admission.",
+    "canonical_readings": [
+      {
+        "reader": "Nafi",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Ibn Kathir",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Abu Amr",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Ibn Amir",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Asim",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Hamza",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Al-Kisai",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Abu Jafar",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Yaqub",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      },
+      {
+        "reader": "Khalaf al-Ashir",
+        "status": "canonical-reading-identified; individual-source-verification-pending"
+      }
+    ],
+    "primary_source_evidence": {
+      "quran_com_ten_readings_guide": {
+        "status": "official-site-documentation-verified",
+        "role": "establishes the Ten Readings as a distinct canonical-reading set and documents reader/transmitter presentation",
+        "does_not_prove": "individual downloadable/API data contract or redistribution rights for every reading"
+      },
+      "quran_foundation_content_api_v4": {
+        "status": "official-api-contract-verified",
+        "role": "canonical content, translations, tafsir, recitations and related content API",
+        "qiraat_api_status": "not-verified-as-ten-readings-api"
+      },
+      "king_fahd_complex": {
+        "status": "official-developer-data-verified",
+        "role": "digital Quran resources",
+        "individually_verified_readings": [
+          "Hafs",
+          "Warsh",
+          "Qalun",
+          "Al-Susi"
+        ],
+        "ten_readings_complete": false
+      }
+    },
+    "riwaya_rule": "Reader-level evidence must not be conflated with transmitter/riwaya-level evidence. Register the transmitter, resource/edition, upstream source, file/API endpoint, rights and checksum independently.",
+    "recitation_rule": "For audio, store reader, style, qiraat/riwaya when supplied by the official source, source resource ID and licensing/redistribution state. Quran Foundation's official API exposes reciter records with a qirat field, but that API contract alone is not a rights grant.",
+    "tajweed_rule": "Tajweed annotations and colored Mushaf representations remain a separate layer from canonical Arabic text and from qiraat-specific variants.",
+    "tafseer_rule": "Tafsir records must preserve author, language, resource/edition ID and upstream provenance; an API provider is not itself the scholarly author."
+  },
+  "mushaf_service_contract": {
+    "service_id": "quran-foundation-mushaf-resources-v4",
+    "provider_source_id": "source:quran-foundation",
+    "role": "Second sequential Quran layer: Mushaf/page/layout representations over the separately governed canonical Quran Core.",
+    "upstream_contract": "quran-foundation-content-api-v4",
+    "scope": [
+      "pages",
+      "mushaf/page-layout metadata",
+      "Uthmani representations",
+      "tajweed representation where explicitly returned",
+      "Mushaf variants/resources where individually identified"
+    ],
+    "separation_rule": "Mushaf presentation/layout resources must not replace or mutate the canonical Quran text record.",
+    "provenance_rule": "Every Mushaf resource keeps its own resource/edition identity and upstream provenance.",
+    "rights_rule": "API availability is not redistribution permission; verify rights for each resource before public storage or publication.",
+    "acquisition_rule": "Acquire only after official endpoint/resource identity and access are verified; preserve source identifiers and retrieval metadata.",
+    "corpus_write_policy": "forbidden-direct",
+    "ai_rule": "AI cannot generate, reconstruct, or silently normalize a Mushaf representation as authoritative source content.",
+    "verification_status": "official-documentation-surface-verified; resource-level enumeration pending authorized production access"
+  },
+  "translation_service_contract": {
+    "service_id": "quran-foundation-translations-v4",
+    "provider_source_id": "source:quran-foundation",
+    "role": "Third sequential Quran layer: verified translation editions kept separate from canonical Arabic Quran text.",
+    "upstream_contract": "quran-foundation-content-api-v4",
+    "scope": [
+      "translation resource catalog",
+      "language catalog",
+      "full-translation retrieval",
+      "surah-level translation retrieval",
+      "ayah-level translation retrieval",
+      "verse-range translation retrieval",
+      "translation metadata",
+      "translation footnotes"
+    ],
+    "endpoint_contract": {
+      "resources_translations": "/content/api/v4/resources/translations",
+      "resources_languages": "/content/api/v4/resources/languages",
+      "single_translation": "/content/api/v4/translations/{translation_id}",
+      "surah_translations": "/content/api/v4/translations/{resource_id}/by_chapter/{chapter_number}",
+      "ayah_translations": "/content/api/v4/translations/{resource_id}/by_ayah/{ayah_key}",
+      "verse_range": "/content/api/v4/verses/by_range",
+      "auth": "OAuth2 client_credentials; content scope; x-auth-token and x-client-id",
+      "pagination": "translation list/surah/ayah routes support paginated responses; verse-range supports per_page up to 50"
+    },
+    "translation_record_identity": [
+      "resource_id",
+      "resource_name",
+      "id",
+      "language_id",
+      "language_name",
+      "verse_key",
+      "chapter_id",
+      "verse_number",
+      "juz_number",
+      "hizb_number",
+      "page_number",
+      "rub_el_hizb_number",
+      "ruku_number",
+      "manzil_number"
+    ],
+    "rights_rule": "API availability is not redistribution permission. Rights and attribution must be verified for each translation edition/resource before public storage or publication.",
+    "provenance_rule": "Every translation remains an edition-level record with author/institution, language, resource ID, upstream source, retrieval metadata, rights state and verification state.",
+    "separation_rule": "Translations must never overwrite, normalize, or substitute for the canonical Arabic Quran record.",
+    "integrity_rule": "Do not use automatic browser translation on vetted Quran translation text; preserve the source translation text and footnotes as returned by the official resource.",
+    "ai_rule": "AI may assist indexing, matching and discovery, but may not generate or silently retranslate an authoritative Quran translation.",
+    "corpus_write_policy": "forbidden-direct",
+    "verification_status": "official-documentation-contract-verified; individual edition/resource rights and provenance verification remains required"
+  },
+  "translation_network_policy": {
+    "objective": "Expand Quran translation coverage beyond the currently observed Quran Foundation inventory without using AI-generated Quran translations.",
+    "priority_order": [
+      "official_or_governmental_ Islamic_institutional_translation",
+      "QuranEnc_verified_translation_edition",
+      "other_primary_source_or_scholarly_translation_with_explicit_provenance",
+      "AI_only_discovery_or_matching; never authoritative translation"
+    ],
+    "quran_foundation": {
+      "role": "primary API service where its translation editions are available",
+      "observed_unique_translation_languages": 12,
+      "rule": "Do not treat this inventory as the global language ceiling."
+    },
+    "quranenc": {
+      "service_id": "quranenc-translations-api-v1",
+      "source_url": "https://quranenc.com",
+      "api_base": "https://quranenc.com/api/v1",
+      "translation_catalog_endpoint": "/translations/list",
+      "language_filter_endpoint": "/translations/list/{language}",
+      "translation_sura_endpoint": "/translation/sura/{translation_key}/{sura_number}",
+      "translation_ayah_endpoint": "/translation/aya/{translation_key}/{sura_number}/{aya_number}",
+      "verified_capability": "official API documentation exposes a catalog of available translation editions and language filtering.",
+      "current_public_scope": "QuranEnc currently advertises 80+ languages; this is a discovery/availability statement, not a claim that every advertised language has a complete translation.",
+      "coverage_rule": "Enumerate actual translation editions from the catalog endpoint; never infer coverage from the language directory alone.",
+      "integrity_rule": "Preserve the source translation and footnotes unchanged; retain translation key/version/last_update and source attribution.",
+      "rights_rule": "QuranEnc states that translation content may be downloaded/re-published subject to its terms; each acquired edition must retain the applicable version and attribution requirements.",
+      "ai_rule": "No AI-generated or AI-retranslated Quran translation may be inserted when a verified source translation is unavailable.",
+      "catalog_snapshot": {
+        "snapshot_date": "2026-09-22",
+        "catalog_file": "config/quranenc-translation-catalog-2026-09-22.json",
+        "api_endpoint": "https://quranenc.com/api/v1/translations/list",
+        "translation_edition_count": 74,
+        "unique_language_count": 45,
+        "note": "The live API snapshot returned 74 translation editions across 45 language ISO codes. QuranEnc's broader '+80 Languages' site figure must not be converted into 80+ Quran translation languages without edition-level API evidence."
+      }
+    },
+    "official_country_translation_program": {
+      "role": "Search and verify translations issued or formally supervised by ministries, national Quran complexes, official Islamic affairs bodies, universities, and recognized scholarly institutions in Muslim-majority countries.",
+      "verification_rule": "A country is not marked covered until a primary institutional source identifies the translation, language, edition/resource, responsible institution and provenance.",
+      "priority_countries": [
+        "SA",
+        "TR",
+        "ID",
+        "MY",
+        "PK",
+        "BD",
+        "EG",
+        "JO",
+        "MA",
+        "DZ",
+        "TN",
+        "AE",
+        "QA",
+        "KW",
+        "OM",
+        "BH"
+      ],
+      "known_verified_example": {
+        "country": "ID",
+        "institution": "Ministry of Religious Affairs of the Republic of Indonesia",
+        "translation": "Indonesian Translation - Ministry of Religious Affairs",
+        "source": "QuranEnc",
+        "status": "source-edition-verified; institutional provenance identified",
+        "note": "QuranEnc identifies the edition as issued by Indonesia's Ministry of Religious Affairs and developed under supervision of the Rowwad Translation Center."
+      },
+      "api_rule": "An institutional website or application is not labeled as a public API unless its official documentation exposes an API contract."
+    },
+    "coverage_states": [
+      "verified_official_institutional_translation",
+      "verified_quranenc_translation",
+      "verified_scholarly_translation",
+      "candidate_requires_primary_source_verification",
+      "language_present_but_translation_not_verified",
+      "no_verified_translation_found"
+    ],
+    "forbidden_states": [
+      "ai_generated_authoritative_translation",
+      "ai_retranslation_of_vetted_translation",
+      "language_directory_equals_translation_coverage"
+    ],
+    "133x24_rule": "For each language/content cell, use an individually identified translation edition and source. If none exists, record the gap; do not synthesize a translation."
+  }
+}

@@ -1,0 +1,72 @@
+name: Rechercher — Quran multilingual translation acquisition
+# Triggered by branch updates for coordinated Quran acquisition.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'rechercher-quran-official-api-registry-2026-09-22'
+
+concurrency:
+  group: rechercher-quran-quranenc-acquisition-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  acquire-quranenc-translations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Restore previous acquisition checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "artifacts/quran-translation-acquisition"
+          artifacts_json="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=quranenc-translation-acquisition&per_page=100")"
+          artifact_id="$(printf '%s' "$artifacts_json" | jq -r --arg current "$GITHUB_RUN_ID" --arg branch "$GITHUB_REF_NAME" '[.artifacts[] | select(.expired == false and (.workflow_run.id | tostring) != $current and .workflow_run.head_branch == $branch)] | sort_by(.created_at) | last | .id // empty')"
+          if [ -n "$artifact_id" ]; then
+            echo "Restoring acquisition checkpoint artifact $artifact_id"
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" > /tmp/previous-acquisition.zip
+            unzip -q /tmp/previous-acquisition.zip -d "artifacts/quran-translation-acquisition"
+            rm -f /tmp/previous-acquisition.zip
+          else
+            echo "No previous checkpoint artifact found; starting from the first pending language."
+          fi
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          cache: npm
+      - name: Acquire all catalogued QuranEnc editions
+        run: node scripts/rechercher-acquire-quranenc-translations.mjs
+        env:
+          QURANENC_CONCURRENCY: 6
+      - name: Validate research-only manifest
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'artifacts/quran-translation-acquisition/manifest.json';
+          const m = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (m.corpus_write !== false) throw new Error('Corpus write must remain forbidden');
+          if (m.ai_generated_translation !== false) throw new Error('AI-generated translation must remain forbidden');
+          if (m.canonical_arabic_separate !== true) throw new Error('Canonical Arabic separation required');
+          if (m.network_unavailable === true) {
+            console.log('QuranEnc API temporarily unavailable; no editions marked acquired.');
+            process.exit(0);
+          }
+          if (m.edition_count < 1) throw new Error('QuranEnc live API returned no editions');
+          if (!Number.isInteger(m.live_only_edition_count) || m.live_only_edition_count < 0) throw new Error('Live-only edition diff is missing');
+          console.log(`QuranEnc live editions: ${m.edition_count}; languages: ${m.language_count}; live-only editions: ${m.live_only_edition_count}`);
+          NODE
+      - name: Upload research-only acquisition
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: quranenc-translation-acquisition
+          path: artifacts/quran-translation-acquisition
+          retention-days: 90

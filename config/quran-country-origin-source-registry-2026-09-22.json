@@ -1,0 +1,144 @@
+{
+  "schema_version": "2026-09-22",
+  "layer": "System",
+  "purpose": "Country-of-origin discovery registry for Quran translations and national institutional Quran resources. Discovery does not imply acquisition, publication rights, or Corpus admission.",
+  "policy": {
+    "canonical_arabic_separate": true,
+    "ai_generated_translation_forbidden": true,
+    "discovery_only_until_source_and_edition_verification": true,
+    "rights_verification_required": true,
+    "text_integrity_verification_required": true,
+    "corpus_write_forbidden": true
+  },
+  "discovery_rules": {
+    "preferred_order": [
+      "national_religious_authority",
+      "government_ministry",
+      "national_quran_publishing_or_mushaf_center",
+      "national_islamic_digital_library",
+      "university_or_national_library",
+      "international_secondary_source"
+    ],
+    "acquisition_requires_explicit_asset": true,
+    "api_presence_is_not_redistribution_rights": true
+  },
+  "sources": [
+    {
+      "source_id": "bd-quran-gov-bd",
+      "country": "BD",
+      "institution": "Bangladesh Ministry of Religious Affairs",
+      "role": "national_quran_portal",
+      "official_url": "https://quran.gov.bd/",
+      "discovery_urls": [
+        "https://quran.gov.bd/",
+        "https://quran.gov.bd/home/ebook_download.html"
+      ],
+      "language_targets": ["bn"],
+      "source_status": "official_source_verified",
+      "edition_status": "discovery_target",
+      "rights_status": "pending",
+      "text_integrity_status": "pending"
+    },
+    {
+      "source_id": "tr-diyanet-kuran",
+      "country": "TR",
+      "institution": "Diyanet İşleri Başkanlığı",
+      "role": "national_religious_authority",
+      "official_url": "https://kuran.diyanet.gov.tr/",
+      "discovery_urls": [
+        "https://kuran.diyanet.gov.tr/",
+        "https://kuran.diyanet.gov.tr/Yayinlar",
+        "https://dijital.diyanet.gov.tr/Kitaplik/kuran-kitapligi"
+      ],
+      "language_targets": ["tr"],
+      "source_status": "official_source_verified",
+      "edition_status": "discovery_target",
+      "rights_status": "pending",
+      "text_integrity_status": "pending"
+    },
+    {
+      "source_id": "id-kemenag-lajnah",
+      "country": "ID",
+      "institution": "Lajnah Pentashihan Mushaf Al-Qur'an, Ministry of Religious Affairs of Indonesia",
+      "role": "national_quran_publishing_and_verification_center",
+      "official_url": "https://pustakalajnah.kemenag.go.id/",
+      "discovery_urls": [
+        "https://pustakalajnah.kemenag.go.id/",
+        "https://lajnah.kemenag.go.id/info-lpmq/unduhan/terjemah-al-quran.html"
+      ],
+      "language_targets": ["id"],
+      "additional_language_discovery": ["su", "ace", "jv", "mad"],
+      "source_status": "official_source_verified",
+      "edition_status": "discovery_target",
+      "rights_status": "pending",
+      "text_integrity_status": "pending"
+    },
+    {
+      "source_id": "ma-ministry-habous-mohammedan-mushaf",
+      "country": "MA",
+      "institution": "Ministry of Habous and Islamic Affairs / Mohammed VI Foundation for the Edition of the Holy Quran",
+      "role": "national_mushaf_institution",
+      "official_url": "https://habous.gov.ma/",
+      "discovery_urls": [
+        "https://habous.gov.ma/fr/component/content/article/6558-la-mise-en-ligne-de-al-moshaf-almohammadi.html"
+      ],
+      "language_targets": ["fr", "en", "es"],
+      "source_status": "official_source_verified",
+      "edition_status": "discovery_target",
+      "rights_status": "pending",
+      "text_integrity_status": "pending"
+    },
+    {
+      "source_id": "my-jakim-smart-quran",
+      "country": "MY",
+      "institution": "Jabatan Kemajuan Islam Malaysia (JAKIM)",
+      "role": "national_islamic_authority",
+      "official_url": "https://www.islam.gov.my/ms/quran-hadith/smart-quran",
+      "discovery_urls": [
+        "https://www.islam.gov.my/ms/quran-hadith/smart-quran"
+      ],
+      "language_targets": ["ms", "en"],
+      "source_status": "official_source_verified",
+      "edition_status": "discovery_target",
+      "rights_status": "pending",
+      "text_integrity_status": "pending"
+    },
+    {
+      "source_id": "ir-moshaf-quran-publishing-center",
+      "country": "IR",
+      "institution": "Quran Publishing and Printing Center of the Islamic Republic of Iran",
+      "role": "national_quran_publishing_center",
+      "official_url": "https://moshaf.org/",
+      "discovery_urls": [
+        "https://moshaf.org/",
+        "https://moshaf.org/fa/about/",
+        "https://shop.moshaf.org/product/search/brand/168-quran-publishing-center-%D9%85%D8%B1%DA%A9%D8%B2-%D8%B7%D8%A8%D8%B9-%D9%88-%D9%86%D8%B4%D8%B1-%D9%82%D8%B1%D8%A2%D9%86-%DA%A9%D8%B1%DB%8C%D9%85"
+      ],
+      "language_targets": ["fa"],
+      "source_status": "official_source_verified",
+      "edition_status": "discovery_target",
+      "rights_status": "pending",
+      "text_integrity_status": "pending"
+    },
+    {
+      "source_id": "sa-kfgqpc-country-origin",
+      "country": "SA",
+      "institution": "King Fahd Glorious Quran Printing Complex",
+      "role": "national_quran_translation_center",
+      "official_url": "https://qurancomplex.gov.sa/en/kfgqpc/kfq-structure/",
+      "discovery_urls": [
+        "https://qurancomplex.gov.sa/en/kfgqpc/kfq-structure/"
+      ],
+      "language_targets": ["de", "ber", "en", "tr", "prs", "ru", "sw", "zh", "fr", "ff", "ne", "kn"],
+      "source_status": "official_source_verified",
+      "edition_status": "discovery_target",
+      "rights_status": "pending",
+      "text_integrity_status": "pending"
+    }
+  ],
+  "coverage": {
+    "country_sources": 7,
+    "language_targets": ["bn", "tr", "id", "fr", "en", "es", "ms", "fa", "de", "ber", "prs", "ru", "sw", "zh", "ff", "ne", "kn"],
+    "note": "This registry deliberately separates country-origin source discovery from acquisition and publication eligibility."
+  }
+}

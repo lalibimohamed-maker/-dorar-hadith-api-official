@@ -1,0 +1,145 @@
+{
+  "schema_version": "2026-09-22",
+  "layer": "System",
+  "purpose": "Primary-source registry for officially published Quran translations identified from governmental or national religious institutions. These records are candidates only until rights and text-integrity checks pass.",
+  "policy": {
+    "canonical_arabic_separate": true,
+    "ai_generated_translation_forbidden": true,
+    "primary_source_required": true,
+    "rights_verification_required": true,
+    "text_integrity_verification_required": true,
+    "public_corpus_ingestion_requires_verified_status": true,
+    "matrix_admission_requires_all_verifications": true,
+    "corpus_write_forbidden": true
+  },
+  "sources": [
+    {
+      "source_id": "bd-ministry-religious-affairs-quran",
+      "country": "BD",
+      "institution": "Bangladesh Ministry of Religious Affairs",
+      "official_url": "https://quran.gov.bd/",
+      "evidence_url": "https://quran.gov.bd/common/user_Manual/UserManual.pdf",
+      "status": "primary_source_verified",
+      "evidence": "The Ministry's Quran Digital manual documents Bengali translation and the Arabic-Bengali-English Quran interface.",
+      "language_editions": [
+        {
+          "edition_id": "bangla-government-quran-digital",
+          "language_iso_code": "bn",
+          "language_name": "Bengali",
+          "publisher_or_institution": "Bangladesh Ministry of Religious Affairs",
+          "original_source_url": "https://quran.gov.bd/",
+          "license_or_permission_evidence": null,
+          "primary_source_verification": "verified",
+          "rights_verification": "pending",
+          "text_integrity_status": "pending",
+          "matrix_eligibility": "blocked_pending_rights_and_integrity"
+        }
+      ]
+    },
+    {
+      "source_id": "tr-diyanet-quran",
+      "country": "TR",
+      "institution": "Diyanet İşleri Başkanlığı",
+      "official_url": "https://kuran.diyanet.gov.tr/",
+      "evidence_url": "https://kuran.diyanet.gov.tr/Yayinlar",
+      "status": "primary_source_verified",
+      "evidence": "The official Diyanet Quran portal publishes Turkish meâl and tafsir resources and provides downloadable Quran and meâl editions.",
+      "language_editions": [
+        {
+          "edition_id": "diyanet-turkish-meal",
+          "language_iso_code": "tr",
+          "language_name": "Turkish",
+          "publisher_or_institution": "Diyanet İşleri Başkanlığı",
+          "original_source_url": "https://kuran.diyanet.gov.tr/",
+          "license_or_permission_evidence": null,
+          "primary_source_verification": "verified",
+          "rights_verification": "pending",
+          "text_integrity_status": "pending",
+          "matrix_eligibility": "blocked_pending_rights_and_integrity"
+        }
+      ]
+    },
+    {
+      "source_id": "ma-ministry-habous-mohammedi-mushaf",
+      "country": "MA",
+      "institution": "Ministry of Habous and Islamic Affairs / Mohammed VI Foundation for the Edition of the Holy Quran",
+      "official_url": "https://habous.gov.ma/",
+      "evidence_url": "https://habous.gov.ma/fr/component/content/article/6558-la-mise-en-ligne-de-al-moshaf-almohammadi.html",
+      "status": "primary_source_verified",
+      "evidence": "The ministry states that the 2026 digital Mohammedan Mushaf provides translations of the meanings of the verses in English, Spanish and French.",
+      "language_editions": [
+        {
+          "edition_id": "mohammedan-mushaf-fr",
+          "language_iso_code": "fr",
+          "language_name": "French",
+          "publisher_or_institution": "Ministry of Habous and Islamic Affairs / Mohammed VI Foundation",
+          "original_source_url": "https://habous.gov.ma/",
+          "license_or_permission_evidence": null,
+          "primary_source_verification": "verified",
+          "rights_verification": "pending",
+          "text_integrity_status": "pending",
+          "matrix_eligibility": "blocked_pending_rights_and_integrity"
+        },
+        {
+          "edition_id": "mohammedan-mushaf-en",
+          "language_iso_code": "en",
+          "language_name": "English",
+          "publisher_or_institution": "Ministry of Habous and Islamic Affairs / Mohammed VI Foundation",
+          "original_source_url": "https://habous.gov.ma/",
+          "license_or_permission_evidence": null,
+          "primary_source_verification": "verified",
+          "rights_verification": "pending",
+          "text_integrity_status": "pending",
+          "matrix_eligibility": "blocked_pending_rights_and_integrity"
+        },
+        {
+          "edition_id": "mohammedan-mushaf-es",
+          "language_iso_code": "es",
+          "language_name": "Spanish",
+          "publisher_or_institution": "Ministry of Habous and Islamic Affairs / Mohammed VI Foundation",
+          "original_source_url": "https://habous.gov.ma/",
+          "license_or_permission_evidence": null,
+          "primary_source_verification": "verified",
+          "rights_verification": "pending",
+          "text_integrity_status": "pending",
+          "matrix_eligibility": "blocked_pending_rights_and_integrity"
+        }
+      ]
+    },
+    {
+      "source_id": "id-kemenag-quran-translation",
+      "country": "ID",
+      "institution": "Lajnah Pentashihan Mushaf Al-Qur'an, Ministry of Religious Affairs of Indonesia",
+      "official_url": "https://pustakalajnah.kemenag.go.id/",
+      "evidence_url": "https://lajnah.kemenag.go.id/info-lpmq/unduhan/terjemah-al-quran.html",
+      "status": "primary_source_verified",
+      "evidence": "The official Lajnah site publishes Al-Qur'an dan Terjemahannya Edisi Penyempurnaan 2019 and downloadable translation data.",
+      "language_editions": [
+        {
+          "edition_id": "kemenag-indonesian-2019",
+          "language_iso_code": "id",
+          "language_name": "Indonesian",
+          "publisher_or_institution": "Lajnah Pentashihan Mushaf Al-Qur'an",
+          "original_source_url": "https://pustakalajnah.kemenag.go.id/",
+          "license_or_permission_evidence": null,
+          "primary_source_verification": "verified",
+          "rights_verification": "pending",
+          "text_integrity_status": "pending",
+          "matrix_eligibility": "blocked_pending_rights_and_integrity"
+        }
+      ]
+    }
+  ],
+  "verification_rule": "Primary-source verification records that the issuing institution publishes or identifies the edition; it does not grant redistribution rights. Rights and text integrity remain independent gates.",
+  "newly_materialized_languages": [
+    "bn"
+  ],
+  "institutional_source_language_coverage": [
+    "bn",
+    "tr",
+    "fr",
+    "en",
+    "es",
+    "id"
+  ]
+}

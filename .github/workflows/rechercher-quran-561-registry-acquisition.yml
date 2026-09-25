@@ -1,0 +1,64 @@
+name: Rechercher — Quran acquisition from live PR #561 sources
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'rechercher-quran-official-api-registry-2026-09-22'
+  schedule:
+    - cron: "31 */6 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Install PDF/DOCX validation and conversion tools
+        run: sudo apt-get update && sudo apt-get install -y qpdf poppler-utils libreoffice-writer fonts-noto-core
+
+      - name: Acquire Quran PDFs from live #561 source registry
+        run: node scripts/rechercher-acquire-561-quran-sources.mjs
+
+      - name: Validate Quran acquisition manifest
+        run: |
+          set -euo pipefail
+          manifest="artifacts/quran-561-registry-acquisition/manifest.json"
+          test -s "$manifest"
+          node - "$manifest" <<'NODE'
+          const fs=require('node:fs');
+          const m=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(m.source_count < 1) throw new Error('No Quran-relevant #561 sources selected');
+          if(m.source_count !== m.quran_registry_source_count) throw new Error(`Not all live Quran #561 sources were selected: ${m.source_count}/${m.quran_registry_source_count}`);
+          if(m.rights_status !== 'review_required_for_all') throw new Error('Rights gate invalid');
+          if(m.corpus_write !== false || m.ai_generated_translation !== false || m.canonical_arabic_separate !== true) {
+            throw new Error('Quran governance invariants failed');
+          }
+          console.log(JSON.stringify({
+            source_count:m.source_count,
+            crawled_sources:m.crawled_sources,
+            pdf_candidates:m.pdf_candidates,
+            downloaded_pdfs:m.downloaded_pdfs
+          }));
+          NODE
+
+      - name: Upload research-only Quran acquisition
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: quran-561-registry-acquisition-${{ github.run_id }}
+          path: artifacts/quran-561-registry-acquisition/
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,60 @@
+{
+  "registry_version": "2026-09-22",
+  "source_id": "fawazahmed0-quran-api",
+  "display_name": "Fawaz Ahmed Quran API",
+  "repository": "https://github.com/fawazahmed0/quran-api",
+  "delivery_endpoint": "https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/",
+  "role": [
+    "discovery",
+    "metadata_catalog",
+    "runtime_candidate"
+  ],
+  "repository_license": {
+    "declared": "Unlicense",
+    "scope": "repository_software_and_repository_authored_material_only",
+    "translation_rights_scope": "verify_per_edition"
+  },
+  "policy": {
+    "api_access_is_not_redistribution_rights": true,
+    "repository_license_does_not_automatically_cover_embedded_translations": true,
+    "primary_provenance_required_per_edition": true,
+    "rights_verification_required_per_asset": true,
+    "canonical_arabic_separate": true,
+    "ai_generated_translation_forbidden": true,
+    "ocr_content_requires_text_integrity_review": true,
+    "public_corpus_ingestion_blocked_until_verified": true,
+    "aggregator_presence_is_not_primary_provenance": true,
+    "no_automatic_governmental_or_institutional_certification": true
+  },
+  "allowed_initial_uses": [
+    "edition_discovery",
+    "language_gap_analysis",
+    "metadata_capture",
+    "provenance_candidate_matching",
+    "runtime_read_only_candidate_subject_to_source_terms"
+  ],
+  "blocked_until_review": [
+    "bulk_republication",
+    "public_static_mirroring",
+    "corpus_ingestion",
+    "rights_inference_from_edition_name",
+    "treating_ocr_text_as_verified"
+  ],
+  "required_per_edition_fields": [
+    "edition_identifier",
+    "language_iso_code",
+    "translator_or_author",
+    "publisher_or_institution",
+    "original_source_url",
+    "license_or_permission_evidence",
+    "text_integrity_status",
+    "verification_status",
+    "checked_at"
+  ],
+  "verification_status_default": "discovered_pending_primary_source_and_rights_review",
+  "notes": [
+    "The API is valuable for discovering multilingual editions but does not replace verification against the original publisher or institution.",
+    "Any edition with unclear provenance, OCR warnings, disputed attribution, or unclear redistribution rights remains outside the public Corpus.",
+    "This registry is a System Layer configuration and must not modify canonical Corpus content."
+  ]
+}
