@@ -63,3 +63,16 @@ export function assertExecutionBoundary(plan) {
   }
   return true;
 }
+
+export async function executeSelectedBackend(plan, input = {}) {
+  assertExecutionBoundary(plan);
+  if (plan.status !== "ready") throw new Error("Rechercher Ω cannot execute a non-ready plan");
+  const adapters = await import("./rechercher-omega-adapters.js");
+  const payload = { ...input, corpus_write_allowed: false, generated_media_is_evidence: false };
+  if (plan.backend === "gemini-free-tier") return adapters.executeGemini({ model: plan.model, ...payload });
+  if (plan.backend === "groq-free-plan") return adapters.executeGroq({ model: plan.model, ...payload });
+  if (plan.backend === "huggingface-inference") return adapters.executeHuggingFace({ model: plan.model, ...payload });
+  if (plan.backend === "local") return adapters.executeLocal(payload);
+  if (plan.backend === "kaggle-gpu") return adapters.buildKaggleExecution(payload);
+  throw new Error("unsupported Rechercher Ω backend: " + plan.backend);
+}
