@@ -1,6 +1,14 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { selectExecutionBackend, assertExecutionBoundary } from "./rechercher-omega-execution-router.js";
 
-export function buildRuntimeGate({ registry, backends, task, model, capabilities = {}, availableBackends = [] }) {
+const DEFAULT_BACKENDS = fileURLToPath(new URL("../config/rechercher-omega-execution-backends.json", import.meta.url));
+
+function loadDefaultBackends() {
+  return JSON.parse(readFileSync(DEFAULT_BACKENDS, "utf8"));
+}
+
+export function buildRuntimeGate({ registry, backends = loadDefaultBackends(), task, model, capabilities = {}, availableBackends = [] }) {
   const plan = selectExecutionBackend({
     backends, task, model, capabilities,
     availableBackends, preferFree: true
