@@ -121,7 +121,8 @@ if (list_error) {
   };
   await fs.rm(OUT, { recursive: true, force: true });
   await fs.mkdir(OUT, { recursive: true });
-  await fs.writeFile(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", "utf8");
+  await fs.writeFile( // codeql[js/http-to-file-access] Intentional research-only metadata sink: serialized edition metadata is written only to the bounded local acquisition directory.
+path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", "utf8"); // codeql[js/http-to-file-access] Intentional research-only outage/provenance manifest sink: fixed output path and network error metadata only; never Corpus content.
   console.log(JSON.stringify(manifest, null, 2));
   process.exit(list_error.classification === "network_unavailable" ? 0 : 1);
 }
@@ -192,7 +193,7 @@ const editionResults = await mapLimit(editions, async (edition) => {
       validateSignature(kind, data);
       const ext = kind.startsWith("pdf") ? ".pdf" : kind === "sqlite_zip" ? ".zip" : kind === "sqlite" ? ".sqlite" : ".epub";
       const file = path.join(dir, `${editionId}${kind === "pdf" ? "" : `.${kind}`}${ext}`);
-      await fs.writeFile(file, data);
+      await fs.writeFile(file, data); // codeql[js/http-to-file-access] Intentional research-only asset sink: URL is restricted to QuranEnc HTTPS allowlist and payload is size+signature validated before fixed-path persistence.
       acquired = {
         kind,
         url,
