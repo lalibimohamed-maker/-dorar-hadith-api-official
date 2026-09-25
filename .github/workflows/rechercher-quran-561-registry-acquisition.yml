@@ -27,6 +27,9 @@ jobs:
         with:
           node-version: 24
 
+      - name: Install PDF/DOCX validation and conversion tools
+        run: sudo apt-get update && sudo apt-get install -y qpdf poppler-utils libreoffice-writer fonts-noto-core
+
       - name: Acquire Quran PDFs from live #561 source registry
         run: node scripts/rechercher-acquire-561-quran-sources.mjs
 
