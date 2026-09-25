@@ -1,0 +1,85 @@
+{
+  "schema": "rechercher/video-engine-registry/v1",
+  "purpose": "Open video-generation engine registry for source-grounded educational animation. Engines are media generators, never scholarly sources.",
+  "governance": {
+    "system_layer_above_corpus": true,
+    "corpus_write": false,
+    "source_grounding_required": true,
+    "rights_review_required": true,
+    "model_license_review_required": true,
+    "generated_media_is_derived": true
+  },
+  "engines": [
+    {
+      "id": "wan2.2-ti2v-5b",
+      "project": "Wan2.2",
+      "repository": "https://github.com/Wan-Video/Wan2.2",
+      "capabilities": ["text-to-video", "image-to-video", "720p", "24fps"],
+      "reference_role": "primary-candidate",
+      "license_status": "repository Apache-2.0; verify each released weight package before redistribution",
+      "local_gpu_note": "official README states TI2V-5B can run on at least 24GB VRAM with offloading",
+      "children_animation_relevance": "high"
+    },
+    {
+      "id": "hunyuanvideo-1.5",
+      "project": "HunyuanVideo-1.5",
+      "repository": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5",
+      "capabilities": ["text-to-video", "image-to-video", "video-super-resolution"],
+      "reference_role": "quality-candidate",
+      "license_status": "Tencent Hunyuan Community License; territory and use restrictions must be enforced",
+      "local_gpu_note": "official README states 14GB minimum with model offloading",
+      "children_animation_relevance": "high"
+    },
+    {
+      "id": "ltx-2.x",
+      "project": "LTX-2",
+      "repository": "https://github.com/Lightricks/LTX-2",
+      "capabilities": ["video", "audio", "multimodal-generation"],
+      "reference_role": "audio-video-candidate",
+      "license_status": "LTX-2.x Community License; commercial/entity conditions must be checked before deployment",
+      "children_animation_relevance": "high"
+    },
+    {
+      "id": "cogvideox-2b",
+      "project": "CogVideo",
+      "repository": "https://github.com/zai-org/CogVideo",
+      "capabilities": ["text-to-video", "image-to-video", "video-continuation"],
+      "reference_role": "low-vram-candidate",
+      "license_status": "Apache-2.0 for CogVideoX-2B according to the project README/model licensing",
+      "local_gpu_note": "official README reports CogVideoX-2B can run on older GPUs such as GTX 1080 Ti",
+      "children_animation_relevance": "high"
+    },
+    {
+      "id": "open-sora",
+      "project": "Open-Sora",
+      "repository": "https://github.com/hpcaitech/Open-Sora",
+      "capabilities": ["video-generation-pipeline", "training", "research"],
+      "reference_role": "research-and-orchestration-candidate",
+      "license_status": "project license must be checked per release and model/checkpoint",
+      "children_animation_relevance": "medium"
+    }
+  ],
+  "planned_engine": {
+    "id": "rechercher-edu-video-engine",
+    "status": "planned",
+    "principle": "orchestrator, not a new foundation model initially",
+    "pipeline": [
+      "verified-source-selection",
+      "evidence-bundle",
+      "age-appropriate-script",
+      "character-bible",
+      "storyboard",
+      "reference-image-generation",
+      "shot-generation",
+      "shot-consistency-check",
+      "voice-generation",
+      "arabic-captioning",
+      "assembly",
+      "scholarly-provenance-overlay",
+      "rights-and-model-license-gate",
+      "final-media-manifest"
+    ],
+    "engine_selection": "benchmark-per-shot and select the licensed engine that satisfies the required task",
+    "training_policy": "do not train or fine-tune on protected scholarly corpus unless rights explicitly permit it"
+  }
+}
