@@ -558,9 +558,16 @@ async function processCell(row){
     const docxSeen=new Set();
     for(const {seed,sourceRights,sourceType} of eligibleSeeds){
       if(entry.files.length>=1) break;
-      let discovered;
-      try{discovered=await candidateUrls(seed.url);}catch(e){continue;}
-      for(const candidate of (discovered.docxs||[])){
+      const localizedSeeds=languageIndexedSeedUrls(seed.url,row.language_iso);
+      const discoveredDocxs=new Set();
+      for(const localizedSeed of localizedSeeds){
+        entry.source_candidates.push(localizedSeed);
+        try{
+          const discovered=await candidateUrls(localizedSeed);
+          for(const candidate of (discovered.docxs||[])) discoveredDocxs.add(candidate);
+        }catch{}
+      }
+      for(const candidate of discoveredDocxs){
         if(entry.files.length>=1||docxSeen.has(candidate)) continue;
         docxSeen.add(candidate);
         const docx=allow(candidate)?.href;if(!docx) continue;
