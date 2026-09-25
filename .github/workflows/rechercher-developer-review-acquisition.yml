@@ -38,6 +38,17 @@ jobs:
           set -euo pipefail
           test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
 
+      - name: Restore persistent master catalog from review branch
+        run: |
+          set -euo pipefail
+          git fetch origin "$REVIEW_BRANCH" || true
+          if git show "origin/$REVIEW_BRANCH:$CATALOG_PATH" > "$RUNNER_TEMP/rechercher-persistent-master-catalog.json" 2>/dev/null; then
+            cp "$RUNNER_TEMP/rechercher-persistent-master-catalog.json" "$CATALOG_PATH"
+            echo "RESTORED_PERSISTENT_MASTER_CATALOG_FROM_REVIEW_BRANCH=true"
+          else
+            echo "RESTORED_PERSISTENT_MASTER_CATALOG_FROM_REVIEW_BRANCH=false (using main seed catalog)"
+          fi
+
       - name: Materialize central unbounded master catalog
         run: |
           set -euo pipefail
@@ -248,12 +259,51 @@ jobs:
           fi
           git commit -m 'data(rechercher): retain encrypted vault release and governance evidence'
           ACQ_COMMIT=$(git rev-parse HEAD)
-          # The central catalog is materialized for this run only. Restore the tracked
-          # catalog before switching branches so generated catalog state never blocks checkout
-          # and is never accidentally carried into the protected review branch or Corpus.
-          git restore --worktree --staged -- "$CATALOG_PATH" 2>/dev/null || true
           git fetch origin "$REVIEW_BRANCH"
-          git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
+          REVIEW_WORKTREE="$RUNNER_TEMP/rechercher-review-worktree"
+          rm -rf "$REVIEW_WORKTREE"
+          git worktree add --force "$REVIEW_WORKTREE" "origin/$REVIEW_BRANCH"
+          trap 'git worktree remove --force "$REVIEW_WORKTREE" 2>/dev/null || true' EXIT
+          mkdir -p "$REVIEW_WORKTREE/artifacts/governance" "$REVIEW_WORKTREE/books-batches/salaf-01-400h" "$REVIEW_WORKTREE/books-batches/encyclopedia-master"
+          cp "$GITHUB_WORKSPACE/artifacts/governance/vault-release.json" "$REVIEW_WORKTREE/artifacts/governance/vault-release.json"
+          cp "$GITHUB_WORKSPACE/books-batches/salaf-01-400h/engine-source-overlay.json" "$REVIEW_WORKTREE/books-batches/salaf-01-400h/engine-source-overlay.json"
+          cp "$GITHUB_WORKSPACE/books-batches/encyclopedia-master/catalog.json" "$REVIEW_WORKTREE/books-batches/encyclopedia-master/catalog.json"
+          python3 - "$GITHUB_WORKSPACE/books-batches/salaf-01-400h/developer-review-manifest.json" "$REVIEW_WORKTREE/books-batches/salaf-01-400h/developer-review-manifest.json" <<'PY'
+          import json, sys
+          from pathlib import Path
+          incoming_path, existing_path = map(Path, sys.argv[1:])
+          incoming=json.loads(incoming_path.read_text(encoding='utf-8'))
+          try: existing=json.loads(existing_path.read_text(encoding='utf-8'))
+          except FileNotFoundError: existing=None
+          if not existing:
+              merged=incoming
+          else:
+              old={r.get('id'):r for r in existing.get('records',[]) if r.get('id')}
+              for rec in incoming.get('records',[]):
+                  rid=rec.get('id')
+                  if not rid: continue
+                  if rid not in old: old[rid]=rec; continue
+                  cur=old[rid]
+                  for key in ('discovery_registries','candidates','acquired'):
+                      vals=[]
+                      for src in (cur.get(key,[]), rec.get(key,[])):
+                          for v in src:
+                              if v not in vals: vals.append(v)
+                      if vals: cur[key]=vals
+                  if rec.get('acquired_count',0) > cur.get('acquired_count',0):
+                      cur.update({k:v for k,v in rec.items() if k not in ('discovery_registries','candidates','acquired')})
+                  else:
+                      for k,v in rec.items():
+                          if k not in ('discovery_registries','candidates','acquired') and cur.get(k) in (None,'',[]) and v not in (None,'',[]): cur[k]=v
+              merged=dict(existing); merged['records']=list(old.values()); merged['counts']=incoming.get('counts', merged.get('counts', {}))
+          existing_path.write_text(json.dumps(merged, ensure_ascii=False, indent=2, sort_keys=False)+'\n', encoding='utf-8')
+          PY
+          cd "$REVIEW_WORKTREE"
+          git add artifacts/governance/vault-release.json books-batches/salaf-01-400h/engine-source-overlay.json books-batches/salaf-01-400h/developer-review-manifest.json books-batches/encyclopedia-master/catalog.json
+          if git diff --cached --quiet; then echo 'ERROR: no acquisition/governance/catalog changes remain after reconciliation.'; exit 1; fi
+          git commit -m 'data(rechercher): persist master catalog and acquisition state'
+          GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=$GIT_AUTH_HEADER" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           git checkout "$ACQ_COMMIT" -- artifacts/governance books-batches/salaf-01-400h/engine-source-overlay.json
           python3 - "$ACQ_COMMIT" <<'PY'
           import json, subprocess, sys
@@ -302,3 +352,4 @@ jobs:
           GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
           git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           echo "PERSISTED_ACQUISITION_COMMIT=$ACQ_COMMIT"
+          echo "PERSISTED_MASTER_CATALOG=books-batches/encyclopedia-master/catalog.json"

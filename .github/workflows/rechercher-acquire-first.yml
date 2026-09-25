@@ -43,6 +43,17 @@ jobs:
           set -euo pipefail
           test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
 
+      - name: Restore persistent master catalog from review branch
+        run: |
+          set -euo pipefail
+          git fetch origin "$REVIEW_BRANCH" || true
+          if git show "origin/$REVIEW_BRANCH:$CATALOG_PATH" > "$RUNNER_TEMP/rechercher-persistent-master-catalog.json" 2>/dev/null; then
+            cp "$RUNNER_TEMP/rechercher-persistent-master-catalog.json" "$CATALOG_PATH"
+            echo "RESTORED_PERSISTENT_MASTER_CATALOG_FROM_REVIEW_BRANCH=true"
+          else
+            echo "RESTORED_PERSISTENT_MASTER_CATALOG_FROM_REVIEW_BRANCH=false (using main seed catalog)"
+          fi
+
       - name: Materialize central unbounded master catalog
         run: |
           set -euo pipefail
@@ -169,12 +180,22 @@ jobs:
             books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json
           git diff --cached --quiet || git commit -m 'data(rechercher): persist acquisition state and cumulative discovery memory'
           ACQ_COMMIT=$(git rev-parse HEAD)
-          # The central catalog is materialized for this run only. Restore the tracked
-          # catalog before switching branches so generated catalog state never blocks checkout
-          # and is never accidentally carried into the protected review branch or Corpus.
-          git restore --worktree --staged -- "$CATALOG_PATH" 2>/dev/null || true
           git fetch origin "$REVIEW_BRANCH"
-          git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
+          REVIEW_WORKTREE="$RUNNER_TEMP/rechercher-review-worktree"
+          rm -rf "$REVIEW_WORKTREE"
+          git worktree add --force "$REVIEW_WORKTREE" "origin/$REVIEW_BRANCH"
+          trap 'git worktree remove --force "$REVIEW_WORKTREE" 2>/dev/null || true' EXIT
+          mkdir -p "$REVIEW_WORKTREE/artifacts/governance" "$REVIEW_WORKTREE/books-batches/salaf-01-400h" "$REVIEW_WORKTREE/books-batches/encyclopedia-master"
+          cp "$GITHUB_WORKSPACE/artifacts/governance/vault-release.json" "$REVIEW_WORKTREE/artifacts/governance/vault-release.json"
+          cp "$GITHUB_WORKSPACE/books-batches/salaf-01-400h/master-discovery-additions-2026.json" "$REVIEW_WORKTREE/books-batches/salaf-01-400h/master-discovery-additions-2026.json"
+          cp "$GITHUB_WORKSPACE/books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json" "$REVIEW_WORKTREE/books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json"
+          cp "$GITHUB_WORKSPACE/books-batches/salaf-01-400h/developer-review-manifest.json" "$REVIEW_WORKTREE/books-batches/salaf-01-400h/developer-review-manifest.json"
+          cp "$GITHUB_WORKSPACE/books-batches/encyclopedia-master/catalog.json" "$REVIEW_WORKTREE/books-batches/encyclopedia-master/catalog.json"
+          cd "$REVIEW_WORKTREE"
+          git add artifacts/governance/vault-release.json books-batches/salaf-01-400h/master-discovery-additions-2026.json books-batches/salaf-01-400h/worldwide-deep-research-wave-2026-09.json books-batches/salaf-01-400h/developer-review-manifest.json books-batches/encyclopedia-master/catalog.json
+          if git diff --cached --quiet; then echo 'ERROR: no acquisition/discovery/catalog changes remain after reconciliation.'; exit 1; fi
+          git commit -m 'data(rechercher): persist master catalog and acquisition state'
+          git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           git checkout "$ACQ_COMMIT" -- \
             artifacts/governance/vault-release.json \
             books-batches/salaf-01-400h/developer-review-manifest.json \
@@ -199,3 +220,4 @@ jobs:
           export GIT_ASKPASS="$RUNNER_TEMP/rechercher-review-askpass" GIT_TERMINAL_PROMPT=0
           git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
           echo "ACQUIRE_FIRST_PERSISTED=$ACQ_COMMIT"
+          echo "PERSISTED_MASTER_CATALOG=books-batches/encyclopedia-master/catalog.json"
