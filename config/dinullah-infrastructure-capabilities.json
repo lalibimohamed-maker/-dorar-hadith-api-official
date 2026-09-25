@@ -1,0 +1,13 @@
+{
+  "schema_version":"1.0.0",
+  "layers":{
+    "source":["registry","health","capabilities","rights"],
+    "evidence":["citations","editions","acquisition_events","verification_events"],
+    "corpus":["curated_only","promotion_boundary"],
+    "knowledge":["persons","works","editions","volumes","quran_units","hadith","narrators","relations"],
+    "delivery":["rest","openapi","search","datasets","sdk","cli","mcp"]
+  },
+  "interoperability":["json-ld","rdf","iiif","alto","mets","tei","jsonl","parquet","sqlite"],
+  "processing":["nodejs-orchestration","python-document-processing","libreoffice-docx-to-pdf","qpdf-validation","sha256-deduplication"],
+  "rights_policy":{"unknown":"do_not_redistribute","review_required":"do_not_redistribute_without_approval"}
+}
