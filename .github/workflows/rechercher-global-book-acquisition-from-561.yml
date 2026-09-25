@@ -16,7 +16,7 @@ concurrency:
 env:
   SOURCE_REGISTRY_URL: https://raw.githubusercontent.com/lalibimohamed-maker/-dorar-hadith-api-official/feat/rechercher-worldwide-source-link-registry-2026-09-24/research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json
   SOURCE_REGISTRY_PR: "561"
-  PROTECTED_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
+  PROTECTED_STORAGE_REPO: lalibimohamed-maker/dinullah-pdf-storage-01
 
 jobs:
   acquire:
@@ -147,8 +147,8 @@ jobs:
 
       - name: Persist acquired PDFs to protected Releases
         env:
-          GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
-          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.DINULLAH_PDF_STORAGE_TOKEN }}
+          SECONDARY_STORAGE_TOKEN: ${{ secrets.DINULLAH_PDF_STORAGE_TOKEN }}
         run: |
           set -euo pipefail
           shopt -s nullglob
@@ -158,7 +158,7 @@ jobs:
             exit 0
           fi
           test -n "${SECONDARY_STORAGE_TOKEN:-}" || {
-            echo "RECHERCHER_SECONDARY_STORAGE_TOKEN missing; durable protected PDF persistence cannot proceed."
+            echo "DINULLAH_PDF_STORAGE_TOKEN missing; durable Release PDF persistence cannot proceed."
             exit 1
           }
 
