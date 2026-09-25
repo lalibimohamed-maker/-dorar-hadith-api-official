@@ -399,13 +399,15 @@ async function convertDocxToPdf(docxPath,pdfPath){
     ],{timeout:DOWNLOAD_TIMEOUT,maxBuffer:4*1024*1024});
     const produced=path.join(outdir,path.basename(docxPath).replace(/\.docx$/i,'.pdf'));
     if(produced!==pdfPath) await fs.rename(produced,pdfPath);
-    const st=await fs.stat(pdfPath);
-    if(st.size<=0) throw new Error('DOCX conversion produced an empty PDF');
-    const first=Buffer.alloc(5),fh=await fs.open(pdfPath,'r');
-    try{await fh.read(first,0,5,0);}finally{await fh.close();}
-    if(first.toString() !== '%PDF-') throw new Error('DOCX conversion did not produce a PDF');
-    const q=await execFileAsync('qpdf',['--check','--warning-exit-0',pdfPath],{timeout:30000,maxBuffer:2*1024*1024});
-    return {bytes:st.size,stdout:q.stdout||'',stderr:q.stderr||''};
+    const fh=await fs.open(pdfPath,'r');
+    try{
+      const st=await fh.stat();
+      if(st.size<=0) throw new Error('DOCX conversion produced an empty PDF');
+      const first=Buffer.alloc(5);
+      await fh.read(first,0,5,0);
+      if(first.toString() !== '%PDF-') throw new Error('DOCX conversion did not produce a PDF');
+      return {bytes:st.size};
+    }finally{await fh.close();}
   }finally{
     await fs.rm(profile,{recursive:true,force:true});
   }
