@@ -40,7 +40,12 @@ export function recordAcquisition(doc, info){
   const activityId=`din:activity:${runId}:acquisition:${cell}:${sha.slice(0,16)}`;
   const outputId=`din:entity:pdf:sha256:${sha}`;
   const sourceId=`din:entity:source:${source}:${clean(info.sourceUrl)}`;
-  const activity=ensureMap(doc,'activity'),entity=ensureMap(doc,'entity');
+  const activity=ensureMap(doc,'activity'),entity=ensureMap(doc,'entity'),agent=ensureMap(doc,'agent');
+  const sourceAgentId=`din:agent:source:${source}`;
+  agent[sourceAgentId]={
+    'prov:type':'prov:Organization',
+    'prov:label':String(info.sourceLabel||info.sourceId)
+  };
   activity[activityId]={
     'prov:type':'din:Acquisition',
     'prov:startTime':stamp,
@@ -51,18 +56,19 @@ export function recordAcquisition(doc, info){
     'din:tool':String(info.tool||'DinAllah-Rechercher')
   };
   entity[outputId]={
-    'prov:type':'prov:Entity',
+    'prov:type':'din:DigitalObject',
     'prov:label':String(info.outputPath||sha),
     'din:sha256':sha,
     'din:cell_id':String(info.cellId),
     'din:source_id':String(info.sourceId),
     'din:source_url':String(info.sourceUrl),
+    ...(info.discoveredFrom?{'din:discovered_from':String(info.discoveredFrom)}:{}),
     'din:rights_status':String(info.rightsStatus||'review_required'),
     'din:format':String(info.outputFormat||'pdf'),
     ...(info.outputPath?{'din:path':String(info.outputPath)}:{})
   };
   entity[sourceId]={
-    'prov:type':'prov:Entity',
+    'prov:type':'din:SourceDocument',
     'prov:label':String(info.sourceUrl),
     'din:source_id':String(info.sourceId),
     'din:source_url':String(info.sourceUrl),
@@ -81,8 +87,12 @@ export function recordAcquisition(doc, info){
     'prov:agent':'din:agent:rechercher'
   };
   ensureMap(doc,'hadPrimarySource')[`${outputId}:primary:${sourceId}`]={
+    'prov:generatedEntity':outputId,
+    'prov:usedEntity':sourceId
+  };
+  ensureMap(doc,'wasAttributedTo')[`${outputId}:attributed:${sourceAgentId}`]={
     'prov:entity':outputId,
-    'prov:hadPrimarySource':sourceId
+    'prov:agent':sourceAgentId
   };
   if(info.derivedFrom){
     const used=String(info.derivedFrom.id||'');
