@@ -5,6 +5,7 @@ on:
   schedule:
     - cron: "17 */4 * * *"
 
+# security-justification: reviewed; contents:write is required to persist governed #563 acquisition manifests/state back to the exact PR branch after a remote-SHA concurrency check. No arbitrary branch targeting is permitted.
 permissions:
   contents: write
   pull-requests: read
