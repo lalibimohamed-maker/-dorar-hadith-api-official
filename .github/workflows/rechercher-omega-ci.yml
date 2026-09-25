@@ -9,9 +9,16 @@ on:
       - main
     paths:
       - "src/rechercher-omega-orchestrator.js"
+      - "src/rechercher-omega-execution-router.js"
+      - "src/rechercher-omega-adapters.js"
       - "config/rechercher-omega-model-registry.json"
+      - "config/rechercher-omega-execution-backends.json"
+      - "config/rechercher-omega-model-weights.json"
       - "test/rechercher-omega-orchestrator.test.js"
+      - "test/rechercher-omega-execution-router.test.js"
+      - "test/rechercher-omega-adapters.test.js"
       - "docs/RECHERCHER-OMEGA.md"
+      - "docs/RECHERCHER-OMEGA-EXECUTION.md"
       - ".github/workflows/rechercher-omega-ci.yml"
 
 permissions:
@@ -34,4 +41,4 @@ jobs:
       - name: Install
         run: npm ci
       - name: Ω boundary tests
-        run: node --test test/rechercher-omega-orchestrator.test.js
+        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js
