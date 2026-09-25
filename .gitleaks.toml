@@ -1,0 +1,10 @@
+# Repository-specific Gitleaks policy.
+# The two historical findings are public Rwanda government document-download
+# URLs whose query token is part of the published evidence URL, not a
+# repository credential. Keep the exception narrowly scoped to that exact URL.
+[allowlist]
+description = "Known public Rwanda government evidence URL false positive"
+regexTarget = "match"
+regexes = [
+  '''https://www\.minijust\.gov\.rw/index\.php\?eID=dumpFile&f=77060&t=dumpFile&token=0a72c9f36e0694e727af1c50eeb47f730ca327e3'''
+]
