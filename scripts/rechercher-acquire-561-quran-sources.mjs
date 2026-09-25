@@ -92,9 +92,10 @@ const registry=await (async()=>{
   if(!r.ok) throw new Error("PR #561 registry HTTP "+r.status);
   return r.json();
 })();
-const sources=(registry.sources||[])
-  .filter(s=>s&&s.rights_status==="review_required"&&quranRelevant(s))
-  .slice(0,MAX_SOURCES);
+const registrySources=registry.sources||[];
+const quranRegistrySources=registrySources.filter(s=>s&&s.rights_status==="review_required"&&quranRelevant(s));
+if(quranRegistrySources.length>MAX_SOURCES) throw new Error(`Quran source cap ${MAX_SOURCES} is below live PR #561 Quran source count ${quranRegistrySources.length}`);
+const sources=quranRegistrySources;
 await fs.rm(OUT,{recursive:true,force:true});
 await fs.mkdir(OUT,{recursive:true});
 
@@ -162,6 +163,8 @@ const manifest={
   generated_at:new Date().toISOString(),
   source_registry_pr:561,
   source_registry_branch:"feat/rechercher-worldwide-source-link-registry-2026-09-24",
+  registry_source_count:registrySources.length,
+  quran_registry_source_count:quranRegistrySources.length,
   source_count:sources.length,
   crawled_sources:sourceResults.filter(Boolean).length,
   pdf_candidates:sourceResults.reduce((n,s)=>n+s.pdf_candidates.length,0),
