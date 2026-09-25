@@ -16,7 +16,11 @@
       "id": "hf-document-qa",
       "space_id": "lfoppiano/document-qa",
       "url": "https://huggingface.co/spaces/lfoppiano/document-qa",
-      "capabilities": ["document_qa", "pdf_rag", "document_retrieval"],
+      "capabilities": [
+        "document_qa",
+        "pdf_rag",
+        "document_retrieval"
+      ],
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
@@ -26,7 +30,11 @@
       "id": "hf-pdf-rag",
       "space_id": "LovnishVerma/rag",
       "url": "https://huggingface.co/spaces/LovnishVerma/rag",
-      "capabilities": ["document_qa", "pdf_rag", "retrieval_augmented_generation"],
+      "capabilities": [
+        "document_qa",
+        "pdf_rag",
+        "retrieval_augmented_generation"
+      ],
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
@@ -36,7 +44,11 @@
       "id": "hf-slm-rag-arena",
       "space_id": "aizip-dev/SLM-RAG-Arena",
       "url": "https://huggingface.co/spaces/aizip-dev/SLM-RAG-Arena",
-      "capabilities": ["rag_evaluation", "document_qa", "groundedness_evaluation"],
+      "capabilities": [
+        "rag_evaluation",
+        "document_qa",
+        "groundedness_evaluation"
+      ],
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
@@ -46,7 +58,11 @@
       "id": "hf-omnivoice",
       "space_id": "k2-fsa/OmniVoice",
       "url": "https://huggingface.co/spaces/k2-fsa/OmniVoice",
-      "capabilities": ["text_to_speech", "multilingual_speech", "voice"],
+      "capabilities": [
+        "text_to_speech",
+        "multilingual_speech",
+        "voice"
+      ],
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
@@ -56,7 +72,11 @@
       "id": "hf-lahgtna-omnivoice",
       "space_id": "oddadmix/Lahgtna-OmniVoice-Demo",
       "url": "https://huggingface.co/spaces/oddadmix/Lahgtna-OmniVoice-Demo",
-      "capabilities": ["arabic_speech", "dialect_speech", "text_to_speech"],
+      "capabilities": [
+        "arabic_speech",
+        "dialect_speech",
+        "text_to_speech"
+      ],
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
@@ -66,7 +86,11 @@
       "id": "hf-token-visual",
       "space_id": "aiqtech/LLM-Token-Visual",
       "url": "https://huggingface.co/spaces/aiqtech/LLM-Token-Visual",
-      "capabilities": ["tokenization", "multilingual_token_analysis", "arabic_token_analysis"],
+      "capabilities": [
+        "tokenization",
+        "multilingual_token_analysis",
+        "arabic_token_analysis"
+      ],
       "use": "reference",
       "status": "verified_paused",
       "license_review": "required",
@@ -76,11 +100,72 @@
       "id": "hf-hallucination-detector",
       "space_id": "hugging-apps/enoki-hallucination-detector",
       "url": "https://huggingface.co/spaces/hugging-apps/enoki-hallucination-detector",
-      "capabilities": ["hallucination_detection", "quality_assurance"],
+      "capabilities": [
+        "hallucination_detection",
+        "quality_assurance"
+      ],
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
       "notes": "Quality-assurance reference only; not a truth oracle."
+    },
+    {
+      "id": "hf-paddleocr-vl-online-demo",
+      "space_id": "PaddlePaddle/PaddleOCR-VL_Online_Demo",
+      "url": "https://huggingface.co/spaces/PaddlePaddle/PaddleOCR-VL_Online_Demo",
+      "capabilities": [
+        "document_parsing",
+        "ocr",
+        "layout",
+        "table",
+        "formula",
+        "chart"
+      ],
+      "use": "reference",
+      "status": "verified_live",
+      "license_review": "required",
+      "notes": "Official PaddleOCR-VL demo; reference implementation only."
+    },
+    {
+      "id": "hf-paddleocr-vl-upsampler",
+      "space_id": "Upsampler/paddleocr-vl",
+      "url": "https://huggingface.co/spaces/Upsampler/paddleocr-vl",
+      "capabilities": [
+        "document_parsing",
+        "ocr",
+        "layout"
+      ],
+      "use": "reference",
+      "status": "candidate",
+      "license_review": "required",
+      "notes": "Community deployment/reference; verify code and dependencies before reuse."
+    },
+    {
+      "id": "hf-paddleocr-vl-waytoagi",
+      "space_id": "waytoAGI/PaddleOCR-VL_Online_Demo",
+      "url": "https://huggingface.co/spaces/waytoAGI/PaddleOCR-VL_Online_Demo",
+      "capabilities": [
+        "document_parsing",
+        "ocr",
+        "layout"
+      ],
+      "use": "reference",
+      "status": "candidate",
+      "license_review": "required",
+      "notes": "Community demo/reference; not a trusted dependency."
+    },
+    {
+      "id": "hf-multilingual-tokenizer-leaderboard",
+      "space_id": "eduagarcia/multilingual-tokenizer-leaderboard",
+      "url": "https://huggingface.co/spaces/eduagarcia/multilingual-tokenizer-leaderboard",
+      "capabilities": [
+        "multilingual_token_analysis",
+        "tokenizer_benchmark"
+      ],
+      "use": "reference",
+      "status": "candidate",
+      "license_review": "required",
+      "notes": "Useful for multilingual tokenizer comparisons; not a PaddleOCR runtime dependency."
     }
   ]
 }
