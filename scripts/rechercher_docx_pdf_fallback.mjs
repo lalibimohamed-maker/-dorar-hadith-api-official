@@ -20,10 +20,15 @@ export async function validateRepairAndQualityGate(pdfPath){
     "print(r)",
     "raise SystemExit(0 if r.get('status')=='pass' else 1)"
   ].join(";"),pdfPath]);
-  const st=await fs.stat(pdfPath);
   const head=Buffer.alloc(5);
   const fh=await fs.open(pdfPath,"r");
-  try{await fh.read(head,0,5,0);}finally{await fh.close();}
+  let st;
+  try{
+    st=await fh.stat();
+    await fh.read(head,0,5,0);
+  }finally{
+    await fh.close();
+  }
   if(st.size<=0||head.toString()!=="%PDF-") throw new Error("quality-gated PDF is empty or invalid");
   return {bytes:st.size};
 }
