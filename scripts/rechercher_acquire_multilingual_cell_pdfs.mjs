@@ -2,6 +2,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+const execFileAsync=promisify(execFile);
 import {resolveRights, RIGHTS} from '../src/book-rights-resolver.js';
 
 const ROOT=process.cwd();
@@ -138,9 +141,10 @@ function htmlUrls(text,base,set){
   while((m=re.exec(text))!==null)addUrl(m[1],base,set);
 }
 function isPdfUrl(url){try{const u=new URL(url);return /\.pdf$/i.test(u.pathname)||/format=pdf/i.test(u.search)||/\.pdf\?/i.test(u.href);}catch{return false;}}
+function isDocxUrl(url){try{const u=new URL(url);return /\.docx$/i.test(u.pathname)||/format=docx/i.test(u.search)||/\.docx\?/i.test(u.href);}catch{return false;}}
 
-async function archivePdfUrls(json){
-  const ids=new Set(),out=new Set();
+async function archiveAssetUrls(json){
+  const ids=new Set(),pdfs=new Set(),docxs=new Set();
   const scan=v=>{
     if(!v||typeof v!=='object') return;
     if(Array.isArray(v)){for(const x of v.slice(0,300))scan(x);return;}
@@ -149,7 +153,8 @@ async function archivePdfUrls(json){
     if(Array.isArray(v.files)&&v.identifier){
       for(const f of v.files.slice(0,500)){
         const n=String(f?.name||''),fmt=String(f?.format||'');
-        if((/\.pdf$/i.test(n)||/pdf/i.test(fmt))&&!n.includes('/')) out.add('https://archive.org/download/'+encodeURIComponent(v.identifier)+'/'+encodeURIComponent(n));
+        if((/\.pdf$/i.test(n)||/pdf/i.test(fmt))&&!n.includes('/')) pdfs.add('https://archive.org/download/'+encodeURIComponent(v.identifier)+'/'+encodeURIComponent(n));
+        if((/\.docx$/i.test(n)||/wordprocessingml\.document/i.test(fmt))&&!n.includes('/')) docxs.add('https://archive.org/download/'+encodeURIComponent(v.identifier)+'/'+encodeURIComponent(n));
       }
     }
   };
@@ -160,13 +165,13 @@ async function archivePdfUrls(json){
       if(r.bytes) scan(JSON.parse(r.bytes.toString('utf8')));
     }catch{}
   }
-  return [...out];
+  return {pdfs:[...pdfs],docxs:[...docxs]};
 }
 
 async function candidateUrls(seed){
   if(candidateCache.has(seed)) return candidateCache.get(seed);
   const pending=(async()=>{
-    const queue=[{url:seed,depth:0}],visited=new Set(),pdfs=new Set(),sourceOrigin=new URL(seed).origin;
+    const queue=[{url:seed,depth:0}],visited=new Set(),pdfs=new Set(),docxs=new Set(),sourceOrigin=new URL(seed).origin;
     while(queue.length && visited.size<MAX_DISCOVERY_URLS_PER_SOURCE && pdfs.size<MAX_PDF_CANDIDATES_PER_SOURCE){
       const item=queue.shift();
       if(visited.has(item.url)||item.depth>MAX_DISCOVERY_DEPTH) continue;
@@ -177,20 +182,26 @@ async function candidateUrls(seed){
       const final=allow(r.finalUrl);
       if(!final||final.origin!==sourceOrigin) continue;
       if(isPdfUrl(r.finalUrl)||/^application\/pdf/i.test(r.contentType)){pdfs.add(r.finalUrl);continue;}
+      if(isDocxUrl(r.finalUrl)||/wordprocessingml\.document/i.test(r.contentType)){docxs.add(r.finalUrl);continue;}
       const discovered=new Set(),text=r.bytes.toString('utf8');
       try{
         const json=JSON.parse(text);
         deepUrls(json,r.finalUrl,discovered);
-        if(final.origin==='https://archive.org') for(const u of await archivePdfUrls(json)) discovered.add(u);
+        if(final.origin==='https://archive.org'){
+          const archive=await archiveAssetUrls(json);
+          for(const u of archive.pdfs) discovered.add(u);
+          for(const u of archive.docxs) discovered.add(u);
+        }
       }catch{htmlUrls(text,r.finalUrl,discovered);}
       for(const u of discovered){
         const trusted=allow(u);
         if(!trusted||trusted.origin!==sourceOrigin) continue;
         if(isPdfUrl(u)){pdfs.add(u);continue;}
+        if(isDocxUrl(u)){docxs.add(u);continue;}
         if(item.depth<MAX_DISCOVERY_DEPTH && !visited.has(u) && !queue.some(x=>x.url===u)) queue.push({url:u,depth:item.depth+1});
       }
     }
-    return [...pdfs];
+    return {pdfs:[...pdfs],docxs:[...docxs]};
   })();
   candidateCache.set(seed,pending);
   try{return await pending;}catch(e){candidateCache.delete(seed);throw e;}
@@ -305,14 +316,16 @@ const manifest={
   schema:'rechercher/multilingual-resource-acquisition/v4',
   generated_at:new Date().toISOString(),
   language_count:new Set([...cells.values()].map(r=>r.language_iso||r.language)).size,
-  cell_count:cells.size,total_files:0,total_public_files:0,total_research_only_files:0,total_blocked_cells:0,
+  cell_count:cells.size,total_files:0,total_pdf_files:0,total_docx_files:0,total_derived_pdf_files:0,total_public_files:0,total_research_only_files:0,total_blocked_cells:0,
   concurrency:CONCURRENCY,
   policy:{
     redistribution:'only when explicitly verified',
     research_only:'only explicit read-copy/read-only evidence; never public',
     rights_unclear:'metadata preserved; no file publication or mirroring',
     discovery_is_not_permission:true,canonical_arabic_separate:true,machine_translation_never_promoted:true,
-    no_new_pdf_enc:true,corpus_write:false
+    no_new_pdf_enc:true,corpus_write:false,
+    source_format_priority:'pdf-first; docx-only fallback when no eligible PDF exists',
+    docx_original_retained:true,derived_pdf_created:true,derived_pdf_is_not_source_original:true
   },
   source_counts:{},source_registry_561_count:MASTER.sources.length,source_registry_561_loaded:true,cells:{}
 };
@@ -350,6 +363,45 @@ async function downloadPdf(url,dest){
   }catch(e){await fs.rm(part,{force:true});throw e;}finally{clearTimeout(timer);}
 }
 
+async function downloadDocx(url,dest){
+  const u=allow(url);if(!u)throw new Error('untrusted DOCX');
+  const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),DOWNLOAD_TIMEOUT),part=dest+'.part';
+  try{
+    const r=await fetch(u.href,{redirect:'follow',signal:ctl.signal,headers:{'user-agent':'DinAllah-Rechercher/4.0',accept:'application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/octet-stream,*/*;q=0.1'}});
+    if(!allow(r.url||u.href)) throw new Error('untrusted DOCX redirect');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    await fs.mkdir(path.dirname(dest),{recursive:true});
+    const h=await fs.open(part,'w'),hash=createHash('sha256');let total=0,header='';
+    try{
+      for await(const chunk of r.body){
+        const b=Buffer.from(chunk);if(!header)header=b.subarray(0,2).toString('hex').toLowerCase();total+=b.length;
+        if(total>PDF_LIMIT) throw new Error('DOCX exceeds size limit');
+        hash.update(b);await h.write(b);
+      }
+    }finally{await h.close();}
+    if(header!=='504b'){await fs.rm(part,{force:true});throw new Error('not a DOCX/ZIP container');}
+    const sha256=hash.digest('hex');await fs.rename(part,dest);
+    return {bytes:total,sha256,finalUrl:r.url||u.href,contentType:r.headers.get('content-type')||''};
+  }catch(e){await fs.rm(part,{force:true});throw e;}finally{clearTimeout(timer);}
+}
+
+async function convertDocxToPdf(docxPath,pdfPath){
+  const outdir=path.dirname(pdfPath);
+  await fs.mkdir(outdir,{recursive:true});
+  await execFileAsync('libreoffice',[
+    '--headless','--convert-to','pdf:writer_pdf_Export','--outdir',outdir,docxPath
+  ],{timeout:DOWNLOAD_TIMEOUT,maxBuffer:4*1024*1024});
+  const produced=path.join(outdir,path.basename(docxPath).replace(/\.docx$/i,'.pdf'));
+  if(produced!==pdfPath) await fs.rename(produced,pdfPath);
+  const st=await fs.stat(pdfPath);
+  if(st.size<=0) throw new Error('DOCX conversion produced an empty PDF');
+  const first=Buffer.alloc(5),fh=await fs.open(pdfPath,'r');
+  try{await fh.read(first,0,5,0);}finally{await fh.close();}
+  if(first.toString() !== '%PDF-') throw new Error('DOCX conversion did not produce a PDF');
+  const q=await execFileAsync('qpdf',['--check','--warning-exit-0',pdfPath],{timeout:30000,maxBuffer:2*1024*1024});
+  return {bytes:st.size,stdout:q.stdout||'',stderr:q.stderr||''};
+}
+
 async function processCell(row){
   const urls=evidenceUrls(row),rowRights=rightsFor(row);
   const entry={
@@ -360,6 +412,7 @@ async function processCell(row){
     source_candidates:[],rights_approved_sources:[],rights_blocked_sources:[]
   };
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
+  const eligibleSeeds=[];
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
   // Inspect every active adapter AND every active master-registry source relevant to the cell.
@@ -403,8 +456,10 @@ async function processCell(row){
     }
     rightsApprovedSources++;
     if(!entry.rights_approved_sources.includes(seed.id)) entry.rights_approved_sources.push(seed.id);
-    let candidates=[];
-    try{candidates=await candidateUrls(seed.url);}catch(e){entry.source_errors.push({source:seed.id,url:seed.url,error:String(e.message||e)});continue;}
+    eligibleSeeds.push({seed,sourceRights,sourceType});
+    let discovered;
+    try{discovered=await candidateUrls(seed.url);}catch(e){entry.source_errors.push({source:seed.id,url:seed.url,error:String(e.message||e)});continue;}
+    const candidates=discovered.pdfs||[];
     for(const candidate of candidates){
       if(entry.files.length>=MAX_FILES||!isPdfUrl(candidate)) continue;
       const pdf=allow(candidate)?.href;if(!pdf||claimed.has(pdf)) continue;
@@ -445,10 +500,82 @@ async function processCell(row){
           domain:row.domain,language_iso:row.language_iso||null,provenance:seed.id+':'+seed.url,promoteToCorpus:false
         });
         manifest.total_files++;
+        manifest.total_pdf_files++;
         if(sourceType==='public')manifest.total_public_files++;
         if(sourceType==='research-only')manifest.total_research_only_files++;
         manifest.source_counts[sourceId]=(manifest.source_counts[sourceId]||0)+1;
       }catch(e){claimed.delete(pdf);entry.source_errors.push({source:seed.id,url:pdf,error:String(e.message||e)});}
+    }
+  }
+  if(entry.files.length===0){
+    // DOCX is a fallback format only: all eligible source seeds are searched for PDFs first.
+    const docxSeen=new Set();
+    for(const {seed,sourceRights,sourceType} of eligibleSeeds){
+      if(entry.files.length>=1) break;
+      let discovered;
+      try{discovered=await candidateUrls(seed.url);}catch(e){continue;}
+      for(const candidate of (discovered.docxs||[])){
+        if(entry.files.length>=1||docxSeen.has(candidate)) continue;
+        docxSeen.add(candidate);
+        const docx=allow(candidate)?.href;if(!docx) continue;
+        const sourceId=sourceOf(docx)||seed.id;
+        const dir=path.join(OUT,safe(row.language_iso||row.language),safe(row.domain),safe(sourceId));
+        const token=createHash('sha1').update(docx).digest('hex').slice(0,12);
+        const tempDocx=path.join(dir,safe(row.cell_id)+'-'+token+'.docx');
+        const finalDocx=path.join(dir,safe(row.cell_id)+'__DOCX__'+token+'.docx');
+        const tempPdf=path.join(dir,safe(row.cell_id)+'-'+token+'.pdf');
+        const finalPdf=path.join(dir,safe(row.cell_id)+'__derived-from-docx__'+token+'.pdf');
+        try{
+          const dr=await downloadDocx(docx,tempDocx);
+          const duplicateDocx=existingSha.has(dr.sha256);
+          if(duplicateDocx){
+            await fs.rename(tempDocx,finalDocx);
+          }else{
+            await fs.rename(tempDocx,finalDocx);
+          }
+          const docxRelative=path.relative(ROOT,finalDocx);
+          entry.files.push({
+            cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:dr.finalUrl,path:docxRelative,
+            bytes:dr.bytes,sha256:dr.sha256,content_type:dr.contentType,format:'docx',original:true,
+            acquisition:sourceType,rights:sourceRights.status,domain:row.domain,language_iso:row.language_iso||null,
+            provenance:seed.id+':'+seed.url,promoteToCorpus:false
+          });
+          manifest.total_files++;manifest.total_docx_files++;
+          if(sourceType==='public')manifest.total_public_files++;
+          if(sourceType==='research-only')manifest.total_research_only_files++;
+
+          const conv=await convertDocxToPdf(finalDocx,tempPdf);
+          const pdfSha=await (async()=>{const h=createHash('sha256');const fh=await fs.open(tempPdf,'r');try{for await(const chunk of fh.readableWebStream())h.update(Buffer.from(chunk));}finally{await fh.close();}return h.digest('hex');})();
+          if(existingSha.has(pdfSha)){
+            await fs.rm(tempPdf,{force:true});
+            entry.files.push({
+              cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:dr.finalUrl,bytes:conv.bytes,sha256:pdfSha,
+              content_type:'application/pdf',format:'pdf',derived:true,derived_from_sha256:dr.sha256,derived_from_format:'docx',
+              acquisition:sourceType,rights:sourceRights.status,domain:row.domain,language_iso:row.language_iso||null,
+              provenance:'derived-from-docx:'+docxRelative,promoteToCorpus:false,deduplicated:true,duplicate_of:'durable-release-inventory'
+            });
+          }else{
+            const relativePdf=path.relative(ROOT,finalPdf);
+            await fs.rename(tempPdf,finalPdf);
+            entry.files.push({
+              cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:dr.finalUrl,path:relativePdf,bytes:conv.bytes,
+              sha256:pdfSha,content_type:'application/pdf',format:'pdf',derived:true,derived_from_sha256:dr.sha256,
+              derived_from_format:'docx',derived_from_path:docxRelative,acquisition:sourceType,rights:sourceRights.status,
+              domain:row.domain,language_iso:row.language_iso||null,provenance:'derived-from-docx:'+docxRelative,
+              promoteToCorpus:false
+            });
+          }
+          manifest.total_files++;manifest.total_pdf_files++;manifest.total_derived_pdf_files++;
+          if(sourceType==='public')manifest.total_public_files++;
+          if(sourceType==='research-only')manifest.total_research_only_files++;
+          manifest.source_counts[sourceId]=(manifest.source_counts[sourceId]||0)+2;
+          entry.status=sourceType==='public'?'acquired-from-docx-derived-pdf':'research-only-docx-derived-pdf';
+          entry.acquisition=sourceType;
+        }catch(e){
+          await fs.rm(tempDocx,{force:true});await fs.rm(finalDocx,{force:true});await fs.rm(tempPdf,{force:true});await fs.rm(finalPdf,{force:true});
+          entry.source_errors.push({source:seed.id,url:docx,error:String(e.message||e)});
+        }
+      }
     }
   }
   if(entry.files.length){
@@ -493,4 +620,4 @@ await fs.mkdir(OUT,{recursive:true});
 await Promise.all(Array.from({length:CONCURRENCY},()=>worker()));
 manifest.completed_at=new Date().toISOString();manifest.elapsed_ms=Date.now()-started;
 await fs.writeFile(path.join(OUT,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
-console.log(JSON.stringify({schema:manifest.schema,cell_count:manifest.cell_count,language_count:manifest.language_count,total_files:manifest.total_files,total_public_files:manifest.total_public_files,total_research_only_files:manifest.total_research_only_files,total_blocked_cells:manifest.total_blocked_cells,source_counts:manifest.source_counts,manifest:path.relative(ROOT,path.join(OUT,'manifest.json'))},null,2));
+console.log(JSON.stringify({schema:manifest.schema,cell_count:manifest.cell_count,language_count:manifest.language_count,total_files:manifest.total_files,total_pdf_files:manifest.total_pdf_files,total_docx_files:manifest.total_docx_files,total_derived_pdf_files:manifest.total_derived_pdf_files,total_public_files:manifest.total_public_files,total_research_only_files:manifest.total_research_only_files,total_blocked_cells:manifest.total_blocked_cells,source_counts:manifest.source_counts,manifest:path.relative(ROOT,path.join(OUT,'manifest.json'))},null,2));
