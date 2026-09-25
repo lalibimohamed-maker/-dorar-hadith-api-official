@@ -121,7 +121,7 @@ async function worker(){
           const final=file.endsWith(".pdf")?file:file+".pdf";
           const seenPath=path.join(OUT,"_sha256-index.json");
           row.downloaded.push({source:s.id,url:pdfUrl,path:path.relative(ROOT,final),bytes:data.length,sha256:sha,rights_status:"review_required"});
-          try{await fs.access(final);}catch{await fs.writeFile(final,data);}
+          try{await fs.access(final);}catch{await fs.writeFile(final,data);} // codeql[js/http-to-file-access] Intentional research-only sink: HTTPS/same-origin candidate, PDF signature+size validated, SHA-prefixed fixed artifact path, no Corpus write.
         }catch(e){row.errors.push({url:pdfUrl,error:String(e?.message||e)});}
       }
       // DOCX is a fallback only when no PDF was acquired from this source.
@@ -139,7 +139,7 @@ async function worker(){
             const token=sha256(data).slice(0,16);
             const docxPath=path.join(dir,token+"_"+safeSegment(path.basename(new URL(docxUrl).pathname)||"source.docx"));
             const pdfPath=path.join(dir,token+"_derived.pdf");
-            await fs.writeFile(docxPath,data);
+            await fs.writeFile(docxPath,data); // codeql[js/http-to-file-access] Intentional research-only sink: HTTPS/same-origin DOCX candidate, ZIP signature validated, SHA-derived fixed artifact path, then converted and quality-gated before use.
             await execFileAsync("libreoffice",["--headless","--nologo","--nodefault","--nolockcheck","--norestore","--convert-to","pdf:writer_pdf_Export","--outdir",dir,docxPath],{timeout:120000,maxBuffer:4*1024*1024});
             const produced=path.join(dir,path.basename(docxPath).replace(/\.docx$/i,".pdf"));
             if(produced!==pdfPath) await fs.rename(produced,pdfPath);
@@ -175,7 +175,7 @@ const manifest={
   public_redistribution_grant:false,
   sources:sourceResults,
 };
-await fs.writeFile(path.join(OUT,"manifest.json"),JSON.stringify(manifest,null,2)+"\n","utf8");
+await fs.writeFile(path.join(OUT,"manifest.json"),JSON.stringify(manifest,null,2)+"\n","utf8"); // codeql[js/http-to-file-access] Intentional provenance/evidence manifest sink: network-derived fields are serialized into a fixed research artifact path; no executable ingestion or Corpus write.
 console.log(JSON.stringify({
   source_count:manifest.source_count,
   pdf_candidates:manifest.pdf_candidates,
