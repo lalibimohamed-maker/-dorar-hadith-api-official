@@ -176,7 +176,7 @@ PY
         run: |
           set -euo pipefail
           if ! find artifacts/rechercher/multilingual-research-vault -type f \( -name "*.pdf" -o -name "*.docx" \) -print -quit | grep -q .; then
-            echo "No research-only PDFs to persist."
+            echo "No research-only source files to persist."
             exit 0
           fi
           test -n "${SECONDARY_STORAGE_TOKEN:-}" || {
@@ -244,7 +244,7 @@ PY
           done < "$release_root/files.nul"
           echo "SECONDARY_RELEASE_INPUTS total=$count new=$new_count duplicates_skipped=$duplicate_count"
           if [ "$new_count" -eq 0 ]; then
-            echo "SECONDARY_RELEASE_NOOP all_research_only_pdfs_already_persisted=true"
+            echo "SECONDARY_RELEASE_NOOP all_research_only_source_files_already_persisted=true"
             rm -rf "$release_root"
             exit 0
           fi
@@ -295,7 +295,7 @@ PY
           manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
           test -s "$manifest"
           python3 - "$release_root" <<'PY'
-          import json, os, shutil, hashlib, sys
+          import json, os, shutil, hashlib, sys, re
           m=json.load(open("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json",encoding="utf-8"))
           root=os.path.abspath("artifacts/rechercher/multilingual-pdf-acquisition")
           out=os.path.abspath(os.path.join(sys.argv[1],"assets"))
@@ -320,7 +320,7 @@ PY
                   rows.append((cell_id,name,sha,os.path.getsize(full),fmt))
           with open(os.path.join(os.path.dirname(out),"asset-manifest.tsv"),"w",encoding="utf-8") as fp:
               for row in rows: fp.write("\t".join(map(str,row))+"\n")
-          print(f"PUBLIC_RELEASE_INPUTS pdfs={len(rows)}")
+          print(f"PUBLIC_RELEASE_INPUTS source_files={len(rows)}")
           PY
           # Global SHA-256 release deduplication: inspect every existing Release asset digest
           # before creating a new release. GitHub exposes the asset digest on the Releases API.
@@ -335,7 +335,7 @@ PY
           )
           echo "MATRIX_EXISTING_SHA_COUNT=${#existing_sha[@]}"
 
-          mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f -name '*.pdf' -print | sort)
+          mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f \( -name '*.pdf' -o -name '*.docx' \) -print | sort)
           total="${#assets[@]}"
           if [ "$total" -eq 0 ]; then
             echo "No public redistributable source files to persist."
@@ -357,7 +357,7 @@ PY
           total_new="${#new_assets[@]}"
           echo "MATRIX_RELEASE_INPUTS total=$total new=$total_new duplicates_skipped=$duplicate_count"
           if [ "$total_new" -eq 0 ]; then
-            echo "MATRIX_RELEASE_NOOP all_public_pdfs_already_persisted=true"
+            echo "MATRIX_RELEASE_NOOP all_public_source_files_already_persisted=true"
             rm -rf "$release_root"
             exit 0
           fi
@@ -377,7 +377,7 @@ PY
               echo "Cells: 133 languages × 24 domains = 3,192."
               echo "Only manifest entries classified as public are included."
               echo "When a cell had no PDF, an original DOCX may be paired with a derived PDF."
-              echo "Canonical plaintext PDFs only; no LFS and no encrypted PDF artifacts."
+              echo "Original DOCX and plaintext PDF assets only; no LFS and no encrypted artifacts."
               echo "Asset count: $((end-i))."
               echo "Global SHA-256 deduplication is enforced against all existing Releases before upload."
             } > "$notes"
