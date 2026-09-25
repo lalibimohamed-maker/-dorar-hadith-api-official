@@ -347,7 +347,7 @@ const manifest={
     research_only:'only explicit read-copy/read-only evidence; never public',
     rights_unclear:'metadata preserved; no file publication or mirroring',
     discovery_is_not_permission:true,canonical_arabic_separate:true,machine_translation_never_promoted:true,
-    no_new_pdf_enc:true,corpus_write:false,
+    no_new_pdf_enc:true,corpus_write:false,promoteToCorpus:false,
     source_format_priority:'pdf-first; docx-only fallback when no eligible PDF exists',
     docx_original_retained:true,derived_pdf_created:true,derived_pdf_is_not_source_original:true
   },
