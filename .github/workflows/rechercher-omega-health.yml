@@ -1,0 +1,80 @@
+name: Rechercher — Omega health
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+  pull_request:
+    paths:
+      - "src/rechercher-omega-*.js"
+      - "test/rechercher-omega-*.test.js"
+      - "config/rechercher-omega-*.json"
+      - "docs/RECHERCHER-OMEGA-*.md"
+      - ".github/workflows/rechercher-omega-health.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */4 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-omega-health
+  cancel-in-progress: true
+
+jobs:
+  health:
+    name: Omega contract health
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax health
+        run: npm run health
+
+      - name: Omega execution, adapter and Phase 3 contracts
+        run: >
+          node --test
+          test/rechercher-omega-execution-router.test.js
+          test/rechercher-omega-adapters.test.js
+          test/rechercher-omega-phase3.test.js
+
+      - name: Verify no runtime credentials are exposed
+        env:
+          GEMINI_API_KEY: ""
+          GROQ_API_KEY: ""
+          HF_TOKEN: ""
+        run: >
+          node --input-type=module -e
+          "import('./src/rechercher-omega-adapters.js').then(async m => {
+          for (const backend of ['gemini-free-tier','groq-free-plan','huggingface-inference']) {
+          try { await m.buildAdapterRequest({backend, model:'health-check', input:{}}); }
+          catch (e) { if (!String(e.message).includes('credentials are missing')) throw e; }
+          }
+          })"
+
+      - name: Enforce fail-closed execution policy
+        run: >
+          node --input-type=module -e
+          "import('./src/rechercher-omega-runtime-gate.js').then(m => {
+          const gate = m.buildRuntimeGate({
+          task:'health-check',
+          model:'health-check',
+          capabilities:['text'],
+          availableBackends:['local','huggingface-inference'],
+          });
+          m.assertRuntimeGate(gate);
+          if (gate.paid_fallback_allowed || gate.corpus_write_allowed) process.exit(1);
+          console.log(JSON.stringify(gate,null,2));
+          })"
