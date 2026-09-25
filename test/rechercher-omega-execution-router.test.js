@@ -45,7 +45,7 @@ test("router queues when no eligible backend exists", async () => {
     model: "wan2.2",
     availableBackends: ["unavailable-backend"]
   });
-  assert.equal(plan.status, "ready");
+  assert.equal(plan.status, "queued");
   assert.equal(plan.corpus_write_allowed, false);
 });
 
