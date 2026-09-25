@@ -388,18 +388,27 @@ async function downloadDocx(url,dest){
 async function convertDocxToPdf(docxPath,pdfPath){
   const outdir=path.dirname(pdfPath);
   await fs.mkdir(outdir,{recursive:true});
-  await execFileAsync('libreoffice',[
-    '--headless','--convert-to','pdf:writer_pdf_Export','--outdir',outdir,docxPath
-  ],{timeout:DOWNLOAD_TIMEOUT,maxBuffer:4*1024*1024});
-  const produced=path.join(outdir,path.basename(docxPath).replace(/\.docx$/i,'.pdf'));
-  if(produced!==pdfPath) await fs.rename(produced,pdfPath);
-  const st=await fs.stat(pdfPath);
-  if(st.size<=0) throw new Error('DOCX conversion produced an empty PDF');
-  const first=Buffer.alloc(5),fh=await fs.open(pdfPath,'r');
-  try{await fh.read(first,0,5,0);}finally{await fh.close();}
-  if(first.toString() !== '%PDF-') throw new Error('DOCX conversion did not produce a PDF');
-  const q=await execFileAsync('qpdf',['--check','--warning-exit-0',pdfPath],{timeout:30000,maxBuffer:2*1024*1024});
-  return {bytes:st.size,stdout:q.stdout||'',stderr:q.stderr||''};
+  const profile=path.join(outdir,'.libreoffice-profile-'+createHash('sha1').update(docxPath).digest('hex').slice(0,12));
+  await fs.mkdir(profile,{recursive:true});
+  try{
+    const profileUrl='file://'+profile.replace(/\\/g,'/');
+    await execFileAsync('libreoffice',[
+      '--headless','--nologo','--nodefault','--nolockcheck','--norestore',
+      '-env:UserInstallation='+profileUrl,
+      '--convert-to','pdf:writer_pdf_Export','--outdir',outdir,docxPath
+    ],{timeout:DOWNLOAD_TIMEOUT,maxBuffer:4*1024*1024});
+    const produced=path.join(outdir,path.basename(docxPath).replace(/\.docx$/i,'.pdf'));
+    if(produced!==pdfPath) await fs.rename(produced,pdfPath);
+    const st=await fs.stat(pdfPath);
+    if(st.size<=0) throw new Error('DOCX conversion produced an empty PDF');
+    const first=Buffer.alloc(5),fh=await fs.open(pdfPath,'r');
+    try{await fh.read(first,0,5,0);}finally{await fh.close();}
+    if(first.toString() !== '%PDF-') throw new Error('DOCX conversion did not produce a PDF');
+    const q=await execFileAsync('qpdf',['--check','--warning-exit-0',pdfPath],{timeout:30000,maxBuffer:2*1024*1024});
+    return {bytes:st.size,stdout:q.stdout||'',stderr:q.stderr||''};
+  }finally{
+    await fs.rm(profile,{recursive:true,force:true});
+  }
 }
 
 async function processCell(row){
