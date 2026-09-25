@@ -30,7 +30,7 @@ for(const [key,entry] of Object.entries(cells)){
     const deduplicatedReference=isDeduplicatedReference(file);
     if(file?.deduplicated===true&&!deduplicatedReference)err('deduplication_reference_missing',{key,duplicate_of:file?.duplicate_of});
     if(!deduplicatedReference&&!isPhysicalSourceFile(file))err('unsupported_source_file_path',{key,path:file.path});
-    if(isPdfPath(file)&&String(file.path||'').toLowerCase().endsWith('.pdf.enc'))err('encrypted_pdf_forbidden',{key,path:file.path});
+    if(/\.pdf\.enc$/i.test(String(file.path||'')))err('encrypted_pdf_forbidden',{key,path:file.path});
     if(!deduplicatedReference && isPhysicalSourceFile(file)){
       const expectedFormat=isDocxPath(file)?'docx':'pdf';
       if(file.format && String(file.format).toLowerCase()!==expectedFormat)err('format_extension_mismatch',{key,path:file.path,format:file.format,expected:expectedFormat});
