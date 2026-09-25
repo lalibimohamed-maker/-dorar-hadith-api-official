@@ -46,7 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y qpdf poppler-utils
+          sudo apt-get install -y qpdf poppler-utils libreoffice
 
       - name: Fetch live #561 source registry
         run: |
@@ -147,7 +147,7 @@ jobs:
 
       - name: Persist acquired PDFs to protected Releases
         env:
-          GH_TOKEN: ${{ secrets.DINULLAH_PDF_STORAGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
           SECONDARY_STORAGE_TOKEN: ${{ secrets.DINULLAH_PDF_STORAGE_TOKEN }}
         run: |
           set -euo pipefail
@@ -196,6 +196,38 @@ jobs:
           gh release view "$tag" --repo "$PROTECTED_STORAGE_REPO" --json tagName,assets,url
           echo "PROTECTED_PDF_RELEASE_OK uploaded=$uploaded skipped_duplicates=$skipped"
           rm -rf "$release_root"
+
+      - name: Remove superseded .pdf.enc assets after successful PDF persistence
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(artifacts/*.pdf)
+          [ "${#files[@]}" -gt 0 ] || { echo "NO_NEW_PDFS_FOR_ENC_CLEANUP"; exit 0; }
+
+          python3 - <<'PY'
+          import json, os, re, subprocess
+          from pathlib import Path
+          repo=os.environ["PROTECTED_STORAGE_REPO"]
+          new_names=[p.name for p in Path("artifacts").glob("*.pdf")]
+          releases=json.loads(subprocess.check_output(["gh","api","--paginate",f"/repos/{repo}/releases?per_page=100"],text=True))
+          deleted=0
+          for rel in releases:
+              tag=rel["tag_name"]
+              for asset in rel.get("assets",[]):
+                  name=asset["name"]
+                  normalized=re.sub(r"^[0-9a-f]{64}_","",name,re.I)
+                  if not normalized.lower().endswith(".pdf.enc"):
+                      continue
+                  pdf_name=normalized[:-4]
+                  if pdf_name not in new_names:
+                      continue
+                  subprocess.run(["gh","release","delete-asset",tag,name,"--repo",repo,"--yes"],check=True)
+                  print(f"REMOVED_SUPERSEDED_PDF_ENC release={tag} asset={name} replacement={pdf_name}")
+                  deleted += 1
+          print(f"SUPERSEDED_PDF_ENC_REMOVED={deleted}")
+          PY
 
       - name: Upload run evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
