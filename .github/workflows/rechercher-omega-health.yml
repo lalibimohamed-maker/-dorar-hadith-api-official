@@ -9,6 +9,8 @@ on:
       - "src/rechercher-omega-*.js"
       - "test/rechercher-omega-*.test.js"
       - "config/rechercher-omega-*.json"
+      - "src/rechercher-omega-space-registry.js"
+      - "test/rechercher-omega-space-registry.test.js"
       - "docs/RECHERCHER-OMEGA-*.md"
       - ".github/workflows/rechercher-omega-health.yml"
   workflow_dispatch:
@@ -56,6 +58,7 @@ jobs:
           test/rechercher-omega-media-pipeline.test.js
           test/rechercher-omega-video-studio.test.js
           test/rechercher-omega-video-orchestrator.test.js
+          test/rechercher-omega-space-registry.test.js
 
       - name: Verify Global Deep Research Radar is fail-closed
         run: >
