@@ -1,73 +1,104 @@
 # Roadmap to the Peak
 
-## Phase 0 — Foundation
+The canonical scope is locked in [Dinullah Platform Scope](./DINULLAH-PLATFORM-SCOPE.md).
+
+## Permanent architecture
+
+`Global Sources → Source Graph → Provenance / W3C PROV → Work / Edition / Author / Scholar Graph → Evidence Graph → Curated Corpus → Knowledge Graph → Multilingual Search → Research API → SDK → CLI → MCP → Datasets → Digital Library`
+
+## V1 — Foundation
+
 - [x] System Layer separated from curated Corpus.
-- [x] Source/provenance/rights concepts.
+- [x] Source, provenance and rights concepts.
 - [x] PDF validation and SHA-256 pipeline.
 - [x] DOCX to validated PDF fallback.
-- [x] Matrix target: 133 x 24 = 3,192 cells.
+- [x] Matrix target: 133 × 24 = 3,192 cells.
 - [x] Quran-specific acquisition/API layer.
 - [x] Continuous book acquisition architecture.
 - [x] Open-source governance metadata.
 
-## Phase 1 — Public developer product
-- [ ] Stable live API endpoint.
-- [ ] OpenAPI 3.1/3.2-compatible specification with real server URLs.
-- [ ] Interactive API documentation.
-- [ ] Postman collection.
-- [ ] Public examples and quickstarts.
+## V2 — Global Source Graph
+
+- [x] Worldwide source-link registry.
+- [x] Source relationship graph.
+- [ ] Federated Discovery Engine with evidence-preserving source expansion.
+- [ ] Source Observatory.
+- [ ] Source health, capability and change monitoring.
+- [ ] Cross-source work/edition discovery.
+- [ ] Source-level and item-level rights observability.
+
+## V3 — Provenance + Evidence Graph
+
+- [x] W3C PROV-compatible provenance foundation.
+- [ ] Full Claim → Evidence → Source → Work → Edition → Page → Passage model.
+- [ ] Citation-level evidence API.
+- [ ] Reproducible acquisition manifests connected to every digital object.
+- [ ] Provenance and evidence consistency tests.
+
+## V4 — Edition & Digital Library Graph
+
+- [ ] Work / Edition / Volume / DigitalObject graph.
+- [ ] Author / Scholar graph with attributed evidence.
+- [ ] Edition deduplication and entity resolution.
+- [ ] IIIF interoperability.
+- [ ] OCR / ALTO where source quality permits.
+- [ ] METS-style digital-object packaging where useful.
+- [ ] TEI exports for curated scholarly text.
+- [ ] Page, volume, edition and derivative relationships.
+
+## V5 — Multilingual Research Engine
+
+- [x] 133 × 24 = 3,192-cell foundation.
+- [ ] Cross-source multilingual discovery.
+- [ ] Cross-language concept matching.
+- [ ] Language-aware edition and translation linking.
+- [ ] Source Recall benchmark.
+- [ ] Edition Recall benchmark.
+- [ ] Language Coverage benchmark.
+- [ ] Citation Accuracy benchmark.
+
+## V6 — Research API + SDK + CLI
+
+- [ ] Stable research API.
+- [ ] OpenAPI specification.
+- [ ] `findWork`.
+- [ ] `findEdition`.
+- [ ] `findAuthor`.
+- [ ] `findEvidence`.
+- [ ] `findTranslations`.
+- [ ] `findSources`.
+- [ ] `traceProvenance`.
+- [ ] `compareEditions`.
+- [ ] `searchMultilingual`.
+- [ ] `findRelatedSources`.
 - [ ] JavaScript/TypeScript SDK.
 - [ ] Python SDK.
 - [ ] CLI.
 
-## Phase 2 — Canonical knowledge model
-- [ ] Stable IDs for Person, Work, Edition, Volume, Source and Evidence.
-- [ ] Edition graph.
-- [ ] Scholar authority records.
-- [ ] External identifier mapping.
-- [ ] JSON-LD/RDF exports.
-- [ ] Entity-resolution tests.
+## V7 — MCP + Agent Interoperability
 
-## Phase 3 — Research infrastructure
-- [ ] Hadith evidence graph.
-- [ ] Narrator/rijal graph.
-- [ ] Quran research graph.
-- [ ] Citation-level evidence API.
-- [ ] W3C-PROV-compatible provenance exports.
-- [ ] Reproducible acquisition manifests.
-
-## Phase 4 — Digital library
-- [ ] IIIF manifests.
-- [ ] OCR + ALTO where source quality permits.
-- [ ] METS-style digital-object packaging where useful.
-- [ ] TEI exports for curated scholarly text.
-- [ ] Page/volume/edition relationships.
-
-## Phase 5 — Global source observatory
-- [ ] Source health monitoring.
-- [ ] API/PDF/DOCX capability detection.
-- [ ] Rights-state monitoring.
-- [ ] Last-verified timestamps.
-- [ ] Acquisition success/failure metrics.
-- [ ] Source coverage dashboard.
-
-## Phase 6 — Distribution
-- [ ] Immutable release snapshots.
-- [ ] DOI-backed scholarly snapshots.
-- [ ] JSONL/Parquet/SQLite datasets.
-- [ ] Public datasets only where rights permit.
-- [ ] Protected/review queues for uncertain rights.
-
-## Phase 7 — AI interoperability
 - [ ] Evidence-first retrieval tools.
 - [ ] MCP server.
-- [ ] Citation/provenance-preserving agent responses.
-- [ ] Retrieval benchmarks.
-- [ ] Arabic OCR benchmark.
+- [ ] Citation-preserving agent responses.
+- [ ] Provenance-preserving agent responses.
+- [ ] Retrieval benchmark suite.
 - [ ] Multilingual Islamic retrieval benchmark.
+- [ ] Arabic OCR benchmark.
 
-## Success definition
+## V8 — Public Islamic Research Infrastructure
 
-Another researcher, library or developer should be able to discover a source, identify the exact work/edition, retrieve evidence, inspect provenance and rights, reproduce validation, cite the exact version and consume the same data through API, dataset or interoperable formats.
+- [ ] Stable release snapshots.
+- [ ] Offline Islamic Data Commons.
+- [ ] JSONL / JSON / CSV datasets.
+- [ ] SQLite datasets.
+- [ ] Parquet datasets.
+- [ ] TEI and JSON-LD exports.
+- [ ] Metadata/index/provenance distributions separated from rights-restricted content.
+- [ ] Public Source Observatory.
+- [ ] Reproducibility reports.
 
-Stars are an outcome, not a quality gate.
+## Definition of completion
+
+A researcher, library or developer should be able to discover a source, identify the exact work and edition, trace the evidence to a page or passage, inspect provenance and rights, reproduce validation, and consume the governed result through search, API, SDK, CLI, MCP, dataset or digital-library interfaces.
+
+The project optimizes for traceability before scale. Popularity is not an engineering or scholarly quality gate.
