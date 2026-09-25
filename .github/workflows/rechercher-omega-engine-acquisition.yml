@@ -1,0 +1,75 @@
+name: Rechercher Omega — acquire starter engines
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - "config/rechercher-omega-engine-acquisition.json"
+      - ".github/workflows/rechercher-omega-engine-acquisition.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "30 2 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-omega-engine-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquire:
+    name: Acquire ${{ matrix.logical_id }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - logical_id: qwen3
+            model_id: Qwen/Qwen3-0.6B
+            revision: main
+          - logical_id: paddleocr-vl
+            model_id: PaddlePaddle/PaddleOCR-VL
+            revision: main
+    steps:
+      - name: Install Hugging Face Hub client
+        run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Acquire model weights
+        env:
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ matrix.revision }}
+          OUT_DIR: ${{{ github.workspace }/engine-${{ matrix.logical_id }}
+        run: |
+          set -euo pipefail
+          rm -rf "$OUT_DIR"
+          mkdir -p "$OUT_DIR"
+          hf download "$MODEL_ID" --revision "$REVISION" --local-dir "$OUT_DIR"
+          find "$OUT_DIR" -type f -print0 | sort -z | xargs -0 sha256sum > "$OUT_DIR/SHA256SUMS"
+          python3 - <<'PY'
+          import json, os, pathlib
+          out = pathlib.Path(os.environ["OUT_DIR"])
+          files = [{"path":str(p.relative_to(out)),"bytes":p.stat().st_size} for p in sorted(out.rglob("*")) if p.is_file() and p.name != "acquisition.json"]
+          (out/"acquisition.json").write_text(json.dumps({"model_id":os.environ["MODEL_ID"],"revision":os.environ["REVISION"],"files":files},ensure_ascii=False,indent=2)+"\n")
+          PY
+
+      - name: Verify downloaded manifest
+        env:
+          OUT_DIR: ${{{ github.workspace }/engine-${{ matrix.logical_id }}
+        run: |
+          set -euo pipefail
+          test -s "$OUT_DIR/SHA256SUMS"
+          test -s "$OUT_DIR/acquisition.json"
+          sha256sum -c "$OUT_DIR/SHA256SUMS"
+          test "$(find "$OUT_DIR" -type f | wc -l)" -gt 2
+
+      - name: Upload engine artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: rechercher-omega-engine-${{ matrix.logical_id }}
+          path: engine-${{ matrix.logical_id }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
