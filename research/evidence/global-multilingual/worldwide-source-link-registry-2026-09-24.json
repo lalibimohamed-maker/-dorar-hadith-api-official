@@ -1,0 +1,23 @@
+{
+  "schema": "rechercher/worldwide-source-link-registry/v1",
+  "generated_from": "scripts/rechercher_deep_worldwide.py",
+  "generated_at": "2026-09-24",
+  "scope": "global multilingual discovery",
+  "source_count": 13,
+  "sources": [
+    {"id":"worldcat","url":"https://search.worldcat.org/","role":"global-library-identity","acquisition":false},
+    {"id":"hathitrust","url":"https://catalog.hathitrust.org/","role":"library-identity-and-digital-access","acquisition":false},
+    {"id":"dpla","url":"https://dp.la/","role":"aggregated-cultural-heritage-metadata","acquisition":false},
+    {"id":"europeana","url":"https://www.europeana.eu/","role":"aggregated-cultural-heritage-metadata-and-iiif","acquisition":false},
+    {"id":"openiti_kitab","url":"https://kitab-corpus-metadata.azurewebsites.net/","role":"arabic-text-identity-and-version-metadata","acquisition":false},
+    {"id":"openiti_github","url":"https://github.com/OpenITI/RELEASE","role":"machine-readable-arabic-corpus-evidence","acquisition":false},
+    {"id":"internet_archive","url":"https://archive.org/","role":"digital-copy-candidate","acquisition":true},
+    {"id":"openlibrary","url":"https://openlibrary.org/","role":"edition-and-digital-identifier","acquisition":false},
+    {"id":"library_of_congress","url":"https://www.loc.gov/","role":"national-library-identity","acquisition":false},
+    {"id":"google_books","url":"https://books.google.com/","role":"bibliographic-and-viewability-evidence","acquisition":false},
+    {"id":"crossref","url":"https://www.crossref.org/","role":"bibliographic-and-license-metadata","acquisition":false},
+    {"id":"openalex","url":"https://api.openalex.org/works","role":"scholarly-work-identity-open-access-and-citation-discovery","acquisition":false},
+    {"id":"opencitations","url":"https://api.opencitations.net/","role":"scholarly-citation-and-bibliographic-enrichment","acquisition":false}
+  ],
+  "policy": "Discovery routes do not grant redistribution rights. Exact edition, provenance and rights evidence remain mandatory; discovery sources never write directly to Corpus."
+}
