@@ -24,14 +24,14 @@ export function createProvDocument({runId='local',tool='DinAllah-Rechercher'}={}
     hadPrimarySource:{},
     wasDerivedFrom:{}
   };
-  doc['din:run_id']=String(runId);
+  Object.defineProperty(doc,'_runId',{value:String(runId),enumerable:false,writable:false});
   return doc;
 }
 
 function ensureMap(doc,key){if(!doc[key])doc[key]={};return doc[key];}
 
 export function recordAcquisition(doc, info){
-  const runId=clean(info.runId||doc['din:run_id']||'local');
+  const runId=clean(info.runId||doc._runId||'local');
   const sha=String(info.sha256||'').toLowerCase();
   if(!/^[a-f0-9]{64}$/.test(sha)) throw new Error('invalid SHA-256 for provenance');
   const stamp=new Date(info.acquiredAt||Date.now()).toISOString();
@@ -43,7 +43,7 @@ export function recordAcquisition(doc, info){
   const activity=ensureMap(doc,'activity'),entity=ensureMap(doc,'entity'),agent=ensureMap(doc,'agent');
   const sourceAgentId=`din:agent:source:${source}`;
   agent[sourceAgentId]={
-    'prov:type':'prov:Organization',
+    'prov:type':'prov:Agent',
     'prov:label':String(info.sourceLabel||info.sourceId)
   };
   activity[activityId]={
@@ -133,7 +133,7 @@ export async function writeProvDocument(doc,{bundlePath,eventsPath}){
   await fs.writeFile(bundlePath,text,'utf8');
   const events=[];
   for(const [id,a] of Object.entries(doc.activity||{})){
-    events.push(JSON.stringify({id,type:a['prov:type'],startTime:a['prov:startTime'],endTime:a['prov:endTime'],cell_id:a['din:cell_id']||null,source_id:a['din:source_id']||null,run_id:a['din:run_id']||doc['din:run_id']||null}));
+    events.push(JSON.stringify({id,type:a['prov:type'],startTime:a['prov:startTime'],endTime:a['prov:endTime'],cell_id:a['din:cell_id']||null,source_id:a['din:source_id']||null,run_id:a['din:run_id']||doc._runId||null}));
   }
   await fs.writeFile(eventsPath,events.join('\n')+(events.length?'\n':''),'utf8');
   return {activities:Object.keys(doc.activity||{}).length,entities:Object.keys(doc.entity||{}).length};
