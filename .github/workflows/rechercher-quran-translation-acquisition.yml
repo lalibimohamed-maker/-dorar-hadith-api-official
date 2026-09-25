@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - 'rechercher-quran-official-api-registry-2026-09-22'
+  schedule:
+    - cron: '11 */6 * * *'
 
 concurrency:
   group: rechercher-quran-quranenc-acquisition-${{ github.ref }}
@@ -43,6 +45,28 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - name: Load live Quran source registry from PR #561
+        env:
+          GH_TOKEN: ${{ github.token }}
+          QURAN_SOURCE_REGISTRY_REF: feat/rechercher-worldwide-source-link-registry-2026-09-24
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          gh api "repos/$GITHUB_REPOSITORY/contents/research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json?ref=$QURAN_SOURCE_REGISTRY_REF" --jq '.content' | tr -d '\n' | base64 --decode > artifacts/quran-live-source-registry.json
+          test -s artifacts/quran-live-source-registry.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const m = JSON.parse(fs.readFileSync('artifacts/quran-live-source-registry.json','utf8'));
+          if (!Array.isArray(m.sources) || m.sources.length < 1) throw new Error('PR #561 registry is empty');
+          console.log(`Loaded PR #561 live registry: ${m.sources.length} source links`);
+          NODE
+
+      - name: Acquire Quran PDFs from all Quran-scoped PR #561 sources
+        run: node scripts/rechercher-quran-live-source-acquisition.mjs
+        env:
+          QURAN_SOURCE_MAX_PDFS_PER_SOURCE: 5
+          QURAN_SOURCE_MAX_SOURCES: 1000
+
       - name: Acquire all catalogued QuranEnc editions
         run: node scripts/rechercher-acquire-quranenc-translations.mjs
         env:
