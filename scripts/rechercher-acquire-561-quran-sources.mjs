@@ -13,7 +13,7 @@ const OUT=path.join(ROOT,"artifacts/quran-561-registry-acquisition");
 const MAX_SOURCE_BYTES=3*1024*1024;
 const MAX_PDFS_PER_SOURCE=30;
 const MAX_DEPTH=2;
-const MAX_SOURCES=Math.max(1,Math.min(128,Number(process.env.QURAN_561_MAX_SOURCES||128)));
+const MAX_SOURCES=Math.max(1,Math.min(256,Number(process.env.QURAN_561_MAX_SOURCES||256)));
 const CONCURRENCY=Math.max(1,Math.min(8,Number(process.env.QURAN_561_CONCURRENCY||6)));
 
 function sha256(data){return crypto.createHash("sha256").update(data).digest("hex");}
