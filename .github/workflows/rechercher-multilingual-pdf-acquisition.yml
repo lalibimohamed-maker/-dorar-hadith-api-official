@@ -128,17 +128,17 @@ jobs:
                   ;;
                 *.docx)
                   python3 - "$f" <<'PY'
-import sys, zipfile
-p=sys.argv[1]
-if not zipfile.is_zipfile(p):
-    raise SystemExit(f"ERROR: invalid DOCX container: {p}")
-with zipfile.ZipFile(p) as z:
-    names=set(z.namelist())
-    required={"[Content_Types].xml","word/document.xml"}
-    missing=required-names
-    if missing:
-        raise SystemExit(f"ERROR: invalid DOCX structure {p}: missing={sorted(missing)}")
-print(f"DOCX_OK {p}")
+          import sys, zipfile
+          p=sys.argv[1]
+          if not zipfile.is_zipfile(p):
+          raise SystemExit(f"ERROR: invalid DOCX container: {p}")
+          with zipfile.ZipFile(p) as z:
+          names=set(z.namelist())
+          required={"[Content_Types].xml","word/document.xml"}
+          missing=required-names
+          if missing:
+          raise SystemExit(f"ERROR: invalid DOCX structure {p}: missing={sorted(missing)}")
+          print(f"DOCX_OK {p}")
 PY
                   ;;
               esac
@@ -193,12 +193,12 @@ PY
             case "$file" in
               *.pdf) test "$(head -c 5 "$file")" = "%PDF-" ;;
               *.docx) python3 - "$file" <<'PY'
-import sys, zipfile
-p=sys.argv[1]
-assert zipfile.is_zipfile(p), p
-with zipfile.ZipFile(p) as z:
-    names=set(z.namelist())
-    assert "[Content_Types].xml" in names and "word/document.xml" in names, p
+          import sys, zipfile
+          p=sys.argv[1]
+          assert zipfile.is_zipfile(p), p
+          with zipfile.ZipFile(p) as z:
+          names=set(z.namelist())
+          assert "[Content_Types].xml" in names and "word/document.xml" in names, p
 PY
                 ;;
             esac
