@@ -24,6 +24,9 @@ import math
 import os
 import re
 import subprocess
+import shutil
+import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import quote, urljoin, urlsplit, urlunsplit
@@ -42,6 +45,10 @@ DOWNLOAD_TIMEOUT = 120
 MAX_SOURCE_ATTEMPTS = max(12, int(os.environ.get("RECHERCHER_MAX_SOURCE_ATTEMPTS", "24")))
 MAX_BOOK_WORKERS = max(1, min(int(os.environ.get("RECHERCHER_MAX_BOOK_WORKERS", "12")), 32))
 REEVALUATE_EXISTING = os.environ.get("RECHERCHER_REEVALUATE_EXISTING", "0") == "1"
+ENGINE_B_ENABLED = os.environ.get("RECHERCHER_ENGINE_B", "1") == "1"
+ENGINE_B_DB = ART / "engine-b" / "tasks.sqlite"
+_ENGINE_B_PROC = None
+_ENGINE_B_LOCK = threading.Lock()
 
 
 def book_key(book):
@@ -115,9 +122,61 @@ def sha256(path):
     return subprocess.check_output(["sha256sum", str(path)], text=True).split()[0]
 
 
+def _engine_b_start():
+    global _ENGINE_B_PROC
+    with _ENGINE_B_LOCK:
+        if _ENGINE_B_PROC is not None and _ENGINE_B_PROC.poll() is None:
+            return
+        ENGINE_B_DB.parent.mkdir(parents=True, exist_ok=True)
+        _ENGINE_B_PROC = subprocess.Popen([
+            "python3", str(ROOT / "scripts" / "rechercher_downloader_engine_b.py"),
+            "--db", str(ENGINE_B_DB),
+            "--workers", os.environ.get("ENGINE_B_WORKERS", "8"),
+            "--connections-per-file", os.environ.get("ENGINE_B_CONNECTIONS_PER_FILE", "8"),
+        ], cwd=str(ROOT))
+        print(f"ENGINE_B_STARTED pid={_ENGINE_B_PROC.pid}", flush=True)
+
+
+def _engine_b_enqueue(url, path):
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from rechercher_download_task_registry import enqueue, get_task
+    tid = enqueue(ENGINE_B_DB, url, str(path))
+    _engine_b_start()
+    return tid, get_task(ENGINE_B_DB, tid)
+
+
+def _engine_b_wait(tid, requested_path, timeout=21600):
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from rechercher_download_task_registry import get_task
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        task = get_task(ENGINE_B_DB, tid)
+        if not task:
+            raise RuntimeError(f"engine-b-task-missing:{tid}")
+        if task["status"] == "completed":
+            actual = Path(task["output_path"])
+            if not actual.exists():
+                raise RuntimeError(f"engine-b-output-missing:{actual}")
+            requested = Path(requested_path)
+            if actual.resolve() != requested.resolve():
+                requested.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(actual, requested)
+            return
+        if task["status"] == "failed":
+            raise RuntimeError(f"engine-b-download-failed:{task.get('last_error')}")
+        time.sleep(1)
+    raise TimeoutError(f"engine-b-timeout:{tid}")
+
+
 def download(url, path):
     if re.search(r"\.pdf\.enc(?:\?|$)", url, re.I):
         raise ValueError("encrypted .pdf.enc candidate rejected; Rechercher requires a real .pdf")
+    if ENGINE_B_ENABLED:
+        tid, _ = _engine_b_enqueue(url, path)
+        _engine_b_wait(tid, path)
+        return
     subprocess.run([
         "curl", "-L", "--fail", "--retry", "5", "--retry-delay", "2",
         "--connect-timeout", "30", "--max-time", str(DOWNLOAD_TIMEOUT),
@@ -409,6 +468,7 @@ def main():
     books = load_books()
     print(f"=== Rechercher independent real-PDF engine: {len(books)} unique books, {MAX_BOOK_WORKERS} workers ===", flush=True)
     summary = []
+    print(f"RECHERCHER_ENGINE_B={'ENABLED' if ENGINE_B_ENABLED else 'DISABLED'}", flush=True)
     with ThreadPoolExecutor(max_workers=MAX_BOOK_WORKERS, thread_name_prefix="rechercher-pdf") as pool:
         futures = {pool.submit(acquire, book): book for book in books}
         for future in as_completed(futures):
@@ -419,6 +479,8 @@ def main():
                 print(f"[RETRY] {book_key(book)}: unexpected error: {exc}", flush=True)
                 summary.append({"id": book_key(book), "status": "unexpected-error", "error": str(exc)})
     (ART / "acquisition-run-summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if _ENGINE_B_PROC is not None:
+        _ENGINE_B_PROC.wait(timeout=300)
     blocked = [x for x in summary if x.get("status") not in ("acquired",)]
     print(f"ENGINE_SUMMARY acquired={len(summary)-len(blocked)} blocked_or_failed={len(blocked)} total={len(summary)}", flush=True)
     if blocked:
