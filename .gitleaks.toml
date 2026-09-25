@@ -4,18 +4,18 @@ title = "Rechercher Ω reviewed Gitleaks exceptions"
 useDefault = true
 
 # Narrow, reviewed false-positive exception:
-# the historical findings are generic-api-key matches against a public Rwanda
-# government evidence URL whose token parameter is part of the published URL.
-# Scope is limited to the two known JSON evidence records and this URL shape.
+# these two historical findings are public Rwanda government evidence URLs
+# whose token query parameters are published as part of the evidence URL.
+# Scope is restricted to the exact historical commits and exact JSON paths.
 [[allowlists]]
-description = "Reviewed public Rwanda government evidence URL false positive"
+description = "Reviewed Rwanda government evidence URL false positives"
 targetRules = ["generic-api-key"]
 condition = "AND"
-regexTarget = "line"
+commits = [
+  "3fc525e539c2ecc3365bc41d65d1771eecedf0ae",
+  "bc5864376c6b4acb7242ea43d0276ba231f9d1e8"
+]
 paths = [
   '''^config/quran-multisource-translation-catalog-2026-09-22\.json$''',
   '''^config/quranenc-translation-provenance-2026-09-22\.json$'''
-]
-regexes = [
-  '''^.*https://www\.minijust\.gov\.rw/index\.php\?eID=dumpFile&f=77060&t=dumpFile&token=[0-9a-f]{40}.*$'''
 ]
