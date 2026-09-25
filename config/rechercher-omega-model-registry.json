@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Open multimodal model registry for Rechercher Ω. Models are interchangeable workers, never scholarly sources.",
+  "selection_policy": {
+    "principles": [
+      "Prefer local/open implementations over paid APIs.",
+      "Treat code license and model-weight license as separate fields.",
+      "Never infer license permissions from repository visibility alone.",
+      "Never let generated media become evidence for a scholarly claim.",
+      "Route by task, resource budget, provenance and quality gates."
+    ]
+  },
+  "models": [
+    {
+      "id": "qwen3",
+      "family": "reasoning",
+      "tasks": ["reasoning", "planning", "tool_use", "text"],
+      "source": "https://github.com/QwenLM/Qwen3",
+      "status": "candidate",
+      "license_review": "required"
+    },
+    {
+      "id": "qwen3-omni",
+      "family": "multimodal-understanding",
+      "tasks": ["text", "image", "audio", "video", "speech"],
+      "source": "https://github.com/QwenLM/Qwen3-Omni",
+      "status": "candidate",
+      "license_review": "required"
+    },
+    {
+      "id": "paddleocr-vl",
+      "family": "document-understanding",
+      "tasks": ["ocr", "document_layout", "tables", "multilingual_document_parsing"],
+      "source": "https://github.com/PaddlePaddle/PaddleOCR",
+      "status": "candidate",
+      "license_review": "required"
+    },
+    {
+      "id": "wan2.2",
+      "family": "video-generation",
+      "tasks": ["text_to_video", "image_to_video", "animation"],
+      "source": "https://github.com/Wan-Video/Wan2.2",
+      "status": "candidate",
+      "license_review": "required"
+    },
+    {
+      "id": "hunyuanvideo-1.5",
+      "family": "video-generation",
+      "tasks": ["text_to_video", "image_to_video"],
+      "source": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5",
+      "status": "candidate",
+      "license_review": "required"
+    },
+    {
+      "id": "ltx-2",
+      "family": "audio-video-generation",
+      "tasks": ["text_to_video", "image_to_video", "audio_video"],
+      "source": "https://github.com/Lightricks/LTX-2",
+      "status": "candidate",
+      "license_review": "required"
+    },
+    {
+      "id": "cogvideox",
+      "family": "video-generation",
+      "tasks": ["text_to_video", "image_to_video", "video_continuation"],
+      "source": "https://github.com/zai-org/CogVideo",
+      "status": "candidate",
+      "license_review": "required"
+    },
+    {
+      "id": "cosyvoice",
+      "family": "speech-generation",
+      "tasks": ["text_to_speech", "multilingual_speech"],
+      "source": "https://github.com/FunAudioLLM/CosyVoice",
+      "status": "candidate",
+      "license_review": "required"
+    },
+    {
+      "id": "sglang",
+      "family": "inference-runtime",
+      "tasks": ["model_serving", "batch_inference", "distributed_inference"],
+      "source": "https://github.com/sgl-project/sglang",
+      "status": "candidate",
+      "license_review": "required"
+    }
+  ]
+}
