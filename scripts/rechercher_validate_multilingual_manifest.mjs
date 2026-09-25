@@ -15,6 +15,7 @@ const add=v=>{try{const u=new URL(v);if(u.protocol==='https:')allowedOrigins.add
 for(const a of adapters.values()){for(const o of a.origins||[])add(o);add(a.base_url);add(a.api_base_url);}
 for(const s of sources.values())add(s.url);
 const cells=manifest.cells||manifest.languages||{},errors=[],warnings=[],err=(code,detail)=>errors.push({code,detail});
+const isDeduplicatedReference=file=>file?.deduplicated===true&&typeof file?.duplicate_of==='string'&&file.duplicate_of.length>0;
 for(const [key,entry] of Object.entries(cells)){
   if(!entry.language||!entry.domain)err('cell_identity_missing',key);
   for(const file of entry.files||[]){
@@ -23,14 +24,18 @@ for(const [key,entry] of Object.entries(cells)){
     else try{assertTrustedSource({url:file.url,allowedOrigins,sourceId:file.source});}catch{err('source_origin_not_allowlisted',{key,source:file.source,url:file.url});}
     if(!/^[a-f0-9]{64}$/.test(String(file.sha256||'')))err('sha256_invalid',{key,path:file.path});
     if(!Number.isInteger(file.bytes)||file.bytes<=0)err('size_invalid',{key,path:file.path});
-    if(!String(file.path||'').toLowerCase().endsWith('.pdf'))err('not_pdf_path',{key,path:file.path});
-    if(/\.pdf\.enc(?:$|\?)/i.test(String(file.path||'')))err('encrypted_pdf_forbidden',{key,path:file.path});
+    const deduplicatedReference=isDeduplicatedReference(file);
+    if(file?.deduplicated===true&&!deduplicatedReference)err('deduplication_reference_missing',{key,duplicate_of:file?.duplicate_of});
+    if(!deduplicatedReference&&!String(file.path||'').toLowerCase().endsWith('.pdf'))err('not_pdf_path',{key,path:file.path});
+    if(String(file.path||'').toLowerCase().endsWith('.pdf.enc'))err('encrypted_pdf_forbidden',{key,path:file.path});
     const v=validateEvidenceRecord({sourceId:file.source,url:file.url,provenance:file.provenance||file.source+':'+file.url,rightsStatus:file.rights||entry.rights,role:'original',promoteToCorpus:false});
     if(!v.valid)err('evidence_invalid',{key,path:file.path,errors:v.errors});
     if(file.promoteToCorpus===true)err('corpus_promotion_forbidden',{key,path:file.path});
   }
 }
 if(Object.keys(cells).length!==3192)err('matrix_cell_count_mismatch',{expected:3192,observed:Object.keys(cells).length});
-if(manifest.total_files!==undefined){const n=Object.values(cells).reduce((s,e)=>s+(e.files||[]).length,0);if(n!==manifest.total_files)err('total_files_mismatch',{declared:manifest.total_files,observed:n});}
-const result={schema:'rechercher/multilingual-manifest-validation/v3',cell_count:Object.keys(cells).length,total_files:Object.values(cells).reduce((s,e)=>s+(e.files||[]).length,0),errors,warnings,valid:errors.length===0};
+const fileRecords=Object.values(cells).flatMap(e=>e.files||[]);
+const physicalFiles=fileRecords.filter(file=>!isDeduplicatedReference(file)&&String(file.path||'').toLowerCase().endsWith('.pdf'));
+if(manifest.total_files!==undefined){const n=physicalFiles.length;if(n!==manifest.total_files)err('total_files_mismatch',{declared:manifest.total_files,observed:n});}
+const result={schema:'rechercher/multilingual-manifest-validation/v3',cell_count:Object.keys(cells).length,total_files:physicalFiles.length,file_records:fileRecords.length,errors,warnings,valid:errors.length===0};
 console.log(JSON.stringify(result,null,2));if(errors.length)process.exitCode=1;
