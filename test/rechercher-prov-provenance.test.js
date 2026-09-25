@@ -10,6 +10,7 @@ test('PROV profile uses the W3C namespace and Dinullah extension namespace', ()=
   assert.equal(doc.entity && typeof doc.entity,'object');
   assert.equal(doc.activity && typeof doc.activity,'object');
   assert.equal(doc.agent && typeof doc.agent,'object');
+  assert.equal(Object.prototype.hasOwnProperty.call(doc,'din:run_id'),false);
 });
 
 test('acquisition is represented as an activity using a source and generating a PDF entity', ()=>{
@@ -30,6 +31,10 @@ test('acquisition is represented as an activity using a source and generating a 
   assert.ok(doc.wasGeneratedBy);
   assert.ok(doc.hadPrimarySource);
   assert.ok(doc.wasAssociatedWith);
+  assert.ok(doc.wasAttributedTo);
+  const primary=Object.values(doc.hadPrimarySource)[0];
+  assert.equal(primary['prov:generatedEntity'],r.outputId);
+  assert.equal(primary['prov:usedEntity'],r.sourceId);
   assert.equal(validateProvShape(doc),true);
 });
 
