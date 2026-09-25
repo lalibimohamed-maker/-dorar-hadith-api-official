@@ -56,14 +56,16 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-      - name: Install PDF validator
-        run: sudo apt-get update && sudo apt-get install -y qpdf openssl
-      - name: Preflight PDF tooling
+      - name: Install PDF/DOCX validators and conversion tooling
+        run: sudo apt-get update && sudo apt-get install -y qpdf openssl libreoffice-writer fonts-noto-core
+      - name: Preflight PDF/DOCX tooling
         run: |
           set -euo pipefail
           node --version
           qpdf --version
           openssl version
+          libreoffice --version
+          python3 -c 'import zipfile; print("python-docx-container-check=available", zipfile.__name__)'
       - name: Build durable acquisition resume inventory from all matrix Releases
         env:
           MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
@@ -80,21 +82,28 @@ jobs:
               f"/repos/{repo}/releases?per_page=100"
           ], text=True)
           releases=json.loads(raw)
-          cells=set(); sha256=set(); assets=0
+          cells=set(); cells_docx=set(); sha256=set(); assets=0; pdf_assets=0; docx_assets=0
           for rel in releases:
               for a in rel.get("assets") or []:
                   name=str(a.get("name") or "")
-                  if a.get("state") != "uploaded" or not name.lower().endswith(".pdf"):
+                  low=name.lower()
+                  if a.get("state") != "uploaded" or not (low.endswith(".pdf") or low.endswith(".docx")):
                       continue
                   assets += 1
                   digest=str(a.get("digest") or "")
                   if digest.startswith("sha256:"):
                       sha256.add(digest.removeprefix("sha256:"))
                   cell=name.split("__",1)[0].strip()
-                  if cell: cells.add(cell)
-          data={"schema":"rechercher/multilingual-existing-release-inventory/v1",
+                  if low.endswith(".pdf"):
+                      pdf_assets += 1
+                      if cell: cells.add(cell)
+                  else:
+                      docx_assets += 1
+                      if cell: cells_docx.add(cell)
+          data={"schema":"rechercher/multilingual-existing-release-inventory/v2",
                 "repository":repo,"release_count":len(releases),"asset_count":assets,
-                "cells":sorted(cells),"sha256":sorted(sha256)}
+                "pdf_assets":pdf_assets,"docx_assets":docx_assets,"cells":sorted(cells),
+                "cells_docx":sorted(cells_docx),"sha256":sorted(sha256)}
           with open(sys.argv[1],"w",encoding="utf-8") as fp:
               json.dump(data,fp,ensure_ascii=False,indent=2); fp.write("\n")
           print(f"MATRIX_RESUME_INVENTORY releases={len(releases)} assets={assets} cells={len(cells)} sha256={len(sha256)}")
@@ -103,19 +112,38 @@ jobs:
         env:
           ACQUISITION_EXISTING_INVENTORY: ${{ runner.temp }}/existing-release-inventory.json
         run: node scripts/rechercher_acquire_multilingual_cell_pdfs.mjs
-      - name: Validate acquired PDFs
+      - name: Validate acquired PDF and DOCX originals
         run: |
           set -euo pipefail
           manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
           test -s "$manifest"
-          find artifacts/rechercher/multilingual-pdf-acquisition -type f -name '*.pdf' -print0 |
+          find artifacts/rechercher/multilingual-pdf-acquisition -type f \( -name '*.pdf' -o -name '*.docx' \) -print0 |
             while IFS= read -r -d '' f; do
-              test "$(head -c 4 "$f")" = "%PDF"
-              # qpdf exit 3 means warnings without errors; warnings are logged but are not a validation failure.
-              qpdf --check --warning-exit-0 "$f"
               test -s "$f"
+              case "$f" in
+                *.pdf)
+                  test "$(head -c 4 "$f")" = "%PDF"
+                  # qpdf exit 3 means warnings without errors; warnings are logged but are not a validation failure.
+                  qpdf --check --warning-exit-0 "$f"
+                  ;;
+                *.docx)
+                  python3 - "$f" <<'PY'
+import sys, zipfile
+p=sys.argv[1]
+if not zipfile.is_zipfile(p):
+    raise SystemExit(f"ERROR: invalid DOCX container: {p}")
+with zipfile.ZipFile(p) as z:
+    names=set(z.namelist())
+    required={"[Content_Types].xml","word/document.xml"}
+    missing=required-names
+    if missing:
+        raise SystemExit(f"ERROR: invalid DOCX structure {p}: missing={sorted(missing)}")
+print(f"DOCX_OK {p}")
+PY
+                  ;;
+              esac
             done
-      - name: Separate research-only PDFs from public material
+      - name: Separate research-only source files from public material
         run: |
           set -euo pipefail
           node <<'NODE'
@@ -124,7 +152,7 @@ jobs:
           for (const e of Object.values(m.cells || m.languages || {})) {
             if (e.acquisition !== 'research-only') continue;
             for (const f of e.files || []) {
-              if (!f.path.endsWith('.pdf')) continue;
+              if (!/\.(pdf|docx)$/i.test(String(f.path||''))) continue;
               const rel=f.path.replace(/^artifacts\/rechercher\/multilingual-pdf-acquisition\//,'');
               f.path='artifacts/rechercher/multilingual-research-vault/'+rel;
               f.research_only=true;
@@ -141,13 +169,13 @@ jobs:
           done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.cells || m.languages || {}))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
           echo "RESEARCH_ONLY_STORAGE=PRIVATE_DURABLE_STORAGE_REQUIRED"
 
-      - name: Persist research-only PDFs to protected GitHub Releases
+      - name: Persist research-only source files to protected GitHub Releases
         env:
           SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
           SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
         run: |
           set -euo pipefail
-          if ! find artifacts/rechercher/multilingual-research-vault -type f -name "*.pdf" -print -quit | grep -q .; then
+          if ! find artifacts/rechercher/multilingual-research-vault -type f \( -name "*.pdf" -o -name "*.docx" \) -print -quit | grep -q .; then
             echo "No research-only PDFs to persist."
             exit 0
           fi
@@ -162,7 +190,18 @@ jobs:
           find artifacts/rechercher/multilingual-research-vault -type f -name '*.pdf' -print0 > "$release_root/files.nul"
           count=0
           while IFS= read -r -d '' file; do
-            test "$(head -c 5 "$file")" = "%PDF-"
+            case "$file" in
+              *.pdf) test "$(head -c 5 "$file")" = "%PDF-" ;;
+              *.docx) python3 - "$file" <<'PY'
+import sys, zipfile
+p=sys.argv[1]
+assert zipfile.is_zipfile(p), p
+with zipfile.ZipFile(p) as z:
+    names=set(z.namelist())
+    assert "[Content_Types].xml" in names and "word/document.xml" in names, p
+PY
+                ;;
+            esac
             count=$((count+1))
           done < "$release_root/files.nul"
           if [ "$count" -eq 0 ]; then
@@ -174,7 +213,7 @@ jobs:
           {
             echo "# Rechercher protected multilingual PDFs"
             echo
-            echo "Research-only PDFs retained for developer/research review."
+            echo "Research-only original DOCX and/or verified PDFs retained for developer/research review."
             echo "No Corpus write. No public publication."
             echo "Canonical plaintext PDFs only; encrypted extensions are forbidden."
           } > "$notes"
@@ -227,7 +266,7 @@ jobs:
           done < "$release_root/files.nul"
           gh release view "$tag" --repo "$SECONDARY_STORAGE_REPO" --json tagName,isDraft,assets,url
           rm -rf "$release_root"
-          echo "SECONDARY_MULTILINGUAL_PDF_RELEASE_OK assets=$new_count tag=$tag"
+          echo "SECONDARY_MULTILINGUAL_SOURCE_RELEASE_OK assets=$new_count tag=$tag"
 
       - name: Verify cell download inventory
         run: |
@@ -235,7 +274,7 @@ jobs:
           manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
           node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));const cells=m.cells||m.languages||{};if(m.cell_count!==3192||Object.keys(cells).length!==3192)process.exit(1);for(const [id,e] of Object.entries(cells)){if(e.cell_id!==id||!e.language||!e.domain)process.exit(1)};console.log(`CELL_INVENTORY_OK cells=${Object.keys(cells).length} files=${m.total_files}`)' "$manifest"
 
-      - name: Reject encrypted review artifacts
+      - name: Reject encrypted review artifacts and validate source file extensions
         run: |
           set -euo pipefail
           if find artifacts/rechercher -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
@@ -243,7 +282,7 @@ jobs:
             exit 1
           fi
 
-      - name: Persist public multilingual PDFs to matrix GitHub Releases
+      - name: Persist public multilingual source files to matrix GitHub Releases
         env:
           MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
         run: |
@@ -266,7 +305,7 @@ jobs:
                   continue
               for item in e.get("files",[]):
                   p=item.get("path")
-                  if not p or not p.endswith(".pdf") or item.get("research_only"):
+                  if not p or not re.search(r"\.(pdf|docx)$", p, re.I) or item.get("research_only"):
                       continue
                   full=os.path.abspath(p)
                   if not full.startswith(root+os.sep) or not os.path.isfile(full):
@@ -277,7 +316,8 @@ jobs:
                   name=f"{cell_id}__{sha[:16]}__{os.path.basename(full)}"
                   dst=os.path.join(out,name)
                   shutil.copy2(full,dst)
-                  rows.append((cell_id,name,sha,os.path.getsize(full)))
+                  fmt="docx" if full.lower().endswith(".docx") else "pdf"
+                  rows.append((cell_id,name,sha,os.path.getsize(full),fmt))
           with open(os.path.join(os.path.dirname(out),"asset-manifest.tsv"),"w",encoding="utf-8") as fp:
               for row in rows: fp.write("\t".join(map(str,row))+"\n")
           print(f"PUBLIC_RELEASE_INPUTS pdfs={len(rows)}")
@@ -298,7 +338,7 @@ jobs:
           mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f -name '*.pdf' -print | sort)
           total="${#assets[@]}"
           if [ "$total" -eq 0 ]; then
-            echo "No public redistributable PDFs to persist."
+            echo "No public redistributable source files to persist."
             exit 0
           fi
 
@@ -332,10 +372,11 @@ jobs:
             if [ "$end" -gt "$total_new" ]; then end="$total_new"; fi
             notes="$release_root/notes-${part}.md"
             {
-              echo "# Rechercher public multilingual PDF matrix"
+              echo "# Rechercher public multilingual source matrix"
               echo
               echo "Cells: 133 languages × 24 domains = 3,192."
               echo "Only manifest entries classified as public are included."
+              echo "When a cell had no PDF, an original DOCX may be paired with a derived PDF."
               echo "Canonical plaintext PDFs only; no LFS and no encrypted PDF artifacts."
               echo "Asset count: $((end-i))."
               echo "Global SHA-256 deduplication is enforced against all existing Releases before upload."
@@ -360,7 +401,7 @@ jobs:
             echo "MATRIX_PDF_RELEASE_OK part=$part assets=$((end-i)) tag=$tag"
           done
           rm -rf "$release_root"
-          echo "MATRIX_RELEASE_ONLY_PERSISTENCE_OK pdfs=$total releases=$part"
+          echo "MATRIX_RELEASE_ONLY_PERSISTENCE_OK source_files=$total releases=$part"
       - name: Strict multilingual manifest gate
         run: |
           set -euo pipefail
