@@ -1,0 +1,31 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://dinullah.example/schemas/dinullah-source-record.schema.json",
+  "title":"Dinullah Source Record",
+  "type":"object",
+  "required":["source_id","name","kind","rights_status","capabilities"],
+  "properties":{
+    "source_id":{"type":"string"},
+    "name":{"type":"string"},
+    "kind":{"type":"string","enum":["institution","library","api","repository","website","archive","publisher"]},
+    "url":{"type":"string","format":"uri"},
+    "rights_status":{"type":"string","enum":["public","licensed","review_required","restricted","unknown"]},
+    "capabilities":{
+      "type":"object",
+      "properties":{
+        "api":{"type":"boolean"},
+        "pdf":{"type":"boolean"},
+        "docx":{"type":"boolean"},
+        "ocr":{"type":"boolean"},
+        "iiif":{"type":"boolean"},
+        "tei":{"type":"boolean"}
+      },
+      "additionalProperties":true
+    },
+    "languages":{"type":"array","items":{"type":"string"}},
+    "domains":{"type":"array","items":{"type":"string"}},
+    "last_verified_at":{"type":"string","format":"date-time"},
+    "health":{"type":"object","additionalProperties":true}
+  },
+  "additionalProperties":true
+}

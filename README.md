@@ -97,3 +97,19 @@ npm test
 ## التوثيق
 
 تتوفر مواصفة OpenAPI في `openapi.yaml`، وتوجد وثائق المعمارية والبحث الموحد في `docs/`.
+
+## Islamic Open Knowledge Infrastructure
+
+This repository is evolving from an API into an interoperable open knowledge infrastructure.
+
+Architecture: `Source → Evidence → Curated Corpus → Knowledge Graph → API/Search/SDK/CLI/MCP/Datasets`.
+
+See [Open Knowledge Infrastructure](docs/OPEN-KNOWLEDGE-INFRASTRUCTURE.md) and [Roadmap to the Peak](docs/ROADMAP-TO-PEAK.md).
+
+The shared object contract is `schemas/dinullah-core.schema.json`. It covers people, works, editions, digital objects, sources, evidence, acquisition and verification events, rights, Quran units, hadith records, narrators and relations.
+
+Research-first guarantees: provenance is preserved; SHA-256 supports identity and deduplication; rights are independent from acquisition; DOCX-derived PDFs retain derivation metadata; canonical Quran Arabic remains separate from translations; raw acquisition never promotes itself into the curated Corpus; scholarly disagreements remain attributable.
+
+Planned public surfaces include REST/OpenAPI, JavaScript/TypeScript SDK, Python SDK, CLI, MCP, JSON-LD/RDF, IIIF, ALTO, TEI, JSONL, Parquet and SQLite exports, subject to implementation, rights and validation.
+
+See [LICENSE](LICENSE), [CONTRIBUTING](CONTRIBUTING.md), [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md), and [CITATION.cff](CITATION.cff).

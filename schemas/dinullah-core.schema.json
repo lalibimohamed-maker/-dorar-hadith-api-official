@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dinullah.example/schemas/dinullah-core.schema.json",
+  "title": "Dinullah Core Knowledge Object",
+  "description": "Shared envelope for source-attributed Islamic digital knowledge. Corpus promotion remains a separate governed operation.",
+  "type": "object",
+  "required": ["id", "type", "provenance", "rights"],
+  "properties": {
+    "id": {"type": "string", "minLength": 3},
+    "type": {
+      "type": "string",
+      "enum": ["Person","Work","Edition","Volume","DigitalObject","Source","Evidence","AcquisitionEvent","VerificationEvent","RightsRecord","ReleaseAsset","QuranUnit","HadithRecord","Narrator","Relation"]
+    },
+    "canonical_name": {"type": "string"},
+    "external_ids": {"type": "object", "additionalProperties": {"type": "string"}},
+    "provenance": {
+      "type": "object",
+      "required": ["source"],
+      "properties": {
+        "source": {"type": "string"},
+        "source_url": {"type": "string", "format": "uri"},
+        "acquired_at": {"type": "string", "format": "date-time"},
+        "derived": {"type": "boolean", "default": false},
+        "source_format": {"type": "string"},
+        "acquired_format": {"type": "string"},
+        "derivation": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"}
+      },
+      "additionalProperties": true
+    },
+    "rights": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {"type": "string", "enum": ["public","licensed","review_required","restricted","unknown"]},
+        "evidence": {"type": "array", "items": {"type": "string"}},
+        "redistribution_allowed": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "verification": {"type": "array", "items": {"type": "object"}},
+    "relations": {"type": "array", "items": {"type": "object"}},
+    "content": {}
+  },
+  "additionalProperties": true
+}

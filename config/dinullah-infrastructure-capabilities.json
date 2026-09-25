@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.1.0",
+  "layers": {
+    "source": [
+      "registry",
+      "health",
+      "capabilities",
+      "rights",
+      "discovery-engine",
+      "source-observatory"
+    ],
+    "evidence": [
+      "citations",
+      "editions",
+      "acquisition_events",
+      "verification_events",
+      "claim-evidence-source",
+      "citation-traceability"
+    ],
+    "corpus": [
+      "curated_only",
+      "promotion_boundary"
+    ],
+    "knowledge": [
+      "persons",
+      "works",
+      "editions",
+      "volumes",
+      "quran_units",
+      "hadith",
+      "narrators",
+      "relations",
+      "scholar-graph",
+      "edition-graph",
+      "digital-object-graph"
+    ],
+    "delivery": [
+      "multilingual-search",
+      "research-api",
+      "sdk",
+      "cli",
+      "mcp",
+      "datasets",
+      "digital-library"
+    ]
+  },
+  "interoperability": [
+    "json-ld",
+    "rdf",
+    "iiif",
+    "alto",
+    "mets",
+    "tei",
+    "jsonl",
+    "parquet",
+    "sqlite"
+  ],
+  "processing": [
+    "nodejs-orchestration",
+    "python-document-processing",
+    "libreoffice-docx-to-pdf",
+    "qpdf-validation",
+    "sha256-deduplication"
+  ],
+  "rights_policy": {
+    "unknown": "do_not_redistribute",
+    "review_required": "do_not_redistribute_without_approval"
+  },
+  "scope": {
+    "locked": true,
+    "canonical_document": "docs/DINULLAH-PLATFORM-SCOPE.md",
+    "phases": [
+      "V1 Foundation",
+      "V2 Global Source Graph",
+      "V3 Provenance + Evidence Graph",
+      "V4 Edition & Digital Library Graph",
+      "V5 Multilingual Research Engine",
+      "V6 Research API + SDK + CLI",
+      "V7 MCP + Agent Interoperability",
+      "V8 Public Islamic Research Infrastructure"
+    ]
+  },
+  "benchmarks": [
+    "source-recall",
+    "edition-recall",
+    "duplicate-detection",
+    "language-coverage",
+    "provenance-completeness",
+    "rights-classification",
+    "pdf-quality",
+    "citation-accuracy"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://dinullah.example/schemas/dinullah-provenance-event.schema.json",
+  "title":"Dinullah Provenance Event",
+  "type":"object",
+  "required":["event_id","event_type","occurred_at","actor","inputs","outputs"],
+  "properties":{
+    "event_id":{"type":"string"},
+    "event_type":{"type":"string","enum":["discovery","acquisition","conversion","repair","quality_gate","hash","rights_review","publication","withdrawal"]},
+    "occurred_at":{"type":"string","format":"date-time"},
+    "actor":{"type":"object","required":["type"],"properties":{"type":{"type":"string","enum":["human","workflow","tool","external_source"]},"id":{"type":"string"}}},
+    "inputs":{"type":"array","items":{"type":"object"}},
+    "outputs":{"type":"array","items":{"type":"object"}},
+    "tool":{"type":"object","properties":{"name":{"type":"string"},"version":{"type":"string"}}},
+    "evidence":{"type":"array","items":{"type":"string"}}
+  },
+  "additionalProperties":true
+}

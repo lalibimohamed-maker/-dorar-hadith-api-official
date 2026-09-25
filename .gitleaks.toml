@@ -1,0 +1,15 @@
+title = "Dinullah Gitleaks policy"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Known public Rwanda government evidence URLs in historical Quran translation provenance records. These URLs contain a public document-download token used by the government endpoint; they are evidence links, not repository credentials."
+regexTarget = "line"
+regexes = [
+  '''https://www\.minijust\.gov\.rw/index\.php\?eID=dumpFile&f=77060&t=dumpFile&token=[0-9a-f]{40}'''
+]
+paths = [
+  '''^config/quran-multisource-translation-catalog-2026-09-22\.json$''',
+  '''^config/quranenc-translation-provenance-2026-09-22\.json$'''
+]
