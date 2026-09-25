@@ -58,7 +58,7 @@ jobs:
 
       - name: Verify downloaded manifest
         env:
-          OUT_DIR: ${{{ github.workspace }/engine-${{ matrix.logical_id }}
+          OUT_DIR: ${{ github.workspace }}/engine-${{ matrix.logical_id }}
         run: |
           set -euo pipefail
           test -s "$OUT_DIR/SHA256SUMS"
