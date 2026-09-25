@@ -61,6 +61,10 @@
           },
           "din:path": {
             "type": "string"
+          },
+          "din:discovered_from": {
+            "type": "string",
+            "format": "uri"
           }
         },
         "required": [
@@ -186,10 +190,10 @@
           "prov:hadPrimarySource"
         ],
         "properties": {
-          "prov:entity": {
+          "prov:generatedEntity": {
             "type": "string"
           },
-          "prov:hadPrimarySource": {
+          "prov:usedEntity": {
             "type": "string"
           }
         }
@@ -218,6 +222,24 @@
     },
     "din:run_id": {
       "type": "string"
+    },
+    "wasAttributedTo": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "prov:entity",
+          "prov:agent"
+        ],
+        "properties": {
+          "prov:entity": {
+            "type": "string"
+          },
+          "prov:agent": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "additionalProperties": false
