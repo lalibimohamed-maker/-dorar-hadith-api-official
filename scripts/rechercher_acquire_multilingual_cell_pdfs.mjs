@@ -588,6 +588,24 @@ async function processCell(row){
                 if(sourceType==='public')manifest.total_public_files++;
                 if(sourceType==='research-only')manifest.total_research_only_files++;
                 const conv=await convertDocxToPdf(finalDocx,tempPdf);
+                // Treat the converted PDF exactly like a downloaded PDF: validate, repair when qpdf
+                // reports recoverable warnings, then run the canonical quality gate before promotion.
+                const qpdfCheck=async file=>{try{await execFileAsync('qpdf',['--check',file]);return 0;}catch(e){return Number.isInteger(e?.code)?e.code:1;}};
+                let qrc=await qpdfCheck(tempPdf);
+                if(qrc!==0){
+                  try{await execFileAsync('qpdf',[tempPdf,'--replace-input']);}catch{}
+                  qrc=await qpdfCheck(tempPdf);
+                }
+                if(qrc!==0) throw new Error('derived PDF failed qpdf validation after repair attempt');
+                const qualityCheck=await execFileAsync('python3',['-c',[
+                  'from pathlib import Path',
+                  'from scripts.rechercher_pdf_quality_gate import inspect',
+                  'import sys',
+                  'r=inspect(Path(sys.argv[1]))',
+                  'print(r)',
+                  'raise SystemExit(0 if r.get("status")=="pass" else 1)'
+                ].join(';'),tempPdf]);
+                void qualityCheck;
                 const pdfSha=await (async()=>{
                   const h=createHash('sha256');
                   const fh=await fs.open(tempPdf,'r');
