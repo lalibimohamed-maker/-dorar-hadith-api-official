@@ -43,7 +43,7 @@ test("router queues when no eligible backend exists", async () => {
     backends: registry,
     task: "text_to_video",
     model: "wan2.2",
-    availableBackends: []
+    availableBackends: ["unavailable-backend"]
   });
   assert.equal(plan.status, "ready");
   assert.equal(plan.corpus_write_allowed, false);
