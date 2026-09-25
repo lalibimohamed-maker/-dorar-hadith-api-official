@@ -455,7 +455,9 @@ async function processCell(row){
   const localSeen=new Set();
   let rightsApprovedSources=0;
   for(const seed of seeds){
-    if(entry.files.length>=MAX_FILES) break;
+    // MAX_FILES limits persisted files, never source traversal. Every eligible
+    // source must be inspected even after earlier sources produced files;
+    // candidates are accepted only while capacity remains.
     if(localSeen.has(seed.url)||!allow(seed.url)) continue;
     localSeen.add(seed.url);
     const sourceAdapter=adapters.get(seed.id);
