@@ -145,6 +145,23 @@ function htmlUrls(text,base,set){
 }
 function isPdfUrl(url){try{const u=new URL(url);return /\.pdf$/i.test(u.pathname)||/format=pdf/i.test(u.search)||/\.pdf\?/i.test(u.href);}catch{return false;}}
 function isDocxUrl(url){try{const u=new URL(url);return /\.docx$/i.test(u.pathname)||/format=docx/i.test(u.search)||/\.docx\?/i.test(u.href);}catch{return false;}}
+\nconst ISO_639_1_CODES=new Set(["aa","ab","ae","af","ak","am","an","ar","as","av","ay","az","ba","be","bg","bi","bm","bn","bo","br","bs","ca","ce","ch","co","cr","cs","cu","cv","cy","da","de","dv","dz","ee","el","en","eo","es","et","eu","fa","ff","fi","fj","fo","fr","fy","ga","gd","gl","gn","gu","gv","ha","he","hi","ho","hr","ht","hu","hy","hz","ia","id","ie","ig","ii","ik","io","is","it","iu","ja","jv","ka","kg","ki","kj","kk","kl","km","kn","ko","kr","ks","ku","kv","kw","ky","la","lb","lg","li","ln","lo","lt","lu","lv","mg","mh","mi","mk","ml","mn","mr","ms","mt","my","na","nb","nd","ne","ng","nl","nn","no","nr","nv","ny","oc","oj","om","or","os","pa","pi","pl","ps","pt","qu","rm","rn","ro","ru","rw","sa","sc","sd","se","sg","si","sk","sl","sm","sn","so","sq","sr","ss","st","su","sv","sw","ta","te","tg","th","ti","tk","tl","tn","to","tr","ts","tt","tw","ty","ug","uk","ur","uz","ve","vi","vo","wa","wo","xh","yi","yo","za","zh","zu"]);
+
+// Rewrite an existing ISO-639-1 language index in a source URL.
+// Example: https://islamhouse.com/ar/ -> https://islamhouse.com/fr/.
+// We intentionally do not invent /<lang>/ for sites that expose no language index.
+function languageIndexedSeedUrls(url,languageIso){
+  const lang=String(languageIso||'').trim().toLowerCase();
+  if(!ISO_639_1_CODES.has(lang)) return [url];
+  try{
+    const u=new URL(url),parts=u.pathname.split('/');
+    const index=parts.findIndex((part,i)=>i>0&&ISO_639_1_CODES.has(String(part).toLowerCase()));
+    if(index<0) return [u.href];
+    parts[index]=lang;
+    u.pathname=parts.join('/');
+    return [u.href];
+  }catch{return [url];}
+}
 
 async function archiveAssetUrls(json){
   const ids=new Set(),pdfs=new Set(),docxs=new Set();
@@ -476,9 +493,19 @@ async function processCell(row){
     rightsApprovedSources++;
     if(!entry.rights_approved_sources.includes(seed.id)) entry.rights_approved_sources.push(seed.id);
     eligibleSeeds.push({seed,sourceRights,sourceType});
-    let discovered;
-    try{discovered=await candidateUrls(seed.url);}catch(e){entry.source_errors.push({source:seed.id,url:seed.url,error:String(e.message||e)});continue;}
-    const candidates=discovered.pdfs||[];
+    // Search the source using the requested language index whenever the URL
+    // exposes one. This makes /ar/ become /fr/, /en/, /tr/, etc. for the cell
+    // language instead of repeatedly searching only the default-language page.
+    const localizedSeeds=languageIndexedSeedUrls(seed.url,row.language_iso);
+    const discoveredPdfs=new Set();
+    for(const localizedSeed of localizedSeeds){
+      entry.source_candidates.push(localizedSeed);
+      try{
+        const discovered=await candidateUrls(localizedSeed);
+        for(const candidate of (discovered.pdfs||[])) discoveredPdfs.add(candidate);
+      }catch(e){entry.source_errors.push({source:seed.id,url:localizedSeed,error:String(e.message||e)});}
+    }
+    const candidates=[...discoveredPdfs];
     for(const candidate of candidates){
       if(entry.files.length>=MAX_FILES||!isPdfUrl(candidate)) continue;
       const pdf=allow(candidate)?.href;if(!pdf||claimed.has(pdf)) continue;
