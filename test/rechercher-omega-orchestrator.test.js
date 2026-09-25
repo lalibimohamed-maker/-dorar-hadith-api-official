@@ -62,3 +62,24 @@ test("provenance cannot promote generated media into Corpus", async () => {
   assert.equal(provenance.corpus_write, false);
   assert.equal(provenance.generated_media_is_evidence, false);
 });
+
+
+test("council plan includes adversarial and rights review roles", async () => {
+  const { buildCouncilPlan } = await import("../src/rechercher-omega-orchestrator.js");
+  const plan = buildCouncilPlan({ task: "text_to_video", evidence: [{ source_id: "s1" }], output_kind: "research_media" });
+  assert.equal(plan.fail_closed, true);
+  assert.ok(plan.roles.includes("contrarian"));
+  assert.ok(plan.roles.includes("rights_auditor"));
+});
+
+test("model tournament records reproducible evaluation dimensions", async () => {
+  const { buildTournamentPlan } = await import("../src/rechercher-omega-orchestrator.js");
+  const plan = buildTournamentPlan({
+    task: "text_to_video",
+    candidate_models: ["wan2.2", "hunyuanvideo-1.5"],
+    constraints: { max_vram_mb: 16384 }
+  });
+  assert.deepEqual(plan.candidates, ["wan2.2", "hunyuanvideo-1.5"]);
+  assert.ok(plan.metrics.includes("evidence_fidelity"));
+  assert.equal(plan.selection, "benchmark_results_only");
+});
