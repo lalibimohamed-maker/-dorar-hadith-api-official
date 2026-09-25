@@ -72,14 +72,17 @@ def fetch(url):
         return r.read().decode("utf-8", "replace")
 
 
-def pdf_links(page, base):
-    out, seen = [], set()
-    for m in re.finditer(r'href=[\"\']([^\"\']+)[\"\']', page, re.I):
+def document_links(page, base):
+    pdfs, docxs, seen = [], [], set()
+    for m in re.finditer(r'href=["\']([^"\']+)["\']', page, re.I):
         u = normalize_url(urljoin(base, html.unescape(m.group(1))))
-        if re.search(r"\.pdf(?:\?|$)", u, re.I) and not re.search(r"\.pdf\.enc(?:\?|$)", u, re.I) and u not in seen:
-            seen.add(u)
-            out.append(u)
-    return out
+        if u in seen or re.search(r"\.pdf\.enc(?:\?|$)", u, re.I):
+            continue
+        if re.search(r"\.pdf(?:\?|$)", u, re.I):
+            seen.add(u); pdfs.append(u)
+        elif re.search(r"\.docx(?:\?|$)", u, re.I):
+            seen.add(u); docxs.append(u)
+    return pdfs, docxs
 
 
 def qpdf_check(path):
@@ -218,10 +221,11 @@ def candidate_urls(source):
     if re.search(r"\.pdf(?:\?|$)", page, re.I) and not re.search(r"\.pdf\.enc(?:\?|$)", page, re.I):
         return [normalize_url(page)]
     try:
-        discovered = pdf_links(fetch(page), page)
+        discovered_pdf, discovered_docx = document_links(fetch(page), page)
     except Exception:
-        discovered = []
-    return discovered if discovered else [normalize_url(page)]
+        discovered_pdf, discovered_docx = [], []
+    # Prefer PDF; DOCX is the fallback only when no PDF exists.
+    return discovered_pdf or discovered_docx or [normalize_url(page)]
 
 
 def acquire_volume(book, volume, expected, work):
@@ -250,13 +254,22 @@ def acquire_volume(book, volume, expected, work):
             else:
                 urls = urls[:MAX_SOURCE_ATTEMPTS]
             for url_index, url in enumerate(urls[:MAX_SOURCE_ATTEMPTS], 1):
+                is_docx = bool(re.search(r"\.docx(?:\?|$)", url, re.I))
                 candidate = work / f"{volume:03d}.candidate-{source_index}-{url_index}.pdf"
+                download_path = work / f"{volume:03d}.candidate-{source_index}-{url_index}.docx" if is_docx else candidate
                 try:
                     if re.search(r"\.pdf\.enc(?:\?|$)", url, re.I):
                         attempts.append({"source": url, "status": "encrypted_rejected"})
                         continue
-                    print(f"Quality candidate {book_key(book)} volume {volume}/{expected} source {source_index}/{len(sources)}: {url}", flush=True)
-                    download(url, candidate)
+                    print(f"Quality candidate {book_key(book)} volume {volume}/{expected} source {source_index}/{len(sources)} format={'DOCX' if is_docx else 'PDF'}: {url}", flush=True)
+                    download(url, download_path)
+                    if is_docx:
+                        subprocess.run(["libreoffice", "--headless", "--convert-to", "pdf", "--outdir", str(work), str(download_path)], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                        converted = work / (download_path.stem + ".pdf")
+                        if not converted.exists():
+                            attempts.append({"source": url, "status": "docx_conversion_failed"})
+                            continue
+                        converted.replace(candidate)
                     if candidate.read_bytes()[:4] != b"%PDF":
                         attempts.append({"source": url, "status": "invalid_signature"})
                         continue
@@ -283,6 +296,7 @@ def acquire_volume(book, volume, expected, work):
                 except Exception as exc:
                     attempts.append({"source": url, "status": "download_or_quality_error", "error": str(exc)})
                 finally:
+                    download_path.unlink(missing_ok=True)
                     if candidate.exists() and (best is None or best.get("path") != str(candidate)):
                         candidate.unlink(missing_ok=True)
         if best is None:
@@ -300,6 +314,8 @@ def acquire_volume(book, volume, expected, work):
         }
     finally:
         for p in work.glob(f"{volume:03d}.candidate-*.pdf"):
+            p.unlink(missing_ok=True)
+        for p in work.glob(f"{volume:03d}.candidate-*.docx"):
             p.unlink(missing_ok=True)
 
 
