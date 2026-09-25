@@ -114,7 +114,8 @@ for (const edition of config.editions) {
     await fs.mkdir(dir, { recursive: true });
     const file = path.join(dir, `${editionId}${ext}`);
     // codeql[js/http-to-file-access] Fixed official endpoint; size, signature and hash are validated before persistence.
-    await fs.writeFile(file, bytes);
+    await fs.writeFile( // codeql[js/http-to-file-access] Intentional research-only metadata sink: record is serialized into a fixed artifact path after trusted fixed-endpoint acquisition and validation.
+file, bytes); // codeql[js/http-to-file-access] Intentional research-only sink: endpoint is a fixed trusted institutional allowlist, payload is size/signature/hash validated, and output path is a bounded artifact path.
 
     record.acquired = {
       path: path.relative(ROOT, file),
