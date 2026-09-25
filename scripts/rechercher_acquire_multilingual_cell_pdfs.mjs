@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {resolveRights, RIGHTS} from '../src/book-rights-resolver.js';
+import {createProvDocument, recordAcquisition, validateProvShape, writeProvDocument} from './rechercher_prov.mjs';
 
 const ROOT=process.cwd();
 const LEDGER=path.join(ROOT,'research/evidence/global-multilingual/scientific-ledger.jsonl');
@@ -18,6 +19,9 @@ const MAX_DISCOVERY_URLS_PER_SOURCE=Math.max(25,Math.min(500,Number(process.env.
 const MAX_PDF_CANDIDATES_PER_SOURCE=Math.max(8,Math.min(200,Number(process.env.ACQUISITION_MAX_PDF_CANDIDATES_PER_SOURCE||100)));
 const CONCURRENCY=Math.max(1,Math.min(12,Number(process.env.ACQUISITION_CONCURRENCY||8)));
 const MAX_FILES=Math.max(1,Math.min(20,Number(process.env.ACQUISITION_MAX_FILES_PER_CELL||8)));
+const PROV_RUN_ID=process.env.GITHUB_RUN_ID||process.env.GITHUB_RUN_NUMBER||`local-${Date.now()}`;
+const PROV_BUNDLE=path.join(OUT,'provenance.json');
+const PROV_EVENTS=path.join(OUT,'provenance.jsonl');
 const REQUEST_TIMEOUT=15000, DOWNLOAD_TIMEOUT=90000, RESPONSE_LIMIT=12*1024*1024, PDF_LIMIT=750*1024*1024;
 
 const rows=(await fs.readFile(LEDGER,'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
@@ -304,6 +308,7 @@ function apiSeeds(adapter,row){
   return [...new Set(result)];
 }
 
+const provDoc=createProvDocument({runId:PROV_RUN_ID,tool:'DinAllah-Rechercher/multilingual-pdf-acquisition'});
 const manifest={
   schema:'rechercher/multilingual-resource-acquisition/v4',
   generated_at:new Date().toISOString(),
@@ -317,7 +322,8 @@ const manifest={
     discovery_is_not_permission:true,canonical_arabic_separate:true,machine_translation_never_promoted:true,
     no_new_pdf_enc:true,corpus_write:false
   },
-  source_counts:{},cells:{}
+  source_counts:{},cells:{},
+  provenance:{standard:'W3C PROV-DM',serialization:'PROV-JSON',non_blocking:true,status:'pending',bundle:'provenance.json',events:'provenance.jsonl'}
 };
 const claimed=new Set(),seenPdfSha256=new Map(),candidateCache=new Map(),started=Date.now();
 function markAlreadyAcquired(row){
@@ -478,10 +484,29 @@ async function processCell(row){
         await fs.rename(temp,final);
         const relativeFinal=path.relative(ROOT,final);
         seenPdfSha256.set(r.sha256,{cell_id:row.cell_id,path:relativeFinal});
+        let provenanceId=null;
+        try{
+          provenanceId=recordAcquisition(provDoc,{
+            runId:PROV_RUN_ID,
+            cellId:row.cell_id,
+            sourceId,
+            sourceUrl:seed.url,
+            sha256:r.sha256,
+            outputPath:relativeFinal,
+            outputFormat:'pdf',
+            sourceFormat:'pdf',
+            rightsStatus:sourceRights.status,
+            bytes:r.bytes,
+            acquiredAt:new Date().toISOString()
+          }).outputId;
+        }catch(e){
+          // Provenance is audit metadata, never a reason to reject a valid PDF.
+          entry.source_errors.push({source:sourceId,url:r.finalUrl,error:'provenance-record-failed: '+String(e.message||e)});
+        }
         entry.files.push({
           cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:r.finalUrl,path:relativeFinal,
           bytes:r.bytes,sha256:r.sha256,content_type:r.contentType,acquisition:sourceType,rights:sourceRights.status,
-          domain:row.domain,language_iso:row.language_iso||null,provenance:seed.id+':'+seed.url,promoteToCorpus:false
+          domain:row.domain,language_iso:row.language_iso||null,provenance:seed.id+':'+seed.url,provenance_id:provenanceId,promoteToCorpus:false
         });
         manifest.total_files++;
         if(sourceType==='public')manifest.total_public_files++;
@@ -530,6 +555,18 @@ async function worker(){
 console.log('ACQUISITION_START cells='+allRows.length+' pending='+list.length+' already_acquired='+done+' concurrency='+CONCURRENCY+' requestTimeoutMs='+REQUEST_TIMEOUT+' downloadTimeoutMs='+DOWNLOAD_TIMEOUT);
 await fs.mkdir(OUT,{recursive:true});
 await Promise.all(Array.from({length:CONCURRENCY},()=>worker()));
+let provStats={activities:0,entities:0};
+try{
+  validateProvShape(provDoc);
+  provStats=await writeProvDocument(provDoc,{bundlePath:PROV_BUNDLE,eventsPath:PROV_EVENTS});
+  manifest.provenance.status='written';
+  manifest.provenance.activities=provStats.activities;
+  manifest.provenance.entities=provStats.entities;
+}catch(e){
+  manifest.provenance.status='write-failed';
+  manifest.provenance.error=String(e.message||e);
+  console.warn('PROVENANCE_NON_BLOCKING_FAILURE '+manifest.provenance.error);
+}
 manifest.completed_at=new Date().toISOString();manifest.elapsed_ms=Date.now()-started;
 await fs.writeFile(path.join(OUT,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
 console.log(JSON.stringify({schema:manifest.schema,cell_count:manifest.cell_count,language_count:manifest.language_count,total_files:manifest.total_files,total_public_files:manifest.total_public_files,total_research_only_files:manifest.total_research_only_files,total_blocked_cells:manifest.total_blocked_cells,source_counts:manifest.source_counts,manifest:path.relative(ROOT,path.join(OUT,'manifest.json'))},null,2));
