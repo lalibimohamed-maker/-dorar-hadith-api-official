@@ -29,10 +29,10 @@ jobs:
         include:
           - logical_id: qwen3
             model_id: Qwen/Qwen3-0.6B
-            revision: main
+            revision: c1899de
           - logical_id: paddleocr-vl
             model_id: PaddlePaddle/PaddleOCR-VL
-            revision: main
+            revision: 7fa00a8
     steps:
       - name: Install Hugging Face Hub client
         run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
@@ -41,12 +41,13 @@ jobs:
         env:
           MODEL_ID: ${{ matrix.model_id }}
           REVISION: ${{ matrix.revision }}
-          OUT_DIR: ${{{ github.workspace }/engine-${{ matrix.logical_id }}
+          OUT_DIR: ${{ github.workspace }}/engine-${{ matrix.logical_id }}
         run: |
           set -euo pipefail
           rm -rf "$OUT_DIR"
           mkdir -p "$OUT_DIR"
           hf download "$MODEL_ID" --revision "$REVISION" --local-dir "$OUT_DIR"
+          test -d "$OUT_DIR"
           find "$OUT_DIR" -type f -print0 | sort -z | xargs -0 sha256sum > "$OUT_DIR/SHA256SUMS"
           python3 - <<'PY'
           import json, os, pathlib
