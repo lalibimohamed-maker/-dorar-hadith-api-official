@@ -130,3 +130,21 @@ No paid API is required by the architecture.
 - subtitle/audio generation
 - deterministic post-processing
 - rights-aware release promotion
+
+## Free-first execution router
+
+Ω does not require every model weight to be stored in GitHub Releases. Execution is selected independently from the model registry.
+
+Supported backend classes:
+
+- **local** — use locally cached/open weights when available.
+- **Gemini Free Tier** — remote reasoning/multimodal fallback when a user-provided API key and provider quota are available.
+- **Groq Free Plan** — fast remote LLM fallback when provider limits permit.
+- **Hugging Face Inference** — remote model fallback subject to provider/account quota.
+- **Kaggle GPU** — temporary GPU execution for models whose weights must be downloaded and verified at runtime.
+
+The router is fail-closed with respect to the scholarly Corpus: generated output cannot become evidence and cannot write directly to Corpus. API keys are never stored in the model/backend registry; they must be injected as runtime secrets/environment variables.
+
+### Weight policy
+
+Model weights are downloaded only when an execution backend actually needs them. Before any persistent mirroring, Ω records the official source, exact revision, SHA-256 and separate model-weight license status. A GitHub Release mirror is optional and must never be assumed to have redistribution rights merely because the upstream repository is public.
