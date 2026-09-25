@@ -3,33 +3,69 @@
   "title": "Rechercher PROV-JSON profile",
   "description": "Non-blocking provenance interchange profile for Rechercher. It follows the W3C PROV-JSON top-level model while permitting Dinullah-specific attributes.",
   "type": "object",
-  "required": ["prefix", "entity", "activity", "agent"],
+  "required": [
+    "prefix",
+    "entity",
+    "activity",
+    "agent"
+  ],
   "properties": {
     "prefix": {
       "type": "object",
-      "required": ["prov", "din"],
+      "required": [
+        "prov",
+        "din"
+      ],
       "properties": {
-        "prov": { "const": "http://www.w3.org/ns/prov#" },
-        "din": { "const": "urn:dinullah:" }
+        "prov": {
+          "const": "http://www.w3.org/ns/prov#"
+        },
+        "din": {
+          "const": "urn:dinullah:"
+        }
       },
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "entity": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "prov:type": { "type": "string" },
-          "prov:label": { "type": "string" },
-          "din:sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-          "din:cell_id": { "type": "string" },
-          "din:source_id": { "type": "string" },
-          "din:source_url": { "type": "string", "format": "uri" },
-          "din:rights_status": { "type": "string" },
-          "din:format": { "type": "string" },
-          "din:path": { "type": "string" }
+          "prov:type": {
+            "type": "string"
+          },
+          "prov:label": {
+            "type": "string"
+          },
+          "din:sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "din:cell_id": {
+            "type": "string"
+          },
+          "din:source_id": {
+            "type": "string"
+          },
+          "din:source_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "din:rights_status": {
+            "type": "string"
+          },
+          "din:format": {
+            "type": "string"
+          },
+          "din:path": {
+            "type": "string"
+          }
         },
-        "required": ["prov:type"]
+        "required": [
+          "prov:type"
+        ]
       }
     },
     "activity": {
@@ -37,15 +73,33 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "prov:type": { "type": "string" },
-          "prov:startTime": { "type": "string", "format": "date-time" },
-          "prov:endTime": { "type": "string", "format": "date-time" },
-          "din:cell_id": { "type": "string" },
-          "din:source_id": { "type": "string" },
-          "din:run_id": { "type": "string" },
-          "din:tool": { "type": "string" }
+          "prov:type": {
+            "type": "string"
+          },
+          "prov:startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "prov:endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "din:cell_id": {
+            "type": "string"
+          },
+          "din:source_id": {
+            "type": "string"
+          },
+          "din:run_id": {
+            "type": "string"
+          },
+          "din:tool": {
+            "type": "string"
+          }
         },
-        "required": ["prov:type"]
+        "required": [
+          "prov:type"
+        ]
       }
     },
     "agent": {
@@ -53,21 +107,37 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "prov:type": { "type": "string" },
-          "prov:label": { "type": "string" },
-          "prov:location": { "type": "string", "format": "uri" }
+          "prov:type": {
+            "type": "string"
+          },
+          "prov:label": {
+            "type": "string"
+          },
+          "prov:location": {
+            "type": "string",
+            "format": "uri"
+          }
         },
-        "required": ["prov:type"]
+        "required": [
+          "prov:type"
+        ]
       }
     },
     "used": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["prov:activity", "prov:entity"],
+        "required": [
+          "prov:activity",
+          "prov:entity"
+        ],
         "properties": {
-          "prov:activity": { "type": "string" },
-          "prov:entity": { "type": "string" }
+          "prov:activity": {
+            "type": "string"
+          },
+          "prov:entity": {
+            "type": "string"
+          }
         }
       }
     },
@@ -75,10 +145,17 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["prov:entity", "prov:activity"],
+        "required": [
+          "prov:entity",
+          "prov:activity"
+        ],
         "properties": {
-          "prov:entity": { "type": "string" },
-          "prov:activity": { "type": "string" }
+          "prov:entity": {
+            "type": "string"
+          },
+          "prov:activity": {
+            "type": "string"
+          }
         }
       }
     },
@@ -86,10 +163,17 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["prov:activity", "prov:agent"],
+        "required": [
+          "prov:activity",
+          "prov:agent"
+        ],
         "properties": {
-          "prov:activity": { "type": "string" },
-          "prov:agent": { "type": "string" }
+          "prov:activity": {
+            "type": "string"
+          },
+          "prov:agent": {
+            "type": "string"
+          }
         }
       }
     },
@@ -97,10 +181,17 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["prov:entity", "prov:hadPrimarySource"],
+        "required": [
+          "prov:entity",
+          "prov:hadPrimarySource"
+        ],
         "properties": {
-          "prov:entity": { "type": "string" },
-          "prov:hadPrimarySource": { "type": "string" }
+          "prov:entity": {
+            "type": "string"
+          },
+          "prov:hadPrimarySource": {
+            "type": "string"
+          }
         }
       }
     },
@@ -108,13 +199,25 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["prov:generatedEntity", "prov:usedEntity"],
+        "required": [
+          "prov:generatedEntity",
+          "prov:usedEntity"
+        ],
         "properties": {
-          "prov:generatedEntity": { "type": "string" },
-          "prov:usedEntity": { "type": "string" },
-          "prov:activity": { "type": "string" }
+          "prov:generatedEntity": {
+            "type": "string"
+          },
+          "prov:usedEntity": {
+            "type": "string"
+          },
+          "prov:activity": {
+            "type": "string"
+          }
         }
       }
+    },
+    "din:run_id": {
+      "type": "string"
     }
   },
   "additionalProperties": false
