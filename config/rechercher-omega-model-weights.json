@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Rechercher Ω model-weight acquisition and verification manifest.",
+  "policy": {
+    "runtime_download_allowed": true,
+    "persistent_mirror_requires_license_clearance": true,
+    "sha256_required_before_promotion": true,
+    "unknown_revision_is_not_verified": true,
+    "unknown_weight_license_is_not_redistributable": true,
+    "corpus_write_allowed": false
+  },
+  "weights": [
+    {"model_id":"qwen3","source_repo":"https://github.com/QwenLM/Qwen3","revision":null,"sha256":null,"weight_license_status":"review_required","acquisition":"runtime_only"},
+    {"model_id":"qwen3-omni","source_repo":"https://github.com/QwenLM/Qwen3-Omni","revision":null,"sha256":null,"weight_license_status":"review_required","acquisition":"runtime_only"},
+    {"model_id":"paddleocr-vl","source_repo":"https://github.com/PaddlePaddle/PaddleOCR","revision":null,"sha256":null,"weight_license_status":"review_required","acquisition":"runtime_only"},
+    {"model_id":"wan2.2","source_repo":"https://github.com/Wan-Video/Wan2.2","revision":null,"sha256":null,"weight_license_status":"review_required","acquisition":"runtime_only"},
+    {"model_id":"hunyuanvideo-1.5","source_repo":"https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5","revision":null,"sha256":null,"weight_license_status":"review_required","acquisition":"runtime_only"},
+    {"model_id":"ltx-2","source_repo":"https://github.com/Lightricks/LTX-2","revision":null,"sha256":null,"weight_license_status":"review_required","acquisition":"runtime_only"},
+    {"model_id":"cogvideox","source_repo":"https://github.com/zai-org/CogVideo","revision":null,"sha256":null,"weight_license_status":"review_required","acquisition":"runtime_only"},
+    {"model_id":"cosyvoice","source_repo":"https://github.com/FunAudioLLM/CosyVoice","revision":null,"sha256":null,"weight_license_status":"review_required","acquisition":"runtime_only"},
+    {"model_id":"sglang","source_repo":"https://github.com/sgl-project/sglang","revision":null,"sha256":null,"weight_license_status":"review_required","acquisition":"runtime_only"}
+  ]
+}
