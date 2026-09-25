@@ -43,7 +43,10 @@ const MAX_DISCOVERY_DEPTH=Math.max(1,Math.min(6,Number(process.env.ACQUISITION_D
 const MAX_DISCOVERY_URLS_PER_SOURCE=Math.max(25,Math.min(500,Number(process.env.ACQUISITION_DISCOVERY_URLS_PER_SOURCE||250)));
 const MAX_PDF_CANDIDATES_PER_SOURCE=Math.max(8,Math.min(200,Number(process.env.ACQUISITION_MAX_PDF_CANDIDATES_PER_SOURCE||100)));
 const CONCURRENCY=Math.max(1,Math.min(12,Number(process.env.ACQUISITION_CONCURRENCY||8)));
-const MAX_FILES=Math.max(1,Math.min(20,Number(process.env.ACQUISITION_MAX_FILES_PER_CELL||8)));
+const configuredFileLimit=Number(process.env.ACQUISITION_MAX_FILES_PER_CELL||0);
+// By default there is no arbitrary per-cell file cap. A positive value is an explicit
+// operational throttle only; source discovery remains exhaustive regardless of it.
+const MAX_FILES=Number.isFinite(configuredFileLimit)&&configuredFileLimit>0?Math.floor(configuredFileLimit):Infinity;
 const REQUEST_TIMEOUT=15000, DOWNLOAD_TIMEOUT=90000, RESPONSE_LIMIT=12*1024*1024, PDF_LIMIT=750*1024*1024;
 
 const rows=(await fs.readFile(LEDGER,'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
@@ -444,6 +447,7 @@ async function processCell(row){
   };
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
   const eligibleSeeds=[];
+  let acceptedPhysicalFiles=0;
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)))push(row.provider);
   for(const u of urls) push(sourceOf(u));
   // Inspect every active adapter AND every active master-registry source relevant to the cell.
@@ -472,9 +476,9 @@ async function processCell(row){
   const localSeen=new Set();
   let rightsApprovedSources=0;
   for(const seed of seeds){
-    // MAX_FILES limits persisted files, never source traversal. Every eligible
-    // source must be inspected even after earlier sources produced files;
-    // candidates are accepted only while capacity remains.
+    // Every eligible source is inspected even after earlier sources produced files.
+    // An optional MAX_FILES throttle limits only newly persisted physical files;
+    // it never truncates source traversal or candidate inspection.
     if(localSeen.has(seed.url)||!allow(seed.url)) continue;
     localSeen.add(seed.url);
     const sourceAdapter=adapters.get(seed.id);
@@ -507,7 +511,7 @@ async function processCell(row){
     }
     const candidates=[...discoveredPdfs];
     for(const candidate of candidates){
-      if(entry.files.length>=MAX_FILES||!isPdfUrl(candidate)) continue;
+      if(Number.isFinite(MAX_FILES)&&acceptedPhysicalFiles>=MAX_FILES||!isPdfUrl(candidate)) continue;
       const pdf=allow(candidate)?.href;if(!pdf||claimed.has(pdf)) continue;
       claimed.add(pdf);
       const sourceId=sourceOf(pdf)||seed.id;
@@ -540,6 +544,7 @@ async function processCell(row){
         await fs.rename(temp,final);
         const relativeFinal=path.relative(ROOT,final);
         seenPdfSha256.set(r.sha256,{cell_id:row.cell_id,path:relativeFinal});
+        acceptedPhysicalFiles++;
         entry.files.push({
           cell_id:row.cell_id,source:sourceId,discovered_from:seed.url,url:r.finalUrl,path:relativeFinal,
           bytes:r.bytes,sha256:r.sha256,content_type:r.contentType,acquisition:sourceType,rights:sourceRights.status,
