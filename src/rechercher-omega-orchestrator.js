@@ -106,6 +106,31 @@ export function buildPlan(input, registry) {
   return plan;
 }
 
+export function buildCouncilPlan({ evidence = [], task, output_kind = "analysis" }) {
+  return {
+    schema_version: "1.0.0",
+    engine: "rechercher-omega",
+    task,
+    output_kind,
+    roles: ["researcher", "source_auditor", "contrarian", "logic_auditor", "media_critic", "rights_auditor", "synthesizer"],
+    independent_review_required: true,
+    evidence_count: evidence.length,
+    fail_closed: true
+  };
+}
+
+export function buildTournamentPlan({ task, candidate_models = [], constraints = {} }) {
+  return {
+    schema_version: "1.0.0",
+    engine: "rechercher-omega",
+    task,
+    candidates: [...new Set(candidate_models)],
+    constraints,
+    metrics: ["task_success", "evidence_fidelity", "prompt_adherence", "temporal_consistency", "arabic_text_fidelity", "latency_ms", "peak_vram_mb", "output_size_bytes"],
+    selection: "benchmark_results_only"
+  };
+}
+
 export function createProvenanceRecord({
   plan,
   source_ids = [],
