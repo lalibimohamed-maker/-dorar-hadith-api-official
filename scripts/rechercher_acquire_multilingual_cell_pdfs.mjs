@@ -35,7 +35,10 @@ const existingSha=new Set((existingInventory.sha256||[]).map(x=>String(x).replac
 console.log('ACQUISITION_RESUME existing_cells='+existingCells.size+' existing_sha256='+existingSha.size);
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXPECTED=3192;
-const MAX_SOURCES_PER_CELL=Math.max(1,Math.min(256,Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||256)));
+const configuredSourceLimit=Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||0);
+// By default inspect every relevant source registered by the worldwide registry.
+// A positive env value remains available only as an explicit operational throttle.
+const MAX_SOURCES_PER_CELL=Number.isFinite(configuredSourceLimit)&&configuredSourceLimit>0?Math.floor(configuredSourceLimit):Infinity;
 const MAX_DISCOVERY_DEPTH=Math.max(1,Math.min(6,Number(process.env.ACQUISITION_DISCOVERY_DEPTH||4)));
 const MAX_DISCOVERY_URLS_PER_SOURCE=Math.max(25,Math.min(500,Number(process.env.ACQUISITION_DISCOVERY_URLS_PER_SOURCE||250)));
 const MAX_PDF_CANDIDATES_PER_SOURCE=Math.max(8,Math.min(200,Number(process.env.ACQUISITION_MAX_PDF_CANDIDATES_PER_SOURCE||100)));
@@ -428,6 +431,8 @@ async function processCell(row){
   for(const u of urls) push(sourceOf(u));
   // Inspect every active adapter AND every active master-registry source relevant to the cell.
   // The full registered source pool is inspected; there is no 24-source shortlist.
+  // Do not silently truncate the pool: every relevant active source reaches the cell.
+  // An explicit ACQUISITION_MAX_SOURCES_PER_CELL may be used only as an operational throttle.
   for(const a of adapters.values()) if(sourceActive(a)&&adapterRelevant(a,row)) push(a.id);
   for(const s of master.values()){
     const sid=String(s.id||'').trim();
@@ -436,7 +441,8 @@ async function processCell(row){
     const kinds=(s.kinds||s.capabilities||[]).map(x=>String(x).toLowerCase());
     if(adapterRelevant({kinds},row)) push(sid);
   }
-  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);
+  const uniqueIds=[...new Set(ids)];
+  const limitedIds=Number.isFinite(MAX_SOURCES_PER_CELL)?uniqueIds.slice(0,MAX_SOURCES_PER_CELL):uniqueIds;
   entry.source_candidates=limitedIds.slice();
   const seeds=[];
   for(const id of limitedIds){
