@@ -377,7 +377,7 @@ jobs:
               echo "Cells: 133 languages × 24 domains = 3,192."
               echo "Only manifest entries classified as public are included."
               echo "When a cell had no PDF, an original DOCX may be paired with a derived PDF."
-              echo "Original DOCX and plaintext PDF assets only; no LFS and no encrypted artifacts."
+              echo "Plaintext PDF assets only; original DOCX is retained only as provenance when needed; no LFS and no encrypted artifacts."
               echo "Asset count: $((end-i))."
               echo "Global SHA-256 deduplication is enforced against all existing Releases before upload."
             } > "$notes"
