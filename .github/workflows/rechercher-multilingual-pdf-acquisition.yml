@@ -305,7 +305,7 @@ jobs:
                   continue
               for item in e.get("files",[]):
                   p=item.get("path")
-                  if not p or not re.search(r"\.(pdf|docx)$", p, re.I) or item.get("research_only"):
+                  if not p or not re.search(r"\.pdf$", p, re.I) or item.get("research_only"):
                       continue
                   full=os.path.abspath(p)
                   if not full.startswith(root+os.sep) or not os.path.isfile(full):
@@ -316,7 +316,7 @@ jobs:
                   name=f"{cell_id}__{sha[:16]}__{os.path.basename(full)}"
                   dst=os.path.join(out,name)
                   shutil.copy2(full,dst)
-                  fmt="docx" if full.lower().endswith(".docx") else "pdf"
+                  fmt="pdf"
                   rows.append((cell_id,name,sha,os.path.getsize(full),fmt))
           with open(os.path.join(os.path.dirname(out),"asset-manifest.tsv"),"w",encoding="utf-8") as fp:
               for row in rows: fp.write("\t".join(map(str,row))+"\n")
@@ -335,7 +335,7 @@ jobs:
           )
           echo "MATRIX_EXISTING_SHA_COUNT=${#existing_sha[@]}"
 
-          mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f \( -name '*.pdf' -o -name '*.docx' \) -print | sort)
+          mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f -name '*.pdf' -print | sort)
           total="${#assets[@]}"
           if [ "$total" -eq 0 ]; then
             echo "No public redistributable source files to persist."
