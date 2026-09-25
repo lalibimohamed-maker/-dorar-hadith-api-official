@@ -2,7 +2,14 @@
   "schema_version": "1.0.0",
   "purpose": "Source relationship graph for Rechercher/PR 561. Discovery relationships only; never imply scholarly authority or redistribution permission.",
   "standards": {
-    "provenance": "W3C PROV-DM/PROV-O",
+    "provenance": {
+      "model": "W3C PROV-DM",
+      "serialization": "PROV-JSON",
+      "namespace": "http://www.w3.org/ns/prov#",
+      "profile_config": "config/rechercher/provenance-2026.json",
+      "schema": "schemas/rechercher-prov-json.schema.json",
+      "runtime": "non-blocking"
+    },
     "web_metadata": "Schema.org concepts (Book, ScholarlyArticle, DigitalDocument)"
   },
   "node_types": [
@@ -12492,5 +12499,14 @@
   "generated_from": {
     "registry_path": "research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json",
     "registry_count": 454
+  },
+  "prov_mapping": {
+    "AUTHORED_BY": "prov:wasAttributedTo",
+    "DERIVED_FROM": "prov:wasDerivedFrom",
+    "OPERATED_BY": "prov:wasAssociatedWith",
+    "DISCOVERED_VIA": "din:discoveredVia",
+    "RELATED_SOURCE": "din:relatedSource",
+    "AVAILABLE_IN": "din:availableIn",
+    "COVERS_DOMAIN": "din:coversDomain"
   }
 }
