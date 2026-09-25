@@ -2,14 +2,16 @@ name: Rechercher — Central governed PDF acquisition
 
 # One central downloader for the WHOLE encyclopedia. No era-specific acquisition pin.
 # Order is unbounded: Prophet era -> Hijri chronology -> present day -> future catalog additions.
-# Storage rule: ONE physical PDF copy per book. Primary and secondary pools are complementary shards, never mirrors.
-# security-justification: This workflow requires contents: write solely to persist verified, quality-gated PDF shards and governance manifests to the governed acquisition branch and secondary PDF storage; no source-code mutation is performed by the acquisition engine.
+# Storage rule: ONE canonical physical PDF per book. GitHub Releases are the only permanent PDF storage; public and protected Releases are complementary rights-gated destinations, never mirrors.
+# security-justification: This workflow requires contents: write solely for governed acquisition state and release governance manifests; verified PDFs are persisted only through rights-gated GitHub Releases, and no source-code mutation is performed by the acquisition engine.
 permissions:
   contents: write
 
 env:
-  RECHERCHER_MAX_BOOK_WORKERS: 12
+  RECHERCHER_MAX_BOOK_WORKERS: 3
+  RECHERCHER_MAX_BOOKS_PER_RUN: 8
   RECHERCHER_CATALOG_GLOB: books-batches/**/catalog.json
+  RECHERCHER_PUBLIC_PDF_STORAGE_REPO: lalibimohamed-maker/dinullah-pdf-storage-01
   RECHERCHER_SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
 
 on:
@@ -20,16 +22,20 @@ on:
         required: true
         type: string
     secrets:
+      RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN:
+        description: 'Required write token for the public PDF Release storage repository.'
+        required: true
       RECHERCHER_SECONDARY_STORAGE_TOKEN:
-        description: 'Required write token for the secondary PDF storage repository.'
+        description: 'Required write token for the protected PDF Release storage repository.'
         required: true
 
 jobs:
   acquire:
     name: Continuous whole-encyclopedia real-PDF acquisition
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 360
     env:
+      PUBLIC_PDF_STORAGE_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
       SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
     steps:
       - name: Checkout persistent chronological acquisition state
@@ -73,39 +79,20 @@ jobs:
           print('ACQUISITION_ENGINE_SOURCE=governed-main')
           PY
 
-      - name: Connect to secondary PDF pool for state discovery and cleanup
+      - name: Verify public and protected Release destinations
+        env:
+          PUBLIC_GH_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
+          PUBLIC_REPO: ${{ env.RECHERCHER_PUBLIC_PDF_STORAGE_REPO }}
+          PROTECTED_GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          PROTECTED_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
         run: |
           set -euo pipefail
-          test -n "$SECONDARY_STORAGE_TOKEN"
-          cat > "$RUNNER_TEMP/rechercher-askpass" <<'SH'
-          #!/bin/sh
-          case "$1" in
-            *Username*) printf '%s\n' 'x-access-token' ;;
-            *Password*) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
-            *) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
-          esac
-          SH
-          chmod 700 "$RUNNER_TEMP/rechercher-askpass"
-          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-askpass" GIT_TERMINAL_PROMPT=0
-          git ls-remote "https://github.com/${RECHERCHER_SECONDARY_STORAGE_REPO}.git" >/dev/null
-          GIT_LFS_SKIP_SMUDGE=1 git clone "https://github.com/${RECHERCHER_SECONDARY_STORAGE_REPO}.git" .secondary-storage
-          cd .secondary-storage
-          git lfs install
-          if git rev-parse --verify HEAD >/dev/null 2>&1; then
-            git lfs pull --include='artifacts/*.pdf' --exclude='' || true
-          else
-            git switch --orphan main
-          fi
-          find artifacts/permanent-pdfs -type f -name '*.pdf' -delete 2>/dev/null || true
-          rm -rf artifacts/permanent-pdfs
-          find . -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -delete
-          python3 ../scripts/rechercher_pdf_storage_hygiene.py --root "$PWD" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf'
-          python3 ../scripts/rechercher_pdf_storage_hygiene.py --root "$PWD" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
-          mkdir -p ../artifacts
-          while IFS= read -r -d '' f; do
-            base="$(basename "${f#./}")"
-            if [ ! -e "../artifacts/$base" ]; then cp -- "$f" "../artifacts/$base"; fi
-          done < <(find artifacts -type f -name '*.pdf' -print0)
+          test -n "$PUBLIC_GH_TOKEN"
+          test -n "$PROTECTED_GH_TOKEN"
+          GH_TOKEN="$PUBLIC_GH_TOKEN" gh repo view "$PUBLIC_REPO" >/dev/null
+          GH_TOKEN="$PROTECTED_GH_TOKEN" gh repo view "$PROTECTED_REPO" >/dev/null
+          echo "PUBLIC_RELEASE_DESTINATION=READY repository=$PUBLIC_REPO"
+          echo "PROTECTED_RELEASE_DESTINATION=READY repository=$PROTECTED_REPO"
 
       - name: Build census and discovery index
         run: |
@@ -113,19 +100,20 @@ jobs:
           python3 .governance-source/scripts/rechercher_encyclopedia_catalog_census.py
           python3 .governance-source/scripts/rechercher_dorar_book_index.py --root "$GITHUB_WORKSPACE"
 
-      - name: Canonicalize all primary PDF working storage
+      - name: Canonicalize primary PDF working storage
         run: |
           set -euo pipefail
           python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
 
-      - name: Acquire PDFs through the single unbounded Hijri chronological queue
+      - name: Acquire PDFs through a bounded unbounded-queue batch
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
-          git lfs install
-          git lfs pull --include='artifacts/*.pdf' --exclude='' || true
+          sudo apt-get clean
+          df -h "$GITHUB_WORKSPACE"
           python3 scripts/rechercher_sequential_acquisition.py --root "$GITHUB_WORKSPACE"
+          df -h "$GITHUB_WORKSPACE"
           rm -rf .governance-source
 
       - name: Enforce non-destructive PDF quality and completeness gate
@@ -136,179 +124,157 @@ jobs:
       - name: Reject encrypted or invalid primary PDFs
         run: |
           set -euo pipefail
-          if find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then echo 'encrypted artifact remains'; exit 1; fi
+          if find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo 'encrypted artifact remains'
+            exit 1
+          fi
           while IFS= read -r -d '' f; do
-            head -c 5 "$f" | grep -qx '%PDF-' || { echo "not a real PDF: $f"; exit 1; }
+            if head -n 1 "$f" | grep -q '^version https://git-lfs.github.com/spec/v1$'; then
+              continue
+            fi
+            head -c 5 "$f" | grep -qx '%PDF-'
             test -s "$f"
             qpdf --check "$f" >/dev/null
           done < <(find artifacts -type f -name '*.pdf' -print0)
 
-      - name: Route each PDF exactly once by rights (public or protected)
+      - name: Publish each verified PDF to exactly one rights-gated Release
+        env:
+          PUBLIC_GH_TOKEN: ${{ secrets.RECHERCHER_PUBLIC_PDF_STORAGE_TOKEN }}
+          PROTECTED_GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          PUBLIC_REPO: ${{ env.RECHERCHER_PUBLIC_PDF_STORAGE_REPO }}
+          SECONDARY_REPO: ${{ env.RECHERCHER_SECONDARY_STORAGE_REPO }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          public_tag="rechercher-pdf-public-$(date -u +%Y-%m-%d)"
+          protected_tag="rechercher-pdf-protected-$(date -u +%Y-%m-%d)"
+          : > artifacts/governance/release-assets.jsonl
+
+          is_public_eligible() {
+            local manifest="$1"
+            test -s "$manifest" || return 1
+            python3 - "$manifest" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding='utf-8'))
+          raise SystemExit(0 if d.get('storage_visibility') == 'publication-eligible' and d.get('public_browser') is True else 1)
+          PY
+          }
+
+          ensure_release() {
+            local repo="$1" tag="$2" title="$3" notes="$4"
+            local token="$PUBLIC_GH_TOKEN"
+            test "$repo" = "$SECONDARY_REPO" && token="$PROTECTED_GH_TOKEN"
+            if ! GH_TOKEN="$token" gh release view "$tag" --repo "$repo" >/dev/null 2>&1; then
+              GH_TOKEN="$token" gh release create "$tag" --repo "$repo" --target main --title "$title" --notes "$notes"
+            fi
+          }
+
+          while IFS= read -r -d '' f; do
+            test -s "$f"
+            head -c 5 "$f" | grep -qx '%PDF-'
+            name="$(basename "$f")"
+            stem="${name%.pdf}"
+            manifest="artifacts/$stem.manifest.json"
+            sha="$(sha256sum "$f" | awk '{print $1}')"
+
+            if is_public_eligible "$manifest"; then
+              ensure_release "$PUBLIC_REPO" "$public_tag" "Rechercher public PDFs $(date -u +%Y-%m-%d)" "Rights-gated public PDF assets. Canonical plaintext PDFs only. Provenance and rights metadata remain in the main repository; Corpus is not modified."
+              if GH_TOKEN="$PUBLIC_GH_TOKEN" gh release view "$public_tag" --repo "$PUBLIC_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$name"; then
+                echo "RELEASE_ASSET_ALREADY_PRESENT route=public file=$name"
+              else
+                GH_TOKEN="$PUBLIC_GH_TOKEN" gh release upload "$public_tag" "$f" --repo "$PUBLIC_REPO" --clobber=false
+                printf '%s\n' "{\"file\":\"$name\",\"sha256\":\"$sha\",\"release\":\"$public_tag\",\"route\":\"public\",\"repository\":\"$PUBLIC_REPO\"}" >> artifacts/governance/release-assets.jsonl
+              fi
+            else
+              ensure_release "$SECONDARY_REPO" "$protected_tag" "Rechercher protected PDFs $(date -u +%Y-%m-%d)" "Protected developer-access PDF assets. Canonical plaintext PDFs only. Missing or non-public rights evidence stays protected; provenance and rights metadata remain in the main repository; Corpus is not modified."
+              if GH_TOKEN="$PROTECTED_GH_TOKEN" gh release view "$protected_tag" --repo "$SECONDARY_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$name"; then
+                echo "RELEASE_ASSET_ALREADY_PRESENT route=protected file=$name"
+              else
+                GH_TOKEN="$PROTECTED_GH_TOKEN" gh release upload "$protected_tag" "$f" --repo "$SECONDARY_REPO" --clobber=false
+                printf '%s\n' "{\"file\":\"$name\",\"sha256\":\"$sha\",\"release\":\"$protected_tag\",\"route\":\"protected\",\"repository\":\"$SECONDARY_REPO\"}" >> artifacts/governance/release-assets.jsonl
+              fi
+            fi
+            rm -f -- "$f"
+          done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          rows=[json.loads(x) for x in Path('artifacts/governance/release-assets.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len({r['sha256'] for r in rows}) == len(rows), 'DUPLICATE_PDF_SHA_IN_RELEASE_BATCH'
+          Path('artifacts/governance/release-persistence.json').write_text(
+              json.dumps({'schema':'din-allah-encyclopedia/rechercher-release-persistence/v2','storage_model':'github-releases-only','assets':rows,'encrypted_final_artifacts':False,'lfs_pdf_persistence':False,'corpus_write':False},ensure_ascii=False,indent=2)+'\n',
+              encoding='utf-8')
+          PY
+          rm -f artifacts/governance/release-assets.jsonl
+
+      - name: Verify Release-only PDF persistence
+        run: |
+          set -euo pipefail
+          if find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo 'ERROR: encrypted final artifact remains.'
+            exit 1
+          fi
+          if find artifacts -type f -name '*.pdf' -print -quit | grep -q .; then
+            echo 'ERROR: a PDF remained in runner storage after Release persistence.'
+            exit 1
+          fi
+          test -s artifacts/governance/release-persistence.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('artifacts/governance/release-persistence.json').read_text(encoding='utf-8'))
+          assert d['storage_model'] == 'github-releases-only'
+          assert d['lfs_pdf_persistence'] is False
+          assert d['encrypted_final_artifacts'] is False
+          assert d['corpus_write'] is False
+          print('RELEASE_ONLY_STORAGE=VERIFIED assets=%d' % len(d['assets']))
+          PY
+      - name: Verify exactly one newly materialized copy per verified PDF
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import hashlib, json, shutil
+          import hashlib, json
           from pathlib import Path
-
-          primary=Path('artifacts')
-          secondary=Path('.secondary-storage/artifacts')
-          primary.mkdir(parents=True, exist_ok=True)
-          secondary.mkdir(parents=True, exist_ok=True)
-
+          def pointer(path):
+              try:
+                  with path.open('rb') as fh:
+                      return fh.readline().strip() == b'version https://git-lfs.github.com/spec/v1'
+              except OSError:
+                  return False
           def sha256(path):
               h=hashlib.sha256()
               with path.open('rb') as fh:
-                  for chunk in iter(lambda: fh.read(1024*1024), b''): h.update(chunk)
+                  for chunk in iter(lambda: fh.read(1024*1024), b''):
+                      h.update(chunk)
               return h.hexdigest()
-
-          def valid_pdf(path):
-              try:
-                  with path.open('rb') as fh:
-                      return path.is_file() and path.stat().st_size > 0 and fh.read(5) == b'%PDF-'
-              except OSError:
-                  return False
-
-          def route_for(pdf):
-              # The manifest is kept with the acquisition state, never inside
-              # the protected PDF pool. Missing rights evidence fails closed.
-              manifest=primary/(pdf.stem + '.manifest.json')
-              if not manifest.exists():
-                  # Existing legacy secondary PDFs without a manifest remain protected;
-                  # they are never promoted to public without explicit rights evidence.
-                  return 'protected'
-              data=json.loads(manifest.read_text(encoding='utf-8'))
-              visibility=data.get('storage_visibility')
-              if visibility == 'publication-eligible' and data.get('public_browser') is True:
-                  return 'public'
-              if visibility == 'private-protected' and data.get('developer_private_access') is True:
-                  return 'protected'
-              raise SystemExit(f'RIGHTS_ROUTING_BLOCKED: {pdf.name} visibility={visibility!r}')
-
-          # Inspect both pools so a re-run can correct the route without creating
-          # a second PDF copy. Public-eligible -> public primary; otherwise -> protected secondary.
-          candidates=[p for p in sorted(primary.glob('*.pdf'))] + [p for p in sorted(secondary.glob('*.pdf'))]
-          for path in candidates:
-              if not valid_pdf(path):
-                  raise SystemExit(f'not a real PDF: {path}')
-              route=route_for(path)
-              destination_root=primary if route == 'public' else secondary
-              destination=destination_root/path.name
-              if destination != path:
-                  if destination.exists():
-                      if sha256(destination) != sha256(path):
-                          raise SystemExit(f'LOGICAL_PDF_COLLISION: {path.name} conflicts with canonical {destination.name}; refusing a second physical PDF')
-                      path.unlink(missing_ok=True)
-                      continue
-                  shutil.move(str(path),str(destination))
-
-          # Final invariant: one logical book key and one SHA-256 each map to one physical PDF.
           seen={}
-          logical_seen={}
-          for pool,root in (('public',primary),('protected',secondary)):
-              for path in sorted(root.glob('*.pdf')):
-                  if not valid_pdf(path):
-                      raise SystemExit(f'invalid PDF after rights routing: {pool}/{path.name}')
-                  digest=sha256(path)
-                  if digest in seen:
-                      raise SystemExit(f'DUPLICATE_PDF_COPY: {path.name} already stored in {seen[digest]}')
-                  seen[digest]=f'{pool}/{path.name}'
-                  key=path.stem.rsplit('--',1)[0] if '--' in path.stem and len(path.stem.rsplit('--',1)[-1])==12 else path.stem
-                  if key in logical_seen:
-                      raise SystemExit(f'DUPLICATE_LOGICAL_BOOK: {path.name} already stored as {logical_seen[key]}')
-                  logical_seen[key]=f'{pool}/{path.name}'
-
-          public_count=sum(1 for value in seen.values() if value.startswith('public/'))
-          protected_count=sum(1 for value in seen.values() if value.startswith('protected/'))
-          print(f'RIGHTS_ROUTING_OK public={public_count} protected={protected_count} total={len(seen)}')
-          PY
-
-      - name: Persist verified PDFs to primary LFS storage
-        env:
-          TARGET_BRANCH: ${{ inputs.target_branch }}
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          cat > "$RUNNER_TEMP/rechercher-primary-askpass" <<'SH'
-          #!/bin/sh
-          case "$1" in
-            *Username*) printf '%s\n' 'x-access-token' ;;
-            *Password*) printf '%s\n' "$GITHUB_TOKEN" ;;
-            *) printf '%s\n' "$GITHUB_TOKEN" ;;
-          esac
-          SH
-          chmod 700 "$RUNNER_TEMP/rechercher-primary-askpass"
-          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-primary-askpass" GIT_TERMINAL_PROMPT=0
-          git lfs track 'artifacts/*.pdf'
-          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add books-batches scripts .gitattributes artifacts/governance
-          git reset -- ':(glob)scripts/**/__pycache__/**' ':(glob)scripts/**/*.py[cod]' 2>/dev/null || true
-          while IFS= read -r -d '' f; do git add -- "$f"; done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
-          if ! git diff --cached --quiet; then
-            git commit -m 'data(rechercher): persist chronological acquisition state and primary PDFs'
-            git pull --rebase --autostash origin "$TARGET_BRANCH"
-            git lfs fsck --pointers HEAD; git lfs push --dry-run origin HEAD
-            git push origin "HEAD:refs/heads/$TARGET_BRANCH"
-          fi
-
-      - name: Persist verified PDFs to secondary LFS storage
-        env:
-          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
-        run: |
-          set -euo pipefail
-          test -n "$SECONDARY_STORAGE_TOKEN"
-          cd .secondary-storage
-          cat > "$RUNNER_TEMP/rechercher-secondary-askpass" <<'SH'
-          #!/bin/sh
-          case "$1" in
-            *Username*) printf '%s\n' 'x-access-token' ;;
-            *Password*) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
-            *) printf '%s\n' "$SECONDARY_STORAGE_TOKEN" ;;
-          esac
-          SH
-          chmod 700 "$RUNNER_TEMP/rechercher-secondary-askpass"
-          export GIT_ASKPASS="$RUNNER_TEMP/rechercher-secondary-askpass" GIT_TERMINAL_PROMPT=0
-          git lfs track 'artifacts/*.pdf'
-          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .gitattributes
-          git reset -- ':(glob)**/__pycache__/**' ':(glob)**/*.py[cod]' 2>/dev/null || true
-          while IFS= read -r -d '' f; do git add -- "$f"; done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
-          if ! git diff --cached --quiet; then
-            git commit -m 'data(rechercher): persist secondary chronological PDF shard'
-            for attempt in 1 2 3; do
-              git fetch origin main
-              git rebase origin/main
-              git lfs fsck --pointers HEAD
-              git lfs push --dry-run origin HEAD
-              if git push origin HEAD:refs/heads/main; then
-                echo "SECONDARY_PUSH_OK attempt=$attempt"
-                break
-              fi
-              if [ "$attempt" -eq 3 ]; then
-                echo 'ERROR: secondary storage remained non-fast-forward after 3 synchronized attempts.' >&2
-                exit 1
-              fi
-              sleep 3
-            done
-          fi
-
-      - name: Verify exactly one stored copy per verified PDF
-        env:
-          TARGET_BRANCH: ${{ inputs.target_branch }}
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import hashlib,json
-          from pathlib import Path
-          primary=Path('artifacts'); secondary=Path('.secondary-storage/artifacts'); seen={}
-          for pool,root in [('primary',primary),('secondary',secondary)]:
+          for pool, root in [('primary', Path('artifacts'))]:
               for pdf in sorted(root.glob('*.pdf')):
+                  if pointer(pdf):
+                      continue
                   data=pdf.read_bytes()
-                  if not data.startswith(b'%PDF-') or not data: raise SystemExit(f'invalid PDF: {pool}/{pdf.name}')
-                  sha=hashlib.sha256(data).hexdigest()
-                  if sha in seen: raise SystemExit(f'DUPLICATE_PDF_COPY: {pdf.name} already stored in {seen[sha]}')
-                  seen[sha]=f'{pool}/{pdf.name}'
-          Path('artifacts/governance/storage-end-to-end-proof.json').write_text(json.dumps({'status':'VERIFIED','storage_model':'ONE_COPY_ONLY_RIGHTS_ROUTED','verified_real_pdfs':len(seen),'public_storage':'primary public asset','protected_storage':'secondary developer-access pool','developer_access_public':True,'developer_access_protected':True,'sha256':'integrity_only_not_storage_path','encrypted_final_artifacts':False,'duplicate_pdf_copies':0},indent=2)+'\n',encoding='utf-8')
-          print(f'ONE_COPY_STORAGE=VERIFIED count={len(seen)}')
+                  if not data.startswith(b'%PDF-') or not data:
+                      raise SystemExit(f'invalid PDF: {pool}/{pdf.name}')
+                  digest=hashlib.sha256(data).hexdigest()
+                  if digest in seen:
+                      raise SystemExit(f'DUPLICATE_PDF_COPY: {pdf.name} already stored in {seen[digest]}')
+                  seen[digest]=f'{pool}/{pdf.name}'
+          Path('artifacts/governance/storage-end-to-end-proof.json').write_text(
+              json.dumps(
+                  {
+                      'status':'VERIFIED',
+                      'storage_model':'ONE_COPY_ONLY_FOR_MATERIALIZED_BATCH',
+                      'verified_real_pdfs':len(seen),
+                      'primary':'artifacts/*.pdf',
+                      'secondary':'artifacts/*.pdf',
+                      'encrypted_final_artifacts':False,
+                      'duplicate_pdf_copies':0,
+                      'secondary_existing_lfs_objects_downloaded':False
+                  },
+                  indent=2
+              )+'\n',
+              encoding='utf-8'
+          )
+          print(f'ONE_COPY_STORAGE=VERIFIED newly_materialized={len(seen)}')
           PY
-          git lfs fsck --pointers HEAD
-          cd .secondary-storage; git lfs fsck --pointers HEAD

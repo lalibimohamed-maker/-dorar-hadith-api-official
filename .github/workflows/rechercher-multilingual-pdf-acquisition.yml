@@ -1,0 +1,605 @@
+name: Rechercher — Multilingual resource acquisition
+on:
+  workflow_call:
+    secrets:
+      RECHERCHER_MATRIX_STORAGE_TOKEN:
+        required: true
+      RECHERCHER_SECONDARY_STORAGE_TOKEN:
+        required: false
+  workflow_dispatch:
+  push:
+    branches:
+      - 'feat/rechercher-global-multilingual-resource-discovery-v9'
+  pull_request:
+    paths:
+      - '.github/workflows/rechercher-multilingual-pdf-acquisition.yml'
+      - 'research/evidence/global-multilingual/**'
+      - 'scripts/rechercher_acquire_multilingual_pdfs.mjs'
+      - 'scripts/rechercher_acquire_multilingual_cell_pdfs.mjs'
+      - 'scripts/rechercher_prov.mjs'
+      - 'config/rechercher/provenance-2026.json'
+      - 'schemas/rechercher-prov-json.schema.json'
+      - 'scripts/rechercher_validate_multilingual_manifest.mjs'
+  schedule:
+    - cron: '43 3 * * *'
+permissions:
+  contents: none
+
+env:
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
+concurrency:
+  group: rechercher-multilingual-pdf-${{ github.ref }}
+  # Long-running acquisition must not be cancelled by a newer scheduled/manual run; resume inventory handles continuation safely.
+  cancel-in-progress: false
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preflight storage and required secrets
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}" || { echo "PREFLIGHT_FAIL: RECHERCHER_MATRIX_STORAGE_TOKEN missing"; exit 1; }
+          [[ "$MATRIX_STORAGE_REPO" =~ ^[^/]+/[^/]+$ ]] || { echo "PREFLIGHT_FAIL: invalid MATRIX_STORAGE_REPO"; exit 1; }
+          storage_url="https://github.com/${MATRIX_STORAGE_REPO}.git"
+          cat > "$RUNNER_TEMP/matrix-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          test -n "$(git ls-remote "$storage_url" HEAD)"
+          rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
+          git clone --depth 1 "$storage_url" "$RUNNER_TEMP/matrix-storage-preflight"
+          git -C "$RUNNER_TEMP/matrix-storage-preflight" rev-parse --is-inside-work-tree
+          git -C "$RUNNER_TEMP/matrix-storage-preflight" remote -v
+          rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
+          echo "PREFLIGHT_STORAGE_READ_OK repo=$MATRIX_STORAGE_REPO"
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Install PDF validator
+        run: sudo apt-get update && sudo apt-get install -y qpdf openssl
+      - name: Preflight PDF tooling
+        run: |
+          set -euo pipefail
+          node --version
+          qpdf --version
+          openssl version
+      - name: Build durable acquisition resume inventory from all matrix Releases
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}"
+          export GH_TOKEN="$MATRIX_STORAGE_TOKEN"
+          inventory="$RUNNER_TEMP/existing-release-inventory.json"
+          python3 - "$inventory" <<'PY'
+          import json, os, re, subprocess, sys
+          repo=os.environ["MATRIX_STORAGE_REPO"]
+          raw=subprocess.check_output([
+              "gh","api","--paginate","-H","Accept: application/vnd.github+json",
+              f"/repos/{repo}/releases?per_page=100"
+          ], text=True)
+          releases=json.loads(raw)
+          cells=set()
+          sha256=set()
+          assets=0
+          for rel in releases:
+              for a in rel.get("assets") or []:
+                  if a.get("state") != "uploaded" or not str(a.get("name","")).lower().endswith(".pdf"):
+                      continue
+                  assets += 1
+                  digest=str(a.get("digest") or "")
+                  if digest.startswith("sha256:"):
+                      sha256.add(digest.removeprefix("sha256:"))
+                  name=str(a.get("name") or "")
+                  cell=name.split("__",1)[0].strip()
+                  if cell:
+                      cells.add(cell)
+          data={"schema":"rechercher/multilingual-existing-release-inventory/v1",
+                "repository":repo,"release_count":len(releases),"asset_count":assets,
+                "cells":sorted(cells),"sha256":sorted(sha256)}
+          with open(sys.argv[1],"w",encoding="utf-8") as fp:
+              json.dump(data,fp,ensure_ascii=False,indent=2)
+              fp.write("\n")
+          print(f"MATRIX_RESUME_INVENTORY releases={len(releases)} assets={assets} cells={len(cells)} sha256={len(sha256)}")
+          PY
+      - name: Acquire multilingual matrix-cell books and PDFs
+        env:
+          ACQUISITION_EXISTING_INVENTORY: ${{ runner.temp }}/existing-release-inventory.json
+        run: node scripts/rechercher_acquire_multilingual_cell_pdfs.mjs
+      - name: Persist non-blocking PROV provenance to matrix evidence storage
+        if: ${{ always() && hashFiles('artifacts/rechercher/multilingual-pdf-acquisition/provenance.json') != '' }}
+        continue-on-error: true
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}"
+          storage_url="https://github.com/${MATRIX_STORAGE_REPO}.git"
+          cat > "$RUNNER_TEMP/prov-storage-askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+            *) printf '%s\n' "$MATRIX_STORAGE_TOKEN" ;;
+          esac
+          SH
+          chmod 700 "$RUNNER_TEMP/prov-storage-askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/prov-storage-askpass" GIT_TERMINAL_PROMPT=0
+          dest="$RUNNER_TEMP/prov-storage"
+          rm -rf "$dest"
+          git clone --depth 1 "$storage_url" "$dest"
+          target="$dest/research/provenance/rechercher/multilingual/${GITHUB_RUN_ID}"
+          mkdir -p "$target"
+          cp -f artifacts/rechercher/multilingual-pdf-acquisition/provenance.json "$target/provenance.json"
+          if [ -s artifacts/rechercher/multilingual-pdf-acquisition/provenance.jsonl ]; then
+            cp -f artifacts/rechercher/multilingual-pdf-acquisition/provenance.jsonl "$target/provenance.jsonl"
+          fi
+          node - "$target/provenance.json" "$target/provenance-manifest.json" <<'NODE'
+          const fs=require('fs');
+          const p=process.argv[2], out=process.argv[3];
+          const d=JSON.parse(fs.readFileSync(p,'utf8'));
+          fs.writeFileSync(out,JSON.stringify({
+            schema:'rechercher/provenance-storage-manifest/v1',
+            run_id:process.env.GITHUB_RUN_ID,
+            source_repository:process.env.GITHUB_REPOSITORY,
+            source_ref:process.env.GITHUB_REF,
+            format:'PROV-JSON',
+            entities:Object.keys(d.entity||{}).length,
+            activities:Object.keys(d.activity||{}).length,
+            agents:Object.keys(d.agent||{}).length,
+            policy:'metadata-only; provenance does not grant redistribution rights'
+          },null,2)+'\n');
+          NODE
+          git -C "$dest" config user.name "github-actions[bot]"
+          git -C "$dest" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$dest" add "research/provenance/rechercher/multilingual/${GITHUB_RUN_ID}"
+          if git -C "$dest" diff --cached --quiet; then
+            echo "PROV_STORAGE_NOOP=true"
+            exit 0
+          fi
+          git -C "$dest" commit -m "data(provenance): persist multilingual acquisition provenance ${GITHUB_RUN_ID}"
+          for attempt in 1 2 3 4 5; do
+            git -C "$dest" pull --rebase origin main || true
+            if git -C "$dest" push origin HEAD:refs/heads/main; then
+              echo "PROV_STORAGE_PERSIST_OK attempt=$attempt run_id=${GITHUB_RUN_ID}"
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "PROV_STORAGE_PERSIST_FAILED_NON_BLOCKING=true"
+              exit 1
+            fi
+            sleep 5
+          done
+          git -C "$dest" fetch origin main
+          git -C "$dest" reset --hard origin/main
+          test -s "$dest/research/provenance/rechercher/multilingual/${GITHUB_RUN_ID}/provenance.json"
+          echo "PROV_STORAGE_VERIFY_OK run_id=${GITHUB_RUN_ID}"
+
+      - name: Validate acquired PDFs
+        run: |
+          set -euo pipefail
+          manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+          test -s "$manifest"
+          find artifacts/rechercher/multilingual-pdf-acquisition -type f -name '*.pdf' -print0 |
+            while IFS= read -r -d '' f; do
+              test "$(head -c 4 "$f")" = "%PDF"
+              # qpdf exit 3 means warnings without errors; warnings are logged but are not a validation failure.
+              qpdf --check --warning-exit-0 "$f"
+              test -s "$f"
+            done
+      - name: Separate research-only PDFs from public material
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const m=JSON.parse(fs.readFileSync('artifacts/rechercher/multilingual-pdf-acquisition/manifest.json','utf8'));
+          for (const e of Object.values(m.cells || m.languages || {})) {
+            if (e.acquisition !== 'research-only') continue;
+            for (const f of e.files || []) {
+              if (!f.path.endsWith('.pdf')) continue;
+              const rel=f.path.replace(/^artifacts\/rechercher\/multilingual-pdf-acquisition\//,'');
+              f.path='artifacts/rechercher/multilingual-research-vault/'+rel;
+              f.research_only=true;
+            }
+          }
+          fs.writeFileSync('artifacts/rechercher/multilingual-pdf-acquisition/manifest.json', JSON.stringify(m,null,2)+'\n');
+          NODE
+          mkdir -p artifacts/rechercher/multilingual-research-vault
+          while IFS= read -r -d '' f; do
+            rel="${f#artifacts/rechercher/multilingual-pdf-acquisition/}"
+            mkdir -p "artifacts/rechercher/multilingual-research-vault/$(dirname "$rel")"
+            cp -a "$f" "artifacts/rechercher/multilingual-research-vault/$rel"
+            rm -f "$f"
+          done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.cells || m.languages || {}))if(e.acquisition==="research-only")for(const f of e.files||[])if(f.path.endsWith(".pdf"))console.log(f.path)')
+          echo "RESEARCH_ONLY_STORAGE=PRIVATE_DURABLE_STORAGE_REQUIRED"
+
+      - name: Persist research-only PDFs to protected GitHub Releases
+        env:
+          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
+        run: |
+          set -euo pipefail
+          if ! find artifacts/rechercher/multilingual-research-vault -type f -name "*.pdf" -print -quit | grep -q .; then
+            echo "No research-only PDFs to persist."
+            exit 0
+          fi
+          test -n "${SECONDARY_STORAGE_TOKEN:-}" || {
+            echo "ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required for durable research-only PDF retention."
+            exit 1
+          }
+          export GH_TOKEN="$SECONDARY_STORAGE_TOKEN"
+          release_root="$RUNNER_TEMP/research-release"
+          rm -rf "$release_root"
+          mkdir -p "$release_root"
+          find artifacts/rechercher/multilingual-research-vault -type f -name '*.pdf' -print0 > "$release_root/files.nul"
+          count=0
+          while IFS= read -r -d '' file; do
+            test "$(head -c 5 "$file")" = "%PDF-"
+            count=$((count+1))
+          done < "$release_root/files.nul"
+          if [ "$count" -eq 0 ]; then
+            echo "No research-only PDFs to persist."
+            exit 0
+          fi
+          tag="rechercher-multilingual-protected-${GITHUB_RUN_ID}"
+          notes="$release_root/notes.md"
+          {
+            echo "# Rechercher protected multilingual PDFs"
+            echo
+            echo "Research-only PDFs retained for developer/research review."
+            echo "No Corpus write. No public publication."
+            echo "Canonical plaintext PDFs only; encrypted extensions are forbidden."
+          } > "$notes"
+
+          declare -A existing_sha=()
+          while IFS=$'\t' read -r digest release_tag asset_name; do
+            [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
+          done < <(
+            gh api --paginate -H "Accept: application/vnd.github+json" \
+              "/repos/$SECONDARY_STORAGE_REPO/releases?per_page=100" \
+              --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
+          )
+          echo "SECONDARY_EXISTING_SHA_COUNT=${#existing_sha[@]}"
+
+          new_count=0
+          duplicate_count=0
+          declare -A batch_sha=()
+          while IFS= read -r -d '' file; do
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            digest="sha256:$sha"
+            if [ -n "${existing_sha[$digest]+x}" ] || [ -n "${batch_sha[$digest]+x}" ]; then
+              echo "SECONDARY_DEDUP_SKIP sha256=$sha file=$(basename "$file")"
+              duplicate_count=$((duplicate_count+1))
+              continue
+            fi
+            batch_sha["$digest"]=1
+            new_count=$((new_count+1))
+          done < "$release_root/files.nul"
+          echo "SECONDARY_RELEASE_INPUTS total=$count new=$new_count duplicates_skipped=$duplicate_count"
+          if [ "$new_count" -eq 0 ]; then
+            echo "SECONDARY_RELEASE_NOOP all_research_only_pdfs_already_persisted=true"
+            rm -rf "$release_root"
+            exit 0
+          fi
+
+          gh release create "$tag" --repo "$SECONDARY_STORAGE_REPO" --title "Rechercher protected multilingual PDFs — $tag" --notes-file "$notes" --latest=false
+          while IFS= read -r -d '' file; do
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            digest="sha256:$sha"
+            if [ -n "${existing_sha[$digest]+x}" ]; then
+              echo "SECONDARY_DEDUP_SKIP sha256=$sha existing=${existing_sha[$digest]} file=$(basename "$file")"
+              continue
+            fi
+            base="$(basename "$file")"
+            asset="${sha}_${base}"
+            cp -f "$file" "$release_root/$asset"
+            gh release upload "$tag" "$release_root/$asset" --repo "$SECONDARY_STORAGE_REPO"
+            rm -f "$release_root/$asset"
+            existing_sha["$digest"]="$tag/$asset"
+          done < "$release_root/files.nul"
+          gh release view "$tag" --repo "$SECONDARY_STORAGE_REPO" --json tagName,isDraft,assets,url
+          rm -rf "$release_root"
+          echo "SECONDARY_MULTILINGUAL_PDF_RELEASE_OK assets=$new_count tag=$tag"
+
+      - name: Verify cell download inventory
+        run: |
+          set -euo pipefail
+          manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+          node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));const cells=m.cells||m.languages||{};if(m.cell_count!==3192||Object.keys(cells).length!==3192)process.exit(1);for(const [id,e] of Object.entries(cells)){if(e.cell_id!==id||!e.language||!e.domain)process.exit(1)};console.log(`CELL_INVENTORY_OK cells=${Object.keys(cells).length} files=${m.total_files}`)' "$manifest"
+
+      - name: Reject encrypted review artifacts
+        run: |
+          set -euo pipefail
+          if find artifacts/rechercher -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo "ERROR: encrypted review artifacts are not retained."
+            exit 1
+          fi
+
+      - name: Persist public multilingual PDFs to matrix GitHub Releases
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}"
+          export GH_TOKEN="$MATRIX_STORAGE_TOKEN"
+          release_root="$RUNNER_TEMP/matrix-release"
+          rm -rf "$release_root"
+          mkdir -p "$release_root/assets"
+          manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+          test -s "$manifest"
+          python3 - "$release_root" <<'PY'
+          import json, os, shutil, hashlib, sys
+          m=json.load(open("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json",encoding="utf-8"))
+          root=os.path.abspath("artifacts/rechercher/multilingual-pdf-acquisition")
+          out=os.path.abspath(os.path.join(sys.argv[1],"assets"))
+          rows=[]
+          for cell_id,e in (m.get("cells") or {}).items():
+              if e.get("acquisition") != "public":
+                  continue
+              for item in e.get("files",[]):
+                  p=item.get("path")
+                  if not p or not p.endswith(".pdf") or item.get("research_only"):
+                      continue
+                  full=os.path.abspath(p)
+                  if not full.startswith(root+os.sep) or not os.path.isfile(full):
+                      raise SystemExit(f"unsafe or missing manifest PDF: {p}")
+                  if open(full,"rb").read(5) != b"%PDF-":
+                      raise SystemExit(f"invalid PDF header: {p}")
+                  sha=item.get("sha256") or hashlib.sha256(open(full,"rb").read()).hexdigest()
+                  name=f"{cell_id}__{sha[:16]}__{os.path.basename(full)}"
+                  dst=os.path.join(out,name)
+                  shutil.copy2(full,dst)
+                  rows.append((cell_id,name,sha,os.path.getsize(full)))
+          with open(os.path.join(os.path.dirname(out),"asset-manifest.tsv"),"w",encoding="utf-8") as fp:
+              for row in rows: fp.write("\t".join(map(str,row))+"\n")
+          print(f"PUBLIC_RELEASE_INPUTS pdfs={len(rows)}")
+          PY
+          # Global SHA-256 release deduplication: inspect every existing Release asset digest
+          # before creating a new release. GitHub exposes the asset digest on the Releases API.
+          declare -A existing_sha=()
+          while IFS=$'\t' read -r digest release_tag asset_name; do
+            [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
+          done < <(
+            gh api --paginate \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/$MATRIX_STORAGE_REPO/releases?per_page=100" \
+              --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
+          )
+          echo "MATRIX_EXISTING_SHA_COUNT=${#existing_sha[@]}"
+
+          mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f -name '*.pdf' -print | sort)
+          total="${#assets[@]}"
+          if [ "$total" -eq 0 ]; then
+            echo "No public redistributable PDFs to persist."
+            exit 0
+          fi
+
+          new_assets=()
+          duplicate_count=0
+          for file in "${assets[@]}"; do
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            digest="sha256:$sha"
+            if [ -n "${existing_sha[$digest]+x}" ]; then
+              echo "MATRIX_DEDUP_SKIP sha256=$sha existing=${existing_sha[$digest]} file=$(basename "$file")"
+              duplicate_count=$((duplicate_count+1))
+              continue
+            fi
+            new_assets+=( "$file" )
+          done
+          total_new="${#new_assets[@]}"
+          echo "MATRIX_RELEASE_INPUTS total=$total new=$total_new duplicates_skipped=$duplicate_count"
+          if [ "$total_new" -eq 0 ]; then
+            echo "MATRIX_RELEASE_NOOP all_public_pdfs_already_persisted=true"
+            rm -rf "$release_root"
+            exit 0
+          fi
+
+          max_assets=900
+          part=0
+          total_releases=0
+          for ((i=0; i<total_new; i+=max_assets)); do
+            part=$((part+1))
+            tag="rechercher-multilingual-public-${GITHUB_RUN_ID}-$(printf '%03d' "$part")"
+            end=$((i+max_assets))
+            if [ "$end" -gt "$total_new" ]; then end="$total_new"; fi
+            notes="$release_root/notes-${part}.md"
+            {
+              echo "# Rechercher public multilingual PDF matrix"
+              echo
+              echo "Cells: 133 languages × 24 domains = 3,192."
+              echo "Only manifest entries classified as public are included."
+              echo "Canonical plaintext PDFs only; no LFS and no encrypted PDF artifacts."
+              echo "Asset count: $((end-i))."
+              echo "Global SHA-256 deduplication is enforced against all existing Releases before upload."
+            } > "$notes"
+            gh release create "$tag" --repo "$MATRIX_STORAGE_REPO" --title "Rechercher multilingual public PDFs — part $part" --notes-file "$notes" --latest=false
+            for ((j=i; j<end; j++)); do
+              file="${new_assets[$j]}"
+              sha="$(sha256sum "$file" | awk '{print $1}')"
+              digest="sha256:$sha"
+              if gh api --silent --fail "/repos/$MATRIX_STORAGE_REPO/releases" >/dev/null 2>&1; then
+                if gh api --paginate -H "Accept: application/vnd.github+json" "/repos/$MATRIX_STORAGE_REPO/releases?per_page=100" \
+                  --jq '.[] | .assets[]? | .digest // empty' | grep -Fxq "$digest"; then
+                  echo "MATRIX_DEDUP_RACE_SKIP sha256=$sha file=$(basename "$file")"
+                  continue
+                fi
+              fi
+              gh release upload "$tag" "$file" --repo "$MATRIX_STORAGE_REPO"
+              echo "MATRIX_PDF_UPLOADED sha256=$sha file=$(basename "$file") tag=$tag"
+            done
+            gh release view "$tag" --repo "$MATRIX_STORAGE_REPO" --json tagName,isDraft,assets,url
+            total_releases=$((total_releases+1))
+            echo "MATRIX_PDF_RELEASE_OK part=$part assets=$((end-i)) tag=$tag"
+          done
+          rm -rf "$release_root"
+          echo "MATRIX_RELEASE_ONLY_PERSISTENCE_OK pdfs=$total releases=$part"
+      - name: Strict multilingual manifest gate
+        run: |
+          set -euo pipefail
+          node scripts/rechercher_validate_multilingual_manifest.mjs artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+
+      - name: Upload acquisition manifest
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-multilingual-acquisition-manifest-${{ github.run_id }}
+          path: artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+          if-no-files-found: error
+
+      - name: Verify cell download inventory
+        run: |
+          set -euo pipefail
+          manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+          node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));const cells=m.cells||m.languages||{};if(m.cell_count!==3192||Object.keys(cells).length!==3192)process.exit(1);for(const [id,e] of Object.entries(cells)){if(e.cell_id!==id||!e.language||!e.domain)process.exit(1)};console.log(`CELL_INVENTORY_OK cells=${Object.keys(cells).length} files=${m.total_files}`)' "$manifest"
+
+      - name: Reject encrypted review artifacts
+        run: |
+          set -euo pipefail
+          if find artifacts/rechercher -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo "ERROR: encrypted review artifacts are not retained."
+            exit 1
+          fi
+
+      - name: Persist public multilingual PDFs to matrix GitHub Releases
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}"
+          export GH_TOKEN="$MATRIX_STORAGE_TOKEN"
+          release_root="$RUNNER_TEMP/matrix-release"
+          rm -rf "$release_root"
+          mkdir -p "$release_root/assets"
+          manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+          test -s "$manifest"
+          python3 - "$release_root" <<'PY'
+          import json, os, shutil, hashlib, sys
+          m=json.load(open("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json",encoding="utf-8"))
+          root=os.path.abspath("artifacts/rechercher/multilingual-pdf-acquisition")
+          out=os.path.abspath(os.path.join(sys.argv[1],"assets"))
+          rows=[]
+          for cell_id,e in (m.get("cells") or {}).items():
+              if e.get("acquisition") != "public":
+                  continue
+              for item in e.get("files",[]):
+                  p=item.get("path")
+                  if not p or not p.endswith(".pdf") or item.get("research_only"):
+                      continue
+                  full=os.path.abspath(p)
+                  if not full.startswith(root+os.sep) or not os.path.isfile(full):
+                      raise SystemExit(f"unsafe or missing manifest PDF: {p}")
+                  if open(full,"rb").read(5) != b"%PDF-":
+                      raise SystemExit(f"invalid PDF header: {p}")
+                  sha=item.get("sha256") or hashlib.sha256(open(full,"rb").read()).hexdigest()
+                  name=f"{cell_id}__{sha[:16]}__{os.path.basename(full)}"
+                  dst=os.path.join(out,name)
+                  shutil.copy2(full,dst)
+                  rows.append((cell_id,name,sha,os.path.getsize(full)))
+          with open(os.path.join(os.path.dirname(out),"asset-manifest.tsv"),"w",encoding="utf-8") as fp:
+              for row in rows: fp.write("\t".join(map(str,row))+"\n")
+          print(f"PUBLIC_RELEASE_INPUTS pdfs={len(rows)}")
+          PY
+          # Global SHA-256 release deduplication: inspect every existing Release asset digest
+          # before creating a new release. GitHub exposes the asset digest on the Releases API.
+          declare -A existing_sha=()
+          while IFS=$'\t' read -r digest release_tag asset_name; do
+            [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
+          done < <(
+            gh api --paginate \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/$MATRIX_STORAGE_REPO/releases?per_page=100" \
+              --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
+          )
+          echo "MATRIX_EXISTING_SHA_COUNT=${#existing_sha[@]}"
+
+          mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f -name '*.pdf' -print | sort)
+          total="${#assets[@]}"
+          if [ "$total" -eq 0 ]; then
+            echo "No public redistributable PDFs to persist."
+            exit 0
+          fi
+
+          new_assets=()
+          duplicate_count=0
+          for file in "${assets[@]}"; do
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            digest="sha256:$sha"
+            if [ -n "${existing_sha[$digest]+x}" ]; then
+              echo "MATRIX_DEDUP_SKIP sha256=$sha existing=${existing_sha[$digest]} file=$(basename "$file")"
+              duplicate_count=$((duplicate_count+1))
+              continue
+            fi
+            new_assets+=( "$file" )
+          done
+          total_new="${#new_assets[@]}"
+          echo "MATRIX_RELEASE_INPUTS total=$total new=$total_new duplicates_skipped=$duplicate_count"
+          if [ "$total_new" -eq 0 ]; then
+            echo "MATRIX_RELEASE_NOOP all_public_pdfs_already_persisted=true"
+            rm -rf "$release_root"
+            exit 0
+          fi
+
+          max_assets=900
+          part=0
+          total_releases=0
+          for ((i=0; i<total_new; i+=max_assets)); do
+            part=$((part+1))
+            tag="rechercher-multilingual-public-${GITHUB_RUN_ID}-$(printf '%03d' "$part")"
+            end=$((i+max_assets))
+            if [ "$end" -gt "$total_new" ]; then end="$total_new"; fi
+            notes="$release_root/notes-${part}.md"
+            {
+              echo "# Rechercher public multilingual PDF matrix"
+              echo
+              echo "Cells: 133 languages × 24 domains = 3,192."
+              echo "Only manifest entries classified as public are included."
+              echo "Canonical plaintext PDFs only; no LFS and no encrypted PDF artifacts."
+              echo "Asset count: $((end-i))."
+              echo "Global SHA-256 deduplication is enforced against all existing Releases before upload."
+            } > "$notes"
+            gh release create "$tag" --repo "$MATRIX_STORAGE_REPO" --title "Rechercher multilingual public PDFs — part $part" --notes-file "$notes" --latest=false
+            for ((j=i; j<end; j++)); do
+              file="${new_assets[$j]}"
+              sha="$(sha256sum "$file" | awk '{print $1}')"
+              digest="sha256:$sha"
+              if gh api --silent --fail "/repos/$MATRIX_STORAGE_REPO/releases" >/dev/null 2>&1; then
+                if gh api --paginate -H "Accept: application/vnd.github+json" "/repos/$MATRIX_STORAGE_REPO/releases?per_page=100" \
+                  --jq '.[] | .assets[]? | .digest // empty' | grep -Fxq "$digest"; then
+                  echo "MATRIX_DEDUP_RACE_SKIP sha256=$sha file=$(basename "$file")"
+                  continue
+                fi
+              fi
+              gh release upload "$tag" "$file" --repo "$MATRIX_STORAGE_REPO"
+              echo "MATRIX_PDF_UPLOADED sha256=$sha file=$(basename "$file") tag=$tag"
+            done
+            gh release view "$tag" --repo "$MATRIX_STORAGE_REPO" --json tagName,isDraft,assets,url
+            total_releases=$((total_releases+1))
+            echo "MATRIX_PDF_RELEASE_OK part=$part assets=$((end-i)) tag=$tag"
+          done
+          rm -rf "$release_root"
+          echo "MATRIX_RELEASE_ONLY_PERSISTENCE_OK pdfs=$total releases=$part"
+      - name: Strict multilingual manifest gate
+        run: |
+          set -euo pipefail
+          node scripts/rechercher_validate_multilingual_manifest.mjs artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+
+      - name: Upload acquisition manifest
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-multilingual-acquisition-manifest
+          path: artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+          if-no-files-found: error
