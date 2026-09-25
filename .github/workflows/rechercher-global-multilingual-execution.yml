@@ -137,7 +137,7 @@ jobs:
 
 
   acquire-multilingual-pdfs:
-    name: Acquire and persist PDFs from the verified 3,192-cell ledger
+    name: Acquire and persist source files from the verified 3,192-cell ledger (PDF-first, DOCX fallback)
     needs: matrix
     uses: ./.github/workflows/rechercher-multilingual-pdf-acquisition.yml
     secrets:
