@@ -5,6 +5,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { validateRepairAndQualityGate } from "./rechercher_docx_pdf_fallback.mjs";
 
 const ROOT = process.cwd();
 const CONFIG = path.join(ROOT, "config/quran-kfgqpc-official-acquisition-2026-09-22.json");
@@ -31,6 +32,19 @@ function signatureFromPrefix(buffer) {
   if (buffer.length >= 4 && buffer.subarray(0, 4).equals(Buffer.from([0x50,0x4b,0x03,0x04]))) return "zip";
   if (buffer.length >= 7 && buffer.subarray(0, 7).equals(Buffer.from([0x52,0x61,0x72,0x21,0x1a,0x07]))) return "rar";
   return null;
+}
+async function isDocx(file) {
+  try {
+    await execFileAsync("python3", ["-c",[
+      "import sys,zipfile",
+      "p=sys.argv[1]",
+      "assert zipfile.is_zipfile(p)",
+      "z=zipfile.ZipFile(p)",
+      "n=set(z.namelist())",
+      "assert '[Content_Types].xml' in n and 'word/document.xml' in n"
+    ].join(";"),file]);
+    return true;
+  } catch { return false; }
 }
 async function curlToFile(url, file, maxSeconds) {
   if (!allowedHost(url, config.allowed_hosts)) throw new Error("URL host/protocol rejected");
@@ -122,7 +136,28 @@ async function acquireEdition(edition) {
     try {
       if (!allowedHost(assetUrl, config.allowed_hosts)) throw new Error("asset host/protocol rejected");
       await curlToFile(assetUrl, temp, 120);
-      const meta = await sha256AndSignature(temp);
+      let meta = await sha256AndSignature(temp);
+      let derivedFromDocx = null;
+      if (meta.signature === "zip" && await isDocx(temp)) {
+        const pdfTemp = temp + ".converted.pdf";
+        try {
+          await execFileAsync("libreoffice", [
+            "--headless","--nologo","--nodefault","--nolockcheck","--norestore",
+            "--convert-to","pdf:writer_pdf_Export","--outdir",path.dirname(pdfTemp),temp
+          ], { timeout: 120000, maxBuffer: 4 * 1024 * 1024 });
+          const produced = path.join(path.dirname(pdfTemp),path.basename(temp).replace(/\.converted\.pdf$/i,".pdf"));
+          if (produced !== pdfTemp) await fs.rename(produced,pdfTemp);
+          await validateRepairAndQualityGate(pdfTemp);
+          const pdfMeta = await sha256AndSignature(pdfTemp);
+          if (pdfMeta.signature !== "pdf") throw new Error("DOCX conversion did not yield PDF");
+          derivedFromDocx = { sha256: meta.sha256, bytes: meta.bytes, source_path: path.relative(ROOT,temp) };
+          await fs.rm(temp,{force:true});
+          await fs.rename(pdfTemp,temp);
+          meta = {...pdfMeta, derived_from_docx: derivedFromDocx};
+        } finally {
+          await fs.rm(pdfTemp,{force:true});
+        }
+      }
       if (meta.bytes > edition.max_bytes) throw new Error("asset exceeds configured size cap");
       const duplicateOf = seenSha256.get(meta.sha256);
       if (duplicateOf) {
@@ -139,7 +174,7 @@ async function acquireEdition(edition) {
       await fs.rename(temp,file);
       const relativePath = path.relative(ROOT,file);
       seenSha256.set(meta.sha256,{edition_id:editionId,path:relativePath});
-      result.acquired = {asset_url:assetUrl,path:relativePath,...meta,transport:"curl-official"};
+      result.acquired = {asset_url:assetUrl,path:relativePath,...meta,transport:"curl-official",format:meta.signature==="pdf"?"pdf":meta.signature};
       result.status = "acquired_research_only";
       break;
     } catch (e) {
