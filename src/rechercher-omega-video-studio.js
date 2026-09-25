@@ -20,7 +20,7 @@ function assertScene(scene, index) {
   if (!scene || typeof scene !== "object") throw new Error(`scene ${index} must be an object`);
   if (!scene.scene_id) throw new Error(`scene ${index} requires scene_id`);
   if (!Array.isArray(scene.evidence_ids) || scene.evidence_ids.length === 0) {
-    throw new Error(`scene ${scene.scene_id} requires at least one evidence_id`);
+    throw new Error(`scene ${scene.scene_id} requires at least one evidence_ids`);
   }
   if (!scene.visual_mode) throw new Error(`scene ${scene.scene_id} requires visual_mode`);
 }
