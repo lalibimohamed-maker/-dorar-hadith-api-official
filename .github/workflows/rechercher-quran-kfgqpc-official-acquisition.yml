@@ -38,6 +38,8 @@ jobs:
           else
             echo "No previous checkpoint artifact found; starting from the first pending language."
           fi
+      - name: Install PDF/DOCX validation and conversion tools
+        run: sudo apt-get update && sudo apt-get install -y qpdf poppler-utils libreoffice-writer fonts-noto-core
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: 24
