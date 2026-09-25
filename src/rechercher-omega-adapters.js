@@ -92,7 +92,8 @@ export function buildKaggleExecution({ kernel_slug, dataset_refs = [], command, 
   };
 }
 
-export function buildAdapterRequest({ backend, model, input }) {
+export function buildAdapterRequest({ backend, model, input = {} }) {
+  assertNoCorpusWrite(input);
   if (backend === "gemini-free-tier") return { provider: "gemini", model, input };
   if (backend === "groq-free-plan") return { provider: "groq", model, input };
   if (backend === "huggingface-inference") return { provider: "huggingface", model, input };
