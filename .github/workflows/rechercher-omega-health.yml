@@ -19,8 +19,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: rechercher-omega-health
-  cancel-in-progress: true
+  group: rechercher-omega-health-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   health:
