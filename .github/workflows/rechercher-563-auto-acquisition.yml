@@ -35,6 +35,7 @@ jobs:
           persist-credentials: false
 
       - name: Verify PR #563 is still open and points to the target branch
+        id: guard
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -43,19 +44,23 @@ jobs:
           state="$(printf '%s' "$pr_json" | jq -r '.state')"
           head_ref="$(printf '%s' "$pr_json" | jq -r '.head.ref')"
           if [ "$state" != "open" ] || [ "$head_ref" != "$TARGET_BRANCH" ]; then
-            echo "PR #${TARGET_PR} is no longer open on ${TARGET_BRANCH}; scheduled acquisition exits cleanly."
+            echo "active=false" >> "$GITHUB_OUTPUT"
+            echo "PR #${TARGET_PR} is no longer open on ${TARGET_BRANCH}; scheduled acquisition is disabled."
             exit 0
           fi
+          echo "active=true" >> "$GITHUB_OUTPUT"
           echo "PR #${TARGET_PR} is open; automatic acquisition is active."
           echo "START_TARGET_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Install acquisition and PDF quality tooling
+        if: steps.guard.outputs.active == 'true'
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils libreoffice
 
       - name: Fetch live #561 source registry
+        if: steps.guard.outputs.active == 'true'
         run: |
           set -euo pipefail
           mkdir -p artifacts/governance
@@ -77,24 +82,28 @@ jobs:
           PY
 
       - name: Materialize current master catalog
+        if: steps.guard.outputs.active == 'true'
         run: |
           set -euo pipefail
           python3 scripts/rechercher_materialize_master_catalog.py
           test -s books-batches/encyclopedia-master/catalog.json
 
       - name: Attach PDF candidates from all #561 sources
+        if: steps.guard.outputs.active == 'true'
         run: |
           set -euo pipefail
           python3 scripts/rechercher_registry_source_bridge.py             --root "$GITHUB_WORKSPACE"             --registry artifacts/governance/source-registry-561.json             --catalog books-batches/encyclopedia-master/catalog.json
           test -s artifacts/governance/source-registry-561-bridge.json
 
       - name: Resolve expected volume evidence
+        if: steps.guard.outputs.active == 'true'
         run: |
           set -euo pipefail
           python3 scripts/rechercher_resolve_volume_evidence.py
           test -s artifacts/governance/sequential-acquisition/volume-resolution.json
 
       - name: Acquire real PDFs with quality and resume gates
+        if: steps.guard.outputs.active == 'true'
         env:
           RECHERCHER_MAX_BOOK_WORKERS: "12"
         run: |
@@ -121,6 +130,7 @@ jobs:
           PY
 
       - name: Validate retained PDFs
+        if: steps.guard.outputs.active == 'true'
         run: |
           set -euo pipefail
           shopt -s nullglob
@@ -133,6 +143,7 @@ jobs:
           echo "VALID_PDF_COUNT=${#files[@]}"
 
       - name: Persist governed acquisition state back to PR #563 branch
+        if: steps.guard.outputs.active == 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -163,6 +174,7 @@ jobs:
           GIT_ASKPASS="$RUNNER_TEMP/askpass.sh" GIT_TERMINAL_PROMPT=0             git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
 
       - name: Persist acquired PDFs to protected Release storage
+        if: steps.guard.outputs.active == 'true'
         if: always()
         env:
           GH_TOKEN: ${{ secrets.DINULLAH_PDF_STORAGE_TOKEN }}
@@ -215,6 +227,7 @@ jobs:
           rm -rf "$release_root"
 
       - name: Remove superseded .pdf.enc assets only after successful PDF persistence
+        if: steps.guard.outputs.active == 'true'
         if: always()
         env:
           GH_TOKEN: ${{ secrets.DINULLAH_PDF_STORAGE_TOKEN }}
