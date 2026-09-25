@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Curated reference registry for useful Hugging Face Spaces discovered through Qwen3-0.6B usage. Spaces are research references, not trusted dependencies or scholarly evidence.",
+  "policy": {
+    "free_first": true,
+    "reference_only": true,
+    "auto_execute_spaces": false,
+    "auto_install_space_code": false,
+    "persistent_mirror_requires_license_clearance": true,
+    "corpus_write_allowed": false,
+    "generated_media_is_evidence": false,
+    "unknown_license_status": "blocked"
+  },
+  "spaces": [
+    {
+      "id": "hf-document-qa",
+      "space_id": "lfoppiano/document-qa",
+      "url": "https://huggingface.co/spaces/lfoppiano/document-qa",
+      "capabilities": ["document_qa", "pdf_rag", "document_retrieval"],
+      "use": "reference",
+      "status": "verified_live",
+      "license_review": "required",
+      "notes": "Scientific document Q&A reference; inspect architecture and retrieval flow before adapting."
+    },
+    {
+      "id": "hf-pdf-rag",
+      "space_id": "LovnishVerma/rag",
+      "url": "https://huggingface.co/spaces/LovnishVerma/rag",
+      "capabilities": ["document_qa", "pdf_rag", "retrieval_augmented_generation"],
+      "use": "reference",
+      "status": "verified_live",
+      "license_review": "required",
+      "notes": "PDF Q&A/RAG reference; do not import its code or data automatically."
+    },
+    {
+      "id": "hf-slm-rag-arena",
+      "space_id": "aizip-dev/SLM-RAG-Arena",
+      "url": "https://huggingface.co/spaces/aizip-dev/SLM-RAG-Arena",
+      "capabilities": ["rag_evaluation", "document_qa", "groundedness_evaluation"],
+      "use": "reference",
+      "status": "verified_live",
+      "license_review": "required",
+      "notes": "Benchmark/reference for small-model RAG evaluation and groundedness checks."
+    },
+    {
+      "id": "hf-omnivoice",
+      "space_id": "k2-fsa/OmniVoice",
+      "url": "https://huggingface.co/spaces/k2-fsa/OmniVoice",
+      "capabilities": ["text_to_speech", "multilingual_speech", "voice"],
+      "use": "reference",
+      "status": "verified_live",
+      "license_review": "required",
+      "notes": "Voice reference associated with the Qwen3-0.6B ecosystem; model/data licenses must be checked independently."
+    },
+    {
+      "id": "hf-lahgtna-omnivoice",
+      "space_id": "oddadmix/Lahgtna-OmniVoice-Demo",
+      "url": "https://huggingface.co/spaces/oddadmix/Lahgtna-OmniVoice-Demo",
+      "capabilities": ["arabic_speech", "dialect_speech", "text_to_speech"],
+      "use": "reference",
+      "status": "verified_live",
+      "license_review": "required",
+      "notes": "Arabic/dialect speech reference; never treat the demo's model or training data as Apache-2.0 merely because Qwen3 is Apache-2.0."
+    },
+    {
+      "id": "hf-token-visual",
+      "space_id": "aiqtech/LLM-Token-Visual",
+      "url": "https://huggingface.co/spaces/aiqtech/LLM-Token-Visual",
+      "capabilities": ["tokenization", "multilingual_token_analysis", "arabic_token_analysis"],
+      "use": "reference",
+      "status": "verified_paused",
+      "license_review": "required",
+      "notes": "Useful tokenizer-analysis reference; Space is currently paused."
+    },
+    {
+      "id": "hf-hallucination-detector",
+      "space_id": "hugging-apps/enoki-hallucination-detector",
+      "url": "https://huggingface.co/spaces/hugging-apps/enoki-hallucination-detector",
+      "capabilities": ["hallucination_detection", "quality_assurance"],
+      "use": "reference",
+      "status": "verified_live",
+      "license_review": "required",
+      "notes": "Quality-assurance reference only; not a truth oracle."
+    }
+  ]
+}
