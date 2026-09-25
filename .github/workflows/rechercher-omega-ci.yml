@@ -1,0 +1,37 @@
+name: Rechercher Ω — architecture and boundary tests
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/rechercher-omega-orchestrator.js"
+      - "config/rechercher-omega-model-registry.json"
+      - "test/rechercher-omega-orchestrator.test.js"
+      - "docs/RECHERCHER-OMEGA.md"
+      - ".github/workflows/rechercher-omega-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  omega-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: 20
+          cache: npm
+          persist-credentials: false
+      - name: Install
+        run: npm ci
+      - name: Ω boundary tests
+        run: node --test test/rechercher-omega-orchestrator.test.js
