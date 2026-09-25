@@ -87,7 +87,8 @@ registry.next_step =
   "Verify every governmental/institutional/human claim against the issuing institution or publisher primary source; record country, official URL, evidence URL, rights evidence and verification timestamp. Only then admit a translation to a matrix cell.";
 
 // codeql[js/http-to-file-access] The API payload is parsed as JSON and only schema-selected provenance fields are serialized into the fixed registry path.
-await fs.writeFile(
+await fs.writeFile( // codeql[js/http-to-file-access] Intentional provenance sync sink: the fixed repository registry path receives schema-selected JSON provenance only, with no raw network response and no Corpus mutation.
+
   registryPath,
   `${JSON.stringify(registry, null, 2)}\n`,
   "utf8",
