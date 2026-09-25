@@ -6,13 +6,14 @@
     "no_paid_fallback": true,
     "corpus_write_allowed": false,
     "persistent_mirror_requires_license_clearance": true,
-    "sha256_required": true
+    "sha256_required": true,
+    "immutable_revision_required": true
   },
   "engines": [
     {
       "logical_id": "qwen3",
       "model_id": "Qwen/Qwen3-0.6B",
-      "revision": "main",
+      "revision": "c1899de",
       "license": "apache-2.0",
       "size_gb": 1.52,
       "role": [
@@ -21,12 +22,13 @@
         "text",
         "tool_use"
       ],
-      "acquisition": "artifact"
+      "acquisition": "artifact",
+      "revision_type": "immutable_hf_commit"
     },
     {
       "logical_id": "paddleocr-vl",
       "model_id": "PaddlePaddle/PaddleOCR-VL",
-      "revision": "main",
+      "revision": "7fa00a8",
       "license": "apache-2.0",
       "size_gb": 2.14,
       "role": [
@@ -35,7 +37,8 @@
         "tables",
         "multilingual_document_parsing"
       ],
-      "acquisition": "artifact"
+      "acquisition": "artifact",
+      "revision_type": "immutable_hf_commit"
     }
   ]
 }
