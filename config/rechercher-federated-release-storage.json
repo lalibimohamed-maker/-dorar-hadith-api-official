@@ -1,0 +1,8 @@
+{
+  "schema":"din-allah/rechercher-federated-release-storage/v2",
+  "storage_model":"federated-release-assets","corpus_policy":"metadata-index-only","lfs_policy":"large-files-needing-git-versioning-only","actions_artifacts_policy":"ephemeral-processing-results-only","research_vault_policy":"non-public-material-never-published-as-plaintext-release-asset","public_pdf_policy":"only-verified-redistributable",
+  "shard_discovery":{"mode":"automatic","owner":"lalibimohamed-maker","repository_name_prefix":"dinullah-pdf-storage-","include_only_repositories_matching_prefix":true,"sort":"repository-name-natural","minimum_enabled_shards":1,"scale_rule":"discover-all-matching-enabled-storage-repositories"},
+  "selection":{"algorithm":"sha256-first-nibble-modulo-discovered-shard-count","deduplication":"sha256-global","one_physical_copy_per_sha256":true},
+  "record_fields":["book_id","title","author","edition","rights_status","rights_source","rights_evidence","provenance","sha256","size","content_type","storage_repository","release_tag","asset_name","browser_download_url","github_asset_digest","verification_status"],
+  "migration_policy":{"never_modify_corpus_text":true,"never_delete_existing_pdf_without_verified_replacement":true,"never_publish_research_only":true,"never_infer_redistribution_rights":true,"migration_is_append_only_until_verified":true}
+}
