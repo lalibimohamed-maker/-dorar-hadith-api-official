@@ -30,11 +30,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 24
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -80,7 +82,7 @@ jobs:
           "import('./src/rechercher-omega-adapters.js').then(async m => {
           for (const backend of ['gemini-free-tier','groq-free-plan','huggingface-inference']) {
           try { await m.buildAdapterRequest({backend, model:'health-check', input:{}}); }
-          catch (e) { if (!String(e.message).includes('credentials are missing')) throw e; }
+          catch (e) { if (!String(e.message).includes('missing required runtime secret')) throw e; }
           }
           })"
 
