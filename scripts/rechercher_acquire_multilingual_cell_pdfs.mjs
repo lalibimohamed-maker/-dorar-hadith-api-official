@@ -28,11 +28,16 @@ async function load561Registry(){
 }
 const MASTER=await load561Registry();
 const EXISTING_INVENTORY=process.env.ACQUISITION_EXISTING_INVENTORY||path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition/existing-release-inventory.json');
+function normalizeCellId(value){
+  return String(value||'').trim().replace(/\\./g,':').replace(/\\s+/g,' ').toLowerCase();
+}
 let existingInventory={cells:[],sha256:[]};
 try{existingInventory=JSON.parse(await fs.readFile(EXISTING_INVENTORY,'utf8'));}catch{}
-const existingCells=new Set((existingInventory.cells||[]).map(String));
+const existingCellKeys=new Set((existingInventory.cells||[]).map(normalizeCellId).filter(Boolean));
 const existingSha=new Set((existingInventory.sha256||[]).map(x=>String(x).replace(/^sha256:/,'')));
-console.log('ACQUISITION_RESUME existing_cells='+existingCells.size+' existing_sha256='+existingSha.size);
+const rawInventoryCellCount=(existingInventory.cells||[]).length;
+const unmatchedInventoryCells=(existingInventory.cells||[]).filter(x=>!normalizeCellId(x)).length;
+console.log('ACQUISITION_RESUME existing_cells='+existingCellKeys.size+' raw_inventory_cells='+rawInventoryCellCount+' unmatched_inventory_cells='+unmatchedInventoryCells+' existing_sha256='+existingSha.size);
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
 const EXPECTED=3192;
 const configuredSourceLimit=Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||0);
@@ -663,8 +668,8 @@ async function processCell(row){
 }
 
 const allRows=[...cells.values()];
-const list=allRows.filter(row=>!existingCells.has(String(row.cell_id)));
-for(const row of allRows) if(existingCells.has(String(row.cell_id))) markAlreadyAcquired(row);
+const list=allRows.filter(row=>!existingCellKeys.has(normalizeCellId(row.cell_id)));
+for(const row of allRows) if(existingCellKeys.has(normalizeCellId(row.cell_id))) markAlreadyAcquired(row);
 let next=0,done=allRows.length-list.length;
 async function worker(){
   while(true){
