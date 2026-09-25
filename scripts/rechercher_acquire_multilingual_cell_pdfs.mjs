@@ -552,6 +552,8 @@ async function processCell(row){
           continuation=null;
         }
       }while(continuation);
+    }
+  }
   if(entry.files.length===0){
     // DOCX is a fallback format only: all eligible source seeds are searched for PDFs first.
     const docxSeen=new Set();
@@ -623,6 +625,8 @@ async function processCell(row){
             continuation=null;
           }
         }while(continuation&&entry.files.length===0);
+      }
+    }
   }
   if(entry.files.length){
     const hasResearch=entry.files.some(f=>f.acquisition==='research-only');
