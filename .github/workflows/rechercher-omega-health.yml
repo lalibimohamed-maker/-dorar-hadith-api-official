@@ -49,6 +49,22 @@ jobs:
           test/rechercher-omega-execution-router.test.js
           test/rechercher-omega-adapters.test.js
           test/rechercher-omega-phase3.test.js
+          test/rechercher-omega-global-research-radar.test.js
+
+      - name: Verify Global Deep Research Radar is fail-closed
+        run: >
+          node --input-type=module -e
+          "import('./src/rechercher-omega-global-research-radar.js').then(async m => {
+          const radar = await m.loadGlobalResearchRadar();
+          const plan = m.buildResearchProbePlan({
+          radar,
+          task:'health-check',
+          availableProviders:['jina-reader','searxng','brave-search']
+          });
+          m.assertResearchRadarBoundary(plan);
+          if (plan.network_execution || plan.paid_fallback_allowed || plan.corpus_write_allowed) process.exit(1);
+          console.log(JSON.stringify(plan,null,2));
+          })"
 
       - name: Verify no runtime credentials are exposed
         env:
