@@ -16,6 +16,17 @@ test("curated Space registry contains verified useful references", async () => {
   assert.ok(registry.spaces.some(space => space.space_id === "k2-fsa/OmniVoice"));
 });
 
+test("PaddleOCR-VL references resolve as document parsing capabilities", async () => {
+  const registry = await loadOmegaSpaceRegistry();
+  const references = selectOmegaSpaceReferences({
+    registry,
+    capabilities: ["document_parsing", "ocr", "layout"]
+  });
+  assert.ok(references.some(space => space.space_id === "PaddlePaddle/PaddleOCR-VL_Online_Demo"));
+  assert.ok(references.some(space => space.space_id === "Upsampler/paddleocr-vl"));
+  assert.ok(references.every(space => space.use === "reference"));
+});
+
 test("document capabilities resolve only reference Spaces", async () => {
   const registry = await loadOmegaSpaceRegistry();
   const references = selectOmegaSpaceReferences({
