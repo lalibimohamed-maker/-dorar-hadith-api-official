@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Global Deep Research Radar for Rechercher Ω: discover, rank and route worldwide research/search providers without silently charging or promoting generated output to Corpus truth.",
+  "policy": {
+    "free_first": true,
+    "paid_fallback_allowed": false,
+    "corpus_write_allowed": false,
+    "generated_media_is_evidence": false,
+    "ui_only_is_not_automatable": true,
+    "unknown_provider_status": "disabled"
+  },
+  "providers": [
+    {
+      "id": "jina-reader",
+      "kind": "web_reader",
+      "mode": "api",
+      "availability": "free_no_key",
+      "free_without_key": true,
+      "requires_api_key": false,
+      "endpoint": "https://r.jina.ai/",
+      "capabilities": ["url_reading", "web_content_extraction"],
+      "priority": 10
+    },
+    {
+      "id": "searxng",
+      "kind": "web_search",
+      "mode": "self_hosted",
+      "availability": "free_local",
+      "free_without_key": true,
+      "requires_api_key": false,
+      "endpoint_env": "SEARXNG_URL",
+      "capabilities": ["web_search", "metasearch", "multilingual_search"],
+      "priority": 20
+    },
+    {
+      "id": "jina-deepsearch",
+      "kind": "deep_research",
+      "mode": "ui_only",
+      "availability": "free_ui",
+      "free_without_key": true,
+      "requires_api_key": false,
+      "automation_allowed": false,
+      "capabilities": ["iterative_search", "web_reading", "reasoning"],
+      "priority": 30
+    },
+    {
+      "id": "brave-search",
+      "kind": "web_search",
+      "mode": "api",
+      "availability": "free_credit",
+      "free_without_key": false,
+      "requires_api_key": true,
+      "credential_env": "BRAVE_SEARCH_API_KEY",
+      "monthly_free_credit_usd": 5,
+      "paid_fallback_allowed": false,
+      "capabilities": ["web_search", "news", "images", "llm_context"],
+      "priority": 40
+    }
+  ]
+}
