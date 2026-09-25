@@ -534,8 +534,8 @@ async function processCell(row){
 }
 
 const allRows=[...cells.values()];
-const list=allRows.filter(row=>!existingCells.has(String(row.cell_id)));
-for(const row of allRows) if(existingCells.has(String(row.cell_id))) markAlreadyAcquired(row);
+const list=allRows.filter(row=>!existingCells.has(row.cell_id));
+for(const row of allRows) if(existingCells.has(row.cell_id)) markAlreadyAcquired(row);
 let next=0,done=allRows.length-list.length;
 async function worker(){
   while(true){
