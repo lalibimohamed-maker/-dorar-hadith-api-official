@@ -211,11 +211,11 @@ PY
           tag="rechercher-multilingual-protected-${GITHUB_RUN_ID}"
           notes="$release_root/notes.md"
           {
-            echo "# Rechercher protected multilingual PDFs"
+            echo "# Rechercher protected multilingual source files"
             echo
             echo "Research-only original DOCX and/or verified PDFs retained for developer/research review."
             echo "No Corpus write. No public publication."
-            echo "Canonical plaintext PDFs only; encrypted extensions are forbidden."
+            echo "Original DOCX and canonical plaintext PDF source files only; encrypted extensions are forbidden."
           } > "$notes"
 
           declare -A existing_sha=()
@@ -309,8 +309,8 @@ PY
                       continue
                   full=os.path.abspath(p)
                   if not full.startswith(root+os.sep) or not os.path.isfile(full):
-                      raise SystemExit(f"unsafe or missing manifest PDF: {p}")
-                  if open(full,"rb").read(5) != b"%PDF-":
+                      raise SystemExit(f"unsafe or missing manifest source file: {p}")
+                  if full.lower().endswith(".pdf") and open(full,"rb").read(5) != b"%PDF-":
                       raise SystemExit(f"invalid PDF header: {p}")
                   sha=item.get("sha256") or hashlib.sha256(open(full,"rb").read()).hexdigest()
                   name=f"{cell_id}__{sha[:16]}__{os.path.basename(full)}"
