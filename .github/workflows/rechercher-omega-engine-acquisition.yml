@@ -48,7 +48,7 @@ jobs:
           mkdir -p "$OUT_DIR"
           hf download "$MODEL_ID" --revision "$REVISION" --local-dir "$OUT_DIR"
           test -d "$OUT_DIR"
-          find "$OUT_DIR" -type f -print0 | sort -z | xargs -0 sha256sum > "$OUT_DIR/SHA256SUMS"
+          find "$OUT_DIR" -type f ! -name "SHA256SUMS" ! -name "acquisition.json" -print0 | sort -z | xargs -0 sha256sum > "$OUT_DIR/SHA256SUMS"
           python3 - <<'PY'
           import json, os, pathlib
           out = pathlib.Path(os.environ["OUT_DIR"])
