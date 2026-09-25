@@ -1,0 +1,42 @@
+{
+  "schema": "rechercher/provenance/v1",
+  "standard": {
+    "model": "W3C PROV-DM",
+    "serialization": "PROV-JSON",
+    "prov_namespace": "http://www.w3.org/ns/prov#",
+    "custom_namespace": "urn:dinullah:"
+  },
+  "purpose": "Record where a discovery/acquisition/derivation result came from without making provenance a runtime prerequisite for acquisition, storage, or Corpus promotion.",
+  "runtime_policy": {
+    "non_blocking": true,
+    "provenance_failure_must_not_fail_acquisition": true,
+    "provenance_failure_must_not_fail_storage": true,
+    "corpus_write": "never-direct",
+    "rights_remain_item_level": true,
+    "discovery_is_not_permission": true
+  },
+  "roles": {
+    "entity": ["source_page", "source_document", "digital_object", "derived_document"],
+    "activity": ["discovery", "acquisition", "conversion", "repair", "quality_gate", "hash", "rights_review", "publication", "withdrawal"],
+    "agent": ["source_publisher", "repository", "rechercher", "tool"]
+  },
+  "graph_mapping": {
+    "DERIVED_FROM": "prov:wasDerivedFrom",
+    "AUTHORED_BY": "prov:wasAttributedTo",
+    "OPERATED_BY": "prov:wasAssociatedWith",
+    "DISCOVERED_VIA": "din:discoveredVia",
+    "RELATED_SOURCE": "din:relatedSource",
+    "AVAILABLE_IN": "din:availableIn",
+    "COVERS_DOMAIN": "din:coversDomain"
+  },
+  "acquisition_record": {
+    "required": ["cell_id", "source_id", "source_url", "output_sha256", "output_format", "acquired_at"],
+    "recommended": ["output_path", "rights_status", "source_format", "derivation", "bytes"]
+  },
+  "artifact_policy": {
+    "bundle": "artifacts/rechercher/multilingual-pdf-acquisition/provenance.json",
+    "events": "artifacts/rechercher/multilingual-pdf-acquisition/provenance.jsonl",
+    "sidecar_optional": true,
+    "format": "PROV-JSON"
+  }
+}
