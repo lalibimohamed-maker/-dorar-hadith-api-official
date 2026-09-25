@@ -139,7 +139,7 @@ jobs:
               if missing:
                   raise SystemExit(f"ERROR: invalid DOCX structure {p}: missing={sorted(missing)}")
           print(f"DOCX_OK {p}")
-PY
+          PY
                   ;;
               esac
             done
@@ -199,7 +199,7 @@ PY
           with zipfile.ZipFile(p) as z:
               names=set(z.namelist())
               assert "[Content_Types].xml" in names and "word/document.xml" in names, p
-PY
+          PY
                 ;;
             esac
             count=$((count+1))
