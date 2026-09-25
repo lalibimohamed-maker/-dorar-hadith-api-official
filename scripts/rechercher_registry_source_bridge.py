@@ -96,7 +96,7 @@ def extract_pdf_candidates(source_url: str) -> dict:
             parts = urlsplit(u)
             if parts.scheme != "https" or parts.username or parts.password:
                 continue
-            if not (re.search(r"\.pdf(?:$|[?#])", u, re.I) or "archive.org/download/" in u.lower()):
+            if not (re.search(r"\.(?:pdf|docx)(?:$|[?#])", u, re.I) or "archive.org/download/" in u.lower()):
                 continue
             if u in seen:
                 continue
