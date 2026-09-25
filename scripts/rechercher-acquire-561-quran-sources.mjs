@@ -2,6 +2,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { validateRepairAndQualityGate } from "./rechercher_docx_pdf_fallback.mjs";
+const execFileAsync = promisify(execFile);
 
 const ROOT=process.cwd();
 const REGISTRY_URL="https://raw.githubusercontent.com/lalibimohamed-maker/-dorar-hadith-api-official/feat/rechercher-worldwide-source-link-registry-2026-09-24/research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json";
@@ -34,6 +38,9 @@ async function fetchBytes(url){
 function isPdf(url,contentType="",bytes){
   return /^application\/pdf/i.test(contentType)||bytes?.subarray(0,5).toString("ascii")==="%PDF-"||/\.pdf(?:[?#]|$)/i.test(url);
 }
+function isDocx(url,contentType="",bytes){
+  return /wordprocessingml\.document/i.test(contentType)||bytes?.subarray(0,2).toString("hex")==="504b"||/\.docx(?:[?#]|$)/i.test(url);
+}
 function extractLinks(text,base){
   const out=new Set();
   const re=/(?:href|src|data-url|data-href|data-pdf)\s*=\s*["']([^"']+)["']/gi;
@@ -50,7 +57,7 @@ function extractLinks(text,base){
   return [...out];
 }
 async function discover(seed){
-  const queue=[{url:seed,depth:0}],visited=new Set(),pdfs=new Set();
+  const queue=[{url:seed,depth:0}],visited=new Set(),pdfs=new Set(),docxs=new Set();
   while(queue.length&&visited.size<80&&pdfs.size<MAX_PDFS_PER_SOURCE){
     const {url,depth}=queue.shift();
     if(visited.has(url)||depth>MAX_DEPTH) continue;
@@ -58,6 +65,7 @@ async function discover(seed){
     let r;
     try{r=await fetchBytes(url);}catch{continue;}
     if(isPdf(r.finalUrl,r.contentType,r.bytes)){pdfs.add(r.finalUrl);continue;}
+    if(isDocx(r.finalUrl,r.contentType,r.bytes)){docxs.add(r.finalUrl);continue;}
     const text=r.bytes.toString("utf8");
     for(const u of extractLinks(text,r.finalUrl)){
       if(/\.pdf(?:[?#]|$)/i.test(u)) pdfs.add(u);
@@ -65,7 +73,7 @@ async function discover(seed){
       if(pdfs.size>=MAX_PDFS_PER_SOURCE) break;
     }
   }
-  return [...pdfs];
+  return {pdfs:[...pdfs],docxs:[...docxs]};
 }
 async function download(url){
   const r=await fetch(url,{redirect:"follow",headers:{
@@ -100,7 +108,8 @@ async function worker(){
     const row={id:s.id,name:s.name,url:s.url,category:s.category,rights_status:"review_required",pdf_candidates:[],downloaded:[],errors:[]};
     try{
       const candidates=await discover(s.url);
-      row.pdf_candidates=[...new Set(candidates)];
+      row.pdf_candidates=[...new Set(candidates.pdfs)];
+      row.docx_candidates=[...new Set(candidates.docxs)];
       for(const pdfUrl of row.pdf_candidates){
         try{
           const data=await download(pdfUrl);
@@ -114,6 +123,33 @@ async function worker(){
           row.downloaded.push({source:s.id,url:pdfUrl,path:path.relative(ROOT,final),bytes:data.length,sha256:sha,rights_status:"review_required"});
           try{await fs.access(final);}catch{await fs.writeFile(final,data);}
         }catch(e){row.errors.push({url:pdfUrl,error:String(e?.message||e)});}
+      }
+      // DOCX is a fallback only when no PDF was acquired from this source.
+      if(row.downloaded.length===0){
+        for(const docxUrl of row.docx_candidates){
+          try{
+            const data=await (async()=>{
+              const r=await fetch(docxUrl,{redirect:"follow",headers:{"user-agent":"DinAllah-Rechercher/561-Quran-DOCX/1.0","accept":"application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/octet-stream,*/*;q=0.1"}});
+              if(!r.ok) throw new Error("HTTP "+r.status);
+              return Buffer.from(await r.arrayBuffer());
+            })();
+            if(data.subarray(0,2).toString("hex")!=="504b") throw new Error("not a DOCX container");
+            const dir=path.join(OUT,safeSegment(s.id));
+            await fs.mkdir(dir,{recursive:true});
+            const token=sha256(data).slice(0,16);
+            const docxPath=path.join(dir,token+"_"+safeSegment(path.basename(new URL(docxUrl).pathname)||"source.docx"));
+            const pdfPath=path.join(dir,token+"_derived.pdf");
+            await fs.writeFile(docxPath,data);
+            await execFileAsync("libreoffice",["--headless","--nologo","--nodefault","--nolockcheck","--norestore","--convert-to","pdf:writer_pdf_Export","--outdir",dir,docxPath],{timeout:120000,maxBuffer:4*1024*1024});
+            const produced=path.join(dir,path.basename(docxPath).replace(/\.docx$/i,".pdf"));
+            if(produced!==pdfPath) await fs.rename(produced,pdfPath);
+            await validateRepairAndQualityGate(pdfPath);
+            const pdfData=await fs.readFile(pdfPath);
+            const pdfSha=sha256(pdfData);
+            row.downloaded.push({source:s.id,url:docxUrl,path:path.relative(ROOT,pdfPath),original_docx:path.relative(ROOT,docxPath),bytes:pdfData.length,sha256:pdfSha,derived:true,derived_from_format:"docx",rights_status:"review_required"});
+            break;
+          }catch(e){row.errors.push({url:docxUrl,error:String(e?.message||e)});}
+        }
       }
     }catch(e){row.errors.push({source:s.url,error:String(e?.message||e)});}
     sourceResults[i]=row;
@@ -129,7 +165,9 @@ const manifest={
   source_count:sources.length,
   crawled_sources:sourceResults.filter(Boolean).length,
   pdf_candidates:sourceResults.reduce((n,s)=>n+s.pdf_candidates.length,0),
+  docx_candidates:sourceResults.reduce((n,s)=>n+(s.docx_candidates?.length||0),0),
   downloaded_pdfs:sourceResults.reduce((n,s)=>n+s.downloaded.length,0),
+  downloaded_docx_derived_pdfs:sourceResults.reduce((n,s)=>n+s.downloaded.filter(x=>x.derived).length,0),
   rights_status:"review_required_for_all",
   corpus_write:false,
   ai_generated_translation:false,
