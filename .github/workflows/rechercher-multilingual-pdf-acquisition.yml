@@ -6,19 +6,9 @@ on:
         required: true
       RECHERCHER_SECONDARY_STORAGE_TOKEN:
         required: false
+  # PR/schedule/push triggers are owned by the parent orchestration workflow.
+  # Keeping this reusable workflow callable prevents duplicate 3,192-cell acquisition runs.
   workflow_dispatch:
-  push:
-    branches:
-      - 'feat/rechercher-global-multilingual-resource-discovery-v9'
-  pull_request:
-    paths:
-      - '.github/workflows/rechercher-multilingual-pdf-acquisition.yml'
-      - 'research/evidence/global-multilingual/**'
-      - 'scripts/rechercher_acquire_multilingual_pdfs.mjs'
-      - 'scripts/rechercher_acquire_multilingual_cell_pdfs.mjs'
-      - 'scripts/rechercher_validate_multilingual_manifest.mjs'
-  schedule:
-    - cron: '43 3 * * *'
 permissions:
   contents: none
 
@@ -26,7 +16,7 @@ env:
   MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
 concurrency:
   group: rechercher-multilingual-pdf-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   acquire:
     runs-on: ubuntu-24.04
