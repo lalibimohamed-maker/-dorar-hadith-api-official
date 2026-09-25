@@ -172,7 +172,16 @@ const editionResults = await mapLimit(editions, async (edition) => {
     if (existing.status === "acquired_research_only" && existing.acquired?.path) {
       const absolute = path.join(ROOT, existing.acquired.path);
       await fs.access(absolute);
-      return { ...existing, resumed: true };
+
+      // A non-PDF fallback (EPUB/SQLite) must not permanently satisfy a PDF-storage
+      // acquisition. Re-run the PDF candidates on the next scheduled pass so a
+      // transient PDF failure cannot freeze the edition in a non-PDF state.
+      const existingKind = existing.acquired.kind;
+      const existingIsPdf = existingKind?.startsWith("pdf") || absolute.toLowerCase().endsWith(".pdf");
+      if (existingIsPdf) {
+        return { ...existing, resumed: true };
+      }
+      console.log(`Retrying PDF candidates for ${edition.edition_id}; previous asset kind was ${existingKind || "unknown"}.`);
     }
   } catch {}
 
@@ -249,7 +258,12 @@ const manifest = {
   minimum_expected_editions: 74,
   acquired_editions: editionResults.filter((x) => x.acquired).length,
   not_acquired_editions: editionResults.filter((x) => !x.acquired).length,
+  pdf_acquired_editions: editionResults.filter((x) => x.acquired?.kind?.startsWith("pdf")).length,
+  non_pdf_acquired_editions: editionResults.filter((x) => x.acquired && !x.acquired.kind?.startsWith("pdf")).length,
   language_count: new Set(editionResults.map((x) => x.language_iso_code)).size,
+  pdf_language_count: new Set(
+    editionResults.filter((x) => x.acquired?.kind?.startsWith("pdf")).map((x) => x.language_iso_code)
+  ).size,
   live_only_editions: liveOnlyEditions,
   live_only_edition_count: liveOnlyEditions.length,
   editions: editionResults,
