@@ -42,6 +42,7 @@ jobs:
           const fs=require('node:fs');
           const m=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
           if(m.source_count < 1) throw new Error('No Quran-relevant #561 sources selected');
+          if(m.source_count !== m.quran_registry_source_count) throw new Error(`Not all live Quran #561 sources were selected: ${m.source_count}/${m.quran_registry_source_count}`);
           if(m.rights_status !== 'review_required_for_all') throw new Error('Rights gate invalid');
           if(m.corpus_write !== false || m.ai_generated_translation !== false || m.canonical_arabic_separate !== true) {
             throw new Error('Quran governance invariants failed');
