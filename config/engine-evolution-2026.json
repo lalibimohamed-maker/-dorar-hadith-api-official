@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2.3.0",
+  "schemaVersion": "2.4.0",
   "verifiedAt": "2026-09-26",
   "baseMain": "52f5567ddd226cf7f45b0ed6bb779b5391878607",
   "purpose": "Continuous, measurable evaluation of free-first and self-hosted engines without changing canonical scholarly content.",
@@ -164,6 +164,30 @@
       },
       "components": [
         {
+          "id": "agent_guardrail_firewall",
+          "name": "LlamaFirewall",
+          "alternates": [
+            "Guardrails AI"
+          ],
+          "role": "Inspect user/system/tool messages for prompt-injection and related agent safety signals before privileged tool execution.",
+          "status": "candidate",
+          "softwareLicense": "MIT (LlamaFirewall component)",
+          "modelLicense": "scanner-dependent; verify per scanner/model",
+          "source": "https://github.com/meta-llama/PurpleLlama/tree/main/LlamaFirewall",
+          "integration": {
+            "position": "pre_tool_execution",
+            "scopes": [
+              "input",
+              "system",
+              "tool_call",
+              "output"
+            ],
+            "failClosed": true
+          },
+          "watch": "scanner coverage, false positives, tool-call interception, dependency licenses, threat-model updates",
+          "executionOrder": 0
+        },
+        {
           "id": "embedding",
           "name": "Qwen3-Embedding-4B",
           "alternates": [
@@ -188,7 +212,48 @@
             "multilingual": true,
             "arabicSupported": true
           },
-          "watch": "Arabic retrieval quality, memory footprint, CPU/GPU throughput, reproducibility, model provenance"
+          "watch": "Arabic retrieval quality, memory footprint, CPU/GPU throughput, reproducibility, model provenance",
+          "executionOrder": 1
+        },
+        {
+          "id": "hadith_verification_runtime",
+          "name": "Hadith Verification Runtime",
+          "alternates": [
+            "Metadata-Driven Hadith Filter"
+          ],
+          "role": "Runtime provenance and grading gate separating source existence from authenticity.",
+          "status": "candidate",
+          "softwareLicense": "verify_per_component",
+          "modelLicense": "not_applicable",
+          "integration": {
+            "position": "post_dense_retrieval_pre_reranking",
+            "failClosed": true,
+            "canonicalCorpusWrite": false,
+            "hardFilter": true,
+            "input": "retrieval.candidates",
+            "output": "evidence.verified",
+            "requiredMetadata": [
+              "hadith_id",
+              "book",
+              "location",
+              "hadith_number",
+              "authenticity_status",
+              "grader",
+              "grading_source",
+              "provenance",
+              "sha256",
+              "rights_status",
+              "verification_status"
+            ],
+            "rejectIf": [
+              "authenticity_status in [mawdu, batil, very_weak]",
+              "authenticity_status is unknown",
+              "approved_source missing",
+              "provenance missing_or_unverified",
+              "rights_status unknown_or_blocked"
+            ]
+          },
+          "executionOrder": 2
         },
         {
           "id": "reranking",
@@ -213,7 +278,7 @@
             "mixedbread-ai/mxbai-rerank-base-v2": "Apache-2.0"
           },
           "integration": {
-            "input": "search_semantic.topK",
+            "input": "evidence.verified",
             "output": "evidence.reranked",
             "multilingual": true,
             "variants": [
@@ -241,9 +306,12 @@
                 "parameters": "base"
               }
             ],
-            "selectionPolicy": "benchmark_then_route_by_resource_budget; do not infer fiqh authority from model score"
+            "selectionPolicy": "benchmark_then_route_by_resource_budget; do not infer fiqh authority from model score",
+            "softFilterOnly": true,
+            "cannotRestoreRejectedEvidence": true
           },
-          "watch": "Arabic and cross-lingual ranking quality, Quran/hadith evidence ordering, latency, max context, license changes"
+          "watch": "Arabic and cross-lingual ranking quality, Quran/hadith evidence ordering, latency, max context, license changes",
+          "executionOrder": 3
         },
         {
           "id": "grounded_citation_engine",
@@ -258,8 +326,13 @@
           "integration": {
             "position": "post_reranking_pre_generation",
             "failClosed": true,
-            "canonicalCorpusWrite": false
-          }
+            "canonicalCorpusWrite": false,
+            "input": "evidence.reranked",
+            "output": "answer.evidence",
+            "requiredEvidenceIds": true,
+            "noEvidenceResult": "NO_EVIDENCE"
+          },
+          "executionOrder": 4
         },
         {
           "id": "quran_canonical_verification",
@@ -295,22 +368,6 @@
           }
         },
         {
-          "id": "hadith_verification_runtime",
-          "name": "Hadith Verification Runtime",
-          "alternates": [
-            "Metadata-Driven Hadith Filter"
-          ],
-          "role": "Runtime provenance and grading gate separating source existence from authenticity.",
-          "status": "candidate",
-          "softwareLicense": "verify_per_component",
-          "modelLicense": "not_applicable",
-          "integration": {
-            "position": "verification_layer",
-            "failClosed": true,
-            "canonicalCorpusWrite": false
-          }
-        },
-        {
           "id": "sharia_policy_guardrails",
           "name": "Sharia Policy Guardrails",
           "alternates": [
@@ -322,10 +379,13 @@
           "softwareLicense": "verify_per_component",
           "modelLicense": "not_applicable",
           "integration": {
-            "position": "verification_layer",
+            "position": "pre_generation",
             "failClosed": true,
-            "canonicalCorpusWrite": false
-          }
+            "canonicalCorpusWrite": false,
+            "input": "evidence.reranked",
+            "output": "generation.policy_context"
+          },
+          "executionOrder": 4
         },
         {
           "id": "fiqh_knowledge_graph",
@@ -340,33 +400,13 @@
           "softwareLicense": "verify_per_component",
           "modelLicense": "not_applicable",
           "integration": {
-            "position": "verification_layer",
+            "position": "pre_generation",
             "failClosed": true,
-            "canonicalCorpusWrite": false
-          }
-        },
-        {
-          "id": "agent_guardrail_firewall",
-          "name": "LlamaFirewall",
-          "alternates": [
-            "Guardrails AI"
-          ],
-          "role": "Inspect user/system/tool messages for prompt-injection and related agent safety signals before privileged tool execution.",
-          "status": "candidate",
-          "softwareLicense": "MIT (LlamaFirewall component)",
-          "modelLicense": "scanner-dependent; verify per scanner/model",
-          "source": "https://github.com/meta-llama/PurpleLlama/tree/main/LlamaFirewall",
-          "integration": {
-            "position": "pre_tool_execution",
-            "scopes": [
-              "input",
-              "system",
-              "tool_call",
-              "output"
-            ],
-            "failClosed": true
+            "canonicalCorpusWrite": false,
+            "input": "evidence.reranked",
+            "output": "generation.reviewed_rule_context"
           },
-          "watch": "scanner coverage, false positives, tool-call interception, dependency licenses, threat-model updates"
+          "executionOrder": 4
         },
         {
           "id": "vector_storage",
@@ -399,9 +439,15 @@
               "location"
             ],
             "selfHosted": true,
-            "dockerSupported": true
+            "dockerSupported": true,
+            "queryFilterPolicy": {
+              "purpose": "Infrastructure-level narrowing may enforce metadata constraints before returning candidates.",
+              "mustNot": "Use vector similarity to override hard verification decisions.",
+              "recommended": "Apply payload filters for rights_status, verification_status, approved_source, and authenticity eligibility where the indexed metadata supports them."
+            }
           },
-          "watch": "index size, Arabic recall, hybrid search, filtering, durability, resource cost"
+          "watch": "index size, Arabic recall, hybrid search, filtering, durability, resource cost",
+          "executionOrder": "infrastructure"
         },
         {
           "id": "agent_orchestration",
@@ -424,9 +470,76 @@
             "policy": "route -> guard -> execute -> verify -> cite",
             "canonicalCorpusWrite": false
           },
-          "watch": "rail compatibility, tool-calling behavior, policy evaluation, dependency health, Arabic intent routing"
+          "watch": "rail compatibility, tool-calling behavior, policy evaluation, dependency health, Arabic intent routing",
+          "executionOrder": "orchestration"
         }
-      ]
+      ],
+      "executionPipeline": {
+        "principle": "Hard verification and provenance filtering precede semantic reranking. Semantic similarity never overrides authenticity, provenance, rights, or canonical-text constraints.",
+        "stages": [
+          {
+            "order": 1,
+            "id": "dense_retrieval",
+            "component": "embedding",
+            "engine": "Qwen3-Embedding-4B",
+            "action": "Embed the user query and retrieve the initial semantic candidate set from Qdrant.",
+            "candidateLimit": 50,
+            "output": "retrieval.candidates"
+          },
+          {
+            "order": 2,
+            "id": "verification_metadata_hard_gate",
+            "component": "hadith_verification_runtime",
+            "action": "Apply hard metadata/provenance constraints before any semantic reranking.",
+            "input": "retrieval.candidates",
+            "output": "evidence.verified",
+            "failClosed": true,
+            "hardRejectWhen": [
+              "authenticity_status in [mawdu, batil, very_weak]",
+              "authenticity_status is unknown",
+              "approved_source is missing",
+              "provenance is missing_or_unverified",
+              "rights_status is unknown_or_blocked"
+            ],
+            "weakHadithPolicy": "A merely weak hadith is not silently promoted to sound proof. If retained for a documented research purpose, it must remain explicitly labeled weak and cannot satisfy a sound-evidence requirement.",
+            "authorityPolicy": "Do not infer fiqh authority from embedding similarity, reranker score, or model confidence."
+          },
+          {
+            "order": 3,
+            "id": "semantic_reranking",
+            "component": "reranking",
+            "engine": "Qwen3-Reranker-4B",
+            "action": "Rank only candidates that have already passed the hard verification gate.",
+            "input": "evidence.verified",
+            "output": "evidence.reranked",
+            "softFilterOnly": true,
+            "authorityPolicy": "Ranking improves contextual relevance only; it cannot restore a rejected candidate."
+          },
+          {
+            "order": 4,
+            "id": "sharia_policy_and_generation",
+            "components": [
+              "sharia_policy_guardrails",
+              "grounded_citation_engine",
+              "fiqh_knowledge_graph"
+            ],
+            "generator": "Qwen3-Omni-30B-A3B-Instruct",
+            "action": "Generate only from verified evidence and reviewed policy/rule context, with citations/provenance attached.",
+            "input": "evidence.reranked",
+            "output": "answer.draft",
+            "failClosed": true,
+            "noEvidenceResponse": "NO_EVIDENCE",
+            "citationRequired": true,
+            "canonicalCorpusWrite": false
+          }
+        ],
+        "quranPath": {
+          "canonicalSource": "quran_canonical_verification",
+          "literalVerificationBeforeGeneration": true,
+          "modelMayGenerateCanonicalQuranText": false,
+          "diacriticsVerification": "arabic_diacritics_verification"
+        }
+      }
     }
   },
   "promotionPolicy": {
