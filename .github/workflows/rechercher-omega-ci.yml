@@ -49,8 +49,8 @@ jobs:
         run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-integration.test.js
 
   omega-engine-acquisition:
-    if: \${{ github.event_name == 'push' }}
-    name: acquire-\${{ matrix.id }}
+    if: ${{ github.event_name == 'push' }}
+    name: acquire-${{ matrix.id }}
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     strategy:
@@ -80,7 +80,7 @@ jobs:
 
       - name: Validate Omega storage access
         env:
-          GH_TOKEN: \${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           TARGET_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
         run: |
           set -euo pipefail
@@ -103,8 +103,8 @@ jobs:
       - name: Resolve immutable revision
         id: revision
         env:
-          MODEL_ID: \${{ matrix.model_id }}
-          REQUESTED_REVISION: \${{ matrix.revision }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REQUESTED_REVISION: ${{ matrix.revision }}
         run: |
           set -euo pipefail
           python - <<'PY'
@@ -119,15 +119,15 @@ jobs:
               raise SystemExit("Requested revision did not resolve to a full immutable SHA")
           print("Resolved revision:", info.sha)
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
-              f.write("sha="+info.sha+"\\n")
+              f.write("sha="+info.sha+"\n")
           PY
 
       - name: Ensure dedicated Release exists
         env:
-          GH_TOKEN: \${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: lalibimohamed-maker/rechercher-omega-engine-storage
-          RELEASE_TAG: \${{ matrix.release_tag }}
-          RELEASE_MODE: \${{ matrix.release_mode }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          RELEASE_MODE: ${{ matrix.release_mode }}
         run: |
           set -euo pipefail
           if gh release view "$RELEASE_TAG" --repo "$REPO" >/dev/null 2>&1; then
@@ -144,44 +144,44 @@ jobs:
 
       - name: Stream weights directly into Release
         env:
-          GH_TOKEN: \${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
-          MODEL_ID: \${{ matrix.model_id }}
-          REVISION: \${{ steps.revision.outputs.sha }}
-          RELEASE_TAG: \${{ matrix.release_tag }}
-          LICENSE_ID: \${{ matrix.license }}
-          CHUNK_BYTES: \${{ matrix.chunk_bytes }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          LICENSE_ID: ${{ matrix.license }}
+          CHUNK_BYTES: ${{ matrix.chunk_bytes }}
         run: python scripts/rechercher-omega-release-stream.py
 
       - name: Attach LTX-2 license
-        if: \${{ matrix.id == 'ltx-2' }}
+        if: ${{ matrix.id == 'ltx-2' }}
         env:
-          GH_TOKEN: \${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: lalibimohamed-maker/rechercher-omega-engine-storage
-          RELEASE_TAG: \${{ matrix.release_tag }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
           tmp="$(mktemp)"
           curl --fail --location --retry 3 --silent --show-error \
-            "https://raw.githubusercontent.com/Lightricks/LTX-2/\${{ steps.revision.outputs.sha }}/LICENSE-2_x" \
+            "https://raw.githubusercontent.com/Lightricks/LTX-2/${{ steps.revision.outputs.sha }}/LICENSE-2_x" \
             -o "$tmp"
           gh release upload "$RELEASE_TAG" "$tmp#LICENSE-2_x" --repo "$REPO" --clobber
           rm -f "$tmp"
 
       - name: Attach Hunyuan license and notice
-        if: \${{ matrix.id == 'hunyuanvideo-1.5' }}
+        if: ${{ matrix.id == 'hunyuanvideo-1.5' }}
         env:
-          GH_TOKEN: \${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: lalibimohamed-maker/rechercher-omega-engine-storage
-          RELEASE_TAG: \${{ matrix.release_tag }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
           for spec in \
-            "LICENSE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/\${{ steps.revision.outputs.sha }}/LICENSE" \
-            "NOTICE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/\${{ steps.revision.outputs.sha }}/NOTICE"
+            "LICENSE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/${{ steps.revision.outputs.sha }}/LICENSE" \
+            "NOTICE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/${{ steps.revision.outputs.sha }}/NOTICE"
           do
-            name="\${spec%%|*}"
-            url="\${spec#*|}"
+            name="${spec%%|*}"
+            url="${spec#*|}"
             tmp="$(mktemp)"
             curl --fail --location --retry 3 --silent --show-error "$url" -o "$tmp"
             gh release upload "$RELEASE_TAG" "$tmp#$name" --repo "$REPO" --clobber
@@ -190,9 +190,9 @@ jobs:
 
       - name: Verify Release manifest
         env:
-          GH_TOKEN: \${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: lalibimohamed-maker/rechercher-omega-engine-storage
-          RELEASE_TAG: \${{ matrix.release_tag }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
           gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name' | grep -Fxq "release-manifest.json"
