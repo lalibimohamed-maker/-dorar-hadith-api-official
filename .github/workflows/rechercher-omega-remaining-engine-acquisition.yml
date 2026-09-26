@@ -133,6 +133,37 @@ jobs:
           CHUNK_BYTES: ${{ matrix.chunk_bytes }}
         run: python scripts/rechercher-omega-release-stream.py
 
+      - name: Attach LTX-2 license
+        if: matrix.id == 'ltx-2'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp)"
+          curl --fail --location --retry 3 --silent --show-error             "https://raw.githubusercontent.com/Lightricks/LTX-2/${{ steps.revision.outputs.sha }}/LICENSE-2_x"             -o "$tmp"
+          gh release upload "$RELEASE_TAG" "$tmp#LICENSE-2_x" --repo "$REPO" --clobber
+          rm -f "$tmp"
+
+      - name: Attach Hunyuan license and notice
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          for spec in             "LICENSE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/${{ steps.revision.outputs.sha }}/LICENSE"             "NOTICE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/${{ steps.revision.outputs.sha }}/NOTICE"
+          do
+            name="${spec%%|*}"
+            url="${spec#*|}"
+            tmp="$(mktemp)"
+            curl --fail --location --retry 3 --silent --show-error "$url" -o "$tmp"
+            gh release upload "$RELEASE_TAG" "$tmp#$name" --repo "$REPO" --clobber
+            rm -f "$tmp"
+          done
+
       - name: Verify Release manifest
         env:
           GH_TOKEN: ${{ github.token }}
@@ -140,5 +171,5 @@ jobs:
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
-          gh api "/repos/$REPO/releases/tags/$RELEASE_TAG" --jq '.assets[].name' | grep -Fxq "release-manifest.json"
+          gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name' | grep -Fxq "release-manifest.json"
           echo "Verified Release manifest for $RELEASE_TAG"
