@@ -46,3 +46,13 @@ remain the evidence layer.
 
 ## Starter-engine status
 The lightweight acquisition lane now includes Qwen3-0.6B, PaddleOCR-VL and Whisper tiny. Larger or specially licensed families remain registered for runtime/Kaggle execution and are not automatically copied into GitHub artifacts.
+
+
+## Persistent distribution
+
+Lightweight verified starter weights are distributed through the GitHub Release
+`rechercher-omega-engines-v0.1.0`, not through Git history or recurring
+Actions artifacts. The current release set is Qwen3-0.6B, PaddleOCR-VL and
+Whisper tiny. The four-hour verification workflow checks the release assets
+without downloading them again. GitHub Releases permit individual assets under
+2 GiB and do not impose a total release size cap.
