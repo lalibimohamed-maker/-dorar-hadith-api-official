@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "purpose": "Rechercher Omega engine acquisition profile. Logical model families remain in the canonical registry; this file pins small, openly licensed starter weights for real acquisition.",
+  "purpose": "Rechercher Omega starter-engine release profile. Binary weights are distributed through a persistent GitHub Release; GitHub Actions does not retain recurring weight artifacts.",
   "policy": {
     "free_first": true,
     "no_paid_fallback": true,
@@ -12,7 +12,9 @@
       "verified_source_license",
       "review_required",
       "blocked"
-    ]
+    ],
+    "scheduled_downloads": false,
+    "release_distribution": true
   },
   "engines": [
     {
@@ -27,10 +29,12 @@
         "text",
         "tool_use"
       ],
-      "acquisition": "artifact",
+      "acquisition": "github_release",
       "revision_type": "immutable_hf_commit",
       "license_status": "verified_source_license",
-      "license_basis": "Hugging Face model card declares Apache-2.0; redistribution/promotion remains subject to project rights gate."
+      "license_basis": "Hugging Face model card declares Apache-2.0; redistribution/promotion remains subject to project rights gate.",
+      "release_tag": "rechercher-omega-engines-v0.1.0",
+      "release_asset_prefix": "qwen3"
     },
     {
       "logical_id": "paddleocr-vl",
@@ -44,10 +48,12 @@
         "tables",
         "multilingual_document_parsing"
       ],
-      "acquisition": "artifact",
+      "acquisition": "github_release",
       "revision_type": "immutable_hf_commit",
       "license_status": "verified_source_license",
-      "license_basis": "Hugging Face model card declares Apache-2.0; redistribution/promotion remains subject to project rights gate."
+      "license_basis": "Hugging Face model card declares Apache-2.0; redistribution/promotion remains subject to project rights gate.",
+      "release_tag": "rechercher-omega-engines-v0.1.0",
+      "release_asset_prefix": "paddleocr-vl"
     },
     {
       "logical_id": "whisper-tiny",
@@ -60,10 +66,12 @@
         "speech_translation",
         "multilingual_speech"
       ],
-      "acquisition": "artifact",
+      "acquisition": "github_release",
       "revision_type": "immutable_hf_commit",
       "license_status": "verified_source_license",
-      "license_basis": "Hugging Face model card declares Apache-2.0; starter artifact remains subject to project rights gate."
+      "license_basis": "Hugging Face model card declares Apache-2.0; starter artifact remains subject to project rights gate.",
+      "release_tag": "rechercher-omega-engines-v0.1.0",
+      "release_asset_prefix": "whisper-tiny"
     }
   ]
 }
