@@ -22,12 +22,17 @@ async function readText(url) {
 
 const TASK_MODEL_PRIORITY = Object.freeze({
   reasoning: ["qwen3", "qwen3-omni"],
-  multimodal_understanding: ["qwen3-omni", "paddleocr-vl"],
-  document_understanding: ["paddleocr-vl", "qwen3-omni"],
+  multimodal_understanding: ["qwen3-omni", "qwen3-vl", "paddleocr-vl"],
+  document_understanding: ["paddleocr-vl", "qwen3-vl", "qwen3-omni"],
+  image_understanding: ["qwen3-vl", "qwen3-omni"],
+  video_understanding: ["qwen3-vl", "qwen3-omni"],
+  automatic_speech_recognition: ["whisper", "qwen3-omni"],
+  speech_translation: ["whisper", "qwen3-omni"],
   text_to_video: ["wan2.2", "hunyuanvideo-1.5", "ltx-2", "cogvideox"],
   image_to_video: ["hunyuanvideo-1.5", "wan2.2", "ltx-2", "cogvideox"],
   audio_video: ["ltx-2", "qwen3-omni"],
   text_to_speech: ["cosyvoice"],
+  text_to_image: ["flux"],
   inference_runtime: ["sglang"]
 });
 
