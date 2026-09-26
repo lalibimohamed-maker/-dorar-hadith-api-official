@@ -7,17 +7,23 @@
     "sha256_required_before_promotion": true,
     "unknown_revision_is_not_verified": true,
     "unknown_weight_license_is_not_redistributable": true,
-    "corpus_write_allowed": false
+    "corpus_write_allowed": false,
+    "acquisition_manifest_required": true
   },
   "weights": [
     {
       "model_id": "qwen3",
       "source_repo": "https://github.com/QwenLM/Qwen3",
       "revision": "c1899de",
-      "sha256": null,
       "weight_license_status": "review_required",
       "acquisition": "runtime_only",
-      "revision_type": "immutable_hf_commit"
+      "revision_type": "immutable_hf_commit",
+      "verification": {
+        "mode": "acquisition_artifact_manifest",
+        "manifest_file": "acquisition.json",
+        "checksum_file": "SHA256SUMS",
+        "required_before_promotion": true
+      }
     },
     {
       "model_id": "qwen3-omni",
@@ -31,10 +37,15 @@
       "model_id": "paddleocr-vl",
       "source_repo": "https://github.com/PaddlePaddle/PaddleOCR",
       "revision": "7fa00a8",
-      "sha256": null,
       "weight_license_status": "review_required",
       "acquisition": "runtime_only",
-      "revision_type": "immutable_hf_commit"
+      "revision_type": "immutable_hf_commit",
+      "verification": {
+        "mode": "acquisition_artifact_manifest",
+        "manifest_file": "acquisition.json",
+        "checksum_file": "SHA256SUMS",
+        "required_before_promotion": true
+      }
     },
     {
       "model_id": "wan2.2",
