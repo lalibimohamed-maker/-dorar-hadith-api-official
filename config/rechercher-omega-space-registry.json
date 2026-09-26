@@ -9,7 +9,12 @@
     "persistent_mirror_requires_license_clearance": true,
     "corpus_write_allowed": false,
     "generated_media_is_evidence": false,
-    "unknown_license_status": "blocked"
+    "unknown_license_status": "blocked",
+    "license_statuses": [
+      "verified_source_license",
+      "review_required",
+      "blocked"
+    ]
   },
   "spaces": [
     {
@@ -24,7 +29,8 @@
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
-      "notes": "Scientific document Q&A reference; inspect architecture and retrieval flow before adapting."
+      "notes": "Scientific document Q&A reference; inspect architecture and retrieval flow before adapting.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-pdf-rag",
@@ -38,7 +44,8 @@
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
-      "notes": "PDF Q&A/RAG reference; do not import its code or data automatically."
+      "notes": "PDF Q&A/RAG reference; do not import its code or data automatically.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-slm-rag-arena",
@@ -52,7 +59,8 @@
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
-      "notes": "Benchmark/reference for small-model RAG evaluation and groundedness checks."
+      "notes": "Benchmark/reference for small-model RAG evaluation and groundedness checks.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-omnivoice",
@@ -66,7 +74,8 @@
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
-      "notes": "Voice reference associated with the Qwen3-0.6B ecosystem; model/data licenses must be checked independently."
+      "notes": "Voice reference associated with the Qwen3-0.6B ecosystem; model/data licenses must be checked independently.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-lahgtna-omnivoice",
@@ -80,7 +89,8 @@
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
-      "notes": "Arabic/dialect speech reference; never treat the demo's model or training data as Apache-2.0 merely because Qwen3 is Apache-2.0."
+      "notes": "Arabic/dialect speech reference; never treat the demo's model or training data as Apache-2.0 merely because Qwen3 is Apache-2.0.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-token-visual",
@@ -94,7 +104,8 @@
       "use": "reference",
       "status": "verified_paused",
       "license_review": "required",
-      "notes": "Useful tokenizer-analysis reference; Space is currently paused."
+      "notes": "Useful tokenizer-analysis reference; Space is currently paused.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-hallucination-detector",
@@ -107,7 +118,8 @@
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
-      "notes": "Quality-assurance reference only; not a truth oracle."
+      "notes": "Quality-assurance reference only; not a truth oracle.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-paddleocr-vl-online-demo",
@@ -124,7 +136,8 @@
       "use": "reference",
       "status": "verified_live",
       "license_review": "required",
-      "notes": "Official PaddleOCR-VL demo; reference implementation only."
+      "notes": "Official PaddleOCR-VL demo; reference implementation only.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-paddleocr-vl-upsampler",
@@ -138,7 +151,8 @@
       "use": "reference",
       "status": "candidate",
       "license_review": "required",
-      "notes": "Community deployment/reference; verify code and dependencies before reuse."
+      "notes": "Community deployment/reference; verify code and dependencies before reuse.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-paddleocr-vl-waytoagi",
@@ -152,7 +166,8 @@
       "use": "reference",
       "status": "candidate",
       "license_review": "required",
-      "notes": "Community demo/reference; not a trusted dependency."
+      "notes": "Community demo/reference; not a trusted dependency.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-multilingual-tokenizer-leaderboard",
@@ -165,7 +180,8 @@
       "use": "reference",
       "status": "candidate",
       "license_review": "required",
-      "notes": "Useful for multilingual tokenizer comparisons; not a PaddleOCR runtime dependency."
+      "notes": "Useful for multilingual tokenizer comparisons; not a PaddleOCR runtime dependency.",
+      "license_status": "review_required"
     },
     {
       "id": "hf-hfviewer",
@@ -178,7 +194,8 @@
       "use": "reference",
       "status": "candidate",
       "license_review": "required",
-      "notes": "Viewer/reference infrastructure associated with the PaddleOCR-VL-1.5 ecosystem; not a trusted OCR backend and not a Corpus dependency."
+      "notes": "Viewer/reference infrastructure associated with the PaddleOCR-VL-1.5 ecosystem; not a trusted OCR backend and not a Corpus dependency.",
+      "license_status": "review_required"
     }
   ]
 }
