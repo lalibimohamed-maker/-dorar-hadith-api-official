@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2.1.0",
+  "schemaVersion": "2.2.0",
   "verifiedAt": "2026-09-26",
   "baseMain": "52f5567ddd226cf7f45b0ed6bb779b5391878607",
   "purpose": "Continuous, measurable evaluation of free-first and self-hosted engines without changing canonical scholarly content.",
@@ -192,26 +192,58 @@
         },
         {
           "id": "reranking",
-          "name": "BAAI/bge-reranker-v2-m3",
+          "name": "Qwen3-Reranker",
           "alternates": [
             "Qwen/Qwen3-Reranker-0.6B",
-            "jinaai/jina-reranker-v2-base-multilingual"
+            "Qwen/Qwen3-Reranker-4B",
+            "Qwen/Qwen3-Reranker-8B",
+            "BAAI/bge-reranker-v2-m3",
+            "mixedbread-ai/mxbai-rerank-base-v2"
           ],
-          "role": "Re-rank retrieved passages before context assembly so the strongest evidence is passed upstream.",
+          "role": "Re-rank retrieved Quran verses, hadiths, scholarly passages, and other evidence before context assembly.",
           "status": "candidate",
           "softwareLicense": "Apache-2.0",
           "modelLicense": "Apache-2.0",
-          "source": "https://huggingface.co/BAAI/bge-reranker-v2-m3",
+          "source": "https://huggingface.co/Qwen/Qwen3-Reranker-4B",
           "alternatesLicense": {
             "Qwen/Qwen3-Reranker-0.6B": "Apache-2.0",
-            "jinaai/jina-reranker-v2-base-multilingual": "CC-BY-NC-4.0"
+            "Qwen/Qwen3-Reranker-4B": "Apache-2.0",
+            "Qwen/Qwen3-Reranker-8B": "Apache-2.0",
+            "BAAI/bge-reranker-v2-m3": "Apache-2.0",
+            "mixedbread-ai/mxbai-rerank-base-v2": "Apache-2.0"
           },
           "integration": {
             "input": "search_semantic.topK",
             "output": "evidence.reranked",
-            "multilingual": true
+            "multilingual": true,
+            "variants": [
+              {
+                "id": "Qwen/Qwen3-Reranker-0.6B",
+                "parameters": "0.6B",
+                "contextLength": "32K"
+              },
+              {
+                "id": "Qwen/Qwen3-Reranker-4B",
+                "parameters": "4B",
+                "contextLength": "32K"
+              },
+              {
+                "id": "Qwen/Qwen3-Reranker-8B",
+                "parameters": "8B",
+                "contextLength": "32K"
+              },
+              {
+                "id": "BAAI/bge-reranker-v2-m3",
+                "parameters": "~0.57B"
+              },
+              {
+                "id": "mixedbread-ai/mxbai-rerank-base-v2",
+                "parameters": "base"
+              }
+            ],
+            "selectionPolicy": "benchmark_then_route_by_resource_budget; do not infer fiqh authority from model score"
           },
-          "watch": "Arabic and cross-lingual ranking quality, latency, max context, license changes"
+          "watch": "Arabic and cross-lingual ranking quality, Quran/hadith evidence ordering, latency, max context, license changes"
         },
         {
           "id": "agent_guardrail_firewall",
