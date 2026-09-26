@@ -52,6 +52,20 @@ jobs:
           }
           if (!Array.isArray(x.evaluationGates) || x.evaluationGates.length < 10) throw new Error('evaluation gates incomplete');
           for (const [name, engine] of Object.entries(x.engines)) {
+            // omega_support is a composite registry domain, not a single engine record.
+            if (name === 'omega_support') {
+              if (!Array.isArray(engine.components) || engine.components.length === 0) {
+                throw new Error('omega_support components missing');
+              }
+              for (const component of engine.components) {
+                if (!component.id || !component.name || !component.status || !component.watch) {
+                  throw new Error(`incomplete omega support component: ${component.id || component.name || 'unknown'}`);
+                }
+                if (!component.softwareLicense) throw new Error(`software license missing: omega_support/${component.id}`);
+                if (!component.modelLicense) throw new Error(`model license field missing: omega_support/${component.id}`);
+              }
+              continue;
+            }
             if (!engine.primary || !engine.status || !engine.watch) throw new Error(`incomplete engine record: ${name}`);
             if (!engine.softwareLicense) throw new Error(`software license missing: ${name}`);
             if (!engine.modelLicense) throw new Error(`model license field missing: ${name}`);
