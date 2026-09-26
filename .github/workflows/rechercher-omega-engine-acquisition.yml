@@ -9,7 +9,7 @@ on:
       - ".github/workflows/rechercher-omega-engine-acquisition.yml"
   workflow_dispatch:
   schedule:
-    - cron: "30 2 * * 1"
+    - cron: "0 */4 * * *"
 
 permissions:
   contents: read
@@ -50,10 +50,25 @@ jobs:
           test -d "$OUT_DIR"
           find "$OUT_DIR" -type f ! -name "SHA256SUMS" ! -name "acquisition.json" -print0 | sort -z | xargs -0 sha256sum > "$OUT_DIR/SHA256SUMS"
           python3 - <<'PY'
-          import json, os, pathlib
+          import hashlib, json, os, pathlib
           out = pathlib.Path(os.environ["OUT_DIR"])
-          files = [{"path":str(p.relative_to(out)),"bytes":p.stat().st_size} for p in sorted(out.rglob("*")) if p.is_file() and p.name != "acquisition.json"]
-          (out/"acquisition.json").write_text(json.dumps({"model_id":os.environ["MODEL_ID"],"revision":os.environ["REVISION"],"files":files},ensure_ascii=False,indent=2)+"\n")
+          files = []
+          for p in sorted(out.rglob("*")):
+              if not p.is_file() or p.name == "acquisition.json":
+                  continue
+              files.append({
+                  "path": str(p.relative_to(out)),
+                  "bytes": p.stat().st_size,
+                  "sha256": hashlib.sha256(p.read_bytes()).hexdigest()
+              })
+          canonical = "".join(f"{item["path"]}={item["sha256"]}\n" for item in files if item["path"] != "SHA256SUMS")
+          manifest_sha256 = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+          (out/"acquisition.json").write_text(json.dumps({
+              "model_id": os.environ["MODEL_ID"],
+              "revision": os.environ["REVISION"],
+              "manifest_sha256": manifest_sha256,
+              "files": files
+          }, ensure_ascii=False, indent=2)+"\n")
           PY
 
       - name: Verify downloaded manifest
@@ -65,6 +80,19 @@ jobs:
           test -s "$OUT_DIR/acquisition.json"
           sha256sum -c "$OUT_DIR/SHA256SUMS"
           test "$(find "$OUT_DIR" -type f | wc -l)" -gt 2
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          out = pathlib.Path(os.environ["OUT_DIR"])
+          manifest = json.loads((out/"acquisition.json").read_text())
+          listed = {item["path"]: item["sha256"] for item in manifest["files"]}
+          canonical = "".join(f"{path}={listed[path]}\n" for path in sorted(listed) if path != "SHA256SUMS")
+          assert hashlib.sha256(canonical.encode("utf-8")).hexdigest() == manifest["manifest_sha256"]
+          for path, expected in listed.items():
+              if path == "SHA256SUMS":
+                  continue
+              actual = hashlib.sha256((out/path).read_bytes()).hexdigest()
+              assert actual == expected, (path, expected, actual)
+          PY
 
       - name: Upload engine artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
