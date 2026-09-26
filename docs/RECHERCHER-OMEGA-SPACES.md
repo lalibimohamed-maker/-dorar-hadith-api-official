@@ -55,3 +55,7 @@ The machine-readable registry is
 
 ## Coverage note
 The registry is intentionally curated rather than an automatic mirror of every Hugging Face Space. New Spaces are admitted only after capability relevance and independent license review. PaddleOCR-VL, PaddleOCR-VL-1.5, and PaddleOCR-VL-1.6 are tracked as separate model families and are not silently substituted for the pinned starter engine.
+
+
+## PaddleOCR-VL census
+The machine-readable census `config/rechercher-omega-paddleocr-space-census.json` records all 28 Spaces currently exposed by the Hugging Face model registry for `PaddlePaddle/PaddleOCR-VL`. The census is discovery-only: every entry is non-executable and license status defaults to `review_required`; the curated registry remains the only source allowed to produce a Rechercher Ω reference plan.
