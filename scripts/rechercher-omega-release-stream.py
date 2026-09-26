@@ -113,7 +113,19 @@ def main():
         source_size = item["size"]
         source_sha = item["sha256"]
         safe = "".join(ch if ch.isalnum() or ch in "._-" else "_" for ch in source_path.replace("/", "__"))
-        parts = (source_size + CHUNK_BYTES - 1) // CHUNK_BYTES
+        safe_prefix = f"omega__{safe}.part-"
+        existing_parts = [
+            (name, size)
+            for name, size in existing.items()
+            if name.startswith(safe_prefix)
+        ]
+        # Resume legacy 512 MiB releases without colliding with the newer 128 MiB layout.
+        chunk_bytes = CHUNK_BYTES
+        if existing_parts:
+            observed_sizes = sorted({size for name, size in existing_parts if size > 0})
+            if observed_sizes:
+                chunk_bytes = observed_sizes[0]
+        parts = (source_size + chunk_bytes - 1) // chunk_bytes
         names = []
         hasher = hashlib.sha256()
         counted = 0
@@ -124,8 +136,8 @@ def main():
         )
 
         for part in range(parts):
-            start = part * CHUNK_BYTES
-            end = min(source_size - 1, start + CHUNK_BYTES - 1)
+            start = part * chunk_bytes
+            end = min(source_size - 1, start + chunk_bytes - 1)
             length = end - start + 1
             asset_name = f"omega__{safe}.part-{part:04d}" if parts > 1 else f"omega__{safe}"
 
@@ -197,6 +209,7 @@ def main():
         "license": LICENSE_ID,
         "transport": "direct_hf_range_stream_python",
         "chunk_bytes": CHUNK_BYTES,
+        "resume_chunk_policy": "reuse_existing_asset_size_per_source_file",
         "files": manifest,
     }
     upload_bytes(
