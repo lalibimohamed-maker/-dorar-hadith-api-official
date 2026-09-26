@@ -1,0 +1,37 @@
+name: Rechercher Ω — cleanup temporary Release diagnostics
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - ".github/workflows/rechercher-omega-release-cleanup-once.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Remove temporary diagnostic assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          delete_asset() {
+            local tag="$1"
+            local name="$2"
+            asset_id="$(gh api "/repos/$REPO/releases/tags/$tag" --jq ".assets[] | select(.name==\"$name\") | .id" 2>/dev/null || true)"
+            if [ -n "$asset_id" ]; then
+              gh api --method DELETE "/repos/$REPO/releases/assets/$asset_id"
+              echo "Deleted $tag/$name"
+            else
+              echo "Not present: $tag/$name"
+            fi
+          }
+          delete_asset "rechercher-omega-qwen3-vl-v1.0.0" "qwen3-vl-upload-test-128m.part"
+          delete_asset "rechercher-omega-qwen3-vl-v1.0.0" "qwen3-vl-range-stream-test-256m.part"
+          delete_asset "rechercher-omega-cosyvoice2-0.5b-v1.0.0" "diagnostic.txt"
