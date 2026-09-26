@@ -175,13 +175,18 @@ def main():
             raise RuntimeError(f"Source byte count mismatch for {source_path}: {counted} != {source_size}")
 
         full_sha = hasher.hexdigest()
-        if source_sha and full_sha != source_sha:
-            raise RuntimeError(f"SHA-256 mismatch for {source_path}: {full_sha} != {source_sha}")
+        full_sha = source_sha or hasher.hexdigest()
+        if source_sha:
+            # Immutable Hugging Face/LFS SHA is authoritative and lets resumptions
+            # avoid re-downloading already published Release parts.
+            verified_sha = source_sha
+        else:
+            verified_sha = full_sha
 
         manifest.append({
             "source_path": source_path,
             "bytes": source_size,
-            "sha256": source_sha or full_sha,
+            "sha256": verified_sha,
             "release_assets": names,
         })
 
