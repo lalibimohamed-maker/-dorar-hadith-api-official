@@ -13,7 +13,8 @@ permissions:
   contents: write
 
 # security-justification: scoped upload of model binaries to dedicated Releases. No Git source or Corpus writes.
-# Hunyuan/LTX use draft releases pending license review. FLUX is gated and is not downloaded.
+# Community-license models are draft-only. Gated FLUX is intentionally excluded.
+# Large files are streamed from Hugging Face to GitHub Releases and never stored as complete files on the runner.
 
 concurrency:
   group: rechercher-omega-remaining-engine-acquisition
@@ -29,15 +30,15 @@ jobs:
       max-parallel: 2
       matrix:
         include:
-          - id: cosyvoice2-0.5b
-            model_id: FunAudioLLM/CosyVoice2-0.5B
-            revision: eec1ae6c79877dbd9379285cf8789c9e0879293d
-            release_tag: rechercher-omega-cosyvoice2-0.5b-v1.0.0
-            license: apache-2.0
           - id: qwen3-vl
             model_id: Qwen/Qwen3-VL-4B-Instruct
             revision: ebb281ec70b05090aa6165b016eac8ec08e71b17
             release_tag: rechercher-omega-qwen3-vl-v1.0.0
+            license: apache-2.0
+          - id: cosyvoice2-0.5b
+            model_id: FunAudioLLM/CosyVoice2-0.5B
+            revision: eec1ae6c79877dbd9379285cf8789c9e0879293d
+            release_tag: rechercher-omega-cosyvoice2-0.5b-v1.0.0
             license: apache-2.0
           - id: cogvideox-2b
             model_id: zai-org/CogVideoX-2b
@@ -91,175 +92,124 @@ jobs:
               f.write("sha="+sha+"\n")
           PY
 
-      # Release parts are intentionally 128 MiB to keep individual uploads small and restartable.
-      - name: Download and publish weight files with disk-safe policy
+      - name: Stream model files directly from Hugging Face to GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
           MODEL_ID: ${{ matrix.model_id }}
           REVISION: ${{ steps.revision.outputs.sha }}
           RELEASE_TAG: ${{ matrix.release_tag }}
           LICENSE_ID: ${{ matrix.license }}
-          WORKDIR: ${{ runner.temp }}/omega-weight-release
         run: |
           set -euo pipefail
-          existing_manifest="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".assets[].name" 2>/dev/null || true)"
-          if grep -Fxq "release-manifest.json" <<< "$existing_manifest"; then
-            echo "Release already contains release-manifest.json; skipping duplicate model download."
-            exit 0
-          fi
-          rm -rf "$WORKDIR"
-          mkdir -p "$WORKDIR/source"
+          CHUNK_BYTES=$((512*1024*1024))
+          MAX_ASSET_BYTES=2147483647
+          MAX_RELEASE_ASSETS=1000
 
-          python3 - <<'PY' > "$WORKDIR/files.txt"
-          from huggingface_hub import HfApi
+          python3 - <<'PY' > "$RUNNER_TEMP/omega-files.tsv"
           import os
-          from pathlib import Path
-          info=HfApi().model_info(os.environ["MODEL_ID"],revision=os.environ["REVISION"],files_metadata=False)
-          allowed_weights={".safetensors",".bin",".pt",".pth",".onnx"}
-          names=[]
-          for name in info.siblings:
-              p=Path(name.rfilename)
-              if p.suffix.lower() in allowed_weights or p.name == "model.safetensors.index.json" or p.name.endswith(".index.json") or p.name in {"config.json","configuration.json","generation_config.json"}:
-                  names.append(name.rfilename)
-          for name in sorted(set(names)):
-              print(name)
-          PY
-
-          MAX_SOURCE_FILE_BYTES=$((7*1024*1024*1024))
-          : > "$WORKDIR/manifest.tsv"
-          : > "$WORKDIR/deferred.tsv"
-
-          while IFS= read -r source_path; do
-            [ -n "$source_path" ] || continue
-            echo "=== $source_path ==="
-
-            remote_meta=$(python3 - "$source_path" <<'PY'
-          import sys, os
           from pathlib import Path
           from huggingface_hub import HfApi
           info=HfApi().model_info(os.environ["MODEL_ID"],revision=os.environ["REVISION"],files_metadata=True)
-          target=sys.argv[1]
-          for s in info.siblings:
-              if s.rfilename == target:
-                  print(int(s.size or 0)); break
-          else: print(0)
+          allowed={".safetensors",".bin",".pt",".pth",".onnx"}
+          selected=[]
+          total_assets=0
+          for s in sorted(info.siblings,key=lambda x:x.rfilename):
+              name=s.rfilename
+              p=Path(name)
+              if p.suffix.lower() in allowed or p.name == "model.safetensors.index.json" or p.name.endswith(".index.json") or p.name in {"config.json","configuration.json","generation_config.json"}:
+                  size=int(s.size or 0)
+                  if size <= 0: continue
+                  parts=(size + (512*1024*1024) - 1)//(512*1024*1024)
+                  total_assets += parts
+                  selected.append((name,size))
+          if total_assets > 1000:
+              raise SystemExit(f"Release asset budget exceeded: {total_assets}")
+          for name,size in selected:
+              print(name+"\t"+str(size))
           PY
-            )
-            if [ "$remote_meta" -gt "$MAX_SOURCE_FILE_BYTES" ]; then
-              printf '%s\t%s\n' "$source_path" "$remote_meta" >> "$WORKDIR/deferred.tsv"
-              echo "DEFERRED: source file exceeds 7 GiB runner safety limit"
-              continue
-            fi
 
-            rm -rf "$WORKDIR/source" "$WORKDIR/hf-cache"
-            mkdir -p "$WORKDIR/hf-cache"
-            file="$(python3 - "$source_path" <<'PY'
-          import os, sys
-          from huggingface_hub import hf_hub_download
-          print(hf_hub_download(
-              repo_id=os.environ["MODEL_ID"],
-              filename=sys.argv[1],
-              revision=os.environ["REVISION"],
-              cache_dir=os.environ["WORKDIR"] + "/hf-cache"
-          ))
-          PY
-            )"
-            test -s "$file"
-            actual_size="$(stat -c '%s' "$file")"
-            digest="$(sha256sum "$file" | awk '{print $1}')"
+          existing="$(gh api "/repos/$REPO/releases/tags/$RELEASE_TAG" --jq '.assets[].name' 2>/dev/null || true)"
+          : > "$RUNNER_TEMP/omega-manifest.tsv"
+
+          while IFS=$'\t' read -r source_path source_size; do
+            [ -n "$source_path" ] || continue
             safe="$(printf '%s' "$source_path" | sed 's#[^A-Za-z0-9._-]#__#g')"
-            assets=""
+            parts=$(( (source_size + CHUNK_BYTES - 1) / CHUNK_BYTES ))
+            for ((part=0; part<parts; part++)); do
+              start=$((part * CHUNK_BYTES))
+              end=$((start + CHUNK_BYTES - 1))
+              if [ "$end" -ge "$source_size" ]; then end=$((source_size - 1)); fi
+              length=$((end - start + 1))
+              if [ "$parts" -eq 1 ]; then
+                asset_name="omega__$safe"
+              else
+                asset_name="omega__${safe}.part-$(printf '%04d' "$part")"
+              fi
 
-            if [ "$actual_size" -lt 2147483647 ]; then
-              asset="$WORKDIR/omega__$safe"
-              cp "$file" "$asset"
-              upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
-              curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 3600 \
-                -X POST \
-                -H "Authorization: Bearer $GH_TOKEN" \
-                -H "Accept: application/vnd.github+json" \
-                -H "X-GitHub-Api-Version: 2026-03-10" \
-                -H "Content-Type: application/octet-stream" \
-                --data-binary "@$asset" \
-                "$upload_url?name=$(basename "$asset")"
-              assets="$(basename "$asset")"
-              rm -f "$asset"
-            else
-              chunk_bytes=$((128*1024*1024))
-              offset=0
-              part=0
-              while [ "$offset" -lt "$actual_size" ]; do
-                remaining=$((actual_size-offset))
-                count="$chunk_bytes"
-                if [ "$remaining" -lt "$count" ]; then count="$remaining"; fi
-                skip_mb=$((offset/1048576))
-                count_mb=$(((count+1048575)/1048576))
-                chunk="$WORKDIR/omega__$safe.part-$(printf '%04d' "$part")"
-                dd if="$file" of="$chunk" bs=1M skip="$skip_mb" count="$count_mb" iflag=fullblock status=none
-                if [ "$(stat -c '%s' "$chunk")" -gt "$count" ]; then truncate -s "$count" "$chunk"; fi
-                test "$(stat -c '%s' "$chunk")" -lt 2147483647
-                upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
-                curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 3600 \
+              if grep -Fxq "$asset_name" <<< "$existing"; then
+                echo "Already published: $asset_name"
+                continue
+              fi
+
+              upload_url="$(gh api "/repos/$REPO/releases/tags/$RELEASE_TAG" --jq '.upload_url' | sed 's/{?name,label}//')"
+              source_url="https://huggingface.co/$MODEL_ID/resolve/$REVISION/$source_path?download=true"
+              echo "Streaming $source_path bytes $start-$end -> $asset_name ($length bytes)"
+
+              curl --fail --location --retry 6 --retry-all-errors --connect-timeout 30 --max-time 3600 \
+                -H "Range: bytes=$start-$end" "$source_url" \
+                | curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 3600 \
                   -X POST \
                   -H "Authorization: Bearer $GH_TOKEN" \
                   -H "Accept: application/vnd.github+json" \
                   -H "X-GitHub-Api-Version: 2026-03-10" \
                   -H "Content-Type: application/octet-stream" \
-                  --data-binary "@$chunk" \
-                  "$upload_url?name=$(basename "$chunk")"
-                name="$(basename "$chunk")"
-                if [ -n "$assets" ]; then assets="$assets,$name"; else assets="$name"; fi
-                rm -f "$chunk"
-                offset=$((offset+count))
-                part=$((part+1))
-              done
-            fi
+                  -H "Content-Length: $length" \
+                  --data-binary @- "$upload_url?name=$asset_name"
 
-            printf '%s\t%s\t%s\t%s\n' "$source_path" "$actual_size" "$digest" "$assets" >> "$WORKDIR/manifest.tsv"
-            rm -f "$file"
-          done < "$WORKDIR/files.txt"
+              printf '%s\t%s\t%s\t%s\n' "$source_path" "$source_size" "$part" "$asset_name" >> "$RUNNER_TEMP/omega-manifest.tsv"
+            done
+          done < "$RUNNER_TEMP/omega-files.tsv"
 
           python3 - <<'PY'
           import json, os
           from pathlib import Path
-          work=Path(os.environ["WORKDIR"])
+          work=Path(os.environ["RUNNER_TEMP"])
           rows=[]
-          for line in (work/"manifest.tsv").read_text().splitlines():
-              source,size,sha,assets=line.split("\t",3)
-              rows.append({"source_path":source,"bytes":int(size),"sha256":sha,"release_assets":assets.split(",")})
-          deferred=[]
-          for line in (work/"deferred.tsv").read_text().splitlines():
-              if line: source,size=line.split("\t",1); deferred.append({"source_path":source,"bytes":int(size),"reason":"runner_storage_safety_limit_7GiB"})
-          payload={"schema_version":"1.0.0","model_id":os.environ["MODEL_ID"],"revision":os.environ["REVISION"],"license":os.environ["LICENSE_ID"],"transport":"huggingface_hub_download","files":rows,"deferred":deferred}
+          p=work/"omega-manifest.tsv"
+          if p.exists():
+              for line in p.read_text().splitlines():
+                  if line:
+                      source,size,part,asset=line.split("\t",3)
+                      rows.append({"source_path":source,"source_bytes":int(size),"part":int(part),"release_asset":asset})
+          payload={"schema_version":"1.0.0","model_id":os.environ["MODEL_ID"],"revision":os.environ["REVISION"],"license":os.environ["LICENSE_ID"],"transport":"huggingface_http_range_to_github_release","chunk_bytes":512*1024*1024,"files":rows}
           (work/"release-manifest.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
           PY
 
-          upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
+          upload_url="$(gh api "/repos/$REPO/releases/tags/$RELEASE_TAG" --jq '.upload_url' | sed 's/{?name,label}//')"
           curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 600 \
             -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2026-03-10" \
             -H "Content-Type: application/json" \
-            --data-binary "@$WORKDIR/release-manifest.json" \
+            --data-binary "@$RUNNER_TEMP/release-manifest.json" \
             "$upload_url?name=release-manifest.json"
+
       - name: Verify Release manifest
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
           import json, os, subprocess
+          repo=os.environ["REPO"]
           tag=os.environ["RELEASE_TAG"]
-          repo=os.environ["GITHUB_REPOSITORY"]
-          raw=subprocess.check_output([
-              "gh","api",
-              f"/repos/{repo}/releases/tags/{tag}"
-          ], text=True)
-          data=json.loads(raw)
-          names={asset["name"] for asset in data.get("assets",[])}
+          data=json.loads(subprocess.check_output(["gh","api",f"/repos/{repo}/releases/tags/{tag}"],text=True))
+          names={a["name"] for a in data.get("assets",[])}
           if "release-manifest.json" not in names:
               raise SystemExit("release-manifest.json is missing from "+tag)
-          print("Verified manifest asset in", tag)
+          print("Verified manifest asset in",tag)
           PY
