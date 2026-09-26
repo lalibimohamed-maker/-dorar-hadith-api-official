@@ -6,12 +6,12 @@ not as a side feature.
 ## Capability lanes
 
 - Reasoning: Qwen3
-- Vision/multimodal reasoning: Qwen3-VL
+- Vision/multimodal reasoning: Qwen3-VL (4B verified registry candidate; runtime-only due size)
 - OCR/document understanding: PaddleOCR-VL
-- Video: HunyuanVideo-1.5, LTX-2, CogVideoX, Wan 2.2
+- Video: HunyuanVideo-1.5, LTX-2, CogVideoX (2B staged for Kaggle/runtime), Wan 2.2
 - Audio/video: LTX-2
-- Speech synthesis: CosyVoice
-- Speech recognition: Whisper
+- Speech synthesis: CosyVoice (CosyVoice2-0.5B staged as a verified starter candidate)
+- Speech recognition: Whisper (Whisper tiny starter acquired; larger variants remain runtime/Kaggle candidates)
 - Image generation/editing: Flux
 
 The fleet is a registry and router, not an automatic weight distributor. Every
@@ -42,3 +42,7 @@ Research → script → storyboard → assets → generation/editing → voice �
 
 The generated video is an explanatory artifact. The underlying source records
 remain the evidence layer.
+
+
+## Starter-engine status
+The lightweight acquisition lane now includes Qwen3-0.6B, PaddleOCR-VL and Whisper tiny. Larger or specially licensed families remain registered for runtime/Kaggle execution and are not automatically copied into GitHub artifacts.
