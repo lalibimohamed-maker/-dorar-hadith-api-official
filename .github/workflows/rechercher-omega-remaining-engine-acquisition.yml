@@ -93,12 +93,12 @@ jobs:
 
       - name: Download and publish model files with official HF client
         env:
-          GH_TOKEN: \${{ github.token }}
-          MODEL_ID: \${{ matrix.model_id }}
-          REVISION: \${{ steps.revision.outputs.sha }}
-          RELEASE_TAG: \${{ matrix.release_tag }}
-          LICENSE_ID: \${{ matrix.license }}
-          WORKDIR: \${{ runner.temp }}/omega-hf-download
+          GH_TOKEN: ${{ github.token }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          LICENSE_ID: ${{ matrix.license }}
+          WORKDIR: ${{ runner.temp }}/omega-hf-download
         run: |
           set -euo pipefail
           rm -rf "$WORKDIR"
