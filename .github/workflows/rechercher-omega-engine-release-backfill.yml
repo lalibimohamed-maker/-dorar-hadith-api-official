@@ -1,0 +1,100 @@
+name: Rechercher Ω — backfill starter Release assets
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - ".github/workflows/rechercher-omega-engine-release-backfill.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# security-justification: one-time backfill of binary model assets into the dedicated Release; no Git/source/CpR writes.
+
+concurrency:
+  group: rechercher-omega-engine-release-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: Backfill Release assets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install Hugging Face Hub client
+        run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Verify GitHub CLI
+        run: gh --version
+
+      - name: Backfill sharded model assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKDIR: ${{ runner.temp }}/omega-release-backfill
+        run: |
+          set -euo pipefail
+          TAG="rechercher-omega-engines-v0.1.0"
+          rm -rf "$WORKDIR"
+          mkdir -p "$WORKDIR"
+
+          engines=$'qwen3\tQwen/Qwen3-0.6B\tc1899de289a04d12100db370d81485cdf75e47ca\tapache-2.0\thttps://huggingface.co/Qwen/Qwen3-0.6B/tree/c1899de289a04d12100db370d81485cdf75e47ca
+paddleocr-vl\tPaddlePaddle/PaddleOCR-VL\t7fa00a8c55b735ba51ba49a9058f3f9c57a99a11\tapache-2.0\thttps://huggingface.co/PaddlePaddle/PaddleOCR-VL/tree/7fa00a8c55b735ba51ba49a9058f3f9c57a99a11
+whisper-tiny\topenai/whisper-tiny\t169d4a4341b33bc18d8881c4b69c2e104e1cc0af\tapache-2.0\thttps://huggingface.co/openai/whisper-tiny/tree/169d4a4341b33bc18d8881c4b69c2e104e1cc0af'
+
+          while IFS=$'\t' read -r id model revision license source_url; do
+            echo "=== $id ==="
+            dir="$WORKDIR/$id"
+            mkdir -p "$dir"
+
+            case "$id" in
+              qwen3)
+                hf download "$model" model.safetensors LICENSE README.md .gitattributes config.json generation_config.json merges.txt tokenizer.json tokenizer_config.json vocab.json --revision "$revision" --local-dir "$dir"
+                prefix="$WORKDIR/qwen3-model.safetensors.part-"
+                bundle="$WORKDIR/qwen3-runtime-files.tar.gz"
+                ;;
+              paddleocr-vl)
+                hf download "$model" model.safetensors LICENSE README.md .gitattributes config.json configuration_paddleocr_vl.py generation_config.json image_processing_paddleocr_vl.py inference.yml modeling_paddleocr_vl.py preprocessor_config.json processing_paddleocr_vl.py processor_config.json special_tokens_map.json tokenizer.json tokenizer.model tokenizer_config.json --revision "$revision" --local-dir "$dir"
+                prefix="$WORKDIR/paddleocr-vl-model.safetensors.part-"
+                bundle="$WORKDIR/paddleocr-vl-runtime-files.tar.gz"
+                ;;
+              whisper-tiny)
+                hf download "$model" model.safetensors LICENSE README.md .gitattributes added_tokens.json config.json generation_config.json merges.txt normalizer.json preprocessor_config.json special_tokens_map.json tokenizer.json tokenizer_config.json vocab.json --revision "$revision" --local-dir "$dir"
+                prefix="$WORKDIR/whisper-tiny-model.safetensors.part-"
+                bundle="$WORKDIR/whisper-tiny-runtime-files.tar.gz"
+                ;;
+              *) echo "unknown engine"; exit 1 ;;
+            esac
+
+            split -b 256M -d -a 2 "$dir/model.safetensors" "$prefix"
+            rm -f "$dir/model.safetensors"
+            tar -C "$dir" -czf "$bundle" .
+
+            manifest="$WORKDIR/$id-release-manifest.json"
+            printf '{\n  "schema_version": "1.0.0",\n  "logical_id": "%s",\n  "model_id": "%s",\n  "revision": "%s",\n  "license": "%s",\n  "source_url": "%s",\n  "reconstruction": {"method": "cat_sorted_parts", "output": "model.safetensors"},\n  "assets": [\n' "$id" "$model" "$revision" "$license" "$source_url" > "$manifest"
+
+            first=1
+            for asset in "$prefix"* "$bundle"; do
+              [ "$first" -eq 1 ] || printf ',\n' >> "$manifest"
+              first=0
+              printf '    {"name":"%s","bytes":%s,"sha256":"%s"}' "$(basename "$asset")" "$(stat -c '%s' "$asset")" "$(sha256sum "$asset" | awk '{print $1}')" >> "$manifest"
+            done
+            printf '\n  ]\n}\n' >> "$manifest"
+
+            files=( "$prefix"* "$bundle" "$manifest" )
+            gh release upload "$TAG" "${files[@]}" --clobber
+            rm -rf "$dir" "$prefix"* "$bundle" "$manifest"
+          done <<< "$engines"
+
+      - name: Verify release asset inventory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release view "rechercher-omega-engines-v0.1.0" --json tagName,url,assets
