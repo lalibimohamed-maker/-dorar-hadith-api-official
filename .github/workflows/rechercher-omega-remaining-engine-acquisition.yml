@@ -158,7 +158,8 @@ jobs:
             if [ "$actual_size" -lt 2147483647 ]; then
               asset="$WORKDIR/omega__$safe"
               cp "$file" "$asset"
-              gh release upload "$RELEASE_TAG" "$asset" --clobber
+              upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
+              gh api --method POST "$upload_url?name=$(basename "$asset")" --header "Content-Type: application/octet-stream" --input "$asset" >/dev/null
               assets="$(basename "$asset")"
               rm -f "$asset"
             else
@@ -175,7 +176,8 @@ jobs:
                 dd if="$file" of="$chunk" bs=1M skip="$skip_mb" count="$count_mb" iflag=fullblock status=none
                 if [ "$(stat -c '%s' "$chunk")" -gt "$count" ]; then truncate -s "$count" "$chunk"; fi
                 test "$(stat -c '%s' "$chunk")" -lt 2147483647
-                gh release upload "$RELEASE_TAG" "$chunk" --clobber
+                upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
+                gh api --method POST "$upload_url?name=$(basename "$chunk")" --header "Content-Type: application/octet-stream" --input "$chunk" >/dev/null
                 name="$(basename "$chunk")"
                 if [ -n "$assets" ]; then assets="$assets,$name"; else assets="$name"; fi
                 rm -f "$chunk"
@@ -203,7 +205,8 @@ jobs:
           (work/"release-manifest.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
           PY
 
-          gh release upload "$RELEASE_TAG" "$WORKDIR/release-manifest.json" --clobber
+          upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
+          gh api --method POST "$upload_url?name=release-manifest.json" --header "Content-Type: application/json" --input "$WORKDIR/release-manifest.json" >/dev/null
       - name: Verify Release manifest
         env:
           GH_TOKEN: ${{ github.token }}
