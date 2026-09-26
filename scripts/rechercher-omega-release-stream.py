@@ -10,7 +10,8 @@ from http.client import HTTPSConnection
 from pathlib import Path
 from huggingface_hub import HfApi
 
-CHUNK_BYTES = int(os.environ.get("CHUNK_BYTES", str(128 * 1024 * 1024)))
+_chunk_env = os.environ.get("CHUNK_BYTES", "").strip()
+CHUNK_BYTES = int(_chunk_env) if _chunk_env else 128 * 1024 * 1024
 if CHUNK_BYTES <= 0 or CHUNK_BYTES > 2_000_000_000:
     raise RuntimeError("CHUNK_BYTES must be between 1 byte and 2,000,000,000 bytes")
 MAX_ASSET_BYTES = 2_147_483_647
@@ -36,7 +37,18 @@ def gh_json(path):
 
 
 def release_info():
-    return gh_json(f"/repos/{REPO}/releases/tags/{urllib.parse.quote(RELEASE_TAG, safe='')}")
+    try:
+        return gh_json(f"/repos/{REPO}/releases/tags/{urllib.parse.quote(RELEASE_TAG, safe='')}")
+    except urllib.error.HTTPError as exc:
+        if exc.code != 404:
+            raise
+        # Draft releases are not addressable through the /releases/tags endpoint.
+        # Fall back to the releases collection so draft releases can be resumed.
+        releases = gh_json(f"/repos/{REPO}/releases?per_page=100")
+        for release in releases:
+            if release.get("tag_name") == RELEASE_TAG:
+                return release
+        raise RuntimeError(f"GitHub Release not found: {RELEASE_TAG}") from exc
 
 
 def upload_asset(upload_url, name, source_response, length, content_type="application/octet-stream"):
