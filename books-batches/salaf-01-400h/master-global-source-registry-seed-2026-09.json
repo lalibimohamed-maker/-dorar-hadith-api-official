@@ -643,6 +643,91 @@
       "role": "secondary API discovery route for Shamela books/authors/search; never a rights grant",
       "rights": "metadata/content rights must be verified at source/item level",
       "priority_tier": 0
+    },
+    {
+      "id": "quran_foundation_content_api_v4",
+      "name": "Quran Foundation / Quran.com Content API v4",
+      "url": "https://api-docs.quran.com/docs/content_apis_versioned/4.0.0/content-apis/",
+      "region": "global",
+      "languages": [
+        "multi"
+      ],
+      "role": "official Quran API: text, translations, tafsir, recitation/audio, structure and search",
+      "rights": "API access does not grant redistribution permission; resource-level terms required",
+      "priority_tier": 2,
+      "api": {
+        "base_url": "https://apis.quran.foundation/content/api/v4",
+        "authentication": "OAuth2 client_credentials",
+        "status": "official-api-contract-verified"
+      }
+    },
+    {
+      "id": "quranenc_translation_api",
+      "name": "QuranEnc Translation API",
+      "url": "https://quranenc.com/ar/home/api",
+      "region": "global",
+      "languages": [
+        "multi"
+      ],
+      "role": "official multilingual Quran translation API and catalog",
+      "rights": "translation-specific reuse terms and attribution required",
+      "priority_tier": 2,
+      "api": {
+        "base_url": "https://quranenc.com/api/v1",
+        "authentication": "public",
+        "status": "official-api-contract-verified"
+      }
+    },
+    {
+      "id": "alquran_cloud_api_v1",
+      "name": "Al Quran Cloud API v1",
+      "url": "https://alquran.cloud/api",
+      "region": "global",
+      "languages": [
+        "multi"
+      ],
+      "role": "Quran editions, translations, audio and recitation API",
+      "rights": "source/edition-specific terms and attribution required",
+      "priority_tier": 2,
+      "api": {
+        "base_url": "https://api.alquran.cloud/v1",
+        "authentication": "keyless-public",
+        "status": "official-api-documentation-verified"
+      }
+    },
+    {
+      "id": "tafasir_online_api",
+      "name": "الجامع التاريخي لتفسير القرآن الكريم — Tafasir.online API",
+      "url": "https://www.tafasir.online/ar/developer",
+      "region": "Saudi Arabia",
+      "languages": [
+        "ar"
+      ],
+      "role": "official tafsir API and book-content discovery",
+      "rights": "API access does not establish redistribution rights",
+      "priority_tier": 2,
+      "api": {
+        "base_url": "https://www.tafasir.online/",
+        "authentication": "API_Key",
+        "status": "official-api-contract-verified-key-gated"
+      }
+    },
+    {
+      "id": "diyanet_open_source_quran_api",
+      "name": "Diyanet Open Source Quran API",
+      "url": "https://acikkaynakkuran-dev.diyanet.gov.tr/",
+      "region": "Türkiye",
+      "languages": [
+        "tr"
+      ],
+      "role": "official Quran API/open-source project",
+      "rights": "restricted for independent products; follow official project terms",
+      "priority_tier": 2,
+      "api": {
+        "base_url": "https://acikkaynakkuran-dev.diyanet.gov.tr/",
+        "authentication": "GitHub account/API key",
+        "status": "official-api-verified-restricted"
+      }
     }
   ],
   "required_behavior": [
@@ -716,5 +801,6 @@
     "exhaustion_rule": "After every registered source relevant to the cell has been inspected, Rechercher may perform bounded generic-web discovery. Web results are discovery evidence only until the exact source, edition, rights and PDF are independently verified.",
     "no_exclusion": "A priority hit never suppresses searches in the remaining registered pool; a priority miss does not terminate acquisition."
   },
-  "last_priority_update": "2026-09-26"
+  "last_priority_update": "2026-09-26",
+  "last_api_source_import": "2026-09-26"
 }
