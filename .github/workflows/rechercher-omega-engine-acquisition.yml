@@ -35,6 +35,9 @@ jobs:
           - logical_id: paddleocr-vl
             model_id: PaddlePaddle/PaddleOCR-VL
             revision: 7fa00a8c55b735ba51ba49a9058f3f9c57a99a11
+          - logical_id: whisper-tiny
+            model_id: openai/whisper-tiny
+            revision: 169d4a4341b33bc18d8881c4b69c2e104e1cc0af
     steps:
       - name: Install Hugging Face Hub client
         run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
