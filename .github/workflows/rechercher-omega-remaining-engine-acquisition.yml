@@ -213,4 +213,16 @@ jobs:
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
-          gh release view "$RELEASE_TAG" --json tagName,url,assets
+          python3 - <<'PY'
+          import json, os, subprocess
+          tag=os.environ["RELEASE_TAG"]
+          raw=subprocess.check_output([
+              "gh","api",
+              f"/repos/$GITHUB_REPOSITORY/releases/tags/{tag}"
+          ], text=True)
+          data=json.loads(raw)
+          names={asset["name"] for asset in data.get("assets",[])}
+          if "release-manifest.json" not in names:
+              raise SystemExit("release-manifest.json is missing from "+tag)
+          print("Verified manifest asset in", tag)
+          PY
