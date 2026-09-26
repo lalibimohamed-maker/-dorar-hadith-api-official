@@ -1,0 +1,107 @@
+{
+  "schema": "rechercher/omega/islamic-ai-research-sources/v1",
+  "purpose": "Research-only registry for open Islamic NLP, retrieval, knowledge-graph and model-engineering sources that can inform Rechercher Ω. These are engineering inputs and evidence candidates, never canonical religious authority.",
+  "policy": {
+    "free_first": true,
+    "paid_fallback_allowed": false,
+    "corpus_write_allowed": false,
+    "model_or_code_license_must_be_verified": true,
+    "dataset_rights_must_be_verified_per_source": true,
+    "generated_model_output_is_not_corpus_truth": true,
+    "religious_claims_require_grounded_evidence": true
+  },
+  "sources": [
+    {
+      "id": "quran_nlp_engine",
+      "name": "QURAN-NLP",
+      "url": "https://github.com/islamAndAi/QURAN-NLP",
+      "role": "Quran/Hadith NLP, morphology, semantic search, corpus tooling",
+      "license": "Apache-2.0 code; individual datasets/translations retain their own terms",
+      "integration": "study semantic search, morphology, canonical-row validation and hadith/isnad graph ideas",
+      "status": "research-approved"
+    },
+    {
+      "id": "adhkar_duaa_db",
+      "name": "Adhkar-Duaa Multilingual Database",
+      "url": "https://github.com/Kind-Unes/Adhkar-Duaa-Multilingual-Database",
+      "role": "multilingual adhkar/duaa structured data",
+      "integration": "candidate multilingual schema and ingestion patterns; verify each data item's provenance",
+      "status": "research-approved"
+    },
+    {
+      "id": "islampack_core",
+      "name": "Arabic NLP GitHub topic/repository family",
+      "url": "https://github.com/topics/arabic-nlp?o=desc&s=updated",
+      "role": "discover Arabic NLP libraries/models",
+      "integration": "discovery only; promote individual repositories after license and technical review",
+      "status": "discovery"
+    },
+    {
+      "id": "quranic_corpus",
+      "name": "Quranic Arabic Corpus",
+      "url": "https://corpus.quran.com/",
+      "role": "morphology, syntax and linguistic annotation",
+      "integration": "linguistic evidence/feature engineering; canonical Quran text remains separate",
+      "status": "research-approved"
+    },
+    {
+      "id": "fiqh_rag_reference",
+      "name": "Fiqh RAG Engine reference",
+      "url": "https://github.com/JaedenRotondo/fiqh-mcp-server",
+      "role": "MCP/RAG architecture reference for source-cited fiqh retrieval",
+      "integration": "architecture study only; do not import its conclusions as religious authority",
+      "status": "research-approved"
+    },
+    {
+      "id": "fiqh_embedding_benchmark",
+      "name": "Arabic Embeddings + FlashRank Fiqh RAG benchmark",
+      "url": "https://github.com/hbenayed1976/evaluating-flashrank-impact-in-rag-with-arabic-embeddings-",
+      "role": "Arabic embedding/reranking evaluation methodology",
+      "integration": "benchmark design for retrieval/reranking; license and dataset provenance must be reviewed",
+      "status": "research-approved"
+    },
+    {
+      "id": "fiqh_embed_candidate",
+      "name": "Fiqh-Embed AR/FA",
+      "url": "https://huggingface.co/sadiqoon/fiqh-embed-ar-fa-gguf",
+      "role": "Islamic-jurisprudence embedding model candidate",
+      "integration": "evaluate only as retrieval model; current model targets Ja'fari/Imami jurisprudence and must not silently mix into Sunni evidence lanes",
+      "license": "MIT",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "minsa_nlp_api",
+      "name": "MINSA NLP API",
+      "role": "user-proposed Islamic/Arabic NLP source",
+      "integration": "candidate architecture/API inspiration only until exact repository, endpoint and license are verified",
+      "status": "unverified-candidate"
+    },
+    {
+      "id": "islamic_fiqh_ontology_owl",
+      "name": "Integrated Islamic Fiqh Ontology & Knowledge Graph",
+      "role": "user-proposed RDF/OWL/SPARQL ontology",
+      "integration": "ontology architecture candidate; exact repository and ontology provenance must be verified",
+      "status": "unverified-candidate"
+    },
+    {
+      "id": "fiqh_vector_pipeline",
+      "name": "Islamic Jurisprudence Embeddings Pipeline",
+      "role": "user-proposed vector/RAG pipeline",
+      "integration": "RAG/vector architecture candidate; evaluate against grounded-evidence gate and benchmarked retrieval",
+      "status": "unverified-candidate"
+    },
+    {
+      "id": "awqaf_llm_weights",
+      "name": "Awqaf-LLM / Awqaf-Gemma Weights",
+      "role": "user-proposed Islamic LLM weights",
+      "integration": "do not acquire/use until exact official model repository, weights, license, training-data provenance and evaluation are verified",
+      "status": "unverified-candidate"
+    }
+  ],
+  "design_note": {
+    "minsa": "Added as engineering research candidate, not as trusted religious source.",
+    "ontology": "OWL/RDF can model relationships and support SPARQL, but cannot manufacture fiqh conclusions; every derived claim remains tied to source evidence.",
+    "embeddings": "Embeddings are retrieval infrastructure, not truth or authority; evidence IDs, provenance, rights and verification status must persist through retrieval.",
+    "llm": "LLM weights can assist synthesis only after the evidence gate and never replace source-grounded evidence or scholar review."
+  }
+}
