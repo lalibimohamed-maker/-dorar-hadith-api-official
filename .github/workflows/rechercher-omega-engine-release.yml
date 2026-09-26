@@ -136,13 +136,35 @@ jobs:
               )
           PY
 
-      - name: Upload persistent release assets
+      - name: Upload Qwen3 release assets
         env:
           GH_TOKEN: ${{ github.token }}
           WORKDIR: ${{ runner.temp }}/omega-release
         run: |
           set -euo pipefail
-          gh release upload "$TAG"             "$WORKDIR/qwen3-model.safetensors"             "$WORKDIR/qwen3-runtime-files.tar.gz"             "$WORKDIR/qwen3-release-manifest.json"             "$WORKDIR/paddleocr-vl-model.safetensors"             "$WORKDIR/paddleocr-vl-runtime-files.tar.gz"             "$WORKDIR/paddleocr-vl-release-manifest.json"             "$WORKDIR/whisper-tiny-model.safetensors"             "$WORKDIR/whisper-tiny-runtime-files.tar.gz"             "$WORKDIR/whisper-tiny-release-manifest.json"             --clobber
+          for asset in qwen3-model.safetensors qwen3-runtime-files.tar.gz qwen3-release-manifest.json; do
+            gh release upload "$TAG" "$WORKDIR/$asset" --clobber
+          done
+
+      - name: Upload PaddleOCR-VL release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKDIR: ${{ runner.temp }}/omega-release
+        run: |
+          set -euo pipefail
+          for asset in paddleocr-vl-model.safetensors paddleocr-vl-runtime-files.tar.gz paddleocr-vl-release-manifest.json; do
+            gh release upload "$TAG" "$WORKDIR/$asset" --clobber
+          done
+
+      - name: Upload Whisper tiny release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKDIR: ${{ runner.temp }}/omega-release
+        run: |
+          set -euo pipefail
+          for asset in whisper-tiny-model.safetensors whisper-tiny-runtime-files.tar.gz whisper-tiny-release-manifest.json; do
+            gh release upload "$TAG" "$WORKDIR/$asset" --clobber
+          done
 
       - name: Verify published assets
         env:
