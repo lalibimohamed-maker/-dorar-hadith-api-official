@@ -1,0 +1,66 @@
+name: Rechercher Ω — Qwen3-VL upload diagnostic
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - ".github/workflows/rechercher-omega-qwen3vl-upload-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# security-justification: diagnostic upload of a single 128 MiB model shard into the dedicated Qwen3-VL prerelease.
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Install HF client
+        run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Download first Qwen3-VL shard
+        env:
+          MODEL_ID: Qwen/Qwen3-VL-4B-Instruct
+          REVISION: ebb281ec70b05090aa6165b016eac8ec08e71b17
+          CACHE_DIR: ${{ runner.temp }}/qwen-cache
+        run: |
+          set -euo pipefail
+          rm -rf "$CACHE_DIR"
+          mkdir -p "$CACHE_DIR"
+          python3 - <<'PY'
+          import os
+          from huggingface_hub import hf_hub_download
+          p=hf_hub_download(
+              repo_id=os.environ["MODEL_ID"],
+              filename="model-00001-of-00002.safetensors",
+              revision=os.environ["REVISION"],
+              cache_dir=os.environ["CACHE_DIR"]
+          )
+          print(p)
+          with open(os.environ["GITHUB_OUTPUT"], "w") if False else open("/tmp/qwen_path","w") as f:
+              f.write(p)
+          PY
+          cat /tmp/qwen_path
+
+      - name: Cut a 128 MiB upload test
+        env:
+          CACHE_DIR: ${{ runner.temp }}/qwen-cache
+        run: |
+          set -euo pipefail
+          source_file="$(find "$CACHE_DIR" -type f -name 'xet*' -o -name '*.safetensors' | head -n 1)"
+          test -s "$source_file"
+          dd if="$source_file" of=/tmp/qwen-test.part bs=1M count=128 iflag=fullblock status=none
+          test "$(stat -c '%s' /tmp/qwen-test.part)" -eq 134217728
+
+      - name: Upload 128 MiB test through Releases API
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          upload_url="$(gh api "/repos/$REPO/releases/tags/rechercher-omega-qwen3-vl-v1.0.0" --jq '.upload_url' | sed 's/{?name,label}//')"
+          curl --fail-with-body --location --retry 5 --retry-all-errors             --connect-timeout 30 --max-time 900             -X POST             -H "Authorization: Bearer $GH_TOKEN"             -H "Accept: application/vnd.github+json"             -H "X-GitHub-Api-Version: 2026-03-10"             -H "Content-Type: application/octet-stream"             --data-binary "@/tmp/qwen-test.part"             "$upload_url?name=qwen3-vl-upload-test-128m.part"
+
