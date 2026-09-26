@@ -172,6 +172,43 @@ async function archivePdfUrls(json){
   return [...out];
 }
 
+async function webFallbackCandidates(row){
+  const title=String(row.title||row.book_title||row.work_title||'').trim();
+  const author=String(row.author||row.author_name||'').trim();
+  const query=[title,author].filter(Boolean).join(' ');
+  if(!query) return {queries:[],urls:[],errors:[]};
+  const engines=[
+    'https://www.bing.com/search?q='+encodeURIComponent(query)+'&count=10',
+    'https://search.brave.com/search?q='+encodeURIComponent(query)
+  ];
+  const urls=new Set(),errors=[];
+  for(const searchUrl of engines){
+    try{
+      const u=new URL(searchUrl);
+      const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),REQUEST_TIMEOUT);
+      try{
+        const r=await fetch(u.href,{redirect:'follow',signal:ctl.signal,headers:{
+          'user-agent':'DinAllah-Rechercher/4.0',
+          accept:'text/html,application/xhtml+xml'
+        }});
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const html=await r.text();
+        const matches=[...html.matchAll(/<a[^>]+href=["'](https?:\\/\\/[^"']+)["'][^>]*>/gi)];
+        for(const m of matches){
+          try{
+            const target=new URL(m[1]);
+            if(target.protocol!=='https:'||target.username||target.password) continue;
+            if(target.hostname==='bing.com'||target.hostname.endsWith('.bing.com')||target.hostname==='brave.com'||target.hostname.endsWith('.brave.com')) continue;
+            const clean=target.href.replace(/#.*$/,'');
+            if(clean!==searchUrl) urls.add(clean);
+          }catch{}
+        }
+      }finally{clearTimeout(timer);}
+    }catch(e){errors.push({engine:searchUrl.split('/')[2],error:String(e.message||e)});}
+  }
+  return {queries:[query],urls:[...urls].slice(0,24),errors};
+}
+
 async function candidateUrls(seed){
   if(candidateCache.has(seed)) return candidateCache.get(seed);
   const pending=(async()=>{
@@ -378,7 +415,7 @@ async function processCell(row){
     provider:row.provider||sourceOf(urls[0]||''),status:'no-eligible-pdf-found',
     sources_checked:[],evidence_urls:urls,files:[],rights:rowRights.status,rights_conflict:rowRights.conflict,
     rights_confidence:rowRights.confidence,rights_evidence:rowRights.evidence,acquisition:'blocked',source_errors:[],
-    source_candidates:[],rights_approved_sources:[],rights_blocked_sources:[]
+    source_candidates:[],rights_approved_sources:[],rights_blocked_sources:[],web_discovery:null
   };
   const ids=[],push=id=>{if(id&&!ids.includes(id))ids.push(id)};
   if(row.provider&&(adapters.has(row.provider)||master.has(row.provider)||worldwide.has(row.provider))) push(row.provider);
@@ -403,7 +440,16 @@ async function processCell(row){
     push(sid);
   }
 
-  const limitedIds=[...new Set(ids)].slice(0,MAX_SOURCES_PER_CELL);
+  const priorityIds=new Set([
+    'openiti','openiti_github','openiti_release','shamela','shamela_api_discovery',
+    'waqfeya','kitab_zenodo_full','kitab_zenodo_primary','internet_archive'
+  ]);
+  const orderedIds=[...new Set(ids)].sort((a,b)=>{
+    const ap=priorityIds.has(a)?0:1, bp=priorityIds.has(b)?0:1;
+    if(ap!==bp) return ap-bp;
+    return a.localeCompare(b);
+  });
+  const limitedIds=orderedIds.slice(0,MAX_SOURCES_PER_CELL);
   entry.source_candidates=limitedIds.slice();
   const seeds=[];
   for(const id of limitedIds){
@@ -515,6 +561,36 @@ async function processCell(row){
         if(sourceType==='research-only')manifest.total_research_only_files++;
         manifest.source_counts[sourceId]=(manifest.source_counts[sourceId]||0)+1;
       }catch(e){claimed.delete(pdf);entry.source_errors.push({source:seed.id,url:pdf,error:String(e.message||e)});}
+    }
+  }
+  if(entry.files.length===0){
+    // Last-resort generic web discovery. This is deliberately after the complete
+    // registered-source pass. Search-engine results are discovery evidence only:
+    // they never grant redistribution rights and are recorded for later verification.
+    try{
+      const web=await webFallbackCandidates(row);
+      entry.web_discovery={
+        attempted:true,
+        order:'after-all-registered-sources',
+        queries:web.queries,
+        candidate_urls:web.urls,
+        errors:web.errors
+      };
+      for(const candidate of web.urls.slice(0,24)){
+        try{
+          const u=new URL(candidate);
+          if(u.protocol!=='https:'||u.username||u.password) continue;
+          origins.add(u.origin);
+          if(!originSource.has(u.origin)) originSource.set(u.origin,'web_search');
+          const directPdf=isPdfUrl(candidate);
+          if(directPdf){
+            entry.source_candidates.push('web_search');
+            entry.sources_checked.push({source:'web_search',url:candidate,role:'bounded-generic-web-fallback',rights:'discovery-only'});
+          }
+        }catch{}
+      }
+    }catch(e){
+      entry.web_discovery={attempted:true,order:'after-all-registered-sources',queries:[],candidate_urls:[],errors:[{engine:'web-search',error:String(e.message||e)}]};
     }
   }
   if(entry.files.length){
