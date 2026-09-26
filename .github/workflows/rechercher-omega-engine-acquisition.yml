@@ -11,6 +11,8 @@ on:
   schedule:
     - cron: "0 */4 * * *"
 
+# Acquisition is scheduled every four hours and all starter revisions are immutable full SHAs.
+
 permissions:
   contents: read
 
