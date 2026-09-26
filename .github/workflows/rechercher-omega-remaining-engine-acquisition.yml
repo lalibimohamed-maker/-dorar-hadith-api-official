@@ -173,7 +173,14 @@ jobs:
               asset="$WORKDIR/omega__$safe"
               cp "$file" "$asset"
               upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
-              gh api --method POST "$upload_url?name=$(basename "$asset")" --header "Content-Type: application/octet-stream" --input "$asset" >/dev/null
+              curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 3600 \
+                -X POST \
+                -H "Authorization: Bearer $GH_TOKEN" \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2026-03-10" \
+                -H "Content-Type: application/octet-stream" \
+                --data-binary "@$asset" \
+                "$upload_url?name=$(basename "$asset")"
               assets="$(basename "$asset")"
               rm -f "$asset"
             else
@@ -191,7 +198,14 @@ jobs:
                 if [ "$(stat -c '%s' "$chunk")" -gt "$count" ]; then truncate -s "$count" "$chunk"; fi
                 test "$(stat -c '%s' "$chunk")" -lt 2147483647
                 upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
-                gh api --method POST "$upload_url?name=$(basename "$chunk")" --header "Content-Type: application/octet-stream" --input "$chunk" >/dev/null
+                curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 3600 \
+                  -X POST \
+                  -H "Authorization: Bearer $GH_TOKEN" \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "X-GitHub-Api-Version: 2026-03-10" \
+                  -H "Content-Type: application/octet-stream" \
+                  --data-binary "@$chunk" \
+                  "$upload_url?name=$(basename "$chunk")"
                 name="$(basename "$chunk")"
                 if [ -n "$assets" ]; then assets="$assets,$name"; else assets="$name"; fi
                 rm -f "$chunk"
@@ -220,7 +234,14 @@ jobs:
           PY
 
           upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
-          gh api --method POST "$upload_url?name=release-manifest.json" --header "Content-Type: application/json" --input "$WORKDIR/release-manifest.json" >/dev/null
+          curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 600 \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2026-03-10" \
+            -H "Content-Type: application/json" \
+            --data-binary "@$WORKDIR/release-manifest.json" \
+            "$upload_url?name=release-manifest.json"
       - name: Verify Release manifest
         env:
           GH_TOKEN: ${{ github.token }}
