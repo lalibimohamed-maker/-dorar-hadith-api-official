@@ -111,7 +111,8 @@ test("high-similarity very-weak and unknown-grade hadiths cannot bypass the hard
   });
 
   assert.equal(result.eligible.length, 0);
-  assert.deepEqual(rerankerInput, []);
+  // The hard gate must short-circuit reranking entirely; null means the reranker was never invoked.
+  assert.equal(rerankerInput, null);
 });
 
 test("a verified hadith can reach the reranker while a more similar mawdu hadith cannot", () => {
