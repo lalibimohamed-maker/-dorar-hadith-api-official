@@ -1,0 +1,107 @@
+name: Rechercher — Omega health
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+  pull_request:
+    paths:
+      - "src/rechercher-omega-*.js"
+      - "test/rechercher-omega-*.test.js"
+      - "config/rechercher-omega-*.json"
+      - "src/rechercher-omega-space-registry.js"
+      - "test/rechercher-omega-space-registry.test.js"
+      - "test/rechercher-omega-integration.test.js"
+      - "docs/RECHERCHER-OMEGA-*.md"
+      - ".github/workflows/rechercher-omega-health.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */4 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-omega-health-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  health:
+    name: Omega contract health
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax health
+        run: npm run health
+
+      - name: Omega execution, adapter and Phase 3 contracts
+        run: >
+          node --test
+          test/rechercher-omega-execution-router.test.js
+          test/rechercher-omega-adapters.test.js
+          test/rechercher-omega-phase3.test.js
+          test/rechercher-omega-global-research-radar.test.js
+          test/rechercher-omega-multimodal-router.test.js
+          test/rechercher-omega-media-pipeline.test.js
+          test/rechercher-omega-video-studio.test.js
+          test/rechercher-omega-video-orchestrator.test.js
+          test/rechercher-omega-space-registry.test.js
+          test/rechercher-omega-integration.test.js
+
+      - name: Verify Global Deep Research Radar is fail-closed
+        run: >
+          node --input-type=module -e
+          "import('./src/rechercher-omega-global-research-radar.js').then(async m => {
+          const radar = await m.loadGlobalResearchRadar();
+          const plan = m.buildResearchProbePlan({
+          radar,
+          task:'health-check',
+          availableProviders:['jina-reader','searxng','brave-search']
+          });
+          m.assertResearchRadarBoundary(plan);
+          if (plan.network_execution || plan.paid_fallback_allowed || plan.corpus_write_allowed) process.exit(1);
+          console.log(JSON.stringify(plan,null,2));
+          })"
+
+      - name: Verify no runtime credentials are exposed
+        env:
+          GEMINI_API_KEY: ""
+          GROQ_API_KEY: ""
+          HF_TOKEN: ""
+        run: >
+          node --input-type=module -e
+          "import('./src/rechercher-omega-adapters.js').then(async m => {
+          for (const backend of ['gemini-free-tier','groq-free-plan','huggingface-inference']) {
+          try { await m.buildAdapterRequest({backend, model:'health-check', input:{}}); }
+          catch (e) { if (!String(e.message).includes('missing required runtime secret')) throw e; }
+          }
+          })"
+
+      - name: Enforce fail-closed execution policy
+        run: >
+          node --input-type=module -e
+          "import('./src/rechercher-omega-runtime-gate.js').then(m => {
+          const gate = m.buildRuntimeGate({
+          task:'health-check',
+          model:'health-check',
+          capabilities:['text'],
+          availableBackends:['local','huggingface-inference'],
+          });
+          m.assertRuntimeGate(gate);
+          if (gate.paid_fallback_allowed || gate.corpus_write_allowed) process.exit(1);
+          console.log(JSON.stringify(gate,null,2));
+          })"

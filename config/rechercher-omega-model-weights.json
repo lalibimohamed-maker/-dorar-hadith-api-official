@@ -1,0 +1,259 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Rechercher Ω model-weight acquisition and verification manifest.",
+  "policy": {
+    "runtime_download_allowed": true,
+    "persistent_mirror_requires_license_clearance": true,
+    "sha256_required_before_promotion": true,
+    "unknown_revision_is_not_verified": true,
+    "unknown_weight_license_is_not_redistributable": true,
+    "corpus_write_allowed": false,
+    "acquisition_manifest_required": true,
+    "license_statuses": [
+      "verified_source_license",
+      "review_required",
+      "blocked"
+    ],
+    "scheduled_weight_downloads": false,
+    "release_distribution": true
+  },
+  "weights": [
+    {
+      "model_id": "qwen3",
+      "source_repo": "https://github.com/QwenLM/Qwen3",
+      "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "revision_type": "immutable_hf_commit",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "qwen3-release-manifest.json",
+        "checksum_assets": [
+          "qwen3-model.safetensors",
+          "qwen3-runtime-files.tar.gz"
+        ],
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "rights_promotion_status": "blocked_until_clearance",
+      "release_tag": "rechercher-omega-engines-v0.1.0",
+      "release_assets": [
+        "qwen3-model.safetensors",
+        "qwen3-runtime-files.tar.gz",
+        "qwen3-release-manifest.json"
+      ],
+      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>"
+    },
+    {
+      "model_id": "qwen3-omni",
+      "source_repo": "https://github.com/QwenLM/Qwen3-Omni",
+      "revision": "12a3ac6661e685620bbc6616b7217b26469a81dd",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "revision_type": "immutable_hf_commit",
+      "resource_class": "xlarge",
+      "approximate_size_gb": 70.5,
+      "release_tag": "rechercher-omega-qwen3-omni-v1.0.0",
+      "rights_promotion_status": "blocked_until_clearance"
+    },
+    {
+      "model_id": "paddleocr-vl",
+      "source_repo": "https://github.com/PaddlePaddle/PaddleOCR",
+      "revision": "7fa00a8c55b735ba51ba49a9058f3f9c57a99a11",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "revision_type": "immutable_hf_commit",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "paddleocr-vl-release-manifest.json",
+        "checksum_assets": [
+          "paddleocr-vl-model.safetensors",
+          "paddleocr-vl-runtime-files.tar.gz"
+        ],
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "rights_promotion_status": "blocked_until_clearance",
+      "release_tag": "rechercher-omega-engines-v0.1.0",
+      "release_assets": [
+        "paddleocr-vl-model.safetensors.part-00",
+        "paddleocr-vl-model.safetensors.part-01",
+        "paddleocr-vl-model.safetensors.part-02",
+        "paddleocr-vl-model.safetensors.part-03",
+        "paddleocr-vl-model.safetensors.part-04",
+        "paddleocr-vl-model.safetensors.part-05",
+        "paddleocr-vl-model.safetensors.part-06",
+        "paddleocr-vl-model.safetensors.part-07",
+        "paddleocr-vl-model.safetensors.part-08",
+        "paddleocr-vl-model.safetensors.part-09",
+        "paddleocr-vl-model.safetensors.part-10",
+        "paddleocr-vl-model.safetensors.part-11",
+        "paddleocr-vl-model.safetensors.part-12",
+        "paddleocr-vl-model.safetensors.part-13",
+        "paddleocr-vl-model.safetensors.part-14",
+        "paddleocr-vl-runtime-files.tar.gz",
+        "paddleocr-vl-release-manifest.json"
+      ],
+      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>",
+      "model_reconstruction": {
+        "method": "cat_sorted_parts",
+        "output": "model.safetensors",
+        "part_size_bytes": 134217728
+      }
+    },
+    {
+      "model_id": "wan2.2",
+      "source_repo": "https://github.com/Wan-Video/Wan2.2",
+      "revision": "37685f96025fc1425edccdd4b2bca3836ae917ff",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "release_tag": "rechercher-omega-wan22-ti2v5b-v1.0.0",
+      "source_model_id": "Wan-AI/Wan2.2-TI2V-5B",
+      "rights_promotion_status": "blocked_until_clearance"
+    },
+    {
+      "model_id": "hunyuanvideo-1.5",
+      "source_repo": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5",
+      "revision": null,
+      "weight_license_status": "review_required",
+      "acquisition": "github_release_draft",
+      "verification": {
+        "mode": "draft_release_manifest",
+        "required_before_publication": true,
+        "required_before_runtime": true
+      },
+      "release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+      "rights_promotion_status": "draft_only_pending_license_review"
+    },
+    {
+      "model_id": "ltx-2",
+      "source_repo": "https://github.com/Lightricks/LTX-2",
+      "revision": null,
+      "weight_license_status": "review_required",
+      "acquisition": "github_release_draft",
+      "verification": {
+        "mode": "draft_release_manifest",
+        "required_before_publication": true,
+        "required_before_runtime": true
+      },
+      "release_tag": "rechercher-omega-ltx2-v1.0.0",
+      "rights_promotion_status": "draft_only_pending_license_review"
+    },
+    {
+      "model_id": "cogvideox",
+      "source_repo": "https://github.com/zai-org/CogVideo",
+      "revision": "1137dacfc2c9c012bed6a0793f4ecf2ca8e7ba01",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "release_tag": "rechercher-omega-cogvideox2b-v1.0.0",
+      "source_model_id": "zai-org/CogVideoX-2b",
+      "rights_promotion_status": "blocked_until_clearance"
+    },
+    {
+      "model_id": "cosyvoice",
+      "source_repo": "https://github.com/FunAudioLLM/CosyVoice",
+      "revision": "eec1ae6c79877dbd9379285cf8789c9e0879293d",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "source_model_id": "FunAudioLLM/CosyVoice2-0.5B",
+      "revision_type": "immutable_hf_commit",
+      "notes": "Official Hugging Face model card currently declares Apache-2.0; stage because the repository is about 4.36 GB.",
+      "release_tag": "rechercher-omega-cosyvoice2-0.5b-v1.0.0",
+      "rights_promotion_status": "blocked_until_clearance"
+    },
+    {
+      "model_id": "sglang",
+      "source_repo": "https://github.com/sgl-project/sglang",
+      "revision": null,
+      "weight_license_status": "review_required",
+      "acquisition": "runtime_only",
+      "verification": {
+        "mode": "not_acquired",
+        "requires_immutable_revision": true,
+        "requires_sha256": true,
+        "requires_license_clearance": true
+      }
+    },
+    {
+      "model_id": "qwen3-vl",
+      "source_repo": "https://github.com/QwenLM/Qwen3-VL",
+      "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "source_model_id": "Qwen/Qwen3-VL-4B-Instruct",
+      "revision_type": "immutable_hf_commit",
+      "release_tag": "rechercher-omega-qwen3-vl-v1.0.0",
+      "rights_promotion_status": "blocked_until_clearance"
+    },
+    {
+      "model_id": "whisper",
+      "source_repo": "https://github.com/openai/whisper",
+      "revision": "169d4a4341b33bc18d8881c4b69c2e104e1cc0af",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "whisper-tiny-release-manifest.json",
+        "checksum_assets": [
+          "whisper-tiny-model.safetensors",
+          "whisper-tiny-runtime-files.tar.gz"
+        ],
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "source_model_id": "openai/whisper-tiny",
+      "revision_type": "immutable_hf_commit",
+      "rights_promotion_status": "blocked_until_clearance",
+      "release_tag": "rechercher-omega-engines-v0.1.0",
+      "release_assets": [
+        "whisper-tiny-model.safetensors",
+        "whisper-tiny-runtime-files.tar.gz",
+        "whisper-tiny-release-manifest.json"
+      ],
+      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>"
+    },
+    {
+      "model_id": "flux",
+      "source_repo": "https://github.com/black-forest-labs/flux",
+      "revision": null,
+      "weight_license_status": "review_required",
+      "acquisition": "runtime_only",
+      "verification": {
+        "mode": "not_acquired",
+        "requires_immutable_revision": true,
+        "requires_sha256": true,
+        "requires_license_clearance": true
+      }
+    }
+  ]
+}

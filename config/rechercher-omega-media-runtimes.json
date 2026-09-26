@@ -1,0 +1,11 @@
+{
+  "schema_version":"1.0.0",
+  "purpose":"Free-first runtimes for executing Rechercher Omega media jobs.",
+  "policy":{"prefer_local":true,"paid_fallback_allowed":false,"corpus_write_allowed":false,"generated_media_is_evidence":false},
+  "runtimes":[
+    {"id":"local-comfyui","kind":"local","engine":"comfyui","free":true,"requires_gpu":true,"endpoint_env":"COMFYUI_URL","capabilities":["text_to_image","image_editing","text_to_video","image_to_video","video_to_video"],"priority":10},
+    {"id":"local-ffmpeg","kind":"local","engine":"ffmpeg","free":true,"requires_gpu":false,"capabilities":["video_composition","audio_mix","subtitle_burn","transcode"],"priority":20},
+    {"id":"kaggle-gpu","kind":"remote_gpu","engine":"kaggle","free":true,"requires_gpu":true,"capabilities":["model_inference","video_generation","image_generation","audio_generation","ocr"],"priority":30},
+    {"id":"huggingface-inference","kind":"remote_api","engine":"huggingface","free":true,"requires_gpu":false,"requires_api_key":true,"capabilities":["model_inference"],"priority":40}
+  ]
+}

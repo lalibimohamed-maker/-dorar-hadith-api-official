@@ -1,0 +1,7 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { buildMediaProductionPlan, assertMediaProductionBoundary } from "../src/rechercher-omega-media-pipeline.js";
+import { buildComfyUIJob, buildFFmpegComposition, buildKaggleMediaJob } from "../src/rechercher-omega-media-runtimes.js";
+test("media pipeline builds a full educational production chain",()=>{const plan=buildMediaProductionPlan({research_case_id:"case-1",script:"شرح موثق",storyboard:[{scene:1}],generation:{model_id:"hunyuanvideo-1.5"},voice:{model_id:"cosyvoice"},subtitles:{languages:["ar","en"]},composition:{format:"1080p"}});assert.deepEqual(plan.stages.map(x=>x.id),["research","script","storyboard","assets","generation","voice","subtitles","composition"]);assert.doesNotThrow(()=>assertMediaProductionBoundary(plan));});
+test("ComfyUI runtime requires an explicit workflow",()=>{assert.throws(()=>buildComfyUIJob({}),/explicit workflow/);});
+test("FFmpeg and Kaggle media jobs preserve the Corpus boundary",()=>{const ff=buildFFmpegComposition({command:"ffmpeg",args:["-version"]});const kg=buildKaggleMediaJob({kernel_slug:"owner/media",command:"python generate.py"});assert.equal(ff.corpus_write_allowed,false);assert.equal(kg.generated_media_is_evidence,false);});

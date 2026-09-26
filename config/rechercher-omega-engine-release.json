@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "release_tag": "rechercher-omega-engines-v0.1.0",
+  "channel": "prerelease",
+  "purpose": "Persistent GitHub Release distribution for verified lightweight Rechercher Ω starter model weights. Git stores manifests/code only; release assets store binaries.",
+  "policy": {
+    "max_asset_bytes": 2147483647,
+    "github_release_assets_only": true,
+    "no_git_tracked_weights": true,
+    "scheduled_workflow_downloads": false,
+    "overwrite_existing_assets": true
+  },
+  "engines": [
+    {
+      "logical_id": "qwen3",
+      "model_id": "Qwen/Qwen3-0.6B",
+      "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+      "license": "apache-2.0",
+      "asset_plan": [
+        "qwen3-model.safetensors",
+        "qwen3-runtime-files.tar.gz",
+        "qwen3-release-manifest.json"
+      ],
+      "source_url": "https://huggingface.co/Qwen/Qwen3-0.6B/tree/c1899de289a04d12100db370d81485cdf75e47ca",
+      "distribution": "monolithic"
+    },
+    {
+      "logical_id": "paddleocr-vl",
+      "model_id": "PaddlePaddle/PaddleOCR-VL",
+      "revision": "7fa00a8c55b735ba51ba49a9058f3f9c57a99a11",
+      "license": "apache-2.0",
+      "asset_plan": [
+        "paddleocr-vl-model.safetensors.part-00",
+        "paddleocr-vl-model.safetensors.part-01",
+        "paddleocr-vl-model.safetensors.part-02",
+        "paddleocr-vl-model.safetensors.part-03",
+        "paddleocr-vl-model.safetensors.part-04",
+        "paddleocr-vl-model.safetensors.part-05",
+        "paddleocr-vl-model.safetensors.part-06",
+        "paddleocr-vl-model.safetensors.part-07",
+        "paddleocr-vl-model.safetensors.part-08",
+        "paddleocr-vl-model.safetensors.part-09",
+        "paddleocr-vl-model.safetensors.part-10",
+        "paddleocr-vl-model.safetensors.part-11",
+        "paddleocr-vl-model.safetensors.part-12",
+        "paddleocr-vl-model.safetensors.part-13",
+        "paddleocr-vl-model.safetensors.part-14",
+        "paddleocr-vl-runtime-files.tar.gz",
+        "paddleocr-vl-release-manifest.json"
+      ],
+      "source_url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL/tree/7fa00a8c55b735ba51ba49a9058f3f9c57a99a11",
+      "model_reconstruction": {
+        "method": "cat_sorted_parts",
+        "output": "model.safetensors",
+        "part_size_bytes": 134217728
+      },
+      "distribution": "sharded",
+      "shard_bytes": 134217728
+    },
+    {
+      "logical_id": "whisper-tiny",
+      "model_id": "openai/whisper-tiny",
+      "revision": "169d4a4341b33bc18d8881c4b69c2e104e1cc0af",
+      "license": "apache-2.0",
+      "asset_plan": [
+        "whisper-tiny-model.safetensors",
+        "whisper-tiny-runtime-files.tar.gz",
+        "whisper-tiny-release-manifest.json"
+      ],
+      "source_url": "https://huggingface.co/openai/whisper-tiny/tree/169d4a4341b33bc18d8881c4b69c2e104e1cc0af",
+      "distribution": "monolithic"
+    }
+  ]
+}

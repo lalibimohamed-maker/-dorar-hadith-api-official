@@ -1,0 +1,53 @@
+name: Rechercher Ω — architecture and boundary tests
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/rechercher-omega-orchestrator.js"
+      - "src/rechercher-omega-execution-router.js"
+      - "src/rechercher-omega-adapters.js"
+      - "config/rechercher-omega-model-registry.json"
+      - "config/rechercher-omega-execution-backends.json"
+      - "config/rechercher-omega-model-weights.json"
+      - "test/rechercher-omega-orchestrator.test.js"
+      - "test/rechercher-omega-execution-router.test.js"
+      - "test/rechercher-omega-adapters.test.js"
+      - "test/rechercher-omega-phase3.test.js"
+      - "test/rechercher-omega-integration.test.js"
+      - "src/rechercher-omega-runtime-gate.js"
+      - "src/rechercher-omega-council.js"
+      - "src/rechercher-omega-weight-verifier.js"
+      - "docs/RECHERCHER-OMEGA-PHASE3.md"
+      - "docs/RECHERCHER-OMEGA.md"
+      - "docs/RECHERCHER-OMEGA-EXECUTION.md"
+      - ".github/workflows/rechercher-omega-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-omega-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  omega-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Ω boundary tests
+        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-integration.test.js

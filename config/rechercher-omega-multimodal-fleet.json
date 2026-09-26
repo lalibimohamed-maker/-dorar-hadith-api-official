@@ -1,0 +1,23 @@
+{
+  "schema_version":"1.0.0",
+  "purpose":"Rechercher Ω multimodal model fleet for research, image, video, audio, OCR, vision and presentation workflows.",
+  "policy":{
+    "free_first":true,
+    "paid_fallback_allowed":false,
+    "corpus_write_allowed":false,
+    "generated_media_is_evidence":false,
+    "weights_require_sha256_and_license_clearance_before_promotion":true
+  },
+  "models":[
+    {"id":"qwen3","family":"reasoning","tasks":["reasoning","text_generation"],"runtime":["local","huggingface-inference","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":10},
+    {"id":"qwen3-vl","family":"vision","tasks":["vision","multimodal_reasoning"],"runtime":["local","huggingface-inference","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":20},
+    {"id":"paddleocr-vl","family":"ocr","tasks":["ocr","document_understanding"],"runtime":["local","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":30},
+    {"id":"hunyuanvideo-1.5","family":"video","tasks":["text_to_video","image_to_video"],"runtime":["local","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":40},
+    {"id":"ltx-2","family":"audio_video","tasks":["text_to_video","image_to_video","video_to_video","audio_video_generation"],"runtime":["local","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":50},
+    {"id":"cogvideox","family":"video","tasks":["text_to_video","image_to_video"],"runtime":["local","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":60},
+    {"id":"wan2.2","family":"video","tasks":["text_to_video","image_to_video","video_to_video"],"runtime":["local","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":70},
+    {"id":"cosyvoice","family":"audio","tasks":["text_to_speech","voice_generation"],"runtime":["local","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":80},
+    {"id":"whisper","family":"speech","tasks":["speech_to_text","transcription"],"runtime":["local","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":90},
+    {"id":"flux","family":"image","tasks":["text_to_image","image_editing"],"runtime":["local","kaggle-gpu"],"license_status":"review_required","weight_status":"review_required","priority":100}
+  ]
+}

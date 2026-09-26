@@ -1,0 +1,38 @@
+{
+  "schema_version":"1.0.0",
+  "purpose":"Deterministic scene planner for Rechercher Omega educational video production.",
+  "policy":{
+    "free_first":true,
+    "paid_fallback_allowed":false,
+    "corpus_write_allowed":false,
+    "generated_media_is_evidence":false,
+    "rights_gate_required":true,
+    "provenance_required":true,
+    "council_required":true
+  },
+  "scene_visual_modes":[
+    "source_asset",
+    "generated_video",
+    "generated_image",
+    "diagram",
+    "map",
+    "document_animation",
+    "ocr_reconstruction"
+  ],
+  "generation_tasks":[
+    "text_to_video",
+    "image_to_video",
+    "video_to_video",
+    "text_to_image",
+    "image_editing",
+    "ocr",
+    "document_understanding"
+  ],
+  "timeline":{
+    "ordering":"scene.order",
+    "fps_default":24,
+    "aspect_ratio_default":"16:9",
+    "transitions":"deterministic",
+    "subtitles":"per_scene"
+  }
+}
