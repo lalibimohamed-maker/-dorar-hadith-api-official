@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Release intake plan for the remaining Rechercher Ω model families. Public Apache-2.0 families are distributed in dedicated Releases; community/gated families remain draft or blocked.",
+  "public_release_max_asset_bytes": 2147483647,
+  "engines": [
+    {
+      "id": "qwen3-vl",
+      "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+      "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+      "license": "apache-2.0",
+      "release_tag": "rechercher-omega-qwen3-vl-v1.0.0",
+      "release_visibility": "prerelease",
+      "estimated_gb": 8.89
+    },
+    {
+      "id": "qwen3-omni",
+      "model_id": "Qwen/Qwen3-Omni-30B-A3B-Instruct",
+      "revision": "12a3ac6661e685620bbc6616b7217b26469a81dd",
+      "license": "apache-2.0",
+      "release_tag": "rechercher-omega-qwen3-omni-v1.0.0",
+      "release_visibility": "prerelease",
+      "estimated_gb": 70.5
+    },
+    {
+      "id": "wan2.2-ti2v-5b",
+      "model_id": "Wan-AI/Wan2.2-TI2V-5B",
+      "revision": "37685f96025fc1425edccdd4b2bca3836ae917ff",
+      "license": "apache-2.0",
+      "release_tag": "rechercher-omega-wan22-ti2v5b-v1.0.0",
+      "release_visibility": "prerelease",
+      "estimated_gb": 34.2
+    },
+    {
+      "id": "cogvideox-2b",
+      "model_id": "zai-org/CogVideoX-2b",
+      "revision": "1137dacfc2c9c012bed6a0793f4ecf2ca8e7ba01",
+      "license": "apache-2.0",
+      "release_tag": "rechercher-omega-cogvideox2b-v1.0.0",
+      "release_visibility": "prerelease",
+      "estimated_gb": 13.8
+    },
+    {
+      "id": "cosyvoice2-0.5b",
+      "model_id": "FunAudioLLM/CosyVoice2-0.5B",
+      "revision": "eec1ae6c79877dbd9379285cf8789c9e0879293d",
+      "license": "apache-2.0",
+      "release_tag": "rechercher-omega-cosyvoice2-0.5b-v1.0.0",
+      "release_visibility": "prerelease",
+      "estimated_gb": 4.86
+    },
+    {
+      "id": "hunyuanvideo-1.5",
+      "model_id": "tencent/HunyuanVideo-1.5",
+      "revision": "9b49404b3f5df2a8f0b31df27a0c7ab872e7b038",
+      "license": "tencent-hunyuan-community",
+      "release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+      "release_visibility": "draft_review_only",
+      "estimated_gb": 372
+    },
+    {
+      "id": "ltx-2",
+      "model_id": "Lightricks/LTX-2",
+      "revision": "dfcc210",
+      "license": "ltx-2-community-license-agreement",
+      "release_tag": "rechercher-omega-ltx2-v1.0.0",
+      "release_visibility": "draft_review_only",
+      "estimated_gb": 314
+    },
+    {
+      "id": "flux",
+      "model_id": "black-forest-labs/FLUX.1-schnell",
+      "revision": null,
+      "license": "gated",
+      "release_tag": null,
+      "release_visibility": "blocked_until_access",
+      "estimated_gb": 23.8
+    }
+  ],
+  "non_weight_engine": {
+    "id": "sglang",
+    "action": "runtime_package_only",
+    "reason": "SGLang is an inference runtime, not a model-weight release."
+  }
+}
