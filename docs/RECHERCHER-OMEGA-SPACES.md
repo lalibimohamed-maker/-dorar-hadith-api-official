@@ -17,6 +17,7 @@ reference material for architecture, evaluation and capability discovery.
 | Community PaddleOCR-VL deployment | `Upsampler/paddleocr-vl` | OCR/document parsing reference |
 | Community PaddleOCR-VL demo | `waytoAGI/PaddleOCR-VL_Online_Demo` | OCR/document parsing reference |
 | Multilingual tokenizer benchmark | `eduagarcia/multilingual-tokenizer-leaderboard` | tokenizer comparison reference |
+| Document viewer | `embedl/hfviewer` | document/multimodal preview reference; associated with PaddleOCR-VL-1.5 ecosystem |
 | Tokenization | `aiqtech/LLM-Token-Visual` | multilingual/Arabic token analysis reference; currently paused |
 | Hallucination QA | `hugging-apps/enoki-hallucination-detector` | quality-assurance reference |
 
@@ -45,7 +46,12 @@ by these references rather than depending on the Spaces themselves:
 6. Arabic speech → language/dialect-specific voice candidates;
 7. tokenizer analysis → language-aware token diagnostics;
 8. hallucination checks → QA flags, never a truth oracle.\n9. PaddleOCR-VL document parsing → OCR/layout/table/formula/chart candidates with source provenance.\n10. Benchmark references → regression measurements; benchmark scores are not treated as scholarly evidence.
+11. Viewer references → preview and inspection UX only; never an execution trust root.
 
 The machine-readable registry is
 `config/rechercher-omega-space-registry.json`; its runtime boundary is
 `src/rechercher-omega-space-registry.js`.
+
+
+## Coverage note
+The registry is intentionally curated rather than an automatic mirror of every Hugging Face Space. New Spaces are admitted only after capability relevance and independent license review. PaddleOCR-VL, PaddleOCR-VL-1.5, and PaddleOCR-VL-1.6 are tracked as separate model families and are not silently substituted for the pinned starter engine.
