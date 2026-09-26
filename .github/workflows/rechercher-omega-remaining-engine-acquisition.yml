@@ -144,15 +144,16 @@ jobs:
           mkdir -p "$WORKDIR"
 
           python3 - <<'PY'
-          import hashlib, json, os, re, subprocess, urllib.request
+          import hashlib, json, os, re, subprocess
           from pathlib import Path
-          from huggingface_hub import HfApi, hf_hub_url
+          from huggingface_hub import HfApi, HfFileSystem
 
           model=os.environ["MODEL_ID"]
           revision=os.environ["REVISION"]
           tag=os.environ["RELEASE_TAG"]
           work=Path(os.environ["WORKDIR"])
           api=HfApi()
+          fs=HfFileSystem()
 
           allowed_ext={".safetensors",".bin",".pt",".pth",".onnx",".json",".txt",".md",".yaml",".yml",".py",".model"}
           skip_ext={".png",".jpg",".jpeg",".webp",".gif",".mp4",".wav",".mp3",".flac",".pdf",".zip"}
@@ -171,7 +172,6 @@ jobs:
           chunk_size=1536*1024*1024
           manifest=[]
           for filename in files:
-              url=hf_hub_url(model, filename, revision=revision)
               safe=re.sub(r"[^A-Za-z0-9._-]+","__",filename.replace("/","__"))
               temp=work/(safe+".partial")
               total=0
@@ -179,7 +179,7 @@ jobs:
               part_assets=[]
               part_no=0
 
-              with urllib.request.urlopen(url, timeout=180) as src:
+              with fs.open(model + "/" + filename, "rb", revision=revision) as src:
                   while True:
                       data=src.read(8*1024*1024)
                       if not data:
