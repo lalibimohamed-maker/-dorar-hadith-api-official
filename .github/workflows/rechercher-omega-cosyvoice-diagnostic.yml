@@ -54,6 +54,18 @@ jobs:
           upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/rechercher-omega-cosyvoice2-0.5b-v1.0.0" --jq ".upload_url" | sed "s/{?name,label}//")"
           gh api --method POST "$upload_url?name=diagnostic.txt" --header "Content-Type: text/plain" --input diagnostic.txt >/dev/null
 
+      - name: Upload medium weight with curl
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf diagnostic-medium
+          mkdir diagnostic-medium
+          hf download "FunAudioLLM/CosyVoice2-0.5B" flow.decoder.estimator.fp32.onnx             --revision "eec1ae6c79877dbd9379285cf8789c9e0879293d"             --local-dir diagnostic-medium
+          test -s diagnostic-medium/flow.decoder.estimator.fp32.onnx
+          upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/rechercher-omega-cosyvoice2-0.5b-v1.0.0" --jq ".upload_url" | sed 's/{?name,label}//')"
+          curl --fail --location --retry 4 --retry-all-errors             -X POST             -H "Authorization: Bearer $GH_TOKEN"             -H "Accept: application/vnd.github+json"             -H "Content-Type: application/octet-stream"             --data-binary "@diagnostic-medium/flow.decoder.estimator.fp32.onnx"             "$upload_url?name=diagnostic-flow-decoder.onnx"
+
       - name: Download one representative weight
         run: |
           set -euxo pipefail
