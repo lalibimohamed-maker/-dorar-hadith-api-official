@@ -1,14 +1,15 @@
 name: Rechercher Ω — acquire remaining engine fleet
 
 on:
+  # Every push to this acquisition branch is an explicit continuation trigger.
+  # Path filters are intentionally avoided so a recovery/fix commit cannot
+  # leave the fleet idle after a failed acquisition attempt.
   push:
     branches:
       - feat/rechercher-omega-multimodal-intelligence
-    paths:
-      - ".github/workflows/rechercher-omega-remaining-engine-acquisition.yml"
-      - "scripts/rechercher-omega-release-stream.py"
-      - "config/rechercher-omega-remaining-engine-releases.json"
   workflow_dispatch:
+
+run-name: Rechercher Omega — acquire/resume remaining engine fleet
 
 # network-write-justification: publishes immutable model acquisition assets to dedicated GitHub Releases; no repository files are written.
 permissions:
@@ -24,7 +25,7 @@ jobs:
   acquire:
     name: ${{ matrix.id }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 330
+    timeout-minutes: 350
     strategy:
       fail-fast: false
       max-parallel: 2
