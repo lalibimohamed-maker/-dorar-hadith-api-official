@@ -91,55 +91,68 @@ jobs:
               f.write("sha="+sha+"\n")
           PY
 
-      - name: Download and publish model files with official HF client
+      - name: Download and publish weight files with disk-safe policy
         env:
           GH_TOKEN: ${{ github.token }}
           MODEL_ID: ${{ matrix.model_id }}
           REVISION: ${{ steps.revision.outputs.sha }}
           RELEASE_TAG: ${{ matrix.release_tag }}
           LICENSE_ID: ${{ matrix.license }}
-          WORKDIR: ${{ runner.temp }}/omega-hf-download
+          WORKDIR: ${{ runner.temp }}/omega-weight-release
         run: |
           set -euo pipefail
           rm -rf "$WORKDIR"
           mkdir -p "$WORKDIR/source"
 
-          python3 - <<'PY' > "$WORKDIR/files.tsv"
+          python3 - <<'PY' > "$WORKDIR/files.txt"
           from huggingface_hub import HfApi
           import os
           from pathlib import Path
-          allowed={".safetensors",".bin",".pt",".pth",".onnx",".json",".txt",".md",".yaml",".yml",".py",".model"}
-          skip={".png",".jpg",".jpeg",".webp",".gif",".mp4",".wav",".mp3",".flac",".pdf",".zip"}
-          info=HfApi().model_info(os.environ["MODEL_ID"],revision=os.environ["REVISION"],files_metadata=True)
-          for s in sorted(info.siblings, key=lambda x: x.rfilename):
-              n=s.rfilename
-              ext=Path(n).suffix.lower()
-              base=Path(n).name
-              if base==".gitattributes" or ext in skip:
-                  continue
-              if ext in allowed or base.upper() in {"LICENSE","NOTICE"}:
-                  print(n + "\t" + str(int(s.size or 0)))
+          info=HfApi().model_info(os.environ["MODEL_ID"],revision=os.environ["REVISION"],files_metadata=False)
+          allowed_weights={".safetensors",".bin",".pt",".pth",".onnx"}
+          names=[]
+          for name in info.siblings:
+              p=Path(name.rfilename)
+              if p.suffix.lower() in allowed_weights or p.name == "model.safetensors.index.json" or p.name.endswith(".index.json") or p.name in {"config.json","configuration.json","generation_config.json"}:
+                  names.append(name.rfilename)
+          for name in sorted(set(names)):
+              print(name)
           PY
 
+          MAX_SOURCE_FILE_BYTES=$((7*1024*1024*1024))
           : > "$WORKDIR/manifest.tsv"
+          : > "$WORKDIR/deferred.tsv"
 
-          while IFS=$'\t' read -r source_path expected_size; do
+          while IFS= read -r source_path; do
             [ -n "$source_path" ] || continue
-            echo "=== Downloading $source_path ($expected_size bytes) ==="
+            echo "=== $source_path ==="
+
+            remote_meta=$(python3 - "$source_path" <<'PY'
+          import sys, os
+          from pathlib import Path
+          from huggingface_hub import HfApi
+          info=HfApi().model_info(os.environ["MODEL_ID"],revision=os.environ["REVISION"],files_metadata=True)
+          target=sys.argv[1]
+          for s in info.siblings:
+              if s.rfilename == target:
+                  print(int(s.size or 0)); break
+          else: print(0)
+          PY
+            )
+            if [ "$remote_meta" -gt "$MAX_SOURCE_FILE_BYTES" ]; then
+              printf '%s\t%s\n' "$source_path" "$remote_meta" >> "$WORKDIR/deferred.tsv"
+              echo "DEFERRED: source file exceeds 7 GiB runner safety limit"
+              continue
+            fi
 
             rm -rf "$WORKDIR/source"
             mkdir -p "$WORKDIR/source"
-            hf download "$MODEL_ID" "$source_path" \
-              --revision "$REVISION" \
-              --local-dir "$WORKDIR/source"
-
+            hf download "$MODEL_ID" "$source_path" --revision "$REVISION" --local-dir "$WORKDIR/source"
             file="$WORKDIR/source/$source_path"
             test -s "$file"
             actual_size="$(stat -c '%s' "$file")"
-            test "$actual_size" -eq "$expected_size"
-
-            safe="$(printf '%s' "$source_path" | sed 's#[^A-Za-z0-9._-]#__#g')"
             digest="$(sha256sum "$file" | awk '{print $1}')"
+            safe="$(printf '%s' "$source_path" | sed 's#[^A-Za-z0-9._-]#__#g')"
             assets=""
 
             if [ "$actual_size" -lt 2147483647 ]; then
@@ -155,16 +168,12 @@ jobs:
               while [ "$offset" -lt "$actual_size" ]; do
                 remaining=$((actual_size-offset))
                 count="$chunk_bytes"
-                if [ "$remaining" -lt "$count" ]; then
-                  count="$remaining"
-                fi
+                if [ "$remaining" -lt "$count" ]; then count="$remaining"; fi
                 skip_mb=$((offset/1048576))
                 count_mb=$(((count+1048575)/1048576))
                 chunk="$WORKDIR/omega__$safe.part-$(printf '%04d' "$part")"
                 dd if="$file" of="$chunk" bs=1M skip="$skip_mb" count="$count_mb" iflag=fullblock status=none
-                if [ "$(stat -c '%s' "$chunk")" -gt "$count" ]; then
-                  truncate -s "$count" "$chunk"
-                fi
+                if [ "$(stat -c '%s' "$chunk")" -gt "$count" ]; then truncate -s "$count" "$chunk"; fi
                 test "$(stat -c '%s' "$chunk")" -lt 2147483647
                 gh release upload "$RELEASE_TAG" "$chunk" --clobber
                 name="$(basename "$chunk")"
@@ -177,7 +186,7 @@ jobs:
 
             printf '%s\t%s\t%s\t%s\n' "$source_path" "$actual_size" "$digest" "$assets" >> "$WORKDIR/manifest.tsv"
             rm -f "$file"
-          done < "$WORKDIR/files.tsv"
+          done < "$WORKDIR/files.txt"
 
           python3 - <<'PY'
           import json, os
@@ -186,13 +195,15 @@ jobs:
           rows=[]
           for line in (work/"manifest.tsv").read_text().splitlines():
               source,size,sha,assets=line.split("\t",3)
-              rows.append({"source_path":source,"bytes":int(size),"sha256":sha,"release_assets":assets.split(",") if assets else []})
-          payload={"schema_version":"1.0.0","model_id":os.environ["MODEL_ID"],"revision":os.environ["REVISION"],"license":os.environ["LICENSE_ID"],"transport":"huggingface_hub_download","files":rows}
+              rows.append({"source_path":source,"bytes":int(size),"sha256":sha,"release_assets":assets.split(",")})
+          deferred=[]
+          for line in (work/"deferred.tsv").read_text().splitlines():
+              if line: source,size=line.split("\t",1); deferred.append({"source_path":source,"bytes":int(size),"reason":"runner_storage_safety_limit_7GiB"})
+          payload={"schema_version":"1.0.0","model_id":os.environ["MODEL_ID"],"revision":os.environ["REVISION"],"license":os.environ["LICENSE_ID"],"transport":"huggingface_hub_download","files":rows,"deferred":deferred}
           (work/"release-manifest.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
           PY
 
           gh release upload "$RELEASE_TAG" "$WORKDIR/release-manifest.json" --clobber
-
       - name: Verify Release manifest
         env:
           GH_TOKEN: ${{ github.token }}
