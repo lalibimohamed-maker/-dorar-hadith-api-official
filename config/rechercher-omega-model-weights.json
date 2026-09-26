@@ -38,12 +38,7 @@
       "rights_promotion_status": "blocked_until_clearance",
       "release_tag": "rechercher-omega-engines-v0.1.0",
       "release_assets": [
-        "qwen3-model.safetensors.part-00",
-        "qwen3-model.safetensors.part-01",
-        "qwen3-model.safetensors.part-02",
-        "qwen3-model.safetensors.part-03",
-        "qwen3-model.safetensors.part-04",
-        "qwen3-model.safetensors.part-05",
+        "qwen3-model.safetensors",
         "qwen3-runtime-files.tar.gz",
         "qwen3-release-manifest.json"
       ],
@@ -102,7 +97,8 @@
       "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>",
       "model_reconstruction": {
         "method": "cat_sorted_parts",
-        "output": "model.safetensors"
+        "output": "model.safetensors",
+        "part_size_bytes": 134217728
       }
     },
     {
