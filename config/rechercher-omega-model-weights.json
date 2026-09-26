@@ -180,20 +180,31 @@
       "revision_type": "immutable_hf_commit"
     },
     {
-      "model_id": "whisper",
+      "model_id": "whisper-tiny",
       "source_repo": "https://github.com/openai/whisper",
       "revision": "169d4a4341b33bc18d8881c4b69c2e104e1cc0af",
       "weight_license_status": "verified_source_license",
-      "acquisition": "artifact",
+      "acquisition": "github_release",
       "verification": {
-        "mode": "acquisition_artifact_manifest",
-        "manifest_file": "acquisition.json",
-        "checksum_file": "SHA256SUMS",
+        "mode": "release_manifest",
+        "manifest_asset": "whisper-tiny-release-manifest.json",
+        "checksum_assets": [
+          "whisper-tiny-model.safetensors",
+          "whisper-tiny-runtime-files.tar.gz"
+        ],
+        "required_before_runtime": true,
         "required_before_promotion": true
       },
       "source_model_id": "openai/whisper-tiny",
       "revision_type": "immutable_hf_commit",
-      "rights_promotion_status": "blocked_until_clearance"
+      "rights_promotion_status": "blocked_until_clearance",
+      "release_tag": "rechercher-omega-engines-v0.1.0",
+      "release_assets": [
+        "whisper-tiny-model.safetensors",
+        "whisper-tiny-runtime-files.tar.gz",
+        "whisper-tiny-release-manifest.json"
+      ],
+      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>"
     },
     {
       "model_id": "flux",
