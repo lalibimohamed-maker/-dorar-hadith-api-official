@@ -114,15 +114,17 @@
     {
       "model_id": "cosyvoice",
       "source_repo": "https://github.com/FunAudioLLM/CosyVoice",
-      "revision": null,
-      "weight_license_status": "review_required",
-      "acquisition": "runtime_only",
+      "revision": "23778f84b1b6dd789e1b5092c3ec1145639ee1c3",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "staged_runtime",
       "verification": {
         "mode": "not_acquired",
-        "requires_immutable_revision": true,
         "requires_sha256": true,
         "requires_license_clearance": true
-      }
+      },
+      "source_model_id": "FunAudioLLM/CosyVoice2-0.5B",
+      "revision_type": "immutable_hf_commit",
+      "notes": "Official Hugging Face model card currently declares Apache-2.0; stage because the repository is about 4.36 GB."
     },
     {
       "model_id": "sglang",
@@ -140,28 +142,32 @@
     {
       "model_id": "qwen3-vl",
       "source_repo": "https://github.com/QwenLM/Qwen3-VL",
-      "revision": null,
-      "weight_license_status": "review_required",
+      "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+      "weight_license_status": "verified_source_license",
       "acquisition": "runtime_only",
       "verification": {
-        "mode": "not_acquired",
-        "requires_immutable_revision": true,
-        "requires_sha256": true,
+        "mode": "runtime_only_not_acquired",
+        "requires_sha256_before_promotion": true,
         "requires_license_clearance": true
-      }
+      },
+      "source_model_id": "Qwen/Qwen3-VL-4B-Instruct",
+      "revision_type": "immutable_hf_commit"
     },
     {
       "model_id": "whisper",
       "source_repo": "https://github.com/openai/whisper",
-      "revision": null,
-      "weight_license_status": "review_required",
-      "acquisition": "runtime_only",
+      "revision": "169d4a4341b33bc18d8881c4b69c2e104e1cc0af",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "artifact",
       "verification": {
-        "mode": "not_acquired",
-        "requires_immutable_revision": true,
-        "requires_sha256": true,
-        "requires_license_clearance": true
-      }
+        "mode": "acquisition_artifact_manifest",
+        "manifest_file": "acquisition.json",
+        "checksum_file": "SHA256SUMS",
+        "required_before_promotion": true
+      },
+      "source_model_id": "openai/whisper-tiny",
+      "revision_type": "immutable_hf_commit",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "model_id": "flux",
