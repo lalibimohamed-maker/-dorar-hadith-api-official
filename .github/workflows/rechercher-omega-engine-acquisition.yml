@@ -61,7 +61,7 @@ jobs:
                   "bytes": p.stat().st_size,
                   "sha256": hashlib.sha256(p.read_bytes()).hexdigest()
               })
-          canonical = "".join(f"{item["path"]}={item["sha256"]}\n" for item in files if item["path"] != "SHA256SUMS")
+          canonical = "".join(item["path"] + "=" + item["sha256"] + "\n" for item in files if item["path"] != "SHA256SUMS")
           manifest_sha256 = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
           (out/"acquisition.json").write_text(json.dumps({
               "model_id": os.environ["MODEL_ID"],
