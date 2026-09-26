@@ -8,7 +8,7 @@ gated before it is counted as acquired. Rights never imply publication rights.
 """
 import argparse, hashlib, html, json, re, subprocess, tempfile, unicodedata
 from pathlib import Path
-from urllib.parse import quote, urlencode, urljoin
+from urllib.parse import quote, unquote, urlencode, urljoin
 from urllib.request import Request, urlopen
 
 P = argparse.ArgumentParser()
@@ -130,11 +130,26 @@ def pdf_identity_text(path):
 def identity_check(book,url,data):
     title=tokens(book.get('title','')); author=tokens(book.get('author',''))
     if not title: return False,{'reason':'missing_catalog_title'}
-    url_signal=norm(url.replace('/',' ')); text_signal=norm(data)
-    title_score=max(overlap(title,url_signal),overlap(title,text_signal)); author_score=1.0 if not author else max(overlap(author,url_signal),overlap(author,text_signal))
-    title_ok=title_score >= (0.50 if len(set(title))>=4 else 0.60); author_ok=not author or author_score>=0.50
-    if title_ok and author_ok: return True,{'title_score':round(title_score,3),'author_score':round(author_score,3),'signals':'url_or_pdf_metadata_or_first_pages'}
-    return False,{'reason':'book_identity_mismatch','title_score':round(title_score,3),'author_score':round(author_score,3)}
+    # PDF URLs are commonly percent-encoded. Compare against the decoded URL,
+    # otherwise Arabic filenames can incorrectly produce title_score=0.0.
+    decoded_url=unquote(url or '')
+    url_signal=norm(decoded_url.replace('/',' '))
+    text_signal=norm(data)
+    title_url_score=overlap(title,url_signal)
+    title_text_score=overlap(title,text_signal)
+    title_score=max(title_url_score,title_text_score)
+    author_url_score=overlap(author,url_signal) if author else 1.0
+    author_text_score=overlap(author,text_signal) if author else 1.0
+    author_score=max(author_url_score,author_text_score) if author else 1.0
+    title_ok=title_score >= (0.50 if len(set(title))>=4 else 0.60)
+    # Scanned/volume PDFs may expose the title but not the author's name in
+    # metadata or the first pages. Preserve a strong title match and record
+    # whether the author was actually observable instead of deleting the copy.
+    author_observable=not author or author_score > 0
+    author_ok=(not author) or author_score>=0.50 or title_score>=0.85
+    if title_ok and author_ok:
+        return True,{'title_score':round(title_score,3),'author_score':round(author_score,3),'author_observable':author_observable,'signals':'decoded_url_or_pdf_metadata_or_first_pages'}
+    return False,{'reason':'book_identity_mismatch','title_score':round(title_score,3),'author_score':round(author_score,3),'author_observable':author_observable}
 def key_for(b): return (' '.join((b.get('title') or '').split()),' '.join((b.get('author') or '').split()),str(b.get('author_death_hijri') or b.get('death_hijri') or ''))
 def stable_id(b): return re.sub(r'[^\w\-]+','-',b.get('id') or b.get('title') or 'work',flags=re.UNICODE).strip('-_').lower()[:70]+'--'+hashlib.sha256('|'.join(key_for(b)).encode()).hexdigest()[:12]
 def load_discovery(path):
@@ -163,7 +178,7 @@ def build_books():
     return cat,books,loaded
 def write_manifest(cat,loaded,records):
     counts={'books':len(records),'acquired_books':sum(r.get('availability')=='copy-acquired' for r in records),'acquired_files':sum(r.get('acquired_count',0) for r in records),'global_search_no_match':sum(r.get('acquisition_state')=='global-search-no-match' for r in records),'identity_rejections':sum(r.get('rejected_identity_count',0) for r in records),'partial_books':sum(r.get('acquisition_state')=='partial' for r in records)}
-    data={'schema':'developer-review-acquisition/v8-resilient','scope':cat.get('scope'),'discovery_registries_loaded':loaded,'principle':'acquisition/reporting errors are isolated; acquired PDFs remain available for the persistence boundary; rights do not imply publication','identity_gate':{'required':True,'title_and_known_author_match':True,'validation_before_retention':True,'failover_on_mismatch':True},'global_engines':['internet_archive','nyu_aco','wikimedia_commons','wikisource'],'records':records,'counts':counts}
+    data={'schema':'developer-review-acquisition/v8-resilient','scope':cat.get('scope'),'discovery_registries_loaded':loaded,'principle':'acquisition/reporting errors are isolated; acquired PDFs remain available for the persistence boundary; rights do not imply publication','identity_gate':{'required':True,'title_match_required':True,'author_match_when_observable':True,'validation_before_retention':True,'failover_on_mismatch':True},'global_engines':['internet_archive','nyu_aco','wikimedia_commons','wikisource'],'records':records,'counts':counts}
     OUT.parent.mkdir(parents=True,exist_ok=True); OUT.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'); return data
 def main():
     cat,books,loaded=build_books(); VAULT.mkdir(parents=True,exist_ok=True); records=[]
