@@ -28,7 +28,7 @@ function passesHadithGate(evidence) {
 
 function simulatePipeline(candidates, reranker) {
   const eligible = candidates.filter(passesHadithGate);
-  const reranked = reranker(eligible);
+  const reranked = eligible.length > 0 ? reranker(eligible) : [];
   return { eligible, reranked };
 }
 
@@ -74,7 +74,7 @@ test("high-similarity fabricated/mawdu hadith is rejected before the reranker", 
 
   assert.equal(result.eligible.length, 0);
   assert.equal(result.reranked.length, 0);
-  assert.equal(rerankerCalls, 1);
+  assert.equal(rerankerCalls, 0);
   assert.deepEqual(result.reranked, []);
 });
 
