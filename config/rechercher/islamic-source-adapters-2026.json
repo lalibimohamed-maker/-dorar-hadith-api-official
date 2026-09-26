@@ -12,7 +12,12 @@
     "human_translation_separate_from_machine_translation": true,
     "no_new_pdf_enc": true,
     "additional_sunni_sources_added": true,
-    "source_provenance_preserved": true
+    "source_provenance_preserved": true,
+    "api_sources_imported_from": [
+      "PR #558",
+      "PR #557"
+    ],
+    "api_access_is_not_redistribution": true
   },
   "adapters": [
     {
@@ -106,7 +111,11 @@
       ],
       "authority": "quran_api_provider",
       "runtime": "public",
-      "status": "enabled"
+      "status": "enabled",
+      "api_base_url": "https://api.alquran.cloud/v1",
+      "api_auth": "keyless-public",
+      "api_status": "official-api-documentation-verified",
+      "api_endpoint_example": "GET /surah/1/en.sahih"
     },
     {
       "id": "alukah",
@@ -277,7 +286,9 @@
           "update-to-latest-source-version",
           "no-inappropriate-advertising"
         ]
-      }
+      },
+      "imported_from": "PR #557 official-source-connectors-2026.json",
+      "api_contract_status": "official-public-api-connector-present"
     },
     {
       "id": "hadith-academy",
@@ -880,9 +891,29 @@
       ],
       "authority": "primary_quran_api",
       "runtime": "api-key-or-public-docs",
-      "api_auth": "required_for_content",
+      "api_auth": "OAuth2 client_credentials",
       "status": "enabled",
-      "release_policy": "Use official API/content terms and credentials where required; API access is not itself redistribution permission."
+      "release_policy": "Use official API/content terms and credentials where required; API access is not itself redistribution permission.",
+      "api_base_url": "https://apis.quran.foundation/content/api/v4",
+      "api_status": "official-api-contract-verified",
+      "api_capabilities": [
+        "quran-text",
+        "chapters",
+        "verses",
+        "translations",
+        "tafsir",
+        "audio",
+        "recitations",
+        "pages",
+        "juz",
+        "hizb",
+        "ruku",
+        "manzil",
+        "search",
+        "uthmani_tajweed",
+        "mushaf_variants",
+        "content_sync"
+      ]
     },
     {
       "id": "quranenc",
@@ -918,6 +949,15 @@
           "update-to-latest-source-version",
           "no-inappropriate-advertising"
         ]
+      },
+      "api_base_url": "https://quranenc.com/api/v1",
+      "api_auth": "public",
+      "api_status": "official-api-contract-verified",
+      "api_endpoints": {
+        "list_all": "/translations/list",
+        "list_by_language": "/translations/list/{language}",
+        "sura": "/translation/sura/{translation_key}/{sura_number}",
+        "ayah": "/translation/aya/{translation_key}/{sura_number}/{aya_number}"
       }
     },
     {
@@ -1384,6 +1424,50 @@
       "source_role": "historical_islamic_knowledge_and_discovery",
       "verification": "Independent academic and institutional references document IslamToday.net as an Islamic educational portal with multilingual resources and fatwa material; current site availability/rights should be checked item-by-item before acquisition.",
       "release_policy": "Do not infer redistribution rights from historical availability; verify current item-level rights."
+    },
+    {
+      "id": "tafasir-online-api",
+      "name": "Tafasir.online API",
+      "base_url": "https://www.tafasir.online/",
+      "origins": [
+        "https://www.tafasir.online"
+      ],
+      "kinds": [
+        "quran",
+        "tafsir",
+        "books",
+        "api",
+        "riwayat"
+      ],
+      "authority": "official_tafsir_api",
+      "runtime": "api-key-gated",
+      "status": "contract-verified-key-gated",
+      "api_base_url": "https://www.tafasir.online/",
+      "api_auth": "API_Key",
+      "api_contract_url": "https://www.tafasir.online/ar/developer",
+      "release_policy": "API access does not grant redistribution rights; verify item-level rights and provenance."
+    },
+    {
+      "id": "diyanet-open-source-quran-api",
+      "name": "Diyanet Open Source Quran API",
+      "base_url": "https://acikkaynakkuran.diyanet.gov.tr/",
+      "origins": [
+        "https://acikkaynakkuran.diyanet.gov.tr",
+        "https://acikkaynakkuran-dev.diyanet.gov.tr"
+      ],
+      "kinds": [
+        "quran",
+        "tafsir",
+        "tajwid-learning",
+        "recitation",
+        "api"
+      ],
+      "authority": "official_national_religious_authority",
+      "runtime": "restricted-api",
+      "status": "contract-verified-restricted",
+      "api_base_url": "https://acikkaynakkuran-dev.diyanet.gov.tr/",
+      "api_auth": "GitHub account/API key",
+      "release_policy": "Official developer terms restrict independent applications and bulk republication; keep discovery/verification separate from redistribution."
     }
   ],
   "runtime_policy": {
