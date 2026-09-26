@@ -98,3 +98,18 @@ test("expanded engine fleet keeps heavyweight models out of automatic acquisitio
   assert.equal(omni.resource_class, "xlarge");
   assert.equal(omni.approximate_size_gb, 70.5);
 });
+
+
+test("persistent Release manifest keeps binary weights out of Git", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const release = JSON.parse(await readFile(
+    new URL("../config/rechercher-omega-engine-release.json", import.meta.url), "utf8"
+  ));
+  assert.equal(release.policy.github_release_assets_only, true);
+  assert.equal(release.policy.no_git_tracked_weights, true);
+  assert.equal(release.engines.length, 3);
+  assert.ok(release.engines.every(engine =>
+    engine.revision.length === 40 &&
+    engine.asset_plan.every(name => !name.endsWith(".bin"))
+  ));
+});
