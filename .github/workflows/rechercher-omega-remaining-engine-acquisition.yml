@@ -39,7 +39,7 @@ jobs:
             local title="$2"
             local mode="$3"
             local license="$4"
-            if gh release view "$tag" >/dev/null 2>&1; then
+            if gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$tag" >/dev/null 2>&1; then
               echo "Release exists: $tag"
               return 0
             fi
