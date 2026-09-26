@@ -8,7 +8,7 @@ gated before it is counted as acquired. Rights never imply publication rights.
 """
 import argparse, hashlib, html, json, re, subprocess, tempfile, unicodedata
 from pathlib import Path
-from urllib.parse import quote, urlencode, urljoin
+from urllib.parse import quote, unquote, urlencode, urljoin
 from urllib.request import Request, urlopen
 
 P = argparse.ArgumentParser()
@@ -130,11 +130,20 @@ def pdf_identity_text(path):
 def identity_check(book,url,data):
     title=tokens(book.get('title','')); author=tokens(book.get('author',''))
     if not title: return False,{'reason':'missing_catalog_title'}
-    url_signal=norm(url.replace('/',' ')); text_signal=norm(data)
-    title_score=max(overlap(title,url_signal),overlap(title,text_signal)); author_score=1.0 if not author else max(overlap(author,url_signal),overlap(author,text_signal))
-    title_ok=title_score >= (0.50 if len(set(title))>=4 else 0.60); author_ok=not author or author_score>=0.50
-    if title_ok and author_ok: return True,{'title_score':round(title_score,3),'author_score':round(author_score,3),'signals':'url_or_pdf_metadata_or_first_pages'}
-    return False,{'reason':'book_identity_mismatch','title_score':round(title_score,3),'author_score':round(author_score,3)}
+    # Decode percent-encoded Arabic provider URLs before normalization.
+    decoded_url=unquote(url or '')
+    url_signal=norm(decoded_url.replace('/',' ')); text_signal=norm(data)
+    title_url_score=overlap(title,url_signal); title_text_score=overlap(title,text_signal)
+    title_score=max(title_url_score,title_text_score)
+    author_url_score=overlap(author,url_signal) if author else 1.0
+    author_text_score=overlap(author,text_signal) if author else 1.0
+    author_score=max(author_url_score,author_text_score)
+    title_ok=title_score >= (0.50 if len(set(title))>=4 else 0.60)
+    author_observable=bool(author) and (author_url_score > 0 or author_text_score > 0)
+    author_ok=not author or author_score>=0.50 or (title_score>=0.85 and not author_observable)
+    if title_ok and author_ok:
+        return True,{'title_score':round(title_score,3),'author_score':round(author_score,3),'author_observable':author_observable,'signals':'decoded_url_or_pdf_metadata_or_first_pages'}
+    return False,{'reason':'book_identity_mismatch','title_score':round(title_score,3),'author_score':round(author_score,3),'author_observable':author_observable}
 def key_for(b): return (' '.join((b.get('title') or '').split()),' '.join((b.get('author') or '').split()),str(b.get('author_death_hijri') or b.get('death_hijri') or ''))
 def stable_id(b): return re.sub(r'[^\w\-]+','-',b.get('id') or b.get('title') or 'work',flags=re.UNICODE).strip('-_').lower()[:70]+'--'+hashlib.sha256('|'.join(key_for(b)).encode()).hexdigest()[:12]
 def load_discovery(path):
