@@ -1,0 +1,72 @@
+name: Rechercher Ω — release inventory cleanup
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - ".github/workflows/rechercher-omega-engine-release-cleanup.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# security-justification: scoped deletion of obsolete binary Release assets; no repository source or Corpus writes.
+
+concurrency:
+  group: rechercher-omega-release-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: Remove obsolete Release assets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Normalize Release inventory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="rechercher-omega-engines-v0.1.0"
+          expected="$(python3 - <<'PY'
+          import json
+          m=json.load(open("config/rechercher-omega-engine-release.json"))
+          print("\n".join(sorted({n for e in m["engines"] for n in e["asset_plan"]})))
+          PY
+          )"
+
+          while IFS= read -r name; do
+            [ -n "$name" ] || continue
+            if ! grep -Fxq "$name" <<< "$expected"; then
+              echo "Removing obsolete Release asset: $name"
+              gh release delete-asset "$TAG" "$name" --yes
+            fi
+          done < <(gh release view "$TAG" --json assets --jq '.assets[].name')
+
+      - name: Verify exact Release inventory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, subprocess
+          cfg=json.load(open("config/rechercher-omega-engine-release.json"))
+          actual=set(subprocess.check_output(
+              ["gh","release","view",cfg["release_tag"],"--json","assets","--jq",".assets[].name"],
+              text=True
+          ).splitlines())
+          expected={name for e in cfg["engines"] for name in e["asset_plan"]}
+          missing=sorted(expected-actual)
+          unexpected=sorted(actual-expected)
+          if missing or unexpected:
+              print("Missing:",missing)
+              print("Unexpected:",unexpected)
+              raise SystemExit(1)
+          print("Release inventory exact:",len(expected),"assets")
+          PY
