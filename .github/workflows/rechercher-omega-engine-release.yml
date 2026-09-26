@@ -1,170 +1,75 @@
-name: Rechercher Ω — publish starter engine release
-
-on:
-  push:
-    branches:
-      - feat/rechercher-omega-multimodal-intelligence
-    paths:
-      - "config/rechercher-omega-engine-release.json"
-      - ".github/workflows/rechercher-omega-engine-release.yml"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-
-# security-justification: required only to create and upload the immutable model Release assets; no source/corpus writes are performed.
-
-concurrency:
-  group: rechercher-omega-engine-release
-  cancel-in-progress: false
-
-jobs:
-  publish-release:
-    name: Publish persistent starter engine release
-    runs-on: ubuntu-24.04
-    timeout-minutes: 120
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-
-      - name: Install Hugging Face Hub client
-        run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
-
-      - name: Verify GitHub CLI
-        run: gh --version
-
-      - name: Prepare release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          MANIFEST: config/rechercher-omega-engine-release.json
-        run: |
-          set -euo pipefail
-          TAG="$(python3 -c 'import json; print(json.load(open("'"$MANIFEST"'"))["release_tag"])')"
-          echo "TAG=$TAG" >> "$GITHUB_ENV"
-
-          if ! gh release view "$TAG" >/dev/null 2>&1; then
-            gh release create "$TAG"               --target "$GITHUB_SHA"               --title "Rechercher Ω Starter Engines v0.1.0"               --prerelease               --notes "Persistent lightweight starter engines for Rechercher Ω. Source revisions and per-asset SHA-256 values are included in the release manifests. This release is distribution-only; weights are not tracked in Git."
-          fi
-
-      - name: Download, package and hash engine assets
+      - name: Download, package, hash and publish one engine at a time
         env:
           MANIFEST: config/rechercher-omega-engine-release.json
           WORKDIR: ${{ runner.temp }}/omega-release
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           rm -rf "$WORKDIR"
           mkdir -p "$WORKDIR"
 
-          python3 - <<'PY'
-          import json, os, subprocess
-          manifest=json.load(open(os.environ["MANIFEST"]))
-          work=os.environ["WORKDIR"]
-          for engine in manifest["engines"]:
-              d=os.path.join(work, engine["logical_id"])
-              os.makedirs(d, exist_ok=True)
-              subprocess.run([
-                  "hf","download",engine["model_id"],
-                  "--revision",engine["revision"],
-                  "--local-dir",d
-              ], check=True)
+          python3 - <<'PY' > "$WORKDIR/engines.tsv"
+          import json
+          m=json.load(open("config/rechercher-omega-engine-release.json"))
+          for e in m["engines"]:
+              print("\t".join([e["logical_id"], e["model_id"], e["revision"], e["license"], e["source_url"]]))
           PY
 
-          max_bytes="$(python3 -c 'import json; print(json.load(open("'"$MANIFEST"'"))["policy"]["max_asset_bytes"])')"
-
-          for dir in "$WORKDIR"/*; do
-            [ -d "$dir" ] || continue
-            id="$(basename "$dir")"
+          while IFS=$'\t' read -r id model revision license source_url; do
+            echo "=== Acquiring $id ==="
+            dir="$WORKDIR/$id"
+            rm -rf "$dir"
+            mkdir -p "$dir"
 
             case "$id" in
               qwen3)
+                hf download "$model"                   model.safetensors LICENSE README.md .gitattributes config.json generation_config.json merges.txt tokenizer.json tokenizer_config.json vocab.json                   --revision "$revision" --local-dir "$dir"
                 model_asset="$WORKDIR/qwen3-model.safetensors"
                 bundle="$WORKDIR/qwen3-runtime-files.tar.gz"
                 ;;
               paddleocr-vl)
+                hf download "$model"                   model.safetensors LICENSE README.md .gitattributes config.json configuration_paddleocr_vl.py generation_config.json image_processing_paddleocr_vl.py inference.yml modeling_paddleocr_vl.py preprocessor_config.json processing_paddleocr_vl.py processor_config.json special_tokens_map.json tokenizer.json tokenizer.model tokenizer_config.json                   --revision "$revision" --local-dir "$dir"
                 model_asset="$WORKDIR/paddleocr-vl-model.safetensors"
                 bundle="$WORKDIR/paddleocr-vl-runtime-files.tar.gz"
                 ;;
               whisper-tiny)
+                hf download "$model"                   model.safetensors LICENSE README.md .gitattributes added_tokens.json config.json generation_config.json merges.txt normalizer.json preprocessor_config.json special_tokens_map.json tokenizer.json tokenizer_config.json vocab.json                   --revision "$revision" --local-dir "$dir"
                 model_asset="$WORKDIR/whisper-tiny-model.safetensors"
                 bundle="$WORKDIR/whisper-tiny-runtime-files.tar.gz"
                 ;;
-              *) echo "Unknown engine $id"; exit 1 ;;
+              *) echo "Unknown engine: $id"; exit 1 ;;
             esac
 
+            test -s "$dir/model.safetensors"
             cp "$dir/model.safetensors" "$model_asset"
-            rm -f "$dir/model.safetensors" "$dir/pytorch_model.bin" "$dir/flax_model.msgpack" "$dir/tf_model.h5"
-
+            rm -f "$dir/model.safetensors"
             tar -C "$dir" -czf "$bundle" .
+            max_bytes=2147483647
             test "$(stat -c '%s' "$model_asset")" -lt "$max_bytes"
             test "$(stat -c '%s' "$bundle")" -lt "$max_bytes"
 
-            sha256sum "$model_asset" "$bundle" > "$WORKDIR/$id.sha256"
-          done
+            model_sha="$(sha256sum "$model_asset" | awk '{print $1}')"
+            bundle_sha="$(sha256sum "$bundle" | awk '{print $1}')"
+            cat > "$WORKDIR/$id-release-manifest.json" <<EOF
+{
+  "schema_version": "1.0.0",
+  "logical_id": "$id",
+  "model_id": "$model",
+  "revision": "$revision",
+  "license": "$license",
+  "source_url": "$source_url",
+  "assets": [
+    {"name": "$(basename "$model_asset")", "bytes": $(stat -c '%s' "$model_asset"), "sha256": "$model_sha"},
+    {"name": "$(basename "$bundle")", "bytes": $(stat -c '%s' "$bundle"), "sha256": "$bundle_sha"}
+  ]
+}
+EOF
 
-          python3 - <<'PY'
-          import hashlib, json, os, pathlib, subprocess
-          manifest=json.load(open(os.environ["MANIFEST"]))
-          work=pathlib.Path(os.environ["WORKDIR"])
+            gh release upload "$TAG"               "$model_asset"               "$bundle"               "$WORKDIR/$id-release-manifest.json"               --clobber
 
-          for engine in manifest["engines"]:
-              id=engine["logical_id"]
-              assets=[]
-              for asset_name in engine["asset_plan"]:
-                  if asset_name.endswith(".json"):
-                      continue
-                  p=work/asset_name
-                  if not p.exists():
-                      continue
-                  assets.append({
-                      "name":asset_name,
-                      "bytes":p.stat().st_size,
-                      "sha256":hashlib.sha256(p.read_bytes()).hexdigest()
-                  })
-              release_manifest={
-                  "schema_version":"1.0.0",
-                  "logical_id":id,
-                  "model_id":engine["model_id"],
-                  "revision":engine["revision"],
-                  "license":engine["license"],
-                  "source_url":engine["source_url"],
-                  "assets":assets
-              }
-              (work/f"{id}-release-manifest.json").write_text(
-                  json.dumps(release_manifest,ensure_ascii=False,indent=2)+"\n"
-              )
-          PY
-
-      - name: Upload Qwen3 release assets
-        env:
-          GH_TOKEN: ${{ github.token }}
-          WORKDIR: ${{ runner.temp }}/omega-release
-        run: |
-          set -euo pipefail
-          for asset in qwen3-model.safetensors qwen3-runtime-files.tar.gz qwen3-release-manifest.json; do
-            gh release upload "$TAG" "$WORKDIR/$asset" --clobber
-          done
-
-      - name: Upload PaddleOCR-VL release assets
-        env:
-          GH_TOKEN: ${{ github.token }}
-          WORKDIR: ${{ runner.temp }}/omega-release
-        run: |
-          set -euo pipefail
-          for asset in paddleocr-vl-model.safetensors paddleocr-vl-runtime-files.tar.gz paddleocr-vl-release-manifest.json; do
-            gh release upload "$TAG" "$WORKDIR/$asset" --clobber
-          done
-
-      - name: Upload Whisper tiny release assets
-        env:
-          GH_TOKEN: ${{ github.token }}
-          WORKDIR: ${{ runner.temp }}/omega-release
-        run: |
-          set -euo pipefail
-          for asset in whisper-tiny-model.safetensors whisper-tiny-runtime-files.tar.gz whisper-tiny-release-manifest.json; do
-            gh release upload "$TAG" "$WORKDIR/$asset" --clobber
-          done
+            rm -rf "$dir" "$model_asset" "$bundle" "$WORKDIR/$id-release-manifest.json"
+            echo "=== Published $id ==="
+          done < "$WORKDIR/engines.tsv"
 
       - name: Verify published assets
         env:
