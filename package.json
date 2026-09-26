@@ -33,7 +33,9 @@
     "test:corpus-boundary": "node --test test/corpus-write-boundary.test.js",
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
-    "test:review-expiry": "node --test test/review-expiry.test.js"
+    "test:review-expiry": "node --test test/review-expiry.test.js",
+    "test:ai": "node --test test/rechercher-ai-engine.test.js",
+    "test:rechercher-ai": "npm run test:ai"
   },
   "engines": {
     "node": ">=20"
