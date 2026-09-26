@@ -48,9 +48,11 @@
       "license_review": "verified",
       "license_status": "verified_source_license",
       "source_model_id": "Qwen/Qwen3-Omni-30B-A3B-Instruct",
-      "source_revision": null,
+      "source_revision": "12a3ac6661e685620bbc6616b7217b26469a81dd",
       "acquisition_class": "runtime_only",
-      "notes": "Official multimodal any-to-any model; keep runtime-only until resource sizing and immutable weight acquisition are separately approved."
+      "notes": "Official multimodal any-to-any model; keep runtime-only until resource sizing and immutable weight acquisition are separately approved.",
+      "resource_class": "xlarge",
+      "approximate_size_gb": 70.5
     },
     {
       "id": "paddleocr-vl",
@@ -171,7 +173,9 @@
       "status": "candidate",
       "license_review": "verified",
       "license_status": "verified_source_license",
-      "notes": "Qwen3-VL-4B-Instruct; 4.43B BF16 parameters. Registry entry only; no automatic weight acquisition."
+      "notes": "Qwen3-VL-4B-Instruct; 4.43B BF16 parameters. Registry entry only; no automatic weight acquisition.",
+      "approximate_size_gb": 8.88,
+      "resource_class": "large"
     },
     {
       "id": "whisper",
