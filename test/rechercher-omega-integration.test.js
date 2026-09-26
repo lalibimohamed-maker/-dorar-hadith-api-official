@@ -52,10 +52,26 @@ test("Rechercher Ω keeps source reference → adapter → model → provenance 
     source_ids: [source.space_id],
     input_sha256: "sha256:test-source",
     output_sha256: "sha256:test-output",
-    model_versions: ["paddleocr-vl@7fa00a8"]
+    model_versions: ["paddleocr-vl@7fa00a8c55b735ba51ba49a9058f3f9c57a99a11"]
   });
 
   assert.doesNotThrow(() => assertOutputBoundary({ plan, provenance }));
   assert.equal(provenance.corpus_write, false);
   assert.equal(provenance.generated_media_is_evidence, false);
+});
+
+
+test("Starter engine acquisition pins immutable full SHAs and stays review-only", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const profile = JSON.parse(await readFile(
+    new URL("../config/rechercher-omega-engine-acquisition.json", import.meta.url),
+    "utf8"
+  ));
+  assert.equal(profile.policy.corpus_write_allowed, false);
+  assert.equal(profile.policy.immutable_revision_required, true);
+  for (const engine of profile.engines) {
+    assert.match(engine.revision, /^[0-9a-f]{40}$/);
+    assert.equal(engine.license_status, "verified_source_license");
+    assert.equal(engine.acquisition, "artifact");
+  }
 });
