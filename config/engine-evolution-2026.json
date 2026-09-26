@@ -251,7 +251,8 @@
             ],
             "typedPolicy": "Apply evidence-type-specific hard rules after universal provenance/rights checks; hadith authenticity is enforced by the dedicated Hadith Verification Runtime."
           },
-          "executionOrder": 2
+          "executionOrder": 2,
+          "watch": "Hard eligibility decisions, metadata completeness, rights/provenance rejection, false acceptance/false rejection rates"
         },
         {
           "id": "hadith_verification_runtime",
@@ -291,7 +292,8 @@
               "rights_status unknown_or_blocked"
             ]
           },
-          "executionOrder": 2
+          "executionOrder": 2,
+          "watch": "Hadith grading metadata integrity, provenance enforcement, unknown-grade rejection, policy regressions"
         },
         {
           "id": "reranking",
@@ -371,7 +373,8 @@
             "noEvidenceResult": "NO_EVIDENCE",
             "finalCitationCheck": true
           },
-          "executionOrder": 4
+          "executionOrder": 4,
+          "watch": "Evidence-to-claim traceability, NO_EVIDENCE behavior, citation completeness, unsupported-claim rejection"
         },
         {
           "id": "quran_canonical_verification",
@@ -388,7 +391,8 @@
             "position": "verification_layer",
             "failClosed": true,
             "canonicalCorpusWrite": false
-          }
+          },
+          "watch": "Canonical text matching, source integrity, literal verification, refusal on mismatch"
         },
         {
           "id": "arabic_diacritics_verification",
@@ -404,7 +408,8 @@
             "position": "verification_layer",
             "failClosed": true,
             "canonicalCorpusWrite": false
-          }
+          },
+          "watch": "Diacritics fidelity, orthographic consistency, canonical comparison, false correction rate"
         },
         {
           "id": "sharia_policy_guardrails",
@@ -424,7 +429,8 @@
             "input": "evidence.reranked",
             "output": "generation.policy_context"
           },
-          "executionOrder": 4
+          "executionOrder": 4,
+          "watch": "Policy conformance, fail-closed behavior, human-reviewed policy changes, separation from fiqh authority"
         },
         {
           "id": "fiqh_knowledge_graph",
@@ -445,7 +451,8 @@
             "input": "evidence.reranked",
             "output": "generation.reviewed_rule_context"
           },
-          "executionOrder": 4
+          "executionOrder": 4,
+          "watch": "Rule consistency, evidence linkage, deterministic rule evaluation, human review of authored relations"
         },
         {
           "id": "vector_storage",
