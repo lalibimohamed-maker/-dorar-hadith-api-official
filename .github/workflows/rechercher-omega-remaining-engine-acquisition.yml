@@ -103,116 +103,128 @@ jobs:
           WORKDIR: ${{ runner.temp }}/omega-stream
         run: |
           set -euo pipefail
-          CHUNK_BYTES=$((512*1024*1024))
+          CHUNK_BYTES=$((128*1024*1024))
           MAX_ASSET_BYTES=2147483647
           rm -rf "$WORKDIR"
           mkdir -p "$WORKDIR"
 
           existing="$(gh api "/repos/$REPO/releases/tags/$RELEASE_TAG" --jq '.assets[].name' 2>/dev/null || true)"
+          printf "%s\n" "$existing" > "$WORKDIR/existing-assets.txt"
           if grep -Fxq "release-manifest.json" <<< "$existing"; then
             echo "Release already has a verified manifest; no duplicate download for $MODEL_ID."
             exit 0
           fi
 
           python3 - <<'PY' > "$WORKDIR/files.tsv"
-          import os
+          import os, json
           from pathlib import Path
           from huggingface_hub import HfApi
           info=HfApi().model_info(os.environ["MODEL_ID"],revision=os.environ["REVISION"],files_metadata=True)
           allowed={".safetensors",".bin",".pt",".pth",".onnx"}
           selected=[]
           release_assets=0
-          chunk=512*1024*1024
+          chunk=128*1024*1024
           for s in sorted(info.siblings,key=lambda x:x.rfilename):
               name=s.rfilename
               p=Path(name)
-              if p.suffix.lower() not in allowed and p.name != "model.safetensors.index.json" and not p.name.endswith(".index.json"):
+              if p.suffix.lower() not in allowed:
                   continue
               size=int(s.size or 0)
               if size <= 0:
                   continue
+              lfs=getattr(s,"lfs",None)
+              sha=getattr(lfs,"sha256",None) if lfs is not None else None
+              if isinstance(lfs,dict):
+                  sha=lfs.get("sha256") or sha
               parts=(size+chunk-1)//chunk
               release_assets += parts
-              selected.append((name,size))
+              selected.append((name,size,sha or ""))
           if release_assets > 1000:
               raise SystemExit(f"Release asset budget exceeded: {release_assets}")
-          for name,size in selected:
-              print(name+"\t"+str(size))
+          for name,size,sha in selected:
+              print(json.dumps({"path":name,"size":size,"sha256":sha},ensure_ascii=False,separators=(",",":")))
           PY
 
-          : > "$WORKDIR/manifest.tsv"
+          : > "$WORKDIR/manifest.jsonl"
 
-          while IFS=$'\t' read -r source_path source_size; do
-            [ -n "$source_path" ] || continue
-            safe="$(printf '%s' "$source_path" | sed 's#[^A-Za-z0-9._-]#__#g')"
+          while IFS= read -r file_json; do
+            [ -n "$file_json" ] || continue
+            source_path="$(python3 - "$file_json" <<'PY'
+import json,sys
+print(json.loads(sys.argv[1])["path"])
+PY
+            )"
+            source_size="$(python3 - "$file_json" <<'PY'
+import json,sys
+print(json.loads(sys.argv[1])["size"])
+PY
+            )"
+            source_sha="$(python3 - "$file_json" <<'PY'
+import json,sys
+print(json.loads(sys.argv[1]).get("sha256",""))
+PY
+            )"
+            safe="$(printf "%s" "$source_path" | sed 's#[^A-Za-z0-9._-]#__#g')"
             parts=$(( (source_size + CHUNK_BYTES - 1) / CHUNK_BYTES ))
+            names=""
+
+            encoded_path="$(python3 - "$source_path" <<'PY'
+from urllib.parse import quote
+import sys
+print(quote(sys.argv[1], safe="/"))
+PY
+            )"
+            source_url="https://huggingface.co/$MODEL_ID/resolve/$REVISION/$encoded_path?download=true"
 
             for ((part=0; part<parts; part++)); do
               start_byte=$((part * CHUNK_BYTES))
               end_byte=$((start_byte + CHUNK_BYTES - 1))
               if [ "$end_byte" -ge "$source_size" ]; then end_byte=$((source_size - 1)); fi
               length=$((end_byte - start_byte + 1))
-              if [ "$parts" -eq 1 ]; then
-                asset_name="omega__$safe"
-              else
-                asset_name="omega__${safe}.part-$(printf '%04d' "$part")"
-              fi
+              asset_name="omega__${safe}.part-$(printf "%04d" "$part")"
+              if [ "$parts" -eq 1 ]; then asset_name="omega__$safe"; fi
 
-              if grep -Fxq "$asset_name" <<< "$existing"; then
+              if grep -Fqx "$asset_name" "$WORKDIR/existing-assets.txt"; then
                 echo "Already published: $asset_name"
-                printf '%s\t%s\t%s\t%s\n' "$source_path" "$source_size" "$part" "$asset_name" >> "$WORKDIR/manifest.tsv"
+                names="${names:+$names,}$asset_name"
                 continue
               fi
 
-              encoded_path="$(python3 - "$source_path" <<'PY'
-          import sys
-          from urllib.parse import quote
-          print(quote(sys.argv[1], safe="/"))
-          PY
-              )"
-              source_url="https://huggingface.co/$MODEL_ID/resolve/$REVISION/$encoded_path?download=true"
-              chunk_file="$WORKDIR/$asset_name"
-
-              echo "Downloading range $start_byte-$end_byte from $source_path"
+              upload_url="$(gh api "/repos/$REPO/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
+              echo "Streaming $MODEL_ID:$source_path [$start_byte-$end_byte] -> $asset_name"
               curl --fail --location --retry 6 --retry-all-errors --connect-timeout 30 --max-time 3600 \
                 -H "Range: bytes=$start_byte-$end_byte" \
-                -o "$chunk_file" "$source_url"
-              test -s "$chunk_file"
-              actual="$(stat -c '%s' "$chunk_file")"
-              test "$actual" -eq "$length"
-              test "$actual" -lt "$MAX_ASSET_BYTES"
-
-              upload_url="$(gh api "/repos/$REPO/releases/tags/$RELEASE_TAG" --jq '.upload_url' | sed 's/{?name,label}//')"
-              echo "Uploading $asset_name ($actual bytes)"
-              curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 3600 \
+                "$source_url" \
+              | curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 3600 \
                 -X POST \
                 -H "Authorization: Bearer $GH_TOKEN" \
                 -H "Accept: application/vnd.github+json" \
                 -H "X-GitHub-Api-Version: 2026-03-10" \
                 -H "Content-Type: application/octet-stream" \
-                --data-binary "@$chunk_file" \
+                -H "Content-Length: $length" \
+                --data-binary @- \
                 "$upload_url?name=$asset_name"
 
-              printf '%s\t%s\t%s\t%s\n' "$source_path" "$source_size" "$part" "$asset_name" >> "$WORKDIR/manifest.tsv"
-              rm -f "$chunk_file"
-              existing="$existing"$'\n'"$asset_name"
+              printf "%s\n" "$asset_name" >> "$WORKDIR/existing-assets.txt"
+              names="${names:+$names,}$asset_name"
             done
+
+            python3 - "$source_path" "$source_size" "$source_sha" "$names" <<'PY' >> "$WORKDIR/manifest.jsonl"
+import json,sys
+print(json.dumps({"source_path":sys.argv[1],"source_bytes":int(sys.argv[2]),"source_sha256":sys.argv[3] or None,"release_assets":sys.argv[4].split(",") if sys.argv[4] else []},ensure_ascii=False))
+PY
           done < "$WORKDIR/files.tsv"
 
           python3 - <<'PY'
-          import json, os
-          from pathlib import Path
-          work=Path(os.environ["WORKDIR"])
-          rows=[]
-          for line in (work/"manifest.tsv").read_text().splitlines():
-              if line:
-                  source,size,part,asset=line.split("\t",3)
-                  rows.append({"source_path":source,"source_bytes":int(size),"part":int(part),"release_asset":asset})
-          payload={"schema_version":"1.0.0","model_id":os.environ["MODEL_ID"],"revision":os.environ["REVISION"],"license":os.environ["LICENSE_ID"],"transport":"huggingface_http_range_to_github_release","chunk_bytes":512*1024*1024,"files":rows}
-          (work/"release-manifest.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
-          PY
+import json, os
+from pathlib import Path
+work=Path(os.environ["WORKDIR"])
+rows=[json.loads(x) for x in work.joinpath("manifest.jsonl").read_text().splitlines() if x]
+payload={"schema_version":"1.0.0","model_id":os.environ["MODEL_ID"],"revision":os.environ["REVISION"],"license":os.environ["LICENSE_ID"],"transport":"direct_hf_range_stream","chunk_bytes":128*1024*1024,"files":rows}
+work.joinpath("release-manifest.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
+PY
 
-          upload_url="$(gh api "/repos/$REPO/releases/tags/$RELEASE_TAG" --jq '.upload_url' | sed 's/{?name,label}//')"
+          upload_url="$(gh api "/repos/$REPO/releases/tags/$RELEASE_TAG" --jq ".upload_url" | sed "s/{?name,label}//")"
           curl --fail-with-body --location --retry 5 --retry-all-errors --connect-timeout 30 --max-time 600 \
             -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
