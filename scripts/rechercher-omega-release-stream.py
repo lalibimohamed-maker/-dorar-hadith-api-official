@@ -169,12 +169,10 @@ def main():
             for name, size in existing.items()
             if name.startswith(safe_prefix)
         ]
-        # Resume legacy 512 MiB releases without colliding with the newer 128 MiB layout.
+        # Use the current immutable chunk policy for this run. Existing assets are
+        # resumable only when their exact byte length matches the current part.
+        # Stale assets from older attempts are repaired below rather than reused.
         chunk_bytes = CHUNK_BYTES
-        if existing_parts:
-            observed_sizes = sorted({size for name, size in existing_parts if size > 0})
-            if observed_sizes:
-                chunk_bytes = observed_sizes[0]
         parts = (source_size + chunk_bytes - 1) // chunk_bytes
         names = []
         hasher = hashlib.sha256()
@@ -191,11 +189,33 @@ def main():
             length = end - start + 1
             asset_name = f"omega__{safe}.part-{part:04d}" if parts > 1 else f"omega__{safe}"
 
-            if asset_name in existing and existing[asset_name] == length:
-                print(f"[SKIP] existing {asset_name}")
-                names.append(asset_name)
-                counted += length
-                continue
+            if asset_name in existing:
+                observed = existing[asset_name]
+                if observed == length:
+                    print(f"[SKIP] existing {asset_name} ({observed} bytes)")
+                    names.append(asset_name)
+                    counted += length
+                    continue
+                print(
+                    f"[REPAIR] removing stale {asset_name}: "
+                    f"expected {length} bytes, observed {observed}"
+                )
+                proc = subprocess.run(
+                    [
+                        "gh", "release", "delete-asset", RELEASE_TAG, asset_name,
+                        "--repo", REPO, "--yes",
+                    ],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    env={**os.environ, "GH_TOKEN": TOKEN},
+                )
+                if proc.returncode != 0:
+                    detail = (proc.stderr or proc.stdout or "").strip()
+                    raise RuntimeError(
+                        f"Failed to remove stale Release asset {asset_name}: {detail[:1000]}"
+                    )
+                existing.pop(asset_name, None)
 
             req = urllib.request.Request(
                 source_url,
