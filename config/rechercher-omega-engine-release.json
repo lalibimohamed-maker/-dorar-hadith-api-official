@@ -30,11 +30,30 @@
       "revision": "7fa00a8c55b735ba51ba49a9058f3f9c57a99a11",
       "license": "apache-2.0",
       "asset_plan": [
-        "paddleocr-vl-model.safetensors",
+        "paddleocr-vl-model.safetensors.part-00",
+        "paddleocr-vl-model.safetensors.part-01",
+        "paddleocr-vl-model.safetensors.part-02",
+        "paddleocr-vl-model.safetensors.part-03",
+        "paddleocr-vl-model.safetensors.part-04",
+        "paddleocr-vl-model.safetensors.part-05",
+        "paddleocr-vl-model.safetensors.part-06",
+        "paddleocr-vl-model.safetensors.part-07",
+        "paddleocr-vl-model.safetensors.part-08",
+        "paddleocr-vl-model.safetensors.part-09",
+        "paddleocr-vl-model.safetensors.part-10",
+        "paddleocr-vl-model.safetensors.part-11",
+        "paddleocr-vl-model.safetensors.part-12",
+        "paddleocr-vl-model.safetensors.part-13",
+        "paddleocr-vl-model.safetensors.part-14",
         "paddleocr-vl-runtime-files.tar.gz",
         "paddleocr-vl-release-manifest.json"
       ],
-      "source_url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL/tree/7fa00a8c55b735ba51ba49a9058f3f9c57a99a11"
+      "source_url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL/tree/7fa00a8c55b735ba51ba49a9058f3f9c57a99a11",
+      "model_reconstruction": {
+        "method": "cat_sorted_parts",
+        "output": "model.safetensors",
+        "part_size_bytes": 134217728
+      }
     },
     {
       "logical_id": "whisper-tiny",
