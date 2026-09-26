@@ -10,7 +10,9 @@ from http.client import HTTPSConnection
 from pathlib import Path
 from huggingface_hub import HfApi
 
-CHUNK_BYTES = 128 * 1024 * 1024
+CHUNK_BYTES = int(os.environ.get("CHUNK_BYTES", str(128 * 1024 * 1024)))
+if CHUNK_BYTES <= 0 or CHUNK_BYTES > 2_000_000_000:
+    raise RuntimeError("CHUNK_BYTES must be between 1 byte and 2,000,000,000 bytes")
 MAX_ASSET_BYTES = 2_147_483_647
 MODEL_ID = os.environ["MODEL_ID"]
 REVISION = os.environ["REVISION"]
