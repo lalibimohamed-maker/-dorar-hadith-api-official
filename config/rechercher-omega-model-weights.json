@@ -49,15 +49,18 @@
       "source_repo": "https://github.com/QwenLM/Qwen3-Omni",
       "revision": "12a3ac6661e685620bbc6616b7217b26469a81dd",
       "weight_license_status": "verified_source_license",
-      "acquisition": "runtime_only",
+      "acquisition": "github_release",
       "verification": {
-        "mode": "not_acquired",
-        "requires_sha256_before_promotion": true,
-        "requires_license_clearance": true
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
       },
       "revision_type": "immutable_hf_commit",
       "resource_class": "xlarge",
-      "approximate_size_gb": 70.5
+      "approximate_size_gb": 70.5,
+      "release_tag": "rechercher-omega-qwen3-omni-v1.0.0",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "model_id": "paddleocr-vl",
@@ -107,69 +110,80 @@
     {
       "model_id": "wan2.2",
       "source_repo": "https://github.com/Wan-Video/Wan2.2",
-      "revision": null,
+      "revision": "37685f96025fc1425edccdd4b2bca3836ae917ff",
       "weight_license_status": "review_required",
-      "acquisition": "runtime_only",
+      "acquisition": "github_release",
       "verification": {
-        "mode": "not_acquired",
-        "requires_immutable_revision": true,
-        "requires_sha256": true,
-        "requires_license_clearance": true
-      }
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "release_tag": "rechercher-omega-wan22-ti2v5b-v1.0.0",
+      "source_model_id": "Wan-AI/Wan2.2-TI2V-5B",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "model_id": "hunyuanvideo-1.5",
       "source_repo": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5",
       "revision": null,
       "weight_license_status": "review_required",
-      "acquisition": "runtime_only",
+      "acquisition": "github_release_draft",
       "verification": {
-        "mode": "not_acquired",
-        "requires_immutable_revision": true,
-        "requires_sha256": true,
-        "requires_license_clearance": true
-      }
+        "mode": "draft_release_manifest",
+        "required_before_publication": true,
+        "required_before_runtime": true
+      },
+      "release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+      "rights_promotion_status": "draft_only_pending_license_review"
     },
     {
       "model_id": "ltx-2",
       "source_repo": "https://github.com/Lightricks/LTX-2",
       "revision": null,
       "weight_license_status": "review_required",
-      "acquisition": "runtime_only",
+      "acquisition": "github_release_draft",
       "verification": {
-        "mode": "not_acquired",
-        "requires_immutable_revision": true,
-        "requires_sha256": true,
-        "requires_license_clearance": true
-      }
+        "mode": "draft_release_manifest",
+        "required_before_publication": true,
+        "required_before_runtime": true
+      },
+      "release_tag": "rechercher-omega-ltx2-v1.0.0",
+      "rights_promotion_status": "draft_only_pending_license_review"
     },
     {
       "model_id": "cogvideox",
       "source_repo": "https://github.com/zai-org/CogVideo",
-      "revision": null,
+      "revision": "1137dacfc2c9c012bed6a0793f4ecf2ca8e7ba01",
       "weight_license_status": "review_required",
-      "acquisition": "runtime_only",
+      "acquisition": "github_release",
       "verification": {
-        "mode": "not_acquired",
-        "requires_immutable_revision": true,
-        "requires_sha256": true,
-        "requires_license_clearance": true
-      }
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "release_tag": "rechercher-omega-cogvideox2b-v1.0.0",
+      "source_model_id": "zai-org/CogVideoX-2b",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "model_id": "cosyvoice",
       "source_repo": "https://github.com/FunAudioLLM/CosyVoice",
-      "revision": "23778f84b1b6dd789e1b5092c3ec1145639ee1c3",
+      "revision": "eec1ae6c79877dbd9379285cf8789c9e0879293d",
       "weight_license_status": "verified_source_license",
-      "acquisition": "staged_runtime",
+      "acquisition": "github_release",
       "verification": {
-        "mode": "not_acquired",
-        "requires_sha256": true,
-        "requires_license_clearance": true
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
       },
       "source_model_id": "FunAudioLLM/CosyVoice2-0.5B",
       "revision_type": "immutable_hf_commit",
-      "notes": "Official Hugging Face model card currently declares Apache-2.0; stage because the repository is about 4.36 GB."
+      "notes": "Official Hugging Face model card currently declares Apache-2.0; stage because the repository is about 4.36 GB.",
+      "release_tag": "rechercher-omega-cosyvoice2-0.5b-v1.0.0",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "model_id": "sglang",
@@ -189,14 +203,17 @@
       "source_repo": "https://github.com/QwenLM/Qwen3-VL",
       "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
       "weight_license_status": "verified_source_license",
-      "acquisition": "runtime_only",
+      "acquisition": "github_release",
       "verification": {
-        "mode": "runtime_only_not_acquired",
-        "requires_sha256_before_promotion": true,
-        "requires_license_clearance": true
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
       },
       "source_model_id": "Qwen/Qwen3-VL-4B-Instruct",
-      "revision_type": "immutable_hf_commit"
+      "revision_type": "immutable_hf_commit",
+      "release_tag": "rechercher-omega-qwen3-vl-v1.0.0",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "model_id": "whisper",
