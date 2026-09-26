@@ -44,9 +44,9 @@ jobs:
               return 0
             fi
             if [ "$mode" = "draft" ]; then
-              gh release create "$tag" --target "$GITHUB_SHA" --draft                 --title "$title"                 --notes "Rechercher Ω draft distribution for review. License: $license."
+              gh api --method POST "/repos/$GITHUB_REPOSITORY/releases"                 -f tag_name="$tag"                 -f target_commitish="$GITHUB_SHA"                 -f name="$title"                 -F draft=true                 -f body="Rechercher Ω draft distribution for review. License: $license."
             else
-              gh release create "$tag" --target "$GITHUB_SHA" --prerelease                 --title "$title"                 --notes "Rechercher Ω model distribution. License: $license."
+              gh api --method POST "/repos/$GITHUB_REPOSITORY/releases"                 -f tag_name="$tag"                 -f target_commitish="$GITHUB_SHA"                 -f name="$title"                 -F prerelease=true                 -f body="Rechercher Ω model distribution. License: $license."
             fi
           }
 
