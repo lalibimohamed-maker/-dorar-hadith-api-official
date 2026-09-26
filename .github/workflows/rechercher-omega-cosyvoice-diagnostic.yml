@@ -51,7 +51,8 @@ jobs:
         run: |
           set -euxo pipefail
           printf 'rechercher-omega-cosyvoice-diagnostic\n' > diagnostic.txt
-          gh release upload "rechercher-omega-cosyvoice2-0.5b-v1.0.0" diagnostic.txt --clobber
+          upload_url="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/rechercher-omega-cosyvoice2-0.5b-v1.0.0" --jq ".upload_url" | sed "s/{?name,label}//")"
+          gh api --method POST "$upload_url?name=diagnostic.txt" --header "Content-Type: text/plain" --input diagnostic.txt >/dev/null
 
       - name: Download one representative weight
         run: |
