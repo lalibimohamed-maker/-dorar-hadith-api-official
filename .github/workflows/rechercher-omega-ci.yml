@@ -46,4 +46,4 @@ jobs:
       - name: Install
         run: npm ci
       - name: Ω boundary tests
-        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js
+        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-integration.test.js
