@@ -10,7 +10,9 @@
       "license": "apache-2.0",
       "release_tag": "rechercher-omega-qwen3-vl-v1.0.0",
       "release_visibility": "prerelease",
-      "estimated_gb": 8.89
+      "estimated_gb": 8.89,
+      "acquisition": "github_release",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "id": "qwen3-omni",
@@ -19,7 +21,9 @@
       "license": "apache-2.0",
       "release_tag": "rechercher-omega-qwen3-omni-v1.0.0",
       "release_visibility": "prerelease",
-      "estimated_gb": 70.5
+      "estimated_gb": 70.5,
+      "acquisition": "github_release",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "id": "wan2.2-ti2v-5b",
@@ -28,7 +32,9 @@
       "license": "apache-2.0",
       "release_tag": "rechercher-omega-wan22-ti2v5b-v1.0.0",
       "release_visibility": "prerelease",
-      "estimated_gb": 34.2
+      "estimated_gb": 34.2,
+      "acquisition": "github_release",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "id": "cogvideox-2b",
@@ -37,7 +43,9 @@
       "license": "apache-2.0",
       "release_tag": "rechercher-omega-cogvideox2b-v1.0.0",
       "release_visibility": "prerelease",
-      "estimated_gb": 13.8
+      "estimated_gb": 13.8,
+      "acquisition": "github_release",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "id": "cosyvoice2-0.5b",
@@ -46,7 +54,9 @@
       "license": "apache-2.0",
       "release_tag": "rechercher-omega-cosyvoice2-0.5b-v1.0.0",
       "release_visibility": "prerelease",
-      "estimated_gb": 4.86
+      "estimated_gb": 4.86,
+      "acquisition": "github_release",
+      "rights_promotion_status": "blocked_until_clearance"
     },
     {
       "id": "hunyuanvideo-1.5",
@@ -55,7 +65,9 @@
       "license": "tencent-hunyuan-community",
       "release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
       "release_visibility": "draft_review_only",
-      "estimated_gb": 372
+      "estimated_gb": 372,
+      "acquisition": "github_release_draft",
+      "rights_promotion_status": "draft_only_pending_license_review"
     },
     {
       "id": "ltx-2",
@@ -64,7 +76,9 @@
       "license": "ltx-2-community-license-agreement",
       "release_tag": "rechercher-omega-ltx2-v1.0.0",
       "release_visibility": "draft_review_only",
-      "estimated_gb": 314
+      "estimated_gb": 314,
+      "acquisition": "github_release_draft",
+      "rights_promotion_status": "draft_only_pending_license_review"
     },
     {
       "id": "flux",
@@ -73,12 +87,20 @@
       "license": "gated",
       "release_tag": null,
       "release_visibility": "blocked_until_access",
-      "estimated_gb": 23.8
+      "estimated_gb": 23.8,
+      "acquisition": "blocked"
     }
   ],
   "non_weight_engine": {
     "id": "sglang",
     "action": "runtime_package_only",
     "reason": "SGLang is an inference runtime, not a model-weight release."
-  }
+  },
+  "source_notes": [
+    "Current model pages and commit histories were checked before this intake.",
+    "Public Apache-2.0 models may be published as prerelease assets subject to the project rights gate.",
+    "HunyuanVideo-1.5 and LTX-2 use community licenses and remain draft_review_only pending applicable redistribution review.",
+    "FLUX.1-schnell is gated and requires account acceptance/access; no automated bypass is attempted.",
+    "SGLang is an inference runtime and therefore has no model-weight acquisition target."
+  ]
 }
