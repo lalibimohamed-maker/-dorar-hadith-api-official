@@ -26,6 +26,8 @@ concurrency:
 jobs:
   acquire:
     name: ${{ matrix.id }}
+    env:
+      RECHERCHER_OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     strategy:
@@ -33,31 +35,6 @@ jobs:
       max-parallel: 2
       matrix:
         include:
-          - id: qwen3-vl
-            model_id: Qwen/Qwen3-VL-4B-Instruct
-            revision: ebb281ec70b05090aa6165b016eac8ec08e71b17
-            release_tag: rechercher-omega-qwen3-vl-v1.0.0
-            license: apache-2.0
-          - id: qwen3-omni
-            model_id: Qwen/Qwen3-Omni-30B-A3B-Instruct
-            revision: 12a3ac6661e685620bbc6616b7217b26469a81dd
-            release_tag: rechercher-omega-qwen3-omni-v1.0.0
-            license: apache-2.0
-          - id: wan2.2-ti2v-5b
-            model_id: Wan-AI/Wan2.2-TI2V-5B
-            revision: 37685f96025fc1425edccdd4b2bca3836ae917ff
-            release_tag: rechercher-omega-wan22-ti2v5b-v1.0.0
-            license: apache-2.0
-          - id: cogvideox-2b
-            model_id: zai-org/CogVideoX-2b
-            revision: 1137dacfc2c9c012bed6a0793f4ecf2ca8e7ba01
-            release_tag: rechercher-omega-cogvideox2b-v1.0.0
-            license: apache-2.0
-          - id: cosyvoice2-0.5b
-            model_id: FunAudioLLM/CosyVoice2-0.5B
-            revision: eec1ae6c79877dbd9379285cf8789c9e0879293d
-            release_tag: rechercher-omega-cosyvoice2-0.5b-v1.0.0
-            license: apache-2.0
           - id: ltx-2
             model_id: Lightricks/LTX-2
             revision: dfcc210
@@ -78,6 +55,20 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+
+      - name: Validate Omega storage access
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          TARGET_REPOSITORY: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+        run: |
+          set -euo pipefail
+          test -n "$GH_TOKEN" || { echo "RECHERCHER_OMEGA_STORAGE_TOKEN is missing"; exit 1; }
+          actual="$(gh api "repos/$TARGET_REPOSITORY" --jq '.full_name')"
+          test "$actual" = "$TARGET_REPOSITORY"
+          can_push="$(gh api "repos/$TARGET_REPOSITORY" --jq '.permissions.push // false')"
+          test "$can_push" = "true" || { echo "Token does not have push permission on $TARGET_REPOSITORY"; exit 1; }
+          echo "[OK] Storage target: $TARGET_REPOSITORY"
+          echo "[OK] Token has repository write access"
 
       - name: Setup Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
@@ -111,8 +102,8 @@ jobs:
 
       - name: Ensure dedicated Release exists
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
           RELEASE_TAG: ${{ matrix.release_tag }}
           RELEASE_MODE: ${{ matrix.release_mode }}
         run: |
@@ -127,8 +118,8 @@ jobs:
           fi
       - name: Stream weights directly into Release
         env:
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          GITHUB_REPOSITORY: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
           MODEL_ID: ${{ matrix.model_id }}
           REVISION: ${{ steps.revision.outputs.sha }}
           RELEASE_TAG: ${{ matrix.release_tag }}
@@ -139,8 +130,8 @@ jobs:
       - name: Attach LTX-2 license
         if: matrix.id == 'ltx-2'
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
@@ -152,8 +143,8 @@ jobs:
       - name: Attach Hunyuan license and notice
         if: matrix.id == 'hunyuanvideo-1.5'
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
@@ -169,8 +160,8 @@ jobs:
 
       - name: Verify Release manifest
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
