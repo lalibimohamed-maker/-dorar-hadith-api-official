@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2.2.0",
+  "schemaVersion": "2.3.0",
   "verifiedAt": "2026-09-26",
   "baseMain": "52f5567ddd226cf7f45b0ed6bb779b5391878607",
   "purpose": "Continuous, measurable evaluation of free-first and self-hosted engines without changing canonical scholarly content.",
@@ -244,6 +244,106 @@
             "selectionPolicy": "benchmark_then_route_by_resource_budget; do not infer fiqh authority from model score"
           },
           "watch": "Arabic and cross-lingual ranking quality, Quran/hadith evidence ordering, latency, max context, license changes"
+        },
+        {
+          "id": "grounded_citation_engine",
+          "name": "Verified RAG / Evidence Gate",
+          "alternates": [
+            "Ansari-style verification loop"
+          ],
+          "role": "Deterministic evidence gate: no approved evidence means NO_EVIDENCE.",
+          "status": "candidate",
+          "softwareLicense": "verify_per_component",
+          "modelLicense": "not_applicable",
+          "integration": {
+            "position": "post_reranking_pre_generation",
+            "failClosed": true,
+            "canonicalCorpusWrite": false
+          }
+        },
+        {
+          "id": "quran_canonical_verification",
+          "name": "Quran Canonical Text Verification",
+          "alternates": [
+            "Tanzil Quran Database",
+            "official Quran source adapters"
+          ],
+          "role": "Canonical Quran retrieval and literal verification before display or speech.",
+          "status": "candidate",
+          "softwareLicense": "verify_per_component",
+          "modelLicense": "not_applicable",
+          "integration": {
+            "position": "verification_layer",
+            "failClosed": true,
+            "canonicalCorpusWrite": false
+          }
+        },
+        {
+          "id": "arabic_diacritics_verification",
+          "name": "Arabic Diacritics Verification",
+          "alternates": [
+            "Mishkal"
+          ],
+          "role": "Arabic orthographic and diacritics validation against canonical text.",
+          "status": "candidate",
+          "softwareLicense": "verify_per_component",
+          "modelLicense": "not_applicable",
+          "integration": {
+            "position": "verification_layer",
+            "failClosed": true,
+            "canonicalCorpusWrite": false
+          }
+        },
+        {
+          "id": "hadith_verification_runtime",
+          "name": "Hadith Verification Runtime",
+          "alternates": [
+            "Metadata-Driven Hadith Filter"
+          ],
+          "role": "Runtime provenance and grading gate separating source existence from authenticity.",
+          "status": "candidate",
+          "softwareLicense": "verify_per_component",
+          "modelLicense": "not_applicable",
+          "integration": {
+            "position": "verification_layer",
+            "failClosed": true,
+            "canonicalCorpusWrite": false
+          }
+        },
+        {
+          "id": "sharia_policy_guardrails",
+          "name": "Sharia Policy Guardrails",
+          "alternates": [
+            "Llama Guard",
+            "NeMo Guardrails"
+          ],
+          "role": "Project-defined policy layer distinct from prompt-injection defense.",
+          "status": "candidate",
+          "softwareLicense": "verify_per_component",
+          "modelLicense": "not_applicable",
+          "integration": {
+            "position": "verification_layer",
+            "failClosed": true,
+            "canonicalCorpusWrite": false
+          }
+        },
+        {
+          "id": "fiqh_knowledge_graph",
+          "name": "Fiqh Knowledge Graph / Rule Tree",
+          "alternates": [
+            "Apache Jena",
+            "Oxigraph",
+            "Neo4j Community"
+          ],
+          "role": "Structured reviewed fiqh relations and deterministic rule dependencies.",
+          "status": "candidate",
+          "softwareLicense": "verify_per_component",
+          "modelLicense": "not_applicable",
+          "integration": {
+            "position": "verification_layer",
+            "failClosed": true,
+            "canonicalCorpusWrite": false
+          }
         },
         {
           "id": "agent_guardrail_firewall",
