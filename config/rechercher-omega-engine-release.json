@@ -9,7 +9,7 @@
     "no_git_tracked_weights": true,
     "scheduled_workflow_downloads": false,
     "overwrite_existing_assets": true,
-    "shard_bytes": 268435456
+    "shard_bytes": null
   },
   "engines": [
     {
@@ -30,23 +30,11 @@
       "revision": "7fa00a8c55b735ba51ba49a9058f3f9c57a99a11",
       "license": "apache-2.0",
       "asset_plan": [
-        "paddleocr-vl-model.safetensors.part-00",
-        "paddleocr-vl-model.safetensors.part-01",
-        "paddleocr-vl-model.safetensors.part-02",
-        "paddleocr-vl-model.safetensors.part-03",
-        "paddleocr-vl-model.safetensors.part-04",
-        "paddleocr-vl-model.safetensors.part-05",
-        "paddleocr-vl-model.safetensors.part-06",
-        "paddleocr-vl-model.safetensors.part-07",
+        "paddleocr-vl-model.safetensors",
         "paddleocr-vl-runtime-files.tar.gz",
         "paddleocr-vl-release-manifest.json"
       ],
-      "source_url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL/tree/7fa00a8c55b735ba51ba49a9058f3f9c57a99a11",
-      "model_reconstruction": {
-        "method": "cat_sorted_parts",
-        "output": "model.safetensors",
-        "part_size_bytes": 134217728
-      }
+      "source_url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL/tree/7fa00a8c55b735ba51ba49a9058f3f9c57a99a11"
     },
     {
       "logical_id": "whisper-tiny",
@@ -58,14 +46,7 @@
         "whisper-tiny-runtime-files.tar.gz",
         "whisper-tiny-release-manifest.json"
       ],
-      "source_url": "https://huggingface.co/openai/whisper-tiny/tree/169d4a4341b33bc18d8881c4b69c2e104e1cc0af",
-      "model_reconstruction": {
-        "method": "concatenate_in_lexicographic_order",
-        "output": "model.safetensors",
-        "parts": [
-          "whisper-tiny-model.safetensors.part-00"
-        ]
-      }
+      "source_url": "https://huggingface.co/openai/whisper-tiny/tree/169d4a4341b33bc18d8881c4b69c2e104e1cc0af"
     }
   ]
 }
