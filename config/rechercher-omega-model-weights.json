@@ -38,11 +38,17 @@
       "rights_promotion_status": "blocked_until_clearance",
       "release_tag": "rechercher-omega-engines-v0.1.0",
       "release_assets": [
-        "qwen3-model.safetensors",
+        "qwen3-model.safetensors.part-00",
+        "qwen3-model.safetensors.part-01",
+        "qwen3-model.safetensors.part-02",
         "qwen3-runtime-files.tar.gz",
         "qwen3-release-manifest.json"
       ],
-      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>"
+      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>",
+      "model_reconstruction": {
+        "method": "cat_sorted_parts",
+        "output": "model.safetensors"
+      }
     },
     {
       "model_id": "qwen3-omni",
@@ -79,11 +85,18 @@
       "rights_promotion_status": "blocked_until_clearance",
       "release_tag": "rechercher-omega-engines-v0.1.0",
       "release_assets": [
-        "paddleocr-vl-model.safetensors",
+        "paddleocr-vl-model.safetensors.part-00",
+        "paddleocr-vl-model.safetensors.part-01",
+        "paddleocr-vl-model.safetensors.part-02",
+        "paddleocr-vl-model.safetensors.part-03",
         "paddleocr-vl-runtime-files.tar.gz",
         "paddleocr-vl-release-manifest.json"
       ],
-      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>"
+      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>",
+      "model_reconstruction": {
+        "method": "cat_sorted_parts",
+        "output": "model.safetensors"
+      }
     },
     {
       "model_id": "wan2.2",
