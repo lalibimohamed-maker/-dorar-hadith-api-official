@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2.4.0",
+  "schemaVersion": "2.5.0",
   "verifiedAt": "2026-09-26",
   "baseMain": "52f5567ddd226cf7f45b0ed6bb779b5391878607",
   "purpose": "Continuous, measurable evaluation of free-first and self-hosted engines without changing canonical scholarly content.",
@@ -216,6 +216,44 @@
           "executionOrder": 1
         },
         {
+          "id": "evidence_eligibility_gate",
+          "name": "Evidence Eligibility / Provenance Hard Gate",
+          "alternates": [
+            "Verification & Metadata Gate"
+          ],
+          "role": "Universal hard filter that decides whether a retrieved evidence item is eligible for downstream semantic ranking.",
+          "status": "candidate",
+          "softwareLicense": "verify_per_component",
+          "modelLicense": "not_applicable",
+          "integration": {
+            "position": "post_dense_retrieval_pre_reranking",
+            "failClosed": true,
+            "canonicalCorpusWrite": false,
+            "hardFilter": true,
+            "input": "retrieval.candidates",
+            "output": "evidence.eligible",
+            "requiredMetadata": [
+              "evidence_id",
+              "source",
+              "document_id",
+              "language",
+              "rights_status",
+              "provenance",
+              "sha256",
+              "verification_status"
+            ],
+            "rejectIf": [
+              "rights_status unknown_or_blocked",
+              "provenance missing_or_unverified",
+              "verification_status not_verified_or_approved",
+              "source missing",
+              "sha256 missing"
+            ],
+            "typedPolicy": "Apply evidence-type-specific hard rules after universal provenance/rights checks; hadith authenticity is enforced by the dedicated Hadith Verification Runtime."
+          },
+          "executionOrder": 2
+        },
+        {
           "id": "hadith_verification_runtime",
           "name": "Hadith Verification Runtime",
           "alternates": [
@@ -230,7 +268,7 @@
             "failClosed": true,
             "canonicalCorpusWrite": false,
             "hardFilter": true,
-            "input": "retrieval.candidates",
+            "input": "evidence.eligible",
             "output": "evidence.verified",
             "requiredMetadata": [
               "hadith_id",
@@ -330,7 +368,8 @@
             "input": "evidence.reranked",
             "output": "answer.evidence",
             "requiredEvidenceIds": true,
-            "noEvidenceResult": "NO_EVIDENCE"
+            "noEvidenceResult": "NO_EVIDENCE",
+            "finalCitationCheck": true
           },
           "executionOrder": 4
         },
@@ -475,33 +514,39 @@
         }
       ],
       "executionPipeline": {
-        "principle": "Hard verification and provenance filtering precede semantic reranking. Semantic similarity never overrides authenticity, provenance, rights, or canonical-text constraints.",
+        "principle": "Eligibility and provenance are hard constraints; semantic similarity is never allowed to rescue ineligible evidence. A final grounded-citation gate then verifies that every generated factual claim is traceable to approved evidence.",
         "stages": [
           {
             "order": 1,
             "id": "dense_retrieval",
             "component": "embedding",
             "engine": "Qwen3-Embedding-4B",
-            "action": "Embed the user query and retrieve the initial semantic candidate set from Qdrant.",
+            "action": "Embed the user query and retrieve an initial candidate set from Qdrant; retrieval similarity is discovery only, not evidence approval.",
             "candidateLimit": 50,
             "output": "retrieval.candidates"
           },
           {
             "order": 2,
-            "id": "verification_metadata_hard_gate",
-            "component": "hadith_verification_runtime",
-            "action": "Apply hard metadata/provenance constraints before any semantic reranking.",
+            "id": "evidence_eligibility_hard_gate",
+            "components": [
+              "evidence_eligibility_gate",
+              "hadith_verification_runtime"
+            ],
+            "action": "Apply universal provenance/rights/verification constraints, then evidence-type-specific authenticity rules, before semantic reranking.",
             "input": "retrieval.candidates",
             "output": "evidence.verified",
             "failClosed": true,
-            "hardRejectWhen": [
-              "authenticity_status in [mawdu, batil, very_weak]",
-              "authenticity_status is unknown",
-              "approved_source is missing",
-              "provenance is missing_or_unverified",
-              "rights_status is unknown_or_blocked"
+            "hardFilter": true,
+            "rejectBeforeReranking": [
+              "rights_status unknown_or_blocked",
+              "provenance missing_or_unverified",
+              "verification_status not_verified_or_approved",
+              "approved_source missing",
+              "sha256 missing",
+              "hadith authenticity_status in [mawdu, batil, very_weak]",
+              "hadith authenticity_status unknown"
             ],
-            "weakHadithPolicy": "A merely weak hadith is not silently promoted to sound proof. If retained for a documented research purpose, it must remain explicitly labeled weak and cannot satisfy a sound-evidence requirement.",
+            "weakHadithPolicy": "Weak material may be retained only in an explicitly labeled research lane when policy permits; it cannot satisfy a sound-evidence requirement and must never be silently promoted.",
             "authorityPolicy": "Do not infer fiqh authority from embedding similarity, reranker score, or model confidence."
           },
           {
@@ -509,26 +554,36 @@
             "id": "semantic_reranking",
             "component": "reranking",
             "engine": "Qwen3-Reranker-4B",
-            "action": "Rank only candidates that have already passed the hard verification gate.",
+            "action": "Rank only evidence that passed the hard gate.",
             "input": "evidence.verified",
             "output": "evidence.reranked",
             "softFilterOnly": true,
-            "authorityPolicy": "Ranking improves contextual relevance only; it cannot restore a rejected candidate."
+            "authorityPolicy": "Ranking improves contextual relevance only; it cannot restore rejected evidence."
           },
           {
             "order": 4,
-            "id": "sharia_policy_and_generation",
+            "id": "grounded_evidence_final_gate",
             "components": [
-              "sharia_policy_guardrails",
               "grounded_citation_engine",
+              "sharia_policy_guardrails",
               "fiqh_knowledge_graph"
             ],
-            "generator": "Qwen3-Omni-30B-A3B-Instruct",
-            "action": "Generate only from verified evidence and reviewed policy/rule context, with citations/provenance attached.",
+            "action": "Before generation, verify that selected evidence is still eligible, every factual claim has evidence IDs, and policy/rule context is explicitly attached.",
             "input": "evidence.reranked",
-            "output": "answer.draft",
+            "output": "generation.context",
             "failClosed": true,
             "noEvidenceResponse": "NO_EVIDENCE",
+            "citationRequired": true,
+            "canonicalCorpusWrite": false
+          },
+          {
+            "order": 5,
+            "id": "generation",
+            "generator": "Qwen3-Omni-30B-A3B-Instruct",
+            "action": "Generate only from the verified generation context; do not invent source text, grades, citations, or canonical Quran wording.",
+            "input": "generation.context",
+            "output": "answer.draft",
+            "failClosed": true,
             "citationRequired": true,
             "canonicalCorpusWrite": false
           }
