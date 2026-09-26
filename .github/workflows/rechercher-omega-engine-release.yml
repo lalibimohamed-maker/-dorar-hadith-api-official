@@ -24,51 +24,48 @@
             case "$id" in
               qwen3)
                 hf download "$model"                   model.safetensors LICENSE README.md .gitattributes config.json generation_config.json merges.txt tokenizer.json tokenizer_config.json vocab.json                   --revision "$revision" --local-dir "$dir"
-                model_asset="$WORKDIR/qwen3-model.safetensors"
+                shard_prefix="$WORKDIR/qwen3-model.safetensors.part-"
                 bundle="$WORKDIR/qwen3-runtime-files.tar.gz"
                 ;;
               paddleocr-vl)
                 hf download "$model"                   model.safetensors LICENSE README.md .gitattributes config.json configuration_paddleocr_vl.py generation_config.json image_processing_paddleocr_vl.py inference.yml modeling_paddleocr_vl.py preprocessor_config.json processing_paddleocr_vl.py processor_config.json special_tokens_map.json tokenizer.json tokenizer.model tokenizer_config.json                   --revision "$revision" --local-dir "$dir"
-                model_asset="$WORKDIR/paddleocr-vl-model.safetensors"
+                shard_prefix="$WORKDIR/paddleocr-vl-model.safetensors.part-"
                 bundle="$WORKDIR/paddleocr-vl-runtime-files.tar.gz"
                 ;;
               whisper-tiny)
                 hf download "$model"                   model.safetensors LICENSE README.md .gitattributes added_tokens.json config.json generation_config.json merges.txt normalizer.json preprocessor_config.json special_tokens_map.json tokenizer.json tokenizer_config.json vocab.json                   --revision "$revision" --local-dir "$dir"
-                model_asset="$WORKDIR/whisper-tiny-model.safetensors"
+                shard_prefix="$WORKDIR/whisper-tiny-model.safetensors.part-"
                 bundle="$WORKDIR/whisper-tiny-runtime-files.tar.gz"
                 ;;
               *) echo "Unknown engine: $id"; exit 1 ;;
             esac
 
             test -s "$dir/model.safetensors"
-            cp "$dir/model.safetensors" "$model_asset"
+            split -b 512M -d -a 2 "$dir/model.safetensors" "$shard_prefix"
             rm -f "$dir/model.safetensors"
             tar -C "$dir" -czf "$bundle" .
             max_bytes=2147483647
-            test "$(stat -c '%s' "$model_asset")" -lt "$max_bytes"
+            for shard in "$shard_prefix"*; do
+              test "$(stat -c '%s' "$shard")" -lt "$max_bytes"
+            done
             test "$(stat -c '%s' "$bundle")" -lt "$max_bytes"
 
-            model_sha="$(sha256sum "$model_asset" | awk '{print $1}')"
-            bundle_sha="$(sha256sum "$bundle" | awk '{print $1}')"
-            cat > "$WORKDIR/$id-release-manifest.json" <<EOF
-{
-  "schema_version": "1.0.0",
-  "logical_id": "$id",
-  "model_id": "$model",
-  "revision": "$revision",
-  "license": "$license",
-  "source_url": "$source_url",
-  "assets": [
-    {"name": "$(basename "$model_asset")", "bytes": $(stat -c '%s' "$model_asset"), "sha256": "$model_sha"},
-    {"name": "$(basename "$bundle")", "bytes": $(stat -c '%s' "$bundle"), "sha256": "$bundle_sha"}
-  ]
-}
-EOF
+            manifest_path="$WORKDIR/$id-release-manifest.json"
+            printf '{\n  "schema_version": "1.0.0",\n  "logical_id": "%s",\n  "model_id": "%s",\n  "revision": "%s",\n  "license": "%s",\n  "source_url": "%s",\n  "reconstruction": {"method": "cat_sorted_parts", "output": "model.safetensors"},\n  "assets": [\n' "$id" "$model" "$revision" "$license" "$source_url" > "$manifest_path"
 
-            gh release upload "$TAG"               "$model_asset"               "$bundle"               "$WORKDIR/$id-release-manifest.json"               --clobber
+            first=1
+            for shard in "$shard_prefix"* "$bundle"; do
+              [ "$first" -eq 1 ] || printf ',\n' >> "$manifest_path"
+              first=0
+              printf '    {"name": "%s", "bytes": %s, "sha256": "%s"}'                 "$(basename "$shard")"                 "$(stat -c '%s' "$shard")"                 "$(sha256sum "$shard" | awk '{print $1}')" >> "$manifest_path"
+            done
+            printf '\n  ]\n}\n' >> "$manifest_path"
 
-            rm -rf "$dir" "$model_asset" "$bundle" "$WORKDIR/$id-release-manifest.json"
-            echo "=== Published $id ==="
+            assets=( "$shard_prefix"* "$bundle" "$manifest_path" )
+            gh release upload "$TAG" "${assets[@]}" --clobber
+
+            rm -rf "$dir" "$WORKDIR"/"$id"-model.safetensors.part-* "$bundle" "$manifest_path"
+            echo "=== Published $id shards ==="
           done < "$WORKDIR/engines.tsv"
 
       - name: Verify published assets
