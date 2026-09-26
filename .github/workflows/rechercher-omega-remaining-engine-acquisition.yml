@@ -123,7 +123,7 @@ jobs:
       - name: Stream weights directly into Release
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
-          GITHUB_REPOSITORY: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          OMEGA_STORAGE_REPOSITORY: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
           MODEL_ID: ${{ matrix.model_id }}
           REVISION: ${{ steps.revision.outputs.sha }}
           RELEASE_TAG: ${{ matrix.release_tag }}

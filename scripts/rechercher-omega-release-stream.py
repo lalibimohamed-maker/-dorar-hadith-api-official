@@ -20,7 +20,7 @@ MODEL_ID = os.environ["MODEL_ID"]
 REVISION = os.environ["REVISION"]
 RELEASE_TAG = os.environ["RELEASE_TAG"]
 LICENSE_ID = os.environ["LICENSE_ID"]
-REPO = os.environ["GITHUB_REPOSITORY"]
+REPO = os.environ["OMEGA_STORAGE_REPOSITORY"]
 TOKEN = os.environ["GH_TOKEN"]
 RELEASE_ID = os.environ.get("OMEGA_RELEASE_ID", "").strip()
 
@@ -116,6 +116,8 @@ def release_assets(release):
 
 
 def main():
+    if not REPO or "/" not in REPO:
+        raise RuntimeError("OMEGA_STORAGE_REPOSITORY is missing or invalid")
     api = HfApi()
     info = api.model_info(MODEL_ID, revision=REVISION, files_metadata=True)
 
