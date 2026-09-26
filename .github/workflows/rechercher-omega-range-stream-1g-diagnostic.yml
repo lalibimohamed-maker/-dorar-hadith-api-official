@@ -1,0 +1,50 @@
+name: Rechercher Ω — 1 GiB Range stream diagnostic
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - ".github/workflows/rechercher-omega-range-stream-1g-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# security-justification: one diagnostic binary chunk uploaded to the dedicated Qwen3-VL prerelease.
+
+jobs:
+  stream-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Verify tools
+        run: |
+          set -euo pipefail
+          curl --version
+          gh --version
+
+      - name: Stream 1 GiB directly from Hugging Face to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          MODEL="Qwen/Qwen3-VL-4B-Instruct"
+          REVISION="ebb281ec70b05090aa6165b016eac8ec08e71b17"
+          FILE="model-00001-of-00002.safetensors"
+          TAG="rechercher-omega-qwen3-vl-v1.0.0"
+          START=0
+          END=$((1024*1024*1024-1))
+          LENGTH=$((END-START+1))
+          upload_url="$(gh api "/repos/$REPO/releases/tags/$TAG" --jq '.upload_url' | sed 's/{?name,label}//')"
+
+          curl --fail --location --retry 5 --retry-all-errors             --connect-timeout 30 --max-time 1800             -H "Range: bytes=$START-$END"             "https://huggingface.co/$MODEL/resolve/$REVISION/$FILE?download=true"             | curl --fail-with-body --location --retry 3 --retry-all-errors               --connect-timeout 30 --max-time 1800               -X POST               -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json"               -H "X-GitHub-Api-Version: 2026-03-10"               -H "Content-Type: application/octet-stream"               -H "Content-Length: $LENGTH"               --data-binary @-               "$upload_url?name=qwen3-vl-range-stream-test-1g.part"
+
+      - name: Verify diagnostic asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api "/repos/$REPO/releases/tags/rechercher-omega-qwen3-vl-v1.0.0"             --jq '.assets[] | select(.name=="qwen3-vl-range-stream-test-1g.part") | [.name,.size] | @tsv'
