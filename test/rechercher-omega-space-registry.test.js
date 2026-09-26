@@ -78,3 +78,20 @@ test("hfviewer is tracked only as a reference viewer", async () => {
   assert.equal(viewer.executable, undefined);
   assert.equal(viewer.license_status, "review_required");
 });
+
+
+test("complete PaddleOCR-VL census contains all 28 discovered Spaces", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const { fileURLToPath } = await import("node:url");
+  const { dirname, join } = await import("node:path");
+  const dir = dirname(fileURLToPath(import.meta.url));
+  const census = JSON.parse(await readFile(
+    join(dir, "../config/rechercher-omega-paddleocr-space-census.json"),
+    "utf8"
+  ));
+  assert.equal(census.source.reported_space_count, 28);
+  assert.equal(census.spaces.length, 28);
+  assert.ok(census.spaces.every(space => space.executable === false));
+  assert.ok(census.spaces.some(space => space.space_id === "embedl/hfviewer"));
+  assert.ok(census.spaces.some(space => space.space_id === "vivekreddyr/PaddleOCR-VL-Doc-Editor"));
+});
