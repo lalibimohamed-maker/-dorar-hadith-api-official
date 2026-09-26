@@ -84,12 +84,30 @@ def upload_bytes(upload_url, name, payload, content_type):
     upload_asset(upload_url, name, BytesIO(payload), len(payload), content_type)
 
 
+def release_assets(release):
+    """Return all release assets, including pages beyond the default page size."""
+    assets = []
+    page = 1
+    while True:
+        batch = gh_json(
+            f"/repos/{REPO}/releases/{release['id']}/assets?per_page=100&page={page}"
+        )
+        assets.extend(batch)
+        if len(batch) < 100:
+            break
+        page += 1
+    return {a["name"]: int(a["size"]) for a in assets}
+
+
 def main():
     api = HfApi()
     info = api.model_info(MODEL_ID, revision=REVISION, files_metadata=True)
 
     existing_release = release_info()
-    existing = {a["name"]: int(a["size"]) for a in existing_release.get("assets", [])}
+    # Use the dedicated assets endpoint rather than relying on the release payload's
+    # embedded asset list. This makes resume detection robust for large releases
+    # and avoids duplicate-upload races.
+    existing = release_assets(existing_release)
     upload_url = existing_release["upload_url"].replace("{?name,label}", "")
 
     if "release-manifest.json" in existing:
@@ -192,8 +210,27 @@ def main():
                         return data
 
                 wrapped = HashingReader(response, hasher)
-                upload_asset(upload_url, asset_name, wrapped, length)
-                existing[asset_name] = length
+                try:
+                    upload_asset(upload_url, asset_name, wrapped, length)
+                except RuntimeError as exc:
+                    # Another worker/attempt may have published the same asset after
+                    # our inventory snapshot. GitHub documents HTTP 422 for an
+                    # already-existing release-asset name. Refresh the authoritative
+                    # asset list and accept the asset only when its size is exact.
+                    message = str(exc)
+                    if "HTTP 422" not in message or "already_exists" not in message:
+                        raise
+                    refreshed = release_assets(existing_release)
+                    observed = refreshed.get(asset_name)
+                    if observed != length:
+                        raise RuntimeError(
+                            f"Release asset collision for {asset_name}: "
+                            f"expected {length} bytes, observed {observed}"
+                        ) from exc
+                    print(f"[SKIP-RACE] existing {asset_name} ({observed} bytes)")
+                    existing.update(refreshed)
+                else:
+                    existing[asset_name] = length
                 names.append(asset_name)
                 counted += length
 
