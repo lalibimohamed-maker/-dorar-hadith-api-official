@@ -156,6 +156,15 @@ def main():
     if asset_count > 1000:
         raise RuntimeError(f"{MODEL_ID}: Release would require {asset_count} assets")
 
+    missing_source_sha = [item["path"] for item in files if not item["sha256"]]
+    if missing_source_sha:
+        sample = ", ".join(missing_source_sha[:5])
+        suffix = " ..." if len(missing_source_sha) > 5 else ""
+        raise RuntimeError(
+            f"{MODEL_ID}: immutable source SHA-256 is missing for {len(missing_source_sha)} model file(s): "
+            f"{sample}{suffix}; refusing to publish unverifiable weights"
+        )
+
     manifest = []
 
     for item in files:
@@ -275,14 +284,10 @@ def main():
         if counted != source_size:
             raise RuntimeError(f"Source byte count mismatch for {source_path}: {counted} != {source_size}")
 
-        full_sha = hasher.hexdigest()
-        full_sha = source_sha or hasher.hexdigest()
-        if source_sha:
-            # Immutable Hugging Face/LFS SHA is authoritative and lets resumptions
-            # avoid re-downloading already published Release parts.
-            verified_sha = source_sha
-        else:
-            verified_sha = full_sha
+        # Hugging Face/LFS SHA is authoritative. Existing release parts are
+        # resumable without re-downloading them because this immutable digest
+        # identifies the complete source object.
+        verified_sha = source_sha
 
         manifest.append({
             "source_path": source_path,
