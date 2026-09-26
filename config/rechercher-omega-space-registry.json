@@ -166,6 +166,19 @@
       "status": "candidate",
       "license_review": "required",
       "notes": "Useful for multilingual tokenizer comparisons; not a PaddleOCR runtime dependency."
+    },
+    {
+      "id": "hf-hfviewer",
+      "space_id": "embedl/hfviewer",
+      "url": "https://huggingface.co/spaces/embedl/hfviewer",
+      "capabilities": [
+        "document_viewer",
+        "multimodal_document_preview"
+      ],
+      "use": "reference",
+      "status": "candidate",
+      "license_review": "required",
+      "notes": "Viewer/reference infrastructure associated with the PaddleOCR-VL-1.5 ecosystem; not a trusted OCR backend and not a Corpus dependency."
     }
   ]
 }
