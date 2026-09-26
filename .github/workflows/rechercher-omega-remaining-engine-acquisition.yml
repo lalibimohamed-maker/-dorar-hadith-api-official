@@ -17,59 +17,91 @@ permissions:
 
 concurrency:
   group: rechercher-omega-remaining-engine-acquisition
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
+  prepare-releases:
+    name: Prepare dedicated engine Releases
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Verify GitHub CLI
+        run: gh --version
+
+      - name: Create Releases serially
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          create_release() {
+            local tag="$1"
+            local title="$2"
+            local mode="$3"
+            local license="$4"
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "Release exists: $tag"
+              return 0
+            fi
+            if [ "$mode" = "draft" ]; then
+              gh release create "$tag" --target "$GITHUB_SHA" --draft                 --title "$title"                 --notes "Rechercher Ω draft distribution for review. License: $license."
+            else
+              gh release create "$tag" --target "$GITHUB_SHA" --prerelease                 --title "$title"                 --notes "Rechercher Ω model distribution. License: $license."
+            fi
+          }
+
+          create_release "rechercher-omega-qwen3-vl-v1.0.0" "Rechercher Ω — Qwen3-VL-4B-Instruct" "prerelease" "apache-2.0"
+          create_release "rechercher-omega-qwen3-omni-v1.0.0" "Rechercher Ω — Qwen3-Omni-30B-A3B-Instruct" "prerelease" "apache-2.0"
+          create_release "rechercher-omega-wan22-ti2v5b-v1.0.0" "Rechercher Ω — Wan2.2-TI2V-5B" "prerelease" "apache-2.0"
+          create_release "rechercher-omega-cogvideox2b-v1.0.0" "Rechercher Ω — CogVideoX-2B" "prerelease" "apache-2.0"
+          create_release "rechercher-omega-cosyvoice2-0.5b-v1.0.0" "Rechercher Ω — CosyVoice2-0.5B" "prerelease" "apache-2.0"
+          create_release "rechercher-omega-hunyuanvideo15-v1.0.0" "Rechercher Ω — HunyuanVideo-1.5 (draft)" "draft" "tencent-hunyuan-community"
+          create_release "rechercher-omega-ltx2-v1.0.0" "Rechercher Ω — LTX-2 (draft)" "draft" "ltx-2-community-license-agreement"
+
   acquire:
     name: ${{ matrix.id }}
+    needs: prepare-releases
     runs-on: ubuntu-24.04
     timeout-minutes: 330
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         include:
           - id: qwen3-vl
             model_id: Qwen/Qwen3-VL-4B-Instruct
             revision: ebb281ec70b05090aa6165b016eac8ec08e71b17
             release_tag: rechercher-omega-qwen3-vl-v1.0.0
-            release_mode: prerelease
             license: apache-2.0
           - id: qwen3-omni
             model_id: Qwen/Qwen3-Omni-30B-A3B-Instruct
             revision: 12a3ac6661e685620bbc6616b7217b26469a81dd
             release_tag: rechercher-omega-qwen3-omni-v1.0.0
-            release_mode: prerelease
             license: apache-2.0
           - id: wan2.2-ti2v-5b
             model_id: Wan-AI/Wan2.2-TI2V-5B
             revision: 37685f96025fc1425edccdd4b2bca3836ae917ff
             release_tag: rechercher-omega-wan22-ti2v5b-v1.0.0
-            release_mode: prerelease
             license: apache-2.0
           - id: cogvideox-2b
             model_id: zai-org/CogVideoX-2b
             revision: 1137dacfc2c9c012bed6a0793f4ecf2ca8e7ba01
             release_tag: rechercher-omega-cogvideox2b-v1.0.0
-            release_mode: prerelease
             license: apache-2.0
           - id: cosyvoice2-0.5b
             model_id: FunAudioLLM/CosyVoice2-0.5B
             revision: eec1ae6c79877dbd9379285cf8789c9e0879293d
             release_tag: rechercher-omega-cosyvoice2-0.5b-v1.0.0
-            release_mode: prerelease
             license: apache-2.0
           - id: hunyuanvideo-1.5
             model_id: tencent/HunyuanVideo-1.5
             revision: 9b49404b3f5df2a8f0b31df27a0c7ab872e7b038
             release_tag: rechercher-omega-hunyuanvideo15-v1.0.0
-            release_mode: draft
             license: tencent-hunyuan-community
           - id: ltx-2
             model_id: Lightricks/LTX-2
             revision: dfcc210
             release_tag: rechercher-omega-ltx2-v1.0.0
-            release_mode: draft
             license: ltx-2-community-license-agreement
 
     steps:
@@ -98,24 +130,6 @@ jobs:
               f.write("sha="+sha+"\n")
           PY
 
-      - name: Create dedicated Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ matrix.release_tag }}
-          RELEASE_MODE: ${{ matrix.release_mode }}
-          MODEL_ID: ${{ matrix.model_id }}
-          REVISION: ${{ steps.revision.outputs.sha }}
-          LICENSE_ID: ${{ matrix.license }}
-        run: |
-          set -euo pipefail
-          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            if [ "$RELEASE_MODE" = "draft" ]; then
-              gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --draft                 --title "Rechercher Ω — $MODEL_ID"                 --notes "Draft review distribution. Source revision: $REVISION. License: $LICENSE_ID."
-            else
-              gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --prerelease                 --title "Rechercher Ω — $MODEL_ID"                 --notes "Rechercher Ω model distribution. Source revision: $REVISION. License: $LICENSE_ID."
-            fi
-          fi
-
       - name: Stream model files into Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -141,7 +155,7 @@ jobs:
           api=HfApi()
 
           allowed_ext={".safetensors",".bin",".pt",".pth",".onnx",".json",".txt",".md",".yaml",".yml",".py",".model"}
-          skip_ext={".png",".jpg",".jpeg",".webp",".gif",".mp4",".wav",".mp3",".flac",".pdf"}
+          skip_ext={".png",".jpg",".jpeg",".webp",".gif",".mp4",".wav",".mp3",".flac",".pdf",".zip"}
           files=[]
           for name in api.list_repo_files(model, revision=revision, repo_type="model"):
               suffix=Path(name).suffix.lower()
