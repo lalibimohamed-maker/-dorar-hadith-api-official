@@ -10,3 +10,16 @@ test('Corpus and translation boundaries remain closed',()=>{assert.ok(s.includes
 test('acquisition resumes from durable Release inventory instead of re-downloading acquired cells',()=>{assert.ok(s.includes('ACQUISITION_EXISTING_INVENTORY'));assert.ok(s.includes('existingCells'));assert.ok(s.includes("status:'already-acquired'"));assert.match(s,/filter\(row=>!existingCells\.has/);});
 
 test('resume normalizes legacy Release cell identifiers to ledger cell IDs',()=>{assert.ok(s.includes('normalizeCellId'));assert.ok(s.includes('cellIdByNormalized'));assert.ok(s.includes('rawExistingCells'));});
+
+
+test('priority sources are searched before the remaining registered pool and web fallback is last resort',()=>{
+  assert.ok(s.includes('priorityIds=new Set'));
+  assert.ok(s.includes('openiti'));
+  assert.ok(s.includes('shamela'));
+  assert.ok(s.includes('waqfeya'));
+  assert.ok(s.includes('kitab_zenodo_full'));
+  assert.ok(s.includes('kitab_zenodo_primary'));
+  assert.ok(s.includes('webFallbackCandidates'));
+  assert.ok(s.includes('after-all-registered-sources'));
+  assert.ok(s.includes('discovery-only'));
+});
