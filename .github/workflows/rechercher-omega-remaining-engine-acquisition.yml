@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 330
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 2
       matrix:
         include:
           - id: cosyvoice2-0.5b
@@ -101,6 +101,11 @@ jobs:
           WORKDIR: ${{ runner.temp }}/omega-weight-release
         run: |
           set -euo pipefail
+          existing_manifest="$(gh api "/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".assets[].name" 2>/dev/null || true)"
+          if grep -Fxq "release-manifest.json" <<< "$existing_manifest"; then
+            echo "Release already contains release-manifest.json; skipping duplicate model download."
+            exit 0
+          fi
           rm -rf "$WORKDIR"
           mkdir -p "$WORKDIR/source"
 
