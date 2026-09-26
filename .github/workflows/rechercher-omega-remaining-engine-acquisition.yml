@@ -91,109 +91,107 @@ jobs:
               f.write("sha="+sha+"\n")
           PY
 
-      - name: Download and publish model files with HTTP Range streaming
+      - name: Download and publish model files with official HF client
         env:
           GH_TOKEN: \${{ github.token }}
           MODEL_ID: \${{ matrix.model_id }}
           REVISION: \${{ steps.revision.outputs.sha }}
           RELEASE_TAG: \${{ matrix.release_tag }}
           LICENSE_ID: \${{ matrix.license }}
-          WORKDIR: \${{ runner.temp }}/omega-range
+          WORKDIR: \${{ runner.temp }}/omega-hf-download
         run: |
           set -euo pipefail
           rm -rf "$WORKDIR"
-          mkdir -p "$WORKDIR"
+          mkdir -p "$WORKDIR/source"
 
-          python3 - <<'PY'
-          import hashlib, json, os, re, subprocess
-          from pathlib import Path
-          from urllib.parse import quote
+          python3 - <<'PY' > "$WORKDIR/files.tsv"
           from huggingface_hub import HfApi
-
-          model=os.environ["MODEL_ID"]
-          revision=os.environ["REVISION"]
-          tag=os.environ["RELEASE_TAG"]
-          work=Path(os.environ["WORKDIR"])
-
+          import os
+          from pathlib import Path
           allowed={".safetensors",".bin",".pt",".pth",".onnx",".json",".txt",".md",".yaml",".yml",".py",".model"}
           skip={".png",".jpg",".jpeg",".webp",".gif",".mp4",".wav",".mp3",".flac",".pdf",".zip"}
-
-          info=HfApi().model_info(model,revision=revision,files_metadata=True)
-          files=[]
-          for sibling in info.siblings:
-              name=sibling.rfilename
-              suffix=Path(name).suffix.lower()
-              base=Path(name).name
-              if base==".gitattributes" or suffix in skip:
+          info=HfApi().model_info(os.environ["MODEL_ID"],revision=os.environ["REVISION"],files_metadata=True)
+          for s in sorted(info.siblings, key=lambda x: x.rfilename):
+              n=s.rfilename
+              ext=Path(n).suffix.lower()
+              base=Path(n).name
+              if base==".gitattributes" or ext in skip:
                   continue
-              if suffix in allowed or base.upper() in {"LICENSE","NOTICE"}:
-                  files.append((name,int(sibling.size or 0)))
-          files.sort()
-
-          chunk_size=1536*1024*1024
-          records=[]
-          for filename, expected_size in files:
-              safe=re.sub(r"[^A-Za-z0-9._-]+","__",filename.replace("/","__"))
-              url="https://huggingface.co/"+model+"/resolve/"+revision+"/"+quote(filename,safe="/")+"?download=true"
-              total=0
-              digest=hashlib.sha256()
-              parts=[]
-
-              for start in range(0,expected_size,chunk_size):
-                  end=min(expected_size-1,start+chunk_size-1)
-                  need=end-start+1
-                  part_name="omega__"+safe
-                  if expected_size > chunk_size:
-                      part_name += ".part-"+f"{len(parts):04d}"
-                  chunk=work/part_name
-
-                  subprocess.run([
-                      "curl","--fail","--location","--retry","5","--retry-all-errors",
-                      "--connect-timeout","30","--max-time","3600",
-                      "--header","Accept: application/octet-stream",
-                      "--range",f"{start}-{end}",
-                      "--output",str(chunk),url
-                  ],check=True)
-
-                  actual=chunk.stat().st_size
-                  if actual != need:
-                      raise SystemExit(f"Range mismatch for {filename}: expected {need}, got {actual}")
-
-                  with chunk.open("rb") as fh:
-                      while True:
-                          data=fh.read(8*1024*1024)
-                          if not data:
-                              break
-                          digest.update(data)
-                  total += actual
-
-                  subprocess.run(["gh","release","upload",tag,str(chunk),"--clobber"],check=True)
-                  parts.append(part_name)
-                  chunk.unlink()
-
-              if total != expected_size:
-                  raise SystemExit(f"Size mismatch for {filename}: expected {expected_size}, got {total}")
-
-              records.append({
-                  "source_path":filename,
-                  "bytes":total,
-                  "sha256":digest.hexdigest(),
-                  "release_assets":parts
-              })
-
-          manifest={
-              "schema_version":"1.0.0",
-              "model_id":model,
-              "revision":revision,
-              "license":os.environ["LICENSE_ID"],
-              "transport":"http_range_streaming",
-              "chunk_bytes":chunk_size,
-              "files":records
-          }
-          out=work/"release-manifest.json"
-          out.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n")
-          subprocess.run(["gh","release","upload",tag,str(out),"--clobber"],check=True)
+              if ext in allowed or base.upper() in {"LICENSE","NOTICE"}:
+                  print(n + "\t" + str(int(s.size or 0)))
           PY
+
+          : > "$WORKDIR/manifest.tsv"
+
+          while IFS=$'\t' read -r source_path expected_size; do
+            [ -n "$source_path" ] || continue
+            echo "=== Downloading $source_path ($expected_size bytes) ==="
+
+            rm -rf "$WORKDIR/source"
+            mkdir -p "$WORKDIR/source"
+            hf download "$MODEL_ID" "$source_path" \
+              --revision "$REVISION" \
+              --local-dir "$WORKDIR/source"
+
+            file="$WORKDIR/source/$source_path"
+            test -s "$file"
+            actual_size="$(stat -c '%s' "$file")"
+            test "$actual_size" -eq "$expected_size"
+
+            safe="$(printf '%s' "$source_path" | sed 's#[^A-Za-z0-9._-]#__#g')"
+            digest="$(sha256sum "$file" | awk '{print $1}')"
+            assets=""
+
+            if [ "$actual_size" -lt 2147483647 ]; then
+              asset="$WORKDIR/omega__$safe"
+              cp "$file" "$asset"
+              gh release upload "$RELEASE_TAG" "$asset" --clobber
+              assets="$(basename "$asset")"
+              rm -f "$asset"
+            else
+              chunk_bytes=$((1536*1024*1024))
+              offset=0
+              part=0
+              while [ "$offset" -lt "$actual_size" ]; do
+                remaining=$((actual_size-offset))
+                count="$chunk_bytes"
+                if [ "$remaining" -lt "$count" ]; then
+                  count="$remaining"
+                fi
+                skip_mb=$((offset/1048576))
+                count_mb=$(((count+1048575)/1048576))
+                chunk="$WORKDIR/omega__$safe.part-$(printf '%04d' "$part")"
+                dd if="$file" of="$chunk" bs=1M skip="$skip_mb" count="$count_mb" iflag=fullblock status=none
+                if [ "$(stat -c '%s' "$chunk")" -gt "$count" ]; then
+                  truncate -s "$count" "$chunk"
+                fi
+                test "$(stat -c '%s' "$chunk")" -lt 2147483647
+                gh release upload "$RELEASE_TAG" "$chunk" --clobber
+                name="$(basename "$chunk")"
+                if [ -n "$assets" ]; then assets="$assets,$name"; else assets="$name"; fi
+                rm -f "$chunk"
+                offset=$((offset+count))
+                part=$((part+1))
+              done
+            fi
+
+            printf '%s\t%s\t%s\t%s\n' "$source_path" "$actual_size" "$digest" "$assets" >> "$WORKDIR/manifest.tsv"
+            rm -f "$file"
+          done < "$WORKDIR/files.tsv"
+
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          work=Path(os.environ["WORKDIR"])
+          rows=[]
+          for line in (work/"manifest.tsv").read_text().splitlines():
+              source,size,sha,assets=line.split("\t",3)
+              rows.append({"source_path":source,"bytes":int(size),"sha256":sha,"release_assets":assets.split(",") if assets else []})
+          payload={"schema_version":"1.0.0","model_id":os.environ["MODEL_ID"],"revision":os.environ["REVISION"],"license":os.environ["LICENSE_ID"],"transport":"huggingface_hub_download","files":rows}
+          (work/"release-manifest.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
+          PY
+
+          gh release upload "$RELEASE_TAG" "$WORKDIR/release-manifest.json" --clobber
 
       - name: Verify Release manifest
         env:
