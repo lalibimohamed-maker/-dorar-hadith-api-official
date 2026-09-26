@@ -150,10 +150,19 @@ jobs:
               continue
             fi
 
-            rm -rf "$WORKDIR/source"
-            mkdir -p "$WORKDIR/source"
-            hf download "$MODEL_ID" "$source_path" --revision "$REVISION" --local-dir "$WORKDIR/source"
-            file="$WORKDIR/source/$source_path"
+            rm -rf "$WORKDIR/source" "$WORKDIR/hf-cache"
+            mkdir -p "$WORKDIR/hf-cache"
+            file="$(python3 - "$source_path" <<'PY'
+          import os, sys
+          from huggingface_hub import hf_hub_download
+          print(hf_hub_download(
+              repo_id=os.environ["MODEL_ID"],
+              filename=sys.argv[1],
+              revision=os.environ["REVISION"],
+              cache_dir=os.environ["WORKDIR"] + "/hf-cache"
+          ))
+          PY
+            )"
             test -s "$file"
             actual_size="$(stat -c '%s' "$file")"
             digest="$(sha256sum "$file" | awk '{print $1}')"
