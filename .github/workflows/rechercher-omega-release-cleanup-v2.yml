@@ -1,0 +1,38 @@
+name: Rechercher Ω — clean stale Release assets
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - ".github/workflows/rechercher-omega-release-cleanup-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Delete stale diagnostic assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          remove() {
+            local tag="$1"
+            local name="$2"
+            asset_id="$(gh api "/repos/$REPO/releases/tags/$tag" --jq ".assets[] | select(.name==\"$name\") | .id" 2>/dev/null || true)"
+            if [ -n "$asset_id" ]; then
+              gh api --method DELETE "/repos/$REPO/releases/assets/$asset_id" >/dev/null
+              echo "deleted $tag/$name"
+            else
+              echo "absent $tag/$name"
+            fi
+          }
+          remove "rechercher-omega-qwen3-vl-v1.0.0" "qwen3-vl-range-stream-test-512m.part"
+          remove "rechercher-omega-qwen3-vl-v1.0.0" "qwen3-vl-upload-test-128m.part"
+          remove "rechercher-omega-cosyvoice2-0.5b-v1.0.0" "diagnostic.txt"
+          remove "rechercher-omega-cosyvoice2-0.5b-v1.0.0" "omega__CosyVoice-BlankEN__model.safetensors.part-0000"
