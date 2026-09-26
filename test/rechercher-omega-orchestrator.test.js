@@ -83,3 +83,18 @@ test("model tournament records reproducible evaluation dimensions", async () => 
   assert.ok(plan.metrics.includes("evidence_fidelity"));
   assert.equal(plan.selection, "benchmark_results_only");
 });
+
+
+test("new vision and speech workers are routable from the canonical registry", async () => {
+  const registry = await loadModelRegistry();
+  assert.ok(registry.models.some(model => model.id === "qwen3-vl"));
+  assert.ok(registry.models.some(model => model.id === "whisper"));
+
+  const visionPlan = buildPlan({ task: "image_understanding", output_kind: "analysis" }, registry);
+  assert.equal(visionPlan.status, "ready");
+  assert.equal(visionPlan.models[0].id, "qwen3-vl");
+
+  const speechPlan = buildPlan({ task: "automatic_speech_recognition", output_kind: "analysis" }, registry);
+  assert.equal(speechPlan.status, "ready");
+  assert.equal(speechPlan.models[0].id, "whisper");
+});
