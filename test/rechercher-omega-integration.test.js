@@ -72,7 +72,8 @@ test("Starter engine acquisition pins immutable full SHAs and stays review-only"
   for (const engine of profile.engines) {
     assert.match(engine.revision, /^[0-9a-f]{40}$/);
     assert.equal(engine.license_status, "verified_source_license");
-    assert.equal(engine.acquisition, "artifact");
+    assert.equal(engine.acquisition, "github_release");
+    assert.match(engine.release_tag, /^rechercher-omega-engines-v0\.1\.0$/);
   }
 });
 
