@@ -116,6 +116,10 @@ jobs:
           else
             gh release create "$RELEASE_TAG" --repo "$REPO" --prerelease --title "$RELEASE_TAG" --notes "Rechercher Omega prerelease: license terms accompany redistribution."
           fi
+          release_id="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json databaseId --jq '.databaseId')"
+          test -n "$release_id"
+          echo "OMEGA_RELEASE_ID=$release_id" >> "$GITHUB_ENV"
+          echo "[OK] Release ID: $release_id"
       - name: Stream weights directly into Release
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}

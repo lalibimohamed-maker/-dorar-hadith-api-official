@@ -21,6 +21,7 @@ RELEASE_TAG = os.environ["RELEASE_TAG"]
 LICENSE_ID = os.environ["LICENSE_ID"]
 REPO = os.environ["GITHUB_REPOSITORY"]
 TOKEN = os.environ["GH_TOKEN"]
+RELEASE_ID = os.environ.get("OMEGA_RELEASE_ID", "").strip()
 
 JSON_HEADERS = {
     "Accept": "application/vnd.github+json",
@@ -37,6 +38,8 @@ def gh_json(path):
 
 
 def release_info():
+    if RELEASE_ID:
+        return gh_json(f"/repos/{REPO}/releases/{urllib.parse.quote(RELEASE_ID, safe='')}")
     try:
         return gh_json(f"/repos/{REPO}/releases/tags/{urllib.parse.quote(RELEASE_TAG, safe='')}")
     except urllib.error.HTTPError as exc:
