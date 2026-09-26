@@ -34,15 +34,17 @@
     {
       "model_id": "qwen3-omni",
       "source_repo": "https://github.com/QwenLM/Qwen3-Omni",
-      "revision": null,
-      "weight_license_status": "review_required",
+      "revision": "12a3ac6661e685620bbc6616b7217b26469a81dd",
+      "weight_license_status": "verified_source_license",
       "acquisition": "runtime_only",
       "verification": {
         "mode": "not_acquired",
-        "requires_immutable_revision": true,
-        "requires_sha256": true,
+        "requires_sha256_before_promotion": true,
         "requires_license_clearance": true
-      }
+      },
+      "revision_type": "immutable_hf_commit",
+      "resource_class": "xlarge",
+      "approximate_size_gb": 70.5
     },
     {
       "model_id": "paddleocr-vl",
