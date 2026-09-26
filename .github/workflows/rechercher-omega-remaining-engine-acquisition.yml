@@ -1,0 +1,224 @@
+name: Rechercher Ω — acquire remaining engine fleet
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - "config/rechercher-omega-remaining-engine-releases.json"
+      - ".github/workflows/rechercher-omega-remaining-engine-acquisition.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# security-justification: scoped upload of model binaries to dedicated Releases. No Git source or Corpus writes.
+# Hunyuan/LTX use draft releases pending license review. FLUX is gated and is not downloaded.
+
+concurrency:
+  group: rechercher-omega-remaining-engine-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquire:
+    name: ${{ matrix.id }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - id: qwen3-vl
+            model_id: Qwen/Qwen3-VL-4B-Instruct
+            revision: ebb281ec70b05090aa6165b016eac8ec08e71b17
+            release_tag: rechercher-omega-qwen3-vl-v1.0.0
+            release_mode: prerelease
+            license: apache-2.0
+          - id: qwen3-omni
+            model_id: Qwen/Qwen3-Omni-30B-A3B-Instruct
+            revision: 12a3ac6661e685620bbc6616b7217b26469a81dd
+            release_tag: rechercher-omega-qwen3-omni-v1.0.0
+            release_mode: prerelease
+            license: apache-2.0
+          - id: wan2.2-ti2v-5b
+            model_id: Wan-AI/Wan2.2-TI2V-5B
+            revision: 37685f96025fc1425edccdd4b2bca3836ae917ff
+            release_tag: rechercher-omega-wan22-ti2v5b-v1.0.0
+            release_mode: prerelease
+            license: apache-2.0
+          - id: cogvideox-2b
+            model_id: zai-org/CogVideoX-2b
+            revision: 1137dacfc2c9c012bed6a0793f4ecf2ca8e7ba01
+            release_tag: rechercher-omega-cogvideox2b-v1.0.0
+            release_mode: prerelease
+            license: apache-2.0
+          - id: cosyvoice2-0.5b
+            model_id: FunAudioLLM/CosyVoice2-0.5B
+            revision: eec1ae6c79877dbd9379285cf8789c9e0879293d
+            release_tag: rechercher-omega-cosyvoice2-0.5b-v1.0.0
+            release_mode: prerelease
+            license: apache-2.0
+          - id: hunyuanvideo-1.5
+            model_id: tencent/HunyuanVideo-1.5
+            revision: 9b49404b3f5df2a8f0b31df27a0c7ab872e7b038
+            release_tag: rechercher-omega-hunyuanvideo15-v1.0.0
+            release_mode: draft
+            license: tencent-hunyuan-community
+          - id: ltx-2
+            model_id: Lightricks/LTX-2
+            revision: dfcc210
+            release_tag: rechercher-omega-ltx2-v1.0.0
+            release_mode: draft
+            license: ltx-2-community-license-agreement
+
+    steps:
+      - name: Verify GitHub CLI
+        run: gh --version
+
+      - name: Install Hugging Face Hub client
+        run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Resolve immutable revision
+        id: revision
+        env:
+          MODEL_ID: ${{ matrix.model_id }}
+          REQUESTED_REVISION: ${{ matrix.revision }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, re
+          from huggingface_hub import HfApi
+          info=HfApi().model_info(os.environ["MODEL_ID"], revision=os.environ["REQUESTED_REVISION"], files_metadata=False)
+          sha=info.sha
+          if not re.fullmatch(r"[0-9a-f]{40}", sha):
+              raise SystemExit("Revision was not resolved to a full SHA")
+          print("Resolved revision:", sha)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("sha="+sha+"\n")
+          PY
+
+      - name: Create dedicated Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          RELEASE_MODE: ${{ matrix.release_mode }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+          LICENSE_ID: ${{ matrix.license }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            if [ "$RELEASE_MODE" = "draft" ]; then
+              gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --draft                 --title "Rechercher Ω — $MODEL_ID"                 --notes "Draft review distribution. Source revision: $REVISION. License: $LICENSE_ID."
+            else
+              gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --prerelease                 --title "Rechercher Ω — $MODEL_ID"                 --notes "Rechercher Ω model distribution. Source revision: $REVISION. License: $LICENSE_ID."
+            fi
+          fi
+
+      - name: Stream model files into Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          LICENSE_ID: ${{ matrix.license }}
+          WORKDIR: ${{ runner.temp }}/omega-stream
+        run: |
+          set -euo pipefail
+          rm -rf "$WORKDIR"
+          mkdir -p "$WORKDIR"
+
+          python3 - <<'PY'
+          import hashlib, json, os, re, subprocess, urllib.request
+          from pathlib import Path
+          from huggingface_hub import HfApi, hf_hub_url
+
+          model=os.environ["MODEL_ID"]
+          revision=os.environ["REVISION"]
+          tag=os.environ["RELEASE_TAG"]
+          work=Path(os.environ["WORKDIR"])
+          api=HfApi()
+
+          allowed_ext={".safetensors",".bin",".pt",".pth",".onnx",".json",".txt",".md",".yaml",".yml",".py",".model"}
+          skip_ext={".png",".jpg",".jpeg",".webp",".gif",".mp4",".wav",".mp3",".flac",".pdf"}
+          files=[]
+          for name in api.list_repo_files(model, revision=revision, repo_type="model"):
+              suffix=Path(name).suffix.lower()
+              base=Path(name).name
+              if base == ".gitattributes" or suffix in skip_ext:
+                  continue
+              if suffix in allowed_ext or base.upper() in {"LICENSE","NOTICE"}:
+                  files.append(name)
+          files.sort()
+          if not files:
+              raise SystemExit("No supported model files found")
+
+          chunk_size=1536*1024*1024
+          manifest=[]
+          for filename in files:
+              url=hf_hub_url(model, filename, revision=revision)
+              safe=re.sub(r"[^A-Za-z0-9._-]+","__",filename.replace("/","__"))
+              temp=work/(safe+".partial")
+              total=0
+              overall=hashlib.sha256()
+              part_assets=[]
+              part_no=0
+
+              with urllib.request.urlopen(url, timeout=180) as src:
+                  while True:
+                      data=src.read(8*1024*1024)
+                      if not data:
+                          break
+                      offset=0
+                      while offset < len(data):
+                          need=chunk_size-(total % chunk_size)
+                          piece=data[offset:offset+need]
+                          with temp.open("ab") as out:
+                              out.write(piece)
+                          overall.update(piece)
+                          total += len(piece)
+                          offset += len(piece)
+                          if temp.stat().st_size >= chunk_size:
+                              asset_name=f"omega__{safe}.part-{part_no:04d}"
+                              gh=work/asset_name
+                              temp.rename(gh)
+                              subprocess.run(["gh","release","upload",tag,str(gh),"--clobber"],check=True)
+                              part_assets.append(asset_name)
+                              gh.unlink()
+                              part_no += 1
+
+              if temp.exists():
+                  asset_name=f"omega__{safe}" if part_no == 0 else f"omega__{safe}.part-{part_no:04d}"
+                  temp.rename(work/asset_name)
+                  subprocess.run(["gh","release","upload",tag,str(work/asset_name),"--clobber"],check=True)
+                  part_assets.append(asset_name)
+                  (work/asset_name).unlink()
+
+              manifest.append({
+                  "source_path":filename,
+                  "bytes":total,
+                  "sha256":overall.hexdigest(),
+                  "release_assets":part_assets
+              })
+
+          payload={
+              "schema_version":"1.0.0",
+              "model_id":model,
+              "revision":revision,
+              "license":os.environ["LICENSE_ID"],
+              "reconstruction":"concatenate_release_assets_in_list_order",
+              "files":manifest
+          }
+          mpath=work/"release-manifest.json"
+          mpath.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
+          subprocess.run(["gh","release","upload",tag,str(mpath),"--clobber"],check=True)
+          PY
+
+      - name: Verify Release manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          gh release view "$RELEASE_TAG" --json tagName,url,assets
