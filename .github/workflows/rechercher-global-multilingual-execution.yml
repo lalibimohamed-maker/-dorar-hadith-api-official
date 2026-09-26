@@ -63,7 +63,7 @@ jobs:
           esac
           SH
           chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
-          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1
           test -n "$(git ls-remote "$storage_url" HEAD)"
           rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
           git clone --depth 1 "$storage_url" "$RUNNER_TEMP/matrix-storage-preflight"
