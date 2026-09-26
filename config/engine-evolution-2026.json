@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "2.0.0",
-  "verifiedAt": "2026-08-30",
+  "schemaVersion": "2.1.0",
+  "verifiedAt": "2026-09-26",
   "baseMain": "52f5567ddd226cf7f45b0ed6bb779b5391878607",
   "purpose": "Continuous, measurable evaluation of free-first and self-hosted engines without changing canonical scholarly content.",
   "principles": {
@@ -44,7 +44,10 @@
   "engines": {
     "ocr": {
       "primary": "paddleocr",
-      "alternates": ["tesseract", "kraken"],
+      "alternates": [
+        "tesseract",
+        "kraken"
+      ],
       "status": "candidate",
       "versionReference": "3.7.0",
       "softwareLicense": "Apache-2.0",
@@ -54,7 +57,9 @@
     },
     "search_text": {
       "primary": "opensearch",
-      "alternates": ["meilisearch"],
+      "alternates": [
+        "meilisearch"
+      ],
       "status": "candidate",
       "versionReference": "3.6.0",
       "softwareLicense": "Apache-2.0",
@@ -73,16 +78,21 @@
     },
     "search_semantic": {
       "primary": "qdrant",
-      "alternates": ["oxigraph"],
+      "alternates": [
+        "oxigraph"
+      ],
       "status": "candidate",
       "versionReference": "1.18.x",
       "softwareLicense": "Apache-2.0",
       "modelLicense": "embedding_model_dependent",
-      "watch": "hybrid recall, Arabic embeddings, latency, memory, filtering, provenance"
+      "watch": "hybrid recall, Arabic embeddings, latency, memory, filtering, provenance",
+      "source": "https://github.com/qdrant/qdrant"
     },
     "knowledge_graph": {
       "primary": "oxigraph",
-      "alternates": ["apache-jena"],
+      "alternates": [
+        "apache-jena"
+      ],
       "status": "candidate",
       "versionReference": "rolling",
       "softwareLicense": "MIT OR Apache-2.0",
@@ -92,7 +102,9 @@
     },
     "translation": {
       "primary": "argostranslate",
-      "alternates": ["libretranslate"],
+      "alternates": [
+        "libretranslate"
+      ],
       "status": "candidate",
       "versionReference": "Argos 1.4.0 / LibreTranslate 1.9.6",
       "softwareLicense": "MIT / AGPL-3.0 respectively",
@@ -130,12 +142,159 @@
     },
     "image_restoration": {
       "primary": "real-esrgan",
-      "alternates": ["swinir"],
+      "alternates": [
+        "swinir"
+      ],
       "status": "license_gated",
       "versionReference": "0.3.0",
       "softwareLicense": "verify_current_project_license",
       "modelLicense": "verify_per_weight",
       "watch": "artifact rate, Arabic text legibility, source faithfulness, weight provenance"
+    },
+    "omega_support": {
+      "purpose": "Rechercher Ω free-first support layer for semantic retrieval, reranking, agent safety, vector persistence, and tool routing.",
+      "policy": {
+        "paidApiRequired": false,
+        "subscriptionRequired": false,
+        "selfHostedPreferred": true,
+        "runtimeOnlyWherePossible": true,
+        "modelDownloadOptional": true,
+        "failClosedOnUnknownRights": true,
+        "softwareLicenseDistinctFromModelLicense": true
+      },
+      "components": [
+        {
+          "id": "embedding",
+          "name": "Qwen3-Embedding-4B",
+          "alternates": [
+            "BAAI/bge-m3",
+            "Alibaba-NLP/gte-Qwen2-1.5B-instruct"
+          ],
+          "role": "Convert Arabic and multilingual documents into dense vectors for semantic and hybrid retrieval.",
+          "status": "candidate",
+          "softwareLicense": "Apache-2.0",
+          "modelLicense": "Apache-2.0",
+          "source": "https://huggingface.co/Qwen/Qwen3-Embedding-4B",
+          "alternatesLicense": {
+            "BAAI/bge-m3": "MIT",
+            "Alibaba-NLP/gte-Qwen2-1.5B-instruct": "verify_current_model_license"
+          },
+          "integration": {
+            "feeds": [
+              "search_semantic",
+              "vector_storage"
+            ],
+            "recommendedDimension": 2560,
+            "multilingual": true,
+            "arabicSupported": true
+          },
+          "watch": "Arabic retrieval quality, memory footprint, CPU/GPU throughput, reproducibility, model provenance"
+        },
+        {
+          "id": "reranking",
+          "name": "BAAI/bge-reranker-v2-m3",
+          "alternates": [
+            "Qwen/Qwen3-Reranker-0.6B",
+            "jinaai/jina-reranker-v2-base-multilingual"
+          ],
+          "role": "Re-rank retrieved passages before context assembly so the strongest evidence is passed upstream.",
+          "status": "candidate",
+          "softwareLicense": "Apache-2.0",
+          "modelLicense": "Apache-2.0",
+          "source": "https://huggingface.co/BAAI/bge-reranker-v2-m3",
+          "alternatesLicense": {
+            "Qwen/Qwen3-Reranker-0.6B": "Apache-2.0",
+            "jinaai/jina-reranker-v2-base-multilingual": "CC-BY-NC-4.0"
+          },
+          "integration": {
+            "input": "search_semantic.topK",
+            "output": "evidence.reranked",
+            "multilingual": true
+          },
+          "watch": "Arabic and cross-lingual ranking quality, latency, max context, license changes"
+        },
+        {
+          "id": "agent_guardrail_firewall",
+          "name": "LlamaFirewall",
+          "alternates": [
+            "Guardrails AI"
+          ],
+          "role": "Inspect user/system/tool messages for prompt-injection and related agent safety signals before privileged tool execution.",
+          "status": "candidate",
+          "softwareLicense": "MIT (LlamaFirewall component)",
+          "modelLicense": "scanner-dependent; verify per scanner/model",
+          "source": "https://github.com/meta-llama/PurpleLlama/tree/main/LlamaFirewall",
+          "integration": {
+            "position": "pre_tool_execution",
+            "scopes": [
+              "input",
+              "system",
+              "tool_call",
+              "output"
+            ],
+            "failClosed": true
+          },
+          "watch": "scanner coverage, false positives, tool-call interception, dependency licenses, threat-model updates"
+        },
+        {
+          "id": "vector_storage",
+          "name": "Qdrant",
+          "alternates": [
+            "Milvus"
+          ],
+          "role": "Persist and index embeddings plus provenance/filter metadata for semantic and hybrid retrieval.",
+          "status": "candidate",
+          "softwareLicense": "Apache-2.0",
+          "modelLicense": "not_applicable",
+          "source": "https://github.com/qdrant/qdrant",
+          "alternateLicense": {
+            "Milvus": "Apache-2.0"
+          },
+          "integration": {
+            "feedsFrom": [
+              "embedding"
+            ],
+            "queriesFrom": [
+              "search_semantic",
+              "reranking"
+            ],
+            "metadataRequired": [
+              "source",
+              "document_id",
+              "language",
+              "rights_status",
+              "sha256",
+              "location"
+            ],
+            "selfHosted": true,
+            "dockerSupported": true
+          },
+          "watch": "index size, Arabic recall, hybrid search, filtering, durability, resource cost"
+        },
+        {
+          "id": "agent_orchestration",
+          "name": "NVIDIA NeMo Guardrails",
+          "alternates": [],
+          "role": "Declarative orchestration and policy routing across specialized Rechercher Ω engines and tools.",
+          "status": "candidate",
+          "softwareLicense": "Apache-2.0",
+          "modelLicense": "not_applicable",
+          "source": "https://github.com/NVIDIA-NeMo/Guardrails",
+          "integration": {
+            "routes": {
+              "image": "FLUX",
+              "document_ocr": "PaddleOCR-VL",
+              "speech_to_text": "whisper.cpp",
+              "text_to_speech": "CosyVoice2-0.5B",
+              "multimodal_reasoning": "Qwen3-Omni-30B-A3B-Instruct",
+              "text_reasoning": "Qwen3-0.6B"
+            },
+            "policy": "route -> guard -> execute -> verify -> cite",
+            "canonicalCorpusWrite": false
+          },
+          "watch": "rail compatibility, tool-calling behavior, policy evaluation, dependency health, Arabic intent routing"
+        }
+      ]
     }
   },
   "promotionPolicy": {
