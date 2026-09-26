@@ -75,3 +75,26 @@ test("Starter engine acquisition pins immutable full SHAs and stays review-only"
     assert.equal(engine.acquisition, "artifact");
   }
 });
+
+
+test("expanded engine fleet keeps heavyweight models out of automatic acquisition", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const registry = JSON.parse(await readFile(
+    new URL("../config/rechercher-omega-model-registry.json", import.meta.url), "utf8"
+  ));
+  const acquisition = JSON.parse(await readFile(
+    new URL("../config/rechercher-omega-engine-acquisition.json", import.meta.url), "utf8"
+  ));
+
+  const ids = new Set(registry.models.map(model => model.id));
+  for (const required of ["qwen3", "qwen3-vl", "qwen3-omni", "paddleocr-vl", "whisper", "cosyvoice", "wan2.2", "hunyuanvideo-1.5", "ltx-2", "cogvideox", "flux", "sglang"]) {
+    assert.ok(ids.has(required), "missing canonical engine " + required);
+  }
+
+  const acquired = new Set(acquisition.engines.map(engine => engine.logical_id));
+  assert.deepEqual([...acquired].sort(), ["paddleocr-vl", "qwen3", "whisper-tiny"].sort());
+
+  const omni = registry.models.find(model => model.id === "qwen3-omni");
+  assert.equal(omni.resource_class, "xlarge");
+  assert.equal(omni.approximate_size_gb, 70.5);
+});
