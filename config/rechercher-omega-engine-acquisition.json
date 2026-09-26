@@ -7,7 +7,12 @@
     "corpus_write_allowed": false,
     "persistent_mirror_requires_license_clearance": true,
     "sha256_required": true,
-    "immutable_revision_required": true
+    "immutable_revision_required": true,
+    "license_statuses": [
+      "verified_source_license",
+      "review_required",
+      "blocked"
+    ]
   },
   "engines": [
     {
@@ -23,7 +28,9 @@
         "tool_use"
       ],
       "acquisition": "artifact",
-      "revision_type": "immutable_hf_commit"
+      "revision_type": "immutable_hf_commit",
+      "license_status": "verified_source_license",
+      "license_basis": "Hugging Face model card declares Apache-2.0; redistribution/promotion remains subject to project rights gate."
     },
     {
       "logical_id": "paddleocr-vl",
@@ -38,7 +45,9 @@
         "multilingual_document_parsing"
       ],
       "acquisition": "artifact",
-      "revision_type": "immutable_hf_commit"
+      "revision_type": "immutable_hf_commit",
+      "license_status": "verified_source_license",
+      "license_basis": "Hugging Face model card declares Apache-2.0; redistribution/promotion remains subject to project rights gate."
     }
   ]
 }
