@@ -1,0 +1,92 @@
+name: Rechercher Ω — finalize starter Release inventory v2
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - ".github/workflows/rechercher-omega-engine-release-finalize-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# security-justification: scoped maintenance of the dedicated model Release asset inventory; no source or Corpus writes.
+
+concurrency:
+  group: rechercher-omega-engine-release
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    name: Finalize starter Release inventory v2
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Install Hugging Face Hub client
+        run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Restore required Whisper asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKDIR: ${{ runner.temp }}/omega-release-finalize
+        run: |
+          set -euo pipefail
+          TAG="rechercher-omega-engines-v0.1.0"
+          if ! gh release view "$TAG" --json assets --jq '.assets[].name' | grep -Fxq 'whisper-tiny-model.safetensors'; then
+            rm -rf "$WORKDIR"
+            mkdir -p "$WORKDIR"
+            hf download "openai/whisper-tiny" model.safetensors               --revision "169d4a4341b33bc18d8881c4b69c2e104e1cc0af"               --local-dir "$WORKDIR/whisper-tiny"
+            test -s "$WORKDIR/whisper-tiny/model.safetensors"
+            test "$(stat -c '%s' "$WORKDIR/whisper-tiny/model.safetensors")" -lt 2147483647
+            gh release upload "$TAG" "$WORKDIR/whisper-tiny/model.safetensors#whisper-tiny-model.safetensors" --clobber
+          fi
+
+      - name: Remove unexpected Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="rechercher-omega-engines-v0.1.0"
+          expected=$'qwen3-model.safetensors\nqwen3-runtime-files.tar.gz\nqwen3-release-manifest.json\npaddleocr-vl-runtime-files.tar.gz\npaddleocr-vl-release-manifest.json\nwhisper-tiny-model.safetensors\nwhisper-tiny-runtime-files.tar.gz\nwhisper-tiny-release-manifest.json'
+          expected="$expected"$'\n'$(python3 - <<'PY'
+          import json
+          m=json.load(open("config/rechercher-omega-engine-release.json"))
+          for e in m["engines"]:
+              for name in e["asset_plan"]:
+                  if name.startswith("paddleocr-vl-model.safetensors.part-"):
+                      print(name)
+          PY
+          )
+          while IFS= read -r name; do
+            [ -n "$name" ] || continue
+            case "$name" in
+              qwen3-model.safetensors|qwen3-runtime-files.tar.gz|qwen3-release-manifest.json|              paddleocr-vl-model.safetensors.part-*|paddleocr-vl-runtime-files.tar.gz|paddleocr-vl-release-manifest.json|              whisper-tiny-model.safetensors|whisper-tiny-runtime-files.tar.gz|whisper-tiny-release-manifest.json)
+                ;;
+              *)
+                gh release delete-asset "$TAG" "$name" --yes
+                ;;
+            esac
+          done < <(gh release view "$TAG" --json assets --jq '.assets[].name')
+
+      - name: Verify exact Release inventory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, subprocess
+          cfg=json.load(open("config/rechercher-omega-engine-release.json"))
+          actual=set(subprocess.check_output(
+              ["gh","release","view",cfg["release_tag"],"--json","assets","--jq",".assets[].name"],
+              text=True
+          ).splitlines())
+          expected={name for e in cfg["engines"] for name in e["asset_plan"]}
+          missing=sorted(expected-actual)
+          unexpected=sorted(actual-expected)
+          if missing or unexpected:
+              print("Missing:",missing)
+              print("Unexpected:",unexpected)
+              raise SystemExit(1)
+          print("Exact Release inventory verified:",len(expected),"assets")
+          PY
