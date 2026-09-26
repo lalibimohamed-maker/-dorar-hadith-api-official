@@ -12,6 +12,8 @@ on:
 permissions:
   contents: write
 
+# security-justification: required only to create and upload the immutable model Release assets; no source/corpus writes are performed.
+
 concurrency:
   group: rechercher-omega-engine-release
   cancel-in-progress: false
