@@ -13,7 +13,8 @@
         "ar"
       ],
       "role": "book/PDF acquisition",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 0
     },
     {
       "id": "shamela",
@@ -24,7 +25,8 @@
         "ar"
       ],
       "role": "Arabic book/text identity and discovery",
-      "rights": "item/source-level"
+      "rights": "item/source-level",
+      "priority_tier": 0
     },
     {
       "id": "dorar",
@@ -35,7 +37,8 @@
         "ar"
       ],
       "role": "hadith/source discovery and verification",
-      "rights": "site/source-level"
+      "rights": "site/source-level",
+      "priority_tier": 2
     },
     {
       "id": "internet_archive",
@@ -46,7 +49,8 @@
         "multi"
       ],
       "role": "digital-copy/PDF acquisition fallback",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 0
     },
     {
       "id": "openlibrary",
@@ -57,7 +61,8 @@
         "multi"
       ],
       "role": "work/edition and archive identifier resolution",
-      "rights": "metadata is not download permission"
+      "rights": "metadata is not download permission",
+      "priority_tier": 2
     },
     {
       "id": "worldcat",
@@ -68,7 +73,8 @@
         "multi"
       ],
       "role": "global library identity and holdings",
-      "rights": "catalogue"
+      "rights": "catalogue",
+      "priority_tier": 2
     },
     {
       "id": "hathitrust",
@@ -79,7 +85,8 @@
         "multi"
       ],
       "role": "library identity and digital access",
-      "rights": "item/access-level"
+      "rights": "item/access-level",
+      "priority_tier": 2
     },
     {
       "id": "dpla",
@@ -90,7 +97,8 @@
         "multi"
       ],
       "role": "cultural heritage aggregation",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "europeana",
@@ -101,7 +109,8 @@
         "multi"
       ],
       "role": "cultural heritage aggregation and IIIF",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "openiti",
@@ -114,7 +123,8 @@
         "multi"
       ],
       "role": "Arabic/Islamicate text identity and version metadata",
-      "rights": "dataset-level"
+      "rights": "dataset-level",
+      "priority_tier": 0
     },
     {
       "id": "openiti_github",
@@ -127,7 +137,8 @@
         "multi"
       ],
       "role": "machine-readable corpus evidence",
-      "rights": "repository-level"
+      "rights": "repository-level",
+      "priority_tier": 0
     },
     {
       "id": "nyu_aco",
@@ -138,7 +149,8 @@
         "ar"
       ],
       "role": "Arabic public-domain digital books/PDF",
-      "rights": "collection/item-level"
+      "rights": "collection/item-level",
+      "priority_tier": 2
     },
     {
       "id": "smithsonian",
@@ -149,7 +161,8 @@
         "multi"
       ],
       "role": "manuscript/book discovery and qualifying digital copies",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "princeton_islamic_mss",
@@ -163,7 +176,8 @@
         "multi"
       ],
       "role": "Islamic manuscript discovery/provenance",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "kairawan",
@@ -175,7 +189,8 @@
         "multi"
       ],
       "role": "cross-library manuscript discovery/source resolution",
-      "rights": "follow holding institution"
+      "rights": "follow holding institution",
+      "priority_tier": 2
     },
     {
       "id": "british_library",
@@ -189,7 +204,8 @@
         "multi"
       ],
       "role": "manuscript and digital heritage discovery",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "british_library_eap",
@@ -200,7 +216,8 @@
         "multi"
       ],
       "role": "endangered archive/manuscript discovery",
-      "rights": "collection/item-level"
+      "rights": "collection/item-level",
+      "priority_tier": 2
     },
     {
       "id": "gallica_bnf",
@@ -215,7 +232,8 @@
         "multi"
       ],
       "role": "heritage print and manuscript discovery",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "fihrist_bodleian",
@@ -229,7 +247,8 @@
         "multi"
       ],
       "role": "Islamic manuscript catalogue and holding-library resolution",
-      "rights": "holding-library"
+      "rights": "holding-library",
+      "priority_tier": 2
     },
     {
       "id": "cambridge_cudl",
@@ -243,7 +262,8 @@
         "multi"
       ],
       "role": "Arabic/Islamic manuscript discovery",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "vatican",
@@ -256,7 +276,8 @@
         "multi"
       ],
       "role": "Arabic/Islamic manuscript discovery",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "al_furqan",
@@ -273,7 +294,8 @@
         "multi"
       ],
       "role": "Islamic heritage books/manuscripts discovery",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "wikimedia_commons",
@@ -284,7 +306,8 @@
         "multi"
       ],
       "role": "open/public-domain scans and manuscripts",
-      "rights": "file-level license"
+      "rights": "file-level license",
+      "priority_tier": 2
     },
     {
       "id": "wikisource_ar",
@@ -295,7 +318,8 @@
         "ar"
       ],
       "role": "public-domain text/scan/PDF discovery",
-      "rights": "file-level"
+      "rights": "file-level",
+      "priority_tier": 2
     },
     {
       "id": "qatar_digital_library",
@@ -308,7 +332,8 @@
         "multi"
       ],
       "role": "Middle Eastern history, manuscripts and Arabic Islamic science heritage",
-      "rights": "platform/item-level; QDL states free use/reuse"
+      "rights": "platform/item-level; QDL states free use/reuse",
+      "priority_tier": 2
     },
     {
       "id": "qnl_repository",
@@ -325,7 +350,8 @@
         "multi"
       ],
       "role": "rare Arabic manuscripts, early print, books and heritage material",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "qnl_heritage",
@@ -341,7 +367,8 @@
         "multi"
       ],
       "role": "manuscript and rare-book discovery",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "qnl_manara",
@@ -353,7 +380,8 @@
         "multi"
       ],
       "role": "OCR corpus and machine-readable text evidence",
-      "rights": "dataset-level"
+      "rights": "dataset-level",
+      "priority_tier": 2
     },
     {
       "id": "qatar_ministry_islamic_affairs",
@@ -364,7 +392,8 @@
         "ar"
       ],
       "role": "official Islamic publications and book discovery",
-      "rights": "government/item-level"
+      "rights": "government/item-level",
+      "priority_tier": 2
     },
     {
       "id": "saudi_moia_ebook",
@@ -376,7 +405,8 @@
         "multi"
       ],
       "role": "official Islamic books, audio and multilingual religious material",
-      "rights": "site/item-level"
+      "rights": "site/item-level",
+      "priority_tier": 2
     },
     {
       "id": "saudi_moia_elibrary",
@@ -387,7 +417,8 @@
         "ar"
       ],
       "role": "official ministry publications and downloadable copies",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "king_fahd_national_library",
@@ -399,7 +430,8 @@
         "multi"
       ],
       "role": "national bibliography, manuscripts and rare books discovery",
-      "rights": "catalogue/item-level"
+      "rights": "catalogue/item-level",
+      "priority_tier": 2
     },
     {
       "id": "king_fahd_catalog",
@@ -411,7 +443,8 @@
         "multi"
       ],
       "role": "national catalogue and holdings resolution",
-      "rights": "catalogue"
+      "rights": "catalogue",
+      "priority_tier": 2
     },
     {
       "id": "king_abdulaziz_public_library",
@@ -423,7 +456,8 @@
         "multi"
       ],
       "role": "Arabic/Islamic book and heritage collection discovery",
-      "rights": "item-level"
+      "rights": "item-level",
+      "priority_tier": 2
     },
     {
       "id": "ksu_library",
@@ -435,7 +469,8 @@
         "multi"
       ],
       "role": "books, manuscripts, rare books and government publications discovery",
-      "rights": "item/access-level"
+      "rights": "item/access-level",
+      "priority_tier": 2
     },
     {
       "id": "rsl",
@@ -449,7 +484,8 @@
         "multi"
       ],
       "role": "digital books, manuscripts, cultural heritage and early print",
-      "rights": "item/access-level"
+      "rights": "item/access-level",
+      "priority_tier": 2
     },
     {
       "id": "rsl_catalogue",
@@ -462,7 +498,8 @@
         "multi"
       ],
       "role": "global bibliographic holdings and manuscript identity",
-      "rights": "catalogue"
+      "rights": "catalogue",
+      "priority_tier": 2
     },
     {
       "id": "rsl_manuscripts",
@@ -476,7 +513,8 @@
         "multi"
       ],
       "role": "manuscript discovery and digitized copies",
-      "rights": "item/access-level"
+      "rights": "item/access-level",
+      "priority_tier": 2
     },
     {
       "id": "nlr_russia",
@@ -490,7 +528,8 @@
         "multi"
       ],
       "role": "Oriental and Islamic manuscript discovery",
-      "rights": "item/access-level"
+      "rights": "item/access-level",
+      "priority_tier": 2
     },
     {
       "id": "foulabook",
@@ -501,7 +540,8 @@
         "ar"
       ],
       "role": "Arabic book discovery and reading; public-domain/rights-cleared candidates",
-      "rights": "platform states author/publisher rights must be respected; verify item"
+      "rights": "platform states author/publisher rights must be respected; verify item",
+      "priority_tier": 2
     },
     {
       "id": "elnoor",
@@ -513,7 +553,8 @@
         "multi"
       ],
       "role": "candidate Islamic/Arabic digital source",
-      "rights": "VERIFY"
+      "rights": "VERIFY",
+      "priority_tier": 2
     },
     {
       "id": "albayyinah_candidate",
@@ -524,7 +565,8 @@
         "ar"
       ],
       "role": "candidate Islamic library/source; exact official domain requires verification",
-      "rights": "VERIFY"
+      "rights": "VERIFY",
+      "priority_tier": 2
     },
     {
       "id": "albayan_candidate",
@@ -535,7 +577,8 @@
         "ar"
       ],
       "role": "candidate Islamic library/source; exact official domain requires verification",
-      "rights": "VERIFY"
+      "rights": "VERIFY",
+      "priority_tier": 2
     },
     {
       "id": "openalex",
@@ -546,7 +589,8 @@
         "multi"
       ],
       "role": "scholarly work identity, citation graph, open-access location discovery and research metadata",
-      "rights": "metadata/rights evidence only; verify item-level rights before reuse"
+      "rights": "metadata/rights evidence only; verify item-level rights before reuse",
+      "priority_tier": 2
     },
     {
       "id": "opencitations",
@@ -557,7 +601,48 @@
         "multi"
       ],
       "role": "scholarly citation and bibliographic enrichment by persistent identifier",
-      "rights": "metadata only"
+      "rights": "metadata only",
+      "priority_tier": 2
+    },
+    {
+      "id": "kitab_zenodo_full",
+      "name": "OpenITI / KITAB — Zenodo full release",
+      "url": "https://zenodo.org/records/17767721",
+      "region": "global",
+      "languages": [
+        "ar",
+        "fa",
+        "multi"
+      ],
+      "role": "machine-readable corpus snapshot and reproducible textual acquisition",
+      "rights": "dataset-level; verify release license/terms before redistribution",
+      "priority_tier": 0
+    },
+    {
+      "id": "kitab_zenodo_primary",
+      "name": "OpenITI / KITAB — Zenodo Primary Version",
+      "url": "https://zenodo.org/records/18613982",
+      "region": "global",
+      "languages": [
+        "ar",
+        "fa",
+        "multi"
+      ],
+      "role": "one primary digital version per OpenITI text; high-recall identity/text acquisition",
+      "rights": "dataset-level; verify release license/terms before redistribution",
+      "priority_tier": 0
+    },
+    {
+      "id": "shamela_api_discovery",
+      "name": "Shamela API discovery implementation",
+      "url": "https://github.com/dalailcentere/shamela-api",
+      "region": "global",
+      "languages": [
+        "ar"
+      ],
+      "role": "secondary API discovery route for Shamela books/authors/search; never a rights grant",
+      "rights": "metadata/content rights must be verified at source/item level",
+      "priority_tier": 0
     }
   ],
   "required_behavior": [
@@ -575,5 +660,61 @@
     "qatar": "QNL repository includes rare Arabic manuscripts, early Arabic print and European-language material; QDL provides free online access to Middle Eastern historical sources and Arabic scientific manuscripts.",
     "saudi_ministry": "Saudi Ministry of Islamic Affairs provides an Islamic electronic library with books/materials and multilingual content.",
     "foulabook": "FoulaBook states that its platform includes public-domain works and that copyrighted books are published only with author/rightsholder permission; item-level rights must still be verified."
-  }
+  },
+  "priority_policy": {
+    "schema": "rechercher/source-priority/v1",
+    "rule": "Priority sources are searched first for identity, edition, text, metadata and candidate digital witnesses; they never exclude other registered sources.",
+    "tiers": [
+      {
+        "tier": 0,
+        "label": "priority-text-and-book-sources",
+        "ids": [
+          "openiti",
+          "openiti_github",
+          "shamela",
+          "waqfeya",
+          "kitab_zenodo_full",
+          "kitab_zenodo_primary",
+          "internet_archive"
+        ]
+      },
+      {
+        "tier": 1,
+        "label": "priority-library-and-heritage",
+        "ids": [
+          "openlibrary",
+          "worldcat",
+          "hathitrust",
+          "nyu_aco",
+          "princeton_islamic_mss",
+          "british_library",
+          "british_library_eap",
+          "gallica_bnf",
+          "fihrist_bodleian",
+          "cambridge_cudl",
+          "vatican",
+          "qatar_digital_library",
+          "qnl_repository",
+          "al_furqan"
+        ]
+      },
+      {
+        "tier": 2,
+        "label": "all-other-registered-sources",
+        "ids": [
+          "*"
+        ]
+      },
+      {
+        "tier": 3,
+        "label": "web-discovery-fallback",
+        "ids": [
+          "web_search"
+        ]
+      }
+    ],
+    "exhaustion_rule": "After every registered source relevant to the cell has been inspected, Rechercher may perform bounded generic-web discovery. Web results are discovery evidence only until the exact source, edition, rights and PDF are independently verified.",
+    "no_exclusion": "A priority hit never suppresses searches in the remaining registered pool; a priority miss does not terminate acquisition."
+  },
+  "last_priority_update": "2026-09-26"
 }
