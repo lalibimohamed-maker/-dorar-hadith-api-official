@@ -8,6 +8,11 @@
       "Never infer license permissions from repository visibility alone.",
       "Never let generated media become evidence for a scholarly claim.",
       "Route by task, resource budget, provenance and quality gates."
+    ],
+    "license_statuses": [
+      "verified_source_license",
+      "review_required",
+      "blocked"
     ]
   },
   "models": [
@@ -22,7 +27,8 @@
       ],
       "source": "https://github.com/QwenLM/Qwen3",
       "status": "candidate",
-      "license_review": "required"
+      "license_review": "required",
+      "license_status": "review_required"
     },
     {
       "id": "qwen3-omni",
@@ -36,7 +42,8 @@
       ],
       "source": "https://github.com/QwenLM/Qwen3-Omni",
       "status": "candidate",
-      "license_review": "required"
+      "license_review": "required",
+      "license_status": "review_required"
     },
     {
       "id": "paddleocr-vl",
@@ -54,7 +61,8 @@
       "source": "https://github.com/PaddlePaddle/PaddleOCR",
       "status": "candidate",
       "license_review": "required",
-      "notes": "Use the model as a document-ingestion worker; outputs require provenance and validation before becoming evidence."
+      "notes": "Use the model as a document-ingestion worker; outputs require provenance and validation before becoming evidence.",
+      "license_status": "review_required"
     },
     {
       "id": "wan2.2",
@@ -66,7 +74,8 @@
       ],
       "source": "https://github.com/Wan-Video/Wan2.2",
       "status": "candidate",
-      "license_review": "required"
+      "license_review": "required",
+      "license_status": "review_required"
     },
     {
       "id": "hunyuanvideo-1.5",
@@ -77,7 +86,8 @@
       ],
       "source": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5",
       "status": "candidate",
-      "license_review": "required"
+      "license_review": "required",
+      "license_status": "review_required"
     },
     {
       "id": "ltx-2",
@@ -89,7 +99,8 @@
       ],
       "source": "https://github.com/Lightricks/LTX-2",
       "status": "candidate",
-      "license_review": "required"
+      "license_review": "required",
+      "license_status": "review_required"
     },
     {
       "id": "cogvideox",
@@ -101,7 +112,8 @@
       ],
       "source": "https://github.com/zai-org/CogVideo",
       "status": "candidate",
-      "license_review": "required"
+      "license_review": "required",
+      "license_status": "review_required"
     },
     {
       "id": "cosyvoice",
@@ -112,7 +124,8 @@
       ],
       "source": "https://github.com/FunAudioLLM/CosyVoice",
       "status": "candidate",
-      "license_review": "required"
+      "license_review": "required",
+      "license_status": "review_required"
     },
     {
       "id": "sglang",
@@ -124,7 +137,8 @@
       ],
       "source": "https://github.com/sgl-project/sglang",
       "status": "candidate",
-      "license_review": "required"
+      "license_review": "required",
+      "license_status": "review_required"
     }
   ]
 }
