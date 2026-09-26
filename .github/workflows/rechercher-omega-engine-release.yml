@@ -1,0 +1,165 @@
+name: Rechercher Ω — publish starter engine release
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - "config/rechercher-omega-engine-release.json"
+      - ".github/workflows/rechercher-omega-engine-release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rechercher-omega-engine-release
+  cancel-in-progress: false
+
+jobs:
+  publish-release:
+    name: Publish persistent starter engine release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install Hugging Face Hub client
+        run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Verify GitHub CLI
+        run: gh --version
+
+      - name: Prepare release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANIFEST: config/rechercher-omega-engine-release.json
+        run: |
+          set -euo pipefail
+          TAG="$(python3 -c 'import json; print(json.load(open("'"$MANIFEST"'"))["release_tag"])')"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG"               --target "$GITHUB_SHA"               --title "Rechercher Ω Starter Engines v0.1.0"               --prerelease               --notes "Persistent lightweight starter engines for Rechercher Ω. Source revisions and per-asset SHA-256 values are included in the release manifests. This release is distribution-only; weights are not tracked in Git."
+          fi
+
+      - name: Download, package and hash engine assets
+        env:
+          MANIFEST: config/rechercher-omega-engine-release.json
+          WORKDIR: ${{ runner.temp }}/omega-release
+        run: |
+          set -euo pipefail
+          rm -rf "$WORKDIR"
+          mkdir -p "$WORKDIR"
+
+          python3 - <<'PY'
+          import json, os, subprocess
+          manifest=json.load(open(os.environ["MANIFEST"]))
+          work=os.environ["WORKDIR"]
+          for engine in manifest["engines"]:
+              d=os.path.join(work, engine["logical_id"])
+              os.makedirs(d, exist_ok=True)
+              subprocess.run([
+                  "hf","download",engine["model_id"],
+                  "--revision",engine["revision"],
+                  "--local-dir",d
+              ], check=True)
+          PY
+
+          max_bytes="$(python3 -c 'import json; print(json.load(open("'"$MANIFEST"'"))["policy"]["max_asset_bytes"])')"
+
+          for dir in "$WORKDIR"/*; do
+            [ -d "$dir" ] || continue
+            id="$(basename "$dir")"
+
+            case "$id" in
+              qwen3)
+                model_asset="$WORKDIR/qwen3-model.safetensors"
+                bundle="$WORKDIR/qwen3-runtime-files.tar.gz"
+                ;;
+              paddleocr-vl)
+                model_asset="$WORKDIR/paddleocr-vl-model.safetensors"
+                bundle="$WORKDIR/paddleocr-vl-runtime-files.tar.gz"
+                ;;
+              whisper-tiny)
+                model_asset="$WORKDIR/whisper-tiny-model.safetensors"
+                bundle="$WORKDIR/whisper-tiny-runtime-files.tar.gz"
+                ;;
+              *) echo "Unknown engine $id"; exit 1 ;;
+            esac
+
+            cp "$dir/model.safetensors" "$model_asset"
+            rm -f "$dir/model.safetensors" "$dir/pytorch_model.bin" "$dir/flax_model.msgpack" "$dir/tf_model.h5"
+
+            tar -C "$dir" -czf "$bundle" .
+            test "$(stat -c '%s' "$model_asset")" -lt "$max_bytes"
+            test "$(stat -c '%s' "$bundle")" -lt "$max_bytes"
+
+            sha256sum "$model_asset" "$bundle" > "$WORKDIR/$id.sha256"
+          done
+
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, subprocess
+          manifest=json.load(open(os.environ["MANIFEST"]))
+          work=pathlib.Path(os.environ["WORKDIR"])
+
+          for engine in manifest["engines"]:
+              id=engine["logical_id"]
+              assets=[]
+              for asset_name in engine["asset_plan"]:
+                  if asset_name.endswith(".json"):
+                      continue
+                  p=work/asset_name
+                  if not p.exists():
+                      continue
+                  assets.append({
+                      "name":asset_name,
+                      "bytes":p.stat().st_size,
+                      "sha256":hashlib.sha256(p.read_bytes()).hexdigest()
+                  })
+              release_manifest={
+                  "schema_version":"1.0.0",
+                  "logical_id":id,
+                  "model_id":engine["model_id"],
+                  "revision":engine["revision"],
+                  "license":engine["license"],
+                  "source_url":engine["source_url"],
+                  "assets":assets
+              }
+              (work/f"{id}-release-manifest.json").write_text(
+                  json.dumps(release_manifest,ensure_ascii=False,indent=2)+"\n"
+              )
+          PY
+
+      - name: Upload persistent release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKDIR: ${{ runner.temp }}/omega-release
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG"             "$WORKDIR/qwen3-model.safetensors"             "$WORKDIR/qwen3-runtime-files.tar.gz"             "$WORKDIR/qwen3-release-manifest.json"             "$WORKDIR/paddleocr-vl-model.safetensors"             "$WORKDIR/paddleocr-vl-runtime-files.tar.gz"             "$WORKDIR/paddleocr-vl-release-manifest.json"             "$WORKDIR/whisper-tiny-model.safetensors"             "$WORKDIR/whisper-tiny-runtime-files.tar.gz"             "$WORKDIR/whisper-tiny-release-manifest.json"             --clobber
+
+      - name: Verify published assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANIFEST: config/rechercher-omega-engine-release.json
+        run: |
+          set -euo pipefail
+          gh release view "$TAG" --json tagName,url,assets
+          python3 - <<'PY'
+          import json, os, subprocess
+          m=json.load(open(os.environ["MANIFEST"]))
+          raw=subprocess.check_output(
+              ["gh","release","view",m["release_tag"],"--json","assets"],
+              text=True
+          )
+          assets={x["name"] for x in json.loads(raw)["assets"]}
+          expected={name for e in m["engines"] for name in e["asset_plan"]}
+          missing=sorted(expected-assets)
+          if missing:
+              raise SystemExit("missing release assets: "+", ".join(missing))
+          print("All expected Rechercher Ω starter assets are published.")
+          PY
