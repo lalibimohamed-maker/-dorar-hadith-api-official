@@ -230,9 +230,10 @@ jobs:
           python3 - <<'PY'
           import json, os, subprocess
           tag=os.environ["RELEASE_TAG"]
+          repo=os.environ["GITHUB_REPOSITORY"]
           raw=subprocess.check_output([
               "gh","api",
-              f"/repos/$GITHUB_REPOSITORY/releases/tags/{tag}"
+              f"/repos/{repo}/releases/tags/{tag}"
           ], text=True)
           data=json.loads(raw)
           names={asset["name"] for asset in data.get("assets",[])}
