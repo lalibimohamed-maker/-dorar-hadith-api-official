@@ -25,7 +25,13 @@ SOURCES = {
     "crossref": {"url": "https://www.crossref.org/", "role": "bibliographic-and-license-metadata", "acquisition": False},
     "openalex": {"url": "https://api.openalex.org/works", "role": "scholarly-work-identity-open-access-and-citation-discovery", "acquisition": False},
     "opencitations": {"url": "https://api.opencitations.net/", "role": "scholarly-citation-and-bibliographic-enrichment", "acquisition": False},
-    "waqfeya": {"url": "https://waqfeya.net/", "role": "catalogued-arabic-book-source", "acquisition": True},
+    "waqfeya": {"url": "https://waqfeya.net/", "role": "catalogued-arabic-book-source", "acquisition": True, "priority": 0},
+    "shamela": {"url": "https://shamela.ws/", "role": "arabic-book-text-identity-and-discovery", "acquisition": False, "priority": 0},
+    "openiti": {"url": "https://openiti.org/", "role": "machine-readable-islamicate-text-and-work-identity", "acquisition": False, "priority": 0},
+    "openiti_release": {"url": "https://github.com/OpenITI/RELEASE", "role": "release-pinned-machine-readable-corpus", "acquisition": False, "priority": 0},
+    "kitab_zenodo_full": {"url": "https://zenodo.org/records/17767721", "role": "reproducible-openiti-kitab-full-release", "acquisition": False, "priority": 0},
+    "kitab_zenodo_primary": {"url": "https://zenodo.org/records/18613982", "role": "primary-openiti-kitab-release", "acquisition": False, "priority": 0},
+    "shamela_api_discovery": {"url": "https://github.com/dalailcentere/shamela-api", "role": "shamela-api-discovery-route", "acquisition": False, "priority": 0},
 }
 
 RESEARCH_TOOLS = {
@@ -96,6 +102,12 @@ def main():
             "openalex": f"https://api.openalex.org/works?search={q}&select=id,display_name,publication_year,type,doi,open_access,best_oa_location",
             "opencitations": "https://api.opencitations.net/",
             "waqfeya": f"https://waqfeya.net/search?query={q}",
+            "shamela": f"https://shamela.ws/search?query={q}",
+            "openiti": "https://openiti.org/",
+            "openiti_release": f"https://github.com/search?q={q}+org%3AOpenITI&type=code",
+            "kitab_zenodo_full": f"https://zenodo.org/search?q={q}",
+            "kitab_zenodo_primary": f"https://zenodo.org/search?q={q}%20OpenITI%20primary",
+            "shamela_api_discovery": f"https://github.com/dalailcentere/shamela-api/search?q={q}",
         }
         identifier_routes = []
         doi = b.get("doi")
@@ -125,11 +137,13 @@ def main():
         "generated_at": time.time(),
         "scope": "1-400H",
         "source_count": len(SOURCES),
+        "priority_source_count": sum(1 for x in SOURCES.values() if x.get("priority") == 0),
         "research_tool_count": len(RESEARCH_TOOLS),
         "work_count": len(records),
         "sources": SOURCES,
         "research_tools": RESEARCH_TOOLS,
         "records": records,
+        "search_order": ["priority_sources", "all_registered_sources", "bounded_web_discovery"],
         "policy": (
             "Federated discovery maximizes recall; it never converts a search result into "
             "redistribution permission. Exact edition, rights and digital-copy evidence remain "
