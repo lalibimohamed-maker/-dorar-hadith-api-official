@@ -148,7 +148,7 @@ jobs:
         run: |
           set -euo pipefail
           tmp="$(mktemp)"
-          curl --fail --location --retry 3 --silent --show-error             "https://raw.githubusercontent.com/Lightricks/LTX-2/${{ steps.revision.outputs.sha }}/LICENSE-2_x"             -o "$tmp"
+          curl --fail --location --retry 3 --silent --show-error             "https://raw.githubusercontent.com/Lightricks/LTX-2/400fd31054597515f47125691032c04b1c3ee24e/LICENSE-2_x"             -o "$tmp"
           gh release upload "$RELEASE_TAG" "$tmp#LICENSE-2_x" --repo "$REPO" --clobber
           rm -f "$tmp"
 
@@ -160,7 +160,7 @@ jobs:
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
-          for spec in             "LICENSE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/${{ steps.revision.outputs.sha }}/LICENSE"             "NOTICE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/${{ steps.revision.outputs.sha }}/NOTICE"
+          for spec in             "LICENSE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/60783e704160023913bee78f0b47036d393d4dfa/LICENSE"             "NOTICE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/60783e704160023913bee78f0b47036d393d4dfa/NOTICE"
           do
             name="${spec%%|*}"
             url="${spec#*|}"
