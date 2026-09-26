@@ -9,6 +9,7 @@ on:
       - "scripts/rechercher-omega-release-stream.py"
   workflow_dispatch:
 
+# network-write-justification: publishes immutable model acquisition assets to dedicated GitHub Releases; no repository files are written.
 permissions:
   contents: write
 
