@@ -175,7 +175,7 @@ async function archivePdfUrls(json){
 async function webFallbackCandidates(row){
   const title=String(row.title||row.book_title||row.work_title||'').trim();
   const author=String(row.author||row.author_name||'').trim();
-  const query=[title,author].filter(Boolean).join(' ');
+  const query=[row.search_query,row.query,title,author,row.book,row.work,row.provider,row.language,row.domain].map(v=>String(v||'').trim()).filter(Boolean).slice(0,3).join(' ');
   if(!query) return {queries:[],urls:[],errors:[]};
   const engines=[
     'https://www.bing.com/search?q='+encodeURIComponent(query)+'&count=10',
