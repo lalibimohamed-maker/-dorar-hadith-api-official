@@ -15,7 +15,8 @@
     "source_provenance_preserved": true,
     "api_sources_imported_from": [
       "PR #558",
-      "PR #557"
+      "PR #557",
+      "user-requested API adapter expansion 2026-09-26"
     ],
     "api_access_is_not_redistribution": true
   },
@@ -1468,6 +1469,128 @@
       "api_base_url": "https://acikkaynakkuran-dev.diyanet.gov.tr/",
       "api_auth": "GitHub account/API key",
       "release_policy": "Official developer terms restrict independent applications and bulk republication; keep discovery/verification separate from redistribution."
+    },
+    {
+      "id": "sunnah_com_api",
+      "name": "Sunnah.com Official API",
+      "base_url": "https://sunnah.com/",
+      "origins": [
+        "https://sunnah.com",
+        "https://sunnah.stoplight.io/docs/api/",
+        "https://github.com/sunnah-com/api"
+      ],
+      "kinds": [
+        "hadith",
+        "sunnah",
+        "hadith-collections",
+        "hadith-grading",
+        "translations",
+        "api"
+      ],
+      "authority": "official_sunnah_com_hadith_platform",
+      "runtime": "api_key",
+      "api_auth": "required",
+      "status": "enabled",
+      "source_role": "official_hadith_api",
+      "api_base_url": "https://sunnah.stoplight.io/docs/api/",
+      "api_contract_status": "official-api-documented-key-gated",
+      "verification": "Sunnah.com states its API provides access to a portion of its hadith data; API key is required and can be requested through its GitHub repository.",
+      "release_policy": "API access does not grant redistribution permission; verify Sunnah.com terms and item-level rights before public redistribution.",
+      "imported_from": "user-requested API adapter expansion 2026-09-26"
+    },
+    {
+      "id": "hadith_api_opensource",
+      "name": "Fawaz Ahmed Hadith API",
+      "base_url": "https://github.com/fawazahmed0/hadith-api",
+      "origins": [
+        "https://github.com/fawazahmed0/hadith-api",
+        "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/"
+      ],
+      "kinds": [
+        "hadith",
+        "sunnah",
+        "hadith-collections",
+        "translations",
+        "grades",
+        "api",
+        "open-source"
+      ],
+      "authority": "open_source_hadith_dataset",
+      "runtime": "public-cdn",
+      "api_auth": "none",
+      "status": "enabled",
+      "source_role": "open_hadith_api_and_dataset",
+      "api_base_url": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/",
+      "api_contract_status": "public-open-source-api-documented",
+      "api_endpoints": {
+        "editions": "/editions.json",
+        "edition": "/editions/{editionName}.json",
+        "hadith": "/editions/{editionName}/{HadithNo}.json",
+        "section": "/editions/{editionName}/sections/{sectionNo}.json",
+        "info": "/info.json"
+      },
+      "verification": "The official repository documents free access, multiple languages and grades, and versioned JSON endpoints served through jsDelivr.",
+      "release_policy": "Treat the API as a data source, not an automatic redistribution grant; preserve source/version/license provenance and verify underlying edition rights before publication.",
+      "license": "Unlicense (repository-level; underlying editions may have separate provenance/rights)",
+      "imported_from": "user-requested API adapter expansion 2026-09-26"
+    },
+    {
+      "id": "islamic_network_api",
+      "name": "Islamic Network APIs",
+      "base_url": "https://islamic.network/api/",
+      "origins": [
+        "https://islamic.network/api/",
+        "https://islamic.network/"
+      ],
+      "kinds": [
+        "quran",
+        "prayer-times",
+        "islamic-calendar",
+        "qibla",
+        "asma-al-husna",
+        "sermons",
+        "events",
+        "people",
+        "quotes",
+        "stories",
+        "api"
+      ],
+      "authority": "islamic_network_service_provider",
+      "runtime": "public-api",
+      "api_auth": "none",
+      "status": "enabled",
+      "source_role": "general_islamic_data_api",
+      "api_contract_status": "official-api-hub-documented",
+      "verification": "Islamic Network documents its services as API-first, free and open, with JSON APIs including AlAdhan, AlQuran, Sermons and other services.",
+      "release_policy": "API availability does not by itself establish redistribution permission for each content item; preserve endpoint/source provenance and verify item-level rights where content is republished.",
+      "imported_from": "user-requested API adapter expansion 2026-09-26"
+    },
+    {
+      "id": "aladhan_api",
+      "name": "AlAdhan API",
+      "base_url": "https://aladhan.com/",
+      "origins": [
+        "https://aladhan.com/",
+        "https://islamic.network/api/"
+      ],
+      "kinds": [
+        "prayer-times",
+        "islamic-calendar",
+        "hijri-gregorian",
+        "qibla",
+        "asma-al-husna",
+        "api"
+      ],
+      "authority": "islamic_network_prayer_and_calendar_api",
+      "runtime": "public-api",
+      "api_auth": "none",
+      "status": "enabled",
+      "source_role": "prayer_times_calendar_qibla_api",
+      "api_base_url": "https://api.aladhan.com/",
+      "api_contract_status": "official-api-documented",
+      "verification": "Islamic Network documents AlAdhan as a free API for prayer timings, Hijri/Gregorian calendars, conversions, Qibla directions and Asma al-Husna.",
+      "release_policy": "Use as a computational/data service; preserve source attribution and do not treat API availability as permission to redistribute third-party content.",
+      "imported_from": "user-requested API adapter expansion 2026-09-26"
     }
   ],
   "runtime_policy": {
@@ -1478,5 +1601,6 @@
     "shamela_api_key_must_never_be_committed": true,
     "discovery_and_content_connector_are_distinct": true,
     "source_enumeration_for_acquisition": "All active source adapters relevant to a matrix cell must be inspected; PDF capability is discovered from the source at runtime and is not used as a prefilter."
-  }
+  },
+  "last_api_source_import": "2026-09-26"
 }
