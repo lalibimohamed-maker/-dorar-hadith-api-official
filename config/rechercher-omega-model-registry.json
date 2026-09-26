@@ -7,7 +7,8 @@
       "Treat code license and model-weight license as separate fields.",
       "Never infer license permissions from repository visibility alone.",
       "Never let generated media become evidence for a scholarly claim.",
-      "Route by task, resource budget, provenance and quality gates."
+      "Route by task, resource budget, provenance and quality gates.",
+      "Canonical model registry and weight-acquisition registry must agree on every executable model family."
     ],
     "license_statuses": [
       "verified_source_license",
@@ -42,8 +43,12 @@
       ],
       "source": "https://github.com/QwenLM/Qwen3-Omni",
       "status": "candidate",
-      "license_review": "required",
-      "license_status": "review_required"
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "source_model_id": "Qwen/Qwen3-Omni-30B-A3B-Instruct",
+      "source_revision": null,
+      "acquisition_class": "runtime_only",
+      "notes": "Official multimodal any-to-any model; keep runtime-only until resource sizing and immutable weight acquisition are separately approved."
     },
     {
       "id": "paddleocr-vl",
@@ -113,19 +118,27 @@
       "source": "https://github.com/zai-org/CogVideo",
       "status": "candidate",
       "license_review": "required",
-      "license_status": "review_required"
+      "license_status": "review_required",
+      "source_model_id": "zai-org/CogVideoX-2b",
+      "source_revision": "1137dacfc2c9c012bed6a0793f4ecf2ca8e7ba01",
+      "acquisition_class": "kaggle_runtime",
+      "notes": "CogVideoX-2B is 13.8 GB and uses a model-specific license presentation; keep out of automatic artifact acquisition until license review is resolved."
     },
     {
       "id": "cosyvoice",
       "family": "speech-generation",
       "tasks": [
         "text_to_speech",
-        "multilingual_speech"
+        "multilingual_speech",
+        "voice"
       ],
       "source": "https://github.com/FunAudioLLM/CosyVoice",
       "status": "candidate",
-      "license_review": "required",
-      "license_status": "review_required"
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "starter_model_id": "FunAudioLLM/CosyVoice2-0.5B",
+      "starter_revision": "23778f84b1b6dd789e1b5092c3ec1145639ee1c3",
+      "notes": "CosyVoice2-0.5B is the lightweight speech starter. Full acquisition remains staged because the official model repository is about 4.36 GB."
     },
     {
       "id": "sglang",
@@ -139,6 +152,52 @@
       "status": "candidate",
       "license_review": "required",
       "license_status": "review_required"
+    },
+    {
+      "id": "qwen3-vl",
+      "family": "vision-multimodal-understanding",
+      "tasks": [
+        "image_understanding",
+        "video_understanding",
+        "visual_reasoning",
+        "document_understanding"
+      ],
+      "source": "https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct",
+      "source_revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+      "status": "candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "notes": "Qwen3-VL-4B-Instruct; 4.43B BF16 parameters. Registry entry only; no automatic weight acquisition."
+    },
+    {
+      "id": "whisper",
+      "family": "speech-recognition",
+      "tasks": [
+        "automatic_speech_recognition",
+        "speech_translation",
+        "multilingual_speech"
+      ],
+      "source": "https://github.com/openai/whisper",
+      "starter_model_id": "openai/whisper-tiny",
+      "starter_revision": "169d4a4341b33bc18d8881c4b69c2e104e1cc0af",
+      "status": "candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "notes": "Multilingual Whisper starter is selected for lightweight local acquisition; larger variants remain runtime/Kaggle candidates."
+    },
+    {
+      "id": "flux",
+      "family": "image-generation",
+      "tasks": [
+        "text_to_image",
+        "image_generation",
+        "image_editing"
+      ],
+      "source": "https://github.com/black-forest-labs/flux",
+      "status": "candidate",
+      "license_review": "required",
+      "license_status": "review_required",
+      "notes": "Generation engine is registry-only until the applicable model-family license is individually cleared."
     }
   ]
 }
