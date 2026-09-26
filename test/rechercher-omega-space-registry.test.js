@@ -68,3 +68,13 @@ test("Space registry is fail-closed", async () => {
   assert.equal(plan.corpus_write_allowed, false);
   assert.equal(plan.generated_media_is_evidence, false);
 });
+
+
+test("hfviewer is tracked only as a reference viewer", async () => {
+  const registry = await loadOmegaSpaceRegistry();
+  const viewer = registry.spaces.find(space => space.space_id === "embedl/hfviewer");
+  assert.ok(viewer);
+  assert.equal(viewer.use, "reference");
+  assert.equal(viewer.executable, undefined);
+  assert.equal(viewer.license_status, "review_required");
+});
