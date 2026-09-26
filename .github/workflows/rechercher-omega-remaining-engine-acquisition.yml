@@ -91,6 +91,7 @@ jobs:
               f.write("sha="+sha+"\n")
           PY
 
+      # Release parts are intentionally 512 MiB to keep individual uploads well below GitHub's 2 GiB asset ceiling.
       - name: Download and publish weight files with disk-safe policy
         env:
           GH_TOKEN: ${{ github.token }}
@@ -184,7 +185,7 @@ jobs:
               assets="$(basename "$asset")"
               rm -f "$asset"
             else
-              chunk_bytes=$((1536*1024*1024))
+              chunk_bytes=$((512*1024*1024))
               offset=0
               part=0
               while [ "$offset" -lt "$actual_size" ]; do
