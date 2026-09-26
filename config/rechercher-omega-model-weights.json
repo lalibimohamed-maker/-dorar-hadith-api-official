@@ -13,7 +13,9 @@
       "verified_source_license",
       "review_required",
       "blocked"
-    ]
+    ],
+    "scheduled_weight_downloads": false,
+    "release_distribution": true
   },
   "weights": [
     {
@@ -21,15 +23,26 @@
       "source_repo": "https://github.com/QwenLM/Qwen3",
       "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
       "weight_license_status": "verified_source_license",
-      "acquisition": "runtime_only",
+      "acquisition": "github_release",
       "revision_type": "immutable_hf_commit",
       "verification": {
-        "mode": "acquisition_artifact_manifest",
-        "manifest_file": "acquisition.json",
-        "checksum_file": "SHA256SUMS",
+        "mode": "release_manifest",
+        "manifest_asset": "qwen3-release-manifest.json",
+        "checksum_assets": [
+          "qwen3-model.safetensors",
+          "qwen3-runtime-files.tar.gz"
+        ],
+        "required_before_runtime": true,
         "required_before_promotion": true
       },
-      "rights_promotion_status": "blocked_until_clearance"
+      "rights_promotion_status": "blocked_until_clearance",
+      "release_tag": "rechercher-omega-engines-v0.1.0",
+      "release_assets": [
+        "qwen3-model.safetensors",
+        "qwen3-runtime-files.tar.gz",
+        "qwen3-release-manifest.json"
+      ],
+      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>"
     },
     {
       "model_id": "qwen3-omni",
@@ -51,15 +64,26 @@
       "source_repo": "https://github.com/PaddlePaddle/PaddleOCR",
       "revision": "7fa00a8c55b735ba51ba49a9058f3f9c57a99a11",
       "weight_license_status": "verified_source_license",
-      "acquisition": "runtime_only",
+      "acquisition": "github_release",
       "revision_type": "immutable_hf_commit",
       "verification": {
-        "mode": "acquisition_artifact_manifest",
-        "manifest_file": "acquisition.json",
-        "checksum_file": "SHA256SUMS",
+        "mode": "release_manifest",
+        "manifest_asset": "paddleocr-vl-release-manifest.json",
+        "checksum_assets": [
+          "paddleocr-vl-model.safetensors",
+          "paddleocr-vl-runtime-files.tar.gz"
+        ],
+        "required_before_runtime": true,
         "required_before_promotion": true
       },
-      "rights_promotion_status": "blocked_until_clearance"
+      "rights_promotion_status": "blocked_until_clearance",
+      "release_tag": "rechercher-omega-engines-v0.1.0",
+      "release_assets": [
+        "paddleocr-vl-model.safetensors",
+        "paddleocr-vl-runtime-files.tar.gz",
+        "paddleocr-vl-release-manifest.json"
+      ],
+      "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>"
     },
     {
       "model_id": "wan2.2",
