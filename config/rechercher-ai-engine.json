@@ -1,18 +1,19 @@
 {
   "schema": "dinullah/rechercher-ai-engine/v1",
-  "status": "provider-neutral-owned-layer",
-  "principle": "Rechercher owns orchestration, governance, evidence and Corpus boundaries; external projects supply replaceable components and protocols only.",
+  "status": "omega-integrated-provider-neutral-layer",
+  "principle": "Rechercher Ω remains the single canonical AI orchestration layer; this module supplies provider interoperability and optional operational adapters only.",
   "components": {
     "vercel_ai_sdk": {"role": "provider interoperability reference", "license": "Apache-2.0", "upstream": "https://github.com/vercel/ai"},
     "supabase": {"role": "operational metadata/search/vector store", "license": "Apache-2.0 repository; verify component-level licenses", "upstream": "https://github.com/supabase/supabase"},
-    "posthog": {"role": "observability", "license": "MIT outside ee; ee has separate Enterprise license", "upstream": "https://github.com/PostHog/posthog", "foss_upstream": "https://github.com/PostHog/posthog-foss"},
-    "free_ai": {"role": "optional coding/model infrastructure", "license": "record per model", "upstream": "https://free.ai/open-source/"}
+    "posthog": {"role": "optional observability", "license": "MIT outside ee; ee has separate Enterprise license", "upstream": "https://github.com/PostHog/posthog", "foss_upstream": "https://github.com/PostHog/posthog-foss"},
+    "free_ai": {"role": "optional model/provider reference", "license": "record per model", "upstream": "https://free.ai/open-source/"}
   },
   "security": {
     "secrets": "environment or secret manager only",
     "corpus_write_from_ai": false,
     "arbitrary_url_fetch_from_ai": false,
     "rights_decision_by_ai": false,
-    "canonical_text_rewrite_by_ai": false
+    "canonical_text_rewrite_by_ai": false,
+    "generated_media_is_scholarly_evidence": false
   }
 }
