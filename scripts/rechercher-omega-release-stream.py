@@ -4,6 +4,7 @@ import json
 import os
 import ssl
 import sys
+import subprocess
 import urllib.parse
 import urllib.request
 from http.client import HTTPSConnection
@@ -32,9 +33,20 @@ TLS = ssl.create_default_context()
 
 
 def gh_json(path):
-    req = urllib.request.Request(f"https://api.github.com{path}", headers=JSON_HEADERS)
-    with urllib.request.urlopen(req, context=TLS, timeout=60) as r:
-        return json.loads(r.read().decode("utf-8"))
+    """Read GitHub JSON through the authenticated gh CLI.
+    This avoids draft-release REST access differences observed with direct urllib.
+    """
+    proc = subprocess.run(
+        ["gh", "api", path],
+        check=False,
+        capture_output=True,
+        text=True,
+        env={**os.environ, "GH_TOKEN": TOKEN},
+    )
+    if proc.returncode != 0:
+        detail = (proc.stderr or proc.stdout or "").strip()
+        raise RuntimeError(f"gh api failed for {path}: {detail[:1000]}")
+    return json.loads(proc.stdout)
 
 
 def release_info():
@@ -62,6 +74,7 @@ def upload_asset(upload_url, name, source_response, length, content_type="applic
     conn.putheader("Authorization", f"Bearer {TOKEN}")
     conn.putheader("Accept", "application/vnd.github+json")
     conn.putheader("X-GitHub-Api-Version", "2026-03-10")
+    conn.putheader("User-Agent", "Rechercher-Omega/1.0")
     conn.putheader("Content-Type", content_type)
     conn.putheader("Content-Length", str(length))
     conn.endheaders()
