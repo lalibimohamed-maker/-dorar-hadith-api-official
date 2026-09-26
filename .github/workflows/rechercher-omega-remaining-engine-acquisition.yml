@@ -12,6 +12,8 @@ on:
 permissions:
   contents: write
 
+# security-justification: publishes immutable, license-cleared model artifacts to dedicated GitHub Releases; no model bytes are committed to git or Corpus.
+
 concurrency:
   group: rechercher-omega-remaining-engine-acquisition
   cancel-in-progress: true
@@ -54,10 +56,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@820762786026740c76f36085b0efc47a31fe5020
         with:
           python-version: "3.12"
 
