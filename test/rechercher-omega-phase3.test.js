@@ -1,4 +1,8 @@
 import test from "node:test";
+import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
 import { createCouncilCase, submitCouncilReview, finalizeCouncil } from "../src/rechercher-omega-council.js";
 import { verifyWeightArtifact } from "../src/rechercher-omega-weight-verifier.js";
@@ -32,4 +36,40 @@ test("Runtime gate never permits paid fallback or Corpus writes", () => {
     quota_exhaustion_action: "queue",
     corpus_write_allowed: false
   }));
+});
+
+
+test("Acquisition manifest verifies every listed file before promotion", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "omega-weight-"));
+  try {
+    const payload = Buffer.from("omega-test-weight");
+    const digest = createHash("sha256").update(payload).digest("hex");
+    const manifest = {
+      model_id: "test",
+      revision: "immutable-test",
+      manifest_sha256: createHash("sha256")
+        .update("weights.bin=" + digest + "\n", "utf8")
+        .digest("hex"),
+      files: [{ path: "weights.bin", bytes: payload.length, sha256: digest }]
+    };
+    await writeFile(join(dir, "weights.bin"), payload);
+    await writeFile(join(dir, "acquisition.json"), JSON.stringify(manifest));
+    const { verifyWeightArtifact } = await import("../src/rechercher-omega-weight-verifier.js");
+    const result = await verifyWeightArtifact({
+      manifestEntry: {
+        model_id: "test",
+        weight_license_status: "cleared",
+        verification: {
+          mode: "acquisition_artifact_manifest",
+          manifest_file: "acquisition.json",
+          checksum_file: "SHA256SUMS"
+        }
+      },
+      path: dir
+    });
+    assert.equal(result.status, "verified");
+    assert.equal(result.files_verified, 1);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });
