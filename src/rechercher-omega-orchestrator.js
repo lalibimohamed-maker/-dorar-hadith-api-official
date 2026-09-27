@@ -33,7 +33,9 @@ const TASK_MODEL_PRIORITY = Object.freeze({
   audio_video: ["ltx-2", "qwen3-omni"],
   text_to_speech: ["cosyvoice"],
   text_to_image: ["flux"],
-  inference_runtime: ["sglang"],\n  safety_audit: ["gpt-oss-safeguard"],\n  programming: ["qwen3-coder", "gpt-oss", "qwen3"]
+  inference_runtime: ["sglang"],
+  safety_audit: ["gpt-oss-safeguard"],
+  programming: ["qwen3-coder", "gpt-oss", "qwen3"]
 });
 
 const SCHOLARLY_TASKS = new Set([
