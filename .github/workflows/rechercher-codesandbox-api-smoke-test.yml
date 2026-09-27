@@ -1,0 +1,66 @@
+name: Rechercher — CodeSandbox API smoke test
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: rechercher-codesandbox-api-smoke-test
+  cancel-in-progress: true
+
+jobs:
+  smoke-test:
+    name: Verify CodeSandbox API read access
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CODESANDBOX_API_KEY: ${{ secrets.CODESANDBOX_API_TOKEN }}
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Install CodeSandbox SDK in an isolated temp project
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmpdir="$(mktemp -d)"
+          cd "$tmpdir"
+          npm init -y >/dev/null 2>&1
+          npm install --ignore-scripts --no-audit --no-fund @codesandbox/sdk@2.4.2
+
+      - name: Authenticate and verify Sandbox Read
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmpdir="$(mktemp -d)"
+          cd "$tmpdir"
+          npm init -y >/dev/null 2>&1
+          npm install --ignore-scripts --no-audit --no-fund @codesandbox/sdk@2.4.2 >/dev/null 2>&1
+          node --input-type=module <<'NODE'
+          import { CodeSandbox } from "@codesandbox/sdk";
+
+          const token = process.env.CODESANDBOX_API_KEY;
+          if (!token) {
+            throw new Error("CODESANDBOX_API_TOKEN secret is unavailable to this workflow.");
+          }
+
+          const sdk = new CodeSandbox(token);
+          if (!sdk.sandboxes || typeof sdk.sandboxes.list !== "function") {
+            throw new Error("Installed CodeSandbox SDK does not expose sandboxes.list().");
+          }
+
+          const sandboxes = await sdk.sandboxes.list();
+          const count = Array.isArray(sandboxes)
+            ? sandboxes.length
+            : Array.isArray(sandboxes?.sandboxes)
+              ? sandboxes.sandboxes.length
+              : null;
+
+          console.log("CodeSandbox API authentication: OK");
+          console.log("Sandbox Read capability: OK");
+          if (count !== null) console.log(`Visible sandbox records returned: ${count}`);
+          console.log("Token value was not printed.");
+          NODE
