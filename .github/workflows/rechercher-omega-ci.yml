@@ -20,6 +20,10 @@ on:
       - "test/rechercher-omega-phase3.test.js"
       - "test/rechercher-omega-integration.test.js"
       - "src/rechercher-omega-global-deep-search.js"
+      - "src/rechercher-omega-scholarly-fleet.js"
+      - "config/rechercher-omega-scholarly-fleet.json"
+      - "test/rechercher-omega-scholarly-fleet.test.js"
+      - "docs/RECHERCHER-OMEGA-SCHOLARLY-FLEET.md"
       - "test/rechercher-omega-global-deep-search.test.js"
       - "src/rechercher-omega-runtime-gate.js"
       - "src/rechercher-omega-council.js"
@@ -52,4 +56,4 @@ jobs:
       - name: Install
         run: npm ci
       - name: Ω boundary tests
-        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-integration.test.js test/rechercher-omega-global-deep-search.test.js test/rechercher-omega-hunyuan-runtime.test.js
+        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-integration.test.js test/rechercher-omega-global-deep-search.test.js test/rechercher-omega-hunyuan-runtime.test.js test/rechercher-omega-scholarly-fleet.test.js
