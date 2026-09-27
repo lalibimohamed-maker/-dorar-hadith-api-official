@@ -8,7 +8,7 @@ const fleet = JSON.parse(fs.readFileSync(new URL("../config/rechercher-omega-sch
 test("the scholarly fleet declares all shared contract axes", () => {
   const result = validateScholarlyFleet(fleet);
   assert.equal(result.valid, true, result.errors.join(", "));
-  assert.equal(fleet.expansion.current_family_count, 9);
+  assert.equal(fleet.expansion.current_family_count, 24);
   assert.equal(fleet.expansion.target_domain_cells, 24);
   for (const family of fleet.families) {
     for (const axis of fleet.contract.required_axes) {
