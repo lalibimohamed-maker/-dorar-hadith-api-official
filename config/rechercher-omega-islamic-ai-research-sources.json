@@ -460,6 +460,24 @@
       "integration": "research reference for multilingual audio pipelines and forced alignment; keep it outside public acquisition/runtime unless the applicable model-specific license permits the intended use",
       "license": "Mixed: MIT for specified non-generative components; SeamlessM4T/Streaming models CC BY-NC 4.0; other Seamless models use the Seamless Licensing Agreement",
       "status": "research-only"
+    },
+    {
+      "id": "openalex_scholarly_graph",
+      "name": "OpenAlex",
+      "url": "https://developers.openalex.org/",
+      "role": "open scholarly graph for works, authors, institutions, sources, topics, languages, locations, open-access status and references",
+      "integration": "bibliographic identity and scholarly-discovery worker for books/articles/theses and institutional research about Islamic studies; use DOI/OpenAlex IDs to reconcile records while keeping religious evidence provenance separate from scholarly metadata",
+      "license": "API access terms apply; open-access/full-text licensing is item-specific and must be verified from each location",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "semantic_scholar_academic_graph",
+      "name": "Semantic Scholar Academic Graph API",
+      "url": "https://api.semanticscholar.org/api-docs/",
+      "role": "paper/author graph with citations, references, search and optional embeddings; supports DOI, arXiv, ACL and other identifiers",
+      "integration": "citation-graph and scholarly-search worker for finding studies about manuscripts, Arabic NLP, Quran/Hadith digitization and Islamic studies; metadata is discovery/bibliography evidence, not canonical religious evidence",
+      "license": "API usage governed by Semantic Scholar terms/rate limits; retrieved paper/full-text rights remain item-specific",
+      "status": "integration-candidate"
     }
   ],
   "design_note": {
