@@ -1,6 +1,13 @@
 name: Rechercher Ω — GitHub AI capability scout
 
 on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - "config/rechercher-omega-ai-capabilities.json"
+      - "scripts/rechercher-omega-github-ai-scout.mjs"
+      - ".github/workflows/rechercher-omega-github-ai-scout.yml"
   workflow_dispatch:
   schedule:
     - cron: "17 3 * * 0"
