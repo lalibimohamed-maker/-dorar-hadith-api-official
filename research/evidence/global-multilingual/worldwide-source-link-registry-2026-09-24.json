@@ -5,8 +5,8 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 462,
-    "rights_review_required": 462,
+    "links": 466,
+    "rights_review_required": 466,
     "new_global_links_added_2026_09_24": 310,
     "previous_snapshot_links": 127
   },
@@ -8568,6 +8568,93 @@
         "prayer_notifications"
       ],
       "notes": "Current first-party site provides cloud-based adhan automation, location-based prayer times, Shafi/Hanafi Asr options and mosque prayer displays; it states use of adhan-js. Included as a discovery/service source; application-owned or third-party content and audio remain item-level review_required."
+    },
+    {
+      "id": "world-465",
+      "category": "Open-source Quran / Islamic knowledge platform",
+      "name": "Ummah Library",
+      "url": "https://ummahlibrary.org/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://github.com/UmmahLibrary/ummah-library",
+      "capabilities": [
+        "quran",
+        "translations",
+        "tafsir",
+        "hadith",
+        "hifz",
+        "offline_reader",
+        "rest_api",
+        "multilingual",
+        "open_source"
+      ],
+      "notes": "Open-source Quran/Islamic knowledge ecosystem; repository states AGPL-3.0 for software and identifies bundled Uthmani Quran as Tanzil CC-BY 3.0. Third-party content remains item-level rights review."
+    },
+    {
+      "id": "world-466",
+      "category": "Open Quran data / waqf platform",
+      "name": "Quran.ws",
+      "url": "https://quran.ws/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://quran.ws/docs/guidelines/ar/licensing/",
+      "capabilities": [
+        "quran",
+        "open_data",
+        "datasets",
+        "api",
+        "multilingual",
+        "waqf",
+        "developer_resources"
+      ],
+      "notes": "First-party licensing guide states code MIT and published data/content CC BY 4.0 by default, with attribution rules; individual resources may differ."
+    },
+    {
+      "id": "world-467",
+      "category": "Open Quran infrastructure",
+      "name": "Itqan CMS",
+      "url": "https://docs.cms.itqan.dev/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://docs.cms.itqan.dev/",
+      "capabilities": [
+        "quran",
+        "tafsir",
+        "multilingual_translations",
+        "word_metadata",
+        "morphology",
+        "memorization",
+        "open_source",
+        "publisher_metadata"
+      ],
+      "notes": "Open-source Quranic CMS/developer infrastructure emphasizing verified publishers, licensing metadata and multilingual APIs; content rights remain source-specific."
+    },
+    {
+      "id": "world-468",
+      "category": "Open Islamic API / data distribution",
+      "name": "i-muslim API",
+      "url": "https://i-muslim.com/id/downloads",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://i-muslim.com/id/downloads",
+      "capabilities": [
+        "quran",
+        "hadith",
+        "translations",
+        "json_downloads",
+        "api",
+        "multilingual",
+        "license_metadata"
+      ],
+      "notes": "First-party download page states 37,165 hadith translations authored by i-muslim are CC0; upstream-mirrored records are metadata-only until an open-license grant is on file."
     }
   ],
   "notes": [
@@ -8614,7 +8701,8 @@
     "2026-09-25 deep verification round 2: added six distinct institutional/educational discovery sources plus Easy Fiqh community channel after live-source checks. Explicit Sunni/Shafi'i identity was recorded only where the first-party source stated it; other sources remain discovery candidates with rights_review_required.",
     "2026-09-25 targeted verification: added Baraheen Network, Islam For All, Taymiyyah Institute and Al-Imam Malick Islamic Institute. Baraheen and Taymiyyah have current first-party Sunni-oriented evidence; Al-Imam Malick explicitly states Maliki jurisprudence. Islam For All was preserved as a multilingual Islamic e-library/discovery lane using domain identity plus historical evidence, but its present operational status was not independently re-established in this pass.",
     "2026-09-25 exclusion policy reaffirmed: The Global Message and Hadith Data Bank are not part of the Sunni source registry and are not retained as Sunni candidates.",
-    "2026-09-27: verified and enriched the existing UmmahAPI record with its official API documentation and live Quran endpoint; added HifzMate, Zikrah, ilmSpace, and AzanCast as distinct Quran/Islamic application and service discovery lanes. All remain review_required and no redistribution rights are inferred."
+    "2026-09-27: verified and enriched the existing UmmahAPI record with its official API documentation and live Quran endpoint; added HifzMate, Zikrah, ilmSpace, and AzanCast as distinct Quran/Islamic application and service discovery lanes. All remain review_required and no redistribution rights are inferred.",
+    "2026-09-27 global design/product radar: added Ummah Library, Quran.ws, Itqan CMS and i-muslim as verified source/design-infrastructure lanes. These records are discovery/design inputs; content rights remain asset-level unless an explicit license states otherwise."
   ],
   "change_log": [
     "2026-09-24: added 6 supplied source-discovery endpoints to the canonical registry: https://saleh.af.org.sa/ar/books?page=1, https://www.sualruhaily.com, https://alshathri.net, https://af.org.sa, https://www.nusuk.sa, https://www.rabita.fi/en#services. All remain review_required; no redistribution permission is inferred.",
@@ -8624,6 +8712,105 @@
     "2026-09-25: added 2 verified source-discovery endpoints: https://tebyanacademy.com/ and https://www.nusuk.sa/. Existing exact URLs were checked before insertion; both remain review_required.",
     "2026-09-25 deep source radar follow-up: +3 verified source lanes; Al-Islam.org was deliberately excluded from the Sunni registry because its own About page states particular emphasis on Twelver Shia Islam. MyIslam was not classified as Sunni without sufficient first-party sectarian identification. Unverified named projects from the supplied list remain pending rather than being fabricated.",
     "2026-09-25 deep source radar round 2: +7 sources (Erth Al Mustafa, IslamicInfo, Ṣifah, International Seerah Council, Al Imam Institute, Imam Al-Shatibi Global Quran Platform, Easy Fiqh). The previously named Global Message/Baraheen/IslamForAll/Ibn Taymiyyah Virtual Institute/Fiqh of Minorities/Islam Verified and similar names remain unregistered because no sufficiently reliable first-party identity was established in this round.",
-    "2026-09-27: added verified HifzMate, Zikrah, ilmSpace and AzanCast source/discovery endpoints; enriched existing UmmahAPI (world-142) with official documentation and live endpoint metadata. Application/service presence does not grant redistribution rights."
-  ]
+    "2026-09-27: added verified HifzMate, Zikrah, ilmSpace and AzanCast source/discovery endpoints; enriched existing UmmahAPI (world-142) with official documentation and live endpoint metadata. Application/service presence does not grant redistribution rights.",
+    "2026-09-27: global design-intelligence pass added a structured product/capability taxonomy and four newly verified open-source/licensing-aware Quran/Islamic infrastructure sources. No new branch was created; changes remain on PR #561 branch."
+  ],
+  "design_intelligence": {
+    "status": "active",
+    "purpose": "Capture reusable product, information-architecture, API, metadata, multilingual, provenance and rights patterns discovered from the worldwide source registry without copying proprietary content or designs.",
+    "separation_of_concerns": [
+      "source_discovery",
+      "content_provenance",
+      "rights",
+      "api_execution",
+      "acquisition",
+      "canonical_corpus",
+      "product_ux"
+    ],
+    "capability_taxonomy": [
+      "quran",
+      "quran_search",
+      "translations",
+      "tafsir",
+      "hadith",
+      "hadith_search",
+      "fiqh",
+      "aqidah",
+      "seerah",
+      "books",
+      "manuscripts",
+      "audio",
+      "recitation",
+      "memorization",
+      "prayer_times",
+      "qibla",
+      "hijri_calendar",
+      "duas",
+      "dhikr",
+      "zakat",
+      "multilingual",
+      "ocr",
+      "metadata",
+      "bibliography",
+      "api",
+      "offline",
+      "accessibility",
+      "education"
+    ],
+    "product_surfaces": [
+      "home",
+      "global_search",
+      "quran_reader",
+      "hadith_reader",
+      "book_reader",
+      "manuscript_viewer",
+      "scholar_profile",
+      "source_profile",
+      "translation_compare",
+      "tafsir_compare",
+      "audio_player",
+      "hifz_mode",
+      "prayer_dashboard",
+      "qibla",
+      "hijri_calendar",
+      "zakat_calculator",
+      "library",
+      "download_center",
+      "citations_provenance",
+      "rights_notice",
+      "settings_language"
+    ],
+    "design_principles": [
+      "Arabic canonical text remains distinct from translations",
+      "every imported work keeps source edition and provenance",
+      "rights are item-level and fail-closed",
+      "API availability never implies redistribution permission",
+      "language is a first-class dimension",
+      "search spans content types while preserving type-specific ranking and metadata",
+      "source refresh never writes directly to canonical Corpus",
+      "design inspiration is abstracted into reusable patterns rather than copied branding or proprietary UI"
+    ],
+    "global_scan_2026_09_27": [
+      "open-source Quran/Islamic ecosystem platforms",
+      "open Quran licensing/data projects",
+      "Quran CMS/developer infrastructure",
+      "per-record license-aware Islamic API distributions"
+    ],
+    "missing_focus_areas": [
+      "unified source/edition/work identity graph",
+      "per-asset license registry",
+      "language/translation quality metadata",
+      "scholar and institution authority records",
+      "citation graph across Quran-hadith-tafsir-books",
+      "accessibility and low-bandwidth/offline UX",
+      "API connector health and contract tests",
+      "design pattern provenance and attribution"
+    ],
+    "source_refs": [
+      "world-465",
+      "world-466",
+      "world-467",
+      "world-468"
+    ]
+  }
 }
