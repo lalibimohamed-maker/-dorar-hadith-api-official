@@ -298,6 +298,15 @@
       "role": "FastAPI aggregation of Quran, 13 hadith collections, tafsir, adhkar, duas, prayer and audio",
       "integration": "evaluate endpoint coverage, test strategy and local/self-hosted data packaging; upstream licenses and provenance remain authoritative",
       "status": "evaluation-candidate"
+    },
+    {
+      "id": "islamic_radio_api",
+      "name": "Islamic Radio API",
+      "url": "https://github.com/uthumany/islamic-radio-api",
+      "role": "open JSON API for Quran and Islamic radio station streams and metadata",
+      "integration": "audio/radio connector reference; retain station/provider attribution and verify stream redistribution terms before caching",
+      "license": "CC0 for API code/data declaration; individual streams remain provider-specific",
+      "status": "evaluation-candidate"
     }
   ],
   "design_note": {
