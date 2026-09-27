@@ -1,0 +1,303 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Reusable open-source AI capability registry for Rechercher Omega. Components are adapters/workers, never scholarly sources.",
+  "policy": {
+    "free_first": true,
+    "prefer_local": true,
+    "secret_harvesting": false,
+    "public_secret_use": false,
+    "external_code_auto_execution": false,
+    "model_weight_license_separate": true,
+    "generated_media_is_evidence": false,
+    "corpus_write_allowed": false
+  },
+  "components": [
+    {
+      "id": "openwakeword",
+      "kind": "voice_wake_word",
+      "source_repo": "https://github.com/dscripka/openWakeWord",
+      "code_license": "Apache-2.0",
+      "model_license_status": "review_required",
+      "tasks": ["wake_word"],
+      "integration": "runtime_reference",
+      "auto_download": false,
+      "notes": "Repository code is Apache-2.0; bundled pretrained wake-word models have more restrictive licensing, so only the runtime/code path is enabled automatically."
+    },
+    {
+      "id": "silero-vad",
+      "kind": "voice_activity_detection",
+      "source_repo": "https://github.com/snakers4/silero-vad",
+      "code_license": "MIT",
+      "model_license_status": "review_required",
+      "tasks": ["voice_activity_detection", "barge_in"],
+      "integration": "runtime_reference",
+      "auto_download": false
+    },
+    {
+      "id": "faster-whisper",
+      "kind": "speech_recognition",
+      "source_repo": "https://github.com/SYSTRAN/faster-whisper",
+      "code_license": "MIT",
+      "model_license_status": "inherited_from_whisper",
+      "tasks": ["automatic_speech_recognition", "speech_language_detection"],
+      "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "whisper",
+      "kind": "speech_recognition",
+      "source_repo": "https://github.com/openai/whisper",
+      "code_license": "MIT",
+      "model_license_status": "verified_source_license",
+      "tasks": ["automatic_speech_recognition", "speech_translation", "language_identification"],
+      "integration": "local_runtime",
+      "auto_download": true
+    },
+    {
+      "id": "kokoro",
+      "kind": "text_to_speech",
+      "source_repo": "https://github.com/hexgrad/kokoro",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": ["text_to_speech"],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Use as a lightweight TTS alternative when the requested language/voice is covered; retain CosyVoice for multilingual coverage."
+    },
+    {
+      "id": "cosyvoice",
+      "kind": "text_to_speech",
+      "source_repo": "https://github.com/FunAudioLLM/CosyVoice",
+      "code_license": "verified_source_license",
+      "model_license_status": "review_required",
+      "tasks": ["text_to_speech", "multilingual_speech", "voice_conversion"],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Existing Omega model registry remains authoritative for the currently staged CosyVoice weights."
+    },
+    {
+      "id": "paddleocr-vl",
+      "kind": "document_vlm_ocr",
+      "source_repo": "https://github.com/PaddlePaddle/PaddleOCR",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": ["ocr", "layout", "tables", "formulas", "charts", "pdf_page_parsing"],
+      "integration": "local_or_gpu_runtime",
+      "auto_download": true
+    },
+    {
+      "id": "docling",
+      "kind": "document_parser",
+      "source_repo": "https://github.com/docling-project/docling",
+      "code_license": "MIT",
+      "model_license_status": "review_required",
+      "tasks": ["pdf_parsing", "reading_order", "tables", "layout", "document_chunking"],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Docling code is MIT; individual models keep their own licenses."
+    },
+    {
+      "id": "docling-mcp",
+      "kind": "document_mcp",
+      "source_repo": "https://github.com/docling-project/docling-mcp",
+      "code_license": "MIT",
+      "model_license_status": "inherited",
+      "tasks": ["document_tools", "pdf_tools", "mcp"],
+      "integration": "mcp_adapter",
+      "auto_download": false
+    },
+    {
+      "id": "mineru",
+      "kind": "document_parser",
+      "source_repo": "https://github.com/opendatalab/MinerU",
+      "code_license": "MinerU Open Source License",
+      "model_license_status": "review_required",
+      "tasks": ["pdf_parsing", "ocr", "reading_order", "markdown_json_extraction"],
+      "integration": "optional_runtime",
+      "auto_download": false,
+      "notes": "License is Apache-2.0 based with additional conditions, including online-service attribution and thresholds; keep deployment policy-aware."
+    },
+    {
+      "id": "olmocr",
+      "kind": "vlm_ocr",
+      "source_repo": "https://github.com/allenai/olmocr",
+      "code_license": "Apache-2.0",
+      "model_license_status": "review_required",
+      "tasks": ["scanned_pdf_ocr", "handwriting", "equations", "tables", "reading_order"],
+      "integration": "gpu_runtime",
+      "auto_download": false,
+      "notes": "Use as an independent OCR/parsing challenger rather than replacing the canonical extraction path."
+    },
+    {
+      "id": "bge-m3",
+      "kind": "multilingual_embedding",
+      "source_repo": "https://github.com/FlagOpen/FlagEmbedding",
+      "code_license": "MIT",
+      "model_license_status": "review_required",
+      "tasks": ["dense_embedding", "sparse_retrieval", "multi_vector_retrieval", "semantic_search"],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "BGE-M3 supports 100+ languages and dense, sparse and multi-vector retrieval; model-weight licensing is reviewed separately."
+    },
+    {
+      "id": "bge-reranker-v2-m3",
+      "kind": "multilingual_reranker",
+      "source_repo": "https://github.com/FlagOpen/FlagEmbedding",
+      "code_license": "MIT",
+      "model_license_status": "review_required",
+      "tasks": ["reranking", "cross_encoder_reranking"],
+      "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "qdrant",
+      "kind": "vector_database",
+      "source_repo": "https://github.com/qdrant/qdrant",
+      "code_license": "Apache-2.0",
+      "model_license_status": "not_applicable",
+      "tasks": ["vector_search", "hybrid_search", "metadata_filtering"],
+      "integration": "service_adapter",
+      "auto_download": false
+    },
+    {
+      "id": "llama-index",
+      "kind": "rag_framework",
+      "source_repo": "https://github.com/run-llama/llama_index",
+      "code_license": "MIT",
+      "model_license_status": "inherited",
+      "tasks": ["rag", "retrieval", "indexing", "tool_use"],
+      "integration": "optional_framework_adapter",
+      "auto_download": false
+    },
+    {
+      "id": "haystack",
+      "kind": "rag_framework",
+      "source_repo": "https://github.com/deepset-ai/haystack",
+      "code_license": "Apache-2.0",
+      "model_license_status": "inherited",
+      "tasks": ["rag", "agents", "retrieval", "routing", "multimodal"],
+      "integration": "optional_framework_adapter",
+      "auto_download": false
+    },
+    {
+      "id": "mcp-python-sdk",
+      "kind": "agent_tool_protocol",
+      "source_repo": "https://github.com/modelcontextprotocol/python-sdk",
+      "code_license": "MIT",
+      "model_license_status": "not_applicable",
+      "tasks": ["mcp", "tool_discovery", "remote_tools", "local_tools"],
+      "integration": "native_adapter",
+      "auto_download": false
+    },
+    {
+      "id": "hermes-agent",
+      "kind": "agent_architecture_reference",
+      "source_repo": "https://github.com/NousResearch/hermes-agent",
+      "code_license": "review_required",
+      "model_license_status": "review_required",
+      "tasks": ["agent_loop", "mcp", "tool_filtering", "memory"],
+      "integration": "architecture_reference",
+      "auto_download": false,
+      "notes": "Borrow the MCP/tool-filtering pattern; do not embed the full agent implementation."
+    },
+    {
+      "id": "litellm",
+      "kind": "model_gateway",
+      "source_repo": "https://github.com/BerriAI/litellm",
+      "code_license": "MIT_outside_enterprise",
+      "model_license_status": "not_applicable",
+      "tasks": ["model_gateway", "provider_failover", "openai_compatible_routing"],
+      "integration": "optional_gateway",
+      "auto_download": false,
+      "notes": "Useful as a provider gateway, but Omega keeps local-first routing and never auto-charges a provider."
+    },
+    {
+      "id": "ollama",
+      "kind": "local_model_runtime",
+      "source_repo": "https://github.com/ollama/ollama",
+      "code_license": "MIT",
+      "model_license_status": "per_model",
+      "tasks": ["local_inference", "vision", "tools", "streaming"],
+      "integration": "openai_compatible",
+      "auto_download": false
+    },
+    {
+      "id": "llama-cpp",
+      "kind": "local_model_runtime",
+      "source_repo": "https://github.com/ggml-org/llama.cpp",
+      "code_license": "MIT",
+      "model_license_status": "per_model",
+      "tasks": ["local_inference", "gguf", "vision", "openai_compatible"],
+      "integration": "openai_compatible",
+      "auto_download": false
+    },
+    {
+      "id": "gpt-oss",
+      "kind": "reasoning_model",
+      "source_repo": "https://github.com/openai/gpt-oss",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": ["reasoning", "tool_use", "structured_output"],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Candidate for local reasoning; resource size is tracked separately in the model registry."
+    },
+    {
+      "id": "gpt-oss-safeguard",
+      "kind": "safety_reasoning_model",
+      "source_repo": "https://github.com/openai/gpt-oss-safeguard",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": ["safety_review", "policy_check"],
+      "integration": "local_runtime",
+      "auto_download": false
+    }
+  ],
+  "pipelines": {
+    "voice": {
+      "stages": [
+        "openwakeword",
+        "silero-vad",
+        "faster-whisper",
+        "qwen3-omni",
+        "cosyvoice_or_kokoro"
+      ],
+      "arabic_speech": {
+        "primary_understanding": "qwen3-omni",
+        "fallback_asr": "faster-whisper"
+      },
+      "canonical_quran_recitation": "arabic_audio_only"
+    },
+    "document": {
+      "stages": [
+        "pdf_integrity",
+        "docling",
+        "paddleocr-vl",
+        "olmocr",
+        "text_validation",
+        "provenance"
+      ],
+      "challenger_policy": "run_independent_parsers when scan/layout confidence is low"
+    },
+    "retrieval": {
+      "stages": [
+        "arabic_normalization",
+        "bm25_or_lexical",
+        "bge-m3",
+        "bge-reranker-v2-m3",
+        "evidence_gate"
+      ]
+    },
+    "agent": {
+      "stages": [
+        "intent_detection",
+        "task_router",
+        "mcp_tool_discovery",
+        "tool_filtering",
+        "execution",
+        "provenance",
+        "evidence_gate"
+      ]
+    }
+  }
+}
