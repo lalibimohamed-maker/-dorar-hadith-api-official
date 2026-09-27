@@ -18,7 +18,13 @@ The Quran lane already has a detailed Quran Foundation contract. This document a
 | biographies | التراجم والرجال | scholarly corpus + web source |
 | references | المراجع والفهارس والمكتبات | library/catalog/metadata services |
 
-The first wave is deliberately nine independent families. It can expand to the 24-cell target without changing the contract.
+The fleet is now 24 independent families. The nine foundational families are joined by fifteen additional lanes covering أسباب النزول، الشروح، التجويد، القراءات، أصول الفقه، التاريخ والحضارة، المصطلحات، التزكية والأخلاق، المخطوطات، الجغرافيا والرحلات، مؤشرات البحث، الموسوعات، الوثائق، الترجمات متعددة اللغات، والتعليم.
+
+## 24-family expansion
+
+The additional families are deliberately source-pluggable. A family can begin with a public corpus, institutional site, catalogue, metadata service, or digital library without claiming that the source exposes a formal API. `not_documented` and `not_applicable` are valid environment states; invented endpoints are forbidden.
+
+Every source record now carries its own seven-axis `contract`, in addition to the family-level contract. This means a single source can be quarantined or replaced without collapsing the entire domain family.
 
 ## Shared contract
 
