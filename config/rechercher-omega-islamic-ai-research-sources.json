@@ -433,6 +433,33 @@
       "integration": "optional audio-segmentation/diarization worker for lectures, lessons and multi-speaker recordings; keep community/open models distinct from any premium hosted pipeline and gate model agreements",
       "license": "MIT code; pretrained model/pipeline terms are separate and may require acceptance",
       "status": "integration-candidate"
+    },
+    {
+      "id": "whisperx",
+      "name": "WhisperX",
+      "url": "https://github.com/m-bain/whisperX",
+      "role": "time-accurate ASR with word-level timestamps, alignment and optional speaker diarization",
+      "integration": "reference for long-form Islamic lecture and recitation transcription workers; pin revision, retain source audio provenance, and treat alignment/diarization as derived evidence",
+      "license": "BSD-2-Clause code; referenced models have separate licenses/agreements",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "mms_multilingual_asr",
+      "name": "Massively Multilingual Speech (MMS) ASR",
+      "url": "https://huggingface.co/facebook/mms-1b-all",
+      "role": "multilingual wav2vec2 ASR model family covering 1,000+ languages",
+      "integration": "research-only fallback for language identification and multilingual speech transcription when Whisper coverage is insufficient; separate Arabic/Quran evaluation from generic multilingual ASR and do not promote model output to canonical text",
+      "license": "CC BY-NC 4.0 for MMS code and model weights",
+      "status": "research-only"
+    },
+    {
+      "id": "seamless_communication",
+      "name": "Seamless Communication",
+      "url": "https://github.com/facebookresearch/seamless_communication",
+      "role": "multilingual speech/text translation and transcription research stack with forced-alignment components",
+      "integration": "research reference for multilingual audio pipelines and forced alignment; keep it outside public acquisition/runtime unless the applicable model-specific license permits the intended use",
+      "license": "Mixed: MIT for specified non-generative components; SeamlessM4T/Streaming models CC BY-NC 4.0; other Seamless models use the Seamless Licensing Agreement",
+      "status": "research-only"
     }
   ],
   "design_note": {
