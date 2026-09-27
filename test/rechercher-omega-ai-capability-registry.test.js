@@ -53,7 +53,14 @@ test("registry includes the voice, document, retrieval and agent building blocks
     "aider",
     "tabby",
     "mini-swe-agent",
-    "codex-cli"
+    "codex-cli",
+    "everos",
+    "memoripy",
+    "tokensave",
+    "roam-code",
+    "prismor",
+    "agent-inspect",
+    "mcp-evals"
   ]) {
     assert.ok(registry.components.some(component => component.id === id), "missing " + id);
   }
