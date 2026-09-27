@@ -46,7 +46,7 @@ Provider credentials remain environment-injected secrets such as `HF_TOKEN`, `GE
 - Qwen3-Coder: https://github.com/QwenLM/Qwen3-Coder
 - gpt-oss: https://github.com/openai/gpt-oss
 - gpt-oss-safeguard: https://github.com/openai/gpt-oss-safeguard
-- Aider: https://github.com/Aider-AI/aider
+- EverOS memory: https://github.com/EverMind-AI/EverOS\n- Memoripy evidence-first memory: https://github.com/caspianmoon/memoripy\n- Prismor agent tool guard: https://github.com/PrismorSec/prismor\n- Agent Inspect: https://github.com/rajudandigam/agent-inspect\n- MCP Evals: https://github.com/mclenhard/mcp-evals\n- Tokensave code intelligence: https://github.com/aovestdipaperino/tokensave\n- Roam Code: https://github.com/Cranot/roam-code\n- Aider: https://github.com/Aider-AI/aider
 - Tabby: https://github.com/TabbyML/tabby
 - mini-SWE-agent: https://github.com/SWE-agent/mini-swe-agent
 - Codex CLI: https://github.com/openai/codex
