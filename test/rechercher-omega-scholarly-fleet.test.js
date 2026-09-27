@@ -26,6 +26,13 @@ test("each family has an independent source set", () => {
   assert.equal(index.get("hadith").sources.some(s => s.id === "sunnah-com-api"), true);
   assert.equal(index.get("fatwa").sources.some(s => s.id === "saudi-alifta"), true);
   assert.equal(index.get("references").sources.some(s => s.id === "crossref"), true);
+  for (const family of fleet.families) {
+    for (const source of family.sources) {
+      for (const axis of fleet.contract.required_axes) {
+        assert.ok(source.contract[axis], family.id + "/" + source.id + " missing " + axis);
+      }
+    }
+  }
 });
 
 test("adapter requests are source-specific and carry provenance and rights", () => {
@@ -56,4 +63,8 @@ test("malformed fleets fail closed", () => {
   const invalid = structuredClone(fleet);
   invalid.contract.required_axes = ["production"];
   assert.equal(validateScholarlyFleet(invalid).valid, false);
+
+  const brokenSource = structuredClone(fleet);
+  delete brokenSource.families[0].sources[0].contract.rights;
+  assert.equal(validateScholarlyFleet(brokenSource).valid, false);
 });
