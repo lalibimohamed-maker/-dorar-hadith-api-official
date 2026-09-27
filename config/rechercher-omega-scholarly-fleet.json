@@ -51,7 +51,16 @@
           "execution": "oauth2_client_credentials",
           "production": "documented",
           "pre_live": "documented",
-          "sdk": "official_js_sdk"
+          "sdk": "official_js_sdk",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "oauth2_client_credentials"
+          }
         }
       ],
       "contract": {
@@ -84,7 +93,16 @@
           "execution": "api_key_server_only",
           "production": "documented",
           "pre_live": "not_documented",
-          "sdk": "official_api_repository"
+          "sdk": "official_api_repository",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "api_key_server_only"
+          }
         },
         {
           "id": "dorar-hadith-web",
@@ -92,7 +110,16 @@
           "execution": "source_specific_http_adapter",
           "production": "web_service",
           "pre_live": "not_documented",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
         },
         {
           "id": "openiti",
@@ -100,7 +127,16 @@
           "execution": "git_or_release_adapter",
           "production": "public_corpus",
           "pre_live": "not_applicable",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
         }
       ],
       "contract": {
@@ -131,7 +167,16 @@
           "execution": "reuse_quran_foundation_adapter",
           "production": "documented",
           "pre_live": "documented_test_environment",
-          "sdk": "official_js_sdk"
+          "sdk": "official_js_sdk",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "reuse_quran_foundation_adapter"
+          }
         },
         {
           "id": "openiti-tafsir",
@@ -139,7 +184,16 @@
           "execution": "git_or_release_adapter",
           "production": "public_corpus",
           "pre_live": "not_applicable",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
         }
       ],
       "contract": {
@@ -171,7 +225,16 @@
           "execution": "git_or_release_adapter",
           "production": "public_corpus",
           "pre_live": "not_applicable",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
         },
         {
           "id": "archive-book-records",
@@ -179,7 +242,16 @@
           "execution": "archive_metadata_adapter",
           "production": "public_service",
           "pre_live": "not_documented",
-          "sdk": "http_adapter"
+          "sdk": "http_adapter",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "archive_metadata_adapter"
+          }
         }
       ],
       "contract": {
@@ -210,7 +282,16 @@
           "execution": "git_or_release_adapter",
           "production": "public_corpus",
           "pre_live": "not_applicable",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
         },
         {
           "id": "shamela-aqidah",
@@ -218,7 +299,16 @@
           "execution": "rights_checked_web_or_archive_adapter",
           "production": "source_defined",
           "pre_live": "not_documented",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "rights_checked_web_or_archive_adapter"
+          }
         }
       ],
       "contract": {
@@ -250,7 +340,16 @@
           "execution": "source_specific_http_adapter",
           "production": "official_site",
           "pre_live": "not_documented",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
         },
         {
           "id": "openiti-fiqh",
@@ -258,7 +357,16 @@
           "execution": "git_or_release_adapter",
           "production": "public_corpus",
           "pre_live": "not_applicable",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
         }
       ],
       "contract": {
@@ -289,7 +397,16 @@
           "execution": "source_specific_http_adapter",
           "production": "official_site",
           "pre_live": "not_documented",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
         },
         {
           "id": "egypt-dar-al-ifta",
@@ -297,7 +414,16 @@
           "execution": "source_specific_http_adapter",
           "production": "official_site",
           "pre_live": "not_documented",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
         },
         {
           "id": "iifa",
@@ -305,7 +431,16 @@
           "execution": "source_specific_http_adapter",
           "production": "official_site",
           "pre_live": "not_documented",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
         }
       ],
       "contract": {
@@ -338,7 +473,16 @@
           "execution": "git_or_release_adapter",
           "production": "public_corpus",
           "pre_live": "not_applicable",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
         },
         {
           "id": "dorar-narrator-material",
@@ -346,7 +490,16 @@
           "execution": "source_specific_http_adapter",
           "production": "web_service",
           "pre_live": "not_documented",
-          "sdk": "none_claimed"
+          "sdk": "none_claimed",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
         }
       ],
       "contract": {
@@ -377,7 +530,16 @@
           "execution": "http_or_catalog_adapter",
           "production": "public_service",
           "pre_live": "not_documented",
-          "sdk": "source_specific"
+          "sdk": "source_specific",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "http_or_catalog_adapter"
+          }
         },
         {
           "id": "crossref",
@@ -385,7 +547,16 @@
           "execution": "http_api_adapter",
           "production": "public_service",
           "pre_live": "not_applicable",
-          "sdk": "http"
+          "sdk": "http",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "http_api_adapter"
+          }
         },
         {
           "id": "google-books",
@@ -393,7 +564,16 @@
           "execution": "source_specific_api_adapter",
           "production": "source_defined",
           "pre_live": "not_documented",
-          "sdk": "source_specific"
+          "sdk": "source_specific",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_api_adapter"
+          }
         },
         {
           "id": "gallica-bnf",
@@ -401,13 +581,754 @@
           "execution": "http_or_iiif_adapter",
           "production": "public_service",
           "pre_live": "not_documented",
-          "sdk": "source_specific"
+          "sdk": "source_specific",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "http_or_iiif_adapter"
+          }
         }
       ],
       "contract": {
         "production": "source_specific",
         "pre_live": "not_documented_or_not_applicable",
         "auth": "source_specific_or_none",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "asbab_al_nuzul",
+      "label_ar": "أسباب النزول",
+      "capabilities": [
+        "works",
+        "ayah_alignment",
+        "narrations",
+        "source_comparison",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "quran-foundation-asbab",
+          "kind": "official_api",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "app_credentials",
+            "sdk": "official_js_sdk",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "reuse_quran_foundation_adapter"
+          }
+        },
+        {
+          "id": "openiti-asbab",
+          "kind": "scholarly_corpus",
+          "contract": {
+            "production": "public_corpus",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "sharh",
+      "label_ar": "الشروح والتعليقات",
+      "capabilities": [
+        "commentaries",
+        "hadith_shuruh",
+        "work_alignment",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "openiti-sharh",
+          "kind": "scholarly_corpus",
+          "contract": {
+            "production": "public_corpus",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
+        },
+        {
+          "id": "waqfeya-sharh",
+          "kind": "digital_library",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "tajwid",
+      "label_ar": "التجويد",
+      "capabilities": [
+        "tajwid_rules",
+        "teaching_texts",
+        "quran_practice",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "waqfeya-tajwid",
+          "kind": "digital_library",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        },
+        {
+          "id": "kfgqpc-tajwid",
+          "kind": "official_quran",
+          "contract": {
+            "production": "official_site",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_official_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "qiraat",
+      "label_ar": "القراءات والرسم والضبط",
+      "capabilities": [
+        "qiraat",
+        "riwayat",
+        "rasm",
+        "dhabt",
+        "recitation_metadata"
+      ],
+      "sources": [
+        {
+          "id": "kfgqpc-qiraat",
+          "kind": "official_quran",
+          "contract": {
+            "production": "official_site",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_official_adapter"
+          }
+        },
+        {
+          "id": "waqfeya-qiraat",
+          "kind": "digital_library",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "usul_al_fiqh",
+      "label_ar": "أصول الفقه والقواعد",
+      "capabilities": [
+        "usul",
+        "legal_maxims",
+        "methodology",
+        "comparative_study",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "iifa-usul",
+          "kind": "official_institutional",
+          "contract": {
+            "production": "official_site",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        },
+        {
+          "id": "waqfeya-usul",
+          "kind": "digital_library",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "islamic_history",
+      "label_ar": "التاريخ الإسلامي والحضارة",
+      "capabilities": [
+        "chronology",
+        "dynasties",
+        "events",
+        "sources",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "openiti-history",
+          "kind": "scholarly_corpus",
+          "contract": {
+            "production": "public_corpus",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
+        },
+        {
+          "id": "waqfeya-history",
+          "kind": "digital_library",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "terminology",
+      "label_ar": "المصطلحات والمفاهيم الإسلامية",
+      "capabilities": [
+        "term_definitions",
+        "cross_reference",
+        "multilingual_terms",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "islam-encyclopedia-terms",
+          "kind": "reference_site",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        },
+        {
+          "id": "openiti-terminology",
+          "kind": "scholarly_corpus",
+          "contract": {
+            "production": "public_corpus",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "ethics_and_spirituality",
+      "label_ar": "التزكية والأخلاق والآداب",
+      "capabilities": [
+        "ethics",
+        "spirituality",
+        "adab",
+        "works",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "waqfeya-ethics",
+          "kind": "digital_library",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        },
+        {
+          "id": "openiti-ethics",
+          "kind": "scholarly_corpus",
+          "contract": {
+            "production": "public_corpus",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "manuscripts",
+      "label_ar": "المخطوطات والتراث المخطوط",
+      "capabilities": [
+        "manuscript_catalogs",
+        "codicology",
+        "paleography",
+        "images",
+        "holdings",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "al-furqan-manuscripts",
+          "kind": "manuscript_database",
+          "contract": {
+            "production": "public_service",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "catalog_http_adapter"
+          }
+        },
+        {
+          "id": "qatar-digital-library-manuscripts",
+          "kind": "digital_library",
+          "contract": {
+            "production": "public_service",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "iiif_http_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "geography",
+      "label_ar": "الجغرافيا والرحلات والأماكن",
+      "capabilities": [
+        "places",
+        "routes",
+        "travel_accounts",
+        "historical_geography",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "waqfeya-geography",
+          "kind": "digital_library",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        },
+        {
+          "id": "openiti-geography",
+          "kind": "scholarly_corpus",
+          "contract": {
+            "production": "public_corpus",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "git_or_release_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "research_indexes",
+      "label_ar": "الفهارس ومؤشرات البحث العلمي",
+      "capabilities": [
+        "bibliographic_indexing",
+        "identifiers",
+        "citations",
+        "crosswalks",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "crossref-research",
+          "kind": "metadata_api",
+          "contract": {
+            "production": "public_service",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "public_or_registered_access",
+            "sdk": "http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "http_api_adapter"
+          }
+        },
+        {
+          "id": "library-of-congress-research",
+          "kind": "library_catalog",
+          "contract": {
+            "production": "public_service",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "source_specific",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "catalog_http_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "encyclopedias",
+      "label_ar": "الموسوعات والمعاجم المرجعية",
+      "capabilities": [
+        "encyclopedia_entries",
+        "reference_articles",
+        "cross_reference",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "al-furqan-encyclopedias",
+          "kind": "reference_database",
+          "contract": {
+            "production": "public_service",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "catalog_http_adapter"
+          }
+        },
+        {
+          "id": "open-library-encyclopedias",
+          "kind": "bibliographic_service",
+          "contract": {
+            "production": "public_service",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "public_api",
+            "sdk": "http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "http_api_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "documents",
+      "label_ar": "الوثائق والسجلات الرقمية",
+      "capabilities": [
+        "documents",
+        "scans",
+        "metadata",
+        "collections",
+        "full_text_discovery"
+      ],
+      "sources": [
+        {
+          "id": "internet-archive-documents",
+          "kind": "digital_archive",
+          "contract": {
+            "production": "public_service",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "metadata_download_adapter"
+          }
+        },
+        {
+          "id": "qatar-digital-library-documents",
+          "kind": "digital_library",
+          "contract": {
+            "production": "public_service",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "iiif_http_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "multilingual_translations",
+      "label_ar": "الترجمات متعددة اللغات",
+      "capabilities": [
+        "translation_records",
+        "language_pairs",
+        "translator_metadata",
+        "parallel_text",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "kfgqpc-translations",
+          "kind": "official_quran",
+          "contract": {
+            "production": "official_site",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "none_claimed",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_official_adapter"
+          }
+        },
+        {
+          "id": "quran-foundation-translations",
+          "kind": "official_api",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "app_credentials",
+            "sdk": "official_js_sdk",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "reuse_quran_foundation_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
+        "sdk": "official_if_documented_else_http",
+        "rights": "item_level_review",
+        "provenance": "required",
+        "adapter": "declared_per_source"
+      }
+    },
+    {
+      "id": "education",
+      "label_ar": "التعليم والمناهج والمتون",
+      "capabilities": [
+        "curricula",
+        "lessons",
+        "study_guides",
+        "structured_courses",
+        "search"
+      ],
+      "sources": [
+        {
+          "id": "waqfeya-education",
+          "kind": "digital_library",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        },
+        {
+          "id": "islamhouse-education",
+          "kind": "educational_repository",
+          "contract": {
+            "production": "source_specific",
+            "pre_live": "not_documented_or_not_applicable",
+            "auth": "source_specific_or_none",
+            "sdk": "official_if_documented_else_http",
+            "rights": "review_required",
+            "provenance": "required",
+            "adapter": "source_specific_http_adapter"
+          }
+        }
+      ],
+      "status": "independent_family",
+      "contract": {
+        "production": "family_level_source_specific",
+        "pre_live": "source_documented_or_not_applicable",
+        "auth": "source_specific",
         "sdk": "official_if_documented_else_http",
         "rights": "item_level_review",
         "provenance": "required",
@@ -470,7 +1391,7 @@
   },
   "expansion": {
     "target_domain_cells": 24,
-    "current_family_count": 9,
+    "current_family_count": 24,
     "rule": "Add new families or source connectors without changing the shared contract or moving scientific content into the system layer.",
     "future_candidates": [
       "asbab_al_nuzul",
