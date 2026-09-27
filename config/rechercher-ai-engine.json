@@ -3,10 +3,66 @@
   "status": "omega-integrated-provider-neutral-layer",
   "principle": "Rechercher Ω remains the single canonical AI orchestration layer; this module supplies provider interoperability and optional operational adapters only.",
   "components": {
-    "vercel_ai_sdk": {"role": "provider interoperability reference", "license": "Apache-2.0", "upstream": "https://github.com/vercel/ai"},
-    "supabase": {"role": "operational metadata/search/vector store", "license": "Apache-2.0 repository; verify component-level licenses", "upstream": "https://github.com/supabase/supabase"},
-    "posthog": {"role": "optional observability", "license": "MIT outside ee; ee has separate Enterprise license", "upstream": "https://github.com/PostHog/posthog", "foss_upstream": "https://github.com/PostHog/posthog-foss"},
-    "free_ai": {"role": "optional model/provider reference", "license": "record per model", "upstream": "https://free.ai/open-source/"}
+    "vercel_ai_sdk": {
+      "role": "provider interoperability reference",
+      "license": "Apache-2.0",
+      "upstream": "https://github.com/vercel/ai"
+    },
+    "supabase": {
+      "role": "operational metadata/search/vector store",
+      "license": "Apache-2.0 repository; verify component-level licenses",
+      "upstream": "https://github.com/supabase/supabase"
+    },
+    "posthog": {
+      "role": "optional observability",
+      "license": "MIT outside ee; ee has separate Enterprise license",
+      "upstream": "https://github.com/PostHog/posthog",
+      "foss_upstream": "https://github.com/PostHog/posthog-foss"
+    },
+    "free_ai": {
+      "role": "optional model/provider reference",
+      "license": "record per model",
+      "upstream": "https://free.ai/open-source/"
+    },
+    "agent_workers": {
+      "role": "optional isolated agent workers behind Rechercher Ω",
+      "policy": "Agents may inspect, research, test and propose changes; all repository changes must flow through isolated branches/PR review and deterministic gates; no direct canonical Corpus writes.",
+      "candidates": [
+        "Arena AI Coding Agent",
+        "goose",
+        "Qwen Code",
+        "OpenHands"
+      ]
+    },
+    "grounded_retrieval": {
+      "role": "source-grounded retrieval and MCP interoperability",
+      "policy": "Every retrieval result carries source/work/edition/language/provenance/rights identifiers; generated text never becomes evidence.",
+      "candidates": [
+        "quran-mcp",
+        "arabic-knowledge-mcp",
+        "IslamicCorpusMCP",
+        "ilm"
+      ]
+    },
+    "manuscript_intelligence": {
+      "role": "OCR/HTR and manuscript processing research adapters",
+      "policy": "Derived OCR must remain non-canonical until multi-engine comparison, checksum/provenance and QC gates pass.",
+      "candidates": [
+        "Tarima",
+        "Arabic-PDF-OCR",
+        "arabic-document-ocr-ai"
+      ]
+    },
+    "knowledge_graph": {
+      "role": "Islamic entity/relationship graph research",
+      "policy": "Graphs encode documented relationships and provenance; they do not create religious authority or infer rulings.",
+      "candidates": [
+        "ilm",
+        "OpenHikmah",
+        "Hadith Knowledge Graph",
+        "Integrated Islamic Ontology"
+      ]
+    }
   },
   "security": {
     "secrets": "environment or secret manager only",
