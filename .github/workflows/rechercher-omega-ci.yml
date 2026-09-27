@@ -19,6 +19,9 @@ on:
       - "test/rechercher-omega-adapters.test.js"
       - "test/rechercher-omega-phase3.test.js"
       - "test/rechercher-omega-integration.test.js"
+      - "src/rechercher-omega-global-deep-search.js"
+      - "config/rechercher-omega-global-deep-search.json"
+      - "test/rechercher-omega-global-deep-search.test.js"
       - "src/rechercher-omega-runtime-gate.js"
       - "src/rechercher-omega-council.js"
       - "src/rechercher-omega-weight-verifier.js"
@@ -50,4 +53,4 @@ jobs:
       - name: Install
         run: npm ci
       - name: Ω boundary tests
-        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-integration.test.js
+        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-integration.test.js test/rechercher-omega-global-deep-search.test.js
