@@ -108,7 +108,7 @@ jobs:
           esac
           SH
           chmod 700 "$RUNNER_TEMP/matrix-storage-askpass"
-          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0
+          export GIT_ASKPASS="$RUNNER_TEMP/matrix-storage-askpass" GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1
           git clone "https://github.com/${MATRIX_STORAGE_REPO}.git" .matrix-storage-shard
           mkdir -p ".matrix-storage-shard/research/evidence/global-multilingual/shards/shard-${SHARD_INDEX}"
           mkdir -p ".matrix-storage-shard/artifacts/rechercher/global-multilingual-research/shards/shard-${SHARD_INDEX}"
