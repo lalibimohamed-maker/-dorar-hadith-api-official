@@ -96,12 +96,94 @@
       "role": "user-proposed Islamic LLM weights",
       "integration": "do not acquire/use until exact official model repository, weights, license, training-data provenance and evaluation are verified",
       "status": "unverified-candidate"
+    },
+    {
+      "id": "arena_ai_coding_agent",
+      "name": "Arena AI Coding Agent (GitHub App)",
+      "url": "https://github.com/apps/arena-ai-coding-agent",
+      "role": "external GitHub coding-agent integration",
+      "integration": "evaluate as an optional agent worker for repository tasks; use branch/PR isolation, least-privilege permissions and human review; never grant direct Corpus-write authority",
+      "status": "evaluation-candidate",
+      "notes": "Third-party GitHub App; exact installation permissions, data handling and terms must be verified before installation."
+    },
+    {
+      "id": "goose_agent",
+      "name": "goose",
+      "url": "https://github.com/aaif-goose/goose",
+      "role": "open-source general-purpose AI agent with CLI/API and MCP extensions",
+      "integration": "candidate execution worker for research automation, repo maintenance and MCP-connected Rechercher tools; keep Corpus boundary and approval gates",
+      "license": "Apache-2.0",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "qwen_code_agent",
+      "name": "Qwen Code",
+      "url": "https://github.com/QwenLM/qwen-code",
+      "role": "open-source coding agent with MCP, subagents, agent teams, memory and multi-provider support",
+      "integration": "candidate coding/review worker for Rechercher Ω; useful for MCP orchestration and local/open-model workflows; verify model/provider terms separately",
+      "license": "Apache-2.0",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "openhands_agent",
+      "name": "OpenHands",
+      "url": "https://github.com/All-Hands-AI/OpenHands",
+      "role": "open-source autonomous software-development agent with CLI/headless/MCP workflows",
+      "integration": "candidate CI/repository engineering worker; use only in isolated branches/worktrees with tests and review",
+      "license": "MIT for core; enterprise directory has separate terms",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "openhikmah_quran_graph",
+      "name": "OpenHikmah",
+      "url": "https://github.com/OpenHikmah/openhikmah-web",
+      "role": "AI-powered Quran knowledge graph and verse relationship exploration",
+      "integration": "study graph UX, verse-linking, root/thematic relationship modeling and scholarly safeguards; generated relationships remain non-canonical until evidence-validated",
+      "license": "GPL-3.0",
+      "status": "research-approved"
+    },
+    {
+      "id": "jamia_hadith_kg",
+      "name": "الجامع — Hadith Knowledge Graph",
+      "url": "https://github.com/qataruts/hadith",
+      "role": "Arabic-first hadith knowledge graph with isnad, narrator, jarh/ta'dil, meaning-group and subject-tree relationships",
+      "integration": "research candidate for hadith entity graph, isnad visualization, semantic retrieval and citation-aware research tooling; verify corpus provenance and rights before any reuse",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "integrated_islamic_ontology",
+      "name": "Integrated Islamic Ontology",
+      "url": "https://github.com/Ibtisam-a/Integrated-Islamic-Ontology",
+      "role": "Arabic-English Islamic ontology integrating Quran/Hadith resources",
+      "integration": "ontology/semantic-layer research input for entity alignment and RDF/OWL/SPARQL modeling; never treat ontology-derived relations as religious authority",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "arabic_pdf_ocr",
+      "name": "Arabic-PDF-OCR",
+      "url": "https://github.com/Huscs/Arabic-PDF-OCR",
+      "role": "Arabic scanned-PDF OCR pipeline using Tesseract with TXT/Markdown/HTML output",
+      "integration": "small reference implementation for Arabic OCR output/RTL handling; compare against Rechercher's multi-engine OCR and QC pipeline before adoption",
+      "license": "MIT",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "arabic_document_ocr_ai",
+      "name": "arabic-document-ocr-ai",
+      "url": "https://github.com/Yaman-dot/arabic-document-ocr-ai",
+      "role": "Arabic document OCR using Surya/Qwen with bilingual document understanding and spatial text reconstruction",
+      "integration": "benchmark/reference for Arabic document layout, bilingual OCR and positioned text; isolate model/runtime licenses and provenance",
+      "license": "MIT",
+      "status": "evaluation-candidate"
     }
   ],
   "design_note": {
     "minsa": "Added as engineering research candidate, not as trusted religious source.",
     "ontology": "OWL/RDF can model relationships and support SPARQL, but cannot manufacture fiqh conclusions; every derived claim remains tied to source evidence.",
     "embeddings": "Embeddings are retrieval infrastructure, not truth or authority; evidence IDs, provenance, rights and verification status must persist through retrieval.",
-    "llm": "LLM weights can assist synthesis only after the evidence gate and never replace source-grounded evidence or scholar review."
+    "llm": "LLM weights can assist synthesis only after the evidence gate and never replace source-grounded evidence or scholar review.",
+    "arena": "Arena is an optional external coding-agent worker; repository access must remain least-privilege and all changes flow through isolated branches, tests, evidence and review.",
+    "agent_fleet": "Multiple agents are capability workers, not authorities. Rechercher Ω remains the orchestrator; no agent may write directly to the canonical Corpus.",
+    "islamic_graphs": "Islamic knowledge-graph projects are research inputs only. Preserve source IDs, provenance, rights and uncertainty through graph construction and retrieval."
   }
 }
