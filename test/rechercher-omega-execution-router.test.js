@@ -4,7 +4,8 @@ import { loadExecutionBackends, selectExecutionBackend, assertExecutionBoundary 
 
 test("execution registry contains free-first local, API and GPU paths", async () => {
   const registry = await loadExecutionBackends();
-  assert.ok(registry.backends.some(b => b.id === "local"));\n  assert.ok(registry.backends.some(b => b.id === "openai-compatible"));
+  assert.ok(registry.backends.some(b => b.id === "local"));
+  assert.ok(registry.backends.some(b => b.id === "openai-compatible"));
   assert.ok(registry.backends.some(b => b.id === "gemini-free-tier"));
   assert.ok(registry.backends.some(b => b.id === "groq-free-plan"));
   assert.ok(registry.backends.some(b => b.id === "huggingface-inference"));
