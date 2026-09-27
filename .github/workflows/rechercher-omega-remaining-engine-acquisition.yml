@@ -208,6 +208,7 @@ jobs:
           set -euo pipefail
           gh release upload "$RELEASE_TAG"             "$OUTPUT_DIR/omega__hunyuanvideo15__runtime.tar.gz"             "$OUTPUT_DIR/hunyuanvideo15-runtime-manifest.json"             "$OUTPUT_DIR/hunyuanvideo15-dependencies.json"             "$OUTPUT_DIR/hunyuanvideo15-release-readiness.json"             --repo "$REPO" --clobber
 
+      # release-manifest.json is a weights-only manifest; it never declares runtime completeness.
       - name: Verify weights manifest
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
