@@ -495,6 +495,167 @@
       "role": "OAuth2/OIDC token exchange reference for Quran Foundation connectors",
       "integration": "implementation/security reference for confidential Client Credentials and Authorization Code/PKCE flows; never store client secrets in frontend/mobile code; tokens are environment-specific",
       "status": "integration-reference"
+    },
+    {
+      "id": "quran_foundation_js_server_sdk_runtime",
+      "name": "Quran Foundation JS/TS Server SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/server-quickstart/",
+      "role": "official server-side SDK runtime for Content/Search and confidential OAuth2",
+      "integration": "Use in Node.js, serverless functions, workers, cron jobs and SSR; keep client_secret on the backend; suitable connector foundation for Rechercher acquisition/search workers.",
+      "status": "integration-candidate",
+      "license": "SDK package terms must be verified separately",
+      "notes": "Current docs recommend @quranjs/api/server for Content and Search."
+    },
+    {
+      "id": "quran_foundation_js_public_sdk_runtime",
+      "name": "Quran Foundation JS/TS Public SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/public-quickstart/",
+      "role": "official browser/mobile-facing SDK runtime for approved public clients and PKCE user flows",
+      "integration": "Use only for public-client/user-session cases; never place client_secret in browser/mobile bundles; pair with backend/BFF when confidential exchange is required.",
+      "status": "integration-candidate",
+      "license": "SDK package terms must be verified separately"
+    },
+    {
+      "id": "quran_foundation_js_runtime_matrix",
+      "name": "Quran Foundation JavaScript Runtime Matrix",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/runtime-matrix/",
+      "role": "runtime selection matrix",
+      "integration": "Drive Rechercher connector selection between server and public entrypoints; encode Content/Search backend requirement as a testable capability rule.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_js_auth_matrix",
+      "name": "Quran Foundation JavaScript Auth Matrix",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/auth-matrix/",
+      "role": "OAuth2 client-type and code-exchange architecture matrix",
+      "integration": "Use to generate secure auth plans: confidential backend, approved public PKCE, or frontend+backend confidential-proxy.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_js_apis_by_runtime",
+      "name": "Quran Foundation APIs By Runtime Matrix",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/apis-by-runtime/",
+      "role": "API-family to runtime capability matrix",
+      "integration": "Use as a connector guard so Content/Search are not incorrectly wired to public/browser-only paths and token introspection remains server-only.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_js_full_stack",
+      "name": "Quran Foundation JavaScript Full-Stack Quickstart",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/full-stack/",
+      "role": "reference full-stack application architecture",
+      "integration": "Study official frontend/backend split, OAuth2 session handling and API access patterns for Dinullah web apps.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_python_sdk",
+      "name": "Quran Foundation Python SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/python/",
+      "role": "official Python SDK for server applications, scripts, jobs, notebooks and AI workflows",
+      "integration": "Candidate Python connector for Kaggle research, batch acquisition, sync jobs, evaluation and Rechercher Ω workers; keep tokens/secrets off public notebooks and clients.",
+      "status": "integration-candidate",
+      "license": "Package terms must be verified separately"
+    },
+    {
+      "id": "quran_foundation_python_sdk_auth",
+      "name": "Quran Foundation Python Authentication Helpers",
+      "url": "https://api-docs.quran.com/docs/sdk/python/authentication/",
+      "role": "Python authentication implementation reference",
+      "integration": "Use to standardize app-token vs user-token handling and prevent secrets/tokens from entering logs or public artifacts.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_python_content_helpers",
+      "name": "Quran Foundation Python Content API Helpers",
+      "url": "https://api-docs.quran.com/docs/sdk/python/content/",
+      "role": "Python helper coverage for Content APIs",
+      "integration": "Map chapter/verse/audio/resource/content operations into Rechercher's typed adapter surface.",
+      "status": "integration-reference"
+    },
+    {
+      "id": "quran_foundation_content_sync_engine",
+      "name": "Quran Foundation Content Sync Engine Pattern",
+      "url": "https://api-docs.quran.com/docs/tutorials/content-sync/getting-started/",
+      "role": "incremental content synchronization protocol",
+      "integration": "Implement source-of-truth sync with sync tokens, change events, resource filters and snapshot replacement; keep synced content in a governed cache layer before any Corpus promotion.",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "quran_foundation_offline_cache_patterns",
+      "name": "Quran Foundation Offline Cache Patterns",
+      "url": "https://api-docs.quran.com/docs/tutorials/content-sync/offline-cache-patterns/",
+      "role": "idempotent local cache and background refresh patterns",
+      "integration": "Use separate sync-state/cache tables and stable resource keys; adapt this pattern to multilingual Quran resource caching and application offline mode.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_full_copy_recovery",
+      "name": "Quran Foundation Full Copies and Recovery",
+      "url": "https://api-docs.quran.com/docs/tutorials/content-sync/full-copies-and-recovery/",
+      "role": "full snapshot replacement and recovery pattern",
+      "integration": "Use as the recovery path when incremental sync is invalid or a resource must be rebuilt atomically; capture snapshot provenance and checksums in Rechercher manifests.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_oauth_oidc_lifecycle",
+      "name": "Quran Foundation OAuth2/OIDC Lifecycle",
+      "url": "https://api-docs.quran.com/docs/oauth2_apis_versioned/1.0.0/oauth-2-apis/",
+      "role": "authorization, token exchange, introspection, revocation, OIDC userinfo and logout lifecycle",
+      "integration": "Model auth as a lifecycle adapter with explicit environment, scope and token-state checks; isolate production from pre-live and never treat authentication as redistribution permission.",
+      "status": "integration-reference"
+    },
+    {
+      "id": "quran_foundation_search_sdk",
+      "name": "Quran Foundation JavaScript Search SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/search/",
+      "role": "official SDK path for Quran search",
+      "integration": "Candidate low-latency Quran search connector for @Rechercher; return source-aware Quran results and preserve Arabic canonical text separately from translations.",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "quran_foundation_official_oauth_example",
+      "name": "Quran Foundation OAuth2 Client Example",
+      "url": "https://github.com/quran/quran-oauth2-client-example",
+      "role": "official/open repository reference for OAuth2 client integration",
+      "integration": "Use as executable reference when implementing OAuth2 flows; validate current dependency versions and compare with the documented server/public auth matrix.",
+      "status": "evaluation-candidate",
+      "license": "Repository license must be verified"
+    },
+    {
+      "id": "quran_foundation_mobile_sync",
+      "name": "Quran Foundation Mobile Sync",
+      "url": "https://github.com/quran/mobile-sync",
+      "role": "official mobile synchronization engine reference",
+      "integration": "Study mobile offline synchronization, cache refresh and resource consistency patterns for Dinullah mobile clients.",
+      "status": "architecture-reference",
+      "license": "Repository license must be verified"
+    },
+    {
+      "id": "quran_foundation_mobile_sync_spm",
+      "name": "Quran Foundation Mobile Sync SPM",
+      "url": "https://github.com/quran/mobile-sync-spm",
+      "role": "official Swift Package integration for mobile sync",
+      "integration": "Candidate Swift/iOS package reference for local Quran resource synchronization and offline support.",
+      "status": "architecture-reference",
+      "license": "Repository license must be verified"
+    },
+    {
+      "id": "quran_foundation_api_docs_repo",
+      "name": "Quran Foundation API Documentation Repository",
+      "url": "https://github.com/quran/qf-api-docs",
+      "role": "official source repository for the API documentation portal",
+      "integration": "Pin documentation revisions/links in connector tests and detect upstream documentation changes that may alter endpoint or SDK contracts.",
+      "status": "research-approved",
+      "license": "Repository license must be verified"
+    },
+    {
+      "id": "quran_foundation_polyglot_http_examples",
+      "name": "Quran Foundation Polyglot HTTP Example Fleet",
+      "url": "https://api-docs.quran.com/docs/sdk/",
+      "role": "developer-facing implementation patterns across common HTTP clients",
+      "integration": "Track cURL, Python/requests, Java/OkHttp, Go/native HTTP, Node.js/axios, Ruby/Net::HTTP, C#/RestSharp, PHP/cURL and PowerShell/Invoke-RestMethod as interchangeable adapter examples; keep endpoint-level verification and auth semantics separate from language syntax.",
+      "status": "architecture-reference",
+      "notes": "Language set is recorded as a developer-support fleet. Exact availability can vary by endpoint/documentation view; verify each endpoint page before copying a sample into production."
     }
   ],
   "design_note": {
@@ -516,5 +677,10 @@
     "local_inference": "llama.cpp is runtime infrastructure only. Rechercher Ω selects models separately and applies the model repository/weights license gate before inference assets are admitted.",
     "arabic_book_ocr": "Arabic-Nougat adds a book-page OCR path producing structured Markdown. Because its README presents code/model/data licensing separately and includes differing license references, it remains review_required until each artifact is individually verified.",
     "arabic_manuscript_htr_2026": "Ketaba-OCR-LoRA is a current Arabic manuscript HTR research candidate. Rechercher should use it as a derived transcription worker only; no OCR output becomes canonical without multi-engine comparison, page provenance, checksum and human/QC review."
+  },
+  "last_refresh": {
+    "date": "2026-09-27",
+    "added": 19,
+    "scope": "Quran Foundation SDK, runtime/auth matrices, OAuth2/OIDC lifecycle, Search, Python, content sync, mobile sync and polyglot developer examples"
   }
 }
