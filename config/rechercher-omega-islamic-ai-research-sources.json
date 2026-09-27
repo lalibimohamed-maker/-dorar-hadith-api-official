@@ -397,6 +397,42 @@
       "integration": "candidate specialist HTR worker for Arabic manuscripts; useful for a third recognition signal and confidence/error metrics. Base model, adapter, training corpus and weights retain separate provenance/licensing",
       "status": "evaluation-candidate",
       "license": "Apache-2.0 repository code; model/data provenance and weight licensing require separate verification"
+    },
+    {
+      "id": "quran_timing_helper",
+      "name": "Quran Timing Helper",
+      "url": "https://github.com/quraniio/quran-timing-helper",
+      "role": "Quran word-level recitation timing generation and validation using Whisper plus wav2vec2 CTC forced alignment",
+      "integration": "evaluation/reference for a two-stage audio alignment worker; keep canonical Quran text fixed and treat generated timestamps as derived evidence requiring validation",
+      "license": "Free-use tool with a free-products-only redistribution condition; inspect LICENSE before deployment",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "quran_word_alignment_local",
+      "name": "Quran Word Alignment",
+      "url": "https://github.com/rekarhiwa/quran-word-alignment",
+      "role": "local-first Quran word timing pipeline with CTC forced alignment, review UI and JSON/CSV/SRT export",
+      "integration": "reference implementation for auditable alignment workers with confidence thresholds, manual corrections and reproducible batch exports; never generate canonical Quran text from speech",
+      "license": "Repository license not established from the reviewed README; review repository and model licenses separately",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "faster_whisper",
+      "name": "faster-whisper",
+      "url": "https://github.com/SYSTRAN/faster-whisper",
+      "role": "CTranslate2-based Whisper inference runtime with quantized/local execution",
+      "integration": "free/local transcription backend candidate for Ω audio agents; pin runtime revision and track the separate Whisper model license/provenance",
+      "license": "MIT runtime; model weights retain their own licensing",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "pyannote_audio",
+      "name": "pyannote.audio",
+      "url": "https://github.com/pyannote/pyannote-audio",
+      "role": "open-source speaker diarization, speech activity, speaker-change and overlap detection toolkit",
+      "integration": "optional audio-segmentation/diarization worker for lectures, lessons and multi-speaker recordings; keep community/open models distinct from any premium hosted pipeline and gate model agreements",
+      "license": "MIT code; pretrained model/pipeline terms are separate and may require acceptance",
+      "status": "integration-candidate"
     }
   ],
   "design_note": {
