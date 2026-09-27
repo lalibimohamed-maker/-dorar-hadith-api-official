@@ -67,7 +67,37 @@
       "release_visibility": "draft_review_only",
       "estimated_gb": 372,
       "acquisition": "github_release_draft",
-      "rights_promotion_status": "draft_only_pending_license_review"
+      "rights_promotion_status": "draft_only_pending_license_review",
+      "runtime_status": "core_weights_acquired_core_runtime_packaged",
+      "runnable_status": "dependency_blocked",
+      "runtime_manifest": "hunyuanvideo15-runtime-manifest.json",
+      "readiness_manifest": "hunyuanvideo15-release-readiness.json",
+      "required_external_dependencies": [
+        {
+          "id": "qwen2.5-vl-7b-instruct",
+          "model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+          "status": "public_dependency_not_embedded",
+          "license": "apache-2.0"
+        },
+        {
+          "id": "byt5-small",
+          "model_id": "google/byt5-small",
+          "status": "public_dependency_not_embedded",
+          "license": "apache-2.0"
+        },
+        {
+          "id": "glyph-sdxl-v2",
+          "model_id": "AI-ModelScope/Glyph-SDXL-v2",
+          "status": "rights_review_required",
+          "license": "review_required"
+        },
+        {
+          "id": "flux-redux-dev",
+          "model_id": "black-forest-labs/FLUX.1-Redux-dev",
+          "status": "gated_access_required",
+          "license": "flux-1-dev-non-commercial-license"
+        }
+      ]
     },
     {
       "id": "ltx-2",
