@@ -574,6 +574,113 @@
       ],
       "integration": "service_adapter",
       "auto_download": false
+    },
+    {
+      "id": "everos",
+      "kind": "agent_memory_layer",
+      "source_repo": "https://github.com/EverMind-AI/EverOS",
+      "code_license": "Apache-2.0",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "agent_memory",
+        "persistent_memory",
+        "memory_portability"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Adopt the local-first, user-owned memory abstraction; memory admission remains governed by Omega provenance and privacy rules."
+    },
+    {
+      "id": "memoripy",
+      "kind": "evidence_first_memory",
+      "source_repo": "https://github.com/caspianmoon/memoripy",
+      "code_license": "Apache-2.0",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "agent_memory",
+        "temporal_memory",
+        "citation_memory",
+        "memory_audit"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Use the evidence-first admission/citation/audit pattern; memory is not scholarly truth by itself."
+    },
+    {
+      "id": "tokensave",
+      "kind": "code_intelligence_mcp",
+      "source_repo": "https://github.com/aovestdipaperino/tokensave",
+      "code_license": "MIT",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "code_indexing",
+        "code_graph",
+        "multilanguage_code_intelligence",
+        "programming"
+      ],
+      "integration": "mcp_adapter",
+      "auto_download": false,
+      "notes": "Reference code-intelligence indexing and graph ideas; no automatic repository write."
+    },
+    {
+      "id": "roam-code",
+      "kind": "codebase_intelligence_mcp",
+      "source_repo": "https://github.com/Cranot/roam-code",
+      "code_license": "Apache-2.0",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "code_indexing",
+        "code_graph",
+        "change_safety",
+        "multilanguage_code_intelligence",
+        "programming"
+      ],
+      "integration": "mcp_adapter",
+      "auto_download": false
+    },
+    {
+      "id": "prismor",
+      "kind": "agent_tool_guard",
+      "source_repo": "https://github.com/PrismorSec/prismor",
+      "code_license": "Apache-2.0",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "tool_call_security",
+        "prompt_injection_guard",
+        "secret_leak_guard",
+        "supply_chain_guard"
+      ],
+      "integration": "agent_security",
+      "auto_download": false
+    },
+    {
+      "id": "agent-inspect",
+      "kind": "agent_evidence_debugger",
+      "source_repo": "https://github.com/rajudandigam/agent-inspect",
+      "code_license": "MIT",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "agent_trace",
+        "tool_path_debugging",
+        "trajectory_testing",
+        "evidence_debugging"
+      ],
+      "integration": "ci_validation",
+      "auto_download": false
+    },
+    {
+      "id": "mcp-evals",
+      "kind": "mcp_evaluation",
+      "source_repo": "https://github.com/mclenhard/mcp-evals",
+      "code_license": "MIT",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "mcp_evaluation",
+        "tool_contract_testing",
+        "agent_evaluation"
+      ],
+      "integration": "ci_validation",
+      "auto_download": false
     }
   ],
   "pipelines": {
@@ -624,8 +731,22 @@
         "execution",
         "provenance",
         "evidence_gate",
-        "qwen3-coder"
+        "qwen3-coder",
+        "everos",
+        "memoripy",
+        "prismor",
+        "agent-inspect"
       ]
+    },
+    "programming": {
+      "stages": [
+        "qwen3-coder",
+        "tokensave",
+        "roam-code",
+        "mini-swe-agent",
+        "mcp-evals"
+      ],
+      "purpose": "multilingual software engineering with codebase intelligence and test-gated changes"
     }
   }
 }
