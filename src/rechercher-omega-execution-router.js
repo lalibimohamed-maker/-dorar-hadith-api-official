@@ -72,6 +72,7 @@ export async function executeSelectedBackend(plan, input = {}) {
   if (plan.backend === "gemini-free-tier") return adapters.executeGemini({ model: plan.model, ...payload });
   if (plan.backend === "groq-free-plan") return adapters.executeGroq({ model: plan.model, ...payload });
   if (plan.backend === "huggingface-inference") return adapters.executeHuggingFace({ model: plan.model, ...payload });
+  if (plan.backend === "openai-compatible") return adapters.executeOpenAICompatible({ model: plan.model, ...payload });
   if (plan.backend === "local") return adapters.executeLocal(payload);
   if (plan.backend === "kaggle-gpu") return adapters.buildKaggleExecution(payload);
   throw new Error("unsupported Rechercher Ω backend: " + plan.backend);
