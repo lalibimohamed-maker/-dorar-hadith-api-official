@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0.0",
-  "generated": "2026-09-24",
+  "generated": "2026-09-27",
   "purpose": "Worldwide source-link registry derived from the global multilingual discovery work in PR #541 plus Quran-specific source/API work in PR #558.",
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 504,
-    "rights_review_required": 504,
+    "links": 515,
+    "rights_review_required": 515,
     "new_global_links_added_2026_09_24": 332,
     "previous_snapshot_links": 127,
-    "sources": 504
+    "sources": 515
   },
   "rules": [
     "URL is a discovery/source endpoint, not proof of item-level rights.",
@@ -9051,6 +9051,116 @@
       "rights_status": "review_required",
       "source_pr": "561_deep_research_2026_09_27",
       "notes": "Official API-family reference covering Content, Search, User and OAuth2 APIs. Useful as the canonical discovery index for Rechercher connectors; access rights and content rights remain distinct."
+    },
+    {
+      "id": "world-505",
+      "category": "API developer documentation",
+      "name": "Quran Foundation OAuth2 APIs",
+      "url": "https://api-docs.quran.com/docs/oauth2_apis_versioned/1.0.0/oauth-2-apis/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official OAuth2/OIDC API family reference covering authorization, token exchange, introspection, OIDC userinfo and logout. Authentication capability does not grant content redistribution rights."
+    },
+    {
+      "id": "world-506",
+      "category": "Quran API",
+      "name": "Quran Foundation Search API",
+      "url": "https://api-docs.quran.com/docs/search_apis_versioned/1.0.0/quran-foundation-search-api/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official Search API family for programmatic Quran search over verses, chapters, juz, pages and translations. Requires the documented search authentication/scope."
+    },
+    {
+      "id": "world-507",
+      "category": "SDK documentation",
+      "name": "Quran Foundation SDKs",
+      "url": "https://api-docs.quran.com/docs/sdk/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official SDK hub for JavaScript/TypeScript and Python, including runtime, authentication, API coverage, examples and migration guidance."
+    },
+    {
+      "id": "world-508",
+      "category": "SDK documentation",
+      "name": "Quran Foundation JavaScript SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official JS/TS SDK documentation. Current docs define separate @quranjs/api/server and @quranjs/api/public entrypoints and distinguish backend/server credentials from browser/mobile PKCE flows."
+    },
+    {
+      "id": "world-509",
+      "category": "SDK documentation",
+      "name": "Quran Foundation Python SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/python/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official server-side Python SDK documentation; package is published on PyPI as quran-foundation-api. Treat package/data terms separately from API access rights."
+    },
+    {
+      "id": "world-510",
+      "category": "Pre-live API documentation",
+      "name": "Quran Foundation User APIs (Pre-live)",
+      "url": "https://api-docs.quran.com/docs/user_related_apis_prelive/user-related-apis/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official pre-live user-related API documentation. Pre-live credentials, base URLs, callback/session behavior and test data must remain isolated from production."
+    },
+    {
+      "id": "world-511",
+      "category": "API schema documentation",
+      "name": "Quran Foundation Field Reference",
+      "url": "https://api-docs.quran.com/docs/api/field-reference/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official field-reference page for stable content field selectors and response-shaping decisions."
+    },
+    {
+      "id": "world-512",
+      "category": "OAuth2 documentation",
+      "name": "Quran Foundation OAuth2 Scopes",
+      "url": "https://api-docs.quran.com/docs/user_related_apis_versioned/scopes/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official scope reference used to constrain access by capability. Scope availability must be treated as an authorization contract, not a redistribution license."
+    },
+    {
+      "id": "world-513",
+      "category": "Content synchronization",
+      "name": "Quran Foundation Offline Content Cache Patterns",
+      "url": "https://api-docs.quran.com/docs/tutorials/content-sync/offline-cache-patterns/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official cache/sync architecture guidance: server remains source of truth, local storage is a readable cache, incremental sync uses a dedicated sync state and idempotent keys."
+    },
+    {
+      "id": "world-514",
+      "category": "Content synchronization",
+      "name": "Quran Foundation Full Copies and Recovery",
+      "url": "https://api-docs.quran.com/docs/tutorials/content-sync/full-copies-and-recovery/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official full-copy/recovery tutorial for resource snapshots and rebuilding local content state when incremental synchronization is insufficient."
+    },
+    {
+      "id": "world-515",
+      "category": "Developer access",
+      "name": "Quran Foundation Request Access",
+      "url": "https://api-docs.quran.com/request-access/",
+      "scope": "engineering-reference",
+      "rights_status": "review_required",
+      "source_pr": "561_refresh_2026_09_27",
+      "notes": "Official developer access request flow, including client URL, privacy policy, terms and redirect URI configuration."
     }
   ],
   "notes": [
@@ -9223,5 +9333,8 @@
       "world-468",
       "world-469"
     ]
-  }
+  },
+  "latest_refresh": "2026-09-27",
+  "latest_refresh_links_added": 11,
+  "latest_refresh_scope": "Quran Foundation developer/API documentation families for OAuth2/OIDC, Search, SDKs, Pre-live, Field/Scopes and Content Sync"
 }
