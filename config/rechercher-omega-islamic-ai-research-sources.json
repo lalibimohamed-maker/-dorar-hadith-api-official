@@ -379,6 +379,24 @@
       "integration": "candidate free/local inference worker for Rechercher Ω on CPU/GPU; model weights remain separately licensed and must pass the model-license/provenance gate before use",
       "license": "MIT for runtime; model weights retain their own licenses",
       "status": "integration-candidate"
+    },
+    {
+      "id": "arabic_nougat_ocr",
+      "name": "Arabic-Nougat",
+      "url": "https://github.com/MohamedAliRashad/arabic-nougat",
+      "role": "Arabic book-page OCR and structured Markdown extraction with Arabic-specific tokenization and long-context variants",
+      "integration": "candidate OCR engine for Arabic books; compare against OCRmyPDF/Tesseract/Kraken and preserve page-level provenance. Model, dataset and code licenses must be tracked separately; repository README contains distinct license statements, so treat rights as review-required",
+      "status": "evaluation-candidate",
+      "license": "review_required"
+    },
+    {
+      "id": "ketaba_ocr_lora",
+      "name": "Ketaba-OCR-LoRA",
+      "url": "https://github.com/HasanBGit/Ketaba-OCR-LoRA",
+      "role": "parameter-efficient Arabic manuscript HTR using QLoRA/DoRA/RSLoRA and ensemble decoding",
+      "integration": "candidate specialist HTR worker for Arabic manuscripts; useful for a third recognition signal and confidence/error metrics. Base model, adapter, training corpus and weights retain separate provenance/licensing",
+      "status": "evaluation-candidate",
+      "license": "Apache-2.0 repository code; model/data provenance and weight licensing require separate verification"
     }
   ],
   "design_note": {
@@ -397,6 +415,8 @@
     "registry_dedup": "Canonicalize research-source entries by URL. When an existing project later gains richer metadata, merge into the original entry instead of creating a second ID.",
     "arabic_nlp": "CAMeL Tools can provide reusable Arabic linguistic preprocessing, but model/data packages are not assumed to inherit the toolkit's MIT license.",
     "local_retrieval": "Qdrant is a candidate self-hosted vector layer; every point should carry source/work/edition/language/provenance/rights identifiers so retrieval never detaches evidence metadata.",
-    "local_inference": "llama.cpp is runtime infrastructure only. Rechercher Ω selects models separately and applies the model repository/weights license gate before inference assets are admitted."
+    "local_inference": "llama.cpp is runtime infrastructure only. Rechercher Ω selects models separately and applies the model repository/weights license gate before inference assets are admitted.",
+    "arabic_book_ocr": "Arabic-Nougat adds a book-page OCR path producing structured Markdown. Because its README presents code/model/data licensing separately and includes differing license references, it remains review_required until each artifact is individually verified.",
+    "arabic_manuscript_htr_2026": "Ketaba-OCR-LoRA is a current Arabic manuscript HTR research candidate. Rechercher should use it as a derived transcription worker only; no OCR output becomes canonical without multi-engine comparison, page provenance, checksum and human/QC review."
   }
 }
