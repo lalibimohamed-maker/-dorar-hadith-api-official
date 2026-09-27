@@ -10,6 +10,11 @@ test("the scholarly fleet declares all shared contract axes", () => {
   assert.equal(result.valid, true, result.errors.join(", "));
   assert.equal(fleet.expansion.current_family_count, 9);
   assert.equal(fleet.expansion.target_domain_cells, 24);
+  for (const family of fleet.families) {
+    for (const axis of fleet.contract.required_axes) {
+      assert.ok(family.contract[axis], family.id + " missing " + axis);
+    }
+  }
 });
 
 test("each family has an independent source set", () => {
