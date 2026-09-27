@@ -882,6 +882,68 @@
       ],
       "integration": "openai_compatible",
       "auto_download": false
+    },
+    {
+      "id": "gitmcp",
+      "kind": "repository_mcp_context",
+      "source_repo": "https://github.com/idosal/git-mcp",
+      "code_license": "Apache-2.0",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "repository_documentation",
+        "repository_code_search",
+        "repository_context",
+        "mcp"
+      ],
+      "integration": "remote_mcp",
+      "auto_download": false,
+      "notes": "Targeted live context for public GitHub repositories. Use scoped owner/repo endpoints; dynamic gitmcp.io/docs is not the default for Omega."
+    },
+    {
+      "id": "gitingest",
+      "kind": "repository_digest_ingest",
+      "source_repo": "https://github.com/coderamp-labs/gitingest",
+      "code_license": "MIT",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "repository_ingest",
+        "codebase_digest",
+        "tree_extraction",
+        "token_estimation",
+        "llm_context"
+      ],
+      "integration": "remote_http_or_local_python",
+      "auto_download": false,
+      "notes": "Whole-repository digest layer. Use short-lived artifacts and explicit include/exclude patterns; never treat digest text as scholarly evidence."
+    },
+    {
+      "id": "codesandbox",
+      "kind": "browser_sandbox_reference",
+      "source_repo": "https://codesandbox.io/",
+      "code_license": "service",
+      "model_license_status": "per_project",
+      "tasks": [
+        "browser_sandbox",
+        "interactive_demo",
+        "ephemeral_execution"
+      ],
+      "integration": "reference_only",
+      "auto_download": false,
+      "notes": "Useful for reproducible browser demos and UI experiments, not a production Omega backend."
+    },
+    {
+      "id": "codextron-dev",
+      "kind": "repository_reference",
+      "source_repo": "https://github.com/codextron-dev",
+      "code_license": "unverified",
+      "model_license_status": "unverified",
+      "tasks": [
+        "git_workflows",
+        "repository_reference"
+      ],
+      "integration": "reference_only",
+      "auto_download": false,
+      "notes": "The supplied organization/profile and git-tutorial sandbox could not be independently resolved from the accessible GitHub index; keep reference-only until repository identity is verified."
     }
   ],
   "pipelines": {
@@ -930,6 +992,7 @@
       "stages": [
         "intent_detection",
         "task_router",
+        "gitmcp",
         "mcp_tool_discovery",
         "tool_filtering",
         "execution",
@@ -947,6 +1010,8 @@
     "programming": {
       "stages": [
         "qwen3-coder",
+        "gitmcp",
+        "gitingest",
         "tokensave",
         "roam-code",
         "mini-swe-agent",
