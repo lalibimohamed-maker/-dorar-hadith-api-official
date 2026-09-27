@@ -35,3 +35,16 @@ test("adapter boundary rejects Corpus writes", () => {
     /Corpus writes are forbidden/
   );
 });
+
+
+test("OpenAI-compatible adapter is secret-optional and provider-neutral", () => {
+  const request = buildAdapterRequest({
+    backend: "openai-compatible",
+    model: "qwen3",
+    input: { messages: [{ role: "user", content: "test" }] }
+  });
+  assert.equal(request.provider, "openai-compatible");
+  assert.equal(request.model, "qwen3");
+  assert.equal("token" in request, false);
+  assert.equal("apiKey" in request, false);
+});
