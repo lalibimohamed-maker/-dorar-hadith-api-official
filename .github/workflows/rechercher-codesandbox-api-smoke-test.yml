@@ -3,7 +3,8 @@ name: Rechercher — CodeSandbox API smoke test
 on:
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  contents: none
 
 concurrency:
   group: rechercher-codesandbox-api-smoke-test
