@@ -5,8 +5,8 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 466,
-    "rights_review_required": 466,
+    "links": 467,
+    "rights_review_required": 467,
     "new_global_links_added_2026_09_24": 310,
     "previous_snapshot_links": 127
   },
@@ -8655,6 +8655,31 @@
         "license_metadata"
       ],
       "notes": "First-party download page states 37,165 hadith translations authored by i-muslim are CC0; upstream-mirrored records are metadata-only until an open-license grant is on file."
+    },
+    {
+      "id": "world-469",
+      "category": "Islamic API directory / integration reference",
+      "name": "Islamic-APIs by alihmada",
+      "url": "https://github.com/alihmada/Islamic-APIs",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://github.com/alihmada/Islamic-APIs",
+      "capabilities": [
+        "prayer_times",
+        "quran",
+        "quran_translations",
+        "quran_audio",
+        "tafsir",
+        "hadith",
+        "hadith_search",
+        "azkar",
+        "quran_radio",
+        "api_directory",
+        "integration_reference"
+      ],
+      "notes": "Public GitHub collection documenting live endpoints from AlAdhan, AlQuran Cloud, Quran.com audio, QuranEnc, a hadith API, Azkar sources and Quran radio. It is primarily an aggregator/reference rather than a single API provider. Its README documents endpoints but does not itself establish redistribution rights for the underlying datasets/services; verify each upstream provider and content license before acquisition or redistribution."
     }
   ],
   "notes": [
@@ -8702,7 +8727,8 @@
     "2026-09-25 targeted verification: added Baraheen Network, Islam For All, Taymiyyah Institute and Al-Imam Malick Islamic Institute. Baraheen and Taymiyyah have current first-party Sunni-oriented evidence; Al-Imam Malick explicitly states Maliki jurisprudence. Islam For All was preserved as a multilingual Islamic e-library/discovery lane using domain identity plus historical evidence, but its present operational status was not independently re-established in this pass.",
     "2026-09-25 exclusion policy reaffirmed: The Global Message and Hadith Data Bank are not part of the Sunni source registry and are not retained as Sunni candidates.",
     "2026-09-27: verified and enriched the existing UmmahAPI record with its official API documentation and live Quran endpoint; added HifzMate, Zikrah, ilmSpace, and AzanCast as distinct Quran/Islamic application and service discovery lanes. All remain review_required and no redistribution rights are inferred.",
-    "2026-09-27 global design/product radar: added Ummah Library, Quran.ws, Itqan CMS and i-muslim as verified source/design-infrastructure lanes. These records are discovery/design inputs; content rights remain asset-level unless an explicit license states otherwise."
+    "2026-09-27 global design/product radar: added Ummah Library, Quran.ws, Itqan CMS and i-muslim as verified source/design-infrastructure lanes. These records are discovery/design inputs; content rights remain asset-level unless an explicit license states otherwise.",
+    "2026-09-27: added alihmada/Islamic-APIs as a verified integration-reference source; underlying API/data rights remain provider-specific."
   ],
   "change_log": [
     "2026-09-24: added 6 supplied source-discovery endpoints to the canonical registry: https://saleh.af.org.sa/ar/books?page=1, https://www.sualruhaily.com, https://alshathri.net, https://af.org.sa, https://www.nusuk.sa, https://www.rabita.fi/en#services. All remain review_required; no redistribution permission is inferred.",
@@ -8713,7 +8739,8 @@
     "2026-09-25 deep source radar follow-up: +3 verified source lanes; Al-Islam.org was deliberately excluded from the Sunni registry because its own About page states particular emphasis on Twelver Shia Islam. MyIslam was not classified as Sunni without sufficient first-party sectarian identification. Unverified named projects from the supplied list remain pending rather than being fabricated.",
     "2026-09-25 deep source radar round 2: +7 sources (Erth Al Mustafa, IslamicInfo, Ṣifah, International Seerah Council, Al Imam Institute, Imam Al-Shatibi Global Quran Platform, Easy Fiqh). The previously named Global Message/Baraheen/IslamForAll/Ibn Taymiyyah Virtual Institute/Fiqh of Minorities/Islam Verified and similar names remain unregistered because no sufficiently reliable first-party identity was established in this round.",
     "2026-09-27: added verified HifzMate, Zikrah, ilmSpace and AzanCast source/discovery endpoints; enriched existing UmmahAPI (world-142) with official documentation and live endpoint metadata. Application/service presence does not grant redistribution rights.",
-    "2026-09-27: global design-intelligence pass added a structured product/capability taxonomy and four newly verified open-source/licensing-aware Quran/Islamic infrastructure sources. No new branch was created; changes remain on PR #561 branch."
+    "2026-09-27: global design-intelligence pass added a structured product/capability taxonomy and four newly verified open-source/licensing-aware Quran/Islamic infrastructure sources. No new branch was created; changes remain on PR #561 branch.",
+    "2026-09-27: added world-469 Islamic-APIs aggregator/reference to the worldwide registry; no underlying content rights were inferred."
   ],
   "design_intelligence": {
     "status": "active",
@@ -8794,7 +8821,8 @@
       "open-source Quran/Islamic ecosystem platforms",
       "open Quran licensing/data projects",
       "Quran CMS/developer infrastructure",
-      "per-record license-aware Islamic API distributions"
+      "per-record license-aware Islamic API distributions",
+      "community-maintained Islamic API directories and integration maps"
     ],
     "missing_focus_areas": [
       "unified source/edition/work identity graph",
@@ -8810,7 +8838,8 @@
       "world-465",
       "world-466",
       "world-467",
-      "world-468"
+      "world-468",
+      "world-469"
     ]
   }
 }
