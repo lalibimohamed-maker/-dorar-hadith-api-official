@@ -608,17 +608,17 @@
     {
       "translation_key": "kinyarwanda_assoc",
       "language_iso_code": "rw",
-      "provenance_class": "catalog_verified_primary_source_verified_rights_pending",
+      "provenance_class": "catalog_verified_primary_source_verification_pending",
       "primary_source": "QuranEnc official translation catalog API",
-      "verification_status": "catalog_exists; primary source verified; rights must still be verified before governed ingestion",
+      "verification_status": "catalog_exists; publisher/institution must be read from live API metadata and then verified against primary source",
       "ai_source": false,
       "primary_source_verification": {
-        "status": "primary_source_verified",
+        "status": "primary_source_candidate_identity_pending",
         "official_url": "https://isengesho.com/en",
         "evidence_url": "https://www.minijust.gov.rw/fileadmin/user_upload/Minijust/Official_gazettes_2/_______________2015_Official_Gazettes/Official_Gazette_no_23_of_08.06.2015.pdf",
         "country": "Rwanda",
         "verified_at": "2026-09-22",
-        "notes": "Rwanda's Official Gazette no. 23 of 08/06/2015 states that Rwanda Muslim Association (AMUR) became Rwanda Muslim Community on 12 January 2014, establishing the name continuity needed for primary-source verification."
+        "notes": "Current official Rwanda Muslim Community evidence was found, but the QuranEnc edition uses the older/different label 'Rwanda Muslim Association'; exact identity continuity remains to be confirmed."
       }
     },
     {
@@ -667,8 +667,7 @@
     "verified_editions": [
       "albanian_nahi",
       "indonesian_affairs",
-      "indonesian_complex",
-      "kinyarwanda_assoc"
+      "indonesian_complex"
     ],
     "pending_editions": [
       "english_rwwad",
@@ -736,6 +735,7 @@
       "oromo_ababor",
       "afar_hamza",
       "ankobambara_dayyan",
+      "kinyarwanda_assoc",
       "ikirundi_gehiti",
       "moore_rwwad",
       "asante_harun",
