@@ -250,6 +250,14 @@
       "role": "self-hosted Arabic manuscript OCR/HTR pipeline using segmentation plus recognition with Kraken and optional HATFormer",
       "integration": "evaluate as a derived-text acquisition worker; retain page/image provenance and require multi-engine QC before promotion",
       "status": "research-approved"
+    },
+    {
+      "id": "rasam_maghribi_htr",
+      "name": "RASAM Maghrebi Arabic HTR Dataset",
+      "url": "https://github.com/calfa-co/rasam-dataset",
+      "role": "open ground-truth dataset for Arabic Maghrebi handwritten text recognition",
+      "integration": "benchmark Maghrebi manuscript OCR/HTR and layout/transcription validation; benchmark labels remain derived data",
+      "status": "research-approved"
     }
   ],
   "design_note": {
