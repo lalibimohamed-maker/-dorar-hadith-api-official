@@ -33,7 +33,7 @@ test("Hunyuan runtime policy requires a separate readiness gate", () => {
 });
 
 test("release-manifest is explicitly weights-only", () => {
-  assert.match(workflow, /weights only/i);
+  assert.match(workflow, /weights[- ]only/i);
   assert.match(workflow, /runtime completeness/i);
 });
 
