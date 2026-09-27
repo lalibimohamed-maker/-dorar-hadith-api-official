@@ -478,6 +478,23 @@
       "integration": "citation-graph and scholarly-search worker for finding studies about manuscripts, Arabic NLP, Quran/Hadith digitization and Islamic studies; metadata is discovery/bibliography evidence, not canonical religious evidence",
       "license": "API usage governed by Semantic Scholar terms/rate limits; retrieved paper/full-text rights remain item-specific",
       "status": "integration-candidate"
+    },
+    {
+      "id": "quranjs_api_sdk",
+      "name": "@quranjs/api",
+      "url": "https://github.com/quran/api-js",
+      "role": "official JavaScript/TypeScript SDK for Quran Foundation Content and User APIs with server/client runtime separation",
+      "integration": "preferred typed connector foundation for Rechercher's Quran Foundation adapter; server client handles OAuth2 Content token retrieval, caching, expiry and required headers, while public client supports PKCE User APIs. Keep secrets server-side and pin SDK versions.",
+      "license": "Verify repository package license and dependency licenses before inclusion in production; API/content rights remain governed by Quran Foundation terms",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "quran_foundation_oauth_reference",
+      "name": "Quran Foundation OAuth2 API reference",
+      "url": "https://api-docs.quran.com/docs/oauth2_apis_versioned/1.0.0/oauth-2-token-exchange/",
+      "role": "OAuth2/OIDC token exchange reference for Quran Foundation connectors",
+      "integration": "implementation/security reference for confidential Client Credentials and Authorization Code/PKCE flows; never store client secrets in frontend/mobile code; tokens are environment-specific",
+      "status": "integration-reference"
     }
   ],
   "design_note": {
