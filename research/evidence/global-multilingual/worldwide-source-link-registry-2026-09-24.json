@@ -5,11 +5,11 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 502,
-    "rights_review_required": 502,
-    "new_global_links_added_2026_09_24": 330,
+    "links": 504,
+    "rights_review_required": 504,
+    "new_global_links_added_2026_09_24": 332,
     "previous_snapshot_links": 127,
-    "sources": 502
+    "sources": 504
   },
   "rules": [
     "URL is a discovery/source endpoint, not proof of item-level rights.",
@@ -9031,6 +9031,26 @@
       "rights_status": "review_required",
       "source_pr": "561_deep_research_2026_09_27",
       "notes": "Official Content Sync workflow using snapshot/sync tokens and incremental changes. Supports quran_core, mushafs, translations, word-by-word translations/transliterations, tafsirs, recitations, chapter recitations and articles. Useful as a controlled refresh connector; sync permission does not itself grant public redistribution rights."
+    },
+    {
+      "id": "world-503",
+      "category": "Quran API OAuth documentation",
+      "name": "Quran Foundation OAuth2 Token Exchange",
+      "url": "https://api-docs.quran.com/docs/oauth2_apis_versioned/1.0.0/oauth-2-token-exchange/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Official OAuth2 token endpoint documentation covering client_credentials, authorization_code and refresh_token exchanges, token expiry, scopes and error handling. Authentication documentation is an integration dependency, not content redistribution permission."
+    },
+    {
+      "id": "world-504",
+      "category": "Quran API SDK documentation",
+      "name": "Quran Foundation API Reference",
+      "url": "https://api-docs.quran.com/docs/api-reference/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Official API-family reference covering Content, Search, User and OAuth2 APIs. Useful as the canonical discovery index for Rechercher connectors; access rights and content rights remain distinct."
     }
   ],
   "notes": [
