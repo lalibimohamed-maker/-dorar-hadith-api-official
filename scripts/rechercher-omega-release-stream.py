@@ -22,6 +22,7 @@ RELEASE_TAG = os.environ["RELEASE_TAG"]
 LICENSE_ID = os.environ["LICENSE_ID"]
 REPO = os.environ["OMEGA_STORAGE_REPOSITORY"]
 TOKEN = os.environ["GH_TOKEN"]
+HF_TOKEN = os.environ.get("HF_TOKEN", "").strip()
 RELEASE_ID = os.environ.get("OMEGA_RELEASE_ID", "").strip()
 
 JSON_HEADERS = {
@@ -118,7 +119,7 @@ def release_assets(release):
 def main():
     if not REPO or "/" not in REPO:
         raise RuntimeError("OMEGA_STORAGE_REPOSITORY is missing or invalid")
-    api = HfApi()
+    api = HfApi(token=HF_TOKEN or None)
     info = api.model_info(MODEL_ID, revision=REVISION, files_metadata=True)
 
     existing_release = release_info()
@@ -232,6 +233,7 @@ def main():
                     "Range": f"bytes={start}-{end}",
                     "Accept": "application/octet-stream",
                     "User-Agent": "Rechercher-Omega/1.0",
+                    **({"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}),
                 },
             )
             print(f"[STREAM] {source_path} {start}-{end} -> {asset_name}")
