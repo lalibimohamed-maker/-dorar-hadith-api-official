@@ -131,7 +131,7 @@ function validatePdfPayload(bytes){
  if(!Buffer.isBuffer(bytes) || bytes.length<5) throw new Error('downloaded payload is empty or too small');
  if(bytes.subarray(0,5).toString()!=='%PDF-') throw new Error('downloaded payload is not a PDF');
  const eofWindow=bytes.subarray(Math.max(0,bytes.length-1024)).toString('latin1');
- if(!/%%EOF\\s*$/.test(eofWindow)) throw new Error('downloaded payload has no PDF EOF marker');
+ if(!/%%EOF\s*$/.test(eofWindow)) throw new Error('downloaded payload has no PDF EOF marker');
  return bytes;
 }
 async function downloadPdf(url,file){
@@ -196,7 +196,7 @@ for(const [key,lang] of languages){
        }
        const duplicateOf=seenPdfSha256.get(inspected.sha256);
        if(duplicateOf){
-         await fs.rm(resolved,{force:true});
+         await fs.rm(file,{force:true});
          entry.files.push({
            source:adapter.id,url:pdfUrl,sha256:inspected.sha256,bytes:inspected.bytes,
            acquisition,rights:rights.status,deduplicated:true,duplicate_of:duplicateOf.path
