@@ -1,0 +1,182 @@
+{
+  "schema_version": "1.0.0",
+  "generated": "2026-09-27",
+  "branch": "feat/rechercher-worldwide-source-link-registry-2026-09-24",
+  "source_registry": "research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json",
+  "purpose": "Machine-readable design and product intelligence for building Dinullah Encyclopedia as a multilingual, provenance-first Islamic knowledge platform.",
+  "principle": "Learn capabilities and information patterns from worldwide sources; do not copy proprietary content, branding, or protected UI.",
+  "architecture": {
+    "layers": [
+      "Source Registry",
+      "Capability Registry",
+      "Work/Edition Identity",
+      "Provenance & Rights",
+      "Connector/API Layer",
+      "Acquisition & QC",
+      "Canonical Corpus",
+      "Search/Discovery",
+      "Presentation/UI"
+    ],
+    "canonical_flow": "discover → classify → verify source → resolve work/edition → verify rights → choose connector → acquire/sync → QC → provenance → index → present",
+    "product_goal": "A unified multilingual encyclopedia and application exposing Quran, hadith, tafsir, books, manuscripts, audio, education and Islamic utilities while preserving source identity and rights."
+  },
+  "information_architecture": {
+    "primary": [
+      "Quran",
+      "Hadith",
+      "Tafsir",
+      "Books",
+      "Manuscripts",
+      "Fiqh",
+      "Aqidah",
+      "Seerah",
+      "Dua & Dhikr",
+      "Audio",
+      "Learning",
+      "Prayer & Qibla",
+      "Zakat",
+      "Hijri"
+    ],
+    "global_search_filters": [
+      "language",
+      "content_type",
+      "source",
+      "author",
+      "scholar",
+      "school_or_method_when_explicit",
+      "work",
+      "edition",
+      "date",
+      "license",
+      "availability",
+      "audio",
+      "downloadable"
+    ],
+    "entity_graph": [
+      "work",
+      "edition",
+      "author",
+      "scholar",
+      "institution",
+      "source",
+      "language",
+      "translation",
+      "commentary",
+      "hadith_collection",
+      "hadith",
+      "ayah",
+      "manuscript",
+      "asset",
+      "license",
+      "api_endpoint"
+    ]
+  },
+  "ui_patterns": [
+    "single global search with type-aware results",
+    "reader-first content pages with source/edition panel",
+    "side-by-side original/translation/commentary",
+    "audio synchronized to verse/hadith where licensed",
+    "source and provenance drawer on every work",
+    "language switcher independent from canonical Arabic text",
+    "offline/download center governed by rights",
+    "accessible RTL/LTR responsive layout",
+    "low-bandwidth mode",
+    "personal study/memorization workspace without altering canonical source"
+  ],
+  "api_patterns": {
+    "connector_record": [
+      "provider",
+      "base_url",
+      "authentication",
+      "endpoint",
+      "method",
+      "request_schema",
+      "response_schema",
+      "rate_limit",
+      "health_status",
+      "last_verified",
+      "rights_scope"
+    ],
+    "execution_states": [
+      "documented",
+      "reachable",
+      "authenticated",
+      "contract_verified",
+      "content_provenance_verified",
+      "rights_verified",
+      "acquisition_allowed",
+      "redistribution_allowed"
+    ],
+    "rule": "Never promote documented/reachable API to acquisition_allowed without rights evidence."
+  },
+  "rights_model": [
+    "unknown",
+    "review_required",
+    "display_only",
+    "api_only",
+    "offline_sync_allowed",
+    "download_allowed",
+    "redistribution_allowed",
+    "licensed_exception"
+  ],
+  "provenance_fields": [
+    "source_url",
+    "provider",
+    "work",
+    "edition",
+    "language",
+    "translator",
+    "editor",
+    "publisher",
+    "publication_year",
+    "asset_url",
+    "retrieved_at",
+    "sha256",
+    "license",
+    "license_url",
+    "attribution",
+    "rights_evidence"
+  ],
+  "multilingual_model": [
+    "canonical_language",
+    "display_language",
+    "translation_source",
+    "translator",
+    "translation_license",
+    "translation_quality_status",
+    "rtl_ltr",
+    "script",
+    "locale"
+  ],
+  "design_governance": [
+    "abstract reusable interaction patterns",
+    "retain attribution where source requires it",
+    "never copy logos/branding/assets without permission",
+    "record the source that inspired a capability",
+    "test accessibility and mobile performance",
+    "keep scientific content separate from product presentation"
+  ],
+  "global_radar_priorities": [
+    "open-license Quran datasets",
+    "license-aware hadith datasets",
+    "multilingual tafsir/translation repositories",
+    "manuscript metadata and IIIF",
+    "Islamic bibliographic authority data",
+    "scholar/institution authority records",
+    "OCR and Arabic NLP infrastructure",
+    "offline-first/mobile Islamic education",
+    "accessibility and low-bandwidth delivery"
+  ],
+  "newly_verified_refs": [
+    "world-465",
+    "world-466",
+    "world-467",
+    "world-468"
+  ],
+  "non_goals": [
+    "not a blanket license",
+    "not a promise that every registry source can be acquired",
+    "not a clone of any source site",
+    "not an AI translation authority"
+  ]
+}
