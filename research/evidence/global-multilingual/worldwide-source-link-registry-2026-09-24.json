@@ -5,11 +5,11 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 488,
-    "rights_review_required": 488,
-    "new_global_links_added_2026_09_24": 316,
+    "links": 495,
+    "rights_review_required": 495,
+    "new_global_links_added_2026_09_24": 323,
     "previous_snapshot_links": 127,
-    "sources": 488
+    "sources": 495
   },
   "rules": [
     "URL is a discovery/source endpoint, not proof of item-level rights.",
@@ -8891,6 +8891,76 @@
       "rights_status": "review_required",
       "source_pr": "561_deep_research_2026_09_27",
       "notes": "Character-indexed Hafs tajweed annotations and decision trees; annotation data is CC BY 4.0, while the referenced Tanzil Uthmani text remains under Tanzil terms. Repository is not actively maintained, so treat it as a compatibility/reference source rather than an authoritative active API."
+    },
+    {
+      "id": "world-489",
+      "category": "Quran audio alignment",
+      "name": "Quran Align",
+      "url": "https://github.com/cpfair/quran-align",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Word-precise Qur'an recitation segmentation with downloadable word-by-word timing data; timing data is CC BY 4.0. Treat the underlying recordings and source Quran text as separately governed upstream assets."
+    },
+    {
+      "id": "world-490",
+      "category": "Quran audio dataset",
+      "name": "Qur'anic Universal Audio",
+      "url": "https://github.com/QUD-Technologies/quranic-universal-audio",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Unified recitation/timestamp catalogue with word- and letter-level timing, validation and versioning. Project code/timestamps/catalog metadata are CC BY 4.0; recitation recordings remain owned by their original upstream sources."
+    },
+    {
+      "id": "world-491",
+      "category": "Hadith corpus",
+      "name": "Leeds–King Saud University Hadith Corpus",
+      "url": "https://github.com/ShathaTm/LK-Hadith-Corpus",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Bilingual Arabic-English corpus of 39,038 annotated hadiths from the six canonical collections, with separate isnad/matn/grade fields. Use as research/parallel-corpus input; verify corpus licensing and upstream text rights before redistribution."
+    },
+    {
+      "id": "world-492",
+      "category": "Seerah API",
+      "name": "Quran-Hadith-Dua-Seerah API",
+      "url": "https://github.com/aquibhussain12/Quran-Hadith-Dua-API",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "API project exposing Quran, Hadith, Duas and Seerah endpoints, including chapter-based Seerah access. Database access is described as separately supplied by the maintainer; no item-level redistribution license was established."
+    },
+    {
+      "id": "world-493",
+      "category": "Multilingual Quran/Hadith API",
+      "name": "Islam Companion Web API",
+      "url": "https://github.com/pakjiddat/Islam-Companion-Web-Api",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "REST API exposing Quran translations in 42 languages and Hadith translations in Arabic, English and Urdu. Treat translation/text licensing and provenance as separate fields before acquisition."
+    },
+    {
+      "id": "world-494",
+      "category": "Islamic digital library",
+      "name": "Kizana",
+      "url": "https://github.com/elkizana/kizana",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Open-source desktop Quran/Islamic-library application describing a collection of about 8,000 books and an external database archive. Application is open source; bundled book database is attributed to al-Maktaba al-Shamela and must be reviewed item-by-item for rights/provenance."
+    },
+    {
+      "id": "world-495",
+      "category": "Open Islamic text metadata",
+      "name": "OpenITI Annotation metadata templates",
+      "url": "https://github.com/OpenITI/Annotation",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Structured author/book metadata templates encoding dates, genres, manuscript, edition, translation, study and link relations. Useful for work/edition identity and scholarly provenance; verify repository/data licensing separately."
     }
   ],
   "notes": [
