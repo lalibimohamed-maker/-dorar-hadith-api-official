@@ -55,6 +55,16 @@ export async function executeHuggingFace({ model, messages, ...input }) {
   return postJson(endpoint, { authorization: "Bearer " + key }, { model, messages });
 }
 
+export async function executeOpenAICompatible({ model, messages, ...input }) {
+  assertNoCorpusWrite(input);
+  if (!model) throw new Error("OpenAI-compatible execution requires a model");
+  const base = (process.env.OPENAI_COMPATIBLE_BASE_URL ?? "http://127.0.0.1:11434/v1").replace(/\/$/, "");
+  const endpoint = base + "/chat/completions";
+  const apiKey = process.env.OPENAI_COMPATIBLE_API_KEY;
+  const headers = apiKey ? { authorization: "Bearer " + apiKey } : {};
+  return postJson(endpoint, headers, { model, messages });
+}
+
 export async function executeLocal({ command, args = [], cwd, env = {}, ...input }) {
   assertNoCorpusWrite(input);
   if (!command) throw new Error("local execution requires an explicit command");
@@ -97,6 +107,7 @@ export function buildAdapterRequest({ backend, model, input = {} }) {
   if (backend === "gemini-free-tier") return { provider: "gemini", model, input };
   if (backend === "groq-free-plan") return { provider: "groq", model, input };
   if (backend === "huggingface-inference") return { provider: "huggingface", model, input };
+  if (backend === "openai-compatible") return { provider: "openai-compatible", model, input };
   if (backend === "kaggle-gpu") return buildKaggleExecution(input);
   if (backend === "local") return { provider: "local", model, input };
   throw new Error("unknown Rechercher Ω execution backend: " + backend);
