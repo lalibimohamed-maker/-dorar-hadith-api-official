@@ -188,7 +188,7 @@ export async function generateAIAugmentedSearchPlan({ provider, ...input } = {})
       evidence_required: true,
       rights_required: true,
       corpus_write_allowed: false
-    })));
+    }));
 
   return {
     ...base,
