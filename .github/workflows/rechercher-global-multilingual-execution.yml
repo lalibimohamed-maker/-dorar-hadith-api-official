@@ -137,9 +137,17 @@ jobs:
 
 
   acquire-multilingual-pdfs:
-    name: Acquire and persist source files from the verified 3,192-cell ledger (PDF-first, DOCX fallback)
+    name: Acquire multilingual matrix shard ${{ matrix.shard }} / 47 (PDF-first, DOCX fallback)
     needs: matrix
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]
     uses: ./.github/workflows/rechercher-multilingual-pdf-acquisition.yml
+    with:
+      shard_index: ${{ matrix.shard }}
+      shard_count: 48
     secrets:
       RECHERCHER_MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
       RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
