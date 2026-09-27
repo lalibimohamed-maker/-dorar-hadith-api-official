@@ -1409,5 +1409,15 @@
     "sunnah_api_docs": "https://sunnah.stoplight.io/docs/api/",
     "openiti_docs": "https://openiti.org/documentation/",
     "openiti_corpus": "https://openiti.org/projects/OpenITI%20Corpus.html"
+  },
+  "registry_layers": {
+    "canonical_global": "config/source-registry.json",
+    "official_sources": "config/official-source-registry-2026.json",
+    "country_overlays": [
+      "config/saudi-official-fatwa-sources-2026.json",
+      "config/global-fatwa-institutions-audit-2026-09.json"
+    ],
+    "heritage_global": "books-batches/salaf-01-400h/global-source-registry-2026-09.json",
+    "rule": "Fleet entries define domain capability and adapter contracts; source identity remains owned by the referenced registries."
   }
 }
