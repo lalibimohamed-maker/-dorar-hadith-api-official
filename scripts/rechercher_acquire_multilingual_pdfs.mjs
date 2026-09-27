@@ -189,9 +189,9 @@ for(const [key,lang] of languages){
        downloadSequence += 1;
        const file=path.join(storageDir,`pdf-${String(downloadSequence).padStart(8,'0')}.pdf`);
        await downloadPdf(pdfUrl,file);
-       const inspected=await inspectPdfFile(resolved);
+       const inspected=await inspectPdfFile(file);
        if(!inspected.isPdf){
-         await fs.rm(resolved,{force:true});
+         await fs.rm(file,{force:true});
          continue;
        }
        const duplicateOf=seenPdfSha256.get(inspected.sha256);
