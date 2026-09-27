@@ -112,7 +112,7 @@ export function buildMcpToolPolicy(requestedTools = DEFAULT_TOOLS) {
 
 export function buildProgrammingGraph(registry) {
   const graph = buildAiExecutionGraph(registry, {
-    pipeline: "agent",
+    pipeline: "programming",
     requestedTools: [
       "repository_read",
       "repository_search",
