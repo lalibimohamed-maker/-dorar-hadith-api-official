@@ -834,6 +834,54 @@
       ],
       "integration": "mcp_adapter",
       "auto_download": false
+    },
+    {
+      "id": "qwen3",
+      "kind": "language_reasoning_model",
+      "source_repo": "https://github.com/QwenLM/Qwen3",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": [
+        "reasoning",
+        "planning",
+        "tool_use",
+        "structured_output",
+        "multilingual_reasoning"
+      ],
+      "integration": "openai_compatible",
+      "auto_download": false
+    },
+    {
+      "id": "qwen3-omni",
+      "kind": "omnimodal_model",
+      "source_repo": "https://github.com/QwenLM/Qwen3-Omni",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": [
+        "multimodal_understanding",
+        "audio_understanding",
+        "video_understanding",
+        "image_understanding",
+        "speech_translation",
+        "reasoning"
+      ],
+      "integration": "openai_compatible",
+      "auto_download": false
+    },
+    {
+      "id": "qwen3-vl",
+      "kind": "vision_language_model",
+      "source_repo": "https://github.com/QwenLM/Qwen3-VL",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": [
+        "image_understanding",
+        "video_understanding",
+        "document_understanding",
+        "visual_grounding"
+      ],
+      "integration": "openai_compatible",
+      "auto_download": false
     }
   ],
   "pipelines": {
