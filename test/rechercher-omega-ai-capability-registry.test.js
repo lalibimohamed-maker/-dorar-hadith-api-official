@@ -38,7 +38,22 @@ test("registry includes the voice, document, retrieval and agent building blocks
     "ollama",
     "llama-cpp",
     "gpt-oss",
-    "gpt-oss-safeguard"
+    "gpt-oss-safeguard",
+    "localai",
+    "vllm",
+    "whisper-cpp",
+    "piper",
+    "pgvector",
+    "bge-vl",
+    "pyannote-audio",
+    "deepseek-ocr",
+    "openvino",
+    "markitdown",
+    "qwen3-coder",
+    "aider",
+    "tabby",
+    "mini-swe-agent",
+    "codex-cli"
   ]) {
     assert.ok(registry.components.some(component => component.id === id), "missing " + id);
   }
