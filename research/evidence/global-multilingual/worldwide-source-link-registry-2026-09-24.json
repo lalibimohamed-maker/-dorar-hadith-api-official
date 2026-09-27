@@ -8,7 +8,8 @@
     "links": 467,
     "rights_review_required": 467,
     "new_global_links_added_2026_09_24": 310,
-    "previous_snapshot_links": 127
+    "previous_snapshot_links": 127,
+    "sources": 474
   },
   "rules": [
     "URL is a discovery/source endpoint, not proof of item-level rights.",
@@ -8680,6 +8681,76 @@
         "integration_reference"
       ],
       "notes": "Public GitHub collection documenting live endpoints from AlAdhan, AlQuran Cloud, Quran.com audio, QuranEnc, a hadith API, Azkar sources and Quran radio. It is primarily an aggregator/reference rather than a single API provider. Its README documents endpoints but does not itself establish redistribution rights for the underlying datasets/services; verify each upstream provider and content license before acquisition or redistribution."
+    },
+    {
+      "id": "world-470",
+      "category": "Islamic API / Quran / Hadith source",
+      "name": "Al-Quran API",
+      "url": "https://alquran-api.pages.dev/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Discovery link added to the worldwide source registry. API/software availability does not itself grant redistribution rights; verify provider terms, content provenance, edition identity and item-level rights before acquisition or redistribution."
+    },
+    {
+      "id": "world-471",
+      "category": "Islamic API / Quran / Hadith source",
+      "name": "QuranHub by Misraj AI",
+      "url": "https://github.com/misraj-ai/quranhub",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Discovery link added to the worldwide source registry. API/software availability does not itself grant redistribution rights; verify provider terms, content provenance, edition identity and item-level rights before acquisition or redistribution."
+    },
+    {
+      "id": "world-472",
+      "category": "Islamic API / Quran / Hadith source",
+      "name": "Sunnah Now",
+      "url": "https://github.com/sunnah-now",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Discovery link added to the worldwide source registry. API/software availability does not itself grant redistribution rights; verify provider terms, content provenance, edition identity and item-level rights before acquisition or redistribution."
+    },
+    {
+      "id": "world-473",
+      "category": "Islamic API / Quran / Hadith source",
+      "name": "AhmedBaset Hadith API",
+      "url": "https://github.com/AhmedBaset/hadith-api",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Discovery link added to the worldwide source registry. API/software availability does not itself grant redistribution rights; verify provider terms, content provenance, edition identity and item-level rights before acquisition or redistribution."
+    },
+    {
+      "id": "world-474",
+      "category": "Islamic API / Quran / Hadith source",
+      "name": "saikothasan Hadith API",
+      "url": "https://github.com/saikothasan/hadithapi",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Discovery link added to the worldwide source registry. API/software availability does not itself grant redistribution rights; verify provider terms, content provenance, edition identity and item-level rights before acquisition or redistribution."
+    },
+    {
+      "id": "world-475",
+      "category": "Islamic API / Quran / Hadith source",
+      "name": "Tarteel / Quranic Universal Library",
+      "url": "https://tarteel.ai/fr",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Discovery link added to the worldwide source registry. API/software availability does not itself grant redistribution rights; verify provider terms, content provenance, edition identity and item-level rights before acquisition or redistribution."
+    },
+    {
+      "id": "world-476",
+      "category": "Islamic API / Quran / Hadith source",
+      "name": "Sunnah.com Official API",
+      "url": "https://github.com/sunnah-com/api",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "notes": "Discovery link added to the worldwide source registry. API/software availability does not itself grant redistribution rights; verify provider terms, content provenance, edition identity and item-level rights before acquisition or redistribution."
     }
   ],
   "notes": [
@@ -8740,7 +8811,12 @@
     "2026-09-25 deep source radar round 2: +7 sources (Erth Al Mustafa, IslamicInfo, Ṣifah, International Seerah Council, Al Imam Institute, Imam Al-Shatibi Global Quran Platform, Easy Fiqh). The previously named Global Message/Baraheen/IslamForAll/Ibn Taymiyyah Virtual Institute/Fiqh of Minorities/Islam Verified and similar names remain unregistered because no sufficiently reliable first-party identity was established in this round.",
     "2026-09-27: added verified HifzMate, Zikrah, ilmSpace and AzanCast source/discovery endpoints; enriched existing UmmahAPI (world-142) with official documentation and live endpoint metadata. Application/service presence does not grant redistribution rights.",
     "2026-09-27: global design-intelligence pass added a structured product/capability taxonomy and four newly verified open-source/licensing-aware Quran/Islamic infrastructure sources. No new branch was created; changes remain on PR #561 branch.",
-    "2026-09-27: added world-469 Islamic-APIs aggregator/reference to the worldwide registry; no underlying content rights were inferred."
+    "2026-09-27: added world-469 Islamic-APIs aggregator/reference to the worldwide registry; no underlying content rights were inferred.",
+    {
+      "date": "2026-09-27",
+      "change": "Added Quran/Hadith API and institutional source links supplied for PR #561; kept rights review-required and separate from Rechercher Ω execution connectors.",
+      "source_pr": "561"
+    }
   ],
   "design_intelligence": {
     "status": "active",
