@@ -240,7 +240,7 @@ jobs:
             exit 1
           fi
           gh release download "$RELEASE_TAG"             --repo "$REPO"             --pattern "hunyuanvideo15-release-readiness.json"             --dir "$VERIFY_DIR"
-          status="$(python3 -c 'import json; print(json.load(open("'"'$VERIFY_DIR/hunyuanvideo15-release-readiness.json'"))["status"])')"
+          status="$(python3 -c "import json; print(json.load(open('$VERIFY_DIR/hunyuanvideo15-release-readiness.json'))['status'])")"
           test "$status" = "dependency_blocked"
           echo "[OK] Runtime completeness gate passed: core packaged, runnable state explicitly blocked by declared external dependencies."
 
