@@ -9,7 +9,7 @@ import urllib.parse
 import urllib.request
 from http.client import HTTPSConnection
 from pathlib import Path
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, HfFileSystem
 
 _chunk_env = os.environ.get("CHUNK_BYTES", "").strip()
 CHUNK_BYTES = int(_chunk_env) if _chunk_env else 128 * 1024 * 1024
@@ -118,45 +118,15 @@ def release_assets(release):
 
 
 
-class _NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
+def open_hf_stream(model_id, source_path, revision, token):
+    """
+    Stream through the Xet-aware Hugging Face filesystem instead of manually
+    following resolve redirects. Authentication and signed Xet URLs remain
+    inside huggingface_hub/hf_xet.
+    """
+    fs = HfFileSystem(token=token or None, block_size=8 * 1024 * 1024)
+    return fs.open(f"hf://{model_id}@{revision}/{source_path}", "rb")
 
-
-def open_hf_stream(url, token):
-    current = url
-    opener = urllib.request.build_opener(_NoRedirect(), urllib.request.HTTPSHandler(context=TLS))
-    for _ in range(8):
-        parsed = urllib.parse.urlsplit(current)
-        headers = {
-            "Accept": "application/octet-stream",
-            "User-Agent": "Rechercher-Omega/1.0",
-        }
-        if token and parsed.hostname in {"huggingface.co", "www.huggingface.co"}:
-            headers["Authorization"] = f"Bearer {token}"
-        req = urllib.request.Request(current, headers=headers)
-        try:
-            response = opener.open(req, timeout=1800)
-        except urllib.error.HTTPError as exc:
-            location = exc.headers.get("Location")
-            if exc.code in (301, 302, 303, 307, 308) and location:
-                exc.close()
-                current = urllib.parse.urljoin(current, location)
-                continue
-            raise
-        status = getattr(response, "status", None)
-        if status == 200:
-            return response
-        if status in (301, 302, 303, 307, 308):
-            location = response.headers.get("Location")
-            response.close()
-            if not location:
-                raise RuntimeError("Hugging Face redirect missing Location for "+url)
-            current = urllib.parse.urljoin(current, location)
-            continue
-        response.close()
-        raise RuntimeError(f"HF returned HTTP {status} for {url}")
-    raise RuntimeError(f"Too many redirects resolving Hugging Face file: {url}")
 def main():
     if not REPO or "/" not in REPO:
         raise RuntimeError("OMEGA_STORAGE_REPOSITORY is missing or invalid")
@@ -229,21 +199,8 @@ def main():
         hasher = hashlib.sha256()
         counted = 0
 
-        encoded = urllib.parse.quote(source_path, safe="/")
-        source_url = (
-            f"https://huggingface.co/{MODEL_ID}/resolve/{REVISION}/{encoded}?download=true"
-        )
-
         print(f"[STREAM-OPEN] {source_path} size={source_size}")
-        with open_hf_stream(source_url, HF_TOKEN) as response:
-            status = getattr(response, "status", None)
-            remote_len = response.headers.get("Content-Length")
-            if status != 200:
-                raise RuntimeError(f"HF returned HTTP {status} for {source_path}")
-            if remote_len is not None and int(remote_len) != source_size:
-                raise RuntimeError(
-                    f"Source length mismatch for {source_path}: expected {source_size}, got {remote_len}"
-                )
+        with open_hf_stream(MODEL_ID, source_path, REVISION, HF_TOKEN) as response:
 
             class LimitedHashingReader:
                 def __init__(self, inner, hasher, limit):
@@ -350,7 +307,7 @@ def main():
         "model_id": MODEL_ID,
         "revision": REVISION,
         "license": LICENSE_ID,
-        "transport": "direct_hf_streaming_release_chunking_python",
+        "transport": "hf_filesystem_xet_streaming_release_chunking_python",
         "chunk_bytes": CHUNK_BYTES,
         "resume_chunk_policy": "reuse_existing_asset_size_per_source_file",
         "files": manifest,
