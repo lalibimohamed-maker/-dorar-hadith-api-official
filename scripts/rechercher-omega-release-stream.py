@@ -234,70 +234,85 @@ def main():
             f"https://huggingface.co/{MODEL_ID}/resolve/{REVISION}/{encoded}?download=true"
         )
 
-        for part in range(parts):
-            start = part * chunk_bytes
-            end = min(source_size - 1, start + chunk_bytes - 1)
-            length = end - start + 1
-            asset_name = f"omega__{safe}.part-{part:04d}" if parts > 1 else f"omega__{safe}"
-
-            if asset_name in existing:
-                observed = existing[asset_name]
-                if observed == length:
-                    print(f"[SKIP] existing {asset_name} ({observed} bytes)")
-                    names.append(asset_name)
-                    counted += length
-                    continue
-                print(
-                    f"[REPAIR] removing stale {asset_name}: "
-                    f"expected {length} bytes, observed {observed}"
+        print(f"[STREAM-OPEN] {source_path} size={source_size}")
+        with open_hf_stream(source_url, HF_TOKEN) as response:
+            status = getattr(response, "status", None)
+            remote_len = response.headers.get("Content-Length")
+            if status != 200:
+                raise RuntimeError(f"HF returned HTTP {status} for {source_path}")
+            if remote_len is not None and int(remote_len) != source_size:
+                raise RuntimeError(
+                    f"Source length mismatch for {source_path}: expected {source_size}, got {remote_len}"
                 )
-                proc = subprocess.run(
-                    [
-                        "gh", "release", "delete-asset", RELEASE_TAG, asset_name,
-                        "--repo", REPO, "--yes",
-                    ],
-                    check=False,
-                    capture_output=True,
-                    text=True,
-                    env={**os.environ, "GH_TOKEN": TOKEN},
-                )
-                if proc.returncode != 0:
-                    detail = (proc.stderr or proc.stdout or "").strip()
-                    raise RuntimeError(
-                        f"Failed to remove stale Release asset {asset_name}: {detail[:1000]}"
+
+            class LimitedHashingReader:
+                def __init__(self, inner, hasher, limit):
+                    self.inner = inner
+                    self.hasher = hasher
+                    self.remaining = limit
+
+                def read(self, n=-1):
+                    if self.remaining <= 0:
+                        return b""
+                    want = self.remaining if n < 0 else min(n, self.remaining)
+                    data = self.inner.read(want)
+                    if not data:
+                        raise RuntimeError(
+                            f"Unexpected EOF while streaming {source_path}; "
+                            f"{self.remaining} bytes remain for current part"
+                        )
+                    self.hasher.update(data)
+                    self.remaining -= len(data)
+                    return data
+
+            for part in range(parts):
+                start = part * chunk_bytes
+                end = min(source_size - 1, start + chunk_bytes - 1)
+                length = end - start + 1
+                asset_name = f"omega__{safe}.part-{part:04d}" if parts > 1 else f"omega__{safe}"
+
+                if asset_name in existing:
+                    observed = existing[asset_name]
+                    if observed == length:
+                        print(f"[SKIP] existing {asset_name} ({observed} bytes)")
+                        remaining = length
+                        while remaining:
+                            data = response.read(min(8 * 1024 * 1024, remaining))
+                            if not data:
+                                raise RuntimeError(
+                                    f"Unexpected EOF while skipping {asset_name}; {remaining} bytes remain"
+                                )
+                            hasher.update(data)
+                            remaining -= len(data)
+                        names.append(asset_name)
+                        counted += length
+                        continue
+                    print(
+                        f"[REPAIR] removing stale {asset_name}: "
+                        f"expected {length} bytes, observed {observed}"
                     )
-                existing.pop(asset_name, None)
-
-            print(f"[STREAM] {source_path} {start}-{end} -> {asset_name}")
-
-            with open_hf_range(source_url, start, end, HF_TOKEN) as response:
-                status = getattr(response, "status", None)
-                remote_len = response.headers.get("Content-Length")
-                if status not in (200, 206):
-                    raise RuntimeError(f"HF returned HTTP {status} for {source_path}")
-                if remote_len is not None and int(remote_len) != length:
-                    raise RuntimeError(
-                        f"Range length mismatch for {source_path}: expected {length}, got {remote_len}"
+                    proc = subprocess.run(
+                        [
+                            "gh", "release", "delete-asset", RELEASE_TAG, asset_name,
+                            "--repo", REPO, "--yes",
+                        ],
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                        env={**os.environ, "GH_TOKEN": TOKEN},
                     )
+                    if proc.returncode != 0:
+                        detail = (proc.stderr or proc.stdout or "").strip()
+                        raise RuntimeError(
+                            f"Failed to remove stale Release asset {asset_name}: {detail[:1000]}"
+                        )
+                    existing.pop(asset_name, None)
 
-                class HashingReader:
-                    def __init__(self, inner, hasher):
-                        self.inner = inner
-                        self.hasher = hasher
-                    def read(self, n=-1):
-                        data = self.inner.read(n)
-                        if data:
-                            self.hasher.update(data)
-                        return data
-
-                wrapped = HashingReader(response, hasher)
+                print(f"[STREAM] {source_path} {start}-{end} -> {asset_name}")
+                wrapped = LimitedHashingReader(response, hasher, length)
                 try:
                     upload_asset(upload_url, asset_name, wrapped, length)
                 except RuntimeError as exc:
-                    # Another worker/attempt may have published the same asset after
-                    # our inventory snapshot. GitHub documents HTTP 422 for an
-                    # already-existing release-asset name. Refresh the authoritative
-                    # asset list and accept the asset only when its size is exact.
                     message = str(exc)
                     if "HTTP 422" not in message or "already_exists" not in message:
                         raise
@@ -335,7 +350,7 @@ def main():
         "model_id": MODEL_ID,
         "revision": REVISION,
         "license": LICENSE_ID,
-        "transport": "direct_hf_range_stream_python",
+        "transport": "direct_hf_streaming_release_chunking_python",
         "chunk_bytes": CHUNK_BYTES,
         "resume_chunk_policy": "reuse_existing_asset_size_per_source_file",
         "files": manifest,
