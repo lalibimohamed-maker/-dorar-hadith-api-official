@@ -1,6 +1,17 @@
 name: Rechercher — Multilingual resource acquisition
 on:
   workflow_call:
+    inputs:
+      shard_index:
+        description: "Zero-based deterministic acquisition shard index."
+        required: false
+        type: string
+        default: "0"
+      shard_count:
+        description: "Deterministic acquisition shard count."
+        required: false
+        type: string
+        default: "48"
     secrets:
       RECHERCHER_MATRIX_STORAGE_TOKEN:
         required: true
@@ -15,12 +26,15 @@ permissions:
 env:
   MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
 concurrency:
-  group: rechercher-multilingual-pdf-${{ github.ref }}
+  group: rechercher-multilingual-pdf-${{ github.ref }}-${{ inputs.shard_index }}
   cancel-in-progress: false
 jobs:
   acquire:
     runs-on: ubuntu-24.04
-    timeout-minutes: 360
+    timeout-minutes: 330
+    env:
+      ACQUISITION_SHARD_INDEX: ${{ inputs.shard_index }}
+      ACQUISITION_SHARD_COUNT: ${{ inputs.shard_count }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -108,9 +122,11 @@ jobs:
               json.dump(data,fp,ensure_ascii=False,indent=2); fp.write("\n")
           print(f"MATRIX_RESUME_INVENTORY releases={len(releases)} assets={assets} cells={len(cells)} sha256={len(sha256)}")
           PY
-      - name: Acquire multilingual matrix-cell source files (PDF-first, DOCX fallback)
+      - name: Acquire multilingual matrix-cell source files (PDF-first, DOCX fallback, deterministic shard)
         env:
           ACQUISITION_EXISTING_INVENTORY: ${{ runner.temp }}/existing-release-inventory.json
+          ACQUISITION_SHARD_INDEX: ${{ env.ACQUISITION_SHARD_INDEX }}
+          ACQUISITION_SHARD_COUNT: ${{ env.ACQUISITION_SHARD_COUNT }}
         run: node scripts/rechercher_acquire_multilingual_cell_pdfs.mjs
       - name: Validate acquired PDF and DOCX originals
         run: |
