@@ -44,6 +44,10 @@ export function validateScholarlyFleet(fleet = {}) {
   }
 
   if (families.length === 0) errors.push("no-families");
+  if (fleet.expansion?.target_domain_cells != null && fleet.expansion.target_domain_cells !== families.length) {
+    errors.push("family-count-target-mismatch");
+  }
+  if (!fleet.registry_layers?.canonical_global) errors.push("missing-canonical-source-registry");
   return { valid: errors.length === 0, errors };
 }
 
