@@ -10,6 +10,9 @@ test("worldwide deep search spans configured languages and registered countries"
   });
   assert.ok(plan.languages_considered.length >= 20);
   assert.ok(plan.countries_considered.length >= 1);
+  assert.equal(plan.scholarly_families_declared.length, 24);
+  assert.ok(plan.source_families_considered.includes("hadith"));
+  assert.ok(plan.source_families_considered.includes("manuscripts"));
   assert.ok(plan.queries.length > 0);
   assert.doesNotThrow(() => assertGlobalDeepSearchBoundary(plan));
 });
