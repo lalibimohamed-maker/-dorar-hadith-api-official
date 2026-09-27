@@ -36,9 +36,10 @@
     "test:review-expiry": "node --test test/review-expiry.test.js",
     "test:ai": "node --test test/rechercher-ai-engine.test.js",
     "test:rechercher-ai": "npm run test:ai",
-    "test:omega-global-search": "node --test test/rechercher-omega-global-deep-search.test.js"
+    "test:omega-global-search": "node --test test/rechercher-omega-global-deep-search.test.js",
+    "test:omega-ai": "node --test test/rechercher-omega-ai-capability-registry.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js"
   },
   "engines": {
     "node": ">=20"
   }
-}
+}\n
