@@ -10,6 +10,7 @@ test("the scholarly fleet declares all shared contract axes", () => {
   assert.equal(result.valid, true, result.errors.join(", "));
   assert.equal(fleet.expansion.current_family_count, 24);
   assert.equal(fleet.expansion.target_domain_cells, 24);
+  assert.equal(fleet.registry_layers.canonical_global, "config/source-registry.json");
   for (const family of fleet.families) {
     for (const axis of fleet.contract.required_axes) {
       assert.ok(family.contract[axis], family.id + " missing " + axis);
