@@ -20,6 +20,12 @@ export function validateScholarlyFleet(fleet = {}) {
     if (family.id && familyIds.has(family.id)) errors.push("duplicate-family:" + family.id);
     if (family.id) familyIds.add(family.id);
 
+    for (const axis of REQUIRED_AXES) {
+      if (family.contract?.[axis] == null || family.contract[axis] === "") {
+        errors.push("family-missing-contract:" + family.id + ":" + axis);
+      }
+    }
+
     for (const source of family.sources ?? []) {
       for (const field of ["id","kind","execution","production","pre_live","sdk"]) {
         if (source[field] == null || source[field] === "") {
