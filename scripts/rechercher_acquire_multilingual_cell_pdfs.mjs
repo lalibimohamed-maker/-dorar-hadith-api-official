@@ -193,7 +193,7 @@ async function webFallbackCandidates(row){
         }});
         if(!r.ok) throw new Error('HTTP '+r.status);
         const html=await r.text();
-        const matches=[...html.matchAll(/<a[^>]+href=["'](https?:\\/\\/[^"']+)["'][^>]*>/gi)];
+        const matches=[...html.matchAll(/<a[^>]+href=["'](https?:\/\/[^"']+)["'][^>]*>/gi)];
         for(const m of matches){
           try{
             const target=new URL(m[1]);
