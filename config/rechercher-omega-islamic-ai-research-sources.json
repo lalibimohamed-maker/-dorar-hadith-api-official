@@ -175,6 +175,73 @@
       "integration": "benchmark/reference for Arabic document layout, bilingual OCR and positioned text; isolate model/runtime licenses and provenance",
       "license": "MIT",
       "status": "evaluation-candidate"
+    },
+    {
+      "id": "arabic_knowledge_mcp",
+      "name": "arabic-knowledge-mcp",
+      "url": "https://github.com/SanaAraj/arabic-knowledge-mcp",
+      "role": "MCP server for Quran, Sunni Hadith collections and Arabic knowledge sources",
+      "integration": "study as an Arabic MCP source adapter and grounding pattern; verify upstream rights and source contracts before ingestion",
+      "license": "MIT",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "quran_mcp",
+      "name": "quran-mcp",
+      "url": "https://github.com/quran/quran-mcp",
+      "role": "MCP server for Quran text, translations, tafsir, morphology and search",
+      "integration": "architecture/reference for Quran grounding, MCP resources and deterministic scripture retrieval; verify Quran Foundation licensing and deployment terms per resource",
+      "license": "QFGPL-1.0",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "islamic_corpus_mcp",
+      "name": "IslamicCorpusMCP",
+      "url": "https://github.com/ayzekhdawy/IslamicCorpusMCP",
+      "role": "secure MCP corpus server for Quran, tafsir and Hadith with structured database retrieval",
+      "integration": "evaluate as a corpus-query/MCP architecture reference; compare normalization, matching, security and provenance against Rechercher gates",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "ilm_islamic_search",
+      "name": "ilm",
+      "url": "https://github.com/arriqaaq/ilm",
+      "role": "Islamic scholarship search with Quran, hadith, narrators, isnad graphs, hybrid search and local GraphRAG",
+      "integration": "strong architecture reference for graph+vector+full-text retrieval, narrator graphs, manuscript presentation and local LLM grounding; independently verify datasets and grading methodology",
+      "license": "Apache-2.0",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "quranic_nlp",
+      "name": "Quranic NLP / quranic-nlp",
+      "url": "https://github.com/language-ml/quranic-nlp",
+      "role": "Quranic NLP: POS, dependency parsing, lemmatization, multilingual search, extraction and graphs",
+      "integration": "candidate linguistic feature layer for Arabic search and morphology; verify dataset licensing and freshness",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "tarima_maghrebi_htr",
+      "name": "Tarima — Maghrebi Arabic HTR ground truth",
+      "url": "https://github.com/calfa-co/tarima",
+      "role": "ground-truth and HTR resources for Maghrebi Arabic manuscripts with IIIF integrations",
+      "integration": "valuable manuscript/OCR research input for Maghrebi Arabic, PageXML and IIIF; use as research/training reference subject to dataset terms",
+      "status": "research-approved"
+    },
+    {
+      "id": "quran_pattern_search_research",
+      "name": "HQDR/HQPS pattern-search research",
+      "url": "https://link.springer.com/article/10.1007/s44443-026-00934-w",
+      "role": "character/grapheme-level Quran repository and deterministic pattern search with MCP interface",
+      "integration": "architecture inspiration for exact Quran search at grapheme level; implement only with independently verified canonical text and rights",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_nlp_existing",
+      "name": "QURAN-NLP",
+      "url": "https://github.com/islamAndAi/QURAN-NLP",
+      "role": "Quran/Hadith NLP, morphology, semantic search, tafsir and narrator graph tooling",
+      "integration": "expand current research record with explicit semantic-search, morphology and isnad graph capabilities; dataset-level rights remain separate",
+      "status": "research-approved"
     }
   ],
   "design_note": {
@@ -184,6 +251,8 @@
     "llm": "LLM weights can assist synthesis only after the evidence gate and never replace source-grounded evidence or scholar review.",
     "arena": "Arena is an optional external coding-agent worker; repository access must remain least-privilege and all changes flow through isolated branches, tests, evidence and review.",
     "agent_fleet": "Multiple agents are capability workers, not authorities. Rechercher Ω remains the orchestrator; no agent may write directly to the canonical Corpus.",
-    "islamic_graphs": "Islamic knowledge-graph projects are research inputs only. Preserve source IDs, provenance, rights and uncertainty through graph construction and retrieval."
+    "islamic_graphs": "Islamic knowledge-graph projects are research inputs only. Preserve source IDs, provenance, rights and uncertainty through graph construction and retrieval.",
+    "mcp_grounding": "MCP servers are connector/query infrastructure, not religious authorities. Rechercher must retain source IDs, exact text, edition/language metadata, provenance, rights and retrieval evidence.",
+    "manuscript_ocr": "Maghrebi and manuscript OCR resources can improve acquisition and transcription, but OCR output remains a derived artifact requiring multi-engine comparison and human/QC validation before canonical use."
   }
 }
