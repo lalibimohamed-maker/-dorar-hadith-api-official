@@ -1,0 +1,68 @@
+name: Rechercher Ω — GitHub AI capability scout
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-omega-github-ai-scout
+  cancel-in-progress: true
+
+jobs:
+  scout:
+    name: discover-public-ai-repositories
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+
+      - name: Run read-only GitHub AI scout
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OUTPUT: ${{ runner.temp }}/rechercher-omega-github-ai-census.json
+          PER_QUERY: "30"
+        run: node scripts/rechercher-omega-github-ai-scout.mjs
+
+      - name: Publish scout report
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
+        with:
+          name: rechercher-omega-github-ai-census
+          path: ${{ runner.temp }}/rechercher-omega-github-ai-census.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Write GitHub Actions summary
+        env:
+          REPORT: ${{ runner.temp }}/rechercher-omega-github-ai-census.json
+        run: |
+          node --input-type=module <<'JS'
+          import fs from "node:fs";
+          const report = JSON.parse(fs.readFileSync(process.env.REPORT, "utf8"));
+          const top = report.repositories.slice(0, 20);
+          const lines = [
+            "## Rechercher Ω — GitHub AI Scout",
+            "",
+            `Read-only repositories discovered: **${report.repository_count}**`,
+            `Queries: **${report.query_count}**`,
+            `Search failures: **${report.failures.length}**`,
+            "",
+            "| Repository | Stars | License | Categories |",
+            "|---|---:|---|---|",
+            ...top.map(r =>
+              `| [${r.full_name}](${r.html_url}) | ${r.stars} | ${r.license_spdx ?? "unknown"} | ${r.categories.join(", ")} |`
+            )
+          ];
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+          JS
