@@ -4,7 +4,7 @@ import { loadExecutionBackends, selectExecutionBackend, assertExecutionBoundary 
 
 test("execution registry contains free-first local, API and GPU paths", async () => {
   const registry = await loadExecutionBackends();
-  assert.ok(registry.backends.some(b => b.id === "local"));
+  assert.ok(registry.backends.some(b => b.id === "local"));\n  assert.ok(registry.backends.some(b => b.id === "openai-compatible"));
   assert.ok(registry.backends.some(b => b.id === "gemini-free-tier"));
   assert.ok(registry.backends.some(b => b.id === "groq-free-plan"));
   assert.ok(registry.backends.some(b => b.id === "huggingface-inference"));
@@ -58,4 +58,19 @@ test("execution boundary remains fail-closed", async () => {
     availableBackends: ["local"]
   });
   assert.doesNotThrow(() => assertExecutionBoundary(plan));
+});
+
+
+test("router selects the generic OpenAI-compatible local gateway before remote APIs", async () => {
+  const registry = await loadExecutionBackends();
+  const plan = selectExecutionBackend({
+    backends: registry,
+    task: "reasoning",
+    model: "qwen3",
+    availableBackends: ["openai-compatible", "gemini-free-tier"]
+  });
+  assert.equal(plan.status, "ready");
+  assert.equal(plan.backend, "openai-compatible");
+  assert.equal(plan.free, true);
+  assert.equal(plan.requires_api_key, false);
 });
