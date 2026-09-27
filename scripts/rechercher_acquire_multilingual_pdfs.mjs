@@ -144,6 +144,7 @@ async function downloadPdf(url,file){
  await fs.writeFile(file,bytes);
 }
 const seenPdfSha256=new Map();
+let downloadSequence=0;
 const summary={schema:'rechercher/multilingual-resource-acquisition/v2',generated_at:new Date().toISOString(),language_count:languages.size,policy:{redistribution:'only when explicitly verified',research_only:'only when lawful research access is explicitly established; never public',public_repo:'research-only PDFs are forbidden from persistence in this public repository'},languages:{}};
 for(const [key,lang] of languages){
  const rights=rightsForRecord(lang.records);
@@ -182,13 +183,12 @@ for(const [key,lang] of languages){
        const d=await probePdf(pdfUrl);
        if(d && (d.status < 200 || d.status >= 400)) continue;
        if(d?.contentType && !/^application\/pdf(?:\s*;|$)/i.test(d.contentType)) continue;
-       const dir=path.join(out,safe(iso),safe(adapter.id)); await fs.mkdir(dir,{recursive:true});
        const parsed=allowedUrl(pdfUrl); if(!parsed) continue;
-       const sequence=String(entry.files.length+1).padStart(4,'0');
-       const file=path.join(dir,`pdf-${sequence}.pdf`);
-       const resolved=path.resolve(file);
-       if(!resolved.startsWith(path.resolve(dir)+path.sep)) continue;
-       await downloadPdf(pdfUrl,resolved);
+       const storageDir=path.join(out,'downloads');
+       await fs.mkdir(storageDir,{recursive:true});
+       downloadSequence += 1;
+       const file=path.join(storageDir,`pdf-${String(downloadSequence).padStart(8,'0')}.pdf`);
+       await downloadPdf(pdfUrl,file);
        const inspected=await inspectPdfFile(resolved);
        if(!inspected.isPdf){
          await fs.rm(resolved,{force:true});
@@ -207,7 +207,7 @@ for(const [key,lang] of languages){
        entry.files.push({
          source:adapter.id,
          url:pdfUrl,
-         path:path.relative(ROOT,resolved),
+         path:path.relative(ROOT,file),
          bytes:inspected.bytes,
          sha256:inspected.sha256,
          content_type:d?.contentType||null,
