@@ -53,11 +53,9 @@ def download_model_runtime_tree(destination: Path):
         "*.zip",
     ]
     allow = [
-        "config.json",
-        "scheduler/*.json",
-        "transformer/**/*.json",
-        "upsampler/**/*.json",
-        "vae/**/*.json",
+        "*.json",
+        "*.yaml",
+        "*.yml",
         "README*.md",
         "LICENSE",
         "NOTICE",
