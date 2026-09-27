@@ -170,3 +170,10 @@ export function assertOutputBoundary({ plan, provenance }) {
   }
   return true;
 }
+
+
+/** Build the worldwide source-discovery plan through the canonical Ω generator. */
+export async function buildGlobalSourceDiscoveryPlan(input = {}) {
+  const { buildGlobalDeepSearchPlan } = await import("./rechercher-omega-global-deep-search.js");
+  return buildGlobalDeepSearchPlan(input);
+}
