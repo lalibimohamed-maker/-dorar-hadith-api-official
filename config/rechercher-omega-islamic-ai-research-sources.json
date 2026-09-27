@@ -315,6 +315,59 @@
       "role": "local-first Quran, hadith and Names of Allah app/API with RAG and Ollama option",
       "integration": "study local RAG, API, reminder and offline architecture; generated answers remain grounded application output, not canonical evidence",
       "status": "architecture-reference"
+    },
+    {
+      "id": "quran_asr",
+      "name": "Quran ASR",
+      "url": "https://github.com/fazals3/quran-asr",
+      "role": "Quran recitation ASR, verse guessing and word/ayah alignment",
+      "integration": "candidate local/self-hosted speech worker for recitation transcription; useful for multi-engine ASR comparison, timing metrics and ayah alignment; keep original audio and derived transcripts separate and verify all upstream model licenses",
+      "status": "evaluation-candidate",
+      "license": "project license not selected; upstream model licenses must be checked separately"
+    },
+    {
+      "id": "tadabur_quran_audio",
+      "name": "Tadabur — Quran Audio Dataset",
+      "url": "https://github.com/fherran/tadabur",
+      "role": "large-scale Quran speech dataset with automatic word-level timestamps and Qur'an-focused ASR/embedding models",
+      "integration": "research benchmark for recitation ASR, word timing and audio embeddings; dataset/model rights remain separate and the published dataset declares CC BY-NC 4.0, so do not treat it as a public-redistribution asset",
+      "status": "evaluation-candidate",
+      "license": "CC BY-NC 4.0 for the published dataset"
+    },
+    {
+      "id": "quran_frequency_audit",
+      "name": "Quran Word Frequency Audit",
+      "url": "https://github.com/taziksh/quran-frequencies",
+      "role": "reproducible Quran word-frequency and claims-audit pipeline using QAC morphology and canonical-text validation",
+      "integration": "use methodology for deterministic counting, occurrence-level provenance and false-claim auditing; never infer religious conclusions from frequency counts",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_analysis_core_rust",
+      "name": "Quran Analysis Core Rust",
+      "url": "https://github.com/Itqan-community/quran-analysis-core-rust",
+      "role": "offline Rust Quran semantic search, morphology, ontology exploration and deterministic QA/search utilities",
+      "integration": "reference implementation for local-first Arabic search, root-based expansion, OWL/RDF concept navigation and tested offline analysis; source texts and annotations retain their upstream licenses",
+      "status": "architecture-reference",
+      "license": "MIT for project code; bundled datasets retain upstream terms"
+    },
+    {
+      "id": "escriptorium_htr",
+      "name": "eScriptorium",
+      "url": "https://github.com/kineticsquid/escriptorium",
+      "role": "open-source historical-document OCR/HTR platform with segmentation, transcription, annotation, collaborative workflow and Kraken integration",
+      "integration": "candidate orchestration layer for manuscript-image ingestion and human-corrected HTR; preserve page/image provenance, transcription versions and model lineage",
+      "status": "integration-candidate",
+      "license": "MIT"
+    },
+    {
+      "id": "kraken_htr",
+      "name": "Kraken OCR/HTR",
+      "url": "https://github.com/mittagessen/kraken",
+      "role": "open-source OCR/HTR engine for historical documents with layout segmentation and trainable recognition models",
+      "integration": "secondary OCR/HTR engine for Rechercher multi-engine validation, especially Arabic/manuscript pages; use alongside Tesseract/other engines and compare outputs before canonical promotion",
+      "status": "integration-candidate",
+      "license": "Apache-2.0"
     }
   ],
   "design_note": {
@@ -326,6 +379,9 @@
     "agent_fleet": "Multiple agents are capability workers, not authorities. Rechercher Ω remains the orchestrator; no agent may write directly to the canonical Corpus.",
     "islamic_graphs": "Islamic knowledge-graph projects are research inputs only. Preserve source IDs, provenance, rights and uncertainty through graph construction and retrieval.",
     "mcp_grounding": "MCP servers are connector/query infrastructure, not religious authorities. Rechercher must retain source IDs, exact text, edition/language metadata, provenance, rights and retrieval evidence.",
-    "manuscript_ocr": "Maghrebi and manuscript OCR resources can improve acquisition and transcription, but OCR output remains a derived artifact requiring multi-engine comparison and human/QC validation before canonical use."
+    "manuscript_ocr": "Maghrebi and manuscript OCR resources can improve acquisition and transcription, but OCR output remains a derived artifact requiring multi-engine comparison and human/QC validation before canonical use.",
+    "quran_audio_alignment": "Quran ASR and Tadabur provide recitation transcription/timing research inputs. Audio, transcripts, model weights and timing annotations remain distinct derived/source layers with separate rights and provenance.",
+    "htr_stack": "eScriptorium plus Kraken strengthen the manuscript OCR/HTR lane. Rechercher should preserve page images, line segmentation, recognition outputs, model/version metadata and human corrections, then require multi-engine agreement/QC before promotion.",
+    "deterministic_quran_analysis": "Exact counting and search tools are evidence-processing infrastructure only. Preserve canonical Quran text separately from morphology, frequency claims, ontology relations and generated answers."
   }
 }
