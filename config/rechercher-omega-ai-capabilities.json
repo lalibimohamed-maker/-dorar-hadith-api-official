@@ -18,7 +18,9 @@
       "source_repo": "https://github.com/dscripka/openWakeWord",
       "code_license": "Apache-2.0",
       "model_license_status": "review_required",
-      "tasks": ["wake_word"],
+      "tasks": [
+        "wake_word"
+      ],
       "integration": "runtime_reference",
       "auto_download": false,
       "notes": "Repository code is Apache-2.0; bundled pretrained wake-word models have more restrictive licensing, so only the runtime/code path is enabled automatically."
@@ -29,7 +31,10 @@
       "source_repo": "https://github.com/snakers4/silero-vad",
       "code_license": "MIT",
       "model_license_status": "review_required",
-      "tasks": ["voice_activity_detection", "barge_in"],
+      "tasks": [
+        "voice_activity_detection",
+        "barge_in"
+      ],
       "integration": "runtime_reference",
       "auto_download": false
     },
@@ -39,7 +44,10 @@
       "source_repo": "https://github.com/SYSTRAN/faster-whisper",
       "code_license": "MIT",
       "model_license_status": "inherited_from_whisper",
-      "tasks": ["automatic_speech_recognition", "speech_language_detection"],
+      "tasks": [
+        "automatic_speech_recognition",
+        "speech_language_detection"
+      ],
       "integration": "local_runtime",
       "auto_download": false
     },
@@ -49,7 +57,11 @@
       "source_repo": "https://github.com/openai/whisper",
       "code_license": "MIT",
       "model_license_status": "verified_source_license",
-      "tasks": ["automatic_speech_recognition", "speech_translation", "language_identification"],
+      "tasks": [
+        "automatic_speech_recognition",
+        "speech_translation",
+        "language_identification"
+      ],
       "integration": "local_runtime",
       "auto_download": true
     },
@@ -59,7 +71,9 @@
       "source_repo": "https://github.com/hexgrad/kokoro",
       "code_license": "Apache-2.0",
       "model_license_status": "verified_source_license",
-      "tasks": ["text_to_speech"],
+      "tasks": [
+        "text_to_speech"
+      ],
       "integration": "local_runtime",
       "auto_download": false,
       "notes": "Use as a lightweight TTS alternative when the requested language/voice is covered; retain CosyVoice for multilingual coverage."
@@ -70,7 +84,11 @@
       "source_repo": "https://github.com/FunAudioLLM/CosyVoice",
       "code_license": "verified_source_license",
       "model_license_status": "review_required",
-      "tasks": ["text_to_speech", "multilingual_speech", "voice_conversion"],
+      "tasks": [
+        "text_to_speech",
+        "multilingual_speech",
+        "voice_conversion"
+      ],
       "integration": "local_runtime",
       "auto_download": false,
       "notes": "Existing Omega model registry remains authoritative for the currently staged CosyVoice weights."
@@ -81,7 +99,14 @@
       "source_repo": "https://github.com/PaddlePaddle/PaddleOCR",
       "code_license": "Apache-2.0",
       "model_license_status": "verified_source_license",
-      "tasks": ["ocr", "layout", "tables", "formulas", "charts", "pdf_page_parsing"],
+      "tasks": [
+        "ocr",
+        "layout",
+        "tables",
+        "formulas",
+        "charts",
+        "pdf_page_parsing"
+      ],
       "integration": "local_or_gpu_runtime",
       "auto_download": true
     },
@@ -91,7 +116,13 @@
       "source_repo": "https://github.com/docling-project/docling",
       "code_license": "MIT",
       "model_license_status": "review_required",
-      "tasks": ["pdf_parsing", "reading_order", "tables", "layout", "document_chunking"],
+      "tasks": [
+        "pdf_parsing",
+        "reading_order",
+        "tables",
+        "layout",
+        "document_chunking"
+      ],
       "integration": "local_runtime",
       "auto_download": false,
       "notes": "Docling code is MIT; individual models keep their own licenses."
@@ -102,7 +133,11 @@
       "source_repo": "https://github.com/docling-project/docling-mcp",
       "code_license": "MIT",
       "model_license_status": "inherited",
-      "tasks": ["document_tools", "pdf_tools", "mcp"],
+      "tasks": [
+        "document_tools",
+        "pdf_tools",
+        "mcp"
+      ],
       "integration": "mcp_adapter",
       "auto_download": false
     },
@@ -112,7 +147,12 @@
       "source_repo": "https://github.com/opendatalab/MinerU",
       "code_license": "MinerU Open Source License",
       "model_license_status": "review_required",
-      "tasks": ["pdf_parsing", "ocr", "reading_order", "markdown_json_extraction"],
+      "tasks": [
+        "pdf_parsing",
+        "ocr",
+        "reading_order",
+        "markdown_json_extraction"
+      ],
       "integration": "optional_runtime",
       "auto_download": false,
       "notes": "License is Apache-2.0 based with additional conditions, including online-service attribution and thresholds; keep deployment policy-aware."
@@ -123,7 +163,13 @@
       "source_repo": "https://github.com/allenai/olmocr",
       "code_license": "Apache-2.0",
       "model_license_status": "review_required",
-      "tasks": ["scanned_pdf_ocr", "handwriting", "equations", "tables", "reading_order"],
+      "tasks": [
+        "scanned_pdf_ocr",
+        "handwriting",
+        "equations",
+        "tables",
+        "reading_order"
+      ],
       "integration": "gpu_runtime",
       "auto_download": false,
       "notes": "Use as an independent OCR/parsing challenger rather than replacing the canonical extraction path."
@@ -134,7 +180,12 @@
       "source_repo": "https://github.com/FlagOpen/FlagEmbedding",
       "code_license": "MIT",
       "model_license_status": "review_required",
-      "tasks": ["dense_embedding", "sparse_retrieval", "multi_vector_retrieval", "semantic_search"],
+      "tasks": [
+        "dense_embedding",
+        "sparse_retrieval",
+        "multi_vector_retrieval",
+        "semantic_search"
+      ],
       "integration": "local_runtime",
       "auto_download": false,
       "notes": "BGE-M3 supports 100+ languages and dense, sparse and multi-vector retrieval; model-weight licensing is reviewed separately."
@@ -145,7 +196,10 @@
       "source_repo": "https://github.com/FlagOpen/FlagEmbedding",
       "code_license": "MIT",
       "model_license_status": "review_required",
-      "tasks": ["reranking", "cross_encoder_reranking"],
+      "tasks": [
+        "reranking",
+        "cross_encoder_reranking"
+      ],
       "integration": "local_runtime",
       "auto_download": false
     },
@@ -155,7 +209,11 @@
       "source_repo": "https://github.com/qdrant/qdrant",
       "code_license": "Apache-2.0",
       "model_license_status": "not_applicable",
-      "tasks": ["vector_search", "hybrid_search", "metadata_filtering"],
+      "tasks": [
+        "vector_search",
+        "hybrid_search",
+        "metadata_filtering"
+      ],
       "integration": "service_adapter",
       "auto_download": false
     },
@@ -165,7 +223,12 @@
       "source_repo": "https://github.com/run-llama/llama_index",
       "code_license": "MIT",
       "model_license_status": "inherited",
-      "tasks": ["rag", "retrieval", "indexing", "tool_use"],
+      "tasks": [
+        "rag",
+        "retrieval",
+        "indexing",
+        "tool_use"
+      ],
       "integration": "optional_framework_adapter",
       "auto_download": false
     },
@@ -175,7 +238,13 @@
       "source_repo": "https://github.com/deepset-ai/haystack",
       "code_license": "Apache-2.0",
       "model_license_status": "inherited",
-      "tasks": ["rag", "agents", "retrieval", "routing", "multimodal"],
+      "tasks": [
+        "rag",
+        "agents",
+        "retrieval",
+        "routing",
+        "multimodal"
+      ],
       "integration": "optional_framework_adapter",
       "auto_download": false
     },
@@ -185,7 +254,12 @@
       "source_repo": "https://github.com/modelcontextprotocol/python-sdk",
       "code_license": "MIT",
       "model_license_status": "not_applicable",
-      "tasks": ["mcp", "tool_discovery", "remote_tools", "local_tools"],
+      "tasks": [
+        "mcp",
+        "tool_discovery",
+        "remote_tools",
+        "local_tools"
+      ],
       "integration": "native_adapter",
       "auto_download": false
     },
@@ -195,7 +269,12 @@
       "source_repo": "https://github.com/NousResearch/hermes-agent",
       "code_license": "review_required",
       "model_license_status": "review_required",
-      "tasks": ["agent_loop", "mcp", "tool_filtering", "memory"],
+      "tasks": [
+        "agent_loop",
+        "mcp",
+        "tool_filtering",
+        "memory"
+      ],
       "integration": "architecture_reference",
       "auto_download": false,
       "notes": "Borrow the MCP/tool-filtering pattern; do not embed the full agent implementation."
@@ -206,7 +285,11 @@
       "source_repo": "https://github.com/BerriAI/litellm",
       "code_license": "MIT_outside_enterprise",
       "model_license_status": "not_applicable",
-      "tasks": ["model_gateway", "provider_failover", "openai_compatible_routing"],
+      "tasks": [
+        "model_gateway",
+        "provider_failover",
+        "openai_compatible_routing"
+      ],
       "integration": "optional_gateway",
       "auto_download": false,
       "notes": "Useful as a provider gateway, but Omega keeps local-first routing and never auto-charges a provider."
@@ -217,7 +300,12 @@
       "source_repo": "https://github.com/ollama/ollama",
       "code_license": "MIT",
       "model_license_status": "per_model",
-      "tasks": ["local_inference", "vision", "tools", "streaming"],
+      "tasks": [
+        "local_inference",
+        "vision",
+        "tools",
+        "streaming"
+      ],
       "integration": "openai_compatible",
       "auto_download": false
     },
@@ -227,7 +315,12 @@
       "source_repo": "https://github.com/ggml-org/llama.cpp",
       "code_license": "MIT",
       "model_license_status": "per_model",
-      "tasks": ["local_inference", "gguf", "vision", "openai_compatible"],
+      "tasks": [
+        "local_inference",
+        "gguf",
+        "vision",
+        "openai_compatible"
+      ],
       "integration": "openai_compatible",
       "auto_download": false
     },
@@ -237,7 +330,11 @@
       "source_repo": "https://github.com/openai/gpt-oss",
       "code_license": "Apache-2.0",
       "model_license_status": "verified_source_license",
-      "tasks": ["reasoning", "tool_use", "structured_output"],
+      "tasks": [
+        "reasoning",
+        "tool_use",
+        "structured_output"
+      ],
       "integration": "local_runtime",
       "auto_download": false,
       "notes": "Candidate for local reasoning; resource size is tracked separately in the model registry."
@@ -248,8 +345,160 @@
       "source_repo": "https://github.com/openai/gpt-oss-safeguard",
       "code_license": "Apache-2.0",
       "model_license_status": "verified_source_license",
-      "tasks": ["safety_review", "policy_check"],
+      "tasks": [
+        "safety_review",
+        "policy_check"
+      ],
       "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "bge-vl",
+      "kind": "multimodal_embedding",
+      "source_repo": "https://github.com/FlagOpen/FlagEmbedding",
+      "code_license": "MIT",
+      "model_license_status": "verified_source_license",
+      "tasks": [
+        "multimodal_embedding",
+        "image_text_retrieval",
+        "visual_search"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Use for image/text semantic retrieval and multimodal evidence discovery; model weights stay subject to their declared license."
+    },
+    {
+      "id": "pyannote-audio",
+      "kind": "speaker_diarization",
+      "source_repo": "https://github.com/pyannote/pyannote-audio",
+      "code_license": "MIT",
+      "model_license_status": "review_required",
+      "tasks": [
+        "speaker_diarization",
+        "speaker_change_detection",
+        "overlapped_speech_detection"
+      ],
+      "integration": "gpu_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "deepseek-ocr",
+      "kind": "vision_ocr",
+      "source_repo": "https://github.com/deepseek-ai/DeepSeek-OCR",
+      "code_license": "MIT",
+      "model_license_status": "review_required",
+      "tasks": [
+        "ocr",
+        "visual_text_extraction",
+        "document_understanding"
+      ],
+      "integration": "gpu_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "openvino",
+      "kind": "inference_optimizer",
+      "source_repo": "https://github.com/openvinotoolkit/openvino",
+      "code_license": "Apache-2.0",
+      "model_license_status": "per_model",
+      "tasks": [
+        "inference_optimization",
+        "cpu_inference",
+        "npu_inference",
+        "vision_inference",
+        "speech_inference"
+      ],
+      "integration": "runtime_acceleration",
+      "auto_download": false
+    },
+    {
+      "id": "markitdown",
+      "kind": "document_converter",
+      "source_repo": "https://github.com/microsoft/markitdown",
+      "code_license": "review_required",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "document_conversion",
+        "pdf_to_markdown",
+        "office_to_markdown"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Treat input as untrusted and use narrow conversion APIs; do not execute plugins or remote content implicitly."
+    },
+    {
+      "id": "qwen3-coder",
+      "kind": "coding_model",
+      "source_repo": "https://github.com/QwenLM/Qwen3-Coder",
+      "code_license": "Apache-2.0",
+      "model_license_status": "review_required",
+      "tasks": [
+        "code_generation",
+        "code_review",
+        "refactoring",
+        "agentic_coding",
+        "programming"
+      ],
+      "integration": "openai_compatible",
+      "auto_download": false
+    },
+    {
+      "id": "aider",
+      "kind": "coding_agent_reference",
+      "source_repo": "https://github.com/Aider-AI/aider",
+      "code_license": "Apache-2.0",
+      "model_license_status": "inherited_from_selected_model",
+      "tasks": [
+        "code_editing",
+        "test_fixing",
+        "repository_context",
+        "programming"
+      ],
+      "integration": "architecture_reference",
+      "auto_download": false
+    },
+    {
+      "id": "tabby",
+      "kind": "self_hosted_coding_assistant",
+      "source_repo": "https://github.com/TabbyML/tabby",
+      "code_license": "review_required",
+      "model_license_status": "per_model",
+      "tasks": [
+        "code_completion",
+        "code_chat",
+        "code_indexing",
+        "programming"
+      ],
+      "integration": "openai_compatible",
+      "auto_download": false
+    },
+    {
+      "id": "mini-swe-agent",
+      "kind": "coding_agent_reference",
+      "source_repo": "https://github.com/SWE-agent/mini-swe-agent",
+      "code_license": "MIT",
+      "model_license_status": "inherited_from_selected_model",
+      "tasks": [
+        "github_issue_resolution",
+        "software_engineering_agent",
+        "programming"
+      ],
+      "integration": "architecture_reference",
+      "auto_download": false
+    },
+    {
+      "id": "codex-cli",
+      "kind": "coding_agent_reference",
+      "source_repo": "https://github.com/openai/codex",
+      "code_license": "Apache-2.0",
+      "model_license_status": "provider_or_model_dependent",
+      "tasks": [
+        "code_generation",
+        "code_review",
+        "repository_operations",
+        "programming"
+      ],
+      "integration": "architecture_reference",
       "auto_download": false
     }
   ],
@@ -260,7 +509,8 @@
         "silero-vad",
         "faster-whisper",
         "qwen3-omni",
-        "cosyvoice_or_kokoro"
+        "cosyvoice_or_kokoro",
+        "pyannote-audio"
       ],
       "arabic_speech": {
         "primary_understanding": "qwen3-omni",
@@ -273,9 +523,11 @@
         "pdf_integrity",
         "docling",
         "paddleocr-vl",
+        "deepseek-ocr",
         "olmocr",
         "text_validation",
-        "provenance"
+        "provenance",
+        "markitdown"
       ],
       "challenger_policy": "run_independent_parsers when scan/layout confidence is low"
     },
@@ -284,6 +536,7 @@
         "arabic_normalization",
         "bm25_or_lexical",
         "bge-m3",
+        "bge-vl",
         "bge-reranker-v2-m3",
         "evidence_gate"
       ]
@@ -296,8 +549,9 @@
         "tool_filtering",
         "execution",
         "provenance",
-        "evidence_gate"
+        "evidence_gate",
+        "qwen3-coder"
       ]
     }
   }
-}
+}\n
