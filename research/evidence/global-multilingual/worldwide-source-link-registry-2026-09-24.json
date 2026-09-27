@@ -5,8 +5,8 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 458,
-    "rights_review_required": 444,
+    "links": 462,
+    "rights_review_required": 462,
     "new_global_links_added_2026_09_24": 310,
     "previous_snapshot_links": 127
   },
@@ -1619,7 +1619,26 @@
       "scope": "candidate-source",
       "rights_status": "review_required",
       "source_pr": "561",
-      "notes": "Public Islamic REST API covering Quran, hadith, tafsir, duas and other services. Official documentation states JSON REST endpoints and currently lists 36,000+ hadith from 10 collections and 12 Quran translations. API availability does not by itself grant redistribution rights for underlying source texts."
+      "notes": "Official UmmahAPI documentation exposes JSON REST endpoints for Quran, tafsir, hadith, prayer times, Qibla, Hijri calendar, duas, Asma al-Husna and related services. The live Quran endpoint reports Uthmani text, 114 surahs, 6,236 verses and attribution to Tanzil.net (CC BY 3.0), with translations via quran.com. API availability does not itself grant redistribution rights for underlying source texts.",
+      "documentation_url": "https://ummahapi.com/api/docs",
+      "verification_status": "web-verified",
+      "verification_url": "https://ummahapi.com/api/docs",
+      "capabilities": [
+        "quran",
+        "quran_search",
+        "quran_word_by_word",
+        "tafsir",
+        "hadith",
+        "hadith_search",
+        "prayer_times",
+        "qibla",
+        "hijri_calendar",
+        "duas",
+        "asma_ul_husna",
+        "islamic_names",
+        "zakat",
+        "moon"
+      ]
     },
     {
       "id": "world-143",
@@ -8471,6 +8490,84 @@
         "Arabic"
       ],
       "notes": "Current official site explicitly states that the institute follows the Maliki school of jurisprudence and provides Quran, Arabic and Islamic education in The Gambia. It lists staff with studies in Madinah, Al-Azhar and other Islamic institutions and offers Quran memorization and Islamic studies. Added as a Sunni/Maliki institutional source; rights remain item-level review_required."
+    },
+    {
+      "id": "world-461",
+      "category": "Quran memorization / education",
+      "name": "HifzMate",
+      "url": "https://hifzmate.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://hifzmate.com/",
+      "capabilities": [
+        "quran",
+        "memorization",
+        "recitation",
+        "ayah_playback",
+        "learning_resources"
+      ],
+      "notes": "Current first-party site provides Quran memorization tooling with surah/ayah selection, reciter playback, repetition and playlists, plus pronunciation, Arabic-learning, Salah and dua resources. Included as a discovery/service source; application-owned or third-party content and audio remain item-level review_required."
+    },
+    {
+      "id": "world-462",
+      "category": "Islamic mobile app",
+      "name": "Zikrah: Prayer Times & Qibla",
+      "url": "https://apps.apple.com/dz/app/zikrah-prayer-times-qibla/id6755621108?l=fr-FR",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://apps.apple.com/dz/app/zikrah-prayer-times-qibla/id6755621108?l=fr-FR",
+      "capabilities": [
+        "prayer_times",
+        "qibla",
+        "quran",
+        "quran_audio",
+        "dua",
+        "dhikr",
+        "hijri_calendar"
+      ],
+      "notes": "Apple App Store listing describes Quran reading/audio, prayer times with multiple calculation methods and madhhabs, Qibla, dhikr and Hijri calendar. Included as a discovery/service source; application-owned or third-party content and audio remain item-level review_required."
+    },
+    {
+      "id": "world-463",
+      "category": "Islamic education mobile app",
+      "name": "ilmSpace",
+      "url": "https://apps.apple.com/dz/app/ilmspace/id6745206145?l=fr-FR",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://apps.apple.com/dz/app/ilmspace/id6745206145?l=fr-FR",
+      "capabilities": [
+        "quran",
+        "prayer",
+        "dhikr",
+        "islamic_productivity",
+        "islamic_education"
+      ],
+      "notes": "Apple App Store listing describes an Islamic productivity/education app covering prayer, Quran reading, dhikr and focus/productivity tools. Included as a discovery/service source; application-owned or third-party content and audio remain item-level review_required."
+    },
+    {
+      "id": "world-464",
+      "category": "Prayer / mosque technology",
+      "name": "AzanCast",
+      "url": "https://myazancast.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561",
+      "verification_status": "web-verified",
+      "verification_url": "https://myazancast.com/",
+      "capabilities": [
+        "prayer_times",
+        "adhan",
+        "mosque_displays",
+        "iqamah",
+        "prayer_notifications"
+      ],
+      "notes": "Current first-party site provides cloud-based adhan automation, location-based prayer times, Shafi/Hanafi Asr options and mosque prayer displays; it states use of adhan-js. Included as a discovery/service source; application-owned or third-party content and audio remain item-level review_required."
     }
   ],
   "notes": [
@@ -8516,7 +8613,8 @@
     "2026-09-25 follow-up verification: added HadithBD, Ilmiyyah Islamic Resources, and IslamHouse by MuslimThaiPost after checking their live content. HadithBD and Ilmiyyah have explicit Ahlus Sunnah/Salafi-oriented material; IslamHouse was retained as a Thai-language Sunni-oriented discovery candidate based on its Quran, hadith and Sunnah-focused content, while institutional affiliation remains review_required.",
     "2026-09-25 deep verification round 2: added six distinct institutional/educational discovery sources plus Easy Fiqh community channel after live-source checks. Explicit Sunni/Shafi'i identity was recorded only where the first-party source stated it; other sources remain discovery candidates with rights_review_required.",
     "2026-09-25 targeted verification: added Baraheen Network, Islam For All, Taymiyyah Institute and Al-Imam Malick Islamic Institute. Baraheen and Taymiyyah have current first-party Sunni-oriented evidence; Al-Imam Malick explicitly states Maliki jurisprudence. Islam For All was preserved as a multilingual Islamic e-library/discovery lane using domain identity plus historical evidence, but its present operational status was not independently re-established in this pass.",
-    "2026-09-25 exclusion policy reaffirmed: The Global Message and Hadith Data Bank are not part of the Sunni source registry and are not retained as Sunni candidates."
+    "2026-09-25 exclusion policy reaffirmed: The Global Message and Hadith Data Bank are not part of the Sunni source registry and are not retained as Sunni candidates.",
+    "2026-09-27: verified and enriched the existing UmmahAPI record with its official API documentation and live Quran endpoint; added HifzMate, Zikrah, ilmSpace, and AzanCast as distinct Quran/Islamic application and service discovery lanes. All remain review_required and no redistribution rights are inferred."
   ],
   "change_log": [
     "2026-09-24: added 6 supplied source-discovery endpoints to the canonical registry: https://saleh.af.org.sa/ar/books?page=1, https://www.sualruhaily.com, https://alshathri.net, https://af.org.sa, https://www.nusuk.sa, https://www.rabita.fi/en#services. All remain review_required; no redistribution permission is inferred.",
@@ -8525,6 +8623,7 @@
     "2026-09-25: added 2 distinct official Sunni acquisition/discovery endpoints from the supplied source set; exact parent URLs were already registered, so only materially useful sub-endpoints were added.",
     "2026-09-25: added 2 verified source-discovery endpoints: https://tebyanacademy.com/ and https://www.nusuk.sa/. Existing exact URLs were checked before insertion; both remain review_required.",
     "2026-09-25 deep source radar follow-up: +3 verified source lanes; Al-Islam.org was deliberately excluded from the Sunni registry because its own About page states particular emphasis on Twelver Shia Islam. MyIslam was not classified as Sunni without sufficient first-party sectarian identification. Unverified named projects from the supplied list remain pending rather than being fabricated.",
-    "2026-09-25 deep source radar round 2: +7 sources (Erth Al Mustafa, IslamicInfo, Ṣifah, International Seerah Council, Al Imam Institute, Imam Al-Shatibi Global Quran Platform, Easy Fiqh). The previously named Global Message/Baraheen/IslamForAll/Ibn Taymiyyah Virtual Institute/Fiqh of Minorities/Islam Verified and similar names remain unregistered because no sufficiently reliable first-party identity was established in this round."
+    "2026-09-25 deep source radar round 2: +7 sources (Erth Al Mustafa, IslamicInfo, Ṣifah, International Seerah Council, Al Imam Institute, Imam Al-Shatibi Global Quran Platform, Easy Fiqh). The previously named Global Message/Baraheen/IslamForAll/Ibn Taymiyyah Virtual Institute/Fiqh of Minorities/Islam Verified and similar names remain unregistered because no sufficiently reliable first-party identity was established in this round.",
+    "2026-09-27: added verified HifzMate, Zikrah, ilmSpace and AzanCast source/discovery endpoints; enriched existing UmmahAPI (world-142) with official documentation and live endpoint metadata. Application/service presence does not grant redistribution rights."
   ]
 }
