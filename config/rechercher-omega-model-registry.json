@@ -227,6 +227,53 @@
       "acquisition_class": "github_release",
       "release_tag": "rechercher-omega-flux1-schnell-v1.0.0",
       "gated_access": true
+    },
+    {
+      "id": "gpt-oss",
+      "family": "reasoning",
+      "tasks": [
+        "reasoning",
+        "planning",
+        "tool_use",
+        "structured_output"
+      ],
+      "source": "https://github.com/openai/gpt-oss",
+      "status": "candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "source_model_id": "openai/gpt-oss-20b",
+      "notes": "Open-weight reasoning family with 20B and 120B variants; use local/self-hosted inference when hardware permits."
+    },
+    {
+      "id": "gpt-oss-safeguard",
+      "family": "safety-reasoning",
+      "tasks": [
+        "safety_audit",
+        "policy_check",
+        "output_review"
+      ],
+      "source": "https://github.com/openai/gpt-oss-safeguard",
+      "status": "candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "notes": "Separate safety reviewer; never the sole authority for scholarly truth."
+    },
+    {
+      "id": "qwen3-coder",
+      "family": "coding",
+      "tasks": [
+        "code_generation",
+        "code_review",
+        "refactoring",
+        "agentic_coding",
+        "programming"
+      ],
+      "source": "https://github.com/QwenLM/Qwen3-Coder",
+      "status": "candidate",
+      "license_review": "required",
+      "license_status": "review_required",
+      "source_model_id": "Qwen/Qwen3-Coder-Next",
+      "notes": "Dedicated coding/agentic-coding family; runtime selection remains benchmark-driven and isolated from scholarly Corpus."
     }
   ]
-}
+}\n
