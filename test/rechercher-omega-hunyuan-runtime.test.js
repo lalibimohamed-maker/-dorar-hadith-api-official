@@ -52,3 +52,11 @@ test("Hunyuan core runtime files are required", () => {
   assert.ok(config.model_runtime_paths.includes("transformer/**/*.json"));
   assert.ok(config.model_runtime_paths.includes("vae/**/*.json"));
 });
+test("public dependencies remain explicitly non-embedded", () => {
+  for (const id of ["qwen2.5-vl-7b-instruct", "byt5-small"]) {
+    const dependency = config.external_dependencies.find((item) => item.id === id);
+    assert.ok(dependency);
+    assert.equal(dependency.status, "public_dependency_not_embedded");
+    assert.equal(dependency.license, "apache-2.0");
+  }
+});
