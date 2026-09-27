@@ -123,14 +123,12 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def open_hf_range(url, start, end, token):
-    """Resolve Hugging Face redirects with auth, then stream the signed CDN/Xet URL without auth."""
+def open_hf_stream(url, token):
     current = url
     opener = urllib.request.build_opener(_NoRedirect(), urllib.request.HTTPSHandler(context=TLS))
     for _ in range(8):
         parsed = urllib.parse.urlsplit(current)
         headers = {
-            "Range": f"bytes={start}-{end}",
             "Accept": "application/octet-stream",
             "User-Agent": "Rechercher-Omega/1.0",
         }
@@ -147,20 +145,18 @@ def open_hf_range(url, start, end, token):
                 continue
             raise
         status = getattr(response, "status", None)
-        if status in (200, 206):
+        if status == 200:
             return response
         if status in (301, 302, 303, 307, 308):
             location = response.headers.get("Location")
             response.close()
             if not location:
-                raise RuntimeError(f"Hugging Face redirect missing Location for {url}")
+                raise RuntimeError("Hugging Face redirect missing Location for "+url)
             current = urllib.parse.urljoin(current, location)
             continue
         response.close()
         raise RuntimeError(f"HF returned HTTP {status} for {url}")
     raise RuntimeError(f"Too many redirects resolving Hugging Face file: {url}")
-
-
 def main():
     if not REPO or "/" not in REPO:
         raise RuntimeError("OMEGA_STORAGE_REPOSITORY is missing or invalid")
