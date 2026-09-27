@@ -29,7 +29,7 @@ async function load561Registry(){
 const MASTER=await load561Registry();
 const EXISTING_INVENTORY=process.env.ACQUISITION_EXISTING_INVENTORY||path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition/existing-release-inventory.json');
 function normalizeCellId(value){
-  return String(value||'').trim().replace(/\\./g,':').replace(/\\s+/g,' ').toLowerCase();
+  return String(value||'').trim().replace(/\./g,':').replace(/\s+/g,' ').toLowerCase();
 }
 let existingInventory={cells:[],sha256:[]};
 try{existingInventory=JSON.parse(await fs.readFile(EXISTING_INVENTORY,'utf8'));}catch{}
@@ -65,7 +65,15 @@ for(const row of rows){
   if(cells.has(row.cell_id)) throw new Error('duplicate cell '+row.cell_id);
   cells.set(row.cell_id,row);
 }
-if(cells.size!==EXPECTED) throw new Error('expected '+EXPECTED+' cells, found '+cells.size);
+if(cells.size!==EXPECTED) throw new Error('expected '+EXPECTED+' cells, found '+EXPECTED);
+
+const configuredShardIndex=Number(process.env.ACQUISITION_SHARD_INDEX||0);
+const configuredShardCount=Number(process.env.ACQUISITION_SHARD_COUNT||48);
+const SHARD_COUNT=Number.isFinite(configuredShardCount)&&configuredShardCount>0?Math.floor(configuredShardCount):48;
+const SHARD_INDEX=Number.isFinite(configuredShardIndex)?Math.floor(configuredShardIndex):0;
+if(SHARD_COUNT<1||SHARD_INDEX<0||SHARD_INDEX>=SHARD_COUNT){
+  throw new Error('invalid acquisition shard: index='+SHARD_INDEX+' count='+SHARD_COUNT);
+}
 
 const adapters=new Map(ADAPTERS.adapters.map(x=>[x.id,x]));
 const master=new Map((MASTER.sources||[]).map(x=>[x.id,x]));
@@ -348,6 +356,7 @@ const manifest={
   language_count:new Set([...cells.values()].map(r=>r.language_iso||r.language)).size,
   cell_count:cells.size,total_files:0,total_pdf_files:0,total_docx_files:0,total_derived_pdf_files:0,total_public_files:0,total_research_only_files:0,total_blocked_cells:0,
   concurrency:CONCURRENCY,
+  shard_index:SHARD_INDEX,shard_count:SHARD_COUNT,shard_cell_count:0,global_cell_count:EXPECTED,
   policy:{
     redistribution:'only when explicitly verified',
     research_only:'only explicit read-copy/read-only evidence; never public',
@@ -360,6 +369,14 @@ const manifest={
   source_counts:{},source_registry_561_count:MASTER.sources.length,source_registry_561_loaded:true,cells:{},discovery:{urls_per_batch:DISCOVERY_URLS_PER_BATCH,pdf_candidates_per_batch:PDF_CANDIDATES_PER_BATCH,initial_depth:DISCOVERY_DEPTH_INITIAL,max_depth:DISCOVERY_DEPTH_MAX,continuation:true}
 };
 const claimed=new Set(),seenPdfSha256=new Map(),started=Date.now();
+function deferredCellEntry(row){
+  return {
+    cell_id:row.cell_id,language:row.language,language_iso:row.language_iso||null,domain:row.domain,
+    provider:row.provider||null,status:'deferred-to-other-shard',sources_checked:[],evidence_urls:evidenceUrls(row),files:[],
+    rights:'not-processed',rights_conflict:false,rights_confidence:0,rights_evidence:[],
+    acquisition:'queued',source_errors:[],source_candidates:[],rights_approved_sources:[],rights_blocked_sources:[]
+  };
+}
 function markAlreadyAcquired(row){
   manifest.cells[row.cell_id]={
     cell_id:row.cell_id,language:row.language,language_iso:row.language_iso||null,domain:row.domain,
@@ -668,9 +685,12 @@ async function processCell(row){
 }
 
 const allRows=[...cells.values()];
-const list=allRows.filter(row=>!existingCellKeys.has(normalizeCellId(row.cell_id)));
-for(const row of allRows) if(existingCellKeys.has(normalizeCellId(row.cell_id))) markAlreadyAcquired(row);
-let next=0,done=allRows.length-list.length;
+const shardRows=allRows.filter((_,index)=>index%SHARD_COUNT===SHARD_INDEX);
+manifest.shard_cell_count=shardRows.length;
+for(const row of allRows) manifest.cells[row.cell_id]=deferredCellEntry(row);
+const list=shardRows.filter(row=>!existingCellKeys.has(normalizeCellId(row.cell_id)));
+for(const row of shardRows) if(existingCellKeys.has(normalizeCellId(row.cell_id))) markAlreadyAcquired(row);
+let next=0,done=shardRows.length-list.length;
 async function worker(){
   while(true){
     const i=next++;if(i>=list.length)return;const row=list[i];
@@ -684,11 +704,11 @@ async function worker(){
     done++;
     if(done%25===0||done===allRows.length){
       const elapsed=(Date.now()-started)/1000,rate=done/Math.max(elapsed,.001);
-      console.log('ACQUISITION_PROGRESS completed='+done+'/'+list.length+' files='+manifest.total_files+' rate='+rate.toFixed(2)+'cells/s');
+      console.log('ACQUISITION_PROGRESS shard='+SHARD_INDEX+'/'+SHARD_COUNT+' completed='+done+'/'+shardRows.length+' pending_initial='+list.length+' files='+manifest.total_files+' rate='+rate.toFixed(2)+'cells/s');
     }
   }
 }
-console.log('ACQUISITION_START cells='+allRows.length+' pending='+list.length+' already_acquired='+done+' concurrency='+CONCURRENCY+' requestTimeoutMs='+REQUEST_TIMEOUT+' downloadTimeoutMs='+DOWNLOAD_TIMEOUT);
+console.log('ACQUISITION_START cells='+EXPECTED+' shard='+SHARD_INDEX+'/'+SHARD_COUNT+' shard_cells='+shardRows.length+' pending='+list.length+' already_acquired='+done+' concurrency='+CONCURRENCY+' requestTimeoutMs='+REQUEST_TIMEOUT+' downloadTimeoutMs='+DOWNLOAD_TIMEOUT);
 await fs.mkdir(OUT,{recursive:true});
 await Promise.all(Array.from({length:CONCURRENCY},()=>worker()));
 manifest.completed_at=new Date().toISOString();manifest.elapsed_ms=Date.now()-started;
