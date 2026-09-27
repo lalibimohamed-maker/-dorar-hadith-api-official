@@ -5,11 +5,11 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 482,
-    "rights_review_required": 482,
-    "new_global_links_added_2026_09_24": 310,
+    "links": 488,
+    "rights_review_required": 488,
+    "new_global_links_added_2026_09_24": 316,
     "previous_snapshot_links": 127,
-    "sources": 482
+    "sources": 488
   },
   "rules": [
     "URL is a discovery/source endpoint, not proof of item-level rights.",
@@ -8831,6 +8831,66 @@
       "rights_status": "review_required",
       "source_pr": "561",
       "notes": "Local-first Quran, hadith and Names of Allah application/API with RAG; upstream content rights and model terms require separate verification."
+    },
+    {
+      "id": "world-483",
+      "category": "Hadith dataset",
+      "name": "Open Hadith Data",
+      "url": "https://github.com/Jaguar16/open-hadith-data",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Structured dataset extracted from sunnah.com: major Sunni collections plus additional collections, Arabic/English fields, isnad/matn separation and grading fields. Repository declares code MIT and structured data CC0; English translations remain subject to sunnah.com terms, so translation rights are kept separate."
+    },
+    {
+      "id": "world-484",
+      "category": "Hadith knowledge graph",
+      "name": "الجامع — Hadith Knowledge Graph",
+      "url": "https://github.com/qataruts/hadith",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Arabic-first hadith research graph with hundreds of classical collections, linked isnad/narrator data, meaning groups and subject tree. Published built databases are declared CC BY 4.0; upstream provenance and any item-level rights must remain attached before redistribution."
+    },
+    {
+      "id": "world-485",
+      "category": "Quran knowledge graph",
+      "name": "مشكاة — Quran Knowledge Graph",
+      "url": "https://github.com/qataruts/quran",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Quran knowledge-graph/PWA source with 6,236-ayah canonical shape validation, verse-linked classical references, QAC morphology and Tanzil Uthmani sources. Application code is MIT, while bundled source data retains upstream licenses; do not collapse those licenses."
+    },
+    {
+      "id": "world-486",
+      "category": "Fiqh corpus",
+      "name": "Fiqh Corpus — Arabic Digital Humanities",
+      "url": "https://github.com/arabic-digital-humanities/fiqh",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Approx. 49.33M-token Arabic fiqh corpus spanning Hanafi, Shafi'i, Maliki, Hanbali and Ja'fari subcorpora in OpenITI markup. Source/license varies by book origin; preserve madhhab and source metadata and never silently merge the Ja'fari lane into Sunni fiqh."
+    },
+    {
+      "id": "world-487",
+      "category": "Bibliographic metadata",
+      "name": "KITAB / OpenITI metadata for DLME",
+      "url": "https://github.com/kitab-project-org/kitab_metadata_for_DLME",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Machine-readable metadata for OpenITI digital text versions and KITAB text-reuse data, including author/title, edition information, full-text URLs, OCR flags and text-reuse links. Useful for work/edition/provenance identity; verify metadata and linked-text licensing separately."
+    },
+    {
+      "id": "world-488",
+      "category": "Quran Tajweed",
+      "name": "Quran Tajweed annotations",
+      "url": "https://github.com/cpfair/quran-tajweed",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Character-indexed Hafs tajweed annotations and decision trees; annotation data is CC BY 4.0, while the referenced Tanzil Uthmani text remains under Tanzil terms. Repository is not actively maintained, so treat it as a compatibility/reference source rather than an authoritative active API."
     }
   ],
   "notes": [
@@ -8879,7 +8939,8 @@
     "2026-09-25 exclusion policy reaffirmed: The Global Message and Hadith Data Bank are not part of the Sunni source registry and are not retained as Sunni candidates.",
     "2026-09-27: verified and enriched the existing UmmahAPI record with its official API documentation and live Quran endpoint; added HifzMate, Zikrah, ilmSpace, and AzanCast as distinct Quran/Islamic application and service discovery lanes. All remain review_required and no redistribution rights are inferred.",
     "2026-09-27 global design/product radar: added Ummah Library, Quran.ws, Itqan CMS and i-muslim as verified source/design-infrastructure lanes. These records are discovery/design inputs; content rights remain asset-level unless an explicit license states otherwise.",
-    "2026-09-27: added alihmada/Islamic-APIs as a verified integration-reference source; underlying API/data rights remain provider-specific."
+    "2026-09-27: added alihmada/Islamic-APIs as a verified integration-reference source; underlying API/data rights remain provider-specific.",
+    "2026-09-27 deep Rechercher radar: added structured hadith data, hadith/Quran knowledge-graph sources, fiqh corpus, KITAB/OpenITI metadata, and Hafs tajweed annotations after repository/readme/license checks. Mixed-school or upstream-dependent rights remain review_required."
   ],
   "change_log": [
     "2026-09-24: added 6 supplied source-discovery endpoints to the canonical registry: https://saleh.af.org.sa/ar/books?page=1, https://www.sualruhaily.com, https://alshathri.net, https://af.org.sa, https://www.nusuk.sa, https://www.rabita.fi/en#services. All remain review_required; no redistribution permission is inferred.",
@@ -8895,6 +8956,11 @@
     {
       "date": "2026-09-27",
       "change": "Added Quran/Hadith API and institutional source links supplied for PR #561; kept rights review-required and separate from Rechercher Ω execution connectors.",
+      "source_pr": "561"
+    },
+    {
+      "date": "2026-09-27",
+      "change": "Added world-483 through world-488 from deep source and infrastructure research; no new branch created.",
       "source_pr": "561"
     }
   ],
