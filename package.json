@@ -35,7 +35,8 @@
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
     "test:review-expiry": "node --test test/review-expiry.test.js",
     "test:ai": "node --test test/rechercher-ai-engine.test.js",
-    "test:rechercher-ai": "npm run test:ai"
+    "test:rechercher-ai": "npm run test:ai",
+    "test:omega-global-search": "node --test test/rechercher-omega-global-deep-search.test.js"
   },
   "engines": {
     "node": ">=20"
