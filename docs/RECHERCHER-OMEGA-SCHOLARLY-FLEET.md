@@ -16,7 +16,22 @@ The Quran lane already has a detailed Quran Foundation contract. This document a
 | fiqh | الفقه | official institution + scholarly corpus |
 | fatwa | الفتاوى | official institutions |
 | biographies | التراجم والرجال | scholarly corpus + web source |
-| references | المراجع والفهارس والمكتبات | library/catalog/metadata services |
+| references | المراجع والفهارس والمكتبات | libraries + metadata services |
+| asbab_al_nuzul | أسباب النزول | official API + scholarly corpus |
+| sharh | الشروح والتعليقات | scholarly corpus + digital library |
+| tajwid | التجويد | digital library + official Quran source |
+| qiraat | القراءات والرسم والضبط | official Quran source + digital library |
+| usul_al_fiqh | أصول الفقه والقواعد | official institution + digital library |
+| islamic_history | التاريخ الإسلامي والحضارة | scholarly corpus + digital library |
+| terminology | المصطلحات والمفاهيم الإسلامية | reference site + scholarly corpus |
+| ethics_and_spirituality | التزكية والأخلاق والآداب | digital library + scholarly corpus |
+| manuscripts | المخطوطات والتراث المخطوط | manuscript databases + digital libraries |
+| geography | الجغرافيا والرحلات والأماكن | digital library + scholarly corpus |
+| research_indexes | الفهارس ومؤشرات البحث العلمي | metadata API + library catalog |
+| encyclopedias | الموسوعات والمعاجم المرجعية | reference database + bibliographic service |
+| documents | الوثائق والسجلات الرقمية | digital archive + digital library |
+| multilingual_translations | الترجمات متعددة اللغات | official Quran sources + API |
+| education | التعليم والمناهج والمتون | digital library + educational repository |
 
 The fleet is now 24 independent families. The nine foundational families are joined by fifteen additional lanes covering أسباب النزول، الشروح، التجويد، القراءات، أصول الفقه، التاريخ والحضارة، المصطلحات، التزكية والأخلاق، المخطوطات، الجغرافيا والرحلات، مؤشرات البحث، الموسوعات، الوثائق، الترجمات متعددة اللغات، والتعليم.
 
