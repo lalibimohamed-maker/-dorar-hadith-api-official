@@ -126,7 +126,7 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 def open_hf_range(url, start, end, token):
     """Resolve Hugging Face redirects with auth, then stream the signed CDN/Xet URL without auth."""
     current = url
-    opener = urllib.request.build_opener(_NoRedirect())
+    opener = urllib.request.build_opener(_NoRedirect(), urllib.request.HTTPSHandler(context=TLS))
     for _ in range(8):
         parsed = urllib.parse.urlsplit(current)
         headers = {
@@ -138,7 +138,7 @@ def open_hf_range(url, start, end, token):
             headers["Authorization"] = f"Bearer {token}"
         req = urllib.request.Request(current, headers=headers)
         try:
-            response = opener.open(req, context=TLS, timeout=1800)
+            response = opener.open(req, timeout=1800)
         except urllib.error.HTTPError as exc:
             location = exc.headers.get("Location")
             if exc.code in (301, 302, 303, 307, 308) and location:
