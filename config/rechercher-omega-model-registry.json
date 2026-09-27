@@ -214,14 +214,19 @@
       "family": "image-generation",
       "tasks": [
         "text_to_image",
-        "image_generation",
-        "image_editing"
+        "image_generation"
       ],
       "source": "https://github.com/black-forest-labs/flux",
       "status": "candidate",
       "license_review": "required",
-      "license_status": "review_required",
-      "notes": "Generation engine is registry-only until the applicable model-family license is individually cleared."
+      "license_status": "verified_source_license",
+      "notes": "FLUX.1 [schnell] is the Apache-2.0 open-weight text-to-image model; Hugging Face access is gated and requires an accepted access agreement plus an HF token. FLUX.1-dev remains excluded because its applicable license is non-commercial.",
+      "model_id": "black-forest-labs/FLUX.1-schnell",
+      "revision": "f095d56c608128f5ec5e80e7c515697d15d02fa6",
+      "revision_type": "immutable_hf_commit",
+      "acquisition_class": "github_release",
+      "release_tag": "rechercher-omega-flux1-schnell-v1.0.0",
+      "gated_access": true
     }
   ]
 }
