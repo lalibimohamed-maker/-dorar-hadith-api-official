@@ -96,100 +96,12 @@
       "role": "user-proposed Islamic LLM weights",
       "integration": "do not acquire/use until exact official model repository, weights, license, training-data provenance and evaluation are verified",
       "status": "unverified-candidate"
-    },
-    {
-      "id": "alquran_api_pages",
-      "name": "Al-Quran API",
-      "url": "https://alquran-api.pages.dev/",
-      "role": "free multilingual Quran REST API and search reference",
-      "license": "open-source/free-use claim; exact data license requires source-level verification",
-      "integration": "candidate Quran retrieval, multilingual search and JSON connector; verify text/translation provenance before acquisition or redistribution",
-      "status": "review_required"
-    },
-    {
-      "id": "quranhub_misraj",
-      "name": "QuranHub API by Misraj AI",
-      "url": "https://github.com/misraj-ai/quranhub",
-      "role": "Quran REST API/MCP with editions, translations, tafsir, audio, search and morphology",
-      "license": "NCL for the software; underlying Quran editions/translations/audio require separate rights verification",
-      "integration": "research and connector reference for edition-aware Quran retrieval and MCP tool routing; never infer content redistribution rights from the software license",
-      "status": "review_required"
-    },
-    {
-      "id": "sunnah_now",
-      "name": "Sunnah Now",
-      "url": "https://github.com/sunnah-now",
-      "role": "community Sunnah/Hadith software and API source family",
-      "integration": "discovery candidate; exact repository, endpoints, provenance and license must be verified before execution",
-      "status": "unverified-candidate"
-    },
-    {
-      "id": "ahmedbaset_hadith_api",
-      "name": "AhmedBaset Hadith API",
-      "url": "https://github.com/AhmedBaset/hadith-api",
-      "role": "REST API over 17+ hadith books",
-      "license": "software/data rights require source-level verification; repository states data was scraped from sunnah.com",
-      "integration": "candidate hadith API and structured collection/book/chapter/hadith schema reference; do not ingest scraped data until upstream rights are cleared",
-      "status": "review_required"
-    },
-    {
-      "id": "saikothasan_hadithapi",
-      "name": "saikothasan Hadith API",
-      "url": "https://github.com/saikothasan/hadithapi",
-      "role": "Next.js/Cloudflare REST API for five major hadith collections with search and pagination",
-      "license": "not established from current registry evidence",
-      "integration": "candidate lightweight hadith search/read API architecture; verify dataset provenance and license",
-      "status": "review_required"
-    },
-    {
-      "id": "quran_ksu",
-      "name": "King Saud University Quran",
-      "url": "https://quran.ksu.edu.sa/",
-      "role": "institutional Quran website and research/reference source",
-      "integration": "institutional Quran reference, corpus comparison and UX/source-pattern research; acquisition rights must be verified from KSU/source terms",
-      "status": "review_required"
-    },
-    {
-      "id": "fawaz_hadith_api",
-      "name": "Fawaz Ahmed Hadith API",
-      "url": "https://github.com/fawazahmed0/hadith-api",
-      "role": "multilingual Hadith API with editions, grades and CDN JSON endpoints",
-      "license": "Unlicense for repository software; hadith text/translation rights remain source-specific and are not cleared by the code license",
-      "integration": "candidate multilingual hadith connector and edition fallback design; preserve source/edition provenance and block redistribution until data rights are verified",
-      "status": "review_required"
-    },
-    {
-      "id": "kalimat",
-      "name": "Kalimat Islamic APIs",
-      "url": "https://www.kalimat.dev/",
-      "role": "Quran/Hadith search and prayer-time API infrastructure",
-      "integration": "candidate live search/API provider and architecture reference; authentication, rate limits, terms and content rights must be verified before operational use",
-      "status": "review_required"
-    },
-    {
-      "id": "tarteel_qul",
-      "name": "Tarteel Quranic Universal Library (QUL)",
-      "url": "https://github.com/TarteelAI/quranic-universal-library",
-      "role": "Quran resource CMS for scripts, translations, tafsirs, audio, layouts, metadata and morphology",
-      "license": "MIT for QUL software; individual resources retain resource-specific rights",
-      "integration": "high-value research source for Quran data model, versioning, multilingual resources, layouts and AI-adjacent Quran tooling; Tarteel states it does not currently offer a public developer API, so use QUL resources rather than inventing an API connector",
-      "status": "research-approved"
-    },
-    {
-      "id": "sunnah_com_official_api",
-      "name": "Sunnah.com Official API",
-      "url": "https://github.com/sunnah-com/api",
-      "role": "official hadith API backend and local deployment reference",
-      "integration": "candidate official hadith connector/local mirror architecture; API access requires the provider's access process and data use/redistribution remains governed by Sunnah.com terms",
-      "status": "review_required"
     }
   ],
   "design_note": {
     "minsa": "Added as engineering research candidate, not as trusted religious source.",
     "ontology": "OWL/RDF can model relationships and support SPARQL, but cannot manufacture fiqh conclusions; every derived claim remains tied to source evidence.",
     "embeddings": "Embeddings are retrieval infrastructure, not truth or authority; evidence IDs, provenance, rights and verification status must persist through retrieval.",
-    "llm": "LLM weights can assist synthesis only after the evidence gate and never replace source-grounded evidence or scholar review.",
-    "tarteel_api": "Tarteel's official help center states there is currently no public API for developers; QUL is the supported developer resource hub. Do not encode an invented GraphQL endpoint or API-key flow as an executable connector.",
-    "api_rights": "API availability, repository license, and underlying religious-content redistribution rights are tracked separately. A software license never clears upstream text, translations, audio or scraped datasets."
+    "llm": "LLM weights can assist synthesis only after the evidence gate and never replace source-grounded evidence or scholar review."
   }
 }
