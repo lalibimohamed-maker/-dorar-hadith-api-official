@@ -15,9 +15,9 @@
       "id": "quran_nlp_engine",
       "name": "QURAN-NLP",
       "url": "https://github.com/islamAndAi/QURAN-NLP",
-      "role": "Quran/Hadith NLP, morphology, semantic search, corpus tooling",
+      "role": "Quran/Hadith NLP, morphology, semantic search, tafsir and narrator-graph tooling",
       "license": "Apache-2.0 code; individual datasets/translations retain their own terms",
-      "integration": "study semantic search, morphology, canonical-row validation and hadith/isnad graph ideas",
+      "integration": "study semantic search, morphology, tafsir and isnad/narrator graph tooling; use as retrieval/linguistic research infrastructure only, with dataset-level provenance and rights kept separate",
       "status": "research-approved"
     },
     {
@@ -220,28 +220,12 @@
       "status": "evaluation-candidate"
     },
     {
-      "id": "tarima_maghrebi_htr",
-      "name": "Tarima — Maghrebi Arabic HTR ground truth",
-      "url": "https://github.com/calfa-co/tarima",
-      "role": "ground-truth and HTR resources for Maghrebi Arabic manuscripts with IIIF integrations",
-      "integration": "valuable manuscript/OCR research input for Maghrebi Arabic, PageXML and IIIF; use as research/training reference subject to dataset terms",
-      "status": "research-approved"
-    },
-    {
       "id": "quran_pattern_search_research",
       "name": "HQDR/HQPS pattern-search research",
       "url": "https://link.springer.com/article/10.1007/s44443-026-00934-w",
       "role": "character/grapheme-level Quran repository and deterministic pattern search with MCP interface",
       "integration": "architecture inspiration for exact Quran search at grapheme level; implement only with independently verified canonical text and rights",
       "status": "architecture-reference"
-    },
-    {
-      "id": "quran_nlp_existing",
-      "name": "QURAN-NLP",
-      "url": "https://github.com/islamAndAi/QURAN-NLP",
-      "role": "Quran/Hadith NLP, morphology, semantic search, tafsir and narrator graph tooling",
-      "integration": "expand current research record with explicit semantic-search, morphology and isnad graph capabilities; dataset-level rights remain separate",
-      "status": "research-approved"
     },
     {
       "id": "manuscript_ocr_workbench",
@@ -382,6 +366,7 @@
     "manuscript_ocr": "Maghrebi and manuscript OCR resources can improve acquisition and transcription, but OCR output remains a derived artifact requiring multi-engine comparison and human/QC validation before canonical use.",
     "quran_audio_alignment": "Quran ASR and Tadabur provide recitation transcription/timing research inputs. Audio, transcripts, model weights and timing annotations remain distinct derived/source layers with separate rights and provenance.",
     "htr_stack": "eScriptorium plus Kraken strengthen the manuscript OCR/HTR lane. Rechercher should preserve page images, line segmentation, recognition outputs, model/version metadata and human corrections, then require multi-engine agreement/QC before promotion.",
-    "deterministic_quran_analysis": "Exact counting and search tools are evidence-processing infrastructure only. Preserve canonical Quran text separately from morphology, frequency claims, ontology relations and generated answers."
+    "deterministic_quran_analysis": "Exact counting and search tools are evidence-processing infrastructure only. Preserve canonical Quran text separately from morphology, frequency claims, ontology relations and generated answers.",
+    "registry_dedup": "Canonicalize research-source entries by URL. When an existing project later gains richer metadata, merge into the original entry instead of creating a second ID."
   }
 }
