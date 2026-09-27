@@ -79,7 +79,6 @@ jobs:
           qpdf --version
           openssl version
           node --check scripts/rechercher_acquire_multilingual_cell_pdfs.mjs
-          node --check scripts/rechercher_acquire_multilingual_cell_pdfs.mjs
       - name: Build durable acquisition resume inventory from all matrix Releases
         env:
           MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
