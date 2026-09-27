@@ -139,20 +139,21 @@ jobs:
           CHUNK_BYTES: ${{ matrix.chunk_bytes }}
         run: python scripts/rechercher-omega-release-stream.py
 
-      - name: Attach LTX-2 license
+      - name: Attach LTX-2 license from the immutable HF model revision
         if: matrix.id == 'ltx-2'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
           RELEASE_TAG: ${{ matrix.release_tag }}
+          REVISION: ${{ steps.revision.outputs.sha }}
         run: |
           set -euo pipefail
-          tmp="$(mktemp)"
-          curl --fail --location --retry 3 --silent --show-error             "https://raw.githubusercontent.com/Lightricks/LTX-2/400fd31054597515f47125691032c04b1c3ee24e/LICENSE-2_x"             -o "$tmp"
-          gh release upload "$RELEASE_TAG" "$tmp#LICENSE-2_x" --repo "$REPO" --clobber
-          rm -f "$tmp"
+          license="${RUNNER_TEMP}/LICENSE-2_x"
+          curl --fail --location --retry 3 --silent --show-error             "https://huggingface.co/Lightricks/LTX-2/resolve/${REVISION}/LICENSE-2_x?download=true"             -o "$license"
+          test -s "$license"
+          gh release upload "$RELEASE_TAG" "$license" --repo "$REPO" --clobber
 
-      - name: Attach Hunyuan license and notice
+      - name: Normalize Hunyuan license assets
         if: matrix.id == 'hunyuanvideo-1.5'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
@@ -160,17 +161,54 @@ jobs:
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
-          for spec in             "LICENSE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/60783e704160023913bee78f0b47036d393d4dfa/LICENSE"             "NOTICE|https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/60783e704160023913bee78f0b47036d393d4dfa/NOTICE"
-          do
-            name="${spec%%|*}"
-            url="${spec#*|}"
-            tmp="$(mktemp)"
-            curl --fail --location --retry 3 --silent --show-error "$url" -o "$tmp"
-            gh release upload "$RELEASE_TAG" "$tmp#$name" --repo "$REPO" --clobber
-            rm -f "$tmp"
-          done
+          while IFS= read -r name; do
+            case "$name" in
+              tmp.*)
+                echo "Removing obsolete temporary license/notice asset: $name"
+                gh release delete-asset "$RELEASE_TAG" "$name" --repo "$REPO" --yes
+                ;;
+            esac
+          done < <(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name')
 
-      - name: Verify Release manifest
+      - name: Attach Hunyuan license and notice with canonical names
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error             "https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/60783e704160023913bee78f0b47036d393d4dfa/LICENSE"             -o "${RUNNER_TEMP}/LICENSE"
+          curl --fail --location --retry 3 --silent --show-error             "https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/60783e704160023913bee78f0b47036d393d4dfa/NOTICE"             -o "${RUNNER_TEMP}/NOTICE"
+          test -s "${RUNNER_TEMP}/LICENSE"
+          test -s "${RUNNER_TEMP}/NOTICE"
+          gh release upload "$RELEASE_TAG" "${RUNNER_TEMP}/LICENSE" "${RUNNER_TEMP}/NOTICE" --repo "$REPO" --clobber
+
+      - name: Build HunyuanVideo 1.5 runtime bundle
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+          SOURCE_REPO: Tencent-Hunyuan/HunyuanVideo-1.5
+          SOURCE_COMMIT: 60783e704160023913bee78f0b47036d393d4dfa
+          OUTPUT_DIR: ${{ runner.temp }}/hunyuanvideo15-runtime
+          CONFIG_PATH: ${{ github.workspace }}/config/rechercher-omega-hunyuanvideo15-runtime.json
+        run: |
+          set -euo pipefail
+          python scripts/rechercher-omega-hunyuan-runtime.py
+
+      - name: Publish HunyuanVideo 1.5 runtime bundle
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          OUTPUT_DIR: ${{ runner.temp }}/hunyuanvideo15-runtime
+        run: |
+          set -euo pipefail
+          gh release upload "$RELEASE_TAG"             "$OUTPUT_DIR/omega__hunyuanvideo15__runtime.tar.gz"             "$OUTPUT_DIR/hunyuanvideo15-runtime-manifest.json"             "$OUTPUT_DIR/hunyuanvideo15-dependencies.json"             "$OUTPUT_DIR/hunyuanvideo15-release-readiness.json"             --repo "$REPO" --clobber
+
+      - name: Verify weights manifest
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -178,4 +216,41 @@ jobs:
         run: |
           set -euo pipefail
           gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name' | grep -Fxq "release-manifest.json"
-          echo "Verified Release manifest for $RELEASE_TAG"
+          echo "[OK] Weights manifest exists for $RELEASE_TAG"
+
+      - name: Verify Hunyuan runtime completeness
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          VERIFY_DIR: ${{ runner.temp }}/hunyuanvideo15-verify
+        run: |
+          set -euo pipefail
+          rm -rf "$VERIFY_DIR"
+          mkdir -p "$VERIFY_DIR"
+          assets="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name')"
+          for required in             "release-manifest.json"             "LICENSE"             "NOTICE"             "omega__hunyuanvideo15__runtime.tar.gz"             "hunyuanvideo15-runtime-manifest.json"             "hunyuanvideo15-dependencies.json"             "hunyuanvideo15-release-readiness.json"
+          do
+            grep -Fxq "$required" <<<"$assets" || { echo "Missing Release asset: $required"; exit 1; }
+          done
+          if grep -Eq '^tmp\.' <<<"$assets"; then
+            echo "Temporary license/notice assets remain in Hunyuan Release"
+            exit 1
+          fi
+          gh release download "$RELEASE_TAG"             --repo "$REPO"             --pattern "hunyuanvideo15-release-readiness.json"             --dir "$VERIFY_DIR"
+          status="$(python3 -c 'import json; print(json.load(open("'"'$VERIFY_DIR/hunyuanvideo15-release-readiness.json'"))["status"])')"
+          test "$status" = "dependency_blocked"
+          echo "[OK] Runtime completeness gate passed: core packaged, runnable state explicitly blocked by declared external dependencies."
+
+      - name: Enforce runtime completeness semantics
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          assets="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name')"
+          test -n "$(grep -Fx "hunyuanvideo15-release-readiness.json" <<<"$assets")"
+          echo "[OK] release-manifest.json is not the runtime completeness signal"
