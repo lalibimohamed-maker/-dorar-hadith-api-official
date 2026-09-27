@@ -681,6 +681,159 @@
       ],
       "integration": "ci_validation",
       "auto_download": false
+    },
+    {
+      "id": "habibi-tts",
+      "kind": "arabic_multidialect_tts",
+      "source_repo": "https://github.com/SWivid/Habibi-TTS",
+      "code_license": "MIT",
+      "model_license_status": "mixed_by_model_variant",
+      "tasks": [
+        "text_to_speech",
+        "arabic_dialect_speech",
+        "multidialect_speech"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Specialized Arabic MSA/dialect TTS. Use only variants whose model license is cleared; never synthesize canonical Quran recitation."
+    },
+    {
+      "id": "arabic-extract",
+      "kind": "arabic_pdf_text_repair",
+      "source_repo": "https://github.com/balswyan/arabic-extract",
+      "code_license": "review_required",
+      "model_license_status": "per_dependency",
+      "tasks": [
+        "arabic_pdf_extraction",
+        "arabic_visual_order_repair",
+        "ocr_postprocessing"
+      ],
+      "integration": "optional_runtime",
+      "auto_download": false,
+      "notes": "Use as an independent Arabic-order repair challenger; never silently overwrite canonical extracted text."
+    },
+    {
+      "id": "research-agent",
+      "kind": "iterative_research_agent",
+      "source_repo": "https://github.com/JinheonBaek/ResearchAgent",
+      "code_license": "research_license_review",
+      "model_license_status": "per_model",
+      "tasks": [
+        "literature_retrieval",
+        "iterative_review",
+        "research_planning",
+        "evidence_synthesis"
+      ],
+      "integration": "architecture_reference",
+      "auto_download": false,
+      "notes": "Adopt retrieval + parallel reviewer iteration for research workflows, not as a source of scholarly truth."
+    },
+    {
+      "id": "ragraph",
+      "kind": "knowledge_graph_rag",
+      "source_repo": "https://github.com/ADVASYS/ragraph",
+      "code_license": "review_required",
+      "model_license_status": "per_model",
+      "tasks": [
+        "graph_rag",
+        "hybrid_retrieval",
+        "citation_navigation",
+        "entity_linking",
+        "document_graph"
+      ],
+      "integration": "architecture_reference",
+      "auto_download": false
+    },
+    {
+      "id": "ragu",
+      "kind": "graph_rag_framework",
+      "source_repo": "https://github.com/RaguTeam/RAGU",
+      "code_license": "MIT",
+      "model_license_status": "per_model",
+      "tasks": [
+        "graph_rag",
+        "query_planning",
+        "community_detection",
+        "hybrid_retrieval"
+      ],
+      "integration": "optional_framework_adapter",
+      "auto_download": false
+    },
+    {
+      "id": "open-computer-use",
+      "kind": "computer_use_mcp",
+      "source_repo": "https://github.com/anomalyco/computer-use",
+      "code_license": "review_required",
+      "model_license_status": "per_model",
+      "tasks": [
+        "computer_use",
+        "browser_control",
+        "desktop_control"
+      ],
+      "integration": "mcp_adapter",
+      "auto_download": false,
+      "notes": "Disabled by default for Omega. Any computer/browser action requires explicit tool allowlisting and human confirmation."
+    },
+    {
+      "id": "wide-moat-computer-use",
+      "kind": "computer_use_workspace_mcp",
+      "source_repo": "https://github.com/Wide-Moat/open-computer-use",
+      "code_license": "review_required",
+      "model_license_status": "per_model",
+      "tasks": [
+        "computer_use",
+        "browser_control",
+        "workspace_agents"
+      ],
+      "integration": "mcp_adapter",
+      "auto_download": false,
+      "notes": "Architecture reference for isolated workspaces; never grants the scholarly agent unrestricted shell access."
+    },
+    {
+      "id": "openmac",
+      "kind": "local_multimodal_server",
+      "source_repo": "https://github.com/echosoar/openmac",
+      "code_license": "MIT",
+      "model_license_status": "per_model",
+      "tasks": [
+        "ocr",
+        "multilingual_translation",
+        "web_retrieval",
+        "tts",
+        "image_processing"
+      ],
+      "integration": "optional_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "open-science",
+      "kind": "research_workbench",
+      "source_repo": "https://github.com/aipoch/open-science",
+      "code_license": "Apache-2.0",
+      "model_license_status": "per_model",
+      "tasks": [
+        "research_agent",
+        "literature_workflow",
+        "local_research",
+        "evidence_management"
+      ],
+      "integration": "architecture_reference",
+      "auto_download": false
+    },
+    {
+      "id": "comfyui-mcp",
+      "kind": "media_generation_mcp",
+      "source_repo": "https://github.com/artokun/comfyui-mcp",
+      "code_license": "MIT",
+      "model_license_status": "per_model",
+      "tasks": [
+        "image_generation",
+        "video_generation",
+        "media_tools",
+        "mcp"
+      ],
+      "integration": "mcp_adapter",
+      "auto_download": false
     }
   ],
   "pipelines": {
@@ -691,7 +844,8 @@
         "faster-whisper",
         "qwen3-omni",
         "cosyvoice_or_kokoro",
-        "pyannote-audio"
+        "pyannote-audio",
+        "habibi-tts"
       ],
       "arabic_speech": {
         "primary_understanding": "qwen3-omni",
@@ -706,6 +860,7 @@
         "paddleocr-vl",
         "deepseek-ocr",
         "olmocr",
+        "arabic-extract",
         "text_validation",
         "provenance",
         "markitdown"
@@ -719,7 +874,8 @@
         "bge-m3",
         "bge-vl",
         "bge-reranker-v2-m3",
-        "evidence_gate"
+        "evidence_gate",
+        "ragraph"
       ]
     },
     "agent": {
@@ -735,7 +891,9 @@
         "everos",
         "memoripy",
         "prismor",
-        "agent-inspect"
+        "agent-inspect",
+        "research-agent",
+        "openmac"
       ]
     },
     "programming": {
@@ -747,6 +905,16 @@
         "mcp-evals"
       ],
       "purpose": "multilingual software engineering with codebase intelligence and test-gated changes"
+    },
+    "research": {
+      "stages": [
+        "research-agent",
+        "ragraph",
+        "ragu",
+        "mcp-evals",
+        "evidence_gate"
+      ],
+      "purpose": "iterative literature retrieval, graph navigation, parallel review and evidence packaging"
     }
   }
 }
