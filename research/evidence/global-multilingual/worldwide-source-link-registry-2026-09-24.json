@@ -5,11 +5,11 @@
   "matrix_owner": "PR #541",
   "quran_layer": "PR #558",
   "counts": {
-    "links": 499,
-    "rights_review_required": 499,
-    "new_global_links_added_2026_09_24": 327,
+    "links": 502,
+    "rights_review_required": 502,
+    "new_global_links_added_2026_09_24": 330,
     "previous_snapshot_links": 127,
-    "sources": 499
+    "sources": 502
   },
   "rules": [
     "URL is a discovery/source endpoint, not proof of item-level rights.",
@@ -9001,6 +9001,36 @@
       "rights_status": "review_required",
       "source_pr": "561_deep_research_2026_09_27",
       "notes": "Free classical Islamic scholarship library covering fiqh, hadith, tafsir, kalam and related disciplines; book pages expose source family and applicable rights/license status. Verify each title before reuse."
+    },
+    {
+      "id": "world-500",
+      "category": "Official Quran API documentation",
+      "name": "Quran Foundation API Docs — current",
+      "url": "https://api-docs.quran.com/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Current official developer documentation for Quran Foundation APIs. Documents Content APIs for Quran text, chapters, verses, translations, tafsirs, audio, recitations, pages and structural resources; Search APIs; OAuth2; and SDKs. API access/authentication is documented here, but API availability is not redistribution permission."
+    },
+    {
+      "id": "world-501",
+      "category": "Quran API v4",
+      "name": "Quran Foundation Content API v4 documentation",
+      "url": "https://api-docs.quran.com/docs/content_apis_versioned/4.0.0/content-apis/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Official v4 Content API reference. Includes Quran, verses, translations, tafsirs, audio, recitations, pages and linked Hadith resources. Production access requires approved credentials; preserve source/resource metadata and rights separately."
+    },
+    {
+      "id": "world-502",
+      "category": "Quran offline synchronization",
+      "name": "Quran Foundation Content Sync documentation",
+      "url": "https://api-docs.quran.com/docs/tutorials/content-sync/getting-started/",
+      "scope": "candidate-source",
+      "rights_status": "review_required",
+      "source_pr": "561_deep_research_2026_09_27",
+      "notes": "Official Content Sync workflow using snapshot/sync tokens and incremental changes. Supports quran_core, mushafs, translations, word-by-word translations/transliterations, tafsirs, recitations, chapter recitations and articles. Useful as a controlled refresh connector; sync permission does not itself grant public redistribution rights."
     }
   ],
   "notes": [
