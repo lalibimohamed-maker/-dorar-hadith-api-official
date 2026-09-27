@@ -21,7 +21,7 @@ async function readText(url) {
 }
 
 const TASK_MODEL_PRIORITY = Object.freeze({
-  reasoning: ["qwen3", "qwen3-omni"],
+  reasoning: ["qwen3", "gpt-oss", "qwen3-omni"],
   multimodal_understanding: ["qwen3-omni", "qwen3-vl", "paddleocr-vl"],
   document_understanding: ["paddleocr-vl", "qwen3-vl", "qwen3-omni"],
   image_understanding: ["qwen3-vl", "qwen3-omni"],
@@ -33,7 +33,7 @@ const TASK_MODEL_PRIORITY = Object.freeze({
   audio_video: ["ltx-2", "qwen3-omni"],
   text_to_speech: ["cosyvoice"],
   text_to_image: ["flux"],
-  inference_runtime: ["sglang"]
+  inference_runtime: ["sglang"],\n  safety_audit: ["gpt-oss-safeguard"],\n  programming: ["qwen3-coder", "gpt-oss", "qwen3"]
 });
 
 const SCHOLARLY_TASKS = new Set([
