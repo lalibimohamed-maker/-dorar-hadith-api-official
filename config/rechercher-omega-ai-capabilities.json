@@ -500,6 +500,80 @@
       ],
       "integration": "architecture_reference",
       "auto_download": false
+    },
+    {
+      "id": "localai",
+      "kind": "unified_local_ai_engine",
+      "source_repo": "https://github.com/mudler/LocalAI",
+      "code_license": "MIT",
+      "model_license_status": "per_model",
+      "tasks": [
+        "local_inference",
+        "vision_inference",
+        "speech_inference",
+        "image_generation",
+        "video_generation",
+        "embeddings",
+        "reranking",
+        "mcp_agents"
+      ],
+      "integration": "openai_compatible",
+      "auto_download": false
+    },
+    {
+      "id": "vllm",
+      "kind": "gpu_inference_server",
+      "source_repo": "https://github.com/vllm-project/vllm",
+      "code_license": "Apache-2.0",
+      "model_license_status": "per_model",
+      "tasks": [
+        "high_throughput_inference",
+        "openai_compatible",
+        "batch_inference"
+      ],
+      "integration": "openai_compatible",
+      "auto_download": false
+    },
+    {
+      "id": "whisper-cpp",
+      "kind": "speech_recognition_runtime",
+      "source_repo": "https://github.com/ggml-org/whisper.cpp",
+      "code_license": "MIT",
+      "model_license_status": "inherited_from_whisper",
+      "tasks": [
+        "automatic_speech_recognition",
+        "cpu_speech_inference",
+        "edge_speech"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "piper",
+      "kind": "text_to_speech_runtime",
+      "source_repo": "https://github.com/OHF-Voice/piper1-gpl",
+      "code_license": "GPL-3.0-or-later",
+      "model_license_status": "review_required",
+      "tasks": [
+        "text_to_speech",
+        "multilingual_speech"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "pgvector",
+      "kind": "vector_database_extension",
+      "source_repo": "https://github.com/pgvector/pgvector",
+      "code_license": "PostgreSQL",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "vector_search",
+        "hybrid_search",
+        "metadata_filtering"
+      ],
+      "integration": "service_adapter",
+      "auto_download": false
     }
   ],
   "pipelines": {
@@ -554,4 +628,4 @@
       ]
     }
   }
-}\n
+}
