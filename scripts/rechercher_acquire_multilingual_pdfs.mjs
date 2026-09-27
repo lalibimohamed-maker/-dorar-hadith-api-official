@@ -203,7 +203,7 @@ for(const [key,lang] of languages){
          });
          continue;
        }
-       seenPdfSha256.set(inspected.sha256,{language:iso,source:adapter.id,path:path.relative(ROOT,resolved)});
+       seenPdfSha256.set(inspected.sha256,{language:iso,source:adapter.id,path:path.relative(ROOT,file)});
        entry.files.push({
          source:adapter.id,
          url:pdfUrl,
