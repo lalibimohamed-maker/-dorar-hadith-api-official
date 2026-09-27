@@ -27,10 +27,18 @@ export function validateScholarlyFleet(fleet = {}) {
     }
 
     for (const source of family.sources ?? []) {
-      for (const field of ["id","kind","execution","production","pre_live","sdk"]) {
+      for (const field of ["id","kind","execution"]) {
         if (source[field] == null || source[field] === "") {
           errors.push("source-missing:" + family.id + ":" + field);
         }
+      }
+      for (const axis of REQUIRED_AXES) {
+        if (source.contract?.[axis] == null || source.contract[axis] === "") {
+          errors.push("source-missing-contract-axis:" + family.id + ":" + source.id + ":" + axis);
+        }
+      }
+      if (source.contract?.rights === "allow_all" || source.contract?.rights === "public_by_default") {
+        errors.push("unsafe-rights-default:" + family.id + ":" + source.id);
       }
     }
   }
