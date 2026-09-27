@@ -116,6 +116,51 @@ def release_assets(release):
     return {a["name"]: int(a["size"]) for a in assets}
 
 
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def open_hf_range(url, start, end, token):
+    """Resolve Hugging Face redirects with auth, then stream the signed CDN/Xet URL without auth."""
+    current = url
+    opener = urllib.request.build_opener(_NoRedirect())
+    for _ in range(8):
+        parsed = urllib.parse.urlsplit(current)
+        headers = {
+            "Range": f"bytes={start}-{end}",
+            "Accept": "application/octet-stream",
+            "User-Agent": "Rechercher-Omega/1.0",
+        }
+        if token and parsed.hostname in {"huggingface.co", "www.huggingface.co"}:
+            headers["Authorization"] = f"Bearer {token}"
+        req = urllib.request.Request(current, headers=headers)
+        try:
+            response = opener.open(req, context=TLS, timeout=1800)
+        except urllib.error.HTTPError as exc:
+            location = exc.headers.get("Location")
+            if exc.code in (301, 302, 303, 307, 308) and location:
+                exc.close()
+                current = urllib.parse.urljoin(current, location)
+                continue
+            raise
+        status = getattr(response, "status", None)
+        if status in (200, 206):
+            return response
+        if status in (301, 302, 303, 307, 308):
+            location = response.headers.get("Location")
+            response.close()
+            if not location:
+                raise RuntimeError(f"Hugging Face redirect missing Location for {url}")
+            current = urllib.parse.urljoin(current, location)
+            continue
+        response.close()
+        raise RuntimeError(f"HF returned HTTP {status} for {url}")
+    raise RuntimeError(f"Too many redirects resolving Hugging Face file: {url}")
+
+
 def main():
     if not REPO or "/" not in REPO:
         raise RuntimeError("OMEGA_STORAGE_REPOSITORY is missing or invalid")
@@ -227,18 +272,9 @@ def main():
                     )
                 existing.pop(asset_name, None)
 
-            req = urllib.request.Request(
-                source_url,
-                headers={
-                    "Range": f"bytes={start}-{end}",
-                    "Accept": "application/octet-stream",
-                    "User-Agent": "Rechercher-Omega/1.0",
-                    **({"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}),
-                },
-            )
             print(f"[STREAM] {source_path} {start}-{end} -> {asset_name}")
 
-            with urllib.request.urlopen(req, context=TLS, timeout=1800) as response:
+            with open_hf_range(source_url, start, end, HF_TOKEN) as response:
                 status = getattr(response, "status", None)
                 remote_len = response.headers.get("Content-Length")
                 if status not in (200, 206):
