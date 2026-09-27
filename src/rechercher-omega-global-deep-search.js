@@ -10,6 +10,7 @@
 const REGISTRY = new URL("../config/source-registry.json", import.meta.url);
 const LANGUAGES = new URL("../config/language-coverage-2026.json", import.meta.url);
 const QUEUE = new URL("../config/global-source-ingestion-queue-2026.json", import.meta.url);
+const SCHOLARLY_FLEET = new URL("../config/rechercher-omega-scholarly-fleet.json", import.meta.url);
 
 async function readJson(url) {
   const fs = await import("node:fs/promises");
@@ -54,10 +55,11 @@ export async function buildGlobalDeepSearchPlan({
 } = {}) {
   if (!clean(title)) throw new TypeError("title is required");
 
-  const [registry, languageCoverage, queue] = await Promise.all([
+  const [registry, languageCoverage, queue, scholarlyFleet] = await Promise.all([
     readJson(REGISTRY),
     readJson(LANGUAGES),
-    readJson(QUEUE)
+    readJson(QUEUE),
+    readJson(SCHOLARLY_FLEET)
   ]);
 
   const sources = registry.sources || [];
@@ -69,13 +71,15 @@ export async function buildGlobalDeepSearchPlan({
       ? languages
       : (languageCoverage.agreed20 || []).map(language => language.code)
   );
+  const declaredScholarlyFamilies = (scholarlyFleet.families || []).map(family => family.id);
   const activeFamilies = unique(
     sourceFamilies.length
       ? sourceFamilies
-      : sources.map(sourceFamily)
+      : [...sources.map(sourceFamily), ...declaredScholarlyFamilies]
   );
 
   const sourceByFamilyCountry = new Map();
+  const fleetFamilies = new Set(declaredScholarlyFamilies);
   for (const source of sources) {
     const key = [sourceFamily(source), clean(source.country) || "worldwide"].join("::");
     if (!sourceByFamilyCountry.has(key)) sourceByFamilyCountry.set(key, source);
@@ -91,7 +95,8 @@ export async function buildGlobalDeepSearchPlan({
           ? sources.filter(source => sourceFamily(source) === family).slice(0, 1)
           : [sourceByFamilyCountry.get([family, country].join("::"))].filter(Boolean);
 
-        for (const source of candidates.length ? candidates : [{ category: family }]) {
+        const fallback = fleetFamilies.has(family) ? [{ category: family, fleet_family: true }] : [{ category: family }];
+        for (const source of candidates.length ? candidates : fallback) {
           if (counter >= maxQueries) break;
           counter += 1;
           queries.push({
@@ -130,6 +135,8 @@ export async function buildGlobalDeepSearchPlan({
     countries_considered: activeCountries,
     languages_considered: activeLanguages,
     source_families_considered: activeFamilies,
+    scholarly_families_declared: declaredScholarlyFamilies,
+    scholarly_fleet_contract_axes: scholarlyFleet.contract?.required_axes || [],
     queries_generated: queries.length,
     queries,
     gates: {
