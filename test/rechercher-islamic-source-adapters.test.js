@@ -34,9 +34,11 @@ test('credential-gated providers are registered without pretending they are publ
 test('all registered origins are HTTPS and uniquely owned by their adapter',()=>{
   const seen=new Set();
   for(const a of r.adapters){
-    for(const origin of a.origins){
+    const origins=Array.isArray(a.origins) ? a.origins : [];
+    if(a.status==='enabled') assert.ok(origins.length>0, a.id + ' enabled adapter must declare at least one origin');
+    for(const origin of origins){
       assert.ok(origin.startsWith('https://'),origin);
-      assert.ok(!seen.has(origin),`duplicate origin: ${origin}`);
+      assert.ok(!seen.has(origin), 'duplicate origin: ' + origin);
       seen.add(origin);
     }
   }
