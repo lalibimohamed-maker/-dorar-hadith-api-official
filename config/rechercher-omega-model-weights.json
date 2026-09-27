@@ -196,7 +196,8 @@
         "requires_immutable_revision": true,
         "requires_sha256": true,
         "requires_license_clearance": true
-      }
+      },
+      "notes": "SGLang is an inference/serving runtime, not a model-weight family. No independent SGLang weights exist to download; it serves model weights acquired under their own model IDs (for example Qwen3)."
     },
     {
       "model_id": "qwen3-vl",
@@ -245,15 +246,23 @@
     {
       "model_id": "flux",
       "source_repo": "https://github.com/black-forest-labs/flux",
-      "revision": null,
-      "weight_license_status": "review_required",
-      "acquisition": "runtime_only",
+      "revision": "f095d56c608128f5ec5e80e7c515697d15d02fa6",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
       "verification": {
-        "mode": "not_acquired",
-        "requires_immutable_revision": true,
-        "requires_sha256": true,
-        "requires_license_clearance": true
-      }
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "revision_type": "immutable_hf_commit",
+      "resource_class": "large",
+      "source_model_id": "black-forest-labs/FLUX.1-schnell",
+      "release_tag": "rechercher-omega-flux1-schnell-v1.0.0",
+      "rights_promotion_status": "blocked_until_clearance",
+      "gated_access": true,
+      "hf_token_required": true,
+      "notes": "Official FLUX.1 Schnell weights; access is gated on Hugging Face. Acquisition workflow authenticates with HF_TOKEN and preserves the immutable revision and per-asset SHA-256 manifest."
     }
   ]
 }
