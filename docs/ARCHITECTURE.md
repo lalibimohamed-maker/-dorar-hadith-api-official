@@ -127,3 +127,6 @@ Contract sequence: `Search → Source → Provenance → Rights → Fetch → Im
 At least two explicitly independent OCR engines are required before alignment can proceed to Digital Master. OCR is derivative evidence; the source/image remains authoritative. Alignment must carry the source fingerprint, unresolved differences block Digital Master, and validation must be `valid` before promotion.
 
 Restricted, read-only, link-only, read-copy and rights-unclear items remain reference-only and cannot enter redistribution export. Bulk requests are planned from catalog editions with deduplication and per-edition rights checks; blocked works retain source references rather than copied content. Presentation themes are read-only overlays and do not mutate the underlying text layer.
+
+
+The integrated graph also carries passage/page/claim/uncertainty records and learning-layer structures such as misconceptions, learning activities and assessments. Prerequisite and misconception relations remain explicit graph edges with their own provenance; learner adaptation consumes them downstream and does not write back into canonical Corpus text.
