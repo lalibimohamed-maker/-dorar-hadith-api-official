@@ -7,7 +7,7 @@ const passed = { status: "passed", checks: ["integrity", "schema"] };
 const bookOperation = {
   resourceId: "book-fixture-1",
   source: { id: "official", url: "https://example.invalid/book" },
-  provenance: { resourceId: "book-fixture-1", source: "official" },
+  provenance: { resourceId: "book-fixture-1", source: "official", edition: "verified-edition" },
   validation: passed,
   rights: { status: "redistributable" }
 };
@@ -42,5 +42,6 @@ test("book publish operations reject missing identity gates", () => {
   assert.throws(() => validateOperation({ ...bookOperation, action: "publish", resourceId: "" }), (error) => error.code === "RESOURCE_ID_REQUIRED");
   assert.throws(() => validateOperation({ ...bookOperation, action: "publish", source: null }), (error) => error.code === "SOURCE_REQUIRED");
   assert.throws(() => validateOperation({ ...bookOperation, action: "publish", provenance: null }), (error) => error.code === "PROVENANCE_REQUIRED");
+  assert.throws(() => validateOperation({ ...bookOperation, action: "publish", provenance: { resourceId: "book-fixture-1", source: "official" } }), (error) => error.code === "PROVENANCE_REQUIRED");
   assert.throws(() => validateOperation({ ...bookOperation, action: "publish", validation: { status: "pending" } }), (error) => error.code === "VALIDATION_REQUIRED");
 });
