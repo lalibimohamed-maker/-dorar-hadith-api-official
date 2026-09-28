@@ -78,8 +78,8 @@ jobs:
           if (JSON.stringify(x.deliveryPipeline) !== JSON.stringify(expectedPipeline)) {
             throw new Error('full religious scholarly delivery pipeline drifted');
           }
-          if (x.digitalMaster.multiOcrRequired !== true || x.digitalMaster.qualityControlRequired !== true) {
-            throw new Error('digital master OCR/quality gates missing');
+          if (x.digitalMaster.multiOcrRequired !== true || x.digitalMaster.qualityControlRequired !== true || x.digitalMaster.minimumIndependentOcrEngines !== 2 || x.digitalMaster.alignmentRequired !== true) {
+            throw new Error('digital master OCR/alignment/quality gates missing');
           }
           if (x.quran.arabicTextCanonical !== true ||
               x.quran.translationDoesNotReplaceArabic !== true ||
