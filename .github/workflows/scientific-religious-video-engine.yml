@@ -91,7 +91,16 @@ jobs:
           const source = (registry.sources || []).find((s) => s.id === 'islamreligion-videos');
           if (!source) throw new Error('IslamReligion source registry entry missing');
           if (source.rights?.defaultStatus !== 'restricted') throw new Error('source registry rights state drifted');
-          if (source.url !== 'https://www.islamreligion.com/fr/videos') throw new Error('source registry URL drifted');
+          if (source.url !== 'https://www.islamreligion.com/fr/videos') throw new Error('legacy source registry URL drifted');
+          if (source.languageMode !== 'localized_path_index') throw new Error('IslamReligion language routing mode missing');
+          const supported = new Map((source.supportedLanguages || []).map((l) => [l.code, l]));
+          for (const code of ['en','ar','es','fr','de','ru','pt','zh','ja','it','tl','hi','sw','ko','he']) {
+            if (!supported.has(code)) throw new Error(`IslamReligion supported language missing: ${code}`);
+          }
+          if (source.englishPath !== 'https://www.islamreligion.com/videos') throw new Error('IslamReligion English video path drifted');
+          if (source.languagePathTemplate !== 'https://www.islamreligion.com/{lang}/videos') throw new Error('IslamReligion localized video path template drifted');
+          if (source.localizationEvidenceUrl !== 'https://www.islamreligion.com/ar/videos') throw new Error('IslamReligion localization evidence URL drifted');
+          if ((x.islamicVideoSources?.find((s) => s.sourceId === 'islamreligion-videos')?.localizedEntryPoints?.supportedLanguages || []).length !== 15) throw new Error('engine language coverage drifted');
           const requiredTrue = [
             'freeFirst','selfHostedPreferred','noPaidCoreDependency','noAutomaticPromotion',
             'noSilentReplacement','noCorpusMutation','noUnlicensedMediaReuse','noUnverifiedReligiousClaim',
