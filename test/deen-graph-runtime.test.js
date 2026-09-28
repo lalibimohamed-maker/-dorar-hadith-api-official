@@ -39,3 +39,13 @@ test('trusted traversal requires verified provenance on nodes and edges', () => 
   assert.equal(validateRuntimeGraph(graph, { trustedOnly: true }).trusted, true);
   assert.equal(neighbors(graph, 'h:1', { direction: 'both', trustedOnly: true })[0].id, 'q:1');
 });
+
+
+test('trusted nodes require explicit rights metadata', () => {
+  const graph = createGraph();
+  addNode(graph, { id: 'h:1', type: 'hadith', provenance: { sourceId: 'bukhari', citation: '1', verificationState: 'source_verified' } });
+  assert.deepEqual(
+    (await import('../src/deen-graph-contract.js')).isTrustedEvidence(graph.nodes.get('h:1').provenance),
+    false
+  );
+});
