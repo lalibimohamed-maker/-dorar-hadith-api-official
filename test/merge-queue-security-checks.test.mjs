@@ -38,7 +38,24 @@ test('antivirus summary fails closed for cancellation or any non-success scanner
   assert.match(source, /exit 1/);
 });
 
-test('merge-queue security changes are workflow-only', () => {
-  const files = [...requiredContexts.values(), '.github/workflows/antivirus-analysis-mesh.yml'];
-  assert.equal(files.every((path) => path.startsWith('.github/workflows/')), true);
+test('historical Gitleaks suppressions are finding-level and exact', () => {
+  const source = fs.readFileSync('.gitleaksignore', 'utf8');
+  const entries = source.split('\n').filter((line) => line && !line.startsWith('#'));
+  assert.deepEqual(entries, [
+    'bc5864376c6b4acb7242ea43d0276ba231f9d1e8:config/quran-multisource-translation-catalog-2026-09-22.json:generic-api-key:1098',
+    '3fc525e539c2ecc3365bc41d65d1771eecedf0ae:config/quranenc-translation-provenance-2026-09-22.json:generic-api-key:618'
+  ]);
+  assert.equal(entries.every((line) => line.split(':').length === 4), true);
+});
+
+test('Gitleaks remains a full-history scan', () => {
+  const source = workflowText('.github/workflows/antivirus-analysis-mesh.yml');
+  assert.match(source, /fetch-depth:\s*0/);
+  assert.match(source, /gitleaks git --redact --report-format sarif/);
+});
+
+test('merge-queue security changes are workflow/security plumbing only', () => {
+  assert.equal(fs.existsSync('.gitleaksignore'), true);
+  const workflowPaths = [...requiredContexts.values(), '.github/workflows/antivirus-analysis-mesh.yml'];
+  assert.equal(workflowPaths.every((path) => path.startsWith('.github/workflows/')), true);
 });
