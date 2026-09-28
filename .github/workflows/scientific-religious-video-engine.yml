@@ -100,7 +100,11 @@ jobs:
           if (source.englishPath !== 'https://www.islamreligion.com/videos') throw new Error('IslamReligion English video path drifted');
           if (source.languagePathTemplate !== 'https://www.islamreligion.com/{lang}/videos') throw new Error('IslamReligion localized video path template drifted');
           if (source.localizationEvidenceUrl !== 'https://www.islamreligion.com/ar/videos') throw new Error('IslamReligion localization evidence URL drifted');
-          if ((x.islamicVideoSources?.find((s) => s.sourceId === 'islamreligion-videos')?.localizedEntryPoints?.supportedLanguages || []).length !== 15) throw new Error('engine language coverage drifted');
+          const languageDiscovery = islamReligion.languageDiscovery;
+          if (!languageDiscovery || languageDiscovery.mode !== 'source_navigation') throw new Error('IslamReligion language discovery must be source-navigation based');
+          if (languageDiscovery.doNotTreatObservedListAsExhaustive !== true) throw new Error('IslamReligion observed language list must not be treated as exhaustive');
+          if (languageDiscovery.futureLanguagesAllowed !== true) throw new Error('IslamReligion future language discovery must remain open');
+          if (languageDiscovery.currentObservedCount < 15) throw new Error('IslamReligion observed language coverage regressed');
           const category33 = islamReligion.categories?.find((category) => category.id === '33');
           if (!category33) throw new Error('IslamReligion category 33 binding missing');
           if (category33.url !== 'https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite') throw new Error('IslamReligion category 33 French URL drifted');
