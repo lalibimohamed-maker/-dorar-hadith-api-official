@@ -1,6 +1,6 @@
-export const NODE_TYPES = Object.freeze(["quran_verse","hadith","hadith_variant","tafsir","asbab_al_nuzul","sirah_event","companion_statement","scholar_statement","scholar","narrator","rijal_entry","hadith_criticism","explanation","benefit","fiqh_ruling","aqeedah_statement","fatwa","book","chapter","concept","source"]);
+export const NODE_TYPES = Object.freeze(["quran_verse","hadith","hadith_variant","tafsir","asbab_al_nuzul","sirah_event","companion_statement","scholar_statement","scholarly_position","scholar","narrator","rijal_entry","hadith_criticism","explanation","benefit","fiqh_ruling","aqeedah_statement","fatwa","book","chapter","page","passage","claim","uncertainty","concept","misconception","learning_activity","assessment","source"]);
 
-export const EDGE_TYPES = Object.freeze(["explains","contextualizes","cause_of_revelation_for","related_to","supports","reports","variant_of","narrated_by","has_narrator","evaluated_by","commented_on","cites","derived_from","applies_to","contradicts","qualifies","same_event_as","same_concept_as","part_of","published_in","source_of"]);
+export const EDGE_TYPES = Object.freeze(["explains","contextualizes","cause_of_revelation_for","related_to","supports","reports","variant_of","narrated_by","has_narrator","evaluated_by","commented_on","cites","derived_from","applies_to","contradicts","qualifies","same_event_as","same_concept_as","part_of","published_in","source_of","contrasts_with","example_of","prerequisite_of","advanced_form_of","depends_on","requires","strongly_requires","recommended_before","parallel_to","triggered_by","causes_error_in","confused_with","corrected_by","re_test_with","expresses_uncertainty"]);
 
 export const EVIDENCE_LAYERS = Object.freeze([
   "primary_text",
