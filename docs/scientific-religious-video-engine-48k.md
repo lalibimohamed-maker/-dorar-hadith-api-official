@@ -61,3 +61,11 @@ The final artifact is backed by a timeline/evidence manifest so the movie can be
 Rights -> evidence verification -> scientific/religious integrity -> security -> Arabic quality -> audiovisual quality -> performance/resource cost -> provenance -> human review -> CI.
 
 No video model, voice, footage source or renderer is promoted automatically.
+
+## IslamReligion.com multilingual video reference
+
+IslamReligion.com is registered as a multilingual Islamic video/reference source. The canonical video entry is `https://www.islamreligion.com/videos`; localized video routes use the language index, for example `/ar/videos`, `/ru/videos`, and `/fr/videos`.
+
+The French URL `https://www.islamreligion.com/fr/category/1033/preuves-que-lislam-est-la-verite` is registered specifically as the French localized entry for the "Evidence Islam is Truth" category. Category numeric IDs and slugs are language-scoped and must be resolved from each localized source navigation rather than copied from another language.
+
+The category page is useful for Islamic/dawah context and discovery, including its scientific-miracles taxonomy, but its claims remain subject to independent evidence verification in the video engine. Its media remains reference-only unless a compatible license or explicit permission is recorded by the rights gate.
