@@ -26,7 +26,10 @@ export const isEdgeType = (value) => EDGE_TYPES.includes(String(value || ""));
 export const isVerificationState = (value) => VERIFICATION_STATES.includes(String(value || ""));
 export const isTrustedVerificationState = (value) => TRUSTED_STATES.has(String(value || ""));
 export const isTrustedEvidence = (value = {}) =>
-  isTrustedVerificationState(value.verificationState) && value.generated !== true;
+  isTrustedVerificationState(value.verificationState) &&
+  value.generated !== true &&
+  Object.prototype.hasOwnProperty.call(value, "rights") &&
+  value.rights !== null;
 
 export function validateProvenance(provenance = {}) {
   const errors = [];
