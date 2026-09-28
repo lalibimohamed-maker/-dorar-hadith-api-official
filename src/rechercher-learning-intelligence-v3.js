@@ -6,21 +6,23 @@
  * source-grounded learning contracts; it never mutates Corpus content.
  */
 
-export const LEARNING_METHODS = Object.freeze([
-  'retrieval',
-  'spacing',
-  'interleaving',
-  'worked_example',
-  'self_explanation',
-  'teach_back',
-  'comparison',
-  'source_criticism',
-  'transfer',
-  'reading',
-  'audio',
-  'visual',
-  'game'
-]);
+export const LEARNING_METHOD_REGISTRY = Object.freeze({
+  retrieval: { version: '1.0.0', targets: ['recall', 'discrimination'], stage: 'practice', feedbackRequired: true, measures: ['immediate_accuracy', 'delayed_retention'] },
+  spacing: { version: '1.0.0', targets: ['retention', 'retrieval_strength'], stage: 'review', feedbackRequired: true, measures: ['delayed_retention'] },
+  interleaving: { version: '1.0.0', targets: ['discrimination', 'transfer'], stage: 'practice', feedbackRequired: true, measures: ['transfer', 'error_correction'] },
+  worked_example: { version: '1.0.0', targets: ['application'], stage: 'instruction', feedbackRequired: true, measures: ['immediate_accuracy', 'transfer'] },
+  self_explanation: { version: '1.0.0', targets: ['explanation', 'metacognition'], stage: 'practice', feedbackRequired: true, measures: ['source_comprehension', 'transfer'] },
+  teach_back: { version: '1.0.0', targets: ['explanation', 'communication'], stage: 'practice', feedbackRequired: true, measures: ['source_comprehension', 'transfer'] },
+  comparison: { version: '1.0.0', targets: ['discrimination', 'comparison'], stage: 'practice', feedbackRequired: true, measures: ['error_correction', 'transfer'] },
+  source_criticism: { version: '1.0.0', targets: ['provenance', 'source_navigation'], stage: 'research', feedbackRequired: true, measures: ['research_quality'] },
+  transfer: { version: '1.0.0', targets: ['transfer'], stage: 'application', feedbackRequired: true, measures: ['transfer'] },
+  reading: { version: '1.0.0', targets: ['source_comprehension'], stage: 'instruction', feedbackRequired: false, measures: ['source_comprehension'] },
+  audio: { version: '1.0.0', targets: ['listening', 'retrieval'], stage: 'practice', feedbackRequired: true, measures: ['immediate_accuracy'] },
+  visual: { version: '1.0.0', targets: ['concept_mapping', 'discrimination'], stage: 'practice', feedbackRequired: true, measures: ['transfer'] },
+  game: { version: '1.0.0', targets: ['retrieval', 'engagement'], stage: 'practice', feedbackRequired: true, measures: ['delayed_retention', 'transfer'] }
+});
+
+export const LEARNING_METHODS = Object.freeze(Object.keys(LEARNING_METHOD_REGISTRY));
 
 export const LEARNING_PIPELINE = Object.freeze([
   'diagnose',
@@ -238,4 +240,9 @@ export function evaluateLearningIntervention({
 
 export function canLearningFailureBlockAcquisition() {
   return false;
+}
+
+
+export function getLearningMethodRegistry() {
+  return structuredClone(LEARNING_METHOD_REGISTRY);
 }
