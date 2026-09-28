@@ -101,6 +101,14 @@ jobs:
           if (source.languagePathTemplate !== 'https://www.islamreligion.com/{lang}/videos') throw new Error('IslamReligion localized video path template drifted');
           if (source.localizationEvidenceUrl !== 'https://www.islamreligion.com/ar/videos') throw new Error('IslamReligion localization evidence URL drifted');
           if ((x.islamicVideoSources?.find((s) => s.sourceId === 'islamreligion-videos')?.localizedEntryPoints?.supportedLanguages || []).length !== 15) throw new Error('engine language coverage drifted');
+          const category1033 = islamReligion.categories?.find((category) => category.id === '1033');
+          if (!category1033) throw new Error('IslamReligion category 1033 binding missing');
+          if (category1033.url !== 'https://www.islamreligion.com/fr/category/1033/preuves-que-lislam-est-la-verite') throw new Error('IslamReligion category 1033 French URL drifted');
+          if (category1033.localizedPathTemplate !== 'https://www.islamreligion.com/{lang}/category/1033/{localizedSlug}') throw new Error('IslamReligion category localization template drifted');
+          if (category1033.languageInvariantId !== true) throw new Error('IslamReligion category ID must remain language-invariant');
+          if (category1033.localizedSlugMustBeResolvedFromSource !== true) throw new Error('IslamReligion localized category slugs must be source-resolved');
+          const categorySource = (registry.sources || []).find((entry) => entry.id === 'islamreligion-videos');
+          if (!categorySource.collections?.some((collection) => collection.id === '1033')) throw new Error('source registry category 1033 entry missing');
           const requiredTrue = [
             'freeFirst','selfHostedPreferred','noPaidCoreDependency','noAutomaticPromotion',
             'noSilentReplacement','noCorpusMutation','noUnlicensedMediaReuse','noUnverifiedReligiousClaim',
