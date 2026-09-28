@@ -105,3 +105,8 @@ Every result must retain source name and URL. Reliability labels must distinguis
 
 ## Localization
 Arabic first, English second, then French, Turkish, Chinese, Korean, Polish, Spanish, Portuguese, German, Italian, Russian and Hindi. Detect device language, allow manual override, persist choice and switch RTL/LTR automatically.
+
+## Book Cache Governance
+The Book Cache is a technical layer, not an authority layer. A book may enter cache only after source identity/URL, provenance identity with a valid verification timestamp, an explicitly allowed redistribution-rights state, and successful validation are all present. Discovery alone never proves redistribution rights. The cache policy fails closed when any gate is missing or uncertain.
+
+For AI/RAG, cached book material remains source-attributed evidence only. Rights, provenance, verification and location metadata travel with the evidence; cached or generated wording never becomes canonical Corpus content.
