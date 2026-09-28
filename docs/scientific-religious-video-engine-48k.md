@@ -101,3 +101,19 @@ The current registry preserves all supplied routes as distinct resources. In par
 The evidence-oriented video category `/category/1033/evidence-islam-is-truth` currently lists 123 videos and links to subcategories including 17 scientific-miracles-of-the-Holy-Quran videos and 2 scientific-miracles-of-the-Prophet-Muhammad-Sayings videos on the English page. The site also exposes other video categories including Benefits of Islam, Worship and Practice, The Hereafter, Stories of New Muslims, Comparative Religion, The Holy Quran, The Prophet Muhammad, Current Issues, Islamic History, Systems in Islam, Islamic Songs, New Muslims, and Short Videos About Islam. citeturn810256view0turn947294search2
 
 These resources serve discovery, contextual research, documentary planning and source navigation. They do not automatically become scientific primary evidence, canonical religious text, or reusable media. Media reuse remains blocked until the rights layer records a compatible license or explicit permission.
+
+
+## Evidence-to-Original Multilingual Production
+
+English or other-language IslamReligion videos may be used as **research references** for the encyclopedia's original-video engine. The engine may extract claims, references, timestamps, presenters/authors, Quran references, hadith references, and scientific terms from a source video.
+
+The source video itself is not automatically copied into the new production. Raw-video reuse, audio reuse, frame reuse, clip reuse, and verbatim transcript reuse remain disabled by default. Any quotation or excerpt requires the rights policy to authorize it.
+
+The extracted material enters an independent verification stage:
+- Quran and hadith references are checked against canonical/qualified Islamic sources and hadith grading metadata.
+- Scientific statements are checked against independent scientific literature, institutional sources, datasets, or other authoritative scientific evidence.
+- Interpretive relationships remain explicitly labeled and cannot silently become scientific facts or religious rulings.
+
+After verification, the engine creates an original claim/evidence representation, original script, original visual plan, and localized narration. The source language of the reference video does not restrict the target language of the final production.
+
+The final provenance manifest records the originating IslamReligion video and its timestamps/references, alongside the independent evidence used to verify the resulting claims.
