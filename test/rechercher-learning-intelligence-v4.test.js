@@ -1,57 +1,125 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  createMemoryState,
-  recordFeedbackSignal,
-  summarizeSession,
-  createCrossDomainGraph,
-  addCrossDomainEdge,
-  findTransferRoutes,
-  evaluateTransfer,
-  applyPedagogicalSafety,
-  canLearningBlockAcquisition,
+  DEFAULT_FEEDBACK_BUFFER_LIMIT,
+  V4_VERSION,
+  appendFeedback,
+  appendSessionEvent,
+  chooseLearningAction,
+  createLongTermLearnerProfile,
+  createSessionMemory,
+  createTransferRoute,
+  evaluatePedagogicalSafety,
+  evaluateTransferRoute,
+  learningIntelligenceV4Policy,
+  persistLongTermMemory,
+  summarizeSession
 } from '../src/learning/rechercher-learning-intelligence-v4.mjs';
 
-test('v4 separates ephemeral session memory from long-term learner memory', () => {
-  let memory = createMemoryState({ session: { sessionId: 's1', currentSkillId: 'hadith' }, longTerm: { learnerId: 'u1' } });
-  memory = recordFeedbackSignal(memory, { type: 'hesitation', skillId: 'hadith', value: 1 });
-  assert.equal(memory.session.recentSignals.length, 1);
-  memory = summarizeSession(memory, { skillId: 'hadith', mastery: 0.72, confidence: 0.8, calibration: { state: 'overconfident' } });
-  assert.equal(memory.session.recentSignals.length, 0);
-  assert.equal(memory.longTerm.skills.hadith.mastery, 0.72);
-  assert.equal(memory.longTerm.calibration.state, 'overconfident');
+test('v4 is additive and keeps acquisition non-blocking', () => {
+  const policy = learningIntelligenceV4Policy();
+  assert.equal(V4_VERSION, '4.0.0');
+  assert.equal(policy.learningMayNotBlockPdfAcquisition, true);
+  assert.equal(policy.acquisitionBlocking, false);
 });
 
-test('v4 feedback buffer accepts micro-interaction signals without forcing persistence', () => {
-  const memory = recordFeedbackSignal(createMemoryState(), { type: 'pause', itemId: 'q1', value: 3200 });
-  assert.equal(memory.session.recentSignals[0].type, 'pause');
-  assert.equal(memory.session.recentSignals[0].value, 3200);
+test('session memory captures transient learning signals before durability', () => {
+  let session = createSessionMemory({ sessionId: 's1', learnerId: 'l1' });
+  session = appendSessionEvent(session, { skillId: 'skill-1', correct: false, sourceIds: ['src-1'] });
+  session = appendSessionEvent(session, { skillId: 'skill-1', correct: true, sourceIds: ['src-1'] });
+  const summary = summarizeSession(session);
+  assert.equal(summary.eventCount, 2);
+  assert.equal(summary.errors, 1);
+  assert.equal(summary.successes, 1);
+  assert.equal(session.durablePersistencePrepared, false);
 });
 
-test('v4 cross-domain graph exposes evidence-ranked transfer routes', () => {
-  const graph = createCrossDomainGraph({
-    domains: { quran: {}, arabic: {} },
-    skills: {
-      tajweed: { domain: 'quran' },
-      phonology: { domain: 'arabic' },
-    },
+test('feedback buffer is bounded', () => {
+  let session = createSessionMemory({ sessionId: 's2' });
+  for (let i = 0; i < DEFAULT_FEEDBACK_BUFFER_LIMIT + 10; i += 1) {
+    session = appendFeedback(session, { kind: 'hint', index: i });
+  }
+  assert.equal(session.feedbackBuffer.length, DEFAULT_FEEDBACK_BUFFER_LIMIT);
+  assert.equal(session.feedbackBuffer.at(-1).index, DEFAULT_FEEDBACK_BUFFER_LIMIT + 9);
+});
+
+test('long-term memory persists summaries rather than raw session events', () => {
+  const session = createSessionMemory({ sessionId: 's3', learnerId: 'l2' });
+  const summary = summarizeSession(session);
+  const durable = persistLongTermMemory({}, summary, { maxEntries: 2 });
+  assert.equal(durable.sessionSummariesOnly, true);
+  assert.equal(durable.rawSessionEventsPersisted, false);
+  assert.equal(durable.rawFeedbackPersisted, false);
+});
+
+test('learner profile remains evidence-minimal and separate from raw session memory', () => {
+  const profile = createLongTermLearnerProfile({
+    learnerId: 'l3',
+    mastery: { skillA: 0.7 },
+    preferredModality: 'text'
   });
-  const next = addCrossDomainEdge(graph, { from: 'tajweed', to: 'phonology', relation: 'supports', confidence: 0.9, evidence: ['e1'] });
-  assert.equal(findTransferRoutes(next, 'tajweed', 'arabic')[0].confidence, 0.9);
-  const result = evaluateTransfer({ sourceSkill: 'tajweed', targetSkill: 'phonology', result: { correct: true, score: 0.8, sourceGrounded: true }, confidence: 0.7 });
-  assert.equal(result.status, 'demonstrated');
-  assert.equal(result.evidenceLevel, 'source-grounded');
+  assert.equal(profile.mastery.skillA, 0.7);
+  assert.equal(profile.rawSessionData, false);
+  assert.equal(profile.rawFeedbackData, false);
 });
 
-test('v4 safety scaffolds before revealing an answer when struggle is detected', () => {
-  const safe = applyPedagogicalSafety({ response: 'answer', learnerState: { struggling: true }, context: { directAnswer: true } });
-  assert.equal(safe.action, 'scaffold-first');
-  assert.equal(safe.avoidDirectAnswer, true);
-  assert.equal(safe.allowed, false);
-  const ready = applyPedagogicalSafety({ response: 'hint', learnerState: { struggling: true }, context: { directAnswer: true, scaffolded: true } });
-  assert.equal(ready.allowed, true);
+test('transfer is represented explicitly and requires evidence support', () => {
+  const route = createTransferRoute({
+    id: 't1',
+    sourceSkillId: 'skill-a',
+    targetSkillId: 'skill-b',
+    sourceEvidenceIds: ['e-a'],
+    targetEvidenceIds: ['e-b']
+  });
+  assert.equal(route.explicit, true);
+  assert.equal(evaluateTransferRoute(route, [{ verified: true, provenanceId: 'p1', skillId: 'skill-a' }]).status, 'needs_review');
+  assert.equal(evaluateTransferRoute(route, [
+    { verified: true, provenanceId: 'p1', skillId: 'skill-a' },
+    { verified: true, provenanceId: 'p2', skillId: 'skill-b' }
+  ]).status, 'evidence_supported');
 });
 
-test('v4 cannot block PDF acquisition', () => {
-  assert.equal(canLearningBlockAcquisition(), false);
+test('direct answers are constrained when retrieval effort should be preserved', () => {
+  const guided = chooseLearningAction({
+    retrievalEffort: 0.8,
+    shouldPreserveRetrieval: true,
+    requestedDirectAnswer: true,
+    evidenceAvailable: true
+  });
+  assert.equal(guided.answerMode, 'guided-retrieval-first');
+  assert.equal(guided.directAnswerConstrained, true);
+
+  const direct = chooseLearningAction({
+    retrievalEffort: 0.0,
+    shouldPreserveRetrieval: false,
+    requestedDirectAnswer: true,
+    evidenceAvailable: true
+  });
+  assert.equal(direct.answerMode, 'direct-answer-with-evidence');
+});
+
+test('pedagogical safety blocks unsupported or authority-seeking generation', () => {
+  const unsafe = evaluatePedagogicalSafety({
+    sourceGrounded: false,
+    uncertaintyExplicit: false,
+    retrievalPreserved: false,
+    generatedClaim: true,
+    autonomousAuthorityRequested: true
+  });
+  assert.equal(unsafe.safe, false);
+  assert.equal(unsafe.acquisitionBlocking, false);
+
+  const safe = evaluatePedagogicalSafety({
+    sourceGrounded: true,
+    uncertaintyExplicit: true,
+    retrievalPreserved: true
+  });
+  assert.equal(safe.safe, true);
+});
+
+test('session event append preserves existing data', () => {
+  const s = createSessionMemory({ sessionId: 's4', sourceIds: ['x'] });
+  const next = appendSessionEvent(s, { skillId: 'k' });
+  assert.deepEqual(next.sourceIds, ['x']);
+  assert.equal(next.events.length, 1);
 });

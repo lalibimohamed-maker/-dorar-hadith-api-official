@@ -1,160 +1,277 @@
+import { createHash } from 'node:crypto';
+
 export const V4_VERSION = '4.0.0';
 
-export const MEMORY_TIERS = ['session', 'long_term'];
-export const FEEDBACK_SIGNALS = [
-  'pause',
-  'hesitation',
-  'revision',
-  'hint_request',
-  'answer_attempt',
-  'confidence_change',
-  'navigation',
-  'completion',
-];
+export const MEMORY_TYPES = Object.freeze([
+  'session',
+  'long_term'
+]);
 
-const clamp = (n, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, Number(n) || 0));
+export const TRANSFER_STATUSES = Object.freeze([
+  'candidate',
+  'evidence_supported',
+  'needs_review',
+  'completed'
+]);
 
-/**
- * Session memory is ephemeral and may be discarded at session end.
- * Long-term memory is an explicit learner-state summary, not a raw event log.
- */
-export function createMemoryState(input = {}) {
+export const PEDAGOGICAL_SAFETY_STATES = Object.freeze([
+  'source_grounded',
+  'retrieval_preserved',
+  'uncertainty_explicit',
+  'human_review_required',
+  'unsafe_for_autonomous_authority'
+]);
+
+export const DEFAULT_FEEDBACK_BUFFER_LIMIT = 32;
+
+const clamp = (n, lo = 0, hi = 1) =>
+  Math.max(lo, Math.min(hi, Number.isFinite(Number(n)) ? Number(n) : 0));
+
+const hash = (value) =>
+  createHash('sha256').update(JSON.stringify(value)).digest('hex');
+
+function requireText(value, field) {
+  if (typeof value !== 'string' || !value.trim()) {
+    throw new Error(`${field} is required`);
+  }
+  return value.trim();
+}
+
+function unique(values) {
+  return [...new Set(values)];
+}
+
+export function createSessionMemory(input = {}) {
   return {
-    version: V4_VERSION,
-    session: {
-      sessionId: input.session?.sessionId ?? null,
-      startedAt: input.session?.startedAt ?? null,
-      currentSkillId: input.session?.currentSkillId ?? null,
-      recentItems: Array.isArray(input.session?.recentItems) ? [...input.session.recentItems] : [],
-      recentSignals: Array.isArray(input.session?.recentSignals) ? [...input.session.recentSignals] : [],
-      workingHypotheses: { ...(input.session?.workingHypotheses || {}) },
-    },
-    longTerm: {
-      learnerId: input.longTerm?.learnerId ?? null,
-      skills: { ...(input.longTerm?.skills || {}) },
-      modalityProfile: { ...(input.longTerm?.modalityProfile || {}) },
-      calibration: { ...(input.longTerm?.calibration || {}) },
-      misconceptions: { ...(input.longTerm?.misconceptions || {}) },
-      transferHistory: Array.isArray(input.longTerm?.transferHistory) ? [...input.longTerm.transferHistory] : [],
-      updatedAt: input.longTerm?.updatedAt ?? null,
-    },
+    type: 'session',
+    version: 4,
+    learnerId: input.learnerId || null,
+    sessionId: requireText(input.sessionId, 'sessionId'),
+    startedAt: input.startedAt || null,
+    events: Array.isArray(input.events) ? [...input.events] : [],
+    feedbackBuffer: Array.isArray(input.feedbackBuffer) ? input.feedbackBuffer.slice(-DEFAULT_FEEDBACK_BUFFER_LIMIT) : [],
+    retrievalEffort: clamp(input.retrievalEffort ?? 0),
+    sourceIds: unique(input.sourceIds || []),
+    durablePersistencePrepared: false
   };
 }
 
-export function recordFeedbackSignal(memory, signal = {}) {
-  if (!FEEDBACK_SIGNALS.includes(signal.type)) throw new Error('invalid feedback signal');
-  const next = createMemoryState(memory);
-  const event = {
-    type: signal.type,
-    itemId: signal.itemId ?? null,
-    skillId: signal.skillId ?? null,
-    value: signal.value ?? null,
-    at: signal.at ?? null,
+export function appendSessionEvent(memory, event) {
+  const next = {
+    ...memory,
+    events: [...(memory?.events || []), { ...event }]
   };
-  next.session.recentSignals.push(event);
-  if (next.session.recentSignals.length > 50) next.session.recentSignals = next.session.recentSignals.slice(-50);
   return next;
 }
 
-/** Convert granular session evidence into a compact, reviewable learner-state update. */
-export function summarizeSession(memory, { skillId, mastery, confidence, modality, calibration } = {}) {
-  const next = createMemoryState(memory);
-  if (skillId) {
-    next.longTerm.skills[skillId] = {
-      ...(next.longTerm.skills[skillId] || {}),
-      mastery: clamp(mastery ?? next.longTerm.skills[skillId]?.mastery ?? 0),
-      lastSessionId: next.session.sessionId,
-    };
-  }
-  if (modality) {
-    next.longTerm.modalityProfile[modality] = {
-      ...(next.longTerm.modalityProfile[modality] || {}),
-      proficiency: clamp(proficiencyValue(modality, next, memory)),
-    };
-  }
-  if (Number.isFinite(confidence)) next.longTerm.calibration.lastConfidence = clamp(confidence);
-  if (calibration) next.longTerm.calibration = { ...next.longTerm.calibration, ...calibration };
-  next.longTerm.updatedAt = new Date().toISOString();
-  next.session.recentSignals = [];
-  return next;
-}
-
-function proficiencyValue(modality, next, previous) {
-  const current = next.longTerm.modalityProfile[modality]?.proficiency;
-  if (Number.isFinite(current)) return current;
-  return clamp(previous?.longTerm?.modalityProfile?.[modality]?.proficiency ?? 0);
-}
-
-export function createCrossDomainGraph(input = {}) {
+export function appendFeedback(memory, feedback, limit = DEFAULT_FEEDBACK_BUFFER_LIMIT) {
+  const boundedLimit = Math.max(1, Math.floor(Number(limit) || DEFAULT_FEEDBACK_BUFFER_LIMIT));
+  const buffer = [...(memory?.feedbackBuffer || []), { ...feedback }];
   return {
-    version: V4_VERSION,
-    domains: { ...(input.domains || {}) },
-    skills: { ...(input.skills || {}) },
-    edges: Array.isArray(input.edges) ? [...input.edges] : [],
+    ...memory,
+    feedbackBuffer: buffer.slice(-boundedLimit)
   };
 }
 
-export function addCrossDomainEdge(graph, edge) {
-  if (!edge?.from || !edge?.to || edge.from === edge.to || !edge.relation) throw new Error('invalid cross-domain edge');
-  if (!graph.skills?.[edge.from] || !graph.skills?.[edge.to]) throw new Error('cross-domain endpoints must exist');
-  const next = createCrossDomainGraph(graph);
-  next.edges.push({
-    from: edge.from,
-    to: edge.to,
-    relation: edge.relation,
-    evidence: edge.evidence ?? [],
-    confidence: clamp(edge.confidence ?? 0.5),
+export function summarizeSession(memory) {
+  if (!memory || memory.type !== 'session') {
+    throw new Error('session memory required');
+  }
+
+  const events = Array.isArray(memory.events) ? memory.events : [];
+  const feedback = Array.isArray(memory.feedbackBuffer) ? memory.feedbackBuffer : [];
+  const summary = {
+    type: 'session_summary',
+    sessionId: memory.sessionId,
+    learnerId: memory.learnerId,
+    eventCount: events.length,
+    sourceIds: unique([
+      ...(memory.sourceIds || []),
+      ...events.flatMap((event) => event.sourceIds || []),
+      ...feedback.flatMap((item) => item.sourceIds || [])
+    ]),
+    attemptedSkills: unique(events.map((event) => event.skillId).filter(Boolean)),
+    errors: events.filter((event) => event.correct === false).length,
+    successes: events.filter((event) => event.correct === true).length,
+    retrievalEffort: clamp(memory.retrievalEffort),
+    feedbackSignals: feedback.map((item) => ({
+      kind: item.kind || 'unspecified',
+      accepted: item.accepted === true,
+      sourceGrounded: item.sourceGrounded === true
+    })),
+    generatedAt: new Date().toISOString(),
+  };
+
+  return Object.freeze({
+    ...summary,
+    summaryHash: hash(summary)
   });
-  return next;
 }
 
-export function findTransferRoutes(graph, fromSkillId, targetDomain) {
-  const routes = [];
-  for (const edge of graph.edges || []) {
-    if (edge.from !== fromSkillId) continue;
-    const target = graph.skills[edge.to];
-    if (target?.domain === targetDomain) routes.push({ ...edge, targetSkillId: edge.to });
+export function persistLongTermMemory(existing = {}, sessionSummary, options = {}) {
+  if (!sessionSummary || sessionSummary.type !== 'session_summary') {
+    throw new Error('session summary required');
   }
-  return routes.sort((a, b) => b.confidence - a.confidence);
-}
 
-export function evaluateTransfer({ sourceSkill, targetSkill, result, confidence = 0.5 } = {}) {
-  const correct = Boolean(result?.correct);
-  const transferScore = correct ? clamp(result?.score ?? 1) : 0;
-  return {
-    sourceSkill,
-    targetSkill,
-    transferScore,
-    confidence: clamp(confidence),
-    evidenceLevel: result?.sourceGrounded ? 'source-grounded' : 'observed',
-    status: transferScore >= 0.7 ? 'demonstrated' : 'needs-practice',
+  const prior = existing || {};
+  const entries = Array.isArray(prior.entries) ? [...prior.entries] : [];
+  const retention = Math.max(1, Math.floor(Number(options.maxEntries) || 100));
+  const entry = {
+    ...sessionSummary,
+    persistedAt: new Date().toISOString()
   };
+
+  return Object.freeze({
+    type: 'long_term',
+    learnerId: prior.learnerId || sessionSummary.learnerId || null,
+    version: 4,
+    entries: [...entries, entry].slice(-retention),
+    sessionSummariesOnly: true,
+    rawSessionEventsPersisted: false,
+    rawFeedbackPersisted: false,
+    retentionLimit: retention
+  });
 }
 
-export const SAFETY_POLICIES = {
-  preserveStruggle: true,
-  scaffoldBeforeAnswer: true,
-  noAnswerDump: true,
-  progressiveDisclosure: true,
-  learnerAgency: true,
-  sourceGrounded: true,
-  rightsAware: true,
-  noBiometricInferenceByDefault: true,
-};
+export function createTransferRoute({
+  id,
+  sourceSkillId,
+  targetSkillId,
+  relation = 'transfer_to',
+  sourceEvidenceIds = [],
+  targetEvidenceIds = [],
+  status = 'candidate'
+} = {}) {
+  requireText(id, 'id');
+  requireText(sourceSkillId, 'sourceSkillId');
+  requireText(targetSkillId, 'targetSkillId');
 
-export function applyPedagogicalSafety({ response, learnerState = {}, context = {} } = {}) {
-  const text = String(response ?? '');
-  const directAnswer = Boolean(context.directAnswer);
-  const hintRequested = Boolean(context.hintRequested);
-  const struggling = Boolean(learnerState.struggling || learnerState.repeatedErrors);
-  const shouldScaffold = SAFETY_POLICIES.scaffoldBeforeAnswer && (hintRequested || struggling) && directAnswer;
-  return {
-    allowed: Boolean(text) && (!shouldScaffold || context.scaffolded === true),
-    action: shouldScaffold ? 'scaffold-first' : 'deliver',
-    avoidDirectAnswer: shouldScaffold,
-    preserveAgency: true,
-    reason: shouldScaffold ? 'support retrieval before revealing the answer' : 'no pedagogical safety conflict detected',
-  };
+  if (!TRANSFER_STATUSES.includes(status)) {
+    throw new Error('invalid transfer status');
+  }
+
+  return Object.freeze({
+    id,
+    sourceSkillId,
+    targetSkillId,
+    relation,
+    sourceEvidenceIds: unique(sourceEvidenceIds),
+    targetEvidenceIds: unique(targetEvidenceIds),
+    status,
+    explicit: true,
+    sameSkillAssumption: false
+  });
 }
 
-export function canLearningBlockAcquisition() { return false; }
+export function evaluateTransferRoute(route = {}, evidence = []) {
+  if (!route?.sourceSkillId || !route?.targetSkillId) {
+    throw new Error('transfer route requires source and target skills');
+  }
+
+  const supported = evidence.filter((item) =>
+    item?.verified === true &&
+    item?.provenanceId &&
+    (item.skillId === route.sourceSkillId || item.skillId === route.targetSkillId)
+  );
+
+  if (supported.length < 2) {
+    return Object.freeze({
+      status: 'needs_review',
+      supportedEvidence: supported.length,
+      route: { ...route, status: 'needs_review' }
+    });
+  }
+
+  return Object.freeze({
+    status: 'evidence_supported',
+    supportedEvidence: supported.length,
+    route: { ...route, status: 'evidence_supported' }
+  });
+}
+
+export function createLongTermLearnerProfile(input = {}) {
+  return Object.freeze({
+    learnerId: input.learnerId || null,
+    mastery: { ...(input.mastery || {}) },
+    prerequisites: { ...(input.prerequisites || {}) },
+    retrievalStrength: { ...(input.retrievalStrength || {}) },
+    recentErrors: Array.isArray(input.recentErrors) ? [...input.recentErrors] : [],
+    confidence: { ...(input.confidence || {}) },
+    learningHistory: Array.isArray(input.learningHistory) ? [...input.learningHistory] : [],
+    sourceProgress: { ...(input.sourceProgress || {}) },
+    preferredModality: input.preferredModality || null,
+    sessionSummaryCount: Number(input.sessionSummaryCount || 0),
+    rawSessionData: false,
+    rawFeedbackData: false
+  });
+}
+
+export function chooseLearningAction({
+  retrievalEffort = 0,
+  shouldPreserveRetrieval = false,
+  requestedDirectAnswer = false,
+  evidenceAvailable = true,
+  preferredModality = null,
+  scaffold = null
+} = {}) {
+  const effort = clamp(retrievalEffort);
+  const preserve = shouldPreserveRetrieval === true && effort > 0;
+  const answerMode =
+    !evidenceAvailable ? 'withhold-and-request-evidence' :
+    preserve && requestedDirectAnswer ? 'guided-retrieval-first' :
+    requestedDirectAnswer ? 'direct-answer-with-evidence' :
+    'guided-practice';
+
+  return Object.freeze({
+    answerMode,
+    retrievalPreserved: preserve,
+    preferredModality,
+    scaffold,
+    sourceGrounded: evidenceAvailable === true,
+    directAnswerConstrained: answerMode === 'guided-retrieval-first'
+  });
+}
+
+export function evaluatePedagogicalSafety({
+  sourceGrounded = false,
+  uncertaintyExplicit = false,
+  retrievalPreserved = true,
+  generatedClaim = false,
+  scholarlyReviewRequired = false,
+  humanReviewAvailable = true,
+  autonomousAuthorityRequested = false
+} = {}) {
+  const failures = [];
+  if (!sourceGrounded) failures.push('source_grounding_required');
+  if (!uncertaintyExplicit) failures.push('uncertainty_must_be_explicit');
+  if (!retrievalPreserved) failures.push('retrieval_effort_was_bypassed');
+  if (generatedClaim) failures.push('generated_claim_cannot_be_authoritative_evidence');
+  if (scholarlyReviewRequired && !humanReviewAvailable) failures.push('human_review_route_required');
+  if (autonomousAuthorityRequested) failures.push('autonomous_religious_authority_forbidden');
+
+  return Object.freeze({
+    safe: failures.length === 0,
+    state: failures.length === 0 ? 'source_grounded' : 'unsafe_for_autonomous_authority',
+    failures,
+    humanReviewRequired: scholarlyReviewRequired === true,
+    acquisitionBlocking: false
+  });
+}
+
+export function learningIntelligenceV4Policy() {
+  return Object.freeze({
+    version: V4_VERSION,
+    sessionMemory: true,
+    durablePersistenceUsesSessionSummaryOnly: true,
+    boundedFeedbackBuffer: true,
+    feedbackBufferDefaultLimit: DEFAULT_FEEDBACK_BUFFER_LIMIT,
+    explicitTransferRoutes: true,
+    evidenceGrounded: true,
+    verifiedCorpusRemainsAuthoritative: true,
+    directAnswersMayBeConstrained: true,
+    pedagogicalSafety: true,
+    rawSessionEventsDurablyStoredByDefault: false,
+    learningMayNotBlockPdfAcquisition: true,
+    acquisitionBlocking: false
+  });
+}
