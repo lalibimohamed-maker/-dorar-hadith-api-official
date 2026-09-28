@@ -33,6 +33,9 @@ jobs:
       - name: Run security baseline
         run: node scripts/security-baseline.mjs
 
+      - name: Verify security policy contract
+        run: npm run test:security-policy
+
       - name: Check JavaScript syntax
         run: npm run health
 
