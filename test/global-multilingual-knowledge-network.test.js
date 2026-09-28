@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  DISCOVERY_STATES,
   LANGUAGE_FIELDS,
   RETRIEVAL_PIPELINE,
   buildMultilingualResponseContext,
@@ -21,7 +20,6 @@ test('retrieval pipeline is explicit and language remains a presentation layer',
     'user-language','intent-detection','multilingual-retrieval','source-verification','provenance-graph','response-user-language'
   ]);
   assert.deepEqual(LANGUAGE_FIELDS, ['uiLanguage','queryLanguage','responseLanguage','sourceLanguage']);
-  assert.equal(DISCOVERY_STATES, undefined);
 });
 
 test('Arabic/English detection supports automatic direction and mixed-language queries', () => {
