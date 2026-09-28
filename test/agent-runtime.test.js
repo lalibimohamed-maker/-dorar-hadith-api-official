@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { routeIntent } from '../src/ai/agent-intent-router.mjs';
 import { buildEvidenceContext } from '../src/ai/evidence-context-builder.mjs';
 import { verifyAgentResponse } from '../src/ai/response-verifier.mjs';
-import { runAgent } from '../src/ai/agent-runtime.mjs';
+import { runAgent, retrieveAgentEvidence } from '../src/ai/agent-runtime.mjs';
 
 test('intent router distinguishes common religious question types', () => {
   assert.equal(routeIntent('ما حكم زكاة المال؟').intent, 'fiqh');
@@ -34,6 +34,27 @@ test('response verifier rejects invented citations and unsupported answers', () 
   assert.equal(verifyAgentResponse({ answer: 'answer [E9]', evidence }).status, 'rejected');
   assert.equal(verifyAgentResponse({ answer: 'answer', evidence }).status, 'rejected');
   assert.equal(verifyAgentResponse({ answer: 'answer [E1]', evidence }).status, 'verified-structure');
+});
+
+test('semantic retrieval and reranking can be exercised without real model weights', async () => {
+  const searchResult = {
+    sourceMatches: [
+      { id: 'source:1', text: 'إجابة عن الحج', source: 'source:1', verification: 'verified', rights: 'catalog-only' },
+      { id: 'source:2', text: 'إجابة عن الصلاة', source: 'source:2', verification: 'verified', rights: 'catalog-only' }
+    ]
+  };
+  const result = await retrieveAgentEvidence({
+    query: 'الحج',
+    searchResult,
+    env: { DEEN_EMBEDDING_MODEL_PATH: 'fixture.gguf', DEEN_RERANKER_MODEL_PATH: 'fixture.gguf' },
+    embedFn: async ({ texts }) => ({
+      embeddings: texts.map((value, index) => index === 0 ? [1, 0] : value.includes('الحج') ? [1, 0] : [0, 1])
+    }),
+    rerankFn: async ({ documents }) => documents.map((document, index) => ({ document, score: documents.length - index }))
+  });
+  assert.equal(result.retrieval.semantic.active, true);
+  assert.equal(result.retrieval.reranker.active, true);
+  assert.equal(result.evidence[0].id, 'source:1');
 });
 
 test('agent executes model-tools-evidence-verification loop with injected generator', async () => {
