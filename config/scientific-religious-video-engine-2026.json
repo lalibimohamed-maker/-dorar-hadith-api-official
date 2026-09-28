@@ -497,7 +497,7 @@
           "parent": "videos",
           "url": "https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite",
           "languageInvariantId": true,
-          "localizedSlugMustBeResolvedFromSource": true,
+          "localizedSlugMustBeResolvedFromSource": false,
           "role": "dawah_video_category_reference",
           "observedFrenchVideoCount": 5,
           "observedFrenchSubcategories": [
@@ -506,7 +506,6 @@
           ],
           "includesScientificMiraclesSubcategoryInSiteTaxonomy": true,
           "mediaBoundary": "reference_only_until_explicit_license_or_permission",
-          "languageScopedCategoryId": false,
           "languageIdInvariant": true,
           "urlRole": "verified_french_category_entry",
           "languageVariants": [
@@ -533,7 +532,7 @@
             },
             {
               "lang": "ru",
-              "categoryId": null,
+              "categoryId": "33",
               "slug": null,
               "url": null,
               "verified": false,
@@ -550,7 +549,9 @@
           ],
           "localizedPathRule": "Preserve the category route and switch only the leading language index; English is the unprefixed default. Do not synthesize localized IDs or slugs.",
           "note": "Verified French localized category uses ID 33; an earlier category classification was incorrect and has been removed.",
-          "localizedRouteTemplate": "https://www.islamreligion.com/{lang}/category/33/preuves-que-lislam-est-la-verite"
+          "localizedRouteTemplate": "https://www.islamreligion.com/{lang}/category/33/preuves-que-lislam-est-la-verite",
+          "languageIndexedRoute": true,
+          "routeRule": "Replace only the leading language index for localized routes; English uses the unprefixed default. Preserve the source route exactly unless the source navigation supplies another URL."
         }
       ],
       "canonicalHome": "https://www.islamreligion.com/",
