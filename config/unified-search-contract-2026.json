@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "unified-search-contract-2026",
+  "endpoint": "/search",
+  "userFacingSurface": "single",
+  "orchestration": {
+    "officialDorarHadithRetrieval": true,
+    "sourceAwareKnowledgeIndex": true,
+    "internalParallelProviders": true
+  },
+  "resultPolicy": {
+    "sourceAttributionRequired": true,
+    "potentialRelationshipsSeparate": true,
+    "verifiedEvidenceSeparate": true,
+    "discoveryDoesNotEqualAuthority": true
+  },
+  "fields": {
+    "sourceMatches": "merged source-aware discovery/indexed results",
+    "verifiedEvidence": "results explicitly classified as verified evidence",
+    "potentialMatches": "potential or interpretive relationships kept outside verifiedEvidence"
+  },
+  "corpusPolicy": {
+    "externalDiscoveryCannotEnterCorpusDirectly": true,
+    "digitalMasterPromotionRequiresGovernance": true
+  }
+}
