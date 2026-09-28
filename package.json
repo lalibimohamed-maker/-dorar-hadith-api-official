@@ -43,7 +43,9 @@
     "learning:capabilities": "node --input-type=module -e \"import('./src/learning/learning-orchestrator.mjs').then(m=>console.log(JSON.stringify(m.createLearningOrchestrator({}).getContextState(),null,2)))\"",
     "test:learning-strategy": "node --test test/global-learning-strategy.test.js",
     "test:learning-gaps": "node --test test/learning-gap-register.test.js",
-    "learning:gaps": "node --input-type=module -e \"import('./src/learning/learning-gap-register.mjs').then(m=>console.log(JSON.stringify(m.summarizeLearningGaps(),null,2)))\""
+    "learning:gaps": "node --input-type=module -e \"import('./src/learning/learning-gap-register.mjs').then(m=>console.log(JSON.stringify(m.summarizeLearningGaps(),null,2)))\"",
+    "test:learning-v3": "node --test test/rechercher-learning-intelligence-v3.test.js",
+    "learning:v3:capabilities": "node --input-type=module -e \"import('./src/learning/rechercher-learning-intelligence-v3.mjs').then(m=>console.log(JSON.stringify(m.getV3Capabilities(),null,2)))\""
   },
   "engines": {
     "node": ">=20"
