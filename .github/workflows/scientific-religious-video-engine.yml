@@ -107,16 +107,15 @@ jobs:
           if (languageDiscovery.currentObservedCount < 15) throw new Error('IslamReligion observed language coverage regressed');
           const category33 = islamReligion.categories?.find((category) => category.id === '33');
           if (!category33) throw new Error('IslamReligion category 33 binding missing');
-          if (category33.url !== 'https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite') throw new Error('IslamReligion category 33 French URL drifted');
-          if (category33.languageScopedCategoryId !== true) throw new Error('IslamReligion category IDs must remain language-scoped');
-          if (category33.languageIdInvariant !== false) throw new Error('IslamReligion category ID invariant flag drifted');
+          if (category33.url !== 'https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite') throw new Error('IslamReligion French category 33 URL drifted');
+          if (category33.languageIdInvariant !== true) throw new Error('IslamReligion category 33 ID should remain language-invariant');
+          if (category33.localizedSlugMustBeResolvedFromSource !== false) throw new Error('IslamReligion category route must not require synthetic slug translation');
+          if (category33.languageIndexedRoute !== true) throw new Error('IslamReligion category language-index routing flag missing');
+          if (category33.localizedRouteTemplate !== 'https://www.islamreligion.com/{lang}/category/33/preuves-que-lislam-est-la-verite') throw new Error('IslamReligion localized category route template drifted');
           const variants = new Map((category33.languageVariants || []).map((entry) => [entry.lang, entry]));
-          for (const lang of ['fr','en','es','ru','ar']) if (!variants.has(lang)) throw new Error(`IslamReligion category language variant missing: ${lang}`);
-          if (variants.get('fr').categoryId !== '33') throw new Error('French category 33 binding drifted');
-          if (variants.get('en').categoryId !== '33') throw new Error('English category 33 binding drifted');
-          if (variants.get('es').categoryId !== '33') throw new Error('Spanish category 33 binding drifted');
-          if (variants.get('ru').discoveryRequired !== true || variants.get('ar').discoveryRequired !== true) throw new Error('Unverified localized category IDs must require source discovery');
-          if (category33.localizedSlugMustBeResolvedFromSource !== true) throw new Error('IslamReligion localized category slugs must be source-resolved');
+          for (const lang of ['fr','en','es','ar']) if (!variants.has(lang)) throw new Error(`IslamReligion category language variant missing: ${lang}`);
+          for (const lang of ['fr','en','es','ar']) if (variants.get(lang).categoryId !== '33') throw new Error(`IslamReligion category ID drifted for ${lang}`);
+          if (!variants.get('ar').verified) throw new Error('Arabic language-index category route is not verified');
           const categorySource = (registry.sources || []).find((entry) => entry.id === 'islamreligion-videos');
           if (!categorySource.collections?.some((collection) => collection.id === '33')) throw new Error('source registry category 33 entry missing');
           const requiredTrue = [
