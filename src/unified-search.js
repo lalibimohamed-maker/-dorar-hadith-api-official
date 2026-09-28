@@ -63,6 +63,27 @@ export function buildUnifiedSourceRecords() {
   });
 }
 
+
+function normalizeHadithEvidence(hadithData = {}) {
+  const items = Array.isArray(hadithData?.ahadith) ? hadithData.ahadith : [];
+  return items.map((item, index) => {
+    const text = typeof item?.th === "string" ? item.th.trim() : "";
+    if (!text) return null;
+    return {
+      id: item.id || item.key || `dorar-hadith:${index + 1}`,
+      text,
+      source: item.url || item.href || "https://dorar.net/",
+      title: item.title || item.book || item.source || "الموسوعة الحديثية",
+      verification: item.hkm || item.grade || item.verification || "source-result",
+      narrator: item.rawi || item.narrator || null,
+      scholar: item.mohdith || item.scholar || null,
+      reference: item.takhrij || item.reference || item.locator || null,
+      sourceKind: "dorar-hadith-api",
+      corpus: "sunni"
+    };
+  }).filter(Boolean);
+}
+
 function fiqhMatches(query) {
   return searchFiqhResearch(query).map((item) => ({
     ...item,
@@ -106,6 +127,7 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
     query,
     responseLanguage: responseLocale,
     hadith: hadithData,
+    hadithEvidence: normalizeHadithEvidence(hadithData),
     scholarMatches,
     sourceMatches: mergedSourceMatches.map((item) => ({ ...item, evidence: buildEvidence(item) })),
     fiqhResearch: {
