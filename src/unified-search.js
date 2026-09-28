@@ -92,21 +92,21 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
     timeoutMs: 1200,
     maxConcurrent: 8,
     jobs: [
-      { id: "dorar-hadith", run: ({ signal: providerSignal }) => searchDorar(query, { signal: providerSignal }) },
+      { id: "dorar-hadith", cacheable: true, retryable: true, run: ({ signal: providerSignal }) => searchDorar(query, { signal: providerSignal }) },
       {
-        id: "unified-source-index",
+        id: "unified-source-index", cacheable: true, retryable: true,
         run: () => searchUnified(query, records, {
           includePotentialMatches,
           corpus: "sunni",
           requireSource: true
         })
       },
-      { id: "fiqh", run: () => fiqhMatches(query) },
-      { id: "historical", run: () => buildHistoricalResearchContext(query) },
-      { id: "official-institutions", run: () => searchOfficialInstitutions(query) },
-      { id: "rijal", run: () => searchRijalResearch(query) },
-      { id: "scholars", run: () => searchScholars(query, { limit: 20 }) },
-      { id: "knowledge-context", run: () => getKnowledgeContext({ query }) }
+      { id: "fiqh", cacheable: true, retryable: true, run: () => fiqhMatches(query) },
+      { id: "historical", cacheable: true, retryable: true, run: () => buildHistoricalResearchContext(query) },
+      { id: "official-institutions", cacheable: true, retryable: true, run: () => searchOfficialInstitutions(query) },
+      { id: "rijal", cacheable: true, retryable: true, run: () => searchRijalResearch(query) },
+      { id: "scholars", cacheable: true, retryable: true, run: () => searchScholars(query, { limit: 20 }) },
+      { id: "knowledge-context", cacheable: true, retryable: true, run: () => getKnowledgeContext({ query }) }
     ]
   });
 
