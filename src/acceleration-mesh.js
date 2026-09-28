@@ -9,6 +9,14 @@ function toPositiveInt(value, fallback) {
   return Number.isFinite(number) && number > 0 ? Math.floor(number) : fallback;
 }
 
+function acceptsEncoding(header, encoding) {
+  const value = String(header || "").toLowerCase();
+  const wildcard = /(?:^|,)\s*\*\s*(?:;|,|$)/.test(value);
+  const match = value.match(new RegExp(`(?:^|,)\\s*${encoding}\\s*(?:;\\s*q\\s*=\\s*([0-9.]+))?(?:,|$)`));
+  if (match) return Number(match[1] ?? 1) > 0;
+  return wildcard && !new RegExp(`(?:^|,)\\s*${encoding}\\s*;\\s*q\\s*=\\s*0(?:[.]0*)?(?:,|$)`).test(value);
+}
+
 export function createAccelerationMesh(options = {}) {
   const maxEntries = toPositiveInt(options.maxEntries, DEFAULT_MAX_ENTRIES);
   const maxBytes = toPositiveInt(options.maxBytes, DEFAULT_MAX_BYTES);
@@ -77,7 +85,6 @@ export function createAccelerationMesh(options = {}) {
       contentType: meta.contentType || "application/json; charset=utf-8",
       etag: meta.etag || `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`,
       ttlMs,
-      staleWhileRevalidate: toPositiveInt(meta.staleWhileRevalidate, 0),
       expiresAt: Date.now() + ttlMs,
     };
     cache.set(key, entry);
@@ -101,12 +108,11 @@ export function createAccelerationMesh(options = {}) {
   function compress(body, acceptEncoding) {
     const input = Buffer.isBuffer(body) ? body : Buffer.from(body);
     if (input.length < minCompressBytes) return { body: input, encoding: null };
-    const accepts = String(acceptEncoding || "").toLowerCase();
-    if (accepts.includes("br")) {
+    if (acceptsEncoding(acceptEncoding, "br")) {
       compressedResponses += 1;
       return { body: zlib.brotliCompressSync(input), encoding: "br" };
     }
-    if (accepts.includes("gzip")) {
+    if (acceptsEncoding(acceptEncoding, "gzip")) {
       compressedResponses += 1;
       return { body: zlib.gzipSync(input, { level: zlib.constants.Z_BEST_SPEED }), encoding: "gzip" };
     }
@@ -116,6 +122,7 @@ export function createAccelerationMesh(options = {}) {
   function profile() {
     return {
       enabled: true,
+      tier: "L1-memory",
       entries: cache.size,
       bytes,
       maxEntries,
@@ -127,6 +134,7 @@ export function createAccelerationMesh(options = {}) {
       compressedResponses,
       etagHits,
       coalesced,
+      externalBackends: "optional-not-loaded",
     };
   }
 
@@ -140,7 +148,11 @@ export function createAccelerationMesh(options = {}) {
 export function cachePolicyForPath(pathname) {
   const path = String(pathname || "/");
   if (path === "/health" || path === "/performance" || path === "/" || path === "/assistant") return { cache: false };
-  if (path === "/search" || path.startsWith("/research/scholars") || path.startsWith("/fiqh/research")) return { cache: true, ttlMs: 8_000, staleWhileRevalidate: 30 };
-  if (path.startsWith("/quran/ayah") || path.startsWith("/quran/translations")) return { cache: true, ttlMs: 120_000, staleWhileRevalidate: 600 };
-  return { cache: true, ttlMs: 60_000, staleWhileRevalidate: 300 };
+  if (path === "/search" || path.startsWith("/research/scholars") || path.startsWith("/fiqh/research")) {
+    return { cache: true, ttlMs: 8_000 };
+  }
+  if (path.startsWith("/quran/ayah") || path.startsWith("/quran/translations")) {
+    return { cache: true, ttlMs: 120_000 };
+  }
+  return { cache: true, ttlMs: 60_000 };
 }
