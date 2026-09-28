@@ -3,7 +3,12 @@ import assert from "node:assert/strict";
 import { buildBookDeliveryPolicy, buildQuranReadingRepresentation, normalizeSupportedFormats, QURAN_POLICY, READER_PIPELINE } from "../src/universal-reader-policy.js";
 
 test("redistributable book gets the digital master in the requested language", () => {
-  const result = buildBookDeliveryPolicy({ rights: { status: "public-domain" }, language: { browserLanguage: "fr" } });
+  const result = buildBookDeliveryPolicy({
+    rights: { status: "public-domain" },
+    language: { browserLanguage: "fr" },
+    provenanceVerified: true,
+    validationPassed: true
+  });
   assert.equal(result.language, "fr");
   assert.equal(result.canRead, true);
   assert.equal(result.canCopyText, true);
