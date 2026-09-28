@@ -81,6 +81,41 @@ jobs:
           const expectedGates = ['rights','evidence_verification','scientific_religious_integrity','security','arabic_quality','audiovisual_quality','performance_resource_cost','provenance','human_review','CI'];
           for (const gate of expectedGates) if (!x.promotionPolicy?.gates?.includes(gate)) throw new Error(`missing promotion gate: ${gate}`);
           if (x.promotionPolicy?.automaticRuntimePromotion !== false) throw new Error('automatic promotion must remain disabled');
+          const e2o = x.evidenceToOriginalMultilingualProduction;
+          if (!e2o?.enabled) throw new Error('evidence-to-original multilingual production must be enabled');
+          if (e2o.sourceVideoUse?.rawVideoReuse !== false ||
+              e2o.sourceVideoUse?.audioReuse !== false ||
+              e2o.sourceVideoUse?.frameReuse !== false ||
+              e2o.sourceVideoUse?.clipReuse !== false ||
+              e2o.sourceVideoUse?.transcriptVerbatimReuse !== false) {
+            throw new Error('reference-video reuse boundary drifted');
+          }
+          if (e2o.sourceVideoUse?.briefQuotationOnlyWhenRightsPolicyAuthorizes !== true) throw new Error('quotation rights gate missing');
+          for (const field of ['sourceVideoId','sourceUrl','title','creator','claimStatements','supportingReferences','timestamps']) {
+            if (!e2o.extraction?.capture?.includes(field)) throw new Error(`video evidence extraction field missing: ${field}`);
+          }
+          if (e2o.extraction?.distinguishPresenterClaimFromIndependentEvidence !== true) throw new Error('presenter-claim/evidence separation missing');
+          if (e2o.verification?.scientificClaims?.sourceVideoAloneInsufficient !== true) throw new Error('scientific independence gate missing');
+          if (e2o.verification?.interpretiveLinks?.cannotPromoteToScientificFact !== true ||
+              e2o.verification?.interpretiveLinks?.cannotPromoteToReligiousRuling !== true) {
+            throw new Error('interpretive-link promotion guard missing');
+          }
+          if (e2o.multilingualProduction?.targetLanguageScope !== 'all_languages_supported_by_Din_Allah_Encyclopedia') throw new Error('global target-language scope drifted');
+          if (e2o.multilingualProduction?.siteLanguageListIsNotTargetLanguageLimit !== true) throw new Error('site language list must not cap encyclopedia target languages');
+          const requiredFlow = [
+            'source_video_reference','evidence_extraction','independent_verification',
+            'neutral_claim_evidence_representation','original_script_generation',
+            'target_language_translation_and_localization','original_visual_generation_or_rights_cleared_media',
+            'target_language_narration','rights_and_provenance_validation'
+          ];
+          for (const stage of requiredFlow) if (!e2o.multilingualProduction?.flow?.includes(stage)) throw new Error(`multilingual production stage missing: ${stage}`);
+          if (e2o.multilingualProduction?.preserveCanonicalQuranArabic !== true) throw new Error('canonical Quran Arabic preservation missing');
+          if (e2o.multilingualProduction?.recitationRemainsArabic !== true) throw new Error('Quran recitation language rule drifted');
+          if (e2o.output?.originalScriptRequired !== true ||
+              e2o.output?.originalVisualPlanRequired !== true ||
+              e2o.output?.sourceVideoDoesNotBecomeOutputMediaByDefault !== true) {
+            throw new Error('original-production output boundary missing');
+          }
           const islamReligion = (x.islamicVideoSources || []).find((s) => s.sourceId === 'islamreligion-videos');
           if (!islamReligion) throw new Error('IslamReligion video source binding missing');
           if (islamReligion.localizedEntryPoints?.fr !== 'https://www.islamreligion.com/fr/videos') throw new Error('IslamReligion French video URL drifted');
