@@ -441,8 +441,30 @@
       "sourceId": "islamreligion-videos",
       "name": "IslamReligion.com — Videos",
       "localizedEntryPoints": {
-        "fr": "https://www.islamreligion.com/fr/videos",
-        "en": "https://www.islamreligion.com/videos"
+        "template": "https://www.islamreligion.com/{lang}/videos",
+        "english": "https://www.islamreligion.com/videos",
+        "supportedLanguages": [
+          "en",
+          "ar",
+          "es",
+          "fr",
+          "de",
+          "ru",
+          "pt",
+          "zh",
+          "ja",
+          "it",
+          "tl",
+          "hi",
+          "sw",
+          "ko",
+          "he"
+        ],
+        "examples": {
+          "ar": "https://www.islamreligion.com/ar/videos",
+          "ru": "https://www.islamreligion.com/ru/videos",
+          "fr": "https://www.islamreligion.com/fr/videos"
+        }
       },
       "role": "dawah_editorial_video_reference",
       "discoveryMode": "search_and_browser_reference",
@@ -464,7 +486,9 @@
       "licenseEvidenceNote": "The site footer currently states Copyright © 2006 - 2026 IslamReligion.com. All rights reserved.",
       "integrateIntoTimelineOnlyAfter": "media_rights_gate_passes",
       "interpretiveClaimsNeedIndependentVerification": true,
-      "corpusMutation": false
+      "corpusMutation": false,
+      "languageRouting": "Use the user's selected language index when supported; English is the unprefixed /videos route.",
+      "localizationEvidence": "https://www.islamreligion.com/ar/videos"
     }
   ]
 }
