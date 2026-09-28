@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createGraph, addNode, addEdge, addEvidence, neighbors, validateRuntimeGraph } from '../src/deen-graph-runtime.js';
+import { isTrustedEvidence } from '../src/deen-graph-contract.js';
 
 test('graph accepts source-backed nodes and relations', () => {
   const graph = createGraph();
@@ -44,8 +45,5 @@ test('trusted traversal requires verified provenance on nodes and edges', () => 
 test('trusted nodes require explicit rights metadata', () => {
   const graph = createGraph();
   addNode(graph, { id: 'h:1', type: 'hadith', provenance: { sourceId: 'bukhari', citation: '1', verificationState: 'source_verified' } });
-  assert.deepEqual(
-    (await import('../src/deen-graph-contract.js')).isTrustedEvidence(graph.nodes.get('h:1').provenance),
-    false
-  );
+  assert.equal(isTrustedEvidence(graph.nodes.get('h:1').provenance), false);
 });
