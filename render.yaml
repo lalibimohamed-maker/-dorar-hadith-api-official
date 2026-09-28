@@ -3,23 +3,48 @@ services:
     name: deen-allah-encyclopedia-api
     runtime: node
     plan: free
-    buildCommand: npm install --ignore-scripts --no-package-lock --no-audit --no-fund
+
+    buildCommand: npm ci --ignore-scripts --no-audit --no-fund
     startCommand: npm start
     healthCheckPath: /health
+
     envVars:
       - key: NODE_VERSION
         value: 22
+
       - key: PUBLIC_MAX_PER_MINUTE
         value: 30
+
       - key: APP_MAX_PER_MINUTE
         value: 120
+
       - key: REQUEST_TIMEOUT_MS
         value: 10000
+
+      - key: MAX_JSON_BODY_BYTES
+        value: 262144
+
+      - key: TRUST_PROXY_HEADERS
+        value: true
+
       - key: PERFORMANCE_CACHE_ENTRIES
         value: 1500
+
       - key: PERFORMANCE_CACHE_BYTES
         value: 50331648
+
       - key: PERFORMANCE_CACHE_MAX_BODY
         value: 2097152
+
       - key: PERFORMANCE_MIN_COMPRESS_BYTES
         value: 768
+
+      # Set these through the Render Dashboard; never commit secret values.
+      - key: APP_KEYS_JSON
+        sync: false
+
+      - key: QF_CLIENT_ID
+        sync: false
+
+      - key: QF_CLIENT_SECRET
+        sync: false
