@@ -41,7 +41,9 @@
       "pdf",
       "docx",
       "epub"
-    ]
+    ],
+    "multiOcrRequired": true,
+    "qualityControlRequired": true
   },
   "protectedBooks": {
     "fullDownloadForbiddenByIndexPresence": true,
@@ -55,5 +57,22 @@
     "translationLanguageRecorded": true,
     "translationSourceRecorded": true
   },
-  "coreBoundary": "Reading Representation != Redistribution Master"
+  "coreBoundary": "Reading Representation != Redistribution Master",
+  "scope": {
+    "inScope": "din-allah-religious-scholarly",
+    "outOfScope": "general-world-books",
+    "comparativeCritical": "descriptive-critical-only-not-trusted-corpus"
+  },
+  "deliveryPipeline": [
+    "user-query",
+    "language-resolution",
+    "book-discovery-across-sources",
+    "edition-resolution",
+    "rights",
+    "provenance",
+    "multi-ocr",
+    "quality-control",
+    "digital-master",
+    "reader-download"
+  ]
 }
