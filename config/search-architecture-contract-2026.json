@@ -1,0 +1,224 @@
+{
+  "version": "2026.28",
+  "id": "search-architecture-contract-2026",
+  "scope": "sunni-islamic-source-search-and-indexing",
+  "principle": "The encyclopedia is a search, indexing and source-linking layer, not a substitute for original sources.",
+  "entrypoint": {
+    "path": "/search",
+    "queryParameter": "q",
+    "expansion": "dorar-hadith-first, then Quran, tafsir, tadabbur, sirah, fiqh, aqidah and library"
+  },
+  "categories": [
+    {
+      "id": "quran",
+      "nameAr": "القرآن وعلومه"
+    },
+    {
+      "id": "tafsir",
+      "nameAr": "التفسير"
+    },
+    {
+      "id": "tadabbur",
+      "nameAr": "التدبر والهدايات"
+    },
+    {
+      "id": "hadith",
+      "nameAr": "الحديث وعلومه"
+    },
+    {
+      "id": "musnads-sunan",
+      "nameAr": "المسانيد والسنن"
+    },
+    {
+      "id": "sirah",
+      "nameAr": "السيرة والمغازي والشمائل"
+    },
+    {
+      "id": "fiqh",
+      "nameAr": "الفقه والمعاملات"
+    },
+    {
+      "id": "usul-fiqh",
+      "nameAr": "أصول الفقه والقواعد"
+    },
+    {
+      "id": "maqasid",
+      "nameAr": "مقاصد الشريعة"
+    },
+    {
+      "id": "aqidah",
+      "nameAr": "العقيدة"
+    },
+    {
+      "id": "biographies",
+      "nameAr": "التراجم والرواة والعلماء"
+    },
+    {
+      "id": "library",
+      "nameAr": "المكتبة الإسلامية"
+    }
+  ],
+  "resultContract": {
+    "required": [
+      "id",
+      "type",
+      "domain",
+      "title",
+      "sourceId",
+      "sourceType",
+      "source",
+      "verificationState"
+    ],
+    "bibliographicWhenAvailable": [
+      "author",
+      "work",
+      "edition",
+      "publisher",
+      "year",
+      "volume",
+      "page",
+      "chapter",
+      "locator"
+    ],
+    "rightsStateRequired": true,
+    "sourceAttributionRequired": true,
+    "discoveryDoesNotImplyAuthority": true
+  },
+  "hadith": {
+    "presenceInCollectionDoesNotEqualAuthenticity": true,
+    "sourceFields": [
+      "collection",
+      "book",
+      "chapter",
+      "hadithNumber",
+      "sourceUrl"
+    ],
+    "gradingField": "grading",
+    "gradingIsSourceBound": true,
+    "keepSourceAndGradingSeparate": true,
+    "compareChainsAndWordingWhenAvailable": true,
+    "absentGradeState": "not-reported",
+    "neverInferGradeFromCollection": true
+  },
+  "quranContext": {
+    "revelationCauseRelation": "verified-source-only",
+    "contextualRelation": "may-be-linked-with-attribution",
+    "thematicSimilarityIsNotCause": true,
+    "weakReports": "remain-labeled-as-weak-or-disputed",
+    "neverPromoteWeakReportToFact": true,
+    "linksMayTarget": [
+      "ayah",
+      "tafsir",
+      "hadith",
+      "sirah-event"
+    ]
+  },
+  "fiqh": {
+    "madhahib": [
+      {
+        "id": "hanafi",
+        "nameAr": "الحنفي"
+      },
+      {
+        "id": "maliki",
+        "nameAr": "المالكي"
+      },
+      {
+        "id": "shafii",
+        "nameAr": "الشافعي"
+      },
+      {
+        "id": "hanbali",
+        "nameAr": "الحنبلي"
+      }
+    ],
+    "separateRulingFromEvidence": true,
+    "preserveAgreementAndDisagreement": true,
+    "areas": [
+      "worship",
+      "transactions",
+      "family",
+      "nawazil",
+      "usul",
+      "legal-maxims"
+    ]
+  },
+  "maqasid": {
+    "parent": {
+      "id": "maqasid",
+      "nameAr": "مقاصد الشريعة"
+    },
+    "daruriyyat": [
+      {
+        "id": "din",
+        "nameAr": "حفظ الدين"
+      },
+      {
+        "id": "nafs",
+        "nameAr": "حفظ النفس"
+      },
+      {
+        "id": "aql",
+        "nameAr": "حفظ العقل"
+      },
+      {
+        "id": "nasl",
+        "nameAr": "حفظ النسل"
+      },
+      {
+        "id": "mal",
+        "nameAr": "حفظ المال"
+      }
+    ],
+    "additional": [
+      "الحاجيات",
+      "التحسينيات",
+      "المقاصد العامة",
+      "المقاصد الخاصة",
+      "المقاصد الجزئية",
+      "القواعد والتطبيقات"
+    ]
+  },
+  "aqidah": {
+    "sourceScope": "verified-sunni-sources",
+    "requestedTexts": [
+      "الأصول الثلاثة",
+      "الأصول الستة",
+      "القواعد الأربع"
+    ],
+    "explanationsRetainAttribution": true
+  },
+  "library": {
+    "indexTypes": [
+      "pdf",
+      "docx"
+    ],
+    "downloadRequires": "source-or-license-permission",
+    "redistributionRequires": "rights-cleared",
+    "restrictedHandling": "retain-source-link-and-bibliographic-record",
+    "neverRepublishMerelyBecauseOnline": true
+  },
+  "recitation": {
+    "offlineAndDownloadRequires": "source-permission",
+    "wordSyncRequires": "trusted-word-level-timing",
+    "fallbackSync": "ayah-level",
+    "originalRecitationPreserved": true,
+    "quranTextUnaffected": true
+  },
+  "languages": {
+    "interface": "multilingual",
+    "directions": [
+      "rtl",
+      "ltr"
+    ],
+    "originalSourceLanguageAccessible": true,
+    "translationsRemainDistinctAssets": true
+  },
+  "boundaries": {
+    "corpusImmutable": true,
+    "searchLayerMayEnrichMetadata": true,
+    "generatedTextIsNotCanonical": true,
+    "noSilentSourceMerge": true,
+    "noRightsUpgradeByDiscovery": true
+  }
+}
