@@ -76,12 +76,12 @@ export function canRead(result = {}, { sourceAllowsReading = false } = {}) {
   );
 }
 
-export function canCopyText(result = {}, { sourceAllowsCopy = false, sourceAllowsReading = false } = {}) {
+export function canCopyText(result = {}, { sourceAllowsCopy = true } = {}) {
   const blocked = [RIGHTS.RESTRICTED, RIGHTS.RIGHTS_UNCLEAR].includes(result.status);
-  return !blocked && (
+  const sourceAllows = sourceAllowsCopy !== false;
+  return !blocked && sourceAllows && (
     [RIGHTS.REDISTRIBUTABLE, RIGHTS.LICENSED, RIGHTS.PUBLIC_DOMAIN].includes(result.status) ||
-    result.status === RIGHTS.READ_COPY ||
-    (sourceAllowsCopy === true && sourceAllowsReading === true)
+    result.status === RIGHTS.READ_COPY
   );
 }
 
