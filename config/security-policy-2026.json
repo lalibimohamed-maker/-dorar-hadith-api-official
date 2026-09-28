@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "security-policy-2026",
+  "title": "Security Policy — Dīn Allāh Encyclopedia",
+  "status": "governed",
+  "securityBoundary": [
+    "source-code",
+    "ci-cd",
+    "source-registry",
+    "corpus",
+    "provenance",
+    "rights-metadata",
+    "generated-artifacts",
+    "apis",
+    "releases",
+    "recovery-data"
+  ],
+  "principles": {
+    "defenseInDepth": true,
+    "leastPrivilege": true,
+    "failClosed": true,
+    "externalSourcesUntrustedUntilVerified": true,
+    "noSecretsInSourceClientOrArtifacts": true,
+    "sourceRefreshCannotDirectlyOverwriteCorpus": true,
+    "provenancePreserved": [
+      "retrieval-time",
+      "content-hash",
+      "parser-version",
+      "rights-state"
+    ],
+    "credentialsSeparated": [
+      "production",
+      "deployment-signing",
+      "backup"
+    ],
+    "recoverableBackups": true,
+    "restorationVerificationRequired": true,
+    "openSourceSelfHostablePreference": true,
+    "noPaidSinglePointOfFailure": true
+  },
+  "secureSourceRefresh": {
+    "requiredGates": [
+      "identity-allowlist",
+      "tls-redirect",
+      "ssrf-safe-network",
+      "size-type-time",
+      "archive-decompression",
+      "malware-scanning",
+      "schema-validation",
+      "provenance-rights",
+      "diff-quality",
+      "atomic-publication"
+    ],
+    "failurePolicy": "retain-previous-verified-version",
+    "uncertaintyPolicy": "retain-previous-verified-version"
+  },
+  "gateImplementations": {
+    "identity-allowlist": [
+      "config/source-registry.json",
+      "config/official-islamic-sources-2026.json",
+      "scripts/source-refresh-gate.mjs"
+    ],
+    "tls-redirect": [
+      "scripts/source-refresh-gate.mjs"
+    ],
+    "ssrf-safe-network": [
+      "scripts/source-refresh-gate.mjs"
+    ],
+    "size-type-time": [
+      "scripts/source-refresh-gate.mjs",
+      "scripts/rechercher_pdf_safety_gate_v2.py",
+      "scripts/rechercher_pdf_quality_gate.py"
+    ],
+    "archive-decompression": [
+      "scripts/rechercher_acquisition_engine_v2.py",
+      "scripts/rechercher_pdf_safety_gate_v2.py"
+    ],
+    "malware-scanning": [
+      ".github/workflows/antivirus-analysis-mesh.yml"
+    ],
+    "schema-validation": [
+      "scripts/content-ingest-gate.mjs"
+    ],
+    "provenance-rights": [
+      "scripts/content-ingest-gate.mjs",
+      "src/book-rights-resolver.js",
+      "src/book-source-connector.js"
+    ],
+    "diff-quality": [
+      "scripts/source-anomaly-gate.mjs",
+      "scripts/rechercher_pdf_quality_gate.py"
+    ],
+    "atomic-publication": [
+      "scripts/rechercher_publication_gate.py",
+      "scripts/content-ingest-gate.mjs"
+    ]
+  },
+  "incidentResponse": {
+    "steps": [
+      "contain",
+      "revoke",
+      "isolate",
+      "preserve-evidence",
+      "patch",
+      "verify",
+      "restore",
+      "document"
+    ],
+    "retaliationForbidden": true
+  }
+}
