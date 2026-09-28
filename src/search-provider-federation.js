@@ -29,15 +29,27 @@ function providerDefinition(id) {
   return null;
 }
 
+function validateInlineProvider(provider = {}) {
+  const integration = String(provider.integration || "").toLowerCase();
+  return Boolean(
+    provider?.id &&
+    provider?.status !== "disabled" &&
+    provider?.scrapingAllowed === false &&
+    (integration.includes("api") || integration.includes("interface"))
+  );
+}
+
 export function validateProviderDefinition(provider = {}) {
+  if (provider?.enabled === false) return { ok: false, reason: "disabled" };
   const definition = providerDefinition(provider.id);
-  if (!definition) return { ok: false, reason: "unknown-provider" };
-  if (provider.enabled === false) return { ok: false, reason: "disabled" };
-  if (definition.scrapingAllowed !== false) return { ok: false, reason: "scraping-policy-invalid" };
-  if (!String(definition.integration || "").includes("api") && !String(definition.integration || "").includes("interface")) {
+  const source = definition || (validateInlineProvider(provider) ? provider : null);
+  if (!source) return { ok: false, reason: definition ? "provider-policy-invalid" : "unregistered-provider-contract" };
+  if (source.scrapingAllowed !== false) return { ok: false, reason: "scraping-policy-invalid" };
+  const integration = String(source.integration || "").toLowerCase();
+  if (!integration.includes("api") && !integration.includes("interface")) {
     return { ok: false, reason: "official-interface-required" };
   }
-  return { ok: true, definition };
+  return { ok: true, definition: source };
 }
 
 export function listProviderNetwork({ domain = null } = {}) {
