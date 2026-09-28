@@ -119,12 +119,15 @@ jobs:
           python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
 
       - name: Acquire PDFs through the single unbounded Hijri chronological queue
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
           git lfs install
-          git lfs pull --include='artifacts/*.pdf' --exclude='' || true
+          GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=${GIT_AUTH_HEADER}" lfs pull --include='artifacts/*.pdf' --exclude='' || true
           python3 scripts/rechercher_sequential_acquisition.py --root "$GITHUB_WORKSPACE"
           rm -rf .governance-source
 
@@ -245,9 +248,12 @@ jobs:
           while IFS= read -r -d '' f; do git add -- "$f"; done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
           if ! git diff --cached --quiet; then
             git commit -m 'data(rechercher): persist chronological acquisition state and primary PDFs'
-            git pull --rebase --autostash origin "$TARGET_BRANCH"
-            git lfs fsck --pointers HEAD; git lfs push --dry-run origin HEAD
-            git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+            GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+            git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin "$TARGET_BRANCH"
+            git rebase "origin/$TARGET_BRANCH"
+            git lfs fsck --pointers HEAD
+            git -c "http.extraheader=${GIT_AUTH_HEADER}" lfs push --dry-run origin HEAD
+            git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin "HEAD:refs/heads/$TARGET_BRANCH"
           fi
 
       - name: Persist verified PDFs to secondary LFS storage
@@ -274,12 +280,13 @@ jobs:
           while IFS= read -r -d '' f; do git add -- "$f"; done < <(find artifacts -maxdepth 1 -type f -name '*.pdf' -print0)
           if ! git diff --cached --quiet; then
             git commit -m 'data(rechercher): persist secondary chronological PDF shard'
+            GIT_AUTH_HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$SECONDARY_STORAGE_TOKEN" | base64 -w0)"
             for attempt in 1 2 3; do
-              git fetch origin main
+              git -c "http.extraheader=${GIT_AUTH_HEADER}" fetch origin main
               git rebase origin/main
               git lfs fsck --pointers HEAD
-              git lfs push --dry-run origin HEAD
-              if git push origin HEAD:refs/heads/main; then
+              git -c "http.extraheader=${GIT_AUTH_HEADER}" lfs push --dry-run origin HEAD
+              if git -c "http.extraheader=${GIT_AUTH_HEADER}" push origin HEAD:refs/heads/main; then
                 echo "SECONDARY_PUSH_OK attempt=$attempt"
                 break
               fi
