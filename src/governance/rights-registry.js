@@ -98,7 +98,7 @@ export function assertRightsRecord(record) {
 }
 
 export const RIGHTS_RECORD_REQUIRED_FIELDS = REQUIRED_FIELDS;
-export const RIGHTS_RECYCLABLE_STATUSES = Object.freeze([...REDISTRIBUTION_STATUSES]);
+export const RIGHTS_ALLOWED_REDISTRIBUTION_STATUSES = Object.freeze([...REDISTRIBUTION_STATUSES]);
 export const RIGHTS_BLOCKED_STATUSES = Object.freeze([
   "rights-unclear",
   "restricted",
