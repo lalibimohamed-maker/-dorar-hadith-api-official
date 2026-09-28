@@ -101,7 +101,7 @@ jobs:
           if (source.languagePathTemplate !== 'https://www.islamreligion.com/{lang}/videos') throw new Error('IslamReligion localized video path template drifted');
           if (source.localizationEvidenceUrl !== 'https://www.islamreligion.com/ar/videos') throw new Error('IslamReligion localization evidence URL drifted');
           if ((x.islamicVideoSources?.find((s) => s.sourceId === 'islamreligion-videos')?.localizedEntryPoints?.supportedLanguages || []).length !== 15) throw new Error('engine language coverage drifted');
-          const category33 = islamReligion.categories?.find((category) => category.id === '1033');
+          const category33 = islamReligion.categories?.find((category) => category.id === '33');
           if (!category33) throw new Error('IslamReligion category 33 binding missing');
           if (category33.url !== 'https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite') throw new Error('IslamReligion category 33 French URL drifted');
           if (category33.languageScopedCategoryId !== true) throw new Error('IslamReligion category IDs must remain language-scoped');
@@ -114,7 +114,7 @@ jobs:
           if (variants.get('ru').discoveryRequired !== true || variants.get('ar').discoveryRequired !== true) throw new Error('Unverified localized category IDs must require source discovery');
           if (category33.localizedSlugMustBeResolvedFromSource !== true) throw new Error('IslamReligion localized category slugs must be source-resolved');
           const categorySource = (registry.sources || []).find((entry) => entry.id === 'islamreligion-videos');
-          if (!categorySource.collections?.some((collection) => collection.id === '1033')) throw new Error('source registry category 33 entry missing');
+          if (!categorySource.collections?.some((collection) => collection.id === '33')) throw new Error('source registry category 33 entry missing');
           const requiredTrue = [
             'freeFirst','selfHostedPreferred','noPaidCoreDependency','noAutomaticPromotion',
             'noSilentReplacement','noCorpusMutation','noUnlicensedMediaReuse','noUnverifiedReligiousClaim',
