@@ -1,0 +1,58 @@
+{
+  "system": "Din Allah Encyclopedia — System Completeness Governance",
+  "version": "1.0.0",
+  "build": "2026",
+  "principles": {
+    "technical_layers_above_corpus": true,
+    "silent_corpus_replacement": false,
+    "human_led_ai_assisted_open_source": true,
+    "discovery_is_evidence": false
+  },
+  "domains": [
+    "ontology",
+    "claims-and-evidence",
+    "lineage",
+    "interoperability",
+    "accessibility",
+    "language-awareness",
+    "resilience",
+    "integrity",
+    "quarantine-and-review",
+    "rights-and-sustainability"
+  ],
+  "truthLayers": [
+    "original_text",
+    "source_metadata",
+    "scholarly_ruling",
+    "scholarly_explanation",
+    "analysis_inference",
+    "translation",
+    "learning_output"
+  ],
+  "minimumIndependentEngines": 2,
+  "preferredIndependentEngines": 3,
+  "externalStandards": {
+    "DCMI": "resource-metadata-rights-identifiers",
+    "IIIF": "compound-digital-objects-and-images",
+    "W3C Web Annotation": "precise-annotations",
+    "RO-Crate": "packaging-and-provenance",
+    "PREMIS": "digital-preservation",
+    "WCAG 2.2 AA": "accessibility-target",
+    "W3C Trace Context": "distributed-observability"
+  },
+  "resilience": {
+    "offline": "required-and-testable",
+    "backup": "required",
+    "restore": "must-be-tested",
+    "distributedMonitoring": true,
+    "safeDegradation": true
+  },
+  "contributions": {
+    "initialState": "quarantine",
+    "directOriginalSourceMutation": false
+  },
+  "rights": {
+    "redistributionRequiresAllowedRights": true,
+    "freeEqualsPublicDomain": false
+  }
+}
