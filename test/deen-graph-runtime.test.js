@@ -23,3 +23,19 @@ test('graph rejects dangling edges', () => {
   addNode(graph, { id: 'h:1', type: 'hadith', provenance: { sourceId: 'bukhari', citation: '1' } });
   assert.throws(() => addEdge(graph, { id: 'e:1', from: 'h:1', to: 'missing', type: 'related_to', provenance: { sourceId: 'x', citation: 'x' } }), /endpoints/);
 });
+
+
+test('trusted traversal requires verified provenance on nodes and edges', () => {
+  const graph = createGraph();
+  addNode(graph, { id: 'q:1', type: 'quran_verse', provenance: { sourceId: 'quran', citation: '1:1', verificationState: 'source_verified' } });
+  addNode(graph, { id: 'h:1', type: 'hadith', provenance: { sourceId: 'bukhari', citation: '1', verificationState: 'edition_verified' } });
+  addEdge(graph, {
+    id: 'e:1',
+    from: 'h:1',
+    to: 'q:1',
+    type: 'related_to',
+    provenance: { sourceId: 'bukhari', citation: '1', verificationState: 'edition_verified' }
+  });
+  assert.equal(validateRuntimeGraph(graph, { trustedOnly: true }).trusted, true);
+  assert.equal(neighbors(graph, 'h:1', { direction: 'both', trustedOnly: true })[0].id, 'q:1');
+});
