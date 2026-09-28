@@ -26,7 +26,7 @@ function publicKey(req) {
   return mesh.keyFor(req);
 }
 
-function responseHeaders(upstreamHeaders, cachePolicy, encoding, bodyLength, etag, cacheStatus) {
+function responseHeaders(upstreamHeaders, cachePolicy, encoding, bodyLength, etag, cacheStatus, cacheBody = true) {
   const headers = {
     "content-type": upstreamHeaders["content-type"] || "application/octet-stream",
     "x-acceleration-engine": "deen-allah-mesh",
@@ -35,19 +35,23 @@ function responseHeaders(upstreamHeaders, cachePolicy, encoding, bodyLength, eta
     "referrer-policy": "no-referrer",
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET,HEAD,OPTIONS",
-    "access-control-allow-headers": "content-type,x-api-key,accept-language,range",
+    "access-control-allow-headers": "content-type,x-api-key,authorization,cookie,accept-language,range",
     vary: "Accept-Encoding, Accept-Language",
   };
   if (encoding) headers["content-encoding"] = encoding;
   if (bodyLength !== undefined) headers["content-length"] = String(bodyLength);
+  else if (upstreamHeaders["content-length"]) headers["content-length"] = upstreamHeaders["content-length"];
   if (etag) headers.etag = etag;
-  if (upstreamHeaders["last-modified"]) headers["last-modified"] = upstreamHeaders["last-modified"];
-  if (upstreamHeaders["accept-ranges"]) headers["accept-ranges"] = upstreamHeaders["accept-ranges"];
-  if (upstreamHeaders["content-range"]) headers["content-range"] = upstreamHeaders["content-range"];
-  if (cachePolicy.cache) {
-    const ttl = Math.max(0, Math.floor(Number(cachePolicy.ttlMs || 0) / 1000));
-    const swr = Math.max(0, Math.floor(Number(cachePolicy.staleWhileRevalidate || 0)));
-    headers["cache-control"] = `public, max-age=${ttl}, stale-while-revalidate=${swr}`;
+  for (const name of [
+    "last-modified",
+    "accept-ranges",
+    "content-range",
+    "content-disposition",
+  ]) {
+    if (upstreamHeaders[name]) headers[name] = upstreamHeaders[name];
+  }
+  if (cacheBody && cachePolicy.cache) {
+    headers["cache-control"] = `public, max-age=${Math.max(0, Math.floor(Number(cachePolicy.ttlMs || 0) / 1000))}`;
   } else {
     headers["cache-control"] = "no-store";
   }
@@ -73,7 +77,7 @@ function writeJsonPayload(req, res, payload, policy, cacheStatus) {
     mesh.noteEtagHit();
     res.writeHead(304, {
       etag,
-      "cache-control": policy.cache ? `public, max-age=0, stale-while-revalidate=${Math.max(0, Math.floor(Number(policy.staleWhileRevalidate || 0)))}` : "no-store",
+      "cache-control": policy.cache ? `public, max-age=0` : "no-store",
       "x-acceleration-cache": cacheStatus,
       "x-acceleration-engine": "deen-allah-mesh",
       vary: "Accept-Encoding, Accept-Language",
@@ -81,7 +85,7 @@ function writeJsonPayload(req, res, payload, policy, cacheStatus) {
     return res.end();
   }
   const packed = mesh.compress(payload.body, req.headers["accept-encoding"]);
-  const headers = responseHeaders(payload.headers, policy, packed.encoding, packed.body.length, etag, cacheStatus);
+  const headers = responseHeaders(payload.headers, policy, packed.encoding, packed.body.length, etag, cacheStatus, policy.cache);
   res.writeHead(payload.status, headers);
   if (req.method === "HEAD") return res.end();
   return res.end(packed.body);
@@ -149,7 +153,7 @@ async function proxyRequest(req, res) {
     res.writeHead(204, {
       "access-control-allow-origin": "*",
       "access-control-allow-methods": "GET,HEAD,OPTIONS",
-      "access-control-allow-headers": "content-type,x-api-key,accept-language,range",
+      "access-control-allow-headers": "content-type,x-api-key,authorization,cookie,accept-language,range",
     });
     return res.end();
   }
@@ -165,7 +169,8 @@ async function proxyRequest(req, res) {
   }
 
   const policy = req.method === "GET" ? cachePolicyForPath(pathname) : { cache: false };
-  const cacheable = req.method === "GET" && policy.cache && !req.headers["x-api-key"] && !req.headers.range;
+  const privateHeaders = Boolean(req.headers["x-api-key"] || req.headers.authorization || req.headers.cookie);
+  const cacheable = req.method === "GET" && policy.cache && !privateHeaders && !req.headers.range;
 
   if (cacheable) {
     const key = publicKey(req);
@@ -177,7 +182,6 @@ async function proxyRequest(req, res) {
       if (origin.status === 200 && isJson(origin.headers) && !isStreamingMedia(origin.headers) && origin.body.length <= CACHE_MAX_BODY) {
         mesh.set(key, origin.body, {
           ttlMs: policy.ttlMs,
-          staleWhileRevalidate: policy.staleWhileRevalidate,
           status: origin.status,
           contentType: origin.headers["content-type"],
           etag: origin.etag || undefined,
@@ -192,10 +196,12 @@ async function proxyRequest(req, res) {
 
   const upstream = await fetchUpstreamStream(req);
   if (!isJson(upstream.headers) || isStreamingMedia(upstream.headers) || req.method === "HEAD") {
-    const headers = responseHeaders(upstream.headers, policy, null, undefined, upstream.headers.etag, "bypass");
+    const headers = responseHeaders(upstream.headers, policy, null, undefined, upstream.headers.etag, "bypass", false);
     res.writeHead(upstream.statusCode || 502, headers);
     if (req.method === "HEAD") return res.end();
-    return pipeline(upstream, res, () => {});
+    return pipeline(upstream, res, (error) => {
+      if (error) console.error("Acceleration streaming pipeline failed:", error.message);
+    });
   }
 
   const chunks = [];
