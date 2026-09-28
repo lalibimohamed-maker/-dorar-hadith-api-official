@@ -21,3 +21,13 @@ test("unified metadata search finds a book by title and preserves provenance", (
   assert.ok(bukhari.author.includes("البخاري"));
   assert.equal(bukhari.sourceKind, "book-catalog");
 });
+
+test("unified source records expose source identifiers and types", () => {
+  const records = buildUnifiedSourceRecords();
+  const dorar = records.find((record) => record.id === "dorar");
+  const shamela = records.find((record) => record.id === "shamela");
+  assert.equal(dorar?.sourceId, "dorar");
+  assert.equal(dorar?.sourceType, "registry-source");
+  assert.equal(shamela?.sourceId, "shamela");
+  assert.equal(shamela?.sourceType, "bibliographic-index");
+});
