@@ -4,12 +4,32 @@ import { routeIntent } from '../src/ai/agent-intent-router.mjs';
 import { buildEvidenceContext } from '../src/ai/evidence-context-builder.mjs';
 import { verifyAgentResponse } from '../src/ai/response-verifier.mjs';
 import { runAgent, retrieveAgentEvidence } from '../src/ai/agent-runtime.mjs';
+import { normalizeHadithEvidence } from '../src/unified-search.js';
 
 test('intent router distinguishes common religious question types', () => {
   assert.equal(routeIntent('ما حكم زكاة المال؟').intent, 'fiqh');
   assert.equal(routeIntent('هل هذا الحديث صحيح؟').intent, 'hadith');
   assert.equal(routeIntent('ما تفسير هذه الآية من سورة البقرة؟').intent, 'quran');
   assert.equal(routeIntent('من هو الراوي فلان؟ وما حاله؟').intent, 'rijal');
+});
+
+test('hadith evidence normalizer preserves text and scholarly metadata', () => {
+  const result = normalizeHadithEvidence({
+    ahadith: [{
+      th: 'نص الحديث',
+      url: 'https://dorar.net/h/example',
+      hkm: 'حسن صحيح',
+      rawi: 'أبو هريرة',
+      mohdith: 'الألباني',
+      takhrij: 'أخرجه الترمذي'
+    }]
+  });
+  assert.equal(result.length, 1);
+  assert.equal(result[0].text, 'نص الحديث');
+  assert.equal(result[0].verification, 'حسن صحيح');
+  assert.equal(result[0].narrator, 'أبو هريرة');
+  assert.equal(result[0].scholar, 'الألباني');
+  assert.equal(result[0].reference, 'أخرجه الترمذي');
 });
 
 test('evidence context preserves source, location and rights', () => {
