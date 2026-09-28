@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createLearnerState, diagnose, selectMethod, scoreLearningItem, selectNextItem, updateLearnerState, buildLearningCycle, canLearningBlockAcquisition, validateLearningItem } from '../src/learning/rechercher-learning-intelligence-v2.mjs';
+import { createLearnerState, diagnose, selectMethod, selectNextItem, updateLearnerState, buildLearningCycle, canLearningBlockAcquisition, validateLearningItem } from '../src/learning/rechercher-learning-intelligence-v2.mjs';
 
 test('diagnoses overconfidence and prerequisite gaps',()=>{
   const state=createLearnerState({skills:{prayer:{mastery:.7,retrievability:.5,confidence:.8}}});
