@@ -44,7 +44,10 @@
   "engines": {
     "ocr": {
       "primary": "paddleocr",
-      "alternates": ["tesseract", "kraken"],
+      "alternates": [
+        "tesseract",
+        "kraken"
+      ],
       "status": "candidate",
       "versionReference": "3.7.0",
       "softwareLicense": "Apache-2.0",
@@ -54,7 +57,9 @@
     },
     "search_text": {
       "primary": "opensearch",
-      "alternates": ["meilisearch"],
+      "alternates": [
+        "meilisearch"
+      ],
       "status": "candidate",
       "versionReference": "3.6.0",
       "softwareLicense": "Apache-2.0",
@@ -73,7 +78,9 @@
     },
     "search_semantic": {
       "primary": "qdrant",
-      "alternates": ["oxigraph"],
+      "alternates": [
+        "oxigraph"
+      ],
       "status": "candidate",
       "versionReference": "1.18.x",
       "softwareLicense": "Apache-2.0",
@@ -82,7 +89,9 @@
     },
     "knowledge_graph": {
       "primary": "oxigraph",
-      "alternates": ["apache-jena"],
+      "alternates": [
+        "apache-jena"
+      ],
       "status": "candidate",
       "versionReference": "rolling",
       "softwareLicense": "MIT OR Apache-2.0",
@@ -92,7 +101,9 @@
     },
     "translation": {
       "primary": "argostranslate",
-      "alternates": ["libretranslate"],
+      "alternates": [
+        "libretranslate"
+      ],
       "status": "candidate",
       "versionReference": "Argos 1.4.0 / LibreTranslate 1.9.6",
       "softwareLicense": "MIT / AGPL-3.0 respectively",
@@ -130,12 +141,44 @@
     },
     "image_restoration": {
       "primary": "real-esrgan",
-      "alternates": ["swinir"],
+      "alternates": [
+        "swinir"
+      ],
       "status": "license_gated",
       "versionReference": "0.3.0",
       "softwareLicense": "verify_current_project_license",
       "modelLicense": "verify_per_weight",
       "watch": "artifact rate, Arabic text legibility, source faithfulness, weight provenance"
+    },
+    "local_llm_inference": {
+      "primary": "node-llama-cpp",
+      "alternates": [
+        "llama.cpp"
+      ],
+      "status": "candidate",
+      "versionReference": "3.22.x",
+      "softwareLicense": "MIT",
+      "modelLicense": "verify_per_model_or_weight",
+      "watch": "Arabic quality, instruction following, grammar-constrained output, CPU/GPU latency, memory use, model provenance",
+      "source": "https://github.com/withcatai/node-llama-cpp"
+    },
+    "local_embeddings": {
+      "primary": "bge-m3",
+      "status": "candidate",
+      "versionReference": "model-dependent",
+      "softwareLicense": "runtime-dependent",
+      "modelLicense": "MIT",
+      "watch": "Arabic/multilingual retrieval recall, dimensions, context length, quantization fidelity, conversion provenance",
+      "source": "https://huggingface.co/BAAI/bge-m3"
+    },
+    "local_reranker": {
+      "primary": "bge-reranker-v2-m3",
+      "status": "candidate",
+      "versionReference": "model-dependent",
+      "softwareLicense": "runtime-dependent",
+      "modelLicense": "Apache-2.0",
+      "watch": "Arabic/multilingual relevance, ranking stability, latency, quantization fidelity, conversion provenance",
+      "source": "https://huggingface.co/BAAI/bge-reranker-v2-m3"
     }
   },
   "promotionPolicy": {
