@@ -278,3 +278,7 @@ The architecture was informed by international research and reviews covering edu
 ## Status
 
 This document is an architectural research record for Rechercher Learning Intelligence Engine v3. It should evolve as higher-quality international evidence appears. New additions should be incorporated only when they materially improve learning quality, explainability, measurement, source grounding, accessibility, or learner outcomes.
+
+
+## Implementation contract
+The first reviewed runtime increment is `src/rechercher-learning-intelligence-v3.js`, configured by `config/rechercher-learning-intelligence-v3.json` and covered by `test/rechercher-learning-intelligence-v3.test.js`. It implements an explainable learner profile, separate correctness/confidence calibration, prerequisite-aware activity selection, source-grounded learning objects, continuous outcome measurement, and an explicit invariant that learning/enrichment failure cannot block acquisition.
