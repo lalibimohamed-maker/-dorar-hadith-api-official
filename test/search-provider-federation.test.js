@@ -30,7 +30,7 @@ test("book queries use book sources before generic web search", () => {
 test("disabled providers are excluded and provider count is bounded", () => {
   const providers = Array.from({ length: 15 }, (_, i) => ({ id: `p-${i}`, class: "web", enabled: i !== 2 }));
   const plan = planSearchFederation({ query: "علم", providers });
-  assert.equal(plan.providers.length, 10);
+  assert.equal(plan.providers.length, 8);
   assert.equal(plan.providers.some((p) => p.id === "p-2"), false);
-  assert.ok(plan.timeoutMs <= 1800);
+  assert.ok(plan.timeoutMs <= 1200);
 });
