@@ -110,3 +110,10 @@ Arabic first, English second, then French, Turkish, Chinese, Korean, Polish, Spa
 The Book Cache is a technical layer, not an authority layer. A book may enter cache only after source identity/URL, provenance identity with a valid verification timestamp, an explicitly allowed redistribution-rights state, and successful validation are all present. Discovery alone never proves redistribution rights. The cache policy fails closed when any gate is missing or uncertain.
 
 For AI/RAG, cached book material remains source-attributed evidence only. Rights, provenance, verification and location metadata travel with the evidence; cached or generated wording never becomes canonical Corpus content.
+
+## Integrated Knowledge Graph
+The encyclopedia uses one source-aware graph contract across Quran, hadith, tafsir, asbab al-nuzul, sirah/context, narrators/rijal, hadith criticism, explanations, fiqh, aqeedah, benefits, scholar statements, fatwa and books. Node and edge provenance is mandatory. Trusted evidence traversal requires a trusted verification state and attached rights metadata.
+
+Evidence layers are explicit: primary text, scholarly interpretation, metadata, source-backed relations, and generated assistance. Generated assistance can explain retrieved evidence but cannot become evidence. Materially different hadith variants remain separate nodes, and conflicting scholarly judgments remain separate attributed records.
+
+Graph traversal is bidirectional for retrieval. Search ranking remains a retrieval signal only and never a religious judgment.
