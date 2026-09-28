@@ -183,6 +183,7 @@ async function proxyRequest(req, res) {
         mesh.set(key, origin.body, {
           ttlMs: policy.ttlMs,
           status: origin.status,
+          headers: origin.headers,
           contentType: origin.headers["content-type"],
           etag: origin.etag || undefined,
         });
