@@ -1,0 +1,34 @@
+{
+  "engine": "Global Cross-Device Display Federation",
+  "version": "1.0.0",
+  "layer": "presentation-infrastructure",
+  "corpusMutation": false,
+  "acquisitionBlocking": false,
+  "freeFirst": true,
+  "paidApiRequired": false,
+  "protocolCandidates": [
+    "Miracast/MiracleCast",
+    "AirPlay/UxPlay",
+    "Cast adapters",
+    "Screen Capture/WebRTC",
+    "scrcpy",
+    "Sunshine/Moonlight"
+  ],
+  "candidateStateUntilProbe": "registered",
+  "displayMedia": {
+    "userConsentRequired": true,
+    "browserSupportNotUniversal": true,
+    "soleUniversalPath": false
+  },
+  "security": {
+    "localDiscoveryPreferred": true,
+    "automaticInternetExposure": false,
+    "silentPrivilegedActivation": false
+  },
+  "resolutionPolicy": {
+    "classes": ["native","4K","8K","10K","12K","16K","24K","future"],
+    "negotiation": "minimum-verified-capability",
+    "nativeClaimRequiresBothNative": true,
+    "rebuiltOutputIsNeverNativeByInference": true
+  }
+}
