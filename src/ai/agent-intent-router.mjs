@@ -4,16 +4,22 @@ export const AGENT_INTENTS = Object.freeze([
 
 const PATTERNS = Object.freeze({
   hadith: [
-    /\bحديث\b|\bأحاديث\b|\bرواية\b|\bروايات\b|\bإسناد\b|\bسند\b|\bمتن\b/,
-    /صحيح\s*(البخاري|مسلم)|سنن\s*(أبي داود|الترمذي|النسائي|ابن ماجه)/
+    /حديث|أحاديث|رواية|روايات|إسناد|سند|متن|hadith|narration|isnad|chain|matn/i,
+    /صحيح\s*(البخاري|مسلم)|سنن\s*(أبي داود|الترمذي|النسائي|ابن ماجه)|sahih\s*(bukhari|muslim)/i
   ],
-  quran: [/\bالقرآن\b|\bقرآن\b|\bآية\b|\bآيات\b|\bسورة\b|\bسور\b|\bتفسير\b|\bتجويد\b|\bمكي|مدني/],
+  quran: [
+    /القرآن|قرآن|آية|آيات|سورة|سور|تفسير|تجويد|مكي|مدني|quran|ayah|surah|tafsir|tajweed/i
+  ],
   fiqh: [
-    /\bفقه\b|\bحكم\b|\bحلال\b|\bحرام\b|\bواجب\b|\bسنة\b|\bمكروه\b|\bمباح\b/,
-    /صلاة|زكاة|صيام|حج|بيوع|نكاح|طلاق|ميراث|وصية|ربا/
+    /فقه|حكم|حلال|حرام|واجب|سنة|مكروه|مباح|fiqh|ruling|halal|haram|fard|sunnah/i,
+    /صلاة|زكاة|صيام|حج|بيوع|نكاح|طلاق|ميراث|وصية|ربا|prayer|zakat|fasting|hajj|marriage|divorce|inheritance|riba/i
   ],
-  rijal: [/\bراوٍ\b|\bراوي\b|\bرواة\b|\bرجال\b|\bجرح\b|\bتعديل\b|\bثقة\b|\bضعيف\b|\bمتروك\b|\bمجهول\b/],
-  scholar: [/\bشيخ\b|\bعالم\b|\bإمام\b|\bفقيه\b|\bمحدث\b|\bقول\b|\bأقوال\b|\bفتوى\b|ابن\s+(تيمية|القيم|باز|عثيمين)/]
+  rijal: [
+    /راوٍ|راوي|رواة|رجال|جرح|تعديل|ثقة|ضعيف|متروك|مجهول|narrator|rijal|jarh|ta'dil|trustworthy|weak/i
+  ],
+  scholar: [
+    /شيخ|عالم|إمام|فقيه|محدث|قول|أقوال|فتوى|scholar|imam|jurist|muhaddith|opinion|fatwa/i
+  ]
 });
 
 function normalizeQuery(query) {
