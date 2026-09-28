@@ -55,7 +55,7 @@ const SCRIPT_PATTERNS = Object.freeze([
 ]);
 
 const LATIN_HINTS = Object.freeze({
-  en: ['the','and','is','are','with','from','what','how','about','quran','hadith'],
+  en: ['the','and','is','are','with','from','what','how','about','meaning','of','in','explain','quran','hadith'],
   fr: ['le','la','les','des','et','est','avec','depuis','quel','comment','coran','hadith'],
   es: ['el','la','los','las','y','es','con','desde','qué','cómo','corán','hadiz'],
   de: ['der','die','das','und','ist','mit','von','was','wie','quran','hadith'],
