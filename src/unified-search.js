@@ -8,6 +8,9 @@ import { buildHistoricalResearchContext } from "./prophets-companions-genealogy-
 import { searchOfficialInstitutions, officialInstitutionPolicy } from "./official-institution-search.js";
 import { searchRijalResearch } from "./rijal-search.js";
 import { searchScholars } from "./scholar-research.js";
+import { deduplicateSearchRecords, resolveSearchLanguage, runParallelSearchProviders, createSearchCache } from "./parallel-search-governance.js";
+
+const SEARCH_CACHE = createSearchCache();
 
 export function buildUnifiedSourceRecords() {
   const registryRecords = listSources().map((source) => ({
@@ -77,34 +80,72 @@ function fiqhMatches(query) {
 }
 
 export async function unifiedSearch(query, { signal, includePotentialMatches = false, responseLocale = "ar" } = {}) {
+  const language = resolveSearchLanguage(responseLocale);
   const records = buildUnifiedSourceRecords();
-  const [hadithData, sourceMatches] = await Promise.all([
-    searchDorar(query, { signal }),
-    Promise.resolve(searchUnified(query, records, {
-      includePotentialMatches,
-      corpus: "sunni",
-      requireSource: true
-    }))
-  ]);
-  const knowledge = getKnowledgeContext({ query });
-  const fiqh = fiqhMatches(query);
-  const historical = buildHistoricalResearchContext(query);
-  const historicalRecords = historical.records.map((item) => ({
+
+  const federation = await runParallelSearchProviders({
+    query,
+    locale: language.resolved,
+    signal,
+    cache: SEARCH_CACHE,
+    retries: 1,
+    timeoutMs: 1200,
+    maxConcurrent: 8,
+    jobs: [
+      { id: "dorar-hadith", run: ({ signal: providerSignal }) => searchDorar(query, { signal: providerSignal }) },
+      {
+        id: "unified-source-index",
+        run: () => searchUnified(query, records, {
+          includePotentialMatches,
+          corpus: "sunni",
+          requireSource: true
+        })
+      },
+      { id: "fiqh", run: () => fiqhMatches(query) },
+      { id: "historical", run: () => buildHistoricalResearchContext(query) },
+      { id: "official-institutions", run: () => searchOfficialInstitutions(query) },
+      { id: "rijal", run: () => searchRijalResearch(query) },
+      { id: "scholars", run: () => searchScholars(query, { limit: 20 }) },
+      { id: "knowledge-context", run: () => getKnowledgeContext({ query }) }
+    ]
+  });
+
+  const valueByProvider = new Map(
+    federation.results
+      .filter((result) => ["success", "cached"].includes(result.status))
+      .map((result) => [result.providerId, result.value])
+  );
+
+  const hadithData = valueByProvider.get("dorar-hadith") ?? [];
+  const sourceMatches = valueByProvider.get("unified-source-index") ?? [];
+  const fiqh = valueByProvider.get("fiqh") ?? [];
+  const historical = valueByProvider.get("historical") ?? { records: [], classification: { confidence: 0 } };
+  const officialInstitutions = valueByProvider.get("official-institutions") ?? [];
+  const rijalResearch = valueByProvider.get("rijal") ?? {
+    matched: false,
+    query: query || "",
+    profiles: [],
+    officialSecondaryReferences: [],
+    bookAccess: []
+  };
+  const scholarMatches = valueByProvider.get("scholars") ?? [];
+  const knowledge = valueByProvider.get("knowledge-context") ?? { sirahEvents: [], books: [], authors: [] };
+
+  const historicalRecords = (historical.records || []).map((item) => ({
     ...item,
-    relevance: historical.classification.confidence,
+    relevance: historical.classification?.confidence || 0,
     verification: item.verification || "catalog-record",
     corpus: "sunni",
     rights: "catalog-and-link-unless-licensed"
   }));
-  const officialInstitutions = searchOfficialInstitutions(query);
-  const rijalResearch = searchRijalResearch(query);
-  const scholarMatches = searchScholars(query, { limit: 20 });
-  const mergedSourceMatches = [...sourceMatches, ...fiqh, ...historicalRecords, ...officialInstitutions]
-    .sort((a, b) => (b.relevance || 0) - (a.relevance || 0));
+
+  const mergedSourceMatches = deduplicateSearchRecords(
+    [...sourceMatches, ...fiqh, ...historicalRecords, ...officialInstitutions]
+  ).sort((a, b) => (b.relevance || 0) - (a.relevance || 0));
 
   return {
     query,
-    responseLanguage: responseLocale,
+    responseLanguage: language.resolved,
     hadith: hadithData,
     scholarMatches,
     sourceMatches: mergedSourceMatches.map((item) => ({ ...item, evidence: buildEvidence(item) })),
@@ -144,7 +185,13 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
       rijalBookLocatorRequiredForEvidence: true,
       scholarCatalogIsDiscoveryLayer: true,
       scholarPresenceDoesNotEqualEndorsement: true,
-      scholarAttributionRequiresEvidence: true
+      scholarAttributionRequiresEvidence: true,
+      parallelProviderConcurrencyLimit: 8,
+      providerTimeoutMs: 1200,
+      providerFailuresAreFailSoft: true,
+      discoveryResultsAreNotAuthority: true,
+      rightsAndValidationRemainIndependentGates: true,
+      internalProviderTopologyHiddenFromUser: true
     }
   };
 }
