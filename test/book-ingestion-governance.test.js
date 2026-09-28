@@ -25,7 +25,10 @@ test("book ingestion requires provenance, rights and validation", () => {
 
 test("unclear or restricted rights fail closed", () => {
   for (const status of ["unknown", "rights-unclear", "restricted"]) {
-    assert.throws(() => validateBookIngestionRequest({ ...baseRequest, rights: { status } }), (error) => error.code === "RIGHTS_NOT_VERIFIED");
+    assert.throws(
+      () => validateBookIngestionRequest({ ...baseRequest, rights: { ...baseRequest.rights, status } }),
+      (error) => error.code === "RIGHTS_NOT_VERIFIED"
+    );
   }
 });
 
