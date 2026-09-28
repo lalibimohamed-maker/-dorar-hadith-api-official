@@ -11,7 +11,7 @@ const TYPE_TO_CATEGORY = new Map([
   ["usul_al_fiqh", "usul-fiqh"], ["legal_maxim", "usul-fiqh"],
   ["maqasid", "maqasid"], ["aqidah", "aqidah"],
   ["biography", "biographies"], ["rijal", "biographies"], ["scholarly_opinion", "biographies"],
-  ["book", "library"], ["book_section", "library"], ["research", "library"]
+  ["book", "library"], ["book_section", "library"], ["research", "library"], ["history", "sirah"], ["maghazi", "sirah"], ["companions", "biographies"], ["genealogy", "biographies"]
 ]);
 
 function clean(value) {
