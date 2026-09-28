@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'src/universal-reader-policy.js'
+      - 'src/universal-religious-scholarly-delivery.js'
       - 'src/digital-book-pipeline.js'
       - 'src/library-edition-registry.js'
       - 'src/book-source-connector.js'
@@ -12,6 +13,7 @@ on:
       - 'docs/universal-reader.md'
       - 'docs/universal-religious-scholarly-delivery.md'
       - 'test/universal-reader-policy.test.js'
+      - 'test/universal-religious-scholarly-delivery.test.js'
       - 'test/digital-book-pipeline.test.js'
       - 'test/global-reader-governance.test.js'
       - 'package.json'
@@ -66,6 +68,19 @@ jobs:
               x.digitalMaster.requiresValidation !== true) throw new Error('digital master governance gates missing');
           for (const format of x.digitalMaster.supportedFormats) if (!formats.has(format)) throw new Error('unsupported export format in contract');
           if (x.protectedBooks.fullDownloadForbiddenByIndexPresence !== true) throw new Error('protected full-download boundary missing');
+          if (x.scope?.inScope !== 'din-allah-religious-scholarly' || x.scope?.outOfScope !== 'general-world-books') {
+            throw new Error('religious scholarly scope contract missing');
+          }
+          if (x.scope?.comparativeCritical !== 'descriptive-critical-only-not-trusted-corpus') {
+            throw new Error('comparative-critical trust boundary missing');
+          }
+          const expectedPipeline = ['user-query','language-resolution','book-discovery-across-sources','edition-resolution','rights','provenance','multi-ocr','quality-control','digital-master','reader-download'];
+          if (JSON.stringify(x.deliveryPipeline) !== JSON.stringify(expectedPipeline)) {
+            throw new Error('full religious scholarly delivery pipeline drifted');
+          }
+          if (x.digitalMaster.multiOcrRequired !== true || x.digitalMaster.qualityControlRequired !== true) {
+            throw new Error('digital master OCR/quality gates missing');
+          }
           if (x.quran.arabicTextCanonical !== true ||
               x.quran.translationDoesNotReplaceArabic !== true ||
               x.quran.translationLanguageRecorded !== true ||
