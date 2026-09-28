@@ -18,6 +18,9 @@ function pushRecord(records, value, path = 'search') {
   }
   if (typeof value !== 'object') return;
 
+  const isBookCacheRecord = value?.cacheType === 'book' || value?.cacheLayer === 'book-cache';
+  if (isBookCacheRecord && value?.cacheGovernance?.allowed !== true) return;
+
   const text = firstNonEmpty(value, CONTENT_KEYS);
   const source = firstNonEmpty(value, ['source','url','sourceUrl','reference']);
   if (text && source) {
@@ -29,6 +32,11 @@ function pushRecord(records, value, path = 'search') {
       source,
       verification: value.verification || value.status || 'unknown',
       rights: value.rights || value.reusePolicy || 'source-dependent',
+      cacheGovernance: isBookCacheRecord ? {
+        layer: 'book-cache',
+        allowed: true,
+        authorityLayer: false
+      } : null,
       location: firstNonEmpty(value, LOCATION_KEYS),
       id: value.id || null
     });
@@ -58,6 +66,7 @@ export function buildEvidenceContext(searchResult, { maxItems = 8, maxCharsPerIt
     location: item.location,
     verification: item.verification,
     rights: item.rights,
+    cacheGovernance: item.cacheGovernance,
     sourcePath: item.path
   }));
 
