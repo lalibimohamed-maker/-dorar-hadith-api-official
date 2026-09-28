@@ -41,6 +41,7 @@ function validateInlineProvider(provider = {}) {
 
 export function validateProviderDefinition(provider = {}) {
   if (provider?.enabled === false) return { ok: false, reason: "disabled" };
+  if (provider?.scrape === true || provider?.scraping === true) return { ok: false, reason: "scraping-forbidden" };
   const definition = providerDefinition(provider.id);
   const source = definition || (validateInlineProvider(provider) ? provider : null);
   if (!source) return { ok: false, reason: definition ? "provider-policy-invalid" : "unregistered-provider-contract" };
