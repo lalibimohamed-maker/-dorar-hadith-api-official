@@ -31,3 +31,40 @@ test("the governed offline record contains provenance, rights and validation", (
   assert.equal(SAFE_BOOK.rights.status, "redistributable");
   assert.equal(SAFE_BOOK.validation.status, "valid");
 });
+
+
+test("persistent storage request is explicit and safe outside a browser", async () => {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+  try {
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: { storage: { persist: async () => true } },
+    });
+    const { requestPersistentStorage } = await import("../src/offline-pdf-library.js?persist-test");
+    assert.equal(await requestPersistentStorage(), true);
+
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: {},
+    });
+    assert.equal(await requestPersistentStorage(), false);
+  } finally {
+    if (previous) Object.defineProperty(globalThis, "navigator", previous);
+    else delete globalThis.navigator;
+  }
+});
+
+test("storage estimate has a safe zero fallback when unavailable", async () => {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+  try {
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: {},
+    });
+    const { storageEstimate } = await import("../src/offline-pdf-library.js?estimate-test");
+    assert.deepEqual(await storageEstimate(), { usage: 0, quota: 0 });
+  } finally {
+    if (previous) Object.defineProperty(globalThis, "navigator", previous);
+    else delete globalThis.navigator;
+  }
+});
