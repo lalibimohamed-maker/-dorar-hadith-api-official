@@ -52,6 +52,9 @@ jobs:
           if (network.limits.maxConcurrentProviders !== 8) throw new Error('provider network concurrency limit must be 8');
           if (network.governance.scrapingForbidden !== true) throw new Error('provider network scraping prohibition missing');
           if (network.connectorActivationPolicy.defaultEnabled !== false) throw new Error('external providers must remain opt-in');
+          if (network.providerIdentity?.runtimeUsesNeutralAdapterContract !== true) throw new Error('neutral provider adapter contract missing');
+          if (network.providerIdentity?.externalServiceNamesAreConfigurationDataOnly !== true) throw new Error('external service names must remain configuration data');
+          if (network.providerIdentity?.noProviderAvailabilityAssumption !== true) throw new Error('provider availability must not be assumed');
           for (const provider of Object.values(network.providerCandidates).flat()) {
             if (provider.scrapingAllowed !== false) throw new Error(`scraping policy invalid for ${provider.id}`);
             if (provider.resultRetention !== 'transient_only_unless_plan_explicitly_grants_storage' && provider.resultRetention !== 'provider_terms_gated') {
