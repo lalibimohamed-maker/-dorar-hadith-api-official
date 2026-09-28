@@ -159,9 +159,15 @@ const server = http.createServer(async (req, res) => {
   }
 
   const pathname = String(req.url || "/").split("?", 1)[0];
-  const allowedMethods = pathname.startsWith("/quran/video/") || pathname.startsWith("/quran/scientific-signs/")
-    ? new Set(["GET", "POST"])
-    : pathname === "/concept" ? new Set(["GET"]) : new Set(["GET", "HEAD"]);
+  const methodOverrides = new Map([
+    ["/quran/video/config", new Set(["GET", "HEAD"])],
+    ["/quran/video/validate", new Set(["POST"])],
+    ["/quran/video/background", new Set(["POST"])],
+    ["/quran/scientific-signs/config", new Set(["GET", "HEAD"])],
+    ["/quran/scientific-signs/project", new Set(["POST"])],
+    ["/concept", new Set(["GET", "HEAD"])]
+  ]);
+  const allowedMethods = methodOverrides.get(pathname) || new Set(["GET", "HEAD"]);
 
   if (!allowedMethods.has(req.method)) {
     res.setHeader("allow", [...allowedMethods].join(", "));
@@ -384,7 +390,7 @@ const server = http.createServer(async (req, res) => {
       const data = validateVideoSelection(body);
       return sendJson(res, 200, { locale, data });
     } catch (error) {
-      const status = ["BODY_TOO_LARGE", "INVALID_JSON"].includes(error.code) ? 413 : 400;
+      const status = error.code === "BODY_TOO_LARGE" ? 413 : 400;
       return sendJson(res, status, { error: error.message, locale });
     }
   }
@@ -395,7 +401,7 @@ const server = http.createServer(async (req, res) => {
       const data = buildVideoBackgroundPrompt(body.prompt, body.preset);
       return sendJson(res, 200, { locale, data });
     } catch (error) {
-      const status = ["BODY_TOO_LARGE", "INVALID_JSON"].includes(error.code) ? 413 : 400;
+      const status = error.code === "BODY_TOO_LARGE" ? 413 : 400;
       return sendJson(res, status, { error: error.message, locale });
     }
   }
