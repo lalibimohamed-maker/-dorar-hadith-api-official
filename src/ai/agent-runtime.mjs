@@ -1,4 +1,4 @@
-import { generateLocal } from './local-llm-runtime.mjs';
+import { generateLocal, embedLocal, rerankLocal, cosineSimilarity } from './local-llm-runtime.mjs';
 import { routeIntent } from './agent-intent-router.mjs';
 import { callAgentTool } from './agent-tool-registry.mjs';
 import { buildEvidenceContext, formatEvidenceForPrompt } from './evidence-context-builder.mjs';
@@ -28,6 +28,81 @@ function parseModelOutput(raw) {
   }
 }
 
+export async function retrieveAgentEvidence({
+  query,
+  searchResult,
+  env = process.env,
+  maxEvidence = 8,
+  maxCandidates = 24,
+  embeddingModelId = 'bge-m3-q8_0',
+  embeddingModelPath,
+  rerankerModelId = 'bge-reranker-v2-m3-q8_0',
+  rerankerModelPath,
+  embedFn = embedLocal,
+  rerankFn = rerankLocal
+} = {}) {
+  const candidateContext = buildEvidenceContext(searchResult, { maxItems: maxCandidates });
+  let candidates = candidateContext.evidence.map(item => ({ ...item }));
+  const retrieval = {
+    candidateCount: candidates.length,
+    semantic: { active: false, reason: 'not-configured' },
+    reranker: { active: false, reason: 'not-configured' }
+  };
+
+  const configuredEmbedding = Boolean(env.DEEN_EMBEDDING_MODEL_PATH || embeddingModelPath);
+  if (configuredEmbedding && candidates.length > 1) {
+    try {
+      const embedded = await embedFn({
+        modelId: embeddingModelId,
+        texts: [query, ...candidates.map(item => item.text)],
+        modelPath: embeddingModelPath,
+        env
+      });
+      const queryVector = embedded.embeddings[0];
+      candidates = candidates.map((item, index) => ({
+        ...item,
+        semanticScore: cosineSimilarity(queryVector, embedded.embeddings[index + 1])
+      })).sort((a, b) => b.semanticScore - a.semanticScore);
+      retrieval.semantic = { active: true, reason: 'local-embedding', modelId: embeddingModelId };
+    } catch (error) {
+      if (!['LOCAL_AI_RUNTIME_MISSING', 'LOCAL_AI_MODEL_PATH_MISSING'].includes(error?.code)) throw error;
+      retrieval.semantic = { active: false, reason: error.code };
+    }
+  }
+
+  const configuredReranker = Boolean(env.DEEN_RERANKER_MODEL_PATH || rerankerModelPath);
+  if (configuredReranker && candidates.length > 1) {
+    const shortlist = candidates.slice(0, Math.max(maxEvidence * 2, maxEvidence));
+    const ranked = await rerankFn({
+      modelId: rerankerModelId,
+      query,
+      documents: shortlist.map(item => item.text),
+      modelPath: rerankerModelPath,
+      env
+    });
+    const scoreByText = new Map(ranked.map(item => [item.document, item.score]));
+    candidates = candidates.map(item => ({
+      ...item,
+      rerankScore: scoreByText.has(item.text) ? scoreByText.get(item.text) : null
+    })).sort((a, b) => {
+      const ar = Number.isFinite(a.rerankScore) ? a.rerankScore : -Infinity;
+      const br = Number.isFinite(b.rerankScore) ? b.rerankScore : -Infinity;
+      if (ar !== br) return br - ar;
+      return (b.semanticScore || 0) - (a.semanticScore || 0);
+    });
+    retrieval.reranker = { active: true, reason: 'local-cross-encoder', modelId: rerankerModelId };
+  }
+
+  const evidence = candidates.slice(0, maxEvidence);
+  return Object.freeze({
+    ...candidateContext,
+    evidence,
+    count: evidence.length,
+    hasSufficientEvidence: evidence.length > 0,
+    retrieval
+  });
+}
+
 export async function runAgent({
   query,
   language = 'ar',
@@ -37,7 +112,14 @@ export async function runAgent({
   signal,
   searchFn,
   generateFn = generateLocal,
+  embedFn = embedLocal,
+  rerankFn = rerankLocal,
+  embeddingModelId = 'bge-m3-q8_0',
+  embeddingModelPath,
+  rerankerModelId = 'bge-reranker-v2-m3-q8_0',
+  rerankerModelPath,
   maxEvidence = 8,
+  maxCandidates = 24,
   maxTokens = 384,
   temperature = 0
 } = {}) {
@@ -45,7 +127,19 @@ export async function runAgent({
 
   const route = routeIntent(query);
   const tool = await callAgentTool('search.unified', { query, intent: route.intent, language, signal, searchFn });
-  const context = buildEvidenceContext(tool.search, { maxItems: maxEvidence });
+  const context = await retrieveAgentEvidence({
+    query,
+    searchResult: tool.search,
+    env,
+    maxEvidence,
+    maxCandidates,
+    embeddingModelId,
+    embeddingModelPath,
+    rerankerModelId,
+    rerankerModelPath,
+    embedFn,
+    rerankFn
+  });
 
   if (!context.hasSufficientEvidence) {
     const refusal = language === 'ar'
