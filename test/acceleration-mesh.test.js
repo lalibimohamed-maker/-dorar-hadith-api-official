@@ -34,6 +34,7 @@ test("cache policies favor short search TTLs and longer corpus TTLs", () => {
   assert.equal(cachePolicyForPath("/quran/ayah").ttlMs, 120_000);
   assert.equal(cachePolicyForPath("/sources").ttlMs, 60_000);
   assert.equal(cachePolicyForPath("/health").cache, false);
+  assert.equal(cachePolicyForPath("/assistant").cache, false);
 });
 
 test("cache entries retain policy TTL metadata", () => {
