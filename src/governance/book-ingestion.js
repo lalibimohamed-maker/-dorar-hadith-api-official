@@ -1,7 +1,5 @@
 import { assertRedistributable, assertRightsRecord } from "./rights-registry.js";
 
-const PUBLISHABLE_RIGHTS = new Set(["redistributable", "licensed", "public-domain"]);
-
 export class BookIngestionGovernanceError extends Error {
   constructor(code, message) {
     super(message);
