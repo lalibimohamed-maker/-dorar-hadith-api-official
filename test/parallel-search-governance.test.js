@@ -99,3 +99,50 @@ test("language resolution is deterministic and does not expose provider topology
   assert.equal(PARALLEL_SEARCH_LIMITS.maxConcurrent, 8);
   assert.equal(PARALLEL_SEARCH_LIMITS.defaultTimeoutMs, 1200);
 });
+
+
+test("cache and retry are opt-in per provider rather than global defaults", async () => {
+  let attempts = 0;
+  const cache = new Map();
+  const adapter = {
+    get: (key) => cache.get(key),
+    set: (key, value) => cache.set(key, value),
+    delete: (key) => cache.delete(key)
+  };
+  const { runParallelSearchProviders } = await import("../src/parallel-search-governance.js");
+  const first = await runParallelSearchProviders({
+    query: "test",
+    cache: adapter,
+    retries: 2,
+    jobs: [{
+      id: "brave",
+      run: async () => {
+        attempts += 1;
+        throw new Error("rate-limited");
+      }
+    }]
+  });
+  assert.equal(first.degradedJobs, 1);
+  assert.equal(attempts, 1);
+  assert.equal(adapter.get("brave::ar::test"), undefined);
+
+  let permittedAttempts = 0;
+  const permitted = await runParallelSearchProviders({
+    query: "test",
+    cache: adapter,
+    retries: 2,
+    jobs: [{
+      id: "local-permitted",
+      cacheable: true,
+      retryable: true,
+      run: async () => {
+        permittedAttempts += 1;
+        if (permittedAttempts < 2) throw new Error("transient");
+        return "ok";
+      }
+    }]
+  });
+  assert.equal(permitted.completedJobs, 1);
+  assert.equal(permittedAttempts, 2);
+  assert.ok(adapter.get("local-permitted::ar::test"));
+});
