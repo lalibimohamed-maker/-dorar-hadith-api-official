@@ -27,7 +27,6 @@ function hasResourceIdentity(operation) {
 
 function hasKnownSource(operation) {
   const source = operation?.source;
-  if (typeof source === "string") return Boolean(source.trim());
   if (!source || typeof source !== "object") return false;
   if (typeof source.id !== "string" || !source.id.trim()) return false;
   if (typeof source.url !== "string" || !source.url.trim()) return false;
@@ -41,13 +40,14 @@ function hasKnownSource(operation) {
 
 function hasProvenanceIdentity(operation) {
   const provenance = operation?.provenance;
-  return Boolean(
-    provenance &&
-    typeof provenance === "object" &&
-    ((typeof provenance.resourceId === "string" && provenance.resourceId.trim()) ||
-      (typeof provenance.source === "string" && provenance.source.trim()) ||
-      (typeof provenance.sourceId === "string" && provenance.sourceId.trim()))
-  );
+  if (!provenance || typeof provenance !== "object") return false;
+  const resourceIdentity = typeof provenance.resourceId === "string" && provenance.resourceId.trim();
+  const sourceIdentity = typeof provenance.source === "string" && provenance.source.trim()
+    || typeof provenance.sourceId === "string" && provenance.sourceId.trim();
+  const versionIdentity = typeof provenance.edition === "string" && provenance.edition.trim()
+    || typeof provenance.version === "string" && provenance.version.trim()
+    || typeof provenance.revision === "string" && provenance.revision.trim();
+  return Boolean(resourceIdentity && sourceIdentity && versionIdentity);
 }
 
 function hasPassedValidation(operation) {
