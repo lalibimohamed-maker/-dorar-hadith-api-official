@@ -111,6 +111,38 @@ jobs:
           if (category33.languageIdInvariant !== true) throw new Error('IslamReligion category 33 ID should remain language-invariant');
           if (category33.localizedSlugMustBeResolvedFromSource !== false) throw new Error('IslamReligion category route must not require synthetic slug translation');
           if (category33.languageIndexedRoute !== true) throw new Error('IslamReligion category language-index routing flag missing');
+          const resourceGraph = islamReligion.resourceGraph || [];
+          if (resourceGraph.length < 24) throw new Error('IslamReligion resource graph coverage regressed');
+          const requiredResourceUrls = [
+            'https://www.islamreligion.com/category/1033/evidence-islam-is-truth',
+            'https://www.islamreligion.com/category/124/how-to-convert-to-islam',
+            'https://www.islamreligion.com/category/1043/benefits-of-islam',
+            'https://www.islamreligion.com/category/1059/hereafter',
+            'https://www.islamreligion.com/category/1055/worship-and-practice',
+            'https://www.islamreligion.com/category/1124/how-to-convert-to-islam',
+            'https://www.islamreligion.com/category/1143/short-videos-about-islam',
+            'https://www.islamreligion.com/category/1131/new-muslims',
+            'https://www.islamreligion.com/category/1091/systems-in-islam',
+            'https://www.islamreligion.com/category/127/islamic-songs-nasheed',
+            'https://www.islamreligion.com/category/1087/islamic-history',
+            'https://www.islamreligion.com/category/1083/current-issues',
+            'https://www.islamreligion.com/category/1079/prophet-muhammad',
+            'https://www.islamreligion.com/category/1075/holy-quran',
+            'https://www.islamreligion.com/category/1068/comparative-religion',
+            'https://www.islamreligion.com/category/1063/stories-of-new-muslims',
+            'https://www.islamreligion.com/articles',
+            'https://www.islamreligion.com/',
+            'https://www.islamreligion.com/islam-at-a-glance',
+            'https://www.islamreligion.com/e-books',
+            'https://www.islamreligion.com/search?query=scientific-miracles-of-holy-quran&search_type=all',
+            'https://www.islamreligion.com/search?query=scientific-miracles-of-prophet-muhammad-sayings&search_type=all',
+            'https://www.islamreligion.com/search?query=authenticity-and-preservation-of-holy-quran&search_type=all'
+          ];
+          const indexedUrls = new Set(resourceGraph.map((resource) => resource.url));
+          for (const url of requiredResourceUrls) if (!indexedUrls.has(url)) throw new Error(`IslamReligion resource missing: ${url}`);
+          if (!resourceGraph.some((resource) => resource.url.endsWith('/category/124/how-to-convert-to-islam'))) throw new Error('IslamReligion category 124 missing');
+          if (!resourceGraph.some((resource) => resource.url.endsWith('/category/1124/how-to-convert-to-islam'))) throw new Error('IslamReligion category 1124 missing');
+          if (islamReligion.resourceGraphPolicy?.doNotDeduplicateByTitle !== true) throw new Error('IslamReligion distinct routes must not be deduplicated by title');
           if (category33.localizedRouteTemplate !== 'https://www.islamreligion.com/{lang}/category/33/preuves-que-lislam-est-la-verite') throw new Error('IslamReligion localized category route template drifted');
           const variants = new Map((category33.languageVariants || []).map((entry) => [entry.lang, entry]));
           for (const lang of ['fr','en','es','ar']) if (!variants.has(lang)) throw new Error(`IslamReligion category language variant missing: ${lang}`);
