@@ -19,3 +19,22 @@ The user receives one normalized search response; internal provider topology, fa
 `unifiedSearch()` fans out to the Dorar hadith search, unified source index, fiqh research, historical research, official institutions, rijal research, scholar research and knowledge context providers. These eight jobs are coordinated under the same concurrency and timeout contract.
 
 The search layer does not mutate canonical Corpus content and does not grant redistribution rights.
+
+
+## Layered provider network
+
+The provider registry is maintained separately in `config/search-provider-network-2026.json`.
+
+Routing layers are:
+- Quran and Quran sciences: specialized Quran sources first, then web.
+- Tafsir: specialized tafsir sources first, then web.
+- Hadith: specialized hadith sources first, then web.
+- Books: book/library connectors first, then web.
+- Fatwa: qualified fatwa sources first, then web.
+- General in-scope encyclopedia queries: multiple web providers.
+
+The current web candidate registry includes Google, Bing, Brave, Mojeek, Yandex and DuckDuckGo. They are candidates, not automatically activated connectors. Activation requires a provider-approved integration method and current terms review.
+
+No provider is queried by scraping when an official API or other provider-permitted interface is required. Rate limits must be respected and provider-specific storage/cache/retry rules are enforced independently. For example, Brave's current Search API terms prohibit storing or caching Search Results beyond transient operational storage unless the applicable plan explicitly grants storage rights. citeturn761850search0turn761850search4
+
+Provider results remain discovery material and do not become authoritative, canonical Corpus content, or redistributable material merely because they were returned by a search API.
