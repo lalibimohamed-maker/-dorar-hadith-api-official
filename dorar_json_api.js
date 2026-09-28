@@ -471,4 +471,8 @@ server.keepAliveTimeout = 65_000;
 server.headersTimeout = 70_000;
 server.requestTimeout = 30_000;
 
-server.listen(PORT, HOST, () => console.log(`Deen Allah API ${API_VERSION} listening on ${HOST}:${PORT}`));
+server.listen(PORT, HOST, () => {
+  const address = server.address();
+  const boundPort = typeof address === "object" && address ? address.port : PORT;
+  console.log(`Deen Allah API ${API_VERSION} listening on ${HOST}:${boundPort}`);
+});
