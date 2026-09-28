@@ -551,6 +551,25 @@
           "localizedPathRule": "Resolve the localized category ID and slug from source navigation; never reuse the French numeric ID across languages.",
           "note": "Verified French localized category uses ID 33; an earlier category classification was incorrect and has been removed."
         }
+      ],
+      "canonicalHome": "https://www.islamreligion.com/",
+      "languageDiscovery": {
+        "mode": "source_navigation",
+        "sourceUrl": "https://www.islamreligion.com/",
+        "currentObservedCount": 15,
+        "futureLanguagesAllowed": true,
+        "doNotTreatObservedListAsExhaustive": true,
+        "resolutionRule": "Discover the site's current language-navigation links and preserve exact source-provided language code, label and localized URL."
+      },
+      "localizedSiteTemplate": "https://www.islamreligion.com/{lang}",
+      "localizedVideosTemplate": "https://www.islamreligion.com/{lang}/videos",
+      "unprefixedEnglishVideos": "https://www.islamreligion.com/videos",
+      "routeGraph": [
+        "localized_home",
+        "localized_videos",
+        "localized_video_category",
+        "localized_video_item",
+        "localized_child_category"
       ]
     }
   ]
