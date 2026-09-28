@@ -1,3 +1,8 @@
 # Generated Python bytecode must never enter governed acquisition commits.
 __pycache__/
 *.py[cod]
+
+# Local AI model weights are machine-local and must never enter Git history.
+/models/
+.local-ai/
+.cache/local-ai/
