@@ -4,8 +4,13 @@ import { createAccelerationMesh, cachePolicyForPath } from "../src/acceleration-
 
 test("acceleration mesh caches values and reports hits", () => {
   const mesh = createAccelerationMesh({ maxEntries: 2, maxBytes: 1024 * 1024 });
-  mesh.set("one", Buffer.from(JSON.stringify({ ok: true })), { ttlMs: 10_000, contentType: "application/json; charset=utf-8" });
+  mesh.set("one", Buffer.from(JSON.stringify({ ok: true })), {
+    ttlMs: 10_000,
+    contentType: "application/json; charset=utf-8",
+    headers: { "content-type": "application/json; charset=utf-8", etag: '"fixture"' }
+  });
   assert.equal(mesh.get("one")?.status, 200);
+  assert.equal(mesh.get("one")?.headers?.etag, '"fixture"');
   assert.equal(mesh.profile().hits, 1);
   assert.equal(mesh.profile().misses, 0);
   assert.equal(mesh.profile().tier, "L1-memory");
