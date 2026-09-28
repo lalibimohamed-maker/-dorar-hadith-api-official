@@ -83,14 +83,14 @@ jobs:
           if (x.responsePolicy.singleUnifiedAnswerSurface !== true || x.responsePolicy.internalProviderDetailsHidden !== true) {
             throw new Error('single user-facing search surface policy missing');
           }
-          const providers = Object.values(x.providerCandidates).flat();
+          const providers = Object.values(network.providerCandidates).flat();
           for (const provider of providers) {
             if (provider.scrapingAllowed !== false) throw new Error(`scraping must remain disabled: ${provider.id}`);
             if (!provider.integration || (!provider.integration.includes('api') && !provider.integration.includes('interface'))) {
               throw new Error(`provider integration must use an official/permitted interface: ${provider.id}`);
             }
           }
-          for (const layer of ['quran','tafsir','hadith','books','fatwa','web']) if (!x.layers[layer]) throw new Error(`provider layer missing: ${layer}`);
+          for (const layer of ['quran','tafsir','hadith','books','fatwa','web']) if (!x.routingLayers?.includes(layer)) throw new Error(`provider layer missing: ${layer}`);
           console.log('Unified search + parallel search governance contract: PASS');
           NODE
 
