@@ -101,20 +101,20 @@ jobs:
           if (source.languagePathTemplate !== 'https://www.islamreligion.com/{lang}/videos') throw new Error('IslamReligion localized video path template drifted');
           if (source.localizationEvidenceUrl !== 'https://www.islamreligion.com/ar/videos') throw new Error('IslamReligion localization evidence URL drifted');
           if ((x.islamicVideoSources?.find((s) => s.sourceId === 'islamreligion-videos')?.localizedEntryPoints?.supportedLanguages || []).length !== 15) throw new Error('engine language coverage drifted');
-          const category1033 = islamReligion.categories?.find((category) => category.id === '1033');
-          if (!category1033) throw new Error('IslamReligion category 1033 binding missing');
-          if (category1033.url !== 'https://www.islamreligion.com/fr/category/1033/preuves-que-lislam-est-la-verite') throw new Error('IslamReligion category 1033 French URL drifted');
-          if (category1033.languageScopedCategoryId !== true) throw new Error('IslamReligion category IDs must remain language-scoped');
-          if (category1033.languageIdInvariant !== false) throw new Error('IslamReligion category ID invariant flag drifted');
-          const variants = new Map((category1033.languageVariants || []).map((entry) => [entry.lang, entry]));
+          const category33 = islamReligion.categories?.find((category) => category.id === '1033');
+          if (!category33) throw new Error('IslamReligion category 33 binding missing');
+          if (category33.url !== 'https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite') throw new Error('IslamReligion category 33 French URL drifted');
+          if (category33.languageScopedCategoryId !== true) throw new Error('IslamReligion category IDs must remain language-scoped');
+          if (category33.languageIdInvariant !== false) throw new Error('IslamReligion category ID invariant flag drifted');
+          const variants = new Map((category33.languageVariants || []).map((entry) => [entry.lang, entry]));
           for (const lang of ['fr','en','es','ru','ar']) if (!variants.has(lang)) throw new Error(`IslamReligion category language variant missing: ${lang}`);
-          if (variants.get('fr').categoryId !== '1033') throw new Error('French category 1033 binding drifted');
+          if (variants.get('fr').categoryId !== '33') throw new Error('French category 33 binding drifted');
           if (variants.get('en').categoryId !== '33') throw new Error('English category 33 binding drifted');
           if (variants.get('es').categoryId !== '33') throw new Error('Spanish category 33 binding drifted');
           if (variants.get('ru').discoveryRequired !== true || variants.get('ar').discoveryRequired !== true) throw new Error('Unverified localized category IDs must require source discovery');
-          if (category1033.localizedSlugMustBeResolvedFromSource !== true) throw new Error('IslamReligion localized category slugs must be source-resolved');
+          if (category33.localizedSlugMustBeResolvedFromSource !== true) throw new Error('IslamReligion localized category slugs must be source-resolved');
           const categorySource = (registry.sources || []).find((entry) => entry.id === 'islamreligion-videos');
-          if (!categorySource.collections?.some((collection) => collection.id === '1033')) throw new Error('source registry category 1033 entry missing');
+          if (!categorySource.collections?.some((collection) => collection.id === '1033')) throw new Error('source registry category 33 entry missing');
           const requiredTrue = [
             'freeFirst','selfHostedPreferred','noPaidCoreDependency','noAutomaticPromotion',
             'noSilentReplacement','noCorpusMutation','noUnlicensedMediaReuse','noUnverifiedReligiousClaim',
