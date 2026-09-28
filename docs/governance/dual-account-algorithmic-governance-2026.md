@@ -1,51 +1,41 @@
-# Dual-Account Algorithmic Governance — 2026
+# Din Allah Encyclopedia — Dual-Account Algorithmic Governance 2026
 
 ## Purpose
 
-Keep the primary account (`lalibimohamed-maker`) and secondary account (`lalibimohamed82-coder`) coordinated without turning the secondary account into an administrative bypass or a single point of failure.
+Establish a two-account governance model that improves continuity, review independence, resilience, and maintainability without duplicating administrative power.
 
 ## Roles
 
-### Primary — `lalibimohamed-maker`
-- Final repository ownership and administrative authority.
-- Primary owner for security controls, source-trust gates, release integrity, dependency manifests, and protected configuration.
-- Final decision-maker for sensitive scholarly provenance and rights boundaries.
+### Primary account — `lalibimohamed-maker`
+- Repository ownership and final administrative authority.
+- Security-critical ownership and emergency governance.
+- Final responsibility for repository rules, protected branches, secrets, and bypass controls.
 
-### Secondary — `lalibimohamed82-coder`
-- Independent maintainer and reviewer for ordinary content/application paths.
-- Can review, test, harden, document, and improve non-sensitive code and content foundations.
-- Must not receive administrative bypass authority merely for continuity.
+### Secondary account — `lalibimohamed82-coder`
+- Independent maintainer and reviewer for approved operational, content, documentation, testing, performance, and non-critical engineering paths.
+- May contribute, review, and repair within granted Write access.
+- Must not receive repository Admin or branch-protection bypass solely for continuity.
 
-## Two-person control loop
+## Governance loop
 
-1. A change is proposed on a topic branch.
-2. CI and security gates evaluate the change.
-3. The account that authored/pushed the latest change cannot satisfy the independent-review requirement for that same change.
-4. The other account reviews the exact current diff.
-5. A changed diff invalidates the old approval where GitHub's stale-review policy applies; the current state must be re-reviewed.
-6. protected `main` remains the only promotion path.
-7. Auto-merge may complete only after the configured checks and review requirements are satisfied.
+`propose -> independent review -> checks -> approve -> protected merge -> observe -> improve`
 
-## Scope separation
+A change authored by one account must not be approved by that same account where the repository rules require independent approval. The current `main` protections remain the final enforcement layer.
 
-The secondary account is intentionally shared owner with the primary account for ordinary `src`, `test`, `scripts`, `docs`, and general `config` paths. Security and source-trust controls remain primary-only through explicit CODEOWNERS rules.
+## Ownership model
 
-## Continuity and fail-closed behavior
+- Shared ownership: content, catalogues, application code, tests, documentation, performance, non-secret automation.
+- Primary-only ownership: security workflows, source-trust controls, secrets/configuration with security impact, `CODEOWNERS`, and repository governance itself.
+- Every sensitive path keeps provenance, validation, and review requirements.
 
-- If either account is unavailable, automated discovery, testing, health checks, and issue/report generation may continue.
-- No automation may use account unavailability as permission to bypass protected review, provenance, rights, or security gates.
-- When a preferred engine or provider is unavailable, only a pre-qualified free fallback may be selected automatically.
-- If no qualified fallback exists for a security-sensitive operation, the operation fails closed.
+## Continuity and failover
 
-## Governance invariants
+For automated engines and services, failover may occur only on measurable health, compatibility, availability, or integrity signals. Failover must not silently promote unverified scholarly material.
 
-- No self-approval of a change by its author.
-- No administrative bypass granted to the secondary account solely for convenience.
-- No silent promotion of discovered scholarly text.
-- No automatic override of rights or provenance controls.
-- No paid dependency may become a hidden hard requirement.
-- Every automatic improvement remains observable through Git history, CI evidence, or an issue/report.
+## Improvement policy
 
-## Review model
+Prefer free/open alternatives first. Evaluate replacements by measured correctness, compatibility, speed, security, maintenance health, and legal/redistribution constraints. A newer dependency or engine is adopted through the same protected review pipeline.
 
-The repository should continue to use protected branches/rulesets, required status checks, independent review, and CODEOWNERS for sensitive paths. This combines account separation with repository-native controls rather than relying on trust in either account alone.
+## No duplication of authority
+
+The secondary account is deliberately not an administrative clone. Security comes from separation of duties, review independence, protected `main`, and layered automation rather than from granting identical privileges to both accounts.
