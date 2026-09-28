@@ -1,3 +1,11 @@
+const rightsRecord = {
+  resourceId: 'book:123',
+  status: 'licensed',
+  basis: 'explicit-license',
+  source: 'https://example.invalid/rights',
+  verifiedAt: '2026-09-28',
+  verifier: 'governance-test'
+};
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createExecutionPlan, evaluateOperation, listGovernanceNetworks } from '../src/algorithmic-governance-mesh.js';
@@ -15,7 +23,8 @@ test('allows a non-destructive verified operation and creates an audit plan', ()
     target: 'book:123',
     requiresRights: true,
     requiresIntegrity: true,
-    evidence: { rightsVerified: true, integrityVerified: true },
+    rightsRecord,
+    evidence: { integrityVerified: true },
     rollbackAvailable: true
   });
   assert.equal(plan.allowed, true);
@@ -29,8 +38,22 @@ test('blocks destructive work without recovery', () => {
   assert.equal(decision.allowed, false);
 });
 
-test('blocks redistribution when rights are not verified', () => {
+test('blocks redistribution without a complete rights ledger record', () => {
   const decision = evaluateOperation({ action: 'publish', requiresRights: true, evidence: {} });
+  assert.equal(decision.allowed, false);
+});
+
+test('accepts redistribution only with a complete allowed rights record', () => {
+  const decision = evaluateOperation({ action: 'publish', requiresRights: true, rightsRecord });
+  assert.equal(decision.allowed, true);
+});
+
+test('status-only rights claims do not satisfy the governance mesh', () => {
+  const decision = evaluateOperation({
+    action: 'publish',
+    requiresRights: true,
+    rightsRecord: { status: 'licensed' }
+  });
   assert.equal(decision.allowed, false);
 });
 
