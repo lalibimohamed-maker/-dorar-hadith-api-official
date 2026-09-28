@@ -49,13 +49,15 @@ test("delivery plan requires rights, provenance, multi-OCR alignment and quality
     sourceClass: "approved",
     rights: { status: "licensed" },
     provenance: { verified: true },
-    ocr: { status: "aligned" },
+    ocr: { status: "aligned", engines: [{ id: "ocr-a" }, { id: "ocr-b" }] },
     validation: { status: "passed" },
     browserLanguage: "fr"
   });
   assert.deepEqual(ready.pipeline, [...DELIVERY_PIPELINE]);
   assert.equal(ready.language, "fr");
   assert.equal(ready.digitalMasterEligible, true);
+  assert.equal(ready.independentOcrEngineCount, 2);
+  assert.equal(ready.multiOcrValidated, true);
   assert.deepEqual(ready.downloadFormats, ["pdf", "docx", "epub"]);
 
   const blockedOcr = buildReligiousScholarlyDeliveryPlan({
@@ -63,7 +65,7 @@ test("delivery plan requires rights, provenance, multi-OCR alignment and quality
     sourceClass: "approved",
     rights: { status: "licensed" },
     provenance: { verified: true },
-    ocr: { status: "needs-review" },
+    ocr: { status: "needs-review", engines: [{ id: "ocr-a" }, { id: "ocr-b" }] },
     validation: { status: "passed" },
     browserLanguage: "fr"
   });
