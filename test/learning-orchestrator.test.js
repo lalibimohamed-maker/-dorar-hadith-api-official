@@ -9,7 +9,8 @@ import {
   updateLearnerFromEvent,
   createLearningTrace,
   createLearningOrchestrator,
-  calculateRetrievability
+  calculateRetrievability,
+  masteryEvidence
 } from '../src/learning/learning-orchestrator.mjs';
 import { fsrsSchedule, sm2Schedule, leitnerSchedule, deadlineAwareSchedule } from '../src/learning/scheduler-registry.mjs';
 
@@ -105,13 +106,19 @@ test('trace is source-to-follow-up complete', () => {
   assert.equal(trace.followUp.nextReview.startsWith('2026-'), true);
 });
 
-test('scheduler state is isolated per content context', () => {
+test('scheduler state is isolated per learner and content context', () => {
   const engine = createLearningOrchestrator({ scheduler: 'fsrs' });
-  engine.schedule('card-1', { contextKey:'hadith' }, 'good', { now:'2026-09-28T10:00:00.000Z' });
-  assert.ok(engine.getContextState('hadith')['card-1']);
-  assert.deepEqual(engine.getContextState('fiqh'), {});
+  engine.schedule('card-1', { learnerId:'learner-a', contextKey:'hadith' }, 'good', { now:'2026-09-28T10:00:00.000Z' });
+  assert.ok(engine.getContextState('hadith', 'learner-a')['card-1']);
+  assert.deepEqual(engine.getContextState('hadith', 'learner-b'), {});
+  assert.deepEqual(engine.getContextState('fiqh', 'learner-a'), {});
 });
 
 test('retrievability decreases as elapsed time grows', () => {
   assert.ok(calculateRetrievability({ stabilityDays: 10, elapsedDays: 5 }) > calculateRetrievability({ stabilityDays: 10, elapsedDays: 20 }));
+});
+
+test('mastery requires delayed or transfer evidence', () => {
+  assert.equal(masteryEvidence({ mastery:0.9, delayedAssessments:0, transferAssessments:0 }).eligible, false);
+  assert.equal(masteryEvidence({ mastery:0.9, delayedAssessments:1, transferAssessments:0 }).eligible, true);
 });
