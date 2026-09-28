@@ -2,15 +2,140 @@ openapi: 3.1.0
 info:
   title: Deen Allah Encyclopedia API
   version: 0.11.0
-  description: Multilingual source-attributed research API for Quran, hadith, tafsir, creed, fiqh, sirah, maqasid, faraid and Quran learning. Search and five-second long-press concept cards respond in the selected language without a separate meaning-translation layer.
+  description: Multilingual source-attributed research API for Quran, hadith, tafsir, creed, fiqh, sirah, maqasid, faraid and Quran learning. Quran Arabic text remains distinct from meaning translations, and source attribution and verification states are preserved.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
+security:
+  - {}
+  - ApiKey: []
 paths:
+  /:
+    get:
+      operationId: getApiRoot
+      responses:
+        '200': {description: API metadata and endpoint catalog}
   /health:
     get:
       operationId: healthCheck
       responses:
         '200': {description: Healthy}
+  /locales:
+    get:
+      operationId: listLocales
+      responses:
+        '200': {description: Supported locales}
+  /categories:
+    get:
+      operationId: listCategories
+      responses:
+        '200': {description: Source categories}
+  /sources:
+    get:
+      operationId: listSources
+      parameters:
+        - {name: category, in: query, schema: {type: string}}
+        - {name: role, in: query, schema: {type: string}}
+        - {name: country, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Source registry entries}
+  /sources/one:
+    get:
+      operationId: getSource
+      parameters:
+        - {name: id, in: query, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Source record}
+        '400': {description: Missing source id}
+        '404': {description: Source not found}
+  /books:
+    get:
+      operationId: listBooks
+      parameters:
+        - {name: subject, in: query, schema: {type: string}}
+        - {name: madhhab, in: query, schema: {type: string}}
+        - {name: authorId, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Book catalog}
+  /authors:
+    get:
+      operationId: listAuthors
+      parameters:
+        - {name: madhhab, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Author catalog}
+  /maqasid:
+    get:
+      operationId: getMaqasid
+      responses:
+        '200': {description: Maqasid data}
+  /search:
+    get:
+      operationId: search
+      summary: Unified source-aware search
+      description: Single user-facing search surface combining governed internal providers and source-attributed evidence. Potential relationships remain separate from verified evidence and discovery never makes a result authoritative.
+      parameters:
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+        - {name: lang, in: query, schema: {type: string}}
+        - {name: includePotentialMatches, in: query, schema: {type: boolean, default: false}}
+      responses:
+        '200':
+          description: Search results in the selected response language
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query: {type: string}
+                  responseLanguage: {type: string}
+                  locale: {type: object}
+                  direction: {type: string}
+                  hadith: {type: array, items: {type: object}}
+                  scholarMatches: {type: array, items: {type: object}}
+                  sourceMatches: {type: array, items: {type: object}}
+                  verifiedEvidence: {type: array, items: {type: object}}
+                  potentialMatches: {type: array, items: {type: object}}
+                  policy: {type: object}
+        '400': {description: Missing query}
+        '413': {description: Query too long}
+        '429': {description: Rate limit exceeded}
+        '502': {description: Search provider failure or timeout}
+  /concept:
+    get:
+      operationId: getConceptCard
+      summary: Contextual concept card for a selected term
+      description: Resolves the selected term in its current research context. The response preserves source provenance and distinguishes canonical Arabic from localized presentation.
+      parameters:
+        - {name: term, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+        - {name: context, in: query, schema: {type: string}}
+        - {name: lang, in: query, schema: {type: string}}
+        - {name: comparative, in: query, schema: {type: boolean, default: false}}
+      responses:
+        '200': {description: Concept knowledge bundle}
+        '400': {description: Missing term}
+        '413': {description: Term too long}
+        '502': {description: Concept resolution failure}
+  /quran/ayah:
+    get:
+      operationId: getQuranAyah
+      parameters:
+        - {name: verse, in: query, required: true, schema: {type: string}}
+        - {name: translationIds, in: query, schema: {type: string, description: Comma-separated positive translation edition IDs}}
+        - {name: tafsirIds, in: query, schema: {type: string, description: Comma-separated positive tafsir edition IDs}}
+        - {name: words, in: query, schema: {type: boolean, default: false}}
+      responses:
+        '200': {description: Quran ayah context}
+        '400': {description: Missing verse}
+        '404': {description: Ayah not found}
+        '502': {description: Quran provider failure}
+        '503': {description: Quran provider is not configured}
+  /quran/translations:
+    get:
+      operationId: listQuranTranslations
+      parameters:
+        - {name: lang, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Quran translations}
+        '502': {description: Translation provider failure}
   /quran/video/config:
     get:
       operationId: getQuranVideoConfig
@@ -29,14 +154,19 @@ paths:
               type: object
               required: [reciterId]
               properties:
-                surahs: {type: array, items: {type: integer, minimum: 1, maximum: 114}}
-                ranges: {type: array, items: {type: object}}
+                surahs:
+                  type: array
+                  items: {type: integer, minimum: 1, maximum: 114}
+                ranges:
+                  type: array
+                  items: {type: object}
                 reciterId: {type: string}
                 format: {type: string, enum: [mp4]}
                 resolution: {type: string, enum: [720p, 1080p, 1440p]}
       responses:
         '200': {description: Validated video selection}
-        '400': {description: Invalid selection}
+        '400': {description: Invalid selection or JSON}
+        '413': {description: JSON request body too large}
   /quran/video/background:
     post:
       operationId: buildQuranVideoBackgroundPrompt
@@ -52,6 +182,8 @@ paths:
                 preset: {type: string}
       responses:
         '200': {description: Background request}
+        '400': {description: Invalid selection or JSON}
+        '413': {description: JSON request body too large}
   /quran/scientific-signs/config:
     get:
       operationId: getQuranScientificSignsConfig
@@ -78,63 +210,8 @@ paths:
                 religiousSources: {type: array, items: {type: object}}
       responses:
         '200': {description: Project created for source review and video rendering}
-        '400': {description: Invalid project}
-  /search:
-    get:
-      operationId: search
-      summary: Unified source-aware search orchestrating Dorar hadith retrieval and the knowledge index; potential relationships remain separate from verified evidence
-      description: |
-        The /search endpoint is the single user-facing search surface. It orchestrates official Dorar hadith retrieval with the source-aware knowledge index and internally governed provider search. Indexed results retain source attribution. Potential relationships are returned separately from verified evidence and never become authoritative merely by being discovered.
-      parameters:
-        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
-        - {name: lang, in: query, required: false, schema: {type: string}}
-        - {name: comparative, in: query, required: false, schema: {type: boolean, default: false}}
-      responses:
-        '200':
-          description: Search results with provenance in the selected language
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  query: {type: string}
-                  responseLanguage: {type: string}
-                  sourceMatches: {type: array, items: {type: object}}
-                  verifiedEvidence: {type: array, items: {type: object}}
-                  potentialMatches: {type: array, items: {type: object}}
-                  policy:
-                    type: object
-                    properties:
-                      sourceAttributionRequired: {type: boolean}
-                      verifiedEvidenceSeparatedFromPotentialRelationships: {type: boolean}
-
-  /concept:
-    get:
-      operationId: getConceptCard
-      summary: Medium concept card opened after a five-second long press; no meaning-translation layer
-      parameters:
-        - {name: term, in: query, required: true, schema: {type: string}}
-        - {name: context, in: query, required: false, schema: {type: string}}
-        - {name: lang, in: query, required: false, schema: {type: string}}
-      responses:
-        '200': {description: Concept card}
-  /quran/ayah:
-    get:
-      operationId: getQuranAyah
-      parameters:
-        - {name: verse, in: query, required: true, schema: {type: string}}
-        - {name: translationIds, in: query, required: false, schema: {type: string}}
-        - {name: tafsirIds, in: query, required: false, schema: {type: string}}
-        - {name: words, in: query, required: false, schema: {type: boolean}}
-      responses:
-        '200': {description: Quran ayah context}
-  /quran/translations:
-    get:
-      operationId: listQuranTranslations
-      parameters:
-        - {name: lang, in: query, required: false, schema: {type: string}}
-      responses:
-        '200': {description: Quran translations}
+        '400': {description: Invalid project or JSON}
+        '413': {description: JSON request body too large}
   /tajweed:
     get:
       operationId: getTajweedCurriculum
@@ -147,6 +224,135 @@ paths:
         - {name: id, in: query, required: true, schema: {type: string}}
       responses:
         '200': {description: Tajweed lesson}
+        '400': {description: Missing lesson id}
+        '404': {description: Lesson not found}
+  /fiqh:
+    get:
+      operationId: getFiqhFramework
+      parameters:
+        - {name: scholar, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Fiqh research framework}
+  /fiqh/research:
+    get:
+      operationId: searchFiqhResearch
+      parameters:
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+      responses:
+        '200': {description: Fiqh research results}
+        '400': {description: Missing query}
+        '413': {description: Query too long}
+  /fiqh/template:
+    get:
+      operationId: buildFiqhResearchTemplate
+      parameters:
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+        - {name: madhhab, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Fiqh research template}
+        '400': {description: Missing query}
+        '413': {description: Query too long}
+  /hadith/methodology:
+    get:
+      operationId: getHadithMethodology
+      responses:
+        '200': {description: Hadith methodology}
+  /hadith/narrator-grades:
+    get:
+      operationId: listNarratorGrades
+      responses:
+        '200': {description: Narrator grades}
+  /hadith/chain-phenomena:
+    get:
+      operationId: listChainPhenomena
+      responses:
+        '200': {description: Chain phenomena}
+  /hadith/rijal-books:
+    get:
+      operationId: listRijalBooks
+      responses:
+        '200': {description: Core rijal books}
+  /hadith/narrator/profile:
+    get:
+      operationId: getNarratorProfile
+      parameters:
+        - {name: name, in: query, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Narrator research profile}
+        '400': {description: Missing narrator name}
+  /hadith/narrator/compare:
+    get:
+      operationId: compareNarratorJudgments
+      parameters:
+        - {name: judgments, in: query, required: false, schema: {type: string, description: URL-encoded JSON array}}
+      responses:
+        '200': {description: Narrator judgment comparison}
+        '400': {description: Invalid judgments JSON}
+        '413': {description: Judgments payload too large}
+  /research/domains:
+    get:
+      operationId: listResearchDomains
+      responses:
+        '200': {description: Knowledge domains and policy}
+  /research/domain:
+    get:
+      operationId: getResearchDomain
+      parameters:
+        - {name: id, in: query, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Research domain}
+        '400': {description: Missing domain id}
+        '404': {description: Domain not found}
+  /research/scholars:
+    get:
+      operationId: searchResearchScholars
+      parameters:
+        - {name: q, in: query, schema: {type: string, maxLength: 300}}
+        - {name: domain, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Scholar discovery results}
+  /inheritance:
+    get:
+      operationId: calculateInheritance
+      parameters:
+        - {name: madhhab, in: query, schema: {type: string, default: hanbali}}
+        - {name: estate, in: query, schema: {type: number, minimum: 0}}
+        - {name: debts, in: query, schema: {type: number, minimum: 0}}
+        - {name: bequest, in: query, schema: {type: number, minimum: 0}}
+        - {name: husband, in: query, schema: {type: integer, minimum: 0}}
+        - {name: wives, in: query, schema: {type: integer, minimum: 0}}
+        - {name: father, in: query, schema: {type: integer, minimum: 0}}
+        - {name: mother, in: query, schema: {type: integer, minimum: 0}}
+        - {name: grandfather, in: query, schema: {type: integer, minimum: 0}}
+        - {name: grandmothers, in: query, schema: {type: integer, minimum: 0}}
+        - {name: sons, in: query, schema: {type: integer, minimum: 0}}
+        - {name: daughters, in: query, schema: {type: integer, minimum: 0}}
+        - {name: grandsons, in: query, schema: {type: integer, minimum: 0}}
+        - {name: granddaughters, in: query, schema: {type: integer, minimum: 0}}
+        - {name: fullBrothers, in: query, schema: {type: integer, minimum: 0}}
+        - {name: fullSisters, in: query, schema: {type: integer, minimum: 0}}
+        - {name: paternalBrothers, in: query, schema: {type: integer, minimum: 0}}
+        - {name: paternalSisters, in: query, schema: {type: integer, minimum: 0}}
+        - {name: maternalBrothers, in: query, schema: {type: integer, minimum: 0}}
+        - {name: maternalSisters, in: query, schema: {type: integer, minimum: 0}}
+      responses:
+        '200': {description: Inheritance calculation}
+        '400': {description: Invalid non-negative numeric input or calculation error}
+  /inheritance/madhahib:
+    get:
+      operationId: listInheritanceMadhahib
+      responses:
+        '200': {description: Supported madhahib}
+  /inheritance/complex-cases:
+    get:
+      operationId: listOrGetComplexFaraidCases
+      parameters:
+        - {name: id, in: query, schema: {type: string}}
+        - {name: status, in: query, schema: {type: string}}
+        - {name: topic, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Complex inheritance cases}
+        '404': {description: Case not found}
 components:
   securitySchemes:
     ApiKey:
