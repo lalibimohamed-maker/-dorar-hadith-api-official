@@ -32,6 +32,34 @@ test('hadith evidence normalizer preserves text and scholarly metadata', () => {
   assert.equal(result[0].reference, 'أخرجه الترمذي');
 });
 
+test('evidence context excludes ungoverned book-cache records but accepts governed cached evidence', () => {
+  const result = buildEvidenceContext({
+    sourceMatches: [
+      {
+        id: 'book:blocked',
+        cacheType: 'book',
+        text: 'blocked cached text',
+        source: 'https://example.invalid/blocked',
+        verification: 'verified',
+        rights: 'rights-unclear'
+      },
+      {
+        id: 'book:allowed',
+        cacheType: 'book',
+        cacheGovernance: { allowed: true },
+        text: 'allowed cached text',
+        source: 'https://example.invalid/allowed',
+        verification: 'verified',
+        rights: 'licensed',
+        location: 'p. 4'
+      }
+    ]
+  });
+  assert.equal(result.evidence.length, 1);
+  assert.equal(result.evidence[0].id, 'book:allowed');
+  assert.equal(result.evidence[0].cacheGovernance.allowed, true);
+});
+
 test('evidence context preserves source, location and rights', () => {
   const result = buildEvidenceContext({
     sourceMatches: [{
