@@ -82,13 +82,51 @@ paths:
   /search:
     get:
       operationId: search
-      summary: Multilingual unified search with methodology routing; no meaning-translation layer
+      summary: Multilingual unified source search; Dorar hadith search first, expanding across verified Sunni Islamic source domains
+      description: |
+        Every returned source record preserves source identity, source type, verification state, rights state, and bibliography when available.
+        Hadith collection membership is never treated as authenticity; reported grading remains a separate evidence field.
+        Cause-of-revelation links require verified source evidence and thematic similarity alone never proves a cause.
+        PDF/DOCX redistribution and Quran recitation download are rights-gated.
       parameters:
         - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
         - {name: lang, in: query, required: false, schema: {type: string}}
         - {name: comparative, in: query, required: false, schema: {type: boolean, default: false}}
       responses:
-        '200': {description: Search results with provenance in selected language}
+        '200':
+          description: Search results with source attribution and governed evidence separation
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [query, sourceMatches, policy]
+                properties:
+                  query: {type: string}
+                  sourceMatches:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, domain, title, sourceId, sourceType, source, verificationState, rightsState]
+                      properties:
+                        id: {type: string}
+                        domain: {type: string}
+                        title: {type: string}
+                        sourceId: {type: [string, "null"]}
+                        sourceType: {type: string}
+                        source: {type: [string, "null"]}
+                        verificationState: {type: string}
+                        rightsState: {type: string}
+                        bibliographic: {type: [object, "null"], additionalProperties: true}
+                  hadithResearch:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        sourceEvidence: {type: object}
+                        gradingEvidence: {type: object}
+                  policy:
+                    type: object
+                    additionalProperties: true
   /concept:
     get:
       operationId: getConceptCard
