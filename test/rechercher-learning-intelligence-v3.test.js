@@ -7,11 +7,19 @@ import {
   createSourceGroundedLearningObject,
   diagnoseLearner,
   evaluateLearningIntervention,
+  getLearningMethodRegistry,
   recordLearningOutcome,
   selectNextActivity,
 } from '../src/rechercher-learning-intelligence-v3.js';
 
 const evidence = [{ sourceId: 'bukhari', citation: 'vol1:p1', verificationState: 'edition_verified', rights: 'source-dependent' }];
+
+test('method registry is versioned and measurable', () => {
+  const registry = getLearningMethodRegistry();
+  assert.equal(registry.retrieval.version, '1.0.0');
+  assert.ok(registry.retrieval.measures.includes('delayed_retention'));
+  assert.equal(registry.game.measures.includes('immediate_accuracy'), false);
+});
 
 test('learner profile is explainable and minimizes data', () => {
   const profile = createLearnerProfile({
