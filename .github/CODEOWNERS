@@ -1,31 +1,30 @@
-# Dual-account governance: shared operational/content ownership with primary-only security governance.
-# Generic shared rules come first; sensitive primary-only rules come last because the last matching pattern wins.
+# Dual-account governance: the primary account retains final authority;
+# the secondary account is an independent maintainer/reviewer for ordinary
+# content, application, test, documentation, performance and UI paths.
+* @lalibimohamed-maker @lalibimohamed82-coder
 
-# Shared operational and scholarly engineering ownership.
-/docs/ @lalibimohamed-maker @lalibimohamed82-coder
-/data/ @lalibimohamed-maker @lalibimohamed82-coder
-/config/ @lalibimohamed-maker @lalibimohamed82-coder
+# Ordinary content/application maintenance: both accounts.
 /src/ @lalibimohamed-maker @lalibimohamed82-coder
 /test/ @lalibimohamed-maker @lalibimohamed82-coder
-/web/ @lalibimohamed-maker @lalibimohamed82-coder
+/scripts/ @lalibimohamed-maker @lalibimohamed82-coder
+/docs/ @lalibimohamed-maker @lalibimohamed82-coder
+/config/ @lalibimohamed-maker @lalibimohamed82-coder
 *.js @lalibimohamed-maker @lalibimohamed82-coder
 *.mjs @lalibimohamed-maker @lalibimohamed82-coder
 *.json @lalibimohamed-maker @lalibimohamed82-coder
 *.md @lalibimohamed-maker @lalibimohamed82-coder
 
-# Primary-only security and repository-governance ownership.
-/.github/workflows/source-refresh-gate.yml @lalibimohamed-maker
-/.github/workflows/source-refresh-integrity.yml @lalibimohamed-maker
-/.github/workflows/source-anomaly-gate.yml @lalibimohamed-maker
-/.github/workflows/source-baseline-approval.yml @lalibimohamed-maker
-/.github/workflows/action-pin-guard.yml @lalibimohamed-maker
-/.github/workflows/security-baseline.yml @lalibimohamed-maker
-/.github/workflows/security.yml @lalibimohamed-maker
-/.github/workflows/codeql.yml @lalibimohamed-maker
-/.github/workflows/scorecard.yml @lalibimohamed-maker
+# Sensitive security, provenance, release-integrity and protected configuration.
+/scripts/enforce_all_branch_governance.py @lalibimohamed-maker
+/scripts/enforce_branch_workflow_policy.py @lalibimohamed-maker
+/scripts/recovery-engine.mjs @lalibimohamed-maker
+/config/auto-recovery-policy-2026.json @lalibimohamed-maker
 /config/source-refresh-baselines.json @lalibimohamed-maker
 /docs/security/ @lalibimohamed-maker
 /SECURITY.md @lalibimohamed-maker
-/.github/CODEOWNERS @lalibimohamed-maker
 /package.json @lalibimohamed-maker
 /package-lock.json @lalibimohamed-maker
+
+# The .github control plane is primary-only. Keep this last so it overrides
+# the generic file/directory ownership above.
+/.github/ @lalibimohamed-maker
