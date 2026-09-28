@@ -200,5 +200,28 @@
     "externalProviderRetry": "opt_in_per_provider",
     "rateLimitHandling": "fail_soft_without_bypass",
     "scraping": "forbidden"
+  },
+  "providerIdentity": {
+    "runtimeUsesNeutralAdapterContract": true,
+    "externalServiceNamesAreConfigurationDataOnly": true,
+    "noProviderAvailabilityAssumption": true,
+    "adapterRequiredFields": [
+      "id",
+      "class",
+      "status",
+      "integration",
+      "scrapingAllowed",
+      "cacheAllowed",
+      "retryAllowed",
+      "rateLimitsMustBeRespected"
+    ],
+    "extensibility": "A new provider can be registered by configuration/adapter integration without modifying federation routing logic."
+  },
+  "providerCandidatesPolicy": {
+    "namesAreCandidatesNotDependencies": true,
+    "activationRequiresExplicitAccess": true,
+    "absenceOfCredentialsMeansDisabled": true,
+    "missingOfficialInterfaceMeansDisabled": true,
+    "noScrapingFallback": true
   }
 }
