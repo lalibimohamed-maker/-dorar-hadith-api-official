@@ -5,6 +5,11 @@ export const BOOK_CACHE_STATES = Object.freeze({
   BLOCKED: "blocked"
 });
 
+export const BOOK_SOURCE_CONNECTOR_STATES = Object.freeze({
+  ELIGIBLE: "eligible",
+  BLOCKED: "blocked"
+});
+
 const ALLOWED_RIGHTS = new Set(["redistributable", "licensed", "public-domain"]);
 
 function hasIdentity(value, keys) {
@@ -60,6 +65,64 @@ export function evaluateBookCacheRequest({ source, provenance, rights, validatio
       futureOcrStorageIndexingExportMustRecheck: true
     })
   });
+}
+
+/**
+ * Contract-only qualification for future book fetching.
+ * This function performs no HTTP, OCR, storage, indexing, or corpus mutation.
+ */
+export function evaluateBookSourceConnector({ resourceId, source, provenance, rights, validation } = {}) {
+  const normalizedProvenance = resourceId && provenance
+    ? { ...provenance, resourceId: provenance.resourceId || resourceId }
+    : provenance;
+
+  const result = evaluateBookCacheRequest({
+    source,
+    provenance: normalizedProvenance,
+    rights,
+    validation
+  });
+
+  if (!result.allowed || !resourceId) {
+    const failures = [...(result.failures || [])];
+    if (!resourceId && !failures.includes("resource_id_required")) failures.unshift("resource_id_required");
+    return Object.freeze({
+      state: BOOK_SOURCE_CONNECTOR_STATES.BLOCKED,
+      allowed: false,
+      failures,
+      fetchAllowed: false,
+      contractOnly: true,
+      rightsGrant: false,
+      networkFetchPerformed: false,
+      ocrPerformed: false,
+      storagePerformed: false,
+      indexingPerformed: false,
+      corpusMutation: false
+    });
+  }
+
+  return Object.freeze({
+    state: BOOK_SOURCE_CONNECTOR_STATES.ELIGIBLE,
+    allowed: true,
+    failures: [],
+    resourceId,
+    source,
+    provenance: normalizedProvenance,
+    rights,
+    validation,
+    fetchAllowed: true,
+    contractOnly: true,
+    rightsGrant: false,
+    networkFetchPerformed: false,
+    ocrPerformed: false,
+    storagePerformed: false,
+    indexingPerformed: false,
+    corpusMutation: false
+  });
+}
+
+export function isBookSourceConnectorEligible(request) {
+  return evaluateBookSourceConnector(request).allowed;
 }
 
 export function isBookCacheSafe(request) {
