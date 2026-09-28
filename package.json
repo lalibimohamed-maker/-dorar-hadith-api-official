@@ -33,7 +33,8 @@
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
     "test:review-expiry": "node --test test/review-expiry.test.js",
-    "local-ai:doctor": "node scripts/local-ai-doctor.mjs"
+    "local-ai:doctor": "node scripts/local-ai-doctor.mjs",
+    "test:ai": "node --test test/local-model-registry.test.js test/local-llm-runtime.test.js test/agent-runtime.test.js"
   },
   "engines": {
     "node": ">=20"
