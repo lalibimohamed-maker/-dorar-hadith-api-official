@@ -70,8 +70,8 @@ export function planSearchFederation({ query, providers = [], timeoutMs = DEFAUL
   const ranked = providers
     .map((provider) => ({ provider, validation: validateProviderDefinition(provider) }))
     .filter(({ validation }) => validation.ok)
-    .map(({ provider }) => {
-      const providerClass = provider.class || provider.id;
+    .map(({ provider, validation }) => {
+      const providerClass = provider.class || validation.definition.class || provider.id;
       const priority = domain === "web"
         ? (providerClass === "web" ? 0 : 1)
         : specialistIds.has(provider.id)
