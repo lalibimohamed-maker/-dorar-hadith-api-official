@@ -435,5 +435,36 @@
       "modelOrTool",
       "modelVersion"
     ]
-  }
+  },
+  "islamicVideoSources": [
+    {
+      "sourceId": "islamreligion-videos",
+      "name": "IslamReligion.com — Videos",
+      "localizedEntryPoints": {
+        "fr": "https://www.islamreligion.com/fr/videos",
+        "en": "https://www.islamreligion.com/videos"
+      },
+      "role": "dawah_editorial_video_reference",
+      "discoveryMode": "search_and_browser_reference",
+      "relevantCollections": [
+        "The Scientific Miracles of the Holy Quran",
+        "The Scientific Miracles of the Prophet Muhammad Sayings",
+        "The Holy Quran",
+        "Evidence of Muhammad's Prophethood"
+      ],
+      "currentObservedCoverage": {
+        "evidenceIslamIsTruthVideos": 123,
+        "scientificMiraclesOfHolyQuranVideos": 17,
+        "holyQuranVideos": 48
+      },
+      "evidenceBoundary": "secondary_dawah_context_not_scientific_primary_evidence",
+      "mediaBoundary": "reference_only_until_explicit_license_or_permission",
+      "rightsDefault": "restricted",
+      "rightsEvidence": "https://www.islamreligion.com/videos",
+      "licenseEvidenceNote": "The site footer currently states Copyright © 2006 - 2026 IslamReligion.com. All rights reserved.",
+      "integrateIntoTimelineOnlyAfter": "media_rights_gate_passes",
+      "interpretiveClaimsNeedIndependentVerification": true,
+      "corpusMutation": false
+    }
+  ]
 }
