@@ -21,8 +21,21 @@ test("publishing requires explicit redistribution rights", () => {
   assert.throws(() => validateOperation({ action: "publish", provenance, validation: passed, rights: { status: "rights-unclear" } }), (error) => error.code === "RIGHTS_REQUIRED");
 });
 
-test("verified operations receive an explicit execution plan", () => {
+test("verified generic publish operations still receive an explicit execution plan", () => {
   const plan = planOperation({ action: "publish", provenance, validation: passed, rights: { status: "redistributable" } });
   assert.equal(plan.status, "approved-for-execution");
-  assert.deepEqual(plan.gates, ["provenance", "validation", "rights"]);
+  assert.deepEqual(plan.gates, ["resourceId", "source", "provenance", "rights", "validation"]);
+});
+
+test("book publish operations require the complete book identity contract", () => {
+  const plan = planOperation({
+    action: "publish",
+    resourceId: "book-fixture-1",
+    source: { id: "official", url: "https://example.invalid/book" },
+    provenance: { resourceId: "book-fixture-1", source: "official" },
+    validation: passed,
+    rights: { status: "redistributable" }
+  });
+  assert.equal(plan.status, "approved-for-execution");
+  assert.deepEqual(plan.gates, ["resourceId", "source", "provenance", "rights", "validation"]);
 });
