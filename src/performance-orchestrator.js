@@ -274,23 +274,26 @@ export function createVoiceQueue({ concurrency = PERFORMANCE_DEFAULTS.voiceQueue
       if (cache.has(key)) return Promise.resolve(cache.get(key));
       if (inflight.has(key)) return inflight.get(key);
 
-      let queuedPromise;
-      queuedPromise = new Promise((resolve, reject) => {
-        queue.push({
-          key,
-          promise: queuedPromise,
-          run: async () => {
-            if (cache.has(key)) return cache.get(key);
-            const value = await run();
-            cache.set(key, value);
-            return value;
-          },
-          resolve,
-          reject,
-        });
-        inflight.set(key, queuedPromise);
-        pump();
+      let resolveJob;
+      let rejectJob;
+      const queuedPromise = new Promise((resolve, reject) => {
+        resolveJob = resolve;
+        rejectJob = reject;
       });
+      queue.push({
+        key,
+        promise: queuedPromise,
+        run: async () => {
+          if (cache.has(key)) return cache.get(key);
+          const value = await run();
+          cache.set(key, value);
+          return value;
+        },
+        resolve: resolveJob,
+        reject: rejectJob,
+      });
+      inflight.set(key, queuedPromise);
+      pump();
       return queuedPromise;
     },
     pending: () => queue.length,
