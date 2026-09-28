@@ -11,7 +11,7 @@ import {
   selectNextActivity,
 } from '../src/rechercher-learning-intelligence-v3.js';
 
-const evidence = [{ sourceId: 'bukhari', citation: 'vol1:p1', verificationState: 'edition_verified' }];
+const evidence = [{ sourceId: 'bukhari', citation: 'vol1:p1', verificationState: 'edition_verified', rights: 'source-dependent' }];
 
 test('learner profile is explainable and minimizes data', () => {
   const profile = createLearnerProfile({
