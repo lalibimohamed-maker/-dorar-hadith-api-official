@@ -11,6 +11,11 @@ test("acceleration mesh caches values and reports hits", () => {
   });
   assert.equal(mesh.get("one")?.status, 200);
   assert.equal(mesh.get("one")?.headers?.etag, '"fixture"');
+  mesh.set("cookie", Buffer.from("payload"), {
+    ttlMs: 10_000,
+    headers: { "content-type": "application/json", "set-cookie": "secret=should-not-cache" }
+  });
+  assert.equal(mesh.get("cookie")?.headers?.["set-cookie"], undefined);
   assert.equal(mesh.profile().hits, 1);
   assert.equal(mesh.profile().misses, 0);
   assert.equal(mesh.profile().tier, "L1-memory");
@@ -35,6 +40,7 @@ test("compression prefers Brotli and can fall back to gzip", () => {
   assert.equal(gzip.encoding, "gzip");
   assert.ok(gzip.body.length < input.length);
   assert.equal(mesh.compress(input, "br;q=0, gzip;q=0").encoding, null);
+  assert.equal(mesh.compress(input, "*;q=0").encoding, null);
 });
 
 test("cache policies favor short search TTLs and longer corpus TTLs", () => {
