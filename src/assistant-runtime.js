@@ -2,6 +2,7 @@ import { unifiedSearch } from './unified-search.js';
 import { createMultimodalSession, normalizeLanguage, speechPolicy, exportRequest } from './multimodal-runtime.js';
 import { transcribe, synthesize, quranRecitation, exportMedia } from './media-provider-adapters.js';
 import { createAlQuranCloudRecitationProvider } from './quran-recitation-source.js';
+import { runAgent } from './ai/agent-runtime.mjs';
 
 /**
  * Orchestrates the public assistant flow without embedding provider secrets.
@@ -35,6 +36,23 @@ export async function runAssistantSearch({
       quranRecitation: Boolean(providers.quranRecitation),
     },
   };
+}
+
+export async function runGroundedAssistant({ query, language = 'ar', modelId, modelPath, env = process.env, signal, searchFn = unifiedSearch, generateFn, maxEvidence, maxTokens, temperature } = {}) {
+  const normalizedLanguage = normalizeLanguage(language);
+  return runAgent({
+    query,
+    language: normalizedLanguage,
+    modelId,
+    modelPath,
+    env,
+    signal,
+    searchFn,
+    generateFn,
+    maxEvidence,
+    maxTokens,
+    temperature
+  });
 }
 
 export async function runVoiceQuestion({ provider, audio, language, searchOptions = {}, searchFn = unifiedSearch } = {}) {
