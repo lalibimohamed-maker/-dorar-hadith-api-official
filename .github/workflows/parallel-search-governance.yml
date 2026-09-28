@@ -8,6 +8,8 @@ on:
       - 'src/unified-search.js'
       - 'config/search-parallel-governance-2026.json'
       - 'config/search-provider-network-2026.json'
+      - 'config/unified-search-contract-2026.json'
+      - 'dorar_json_api.js'
       - 'docs/parallel-search-governance-2026.md'
       - 'test/parallel-search-governance.test.js'
       - 'test/search-provider-federation.test.js'
@@ -48,6 +50,15 @@ jobs:
           const fs = require('fs');
           const x = JSON.parse(fs.readFileSync('config/search-parallel-governance-2026.json', 'utf8'));
           const network = JSON.parse(fs.readFileSync('config/search-provider-network-2026.json', 'utf8'));
+          const unified = JSON.parse(fs.readFileSync('config/unified-search-contract-2026.json', 'utf8'));
+          if (unified.endpoint !== '/search') throw new Error('unified search endpoint contract drifted');
+          if (unified.orchestration.officialDorarHadithRetrieval !== true) throw new Error('Dorar hadith orchestration contract missing');
+          if (unified.orchestration.sourceAwareKnowledgeIndex !== true) throw new Error('source-aware knowledge index contract missing');
+          if (unified.resultPolicy.sourceAttributionRequired !== true) throw new Error('unified search source attribution requirement missing');
+          if (unified.resultPolicy.potentialRelationshipsSeparate !== true || unified.resultPolicy.verifiedEvidenceSeparate !== true) {
+            throw new Error('potential/verified evidence separation missing');
+          }
+          if (unified.resultPolicy.discoveryDoesNotEqualAuthority !== true) throw new Error('discovery authority boundary missing');
           if (x.providerNetworkRegistry !== 'config/search-provider-network-2026.json') throw new Error('provider network registry binding drifted');
           if (network.limits.maxConcurrentProviders !== 8) throw new Error('provider network concurrency limit must be 8');
           if (network.governance.scrapingForbidden !== true) throw new Error('provider network scraping prohibition missing');
@@ -80,7 +91,7 @@ jobs:
             }
           }
           for (const layer of ['quran','tafsir','hadith','books','fatwa','web']) if (!x.layers[layer]) throw new Error(`provider layer missing: ${layer}`);
-          console.log('Parallel search governance contract: PASS');
+          console.log('Unified search + parallel search governance contract: PASS');
           NODE
 
       - name: Run parallel search governance tests
