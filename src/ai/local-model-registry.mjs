@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
-import { access, stat, readFile } from 'node:fs/promises';
+import { access, stat } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
 
 export const LOCAL_AI_SCHEMA_VERSION = '1.0.0';
 
@@ -63,8 +64,8 @@ function normalizeSha256(value) {
 
 export async function sha256File(filePath) {
   const hash = createHash('sha256');
-  const bytes = await readFile(filePath);
-  hash.update(bytes);
+  const stream = createReadStream(filePath);
+  for await (const chunk of stream) hash.update(chunk);
   return hash.digest('hex');
 }
 
