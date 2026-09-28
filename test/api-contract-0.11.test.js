@@ -116,10 +116,10 @@ test("API key dailyLimit is enforced separately from the per-minute limit", asyn
   });
   t.after(() => server.stop());
 
-  const first = await fetch(`${server.base}/health`, {headers: {"x-api-key": rawKey}});
+  const first = await fetch(`${server.base}/locales`, {headers: {"x-api-key": rawKey}});
   assert.equal(first.status, 200);
 
-  const second = await fetch(`${server.base}/locales`, {headers: {"x-api-key": rawKey}});
+  const second = await fetch(`${server.base}/categories`, {headers: {"x-api-key": rawKey}});
   assert.equal(second.status, 429);
   const body = await second.json();
   assert.equal(body.error, "Daily API key limit exceeded");
