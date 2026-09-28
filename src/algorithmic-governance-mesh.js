@@ -1,3 +1,5 @@
+import { canRedistribute, isRightsRecord } from "./governance/rights-registry.js";
+
 /**
  * Algorithmic Governance Mesh
  *
@@ -35,8 +37,10 @@ export function evaluateOperation(request = {}) {
   if (request.destructive && !request.rollbackAvailable) {
     return deny('destructive operation requires rollback/recovery', ['rollback', 'checkpoint']);
   }
-  if (request.requiresRights && evidence.rightsVerified !== true) {
-    return deny('rights have not been verified', ['license', 'provenance']);
+  if (request.requiresRights) {
+    if (!isRightsRecord(request.rightsRecord) || !canRedistribute(request.rightsRecord)) {
+      return deny('a complete verified rights ledger record is required', ['license', 'provenance']);
+    }
   }
   if (request.requiresIntegrity && evidence.integrityVerified !== true) {
     return deny('integrity has not been verified', ['integrity', 'tamper-detection']);
