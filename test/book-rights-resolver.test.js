@@ -67,7 +67,7 @@ test("read-only requires explicit source reading permission", () => {
   assert.equal(result.status, RIGHTS.READ_ONLY);
   assert.equal(canRead(result), false);
   assert.equal(canRead(result, { sourceAllowsReading: true }), true);
-  assert.equal(canCopyText(result, { sourceAllowsReading: true, sourceAllowsCopy: true }), true);
+  assert.equal(canCopyText(result, { sourceAllowsCopy: true }), false);
 });
 
 test("restricted rights remain blocked even when source permissions are supplied", () => {
