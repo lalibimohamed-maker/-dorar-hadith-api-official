@@ -34,6 +34,16 @@ test('response verifier rejects invented citations and unsupported answers', () 
   assert.equal(verifyAgentResponse({ answer: 'answer [E9]', evidence }).status, 'rejected');
   assert.equal(verifyAgentResponse({ answer: 'answer', evidence }).status, 'rejected');
   assert.equal(verifyAgentResponse({ answer: 'answer [E1]', evidence }).status, 'verified-structure');
+  assert.equal(verifyAgentResponse({
+    answer: 'answer [E1]',
+    evidence,
+    claims: [{ text: 'uncited claim', citations: [] }]
+  }).status, 'rejected');
+  assert.equal(verifyAgentResponse({
+    answer: 'answer [E1]',
+    evidence,
+    claims: [{ text: 'cited claim', citations: ['E1'] }]
+  }).status, 'verified-structure');
 });
 
 test('semantic retrieval and reranking can be exercised without real model weights', async () => {
@@ -75,7 +85,7 @@ test('agent executes model-tools-evidence-verification loop with injected genera
     searchFn: fakeSearch,
     generateFn: async () => ({
       modelId: 'fixture-model',
-      text: '{"answer":"The evidence says exactly this. [E1]","citations":["E1"]}'
+      text: '{"answer":"The evidence says exactly this. [E1]","citations":["E1"],"claims":[{"text":"The evidence says exactly this.","citations":["E1"]}]}'
     })
   });
   assert.equal(result.generated, true);
