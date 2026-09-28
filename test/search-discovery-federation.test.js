@@ -3,8 +3,20 @@ import assert from "node:assert/strict";
 import { createDiscoveryPlan, normalizeDiscoveryResults, canEnterSourceVerification } from "../src/search-discovery-federation.js";
 
 const providers = [
-  { id: "official", class: "official", enabled: true },
-  { id: "web1", class: "web", enabled: true }
+  {
+    id: "official",
+    class: "official",
+    enabled: true,
+    integration: "official_api_only",
+    scrapingAllowed: false
+  },
+  {
+    id: "web1",
+    class: "web",
+    enabled: true,
+    integration: "official_api_only",
+    scrapingAllowed: false
+  }
 ];
 
 test("normalizes discovery results and keeps provenance", () => {
