@@ -37,6 +37,48 @@ jobs:
           const fs = require('fs');
           const x = JSON.parse(fs.readFileSync('config/scientific-religious-video-engine-2026.json', 'utf8'));
           const p = x.principles;
+          if (x.scope !== 'candidate_benchmark_only') throw new Error('registry must remain candidate_benchmark_only');
+          if (x.runtimeBoundary?.runtimeDependency !== false) throw new Error('runtime dependency boundary drifted');
+          if (x.runtimeBoundary?.canonicalCorpusMutation !== false) throw new Error('Corpus mutation boundary drifted');
+          if (x.runtimeBoundary?.automaticModelOrMediaPromotion !== false) throw new Error('automatic promotion boundary drifted');
+          const requiredClaimTypes = [
+            'quran_text','quran_translation_meaning','quran_tafsir','hadith_text','hadith_grading',
+            'scientific_observation','scientific_consensus','scientific_hypothesis','historical_report','interpretive_relationship'
+          ];
+          for (const type of requiredClaimTypes) {
+            if (!x.claimPolicy?.separatedClaimTypes?.includes(type)) throw new Error(`missing claim type: ${type}`);
+          }
+          if (x.claimPolicy?.interpretiveRelationshipCannotBecomeScientificFact !== true) throw new Error('interpretive/scientific separation missing');
+          if (x.claimPolicy?.interpretiveRelationshipCannotBecomeReligiousRuling !== true) throw new Error('interpretive/religious separation missing');
+          if (x.sceneContract?.sceneMustReferenceClaimEvidence !== true) throw new Error('scene evidence binding missing');
+          if (x.sceneContract?.publicOnInternetDoesNotMeanReusable !== true) throw new Error('media reuse gate missing');
+          const mediaClasses = new Set(x.mediaRightsPolicy?.embeddableClasses || []);
+          for (const required of ['public_domain','compatible_open_license','explicit_permission','original_generated']) {
+            if (!mediaClasses.has(required)) throw new Error(`missing media class: ${required}`);
+          }
+          if (x.mediaRightsPolicy?.thirdPartySearchResultDefault !== 'reference_only_not_embeddable') throw new Error('third-party reference-only policy drifted');
+          if (x.quranSynchronization?.quranArabicText !== 'verbatim_source_bound') throw new Error('Quran Arabic binding drifted');
+          if (x.quranSynchronization?.recitationRightsRequired !== true) throw new Error('recitation rights gate missing');
+          if (!Array.isArray(x.quranSynchronization?.wordLevelModeRequires) || x.quranSynchronization.wordLevelModeRequires.length < 2) throw new Error('word-level timing/rights requirements incomplete');
+          if (x.quranSynchronization?.fallbackMode !== 'ayah_level') throw new Error('ayah-level synchronization fallback missing');
+          const renderStages = x.renderArchitecture?.stages || [];
+          const requiredRenderStages = [
+            'evidence_and_storyboard','generation_or_lawful_media_acquisition','scene_analysis','composition',
+            'quran_hadith_translation_audio_synchronization','text_vector_render_at_target_resolution',
+            'eligible_raster_restoration_upscaling','final_encode','provenance_manifest'
+          ];
+          for (const stage of requiredRenderStages) if (!renderStages.includes(stage)) throw new Error(`missing render stage: ${stage}`);
+          if (x.renderArchitecture?.landscape48K !== '46080x25920') throw new Error('48K landscape ceiling drifted');
+          if (x.renderArchitecture?.portrait48K !== '25920x46080') throw new Error('48K portrait ceiling drifted');
+          if (x.renderArchitecture?.native48KGenerationNotRequired !== true) throw new Error('native 48K disclaimer missing');
+          if (x.renderArchitecture?.textQuranCitationsAndFactualDiagramsRenderedAsFinalResolutionVectorOrText !== true) throw new Error('final-resolution text/vector rule missing');
+          if (x.reproducibility?.deterministicTimelineManifest !== true) throw new Error('deterministic manifest requirement missing');
+          for (const field of ['visual','audio','model','citation']) {
+            if (!x.reproducibility?.assetProvenanceRequired?.includes(field)) throw new Error(`missing provenance class: ${field}`);
+          }
+          const expectedGates = ['rights','evidence_verification','scientific_religious_integrity','security','arabic_quality','audiovisual_quality','performance_resource_cost','provenance','human_review','CI'];
+          for (const gate of expectedGates) if (!x.promotionPolicy?.gates?.includes(gate)) throw new Error(`missing promotion gate: ${gate}`);
+          if (x.promotionPolicy?.automaticRuntimePromotion !== false) throw new Error('automatic promotion must remain disabled');
           const requiredTrue = [
             'freeFirst','selfHostedPreferred','noPaidCoreDependency','noAutomaticPromotion',
             'noSilentReplacement','noCorpusMutation','noUnlicensedMediaReuse','noUnverifiedReligiousClaim',
