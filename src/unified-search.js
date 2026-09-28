@@ -143,12 +143,21 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
     [...sourceMatches, ...fiqh, ...historicalRecords, ...officialInstitutions]
   ).sort((a, b) => (b.relevance || 0) - (a.relevance || 0));
 
+  const enrichedSourceMatches = mergedSourceMatches.map((item) => ({
+    ...item,
+    evidence: buildEvidence(item)
+  }));
+  const verifiedEvidence = enrichedSourceMatches.filter((item) => item.evidence.evidenceState === "verified");
+  const potentialMatches = enrichedSourceMatches.filter((item) => item.evidence.evidenceState === "potential");
+
   return {
     query,
     responseLanguage: language.resolved,
     hadith: hadithData,
     scholarMatches,
-    sourceMatches: mergedSourceMatches.map((item) => ({ ...item, evidence: buildEvidence(item) })),
+    sourceMatches: enrichedSourceMatches,
+    verifiedEvidence,
+    potentialMatches,
     fiqhResearch: {
       matched: fiqh.length > 0,
       records: fiqh,
@@ -166,8 +175,11 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
       corpus: "sunni",
       responseLanguageMustMatchSelectedLocale: true,
       originalArabicDistinctFromTranslation: true,
-      potentialMatchesSeparated: !includePotentialMatches,
+      potentialMatchesSeparated: true,
+      potentialMatchesVisible: includePotentialMatches,
       sourceAttributionRequired: true,
+      everyIndexedResultRetainsSourceAttribution: true,
+      verifiedEvidenceSeparatedFromPotentialRelationships: true,
       hadithAuthenticityMustBeReadFromItsGrading: true,
       sirahSourceDoesNotImplyNarrationAuthenticity: true,
       shamelaIsBibliographicAndNavigationSourceByDefault: true,
