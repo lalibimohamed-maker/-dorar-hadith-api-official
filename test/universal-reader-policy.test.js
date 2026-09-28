@@ -43,7 +43,7 @@ test("read-copy permits reading and Copy Text but not the digital master", () =>
   assert.equal(result.mode, "reader-only");
 });
 
-test("read-only requires source reading permission and never grants Copy Text by itself", () => {
+test("read-only requires source reading permission and never grants Copy Text", () => {
   const denied = buildBookDeliveryPolicy({
     rights: { status: "read-only" }
   });
@@ -59,14 +59,14 @@ test("read-only requires source reading permission and never grants Copy Text by
   assert.equal(allowed.canDownloadDigitalMaster, false);
 });
 
-test("source-explicit reading and copying can enable those separate permissions", () => {
+test("source-explicit reading may enable reading, but unclear rights never create Copy Text permission", () => {
   const result = buildBookDeliveryPolicy({
     rights: { status: "rights-unclear" },
     sourceAllowsReading: true,
     sourceAllowsCopy: true
   });
   assert.equal(result.canRead, true);
-  assert.equal(result.canCopyText, true);
+  assert.equal(result.canCopyText, false);
   assert.equal(result.canDownloadDigitalMaster, false);
   assert.equal(result.mode, "reader-only");
 });
@@ -111,7 +111,7 @@ test("source copy permission alone does not silently create Copy Text access", (
   const result = buildBookDeliveryPolicy({
     rights: { status: "read-only" },
     sourceAllowsCopy: true,
-    sourceAllowsReading: false
+    sourceAllowsReading: true
   });
   assert.equal(result.canCopyText, false);
 });
