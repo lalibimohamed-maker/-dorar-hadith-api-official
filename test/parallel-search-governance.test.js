@@ -65,7 +65,7 @@ test("provider failures are fail-soft and retry is bounded", async () => {
     query: "حديث",
     retries: 1,
     jobs: [
-      { id: "flaky", run: async () => {
+      { id: "flaky", retryable: true, run: async () => {
         attempts += 1;
         if (attempts === 1) throw new Error("temporary");
         return ["ok"];
