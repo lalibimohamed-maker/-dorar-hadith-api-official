@@ -2,6 +2,8 @@
 
 export const RIGHTS = Object.freeze({
   REDISTRIBUTABLE: "redistributable",
+  LICENSED: "licensed",
+  PUBLIC_DOMAIN: "public-domain",
   READ_COPY: "read-copy",
   READ_ONLY: "read-only",
   LINK_ONLY: "link-only",
@@ -9,7 +11,12 @@ export const RIGHTS = Object.freeze({
   RESTRICTED: "restricted"
 });
 
-const REDISTRIBUTION_KINDS = new Set(["explicit-redistribution-permission","public-domain","waqf"]);
+const REDISTRIBUTION_KINDS = new Set([
+  "explicit-redistribution-permission",
+  "public-domain",
+  "licensed",
+  "waqf"
+]);
 const BLOCKING_KINDS = new Set(["restricted","takedown","no-redistribution","copyright-reservation"]);
 const READ_COPY_KINDS = new Set(["read-copy-permission"]);
 const READ_ONLY_KINDS = new Set(["read-only-permission"]);
@@ -24,8 +31,16 @@ function hasBlockingEvidence(evidence) {
 }
 
 function redistributionEvidence(evidence) {
-  return evidence.filter(e => REDISTRIBUTION_KINDS.has(e.kind) &&
-    (e.kind !== "waqf" || e.allowsRedistribution === true));
+  return evidence.filter(e =>
+    REDISTRIBUTION_KINDS.has(e.kind) &&
+    (e.kind !== "waqf" || e.allowsRedistribution === true)
+  );
+}
+
+function redistributionStatus(evidence) {
+  if (evidence.some(e => e.kind === "public-domain")) return RIGHTS.PUBLIC_DOMAIN;
+  if (evidence.some(e => e.kind === "licensed")) return RIGHTS.LICENSED;
+  return RIGHTS.REDISTRIBUTABLE;
 }
 
 export function resolveRights(evidence = []) {
@@ -38,7 +53,7 @@ export function resolveRights(evidence = []) {
   }
 
   if (redistributionEvidence(valid).length) {
-    return { status: RIGHTS.REDISTRIBUTABLE, evidence: valid, confidence: 1, conflict: false };
+    return { status: redistributionStatus(valid), evidence: valid, confidence: 1, conflict: false };
   }
   if (valid.some(e => READ_COPY_KINDS.has(e.kind))) {
     return { status: RIGHTS.READ_COPY, evidence: valid, confidence: 0.8, conflict: false };
@@ -52,8 +67,28 @@ export function resolveRights(evidence = []) {
   return { status: RIGHTS.RIGHTS_UNCLEAR, evidence: valid, confidence: 0, conflict: false };
 }
 
+export function canRead(result = {}, { sourceAllowsReading = false } = {}) {
+  const blocked = [RIGHTS.RESTRICTED, RIGHTS.RIGHTS_UNCLEAR].includes(result.status);
+  return !blocked && (
+    [RIGHTS.REDISTRIBUTABLE, RIGHTS.LICENSED, RIGHTS.PUBLIC_DOMAIN, RIGHTS.READ_COPY].includes(result.status) ||
+    (result.status === RIGHTS.READ_ONLY && sourceAllowsReading === true) ||
+    (result.status === RIGHTS.LINK_ONLY && sourceAllowsReading === true)
+  );
+}
+
+export function canCopyText(result = {}, { sourceAllowsCopy = false, sourceAllowsReading = false } = {}) {
+  const blocked = [RIGHTS.RESTRICTED, RIGHTS.RIGHTS_UNCLEAR].includes(result.status);
+  return !blocked && (
+    [RIGHTS.REDISTRIBUTABLE, RIGHTS.LICENSED, RIGHTS.PUBLIC_DOMAIN].includes(result.status) ||
+    result.status === RIGHTS.READ_COPY ||
+    (sourceAllowsCopy === true && sourceAllowsReading === true)
+  );
+}
+
 export function canRedistribute(result = {}) {
-  return result.status === RIGHTS.REDISTRIBUTABLE && result.conflict === false && result.confidence === 1;
+  return [RIGHTS.REDISTRIBUTABLE, RIGHTS.LICENSED, RIGHTS.PUBLIC_DOMAIN].includes(result.status) &&
+    result.conflict === false &&
+    result.confidence === 1;
 }
 
 export function canMirror(result = {}) {
