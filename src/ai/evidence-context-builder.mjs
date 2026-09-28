@@ -77,6 +77,6 @@ export function buildEvidenceContext(searchResult, { maxItems = 8, maxCharsPerIt
 
 export function formatEvidenceForPrompt(evidence = []) {
   return evidence.map(item =>
-    `[${item.citationId}] ${item.title || item.id || 'source'}\nSource: ${item.source}\nLocation: ${item.location || 'not recorded'}\nVerification: ${item.verification}\nText: ${item.text}`
+    `[${item.citationId}] ${item.title || item.id || 'source'}\nSource: ${item.source}\nLocation: ${item.location || 'not recorded'}\nVerification: ${item.verification}\nNarrator: ${item.narrator || 'not recorded'}\nScholar: ${item.scholar || 'not recorded'}\nGrading: ${item.grading || 'not recorded'}\nReference: ${item.reference || 'not recorded'}\nText: ${item.text}`
   ).join('\n\n');
 }
