@@ -1,5 +1,6 @@
 import { loadFlashcardConfig } from './flashcard-engine.mjs';
 import { scheduleWith } from './scheduler-registry.mjs';
+import { loadGlobalLearningStrategy, validateGlobalLearningStrategy } from './global-learning-strategy.mjs';
 
 /**
  * Rechercher Learning Intelligence Engine v1.
@@ -215,6 +216,8 @@ export function runLearningCycle({ state = {}, attempt = {}, items = [] } = {}) 
 
 export function getLearningEngineCapabilities() {
   const flashcards = loadFlashcardConfig();
+  const strategy = loadGlobalLearningStrategy();
+  const strategyValidation = validateGlobalLearningStrategy(strategy);
   return {
     engineId: ENGINE_ID,
     version: ENGINE_VERSION,
@@ -225,6 +228,13 @@ export function getLearningEngineCapabilities() {
     flashcardQuestionModes: flashcards.questionModes ?? [],
     acquisitionBlocking: false,
     sourceGroundingRequiredForReligiousAnswers: true,
-    scholarReviewSupported: true
+    scholarReviewSupported: true,
+    strategy: {
+      schema: strategy.schema,
+      version: strategy.version,
+      frozen: strategy.status === 'frozen-strategic-requirements',
+      valid: strategyValidation.ok,
+      acquisitionIndependent: strategy.governance?.acquisitionIndependent === true
+    }
   };
 }
