@@ -1,0 +1,63 @@
+name: Parallel Search Governance
+
+on:
+  pull_request:
+    paths:
+      - 'src/parallel-search-governance.js'
+      - 'src/search-provider-federation.js'
+      - 'src/unified-search.js'
+      - 'config/search-parallel-governance-2026.json'
+      - 'docs/parallel-search-governance-2026.md'
+      - 'test/parallel-search-governance.test.js'
+      - 'test/search-provider-federation.test.js'
+      - 'package.json'
+      - '.github/workflows/parallel-search-governance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/parallel-search-governance.js'
+      - 'src/search-provider-federation.js'
+      - 'src/unified-search.js'
+      - 'config/search-parallel-governance-2026.json'
+      - 'docs/parallel-search-governance-2026.md'
+      - 'test/parallel-search-governance.test.js'
+      - 'test/search-provider-federation.test.js'
+      - 'package.json'
+      - '.github/workflows/parallel-search-governance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-parallel-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout trusted repository content
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate governance contract
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const x = JSON.parse(fs.readFileSync('config/search-parallel-governance-2026.json', 'utf8'));
+          if (x.limits.maxConcurrentProviders !== 8) throw new Error('max concurrent provider limit must be 8');
+          if (x.limits.defaultProviderTimeoutMs > 1200) throw new Error('provider timeout exceeds 1200ms');
+          if (x.providerPolicy.resultsAreDiscoveryMaterial !== true) throw new Error('discovery authority boundary missing');
+          if (x.providerPolicy.providerFailureIsFailSoft !== true) throw new Error('fail-soft provider policy missing');
+          if (x.governanceGates.provenanceRequired !== true || x.governanceGates.rightsIndependent !== true || x.governanceGates.validationIndependent !== true) {
+            throw new Error('governance gate separation missing');
+          }
+          if (x.responsePolicy.singleUnifiedAnswerSurface !== true || x.responsePolicy.internalProviderDetailsHidden !== true) {
+            throw new Error('single user-facing search surface policy missing');
+          }
+          console.log('Parallel search governance contract: PASS');
+          NODE
+
+      - name: Run parallel search governance tests
+        run: npm run test:search-parallel
