@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
+import fs from "node:fs/promises";
 import { spawn } from "node:child_process";
 import test from "node:test";
 
@@ -125,8 +126,8 @@ test("API key dailyLimit is enforced separately from the per-minute limit", asyn
 });
 
 test("Render and package deployment contract uses Node 22, npm ci, and API 0.11.0", async () => {
-  const render = await (await fetch("https://raw.githubusercontent.com/lalibimohamed-maker/-dorar-hadith-api-official/feat/parallel-search-governance-2026/render.yaml")).text();
-  const packageJson = await (await fetch("https://raw.githubusercontent.com/lalibimohamed-maker/-dorar-hadith-api-official/feat/parallel-search-governance-2026/package.json")).json();
+  const render = await fs.readFile(new URL("../render.yaml", import.meta.url), "utf8");
+  const packageJson = JSON.parse(await fs.readFile(new URL("../package.json", import.meta.url), "utf8"));
 
   assert.match(render, /runtime: node/);
   assert.match(render, /plan: free/);
