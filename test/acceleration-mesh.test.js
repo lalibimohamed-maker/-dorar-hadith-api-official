@@ -8,6 +8,8 @@ test("acceleration mesh caches values and reports hits", () => {
   assert.equal(mesh.get("one")?.status, 200);
   assert.equal(mesh.profile().hits, 1);
   assert.equal(mesh.profile().misses, 0);
+  assert.equal(mesh.profile().tier, "L1-memory");
+  assert.equal(mesh.profile().externalBackends, "optional-not-loaded");
 });
 
 test("acceleration mesh expires entries deterministically", async () => {
@@ -24,9 +26,10 @@ test("compression prefers Brotli and can fall back to gzip", () => {
   const br = mesh.compress(input, "gzip, br");
   assert.equal(br.encoding, "br");
   assert.ok(br.body.length < input.length);
-  const gzip = mesh.compress(input, "gzip");
+  const gzip = mesh.compress(input, "br;q=0, gzip;q=1");
   assert.equal(gzip.encoding, "gzip");
   assert.ok(gzip.body.length < input.length);
+  assert.equal(mesh.compress(input, "br;q=0, gzip;q=0").encoding, null);
 });
 
 test("cache policies favor short search TTLs and longer corpus TTLs", () => {
@@ -37,12 +40,12 @@ test("cache policies favor short search TTLs and longer corpus TTLs", () => {
   assert.equal(cachePolicyForPath("/assistant").cache, false);
 });
 
-test("cache entries retain policy TTL metadata", () => {
+test("cache entries retain exact TTL policy metadata", () => {
   const mesh = createAccelerationMesh();
-  mesh.set("policy", Buffer.from("payload"), { ttlMs: 8_000, staleWhileRevalidate: 30 });
+  mesh.set("policy", Buffer.from("payload"), { ttlMs: 8_000 });
   const entry = mesh.get("policy");
   assert.equal(entry?.ttlMs, 8_000);
-  assert.equal(entry?.staleWhileRevalidate, 30);
+  assert.equal("staleWhileRevalidate" in (entry || {}), false);
 });
 
 test("single-flight coalesces work and returns the same data result", async () => {
