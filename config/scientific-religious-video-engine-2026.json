@@ -506,8 +506,8 @@
           ],
           "includesScientificMiraclesSubcategoryInSiteTaxonomy": true,
           "mediaBoundary": "reference_only_until_explicit_license_or_permission",
-          "languageScopedCategoryId": true,
-          "languageIdInvariant": false,
+          "languageScopedCategoryId": false,
+          "languageIdInvariant": true,
           "urlRole": "verified_french_category_entry",
           "languageVariants": [
             {
@@ -520,15 +520,15 @@
             {
               "lang": "en",
               "categoryId": "33",
-              "slug": "evidence-islam-is-truth",
-              "url": "https://www.islamreligion.com/category/33/evidence-islam-is-truth",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/category/33/preuves-que-lislam-est-la-verite",
               "verified": true
             },
             {
               "lang": "es",
               "categoryId": "33",
-              "slug": "evidence-islam-is-truth",
-              "url": "https://www.islamreligion.com/es/category/33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/es/category/33/preuves-que-lislam-est-la-verite",
               "verified": true
             },
             {
@@ -541,15 +541,16 @@
             },
             {
               "lang": "ar",
-              "categoryId": null,
-              "slug": null,
-              "url": null,
-              "verified": false,
+              "categoryId": "33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/ar/category/33/preuves-que-lislam-est-la-verite",
+              "verified": true,
               "discoveryRequired": true
             }
           ],
-          "localizedPathRule": "Resolve the localized category ID and slug from source navigation; never reuse the French numeric ID across languages.",
-          "note": "Verified French localized category uses ID 33; an earlier category classification was incorrect and has been removed."
+          "localizedPathRule": "Preserve the category route and switch only the leading language index; English is the unprefixed default. Do not synthesize localized IDs or slugs.",
+          "note": "Verified French localized category uses ID 33; an earlier category classification was incorrect and has been removed.",
+          "localizedRouteTemplate": "https://www.islamreligion.com/{lang}/category/33/preuves-que-lislam-est-la-verite"
         }
       ],
       "canonicalHome": "https://www.islamreligion.com/",
