@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+const securityPolicyPath = "config/security-policy-2026.json";
 const workflowRoot = ".github/workflows";
 const workflowFiles = fs.readdirSync(workflowRoot).filter((name) => /\.ya?ml$/i.test(name));
 const findings = [];
@@ -32,6 +33,37 @@ for (const name of workflowFiles) {
   if (!/^permissions:/m.test(text)) {
     findings.push(`${file}: workflow must declare explicit top-level permissions`);
   }
+}
+
+const securityPolicy = JSON.parse(fs.readFileSync(securityPolicyPath, "utf8"));
+if (securityPolicy.principles?.defenseInDepth !== true ||
+    securityPolicy.principles?.leastPrivilege !== true ||
+    securityPolicy.principles?.failClosed !== true ||
+    securityPolicy.principles?.externalSourcesUntrustedUntilVerified !== true ||
+    securityPolicy.principles?.noSecretsInSourceClientOrArtifacts !== true ||
+    securityPolicy.principles?.sourceRefreshCannotDirectlyOverwriteCorpus !== true) {
+  findings.push("security-policy-2026.json is missing mandatory fail-closed security principles");
+}
+if (!Array.isArray(securityPolicy.secureSourceRefresh?.requiredGates) ||
+    securityPolicy.secureSourceRefresh.requiredGates.length === 0) {
+  findings.push("security policy must declare secure source refresh gates");
+}
+for (const gate of securityPolicy.secureSourceRefresh?.requiredGates || []) {
+  const implementations = securityPolicy.gateImplementations?.[gate];
+  if (!Array.isArray(implementations) || implementations.length === 0) {
+    findings.push("security policy has no implementation mapping for source refresh gate: " + gate);
+    continue;
+  }
+  for (const file of implementations) {
+    if (!fs.existsSync(file)) findings.push("security policy references missing implementation: " + file);
+  }
+}
+if (securityPolicy.secureSourceRefresh?.failurePolicy !== "retain-previous-verified-version" ||
+    securityPolicy.secureSourceRefresh?.uncertaintyPolicy !== "retain-previous-verified-version") {
+  findings.push("source refresh uncertainty must retain the previous verified version");
+}
+if (securityPolicy.incidentResponse?.retaliationForbidden !== true) {
+  findings.push("incident response must forbid retaliation");
 }
 
 const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
