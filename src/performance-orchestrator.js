@@ -252,6 +252,7 @@ export function createVoiceQueue({ concurrency = PERFORMANCE_DEFAULTS.voiceQueue
   const max = Math.max(1, Math.floor(concurrency));
   let active = 0;
   const queue = [];
+  const inflight = new Map();
 
   const pump = () => {
     while (active < max && queue.length) {
@@ -259,12 +260,10 @@ export function createVoiceQueue({ concurrency = PERFORMANCE_DEFAULTS.voiceQueue
       active += 1;
       Promise.resolve()
         .then(item.run)
-        .then(value => {
-          item.resolve(value);
-          item.finally?.();
-        }, error => item.reject(error))
+        .then(value => item.resolve(value), error => item.reject(error))
         .finally(() => {
           active -= 1;
+          if (inflight.get(item.key) === item.promise) inflight.delete(item.key);
           pump();
         });
     }
@@ -273,8 +272,13 @@ export function createVoiceQueue({ concurrency = PERFORMANCE_DEFAULTS.voiceQueue
   return Object.freeze({
     submit(key, run) {
       if (cache.has(key)) return Promise.resolve(cache.get(key));
-      return new Promise((resolve, reject) => {
+      if (inflight.has(key)) return inflight.get(key);
+
+      let queuedPromise;
+      queuedPromise = new Promise((resolve, reject) => {
         queue.push({
+          key,
+          promise: queuedPromise,
           run: async () => {
             if (cache.has(key)) return cache.get(key);
             const value = await run();
@@ -284,8 +288,10 @@ export function createVoiceQueue({ concurrency = PERFORMANCE_DEFAULTS.voiceQueue
           resolve,
           reject,
         });
+        inflight.set(key, queuedPromise);
         pump();
       });
+      return queuedPromise;
     },
     pending: () => queue.length,
     active: () => active,
