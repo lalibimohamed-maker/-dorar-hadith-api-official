@@ -50,6 +50,7 @@ test('v3 distinguishes prerequisite direction and ranks gaps', () => {
   g = addGraphNode(g, { id:'pre', type:'concept' });
   g = addGraphNode(g, { id:'skill', type:'concept' });
   g = addGraphEdge(g, { from:'pre', to:'skill', relation:'requires', confidence:0.95, provenance, status:'verified' });
+  g = addGraphEdge(g, { from:'pre', to:'skill', relation:'prerequisite_of', confidence:0.9, provenance, status:'verified' });
   const state = { skills:{ pre:{ mastery:0.2 } } };
   assert.equal(prerequisiteGaps(g, state, 'skill')[0].conceptId, 'pre');
   assert.equal(rankPrerequisiteHypotheses(g, state, 'skill')[0].routePriority, 1);
@@ -197,4 +198,9 @@ test('learning/graph/evaluation failures never block PDF acquisition', () => {
   assert.equal(canLearningBlockAcquisition(),false);
   assert.equal(getV3Capabilities().acquisitionIndependent,true);
   assert.equal(V3_VERSION,'3.0.0');
+});
+
+test('v3 does not create a phantom calibration attempt when creating a learner profile', () => {
+  const p = createLearnerProfile({ learnerId:'learner-1' });
+  assert.equal(p.calibration.history.length, 0);
 });
