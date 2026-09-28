@@ -61,6 +61,7 @@
     $("score").textContent = `${state.score}/${state.asked}`;
   }
 
+
   function speak(text) {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
@@ -109,6 +110,8 @@
     $("stop-record").disabled = true;
     $("record-status").textContent = "تم إيقاف التسجيل.";
   }
+
+  window.addEventListener("deenallah:self-test-assessment", event => renderAssessment(event.detail));
 
   $("test-domain").addEventListener("change", e => { state.domain = e.target.value; state.asked = 0; state.score = 0; nextQuestion(); });
   $("difficulty").addEventListener("change", e => { state.difficulty = e.target.value; state.asked = 0; state.score = 0; nextQuestion(); });

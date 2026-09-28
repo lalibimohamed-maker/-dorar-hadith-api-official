@@ -45,6 +45,8 @@ jobs:
             echo 'No npm lockfile in repository; using npm install without lockfile.'
             npm install --ignore-scripts --no-package-lock --no-audit --no-fund
           fi
+      - name: Lint JavaScript
+        run: npm run lint
       - name: Syntax check
         run: |
           npm run health

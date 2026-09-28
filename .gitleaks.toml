@@ -1,0 +1,21 @@
+title = "Dinullah repository Gitleaks policy"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Known public Rwanda government evidence URL false positive in Quran catalogs"
+targetRules = ["generic-api-key"]
+condition = "AND"
+commits = [
+  "3fc525e539c2ecc3365bc41d65d1771eecedf0ae",
+  "bc5864376c6b4acb7242ea43d0276ba231f9d1e8"
+]
+paths = [
+  "^config/quranenc-translation-provenance-2026-09-22\\.json$",
+  "^config/quran-multisource-translation-catalog-2026-09-22\\.json$"
+]
+regexTarget = "line"
+regexes = [
+  "https://www\\.minijust\\.gov\\.rw/index\\.php\\?eID=dumpFile&f=77060&t=dumpFile&token="
+]
