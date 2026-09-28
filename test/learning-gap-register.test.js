@@ -26,6 +26,7 @@ test('priority counts match the frozen roadmap', () => {
 
 test('summary exposes implementation state without pretending future work is done', () => {
   const summary = summarizeLearningGaps();
-  assert.equal(summary.P1.some(g => g.status === 'planned'), true);
+  assert.equal(summary.P1.some(g => g.id === 'LG-P1-02' && g.status === 'planned'), true);
+  assert.equal(summary.P1.filter(g => g.status === 'implemented-in-v3').length, 4);
   assert.equal(summary.P0.every(g => g.status === 'implemented-in-p0'), true);
 });
