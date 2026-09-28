@@ -124,7 +124,11 @@ export function cacheKey(task, input) {
 export async function runParallelAdapters(
   adapters,
   execute,
-  { maxParallelAdapters = PERFORMANCE_DEFAULTS.maxParallelAdapters, accept = value => value != null } = {},
+  {
+    maxParallelAdapters = PERFORMANCE_DEFAULTS.maxParallelAdapters,
+    accept = value => value != null,
+    timeoutMs = null,
+  } = {},
 ) {
   const selected = limitAdapters(adapters, maxParallelAdapters);
   if (!selected.length) throw new Error("No healthy benchmarked adapters are available");
@@ -132,14 +136,26 @@ export async function runParallelAdapters(
   const controller = new AbortController();
   let accepted = null;
   let settled = 0;
+  let timedOut = false;
   const results = [];
 
   await new Promise((resolve, reject) => {
+    const deadline = Number.isFinite(timeoutMs) ? setTimeout(() => {
+      timedOut = true;
+      controller.abort("interactive-budget-exceeded");
+      const error = new Error("Interactive performance budget exceeded");
+      error.code = "PERFORMANCE_BUDGET_EXCEEDED";
+      error.results = results;
+      reject(error);
+    }, Math.max(1, timeoutMs)) : null;
+
     const finish = () => {
       if (accepted !== null) {
+        if (deadline) clearTimeout(deadline);
         controller.abort("accepted-result");
         resolve();
       } else if (settled === selected.length) {
+        if (deadline) clearTimeout(deadline);
         const error = new Error("All adapters completed without an acceptable result");
         error.results = results;
         reject(error);
@@ -150,6 +166,7 @@ export async function runParallelAdapters(
       Promise.resolve()
         .then(() => execute(adapter, { signal: controller.signal, index }))
         .then(value => {
+          if (timedOut) return;
           results[index] = { adapter: adapter.id, value };
           settled += 1;
           if (accepted === null && accept(value)) {
@@ -158,6 +175,7 @@ export async function runParallelAdapters(
           finish();
         })
         .catch(error => {
+          if (timedOut) return;
           results[index] = { adapter: adapter.id, error };
           settled += 1;
           finish();
@@ -182,6 +200,7 @@ export async function runSearchFastPath({
   try {
     return await runParallelAdapters(adapters, execute, {
       maxParallelAdapters: policy.maxParallelAdapters,
+      timeoutMs: policy.interactiveBudgetMs,
       accept: accept ?? (value => Boolean(value?.acceptable ?? value)),
     });
   } finally {
@@ -326,7 +345,26 @@ export function performanceMetrics({ startedAt, finishedAt, throughput, memoryMb
     throughput: Number.isFinite(throughput) ? throughput : 0,
     memoryMb: Number.isFinite(memoryMb) ? memoryMb : 0,
     cacheHit: Boolean(cacheHit),
-    p95LatencyMs: durationMs,
+  });
+}
+
+export function summarizeBenchmarks(samples = []) {
+  const usable = samples.filter(sample =>
+    sample &&
+    Number.isFinite(sample.latencyMs) &&
+    Number.isFinite(sample.throughput) &&
+    Number.isFinite(sample.memoryMb)
+  );
+  if (!usable.length) return null;
+
+  const latencies = usable.map(sample => Math.max(0, sample.latencyMs)).sort((a, b) => a - b);
+  const p95Index = Math.min(latencies.length - 1, Math.ceil(latencies.length * 0.95) - 1);
+  return Object.freeze({
+    samples: usable.length,
+    p95LatencyMs: latencies[p95Index],
+    throughput: usable.reduce((sum, sample) => sum + Math.max(0, sample.throughput), 0) / usable.length,
+    memoryMb: usable.reduce((sum, sample) => sum + Math.max(0, sample.memoryMb), 0) / usable.length,
+    cost: usable.reduce((sum, sample) => sum + Math.max(0, Number(sample.cost) || 0), 0) / usable.length,
   });
 }
 
