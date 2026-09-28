@@ -1,0 +1,29 @@
+{
+  "version": "2026-09-28",
+  "purpose": "Keep reading, text copying, and full-book redistribution as independent permissions.",
+  "permissions": {
+    "read": {
+      "rightsAllowed": ["redistributable", "licensed", "public-domain", "read-copy"],
+      "sourcePermissionMayEnable": ["read-only", "link-only"],
+      "restrictedAlwaysBlocks": true
+    },
+    "copyText": {
+      "rightsAllowed": ["redistributable", "licensed", "public-domain", "read-copy"],
+      "sourceExplicitDenialVetoes": true,
+      "rightsUnclearDoesNotGrant": true,
+      "readOnlyDoesNotGrant": true
+    },
+    "fullRedistribution": {
+      "rightsAllowed": ["redistributable", "licensed", "public-domain"],
+      "restrictedDoesNotGrant": true,
+      "rightsUnclearDoesNotGrant": true
+    }
+  },
+  "principles": [
+    "Reading is not redistribution permission.",
+    "Copy Text is a separate permission from full-book download.",
+    "Free availability or web discovery is not evidence of redistribution permission.",
+    "Explicit source permissions must not override a restricted rights state.",
+    "Unknown or conflicting rights fail closed."
+  ]
+}
