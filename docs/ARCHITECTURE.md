@@ -117,3 +117,13 @@ The encyclopedia uses one source-aware graph contract across Quran, hadith, tafs
 Evidence layers are explicit: primary text, scholarly interpretation, metadata, source-backed relations, and generated assistance. Generated assistance can explain retrieved evidence but cannot become evidence. Materially different hadith variants remain separate nodes, and conflicting scholarly judgments remain separate attributed records.
 
 Graph traversal is bidirectional for retrieval. Search ranking remains a retrieval signal only and never a religious judgment.
+
+
+## Digital Book Processing Pipeline
+The downloadable version of a book is a derived digital edition, not an unmodified assumption about a web search result. The source reference remains immutable and identifiable by `sourceSha256`.
+
+Contract sequence: `Search → Source → Provenance → Rights → Fetch → Immutable Source → Multi-OCR → Alignment → Validation → Digital Master → PDF/DOCX/EPUB/PPTX`.
+
+At least two explicitly independent OCR engines are required before alignment can proceed to Digital Master. OCR is derivative evidence; the source/image remains authoritative. Alignment must carry the source fingerprint, unresolved differences block Digital Master, and validation must be `valid` before promotion.
+
+Restricted, read-only, link-only, read-copy and rights-unclear items remain reference-only and cannot enter redistribution export. Bulk requests are planned from catalog editions with deduplication and per-edition rights checks; blocked works retain source references rather than copied content. Presentation themes are read-only overlays and do not mutate the underlying text layer.
