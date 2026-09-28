@@ -282,7 +282,11 @@ export function applyPedagogicalSafety({
   const hintRequested = Boolean(context.hintRequested);
   const struggling = Boolean(learnerState.struggling || learnerState.repeatedErrors);
   const shouldScaffold = SAFETY_POLICIES.scaffoldBeforeAnswer && (hintRequested || struggling) && directAnswer;
-  const sourceGrounded = context.sourceGrounded !== false;
+  const religiousContent = Boolean(context.religiousContent);
+  const sourceGrounded = religiousContent
+    ? context.sourceGrounded === true && Boolean(source?.sourceId) &&
+      Boolean(source?.anchor || source?.page || source?.location)
+    : context.sourceGrounded !== false;
   const rightsAware = context.rightsAware !== false;
 
   return {
@@ -296,6 +300,7 @@ export function applyPedagogicalSafety({
     sourceGrounded,
     rightsAware,
     supportingSource: source,
+    religiousContent,
     progressiveDisclosure: SAFETY_POLICIES.progressiveDisclosure,
     noBiometricInference: true,
     reason: shouldScaffold
