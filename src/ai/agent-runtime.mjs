@@ -11,7 +11,7 @@ const SYSTEM_PROMPT = [
   'Do not rewrite or generate replacement canonical Quran or hadith text.',
   'Keep scholarly disagreement attributed and explicit.',
   'When evidence is insufficient, state that the available evidence is insufficient.',
-  'Return JSON only: {"answer":"...","citations":["E1","E2"]}.'
+  'Return JSON only: {"answer":"...","citations":["E1","E2"],"claims":[{"text":"...","citations":["E1"]}]}. Every factual claim must cite one or more supplied evidence ids.'
 ].join('\n');
 
 function parseModelOutput(raw) {
@@ -21,10 +21,11 @@ function parseModelOutput(raw) {
     return {
       answer: String(parsed.answer || '').trim(),
       citations: Array.isArray(parsed.citations) ? parsed.citations.map(String) : [],
+      claims: Array.isArray(parsed.claims) ? parsed.claims : [],
       format: 'json'
     };
   } catch {
-    return { answer: text, citations: [], format: 'text-fallback' };
+    return { answer: text, citations: [], claims: [], format: 'text-fallback' };
   }
 }
 
@@ -183,6 +184,7 @@ export async function runAgent({
   const verification = verifyAgentResponse({
     answer: parsed.answer,
     claimedCitations: parsed.citations,
+    claims: parsed.claims,
     evidence: context.evidence,
     intent: route.intent,
     evidenceRequired: true
