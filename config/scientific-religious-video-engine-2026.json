@@ -797,5 +797,92 @@
         "systems-in-islam"
       ]
     }
-  ]
+  ],
+  "evidenceToOriginalMultilingualProduction": {
+    "enabled": true,
+    "name": "Evidence-to-Original Multilingual Production",
+    "inputMode": "reference_and_evidence_extraction",
+    "sourceVideoUse": {
+      "publicVideoMayBeIndexed": true,
+      "publicVideoMayBeWatchedForResearch": true,
+      "rawVideoReuse": false,
+      "audioReuse": false,
+      "frameReuse": false,
+      "clipReuse": false,
+      "transcriptVerbatimReuse": false,
+      "briefQuotationOnlyWhenRightsPolicyAuthorizes": true,
+      "sourceLinkRequired": true
+    },
+    "extraction": {
+      "capture": [
+        "sourceVideoId",
+        "sourceUrl",
+        "title",
+        "creator",
+        "publicationDate",
+        "category",
+        "claimStatements",
+        "supportingReferences",
+        "timestamps",
+        "onScreenCitations",
+        "scientificTerms",
+        "quranReferences",
+        "hadithReferences",
+        "scholarlyReferences"
+      ],
+      "preserveSourceAttribution": true,
+      "preserveTimestampEvidence": true,
+      "distinguishPresenterClaimFromIndependentEvidence": true
+    },
+    "verification": {
+      "religiousClaims": {
+        "quran": "verify_against_canonical_quran_source",
+        "hadith": "verify_text_collection_reference_and_grading_separately",
+        "tafsir": "preserve_exegesis_attribution"
+      },
+      "scientificClaims": {
+        "required": "independent_scientific_source_verification",
+        "preferredEvidence": [
+          "primary_literature",
+          "institutional_scientific_sources",
+          "authoritative_datasets"
+        ],
+        "sourceVideoAloneInsufficient": true
+      },
+      "interpretiveLinks": {
+        "allowed": true,
+        "label": "interpretive_relationship",
+        "cannotPromoteToScientificFact": true,
+        "cannotPromoteToReligiousRuling": true
+      }
+    },
+    "multilingualProduction": {
+      "sourceLanguageMayBeEnglish": true,
+      "targetLanguageScope": "all_languages_supported_by_Din_Allah_Encyclopedia",
+      "siteLanguageListIsNotTargetLanguageLimit": true,
+      "flow": [
+        "source_video_reference",
+        "evidence_extraction",
+        "independent_verification",
+        "neutral_claim_evidence_representation",
+        "original_script_generation",
+        "target_language_translation_and_localization",
+        "original_visual_generation_or_rights_cleared_media",
+        "target_language_narration",
+        "rights_and_provenance_validation"
+      ],
+      "preserveCanonicalQuranArabic": true,
+      "translateMeaningSeparately": true,
+      "recitationRemainsArabic": true,
+      "targetNarrationFollowsUserLanguage": true
+    },
+    "output": {
+      "originalScriptRequired": true,
+      "originalVisualPlanRequired": true,
+      "originalNarrationOrRightsClearedAudioRequired": true,
+      "sourceAttributionInManifestRequired": true,
+      "claimEvidenceTraceabilityRequired": true,
+      "sourceVideoDoesNotBecomeOutputMediaByDefault": true
+    }
+  }
 }
