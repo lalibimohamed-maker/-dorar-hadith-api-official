@@ -1,0 +1,327 @@
+{
+  "schema": "rechercher-global-learning-strategy-2026",
+  "status": "frozen-strategic-requirements",
+  "version": "1.0.0",
+  "productPillars": [
+    "global-search",
+    "ya-bawabat-al-ilm",
+    "self-test",
+    "teach-me",
+    "read-and-learn",
+    "recitation",
+    "tajweed-learning",
+    "knowledge-graph",
+    "flashcards-review",
+    "world-language-learning",
+    "mastery-dashboard",
+    "research-mode"
+  ],
+  "transformation": [
+    "acquire",
+    "preserve",
+    "validate",
+    "extract",
+    "structure",
+    "connect",
+    "explain",
+    "practice",
+    "retrieve",
+    "apply",
+    "assess",
+    "review",
+    "master"
+  ],
+  "learningMethods": [
+    "retrieval-practice",
+    "spaced-practice",
+    "interleaving",
+    "elaboration",
+    "concrete-examples",
+    "dual-coding",
+    "worked-examples",
+    "self-explanation",
+    "concept-mapping",
+    "formative-assessment",
+    "corrective-feedback",
+    "metacognitive-reflection",
+    "transfer-practice",
+    "cumulative-review",
+    "low-stakes-before-high-stakes"
+  ],
+  "assessmentByDomain": {
+    "Quran": [
+      "recall",
+      "completion",
+      "ordering",
+      "recognition",
+      "application",
+      "recitation"
+    ],
+    "Tajweed": [
+      "rule-identification",
+      "examples",
+      "listening",
+      "controlled-recitation"
+    ],
+    "Hadith": [
+      "source-identification",
+      "takhrij",
+      "narrator-relations",
+      "grading-concepts",
+      "comparison"
+    ],
+    "UsulAlHadith": [
+      "applied-rule-selection",
+      "justification"
+    ],
+    "Fiqh": [
+      "practical-cases",
+      "madhhab-comparison",
+      "evidence-mapping"
+    ],
+    "UsulAlFiqh": [
+      "applied-principles",
+      "reasoning"
+    ],
+    "Sirah": [
+      "chronology",
+      "people-events-places",
+      "source-comparison"
+    ],
+    "Aqeedah": [
+      "terminology",
+      "evidence",
+      "distinction",
+      "source-grounded-explanation"
+    ],
+    "Arabic": [
+      "reading",
+      "vocabulary",
+      "morphology",
+      "syntax",
+      "semantic-context"
+    ],
+    "Rijal": [
+      "person-source-network-identification"
+    ],
+    "Faraid": [
+      "worked-cases",
+      "calculation-verification"
+    ],
+    "BooksOfSalaf": [
+      "author-work-era-topic-source-relationships"
+    ],
+    "ResearchSkills": [
+      "source-discovery",
+      "provenance-checking",
+      "contradiction-detection"
+    ]
+  },
+  "masteryDimensions": [
+    "recognition",
+    "recall",
+    "explanation",
+    "application",
+    "discrimination",
+    "transfer",
+    "source-navigation",
+    "confidence-calibration",
+    "retention"
+  ],
+  "adaptiveLearnerModel": [
+    "goals",
+    "language-preferences",
+    "known-prerequisites",
+    "demonstrated-mastery",
+    "error-history",
+    "review-intervals",
+    "confidence",
+    "preferred-modality",
+    "cognitive-load-signals-when-available",
+    "source-rights-availability",
+    "accessibility-requirements"
+  ],
+  "adaptiveRecommendationContract": {
+    "explainable": true,
+    "requiredFields": [
+      "why-this-activity",
+      "why-now",
+      "supporting-source"
+    ]
+  },
+  "knowledgeGraph": {
+    "nodes": [
+      "author",
+      "work",
+      "edition",
+      "chapter",
+      "passage",
+      "concept",
+      "evidence",
+      "narrator",
+      "hadith",
+      "event",
+      "place",
+      "school",
+      "scholar",
+      "commentary",
+      "translation"
+    ],
+    "everyRelationRequires": [
+      "provenance",
+      "confidence"
+    ],
+    "relationIsIndexedClaimNotAutomaticTruth": true
+  },
+  "navigatorPath": [
+    "question",
+    "intent-domain",
+    "candidate-concepts",
+    "primary-secondary-sources",
+    "evidence",
+    "scholarly-positions",
+    "uncertainty",
+    "explanation",
+    "practice",
+    "further-reading"
+  ],
+  "sourceDistinctions": [
+    "source-existence",
+    "text-extraction",
+    "attribution",
+    "authenticity-gradation",
+    "scholarly-interpretation",
+    "project-indexing",
+    "ai-generated-explanation"
+  ],
+  "readAndLearnCapabilities": [
+    "original-document",
+    "searchable-text",
+    "ocr",
+    "chapter-navigation",
+    "vocabulary-terminology",
+    "source-linked-explanations",
+    "concept-map",
+    "flashcards",
+    "questions",
+    "practice-tasks",
+    "review-queue",
+    "exact-source-citations"
+  ],
+  "recitation": {
+    "pipeline": [
+      "canonical-quran",
+      "reference-recitations",
+      "curriculum-rules",
+      "recorder",
+      "alignment",
+      "evaluator",
+      "error-report",
+      "feedback",
+      "repeat",
+      "spaced-review"
+    ],
+    "authoritativeCorrectionRequiresValidatedEvaluator": true
+  },
+  "languages": {
+    "dimensions": [
+      "interface-language",
+      "learning-language",
+      "source-language"
+    ],
+    "canonicalQuranArabicUnchanged": true,
+    "translationDoesNotReplaceSource": true,
+    "worldLanguageExtensible": true
+  },
+  "accessibility": [
+    "keyboard-navigation",
+    "screen-readers",
+    "adjustable-text",
+    "high-contrast",
+    "captions-transcripts",
+    "audio-alternatives",
+    "reduced-motion",
+    "clear-error-recovery"
+  ],
+  "strategicFeatures": {
+    "evidenceToFeatureRegistry": true,
+    "experimentation": {
+      "enabled": true,
+      "privacyPreserving": true,
+      "metrics": [
+        "retention",
+        "transfer",
+        "completion",
+        "error-recovery",
+        "time-to-mastery",
+        "source-engagement",
+        "confidence"
+      ]
+    },
+    "contradictionAwareResearch": true,
+    "confidenceCalibration": [
+      "know-confident",
+      "know-uncertain",
+      "dont-know-confident",
+      "dont-know-uncertain"
+    ],
+    "transferLaboratory": true,
+    "teachBack": {
+      "enabled": true,
+      "sourceAlignmentRequired": true,
+      "humanReviewForAuthoritativeJudgment": true
+    },
+    "socraticDialogue": true,
+    "researchApprenticeship": [
+      "question",
+      "search",
+      "source-evaluation",
+      "provenance",
+      "comparison",
+      "note-taking",
+      "citation",
+      "synthesis",
+      "uncertainty-statement"
+    ],
+    "sourceFirstGeneration": true,
+    "progressiveDisclosure": [
+      "short-answer",
+      "evidence",
+      "explanation",
+      "deep-dive",
+      "original-source"
+    ],
+    "crossModalLearning": true,
+    "interleavedCurriculum": true,
+    "prerequisiteGraph": true,
+    "personalResearchLibrary": true,
+    "teacherScholarReviewChannel": true,
+    "offlinePwaResilience": true
+  },
+  "governance": {
+    "acquisitionIndependent": true,
+    "acquisitionMustNotWaitForLearning": true,
+    "noLearningFeatureMayBlockPdfAcquisition": true,
+    "rightsAware": true,
+    "provenancePreserving": true,
+    "immutableSourceHashes": true,
+    "securityControlsPreserved": true,
+    "protectedMainPreserved": true,
+    "requiredChecksPreserved": true,
+    "freeOpenSourceFirst": true,
+    "privacyByDesign": true,
+    "corpusCanonicalLayersUntouchedByLearning": true
+  },
+  "epistemicBoundary": {
+    "distinguish": [
+      "canonical-text",
+      "source-text",
+      "translation",
+      "scholarly-interpretation",
+      "indexed-metadata",
+      "learner-note",
+      "ai-generated-explanation"
+    ],
+    "aiDoesNotBecomeReligiousAuthority": true
+  }
+}
