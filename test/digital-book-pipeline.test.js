@@ -76,6 +76,8 @@ test('export is blocked unless redistribution rights are explicit', () => {
   assert.equal(canExport(source(RIGHTS.REDISTRIBUTABLE), 'pdf'), true);
   assert.equal(canExport(source(RIGHTS.REDISTRIBUTABLE), 'docx'), true);
   assert.equal(canExport(source(RIGHTS.REDISTRIBUTABLE), 'epub'), true);
+  assert.equal(canExport(source('licensed'), 'pdf'), true);
+  assert.equal(canExport(source('public-domain'), 'epub'), true);
   assert.equal(canExport(source(RIGHTS.RESTRICTED), 'pdf'), false);
   assert.equal(canExport(source(RIGHTS.RESTRICTED), 'docx'), false);
 });
@@ -84,4 +86,15 @@ test('reading themes are presentation-only and do not alter text', () => {
   const theme = readingTheme('sepia');
   assert.equal(theme.textLayerImmutable, true);
   assert.equal(theme.sectionAccent, 'presentation-only');
+});
+
+
+test('digital master is blocked for read-only and unclear books', () => {
+  for (const rights of [RIGHTS.READ_ONLY, RIGHTS.RIGHTS_UNCLEAR]) {
+    assert.throws(() => createDigitalMaster({
+      source: source(rights),
+      alignment: { status: 'aligned', sourceSha256: source(rights).sourceSha256, engines },
+      pages: [{ number: 1, text: 'page', verified: true }],
+    }), /redistribution rights are not explicit/);
+  }
 });
