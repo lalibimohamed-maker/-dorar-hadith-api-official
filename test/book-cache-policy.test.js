@@ -14,6 +14,7 @@ test("verified licensed book may enter cache", () => {
   assert.equal(result.allowed, true);
   assert.equal(result.state, BOOK_CACHE_STATES.CACHED);
   assert.deepEqual(result.failures, []);
+  assert.deepEqual(result.gates, ["source", "provenance", "rights", "validation"]);
 });
 
 test("unknown rights fail closed", () => {
@@ -29,8 +30,31 @@ test("missing provenance fails closed", () => {
   assert.ok(result.failures.includes("provenance_required"));
 });
 
-test("invalid validation fails closed", () => {
+test("invalid verification timestamp fails closed", () => {
+  const result = evaluateBookCacheRequest({
+    ...valid,
+    provenance: { resourceId: "book-001", verifiedAt: "not-a-date" }
+  });
+  assert.equal(result.allowed, false);
+  assert.ok(result.failures.includes("provenance_required"));
+});
+
+test("non-http source URL fails closed", () => {
+  const result = evaluateBookCacheRequest({
+    ...valid,
+    source: { id: "book", url: "file:///tmp/book.pdf" }
+  });
+  assert.equal(result.allowed, false);
+  assert.ok(result.failures.includes("source_required"));
+});
+
+test("validation must be successful", () => {
   const result = evaluateBookCacheRequest({ ...valid, validation: { status: "invalid" } });
   assert.equal(result.allowed, false);
   assert.ok(result.failures.includes("validation_required"));
+});
+
+test("passed validation is also accepted for governance interoperability", () => {
+  const result = evaluateBookCacheRequest({ ...valid, validation: { status: "passed" } });
+  assert.equal(result.allowed, true);
 });
