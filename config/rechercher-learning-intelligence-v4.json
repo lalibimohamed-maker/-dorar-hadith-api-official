@@ -59,7 +59,12 @@
     "learnerAgency": true,
     "sourceGrounded": true,
     "rightsAware": true,
-    "noBiometricInferenceByDefault": true
+    "noBiometricInferenceByDefault": true,
+    "religiousDirectAnswerRequires": {
+      "sourceId": true,
+      "sourceAnchorOrPageOrLocation": true,
+      "sourceGroundedExplicit": true
+    }
   },
   "acquisitionBoundary": {
     "learningDownstream": true,
