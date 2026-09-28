@@ -1,5 +1,5 @@
-const DEFAULT_TIMEOUT_MS = 1800;
-const MAX_PROVIDERS = 10;
+const DEFAULT_TIMEOUT_MS = 1200;
+const MAX_PROVIDERS = 8;
 
 const PROVIDER_CLASSES = Object.freeze({
   web: ["google", "bing", "brave", "mojeek", "yandex", "duckduckgo"],
