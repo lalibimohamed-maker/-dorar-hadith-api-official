@@ -166,13 +166,12 @@ export function prerequisiteGaps(graph, state, conceptId, threshold = 0.7) {
   const relationSet = prerequisiteRelationSet();
   const prerequisites = graph.edges.filter(edge => {
     if (!relationSet.has(edge.relation)) return false;
-    if (edge.relation === 'prerequisite_of') return edge.from === conceptId;
     return edge.to === conceptId;
   });
 
   return prerequisites
     .map(edge => {
-      const prerequisiteId = edge.relation === 'prerequisite_of' ? edge.to : edge.from;
+      const prerequisiteId = edge.from;
       return {
         conceptId: prerequisiteId,
         relation: edge.relation,
@@ -194,13 +193,14 @@ export function rankPrerequisiteHypotheses(graph, state, conceptId, threshold = 
 
 export function diagnoseMisconception(graph, state, skillId, result = {}) {
   if (result.correct) return null;
-  const candidates = graph.edges.filter(edge =>
-    edge.from === skillId &&
-    ['caused_by', 'causes_error_in', 'confused_with'].includes(edge.relation)
-  );
+  const candidates = graph.edges.filter(edge => {
+    if (['caused_by', 'confused_with'].includes(edge.relation)) return edge.from === skillId;
+    if (edge.relation === 'causes_error_in') return edge.to === skillId;
+    return false;
+  });
   return candidates
     .map(edge => ({
-      id: edge.to,
+      id: edge.relation === 'causes_error_in' ? edge.from : edge.to,
       relation: edge.relation,
       confidence: edge.confidence ?? 0.5,
       observed: Boolean(state?.misconceptions?.[edge.to]),
@@ -248,18 +248,23 @@ export function calibrate({ correct, confidence = 0.5, priorBias = 0 } = {}) {
 }
 
 export function updateCalibrationState(state = {}, attempt = {}) {
-  const history = [...asArray(state.history), {
-    correct: Boolean(attempt.correct),
-    confidence: clamp(attempt.confidence ?? 0.5),
-    timestamp: attempt.timestamp ?? new Date().toISOString(),
-    contextKey: attempt.contextKey ?? 'general'
-  }].slice(-200);
-
-  const biasValues = history.map(entry => (entry.correct ? 1 : 0) - entry.confidence);
+  const history = [...asArray(state.history)];
+  const hasOutcome = attempt?.correctness !== undefined || attempt?.correct !== undefined ||
+    attempt?.confidence !== undefined;
+  if (hasOutcome) {
+    history.push({
+      correct: Boolean(attempt.correctness ?? attempt.correct),
+      confidence: clamp(attempt.confidence ?? 0.5),
+      timestamp: attempt.timestamp ?? new Date().toISOString(),
+      contextKey: attempt.contextKey ?? 'general'
+    });
+  }
+  const trimmedHistory = history.slice(-200);
+  const biasValues = trimmedHistory.map(entry => (entry.correct ? 1 : 0) - entry.confidence);
   const errors = history.map(entry => Math.abs((entry.correct ? 1 : 0) - entry.confidence));
 
   return {
-    history,
+    history: trimmedHistory,
     meanCalibrationBias: mean(biasValues) ?? 0,
     meanCalibrationError: mean(errors) ?? 0,
     overconfidenceRisk: clamp(Math.max(0, -(mean(biasValues) ?? 0))),
