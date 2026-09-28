@@ -48,37 +48,62 @@
         "id": "google",
         "status": "candidate",
         "integration": "official_api_only",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       },
       {
         "id": "bing",
         "status": "candidate",
         "integration": "official_api_only",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       },
       {
         "id": "brave",
         "status": "candidate",
         "integration": "official_api_only",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "transient_only_unless_plan_explicitly_grants_storage",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true,
+        "termsReference": "https://api-dashboard.search.brave.com/documentation/resources/terms-of-service"
       },
       {
         "id": "mojeek",
         "status": "candidate",
         "integration": "official_api_only",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       },
       {
         "id": "yandex",
         "status": "candidate",
         "integration": "official_api_only",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       },
       {
         "id": "duckduckgo",
         "status": "candidate",
         "integration": "official_api_or_permitted_interface_only",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       }
     ],
     "quran": [
@@ -86,7 +111,11 @@
         "id": "quran_sources",
         "status": "candidate",
         "integration": "source_authorized_api_or_permitted_interface",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       }
     ],
     "tafsir": [
@@ -94,7 +123,11 @@
         "id": "tafsir_sources",
         "status": "candidate",
         "integration": "source_authorized_api_or_permitted_interface",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       }
     ],
     "hadith": [
@@ -102,7 +135,11 @@
         "id": "hadith_sources",
         "status": "candidate",
         "integration": "source_authorized_api_or_permitted_interface",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       }
     ],
     "books": [
@@ -110,7 +147,11 @@
         "id": "book_sources",
         "status": "candidate",
         "integration": "library_authorized_api_or_permitted_interface",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       }
     ],
     "fatwa": [
@@ -118,7 +159,11 @@
         "id": "fatwa_sources",
         "status": "candidate",
         "integration": "source_authorized_api_or_permitted_interface",
-        "scrapingAllowed": false
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
       }
     ]
   },
@@ -142,5 +187,18 @@
   "response": {
     "oneUnifiedAnswer": true,
     "internalTopologyHidden": true
+  },
+  "connectorActivationPolicy": {
+    "defaultEnabled": false,
+    "activationRequires": [
+      "provider_explicit_access",
+      "official_or_provider_permitted_interface",
+      "credentials_not_committed",
+      "current_terms_reviewed"
+    ],
+    "externalProviderCaching": "opt_in_per_provider",
+    "externalProviderRetry": "opt_in_per_provider",
+    "rateLimitHandling": "fail_soft_without_bypass",
+    "scraping": "forbidden"
   }
 }
