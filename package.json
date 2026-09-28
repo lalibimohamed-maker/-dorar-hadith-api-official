@@ -36,7 +36,8 @@
     "test:search-parallel": "node --test test/parallel-search-governance.test.js test/search-provider-federation.test.js",
     "test:reader": "node --test test/universal-reader-policy.test.js test/universal-religious-scholarly-delivery.test.js test/digital-book-pipeline.test.js test/global-reader-governance.test.js",
     "test:security-policy": "node --test test/security-policy.test.js",
-    "test:api-contract": "node --test test/api-contract-0.11.test.js"
+    "test:api-contract": "node --test test/api-contract-0.11.test.js",
+    "test:free-first": "node --test test/free-first-fallback-registry.test.js test/free-first-fallback-selector.test.js"
   },
   "engines": {
     "node": ">=20"
