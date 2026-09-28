@@ -140,6 +140,8 @@ export function createSourceGroundedLearningObject({
     passage &&
     passage.sourceId &&
     passage.citation &&
+    Object.prototype.hasOwnProperty.call(passage, 'rights') &&
+    passage.rights !== null &&
     VERIFIED_SOURCE_STATES.has(passage.verificationState)
   );
   if (!validPassages) throw new TypeError('learning object requires verified source-grounded passages');
