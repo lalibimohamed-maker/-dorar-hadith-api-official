@@ -1,4 +1,4 @@
-const CONTENT_KEYS = Object.freeze(['text','excerpt','matn','content','description','quote','summary']);
+const CONTENT_KEYS = Object.freeze(['text','excerpt','matn','content','quote']);
 const LOCATION_KEYS = Object.freeze(['locator','location','page','pageNumber','volume','chapter','hadithNumber','ayah','surah']);
 
 function firstNonEmpty(record, keys) {
