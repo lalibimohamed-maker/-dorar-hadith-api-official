@@ -10,11 +10,22 @@ function toPositiveInt(value, fallback) {
 }
 
 function acceptsEncoding(header, encoding) {
-  const value = String(header || "").toLowerCase();
-  const wildcard = /(?:^|,)\s*\*\s*(?:;|,|$)/.test(value);
-  const match = value.match(new RegExp(`(?:^|,)\\s*${encoding}\\s*(?:;\\s*q\\s*=\\s*([0-9.]+))?(?:,|$)`));
-  if (match) return Number(match[1] ?? 1) > 0;
-  return wildcard && !new RegExp(`(?:^|,)\\s*${encoding}\\s*;\\s*q\\s*=\\s*0(?:[.]0*)?(?:,|$)`).test(value);
+  const entries = String(header || "")
+    .toLowerCase()
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const [name, ...params] = part.split(";").map((value) => value.trim());
+      const qualityParam = params.find((value) => value.startsWith("q="));
+      const quality = qualityParam ? Number(qualityParam.slice(2)) : 1;
+      return { name, quality: Number.isFinite(quality) ? quality : 0 };
+    });
+
+  const direct = entries.find((entry) => entry.name === encoding);
+  if (direct) return direct.quality > 0;
+  const wildcard = entries.find((entry) => entry.name === "*");
+  return Boolean(wildcard && wildcard.quality > 0);
 }
 
 export function createAccelerationMesh(options = {}) {
@@ -78,7 +89,10 @@ export function createAccelerationMesh(options = {}) {
     if (buffer.length > maxBytes) return;
     const ttlMs = toPositiveInt(meta.ttlMs, 30_000);
     remove(key);
-    const headers = { ...(meta.headers || {}) };
+    const unsafeHeaderNames = new Set(["set-cookie", "authorization", "proxy-authorization", "www-authenticate"]);
+    const headers = Object.fromEntries(
+      Object.entries(meta.headers || {}).filter(([name]) => !unsafeHeaderNames.has(String(name).toLowerCase()))
+    );
     if (!headers["content-type"] && meta.contentType) headers["content-type"] = meta.contentType;
     const entry = {
       body: buffer,
