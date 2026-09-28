@@ -39,13 +39,33 @@ export function searchUnified(query, records = [], filters = {}) {
     .sort((a, b) => b.relevance - a.relevance);
 }
 
+export function classifyEvidenceState(record = {}) {
+  const verification = String(record.verification || "").toLowerCase();
+  const relationship = String(record.relationshipType || record.relationType || "").toLowerCase();
+  const potential = verification === "potential" ||
+    record.isPotential === true ||
+    relationship === "potential" ||
+    relationship === "interpretive_relationship";
+  const verified = verification === "verified" ||
+    verification === "source-verified" ||
+    record.verifiedEvidence === true;
+  if (potential && !verified) return "potential";
+  if (verified) return "verified";
+  return "unverified";
+}
+
 export function buildEvidence(record = {}) {
+  const state = classifyEvidenceState(record);
   return {
     source: record.source || null,
+    sourceId: record.sourceId || record.id || null,
     work: record.work || null,
     author: record.author || null,
     verification: record.verification || "unverified",
+    evidenceState: state,
+    relationshipType: record.relationshipType || record.relationType || null,
     methodology: record.methodology || null,
     rights: record.rights || "unknown",
+    isDiscoveryOnly: record.isDiscoveryOnly === true
   };
 }
