@@ -69,3 +69,14 @@ IslamReligion.com is registered as a multilingual Islamic video/reference source
 The French URL `https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite` is registered specifically as the French localized entry for the "Evidence Islam is Truth" category. Category numeric IDs and slugs are language-scoped and must be resolved from each localized source navigation rather than copied from another language.
 
 The category page is useful for Islamic/dawah context and discovery, including its scientific-miracles taxonomy, but its claims remain subject to independent evidence verification in the video engine. Its media remains reference-only unless a compatible license or explicit permission is recorded by the rights gate.
+
+
+### Three linked entry points
+
+The IslamReligion integration keeps three connected navigation levels rather than treating one URL as the whole source:
+
+1. The global site/language index: `https://www.islamreligion.com/`
+2. The localized video hub: `https://www.islamreligion.com/{lang}/videos` (English defaults to `/videos`)
+3. The localized "Evidence Islam is Truth" video category: `https://www.islamreligion.com/{lang}/category/33/preuves-que-lislam-est-la-verite`
+
+The site currently exposes 15 language links in its navigation, but this observed set is not an architectural limit. New language links must be discoverable from the source navigation without a code change. The same rule applies to newly added video categories and child categories.
