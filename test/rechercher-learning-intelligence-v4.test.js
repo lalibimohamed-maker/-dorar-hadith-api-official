@@ -93,6 +93,12 @@ test('v4 scaffold-first safety preserves learner agency and source/rights gates'
   });
   assert.equal(ready.allowed,true);
   assert.equal(ready.preserveAgency,true);
+
+  const missingSource=applyPedagogicalSafety({
+    response:'جواب ديني',
+    context:{religiousContent:true,sourceGrounded:true,rightsAware:true}
+  });
+  assert.equal(missingSource.allowed,false);
 });
 
 test('v4 capabilities preserve acquisition independence', () => {
