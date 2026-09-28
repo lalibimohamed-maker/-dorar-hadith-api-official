@@ -42,5 +42,21 @@
   "responsePolicy": {
     "singleUnifiedAnswerSurface": true,
     "internalProviderDetailsHidden": true
+  },
+  "providerNetworkRegistry": "config/search-provider-network-2026.json",
+  "routingLayers": [
+    "quran",
+    "tafsir",
+    "hadith",
+    "books",
+    "fatwa",
+    "web"
+  ],
+  "providerActivation": "explicit-per-provider",
+  "providerRightsPolicy": {
+    "externalSearchIntegration": "official_api_or_provider_permitted_interface_only",
+    "scraping": false,
+    "cache": "only_when_provider_contract_or_connector_policy_explicitly_allows",
+    "retry": "only_when_connector_policy_explicitly_allows_and_rate_limits_are_respected"
   }
 }
