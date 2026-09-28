@@ -224,7 +224,7 @@ export function getLearningEngineCapabilities() {
     version: ENGINE_VERSION,
     loop: [...LEARNING_LOOP],
     practiceModes: [...PRACTICE_MODES],
-    schedulerBackends: ['FSRS', 'SM-2', 'Leitner', 'forgetting-curve'],
+    schedulerBackends: ['FSRS', 'SM-2', 'Leitner', 'forgetting-curve', 'deadline-aware'],
     renderers: ['card', 'reading', 'audio', 'visual', 'game'],
     flashcardQuestionModes: flashcards.questionModes ?? [],
     acquisitionBlocking: false,
