@@ -160,15 +160,20 @@ export async function downloadPdfForOffline(book, { onProgress, requestPersisten
     headers: { "Content-Type": "application/pdf", "Content-Length": String(blob.size), "X-Offline-SHA256": book.sha256 }
   }));
 
-  await putMetadata({
-    ...book,
-    sizeBytes: blob.size,
-    cachedAt: new Date().toISOString(),
-    state: "cached",
-    version: book.version || 1,
-    persistentStorageRequested: requestPersistent === true,
-    persistentStorageGranted: persistentRequested,
-  });
+  try {
+    await putMetadata({
+      ...book,
+      sizeBytes: blob.size,
+      cachedAt: new Date().toISOString(),
+      state: "cached",
+      version: book.version || 1,
+      persistentStorageRequested: requestPersistent === true,
+      persistentStorageGranted: persistentRequested,
+    });
+  } catch (error) {
+    await cache.delete(book.url);
+    throw error;
+  }
   return {
     ...book,
     sizeBytes: blob.size,
