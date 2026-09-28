@@ -78,12 +78,15 @@ export function createAccelerationMesh(options = {}) {
     if (buffer.length > maxBytes) return;
     const ttlMs = toPositiveInt(meta.ttlMs, 30_000);
     remove(key);
+    const headers = { ...(meta.headers || {}) };
+    if (!headers["content-type"] && meta.contentType) headers["content-type"] = meta.contentType;
     const entry = {
       body: buffer,
       size: buffer.length,
       status: Number(meta.status || 200),
-      contentType: meta.contentType || "application/json; charset=utf-8",
-      etag: meta.etag || `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`,
+      headers,
+      contentType: meta.contentType || headers["content-type"] || "application/json; charset=utf-8",
+      etag: meta.etag || headers.etag || `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`,
       ttlMs,
       expiresAt: Date.now() + ttlMs,
     };
