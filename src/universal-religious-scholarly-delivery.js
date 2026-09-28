@@ -79,7 +79,11 @@ export function buildReligiousScholarlyDeliveryPlan({
   const language = requestedLanguage || browserLanguage || "ar";
   const rightsApproved = APPROVED_REUSE.has(rights.status);
   const provenanceVerified = provenance.verified === true;
-  const qualityControlled = validation.status === "passed" && ocr.status === "aligned";
+  const independentOcrEngines = Array.isArray(ocr.engines)
+    ? new Set(ocr.engines.map((engine) => engine?.id).filter(Boolean)).size
+    : 0;
+  const multiOcrValidated = ocr.status === "aligned" && independentOcrEngines >= 2;
+  const qualityControlled = validation.status === "passed" && multiOcrValidated;
   const digitalMasterEligible = classification.eligible &&
     classification.trustedCorpus &&
     rightsApproved &&
@@ -95,6 +99,8 @@ export function buildReligiousScholarlyDeliveryPlan({
     rightsStatus: rights.status ?? "unknown",
     provenanceVerified,
     multiOcrStatus: ocr.status ?? "pending",
+    independentOcrEngineCount: independentOcrEngines,
+    multiOcrValidated,
     qualityControlStatus: validation.status ?? "pending",
     digitalMasterEligible,
     readerMode: digitalMasterEligible
