@@ -19,7 +19,7 @@ export const LEARNING_METHOD_REGISTRY = Object.freeze({
   reading: { version: '1.0.0', targets: ['source_comprehension'], stage: 'instruction', feedbackRequired: false, measures: ['source_comprehension'] },
   audio: { version: '1.0.0', targets: ['listening', 'retrieval'], stage: 'practice', feedbackRequired: true, measures: ['immediate_accuracy'] },
   visual: { version: '1.0.0', targets: ['concept_mapping', 'discrimination'], stage: 'practice', feedbackRequired: true, measures: ['transfer'] },
-  game: { version: '1.0.0', targets: ['retrieval', 'engagement'], stage: 'practice', feedbackRequired: true, measures: ['delayed_retention', 'transfer'] }
+  game: { version: '1.0.0', targets: ['retrieval'], stage: 'practice', feedbackRequired: true, measures: ['delayed_retention', 'transfer'] }
 });
 
 export const LEARNING_METHODS = Object.freeze(Object.keys(LEARNING_METHOD_REGISTRY));
