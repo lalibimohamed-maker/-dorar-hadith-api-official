@@ -82,13 +82,32 @@ paths:
   /search:
     get:
       operationId: search
-      summary: Multilingual unified search with methodology routing; no meaning-translation layer
+      summary: Unified source-aware search orchestrating Dorar hadith retrieval and the knowledge index; potential relationships remain separate from verified evidence
+      description: |
+        The /search endpoint is the single user-facing search surface. It orchestrates official Dorar hadith retrieval with the source-aware knowledge index and internally governed provider search. Indexed results retain source attribution. Potential relationships are returned separately from verified evidence and never become authoritative merely by being discovered.
       parameters:
         - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
         - {name: lang, in: query, required: false, schema: {type: string}}
         - {name: comparative, in: query, required: false, schema: {type: boolean, default: false}}
       responses:
-        '200': {description: Search results with provenance in selected language}
+        '200':
+          description: Search results with provenance in the selected language
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query: {type: string}
+                  responseLanguage: {type: string}
+                  sourceMatches: {type: array, items: {type: object}}
+                  verifiedEvidence: {type: array, items: {type: object}}
+                  potentialMatches: {type: array, items: {type: object}}
+                  policy:
+                    type: object
+                    properties:
+                      sourceAttributionRequired: {type: boolean}
+                      verifiedEvidenceSeparatedFromPotentialRelationships: {type: boolean}
+
   /concept:
     get:
       operationId: getConceptCard
