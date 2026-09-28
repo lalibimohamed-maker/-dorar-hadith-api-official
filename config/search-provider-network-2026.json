@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "search-provider-network-2026",
+  "status": "governed-candidate-network",
+  "userSurface": "main-search-only",
+  "routingOrder": [
+    "quran",
+    "tafsir",
+    "hadith",
+    "books",
+    "fatwa",
+    "web"
+  ],
+  "layers": {
+    "quran": {
+      "priority": "specialized-first",
+      "fallback": "web"
+    },
+    "tafsir": {
+      "priority": "specialized-first",
+      "fallback": "web"
+    },
+    "hadith": {
+      "priority": "specialized-first",
+      "fallback": "web"
+    },
+    "books": {
+      "priority": "library-and-book-connectors-first",
+      "fallback": "web"
+    },
+    "fatwa": {
+      "priority": "qualified-fatwa-sources-first",
+      "fallback": "web"
+    },
+    "web": {
+      "priority": "multi-provider"
+    }
+  },
+  "limits": {
+    "maxConcurrentProviders": 8,
+    "providerTimeoutMs": 1200,
+    "boundedRetries": 1,
+    "cacheMode": "short-lived-optional"
+  },
+  "providerCandidates": {
+    "web": [
+      {
+        "id": "google",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false
+      },
+      {
+        "id": "bing",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false
+      },
+      {
+        "id": "brave",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false
+      },
+      {
+        "id": "mojeek",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false
+      },
+      {
+        "id": "yandex",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false
+      },
+      {
+        "id": "duckduckgo",
+        "status": "candidate",
+        "integration": "official_api_or_permitted_interface_only",
+        "scrapingAllowed": false
+      }
+    ],
+    "quran": [
+      {
+        "id": "quran_sources",
+        "status": "candidate",
+        "integration": "source_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false
+      }
+    ],
+    "tafsir": [
+      {
+        "id": "tafsir_sources",
+        "status": "candidate",
+        "integration": "source_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false
+      }
+    ],
+    "hadith": [
+      {
+        "id": "hadith_sources",
+        "status": "candidate",
+        "integration": "source_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false
+      }
+    ],
+    "books": [
+      {
+        "id": "book_sources",
+        "status": "candidate",
+        "integration": "library_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false
+      }
+    ],
+    "fatwa": [
+      {
+        "id": "fatwa_sources",
+        "status": "candidate",
+        "integration": "source_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false
+      }
+    ]
+  },
+  "governance": {
+    "externalResultsAreDiscoveryOnly": true,
+    "provenanceRequiredBeforeVerification": true,
+    "rightsRequiredBeforeRedistribution": true,
+    "providerPresenceDoesNotImplyAuthority": true,
+    "scrapingForbidden": true,
+    "termsAndRateLimitsMustBeRespected": true,
+    "robotsOrProviderPolicyCannotBeBypassed": true,
+    "noCredentialEmbedding": true,
+    "noSyntheticTrafficAmplification": true
+  },
+  "providerRecordRequiredFields": [
+    "id",
+    "status",
+    "integration",
+    "scrapingAllowed"
+  ],
+  "response": {
+    "oneUnifiedAnswer": true,
+    "internalTopologyHidden": true
+  }
+}
