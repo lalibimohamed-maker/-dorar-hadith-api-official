@@ -41,6 +41,8 @@ USER_AGENT = "DinAllah-Encyclopedia/1.3"
 DOWNLOAD_TIMEOUT = 120
 MAX_SOURCE_ATTEMPTS = max(12, int(os.environ.get("RECHERCHER_MAX_SOURCE_ATTEMPTS", "24")))
 MAX_BOOK_WORKERS = max(1, min(int(os.environ.get("RECHERCHER_MAX_BOOK_WORKERS", "12")), 32))
+RETRYABLE_ATTEMPT_STATUSES = {"incomplete_source", "source_error", "download_error"}
+INTEGRITY_BLOCKING_ATTEMPT_STATUSES = {"invalid_signature", "invalid_pdf", "quality_rejected"}
 REEVALUATE_EXISTING = os.environ.get("RECHERCHER_REEVALUATE_EXISTING", "0") == "1"
 
 
@@ -256,7 +258,11 @@ def acquire_volume(book, volume, expected, work):
                         attempts.append({"source": url, "status": "encrypted_rejected"})
                         continue
                     print(f"Quality candidate {book_key(book)} volume {volume}/{expected} source {source_index}/{len(sources)}: {url}", flush=True)
-                    download(url, candidate)
+                    try:
+                        download(url, candidate)
+                    except Exception as exc:
+                        attempts.append({"source": url, "status": "download_error", "error": str(exc)})
+                        continue
                     if candidate.read_bytes()[:4] != b"%PDF":
                         attempts.append({"source": url, "status": "invalid_signature"})
                         continue
@@ -286,7 +292,28 @@ def acquire_volume(book, volume, expected, work):
                     if candidate.exists() and (best is None or best.get("path") != str(candidate)):
                         candidate.unlink(missing_ok=True)
         if best is None:
-            return None, {"volume": volume, "status": "failed", "attempts": attempts}
+            blocking_attempt = next(
+                (a for a in attempts if a.get("status") in INTEGRITY_BLOCKING_ATTEMPT_STATUSES),
+                None,
+            )
+            if blocking_attempt:
+                return None, {
+                    "volume": volume,
+                    "status": "integrity-failed",
+                    "retryable": False,
+                    "blocking_reason": blocking_attempt.get("status"),
+                    "attempts": attempts,
+                }
+            retryable = bool(attempts) and all(
+                a.get("status") in RETRYABLE_ATTEMPT_STATUSES
+                for a in attempts
+            )
+            return None, {
+                "volume": volume,
+                "status": "failed",
+                "retryable": retryable,
+                "attempts": attempts,
+            }
         final = work / f"{volume:03d}.pdf"
         Path(best["path"]).replace(final)
         return final, {
@@ -340,8 +367,30 @@ def acquire(book):
         else:
             vols.append(record)
     if failed:
-        (work / "retry.json").write_text(json.dumps({"id": book_key(book), "failed_volumes": failed}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        return {"id": book_key(book), "status": "partial", "failed_volumes": failed, "rights_state": rights_state(book)}
+        (work / "retry.json").write_text(
+            json.dumps(
+                {
+                    "id": book_key(book),
+                    "failed_volumes": failed,
+                    "retry_policy": "coverage_and_transport_gaps_only",
+                    "integrity_failures_block": True,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        status = "integrity-failed" if any(
+            item.get("status") == "integrity-failed" for item in failed
+        ) else "partial"
+        return {
+            "id": book_key(book),
+            "status": status,
+            "retryable": status == "partial" and all(item.get("retryable", True) for item in failed),
+            "failed_volumes": failed,
+            "rights_state": rights_state(book),
+        }
     unified = ART / f"{safe}.pdf"
     pages = [str(work / f"{n:03d}.pdf") for n in range(1, expected + 1)]
     subprocess.run(["qpdf", "--empty", "--pages", *pages, "--", str(unified)], check=True)
