@@ -38,3 +38,12 @@ The current web candidate registry includes Google, Bing, Brave, Mojeek, Yandex 
 No provider is queried by scraping when an official API or other provider-permitted interface is required. Rate limits must be respected and provider-specific storage/cache/retry rules are enforced independently. For example, Brave's current Search API terms prohibit storing or caching Search Results beyond transient operational storage unless the applicable plan explicitly grants storage rights. citeturn761850search0turn761850search4
 
 Provider results remain discovery material and do not become authoritative, canonical Corpus content, or redistributable material merely because they were returned by a search API.
+
+
+## Neutral provider adapters
+
+The federation runtime does not assume the availability of any specific external search service. Provider names such as Google, Bing, Brave, Mojeek, Yandex, or DuckDuckGo are configuration-level candidates only.
+
+A provider becomes eligible only through the governed adapter contract: an explicit provider ID/class, an official API or other provider-permitted interface, disabled-by-default activation, no scraping, and compliance with the provider's current rate, retention, caching, and retry terms.
+
+Adding a different provider therefore does not require changing the federation algorithm. It requires registering a compliant adapter and enabling it explicitly.
