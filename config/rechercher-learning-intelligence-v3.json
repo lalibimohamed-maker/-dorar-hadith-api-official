@@ -4,9 +4,37 @@
   "layer": "learning-intelligence",
   "position": "above-corpus-and-acquisition",
   "acquisitionNonBlocking": true,
-  "pipeline": ["diagnose","prerequisites","source_grounded_explanation","worked_example","retrieval","feedback","spacing","interleaving","self_explanation","teach_back","transfer","adapt"],
-  "learnerModel": ["demonstrated_mastery","prerequisite_gaps","retrieval_strength","recent_errors","confidence","confidence_calibration","learning_history","source_reading_progress","language_preferences"],
-  "optionalSignals": ["response_latency","audio_performance","visual_interaction","spoken_explanation"],
+  "pipeline": [
+    "diagnose",
+    "prerequisites",
+    "source_grounded_explanation",
+    "worked_example",
+    "retrieval",
+    "feedback",
+    "spacing",
+    "interleaving",
+    "self_explanation",
+    "teach_back",
+    "transfer",
+    "adapt"
+  ],
+  "learnerModel": [
+    "demonstrated_mastery",
+    "prerequisite_gaps",
+    "retrieval_strength",
+    "recent_errors",
+    "confidence",
+    "confidence_calibration",
+    "learning_history",
+    "source_reading_progress",
+    "language_preferences"
+  ],
+  "optionalSignals": [
+    "response_latency",
+    "audio_performance",
+    "visual_interaction",
+    "spoken_explanation"
+  ],
   "privacy": {
     "localFirst": true,
     "dataMinimization": true,
@@ -21,10 +49,176 @@
     "rightsRemainAttached": true,
     "scholarlyDisagreementRemainsDistinct": true
   },
-  "evaluation": ["immediate_accuracy","delayed_retention","transfer","confidence_calibration","error_correction","method_ablation","longitudinal_retention"],
+  "evaluation": [
+    "immediate_accuracy",
+    "delayed_retention",
+    "transfer",
+    "confidence_calibration",
+    "error_correction",
+    "method_ablation",
+    "longitudinal_retention"
+  ],
   "freeFirst": {
     "localDeterministicToolsPreferred": true,
     "paidInferenceRequired": false
   },
-  "researchLoop": ["discover","screen","evaluate_evidence","extract_method","prototype","measure","integrate","monitor","revise"]
+  "researchLoop": [
+    "discover",
+    "screen",
+    "evaluate_evidence",
+    "extract_method",
+    "prototype",
+    "measure",
+    "integrate",
+    "monitor",
+    "revise"
+  ],
+  "methodRegistry": {
+    "retrieval": {
+      "version": "1.0.0",
+      "targets": [
+        "recall",
+        "discrimination"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "immediate_accuracy",
+        "delayed_retention"
+      ]
+    },
+    "spacing": {
+      "version": "1.0.0",
+      "targets": [
+        "retention",
+        "retrieval_strength"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "delayed_retention"
+      ]
+    },
+    "interleaving": {
+      "version": "1.0.0",
+      "targets": [
+        "discrimination",
+        "transfer"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "transfer",
+        "error_correction"
+      ]
+    },
+    "worked_example": {
+      "version": "1.0.0",
+      "targets": [
+        "application"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "immediate_accuracy",
+        "transfer"
+      ]
+    },
+    "self_explanation": {
+      "version": "1.0.0",
+      "targets": [
+        "explanation",
+        "metacognition"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "source_comprehension",
+        "transfer"
+      ]
+    },
+    "teach_back": {
+      "version": "1.0.0",
+      "targets": [
+        "explanation",
+        "communication"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "source_comprehension",
+        "transfer"
+      ]
+    },
+    "comparison": {
+      "version": "1.0.0",
+      "targets": [
+        "discrimination",
+        "comparison"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "error_correction",
+        "transfer"
+      ]
+    },
+    "source_criticism": {
+      "version": "1.0.0",
+      "targets": [
+        "provenance",
+        "source_navigation"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "research_quality"
+      ]
+    },
+    "transfer": {
+      "version": "1.0.0",
+      "targets": [
+        "transfer"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "transfer"
+      ]
+    },
+    "reading": {
+      "version": "1.0.0",
+      "targets": [
+        "source_comprehension"
+      ],
+      "feedbackRequired": false,
+      "measures": [
+        "source_comprehension"
+      ]
+    },
+    "audio": {
+      "version": "1.0.0",
+      "targets": [
+        "listening",
+        "retrieval"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "immediate_accuracy"
+      ]
+    },
+    "visual": {
+      "version": "1.0.0",
+      "targets": [
+        "concept_mapping",
+        "discrimination"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "transfer"
+      ]
+    },
+    "game": {
+      "version": "1.0.0",
+      "targets": [
+        "retrieval"
+      ],
+      "feedbackRequired": true,
+      "measures": [
+        "delayed_retention",
+        "transfer"
+      ]
+    }
+  }
 }
