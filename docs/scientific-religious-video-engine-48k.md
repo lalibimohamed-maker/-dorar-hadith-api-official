@@ -80,3 +80,24 @@ The IslamReligion integration keeps three connected navigation levels rather tha
 3. The localized "Evidence Islam is Truth" video category: `https://www.islamreligion.com/{lang}/category/33/preuves-que-lislam-est-la-verite`
 
 The site currently exposes 15 language links in its navigation, but this observed set is not an architectural limit. New language links must be discoverable from the source navigation without a code change. The same rule applies to newly added video categories and child categories.
+
+
+## IslamReligion.com — complete source family
+
+The integration is not limited to one video page or two categories. The source family includes the global site, localized navigation, video hub, article hub, e-books, Islam at a Glance, category pages, and source-search entry points.
+
+Registered resource classes include:
+- website/home
+- video hub
+- video categories
+- article categories
+- articles hub
+- e-books
+- Islam at a Glance
+- site-search/discovery queries
+
+The current registry preserves all supplied routes as distinct resources. In particular, `/category/124/how-to-convert-to-islam` and `/category/1124/how-to-convert-to-islam` are retained separately because identical titles do not prove identical resources.
+
+The evidence-oriented video category `/category/1033/evidence-islam-is-truth` currently lists 123 videos and links to subcategories including 17 scientific-miracles-of-the-Holy-Quran videos and 2 scientific-miracles-of-the-Prophet-Muhammad-Sayings videos on the English page. The site also exposes other video categories including Benefits of Islam, Worship and Practice, The Hereafter, Stories of New Muslims, Comparative Religion, The Holy Quran, The Prophet Muhammad, Current Issues, Islamic History, Systems in Islam, Islamic Songs, New Muslims, and Short Videos About Islam. citeturn810256view0turn947294search2
+
+These resources serve discovery, contextual research, documentary planning and source navigation. They do not automatically become scientific primary evidence, canonical religious text, or reusable media. Media reuse remains blocked until the rights layer records a compatible license or explicit permission.
