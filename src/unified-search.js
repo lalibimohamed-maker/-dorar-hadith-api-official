@@ -64,7 +64,7 @@ export function buildUnifiedSourceRecords() {
 }
 
 
-function normalizeHadithEvidence(hadithData = {}) {
+export function normalizeHadithEvidence(hadithData = {}) {
   const items = Array.isArray(hadithData?.ahadith) ? hadithData.ahadith : [];
   return items.map((item, index) => {
     const text = typeof item?.th === "string" ? item.th.trim() : "";
