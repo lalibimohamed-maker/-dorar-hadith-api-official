@@ -139,7 +139,7 @@ export function createAccelerationMesh(options = {}) {
 
 export function cachePolicyForPath(pathname) {
   const path = String(pathname || "/");
-  if (path === "/health" || path === "/performance" || path === "/") return { cache: false };
+  if (path === "/health" || path === "/performance" || path === "/" || path === "/assistant") return { cache: false };
   if (path === "/search" || path.startsWith("/research/scholars") || path.startsWith("/fiqh/research")) return { cache: true, ttlMs: 8_000, staleWhileRevalidate: 30 };
   if (path.startsWith("/quran/ayah") || path.startsWith("/quran/translations")) return { cache: true, ttlMs: 120_000, staleWhileRevalidate: 600 };
   return { cache: true, ttlMs: 60_000, staleWhileRevalidate: 300 };
