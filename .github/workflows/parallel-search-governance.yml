@@ -7,6 +7,7 @@ on:
       - 'src/search-provider-federation.js'
       - 'src/unified-search.js'
       - 'config/search-parallel-governance-2026.json'
+      - 'config/search-provider-network-2026.json'
       - 'docs/parallel-search-governance-2026.md'
       - 'test/parallel-search-governance.test.js'
       - 'test/search-provider-federation.test.js'
@@ -46,6 +47,18 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const x = JSON.parse(fs.readFileSync('config/search-parallel-governance-2026.json', 'utf8'));
+          const network = JSON.parse(fs.readFileSync('config/search-provider-network-2026.json', 'utf8'));
+          if (x.providerNetworkRegistry !== 'config/search-provider-network-2026.json') throw new Error('provider network registry binding drifted');
+          if (network.limits.maxConcurrentProviders !== 8) throw new Error('provider network concurrency limit must be 8');
+          if (network.governance.scrapingForbidden !== true) throw new Error('provider network scraping prohibition missing');
+          if (network.connectorActivationPolicy.defaultEnabled !== false) throw new Error('external providers must remain opt-in');
+          for (const provider of Object.values(network.providerCandidates).flat()) {
+            if (provider.scrapingAllowed !== false) throw new Error(`scraping policy invalid for ${provider.id}`);
+            if (provider.resultRetention !== 'transient_only_unless_plan_explicitly_grants_storage' && provider.resultRetention !== 'provider_terms_gated') {
+              throw new Error(`result retention policy missing for ${provider.id}`);
+            }
+            if (provider.rateLimitsMustBeRespected !== true) throw new Error(`rate-limit policy missing for ${provider.id}`);
+          }
           if (x.limits.maxConcurrentProviders !== 8) throw new Error('max concurrent provider limit must be 8');
           if (x.limits.defaultProviderTimeoutMs > 1200) throw new Error('provider timeout exceeds 1200ms');
           if (x.providerPolicy.resultsAreDiscoveryMaterial !== true) throw new Error('discovery authority boundary missing');
