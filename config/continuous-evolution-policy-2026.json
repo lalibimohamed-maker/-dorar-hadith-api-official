@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.0.0",
+  "policyId": "deen-allah-continuous-evolution-2026",
+  "purpose": "Keep Din Allah Encyclopedia continuously discoverable, verifiable, maintainable and recoverable without treating the scholarly Corpus as a one-time closed dataset.",
+  "principles": {
+    "continuousEvolution": true,
+    "noArtificialClosure": true,
+    "freeFirst": true,
+    "automationDoesNotEqualBlindPublication": true,
+    "canonicalCorpusProtected": true,
+    "mainProtectionMustRemain": true,
+    "independentReviewMustRemain": true
+  },
+  "autonomyLevels": {
+    "fullyAutomatic": [
+      "scheduled-source-health-check",
+      "broken-or-changed-link-detection",
+      "coverage-gap-detection",
+      "provenance-rights-quarantine-checks",
+      "dependabot-dependency-updates",
+      "github-actions-updates",
+      "ci-security-antivirus-codeql-validation"
+    ],
+    "automaticWithPullRequestAndReview": [
+      "new-source-registry-entry",
+      "metadata-update",
+      "edition-or-source-link-update",
+      "candidate-to-stronger-status-promotion",
+      "licensed-or-public-domain-scholarly-text-ingest",
+      "translation-update",
+      "audio-recording-update"
+    ],
+    "neverAutomaticWithoutScientificOrRightsVerification": [
+      "promote-new-religious-text-as-authoritative",
+      "turn-historical-report-into-certain-fact",
+      "copy-copyrighted-book",
+      "promote-raw-ocr-to-reference-text",
+      "mutate-verified-corpus-beyond-source-and-rights-review",
+      "bypass-protected-main",
+      "bypass-independent-review"
+    ]
+  },
+  "updateCycle": [
+    "discovery",
+    "source-verification",
+    "rights-check",
+    "change-comparison",
+    "quarantine-when-needed",
+    "review",
+    "ci-and-security",
+    "promotion-through-protected-main",
+    "historical-record"
+  ],
+  "nonClosure": {
+    "contentGapsAreTracked": true,
+    "contentGapsDoNotCloseSystem": true,
+    "gapsRemainRecheckable": true,
+    "gapResolutionRequiresVerifiedMaterialOrTrustedOfficialLink": true
+  },
+  "automationBoundary": {
+    "automationMay": [
+      "discover",
+      "compare",
+      "scan",
+      "propose",
+      "recheck"
+    ],
+    "automationMayNot": [
+      "blindly_publish_authoritative_scholarly_content",
+      "bypass_rights",
+      "bypass_provenance",
+      "bypass_evidence",
+      "bypass_source_identity",
+      "bypass_review",
+      "bypass_protected_main"
+    ]
+  },
+  "controlMappings": {
+    "sourceDiscoveryAndHealth": [
+      "scripts/continuous-content-watch.mjs",
+      "scripts/source-refresh-gate.mjs"
+    ],
+    "quarantineAndChangeDetection": [
+      "scripts/source-anomaly-gate.mjs",
+      "scripts/source-baseline-candidate.mjs"
+    ],
+    "provenanceRightsIngest": [
+      "scripts/content-ingest-gate.mjs",
+      "config/security-policy-2026.json"
+    ],
+    "publicationProtection": [
+      "scripts/rechercher_publication_gate.py",
+      "config/auto-recovery-policy-2026.json"
+    ],
+    "dependencyAndActionsUpdates": [
+      ".github/dependabot.yml"
+    ],
+    "verification": [
+      ".github/workflows/security-baseline.yml",
+      ".github/workflows/antivirus-analysis-mesh.yml",
+      ".github/workflows/codeql.yml"
+    ],
+    "independentReview": [
+      ".github/CODEOWNERS",
+      "CODEOWNERS"
+    ]
+  },
+  "scheduledRechecks": {
+    "sourceHealth": "daily",
+    "coverageGaps": "daily",
+    "securityAndCi": "on_change_and_pull_request",
+    "dependencyAndActionsUpdates": "weekly",
+    "historicalSourceRevalidation": "weekly",
+    "rightsAndProvenanceReview": "on_change_and_quarterly"
+  },
+  "promotionRules": {
+    "automaticPromotionToMain": false,
+    "pullRequestRequiredForScholarlyChanges": true,
+    "rightsRequired": true,
+    "provenanceRequired": true,
+    "sourceIdentityRequired": true,
+    "evidenceRequired": true,
+    "independentReviewRequired": true,
+    "protectedMainRequired": true,
+    "rawOcrCannotBecomeAuthoritative": true,
+    "copyrightedMaterialCannotBeCopiedWithoutPermission": true
+  }
+}
