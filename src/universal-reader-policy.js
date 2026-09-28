@@ -31,10 +31,10 @@ export function buildBookDeliveryPolicy({
   const blocked = isRestricted(status);
 
   const canRead = !blocked && (fullDistribution || rightsPermitReader || explicitSourceRead);
-  const canCopyText = !blocked && (
+  const copyNotDeniedBySource = sourceAllowsCopy !== false;
+  const canCopyText = !blocked && copyNotDeniedBySource && (
     fullDistribution ||
-    status === "read-copy" ||
-    (explicitSourceCopy && explicitSourceRead)
+    status === "read-copy"
   );
   const canDownloadDigitalMaster = !blocked && fullDistribution;
 
