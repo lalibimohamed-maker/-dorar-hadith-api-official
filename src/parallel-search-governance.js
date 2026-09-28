@@ -76,7 +76,9 @@ export async function runParallelSearchProviders({
     const startedAt = Date.now();
     const key = cacheKey(providerId, query, locale);
 
-    if (cacheStore) {
+    const cacheable = job.cacheable === true;
+    const retryable = job.retryable === true;
+    if (cacheStore && cacheable) {
       const cached = cacheStore.get(key);
       if (cached && cached.expiresAt > Date.now()) {
         results[index] = {
@@ -100,7 +102,7 @@ export async function runParallelSearchProviders({
           return job.run({ query, locale, signal: providerSignal, providerId });
         }, timeout, signal);
 
-        if (cacheStore) {
+        if (cacheStore && cacheable) {
           cacheStore.set(key, { value, expiresAt: Date.now() + Math.max(0, cacheTtlMs) });
         }
         results[index] = {
@@ -113,7 +115,7 @@ export async function runParallelSearchProviders({
         return;
       } catch (error) {
         const isFinal = attempt > retries || signal?.aborted;
-        if (!isFinal) {
+        if (!isFinal && retryable) {
           await sleep(Math.min(100 * attempt, 250));
           continue;
         }
