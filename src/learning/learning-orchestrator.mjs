@@ -357,7 +357,22 @@ export function updateLearnerFromEvent(profileInput = {}, event = {}) {
 
 export function delayedMasteryEligible(profileInput = {}, { delayed = false, transfer = false } = {}) {
   const profile = createLearnerProfile(profileInput);
-  return Boolean((delayed || transfer) && profile.delayedAssessmentCount >= 0);
+  return Boolean((delayed || transfer) && profile.delayedAssessmentCount > 0);
+}
+
+export function masteryEvidence({ mastery = 0, delayedAssessments = 0, transferAssessments = 0, minMastery = 0.8 } = {}) {
+  const score = clamp(mastery);
+  const delayed = Number(delayedAssessments) || 0;
+  const transfer = Number(transferAssessments) || 0;
+  return {
+    masteryScore: score,
+    delayedAssessments: delayed,
+    transferAssessments: transfer,
+    eligible: score >= minMastery && (delayed > 0 || transfer > 0),
+    reason: score < minMastery
+      ? 'mastery-threshold-not-met'
+      : (delayed > 0 || transfer > 0 ? 'delayed-or-transfer-evidence-present' : 'requires-delayed-or-transfer-evidence')
+  };
 }
 
 export function createLearningTrace({ source, learningObject, decision, event, followUp } = {}) {
@@ -375,11 +390,14 @@ export function createLearningTrace({ source, learningObject, decision, event, f
 export function createLearningOrchestrator(options = {}) {
   const scheduler = options.scheduler ?? 'fsrs';
   const stateByContext = new Map();
+  const contextKeyFor = (profile = {}, context = {}) =>
+    String(context.contextKey ?? profile.contextKey ?? 'general') +
+    '::learner:' + String(profile.learnerId ?? 'anonymous');
 
   return Object.freeze({
     scheduler,
     select(item, profile = {}, context = {}) {
-      const key = context.contextKey ?? profile.contextKey ?? 'general';
+      const key = contextKeyFor(profile, context);
       return buildSelectionDecision({
         item,
         candidates: context.candidates ?? [],
@@ -391,15 +409,15 @@ export function createLearningOrchestrator(options = {}) {
       });
     },
     schedule(itemId, profile = {}, grade = 'good', context = {}) {
-      const key = context.contextKey ?? profile.contextKey ?? 'general';
+      const key = contextKeyFor(profile, context);
       const current = stateByContext.get(key) ?? {};
       const state = current[itemId] ?? createSchedulerState({ algorithm: scheduler, contextKey: key });
       const result = scheduleWith(scheduler, { state, grade, now: context.now, deadlineAt: context.deadlineAt });
       stateByContext.set(key, { ...current, [itemId]: result.state });
       return result;
     },
-    getContextState(contextKey = 'general') {
-      return stateByContext.get(contextKey) ?? {};
+    getContextState(contextKey = 'general', learnerId = 'anonymous') {
+      return stateByContext.get(String(contextKey) + '::learner:' + String(learnerId)) ?? {};
     },
     clearContext(contextKey = 'general') {
       stateByContext.delete(contextKey);
