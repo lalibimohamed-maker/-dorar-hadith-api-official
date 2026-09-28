@@ -123,7 +123,7 @@
     "text_to_speech": {
       "primary": "piper1-gpl",
       "status": "license_gated",
-      "versionReference": "1.4.2",
+      "versionReference": "1.8.0",
       "softwareLicense": "GPL-3.0",
       "modelLicense": "verify_per_voice_model",
       "watch": "Arabic voices, voice quality, latency, redistribution rights, model provenance",
@@ -179,6 +179,27 @@
       "modelLicense": "Apache-2.0",
       "watch": "Arabic/multilingual relevance, ranking stability, latency, quantization fidelity, conversion provenance",
       "source": "https://huggingface.co/BAAI/bge-reranker-v2-m3"
+    },
+    "acceleration_cache": {
+      "primary": "valkey",
+      "status": "candidate",
+      "versionReference": "9.1.1",
+      "softwareLicense": "BSD-3-Clause",
+      "modelLicense": "not_applicable",
+      "watch": "cache eviction, persistence settings, memory limits, HA needs, security fixes",
+      "source": "https://github.com/valkey-io/valkey"
+    },
+    "search_instant": {
+      "primary": "typesense",
+      "alternates": [
+        "meilisearch"
+      ],
+      "status": "candidate",
+      "versionReference": "Typesense 30.2 / Meilisearch CE 1.19+",
+      "softwareLicense": "GPL-3.0-or-later for Typesense Server / MIT for Meilisearch CE",
+      "modelLicense": "optional_model_dependent",
+      "watch": "Arabic lexical quality, vector/hybrid retrieval, licensing boundaries, resource use, update latency",
+      "source": "https://github.com/typesense/typesense"
     }
   },
   "promotionPolicy": {
