@@ -504,13 +504,13 @@
     },
     {
       "id": "islamreligion-videos",
-      "nameAr": "IslamReligion.com — فيديوهات",
-      "nameFr": "IslamReligion.com — Vidéos",
+      "nameAr": "IslamReligion.com — المنظومة الإسلامية للمقالات والفيديوهات والكتب والبحث",
+      "nameFr": "IslamReligion.com — contenu islamique, vidéos, articles, e-books et recherche",
       "country": "global",
-      "category": "video-reference",
+      "category": "islamic-content",
       "url": "https://www.islamreligion.com/videos",
       "canonicalUrl": "https://www.islamreligion.com/videos",
-      "role": "dawah-editorial-video-reference",
+      "role": "dawah-editorial-and-reference-source-family",
       "sourceType": "Islamic_dawah_video_platform",
       "languageCoverage": [
         "fr",
@@ -530,14 +530,24 @@
         "he"
       ],
       "coverage": [
+        "website",
+        "articles",
+        "videos",
+        "video-categories",
+        "e-books",
+        "islam-at-a-glance",
+        "site-search",
         "scientific-miracles-of-the-holy-quran",
         "scientific-miracles-of-prophetic-sayings",
         "quran",
-        "prophethood",
-        "islamic-history",
-        "beliefs",
+        "prophet-muhammad",
         "comparative-religion",
-        "short-islamic-videos"
+        "islamic-history",
+        "new-muslims",
+        "worship-and-practice",
+        "hereafter",
+        "current-issues",
+        "systems-in-islam"
       ],
       "integration": {
         "discovery": true,
@@ -806,7 +816,210 @@
         "https://www.islamreligion.com/videos",
         "https://www.islamreligion.com/fr/videos",
         "https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite"
-      ]
+      ],
+      "resourceGraph": [
+        {
+          "id": "islamreligion-home",
+          "kind": "website-home",
+          "url": "https://www.islamreligion.com/",
+          "language": "global",
+          "title": "IslamReligion.com",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-islam-at-a-glance",
+          "kind": "overview",
+          "url": "https://www.islamreligion.com/islam-at-a-glance",
+          "language": "en",
+          "title": "Islam at a Glance",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-articles",
+          "kind": "articles-hub",
+          "url": "https://www.islamreligion.com/articles",
+          "language": "global",
+          "title": "Articles",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-e-books",
+          "kind": "ebooks-hub",
+          "url": "https://www.islamreligion.com/e-books",
+          "language": "global",
+          "title": "E-books",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-videos",
+          "kind": "videos-hub",
+          "url": "https://www.islamreligion.com/videos",
+          "language": "global",
+          "title": "Videos",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1033",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1033/evidence-islam-is-truth",
+          "language": "en",
+          "title": "Evidence Islam is Truth",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-124",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/124/how-to-convert-to-islam",
+          "language": "en",
+          "title": "How to Convert to Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1043",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1043/benefits-of-islam",
+          "language": "en",
+          "title": "Benefits of Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1059",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1059/hereafter",
+          "language": "en",
+          "title": "The Hereafter",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1055",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1055/worship-and-practice",
+          "language": "en",
+          "title": "Worship and Practice",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1124",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1124/how-to-convert-to-islam",
+          "language": "en",
+          "title": "How to Convert to Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1143",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1143/short-videos-about-islam",
+          "language": "en",
+          "title": "Short Videos About Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1131",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1131/new-muslims",
+          "language": "en",
+          "title": "New Muslims",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1091",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1091/systems-in-islam",
+          "language": "en",
+          "title": "Systems in Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-127",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/127/islamic-songs-nasheed",
+          "language": "en",
+          "title": "Islamic Songs (Nasheed)",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1087",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1087/islamic-history",
+          "language": "en",
+          "title": "Islamic History",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1083",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1083/current-issues",
+          "language": "en",
+          "title": "Current Issues",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1079",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1079/prophet-muhammad",
+          "language": "en",
+          "title": "The Prophet Muhammad",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1075",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1075/holy-quran",
+          "language": "en",
+          "title": "The Holy Quran",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1068",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1068/comparative-religion",
+          "language": "en",
+          "title": "Comparative Religion",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1063",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1063/stories-of-new-muslims",
+          "language": "en",
+          "title": "Stories of New Muslims",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-search-scientific-quran",
+          "kind": "search-endpoint-example",
+          "url": "https://www.islamreligion.com/search?query=scientific-miracles-of-holy-quran&search_type=all",
+          "language": "en",
+          "title": "Search: scientific miracles of Holy Quran",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-search-scientific-prophet",
+          "kind": "search-endpoint-example",
+          "url": "https://www.islamreligion.com/search?query=scientific-miracles-of-prophet-muhammad-sayings&search_type=all",
+          "language": "en",
+          "title": "Search: scientific miracles of Prophet Muhammad sayings",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-search-quran-authenticity",
+          "kind": "search-endpoint-example",
+          "url": "https://www.islamreligion.com/search?query=authenticity-and-preservation-of-holy-quran&search_type=all",
+          "language": "en",
+          "title": "Search: authenticity and preservation of Holy Quran",
+          "sourceNavigationRequired": true
+        }
+      ],
+      "resourceGraphPolicy": {
+        "relationship": "all_resources_belong_to_one_IslamReligion_source_family",
+        "preserveDistinctRoutes": true,
+        "preserveDuplicateCategoryIds": true,
+        "doNotDeduplicateByTitle": true,
+        "searchExamplesAreDiscoveryEndpoints": true,
+        "localizedRouteResolution": "discover_or_switch_language_index_from_source_navigation",
+        "rightsInheritedFromSource": "restricted_unless_explicit_license_or_permission"
+      }
     }
   ],
   "maqasid": {
