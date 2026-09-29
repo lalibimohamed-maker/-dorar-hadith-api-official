@@ -8,14 +8,14 @@ const matrix = JSON.parse(fs.readFileSync(path.join(root, 'config/rechercher/glo
 const registry = JSON.parse(fs.readFileSync(path.join(root, matrix.language_registry), 'utf8'));
 
 
-test('global matrix is exactly 133 unique languages by 24 domains', () => {
+test('global matrix is exactly 133 unique languages by 37 matrix lanes (24 knowledge domains + 13 supporting lanes)', () => {
   const languages = registry.enumerated_islamhouse_languages;
   assert.equal(languages.length, matrix.language_count);
   assert.equal(new Set(languages).size, matrix.language_count);
   assert.equal(matrix.domains.length, matrix.domain_count);
   assert.equal(new Set(matrix.domains).size, matrix.domain_count);
-  assert.equal(matrix.language_count * matrix.domain_count, 3192);
-  assert.equal(matrix.expected_search_cells, 3192);
+  assert.equal(matrix.language_count * matrix.domain_count, 4921);
+  assert.equal(matrix.expected_search_cells, 4921);
   assert.ok(languages.includes('Bengali'));
   assert.ok(languages.includes('Malagasy'));
 });
