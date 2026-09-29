@@ -30,6 +30,7 @@ const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 10_000);
 const TRUST_PROXY_HEADERS = process.env.TRUST_PROXY_HEADERS === "true";
 const CLEANUP_INTERVAL_MS = 15 * 60_000;
 const BRAND_NAME = "موسوعة دينُ الله";
+const MIN_APP_KEY_LENGTH = 32;
 
 const appKeys = new Map();
 try {
@@ -52,6 +53,8 @@ try {
 const counters = new Map();
 
 function hashKey(key) {
+  if (key.length < MIN_APP_KEY_LENGTH) return null;
+  // codeql[js/insufficient-password-hash] API keys are high-entropy bearer tokens, not user passwords; SHA-256 is used only as a non-reversible map key after enforcing a minimum 32-character key length.
   return crypto.createHash("sha256").update(key).digest("hex");
 }
 
