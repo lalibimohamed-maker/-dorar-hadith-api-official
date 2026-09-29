@@ -67,23 +67,8 @@ jobs:
           gh api --method GET repos/AcademySoftwareFoundation/OpenTimelineIO/tarball/v0.18.1 > release-assets/OpenTimelineIO-0.18.1.tar.gz
           gh release download v2.5.2 --repo AcademySoftwareFoundation/OpenColorIO --pattern 'OpenColorIO-2.5.2.tar.gz' --dir release-assets --clobber
           test -s release-assets/OpenColorIO-2.5.2.tar.gz
-          python3 - <<'PY'
-          import html, re, urllib.request
-          from pathlib import Path
-          page="https://inkscape.org/release/1.4.2/gnulinux/"
-          req=urllib.request.Request(page,headers={"User-Agent":"Dinullah-Media-Release/1.0"})
-          body=urllib.request.urlopen(req,timeout=30).read().decode("utf-8","replace")
-          pattern = r'href=[\\"]([^\\"]*Inkscape[^\\"]*\\.AppImage)[\\"]'
-          hrefs = re.findall(pattern, body, re.I)
-          candidates = [html.unescape(h) for h in hrefs if "x86_64" in h.lower()]
-          if not candidates: raise SystemExit("No official Inkscape 1.4.2 x86_64 AppImage found.")
-          url=candidates[0]
-          if url.startswith("/"): url="https://inkscape.org"+url
-          if url.startswith("//"): url="https:"+url
-          urllib.request.urlretrieve(url,"release-assets/Inkscape-1.4.2-x86_64.AppImage")
-          Path("release-assets/Inkscape-1.4.2-source-url.txt").write_text(url+"\n",encoding="utf-8")
-          print("INKSCAPE_RESOLVED",url)
-          PY
+          echo "Inkscape 1.4.2 is runtime-installed from the Ubuntu package channel; binary is not required in the Release cache."
+
 
       - name: Acquire remaining media foundation and production assets
         run: |
@@ -106,9 +91,7 @@ jobs:
           echo "b6557ca2059287210332accc94c267094050489cffffc5c832e746e3a418dab0  release-assets/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb" | sha256sum -c -
           grep 'GIMP-3.2.6-x86_64.AppImage' release-assets/GIMP-SHA256SUMS | (cd release-assets && sha256sum -c -)
           echo "8a0e2cc6451de6901fec778a8b6d00165399879233a264ca5bb1b1b283266513  release-assets/kdenlive-26.08.1.tar.xz" | sha256sum -c -
-          test -s release-assets/Inkscape-1.4.2-x86_64.AppImage
-          sha256sum release-assets/Inkscape-1.4.2-x86_64.AppImage > release-assets/Inkscape-1.4.2-x86_64.AppImage.sha256
-          echo "Inkscape 1.4.2: official release-page binary; resolved URL and SHA-256 recorded."
+          echo "Inkscape 1.4.2: runtime-installed via Ubuntu package channel; no release binary cached."
 
       - name: Verify OpenColorIO release asset
         run: |
