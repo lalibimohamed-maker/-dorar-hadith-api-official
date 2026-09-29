@@ -7,6 +7,7 @@ const root=process.cwd();
 const runtime=JSON.parse(fs.readFileSync(path.join(root,'config/media-runtime-2026.json'),'utf8'));
 const studio=JSON.parse(fs.readFileSync(path.join(root,'config/media-studio-toolchain-2026.json'),'utf8'));
 const bridge=JSON.parse(fs.readFileSync(path.join(root,'config/rechercher-omega-media-bridge-2026.json'),'utf8'));
+const models=JSON.parse(fs.readFileSync(path.join(root,'config/rechercher-omega-model-registry.json'),'utf8'));
 
 test('complete runtime manifest covers every selected interoperability/media component',()=>{
   const ids=new Set(runtime.software.map(x=>x.id));
@@ -34,9 +35,10 @@ test('Omega bridge links AI production tasks to execution tools',()=>{
     ...runtime.software.map(x=>x.id),
     ...studio.tools.map(x=>x.id)
   ]);
-  for(const tools of Object.values(bridge.taskRouting)) {
-    for(const tool of tools) {
-      assert.equal(execution.has(tool) || studio.tools.some(x=>x.id===tool) || tool==='wan2.2' || tool==='hunyuanvideo-1.5' || tool==='ltx-2' || tool==='cogvideox' || tool==='flux' || tool==='whisper' || tool==='cosyvoice' || tool==='paddleocr-vl', true, `unresolved bridge tool/model: ${tool}`);
+  const aiModels=new Set(models.models.map(x=>x.id));
+  for(const routingTools of Object.values(bridge.taskRouting)) {
+    for(const tool of routingTools) {
+      assert.equal(execution.has(tool) || aiModels.has(tool), true, `unresolved bridge tool/model: ${tool}`);
     }
   }
 });
