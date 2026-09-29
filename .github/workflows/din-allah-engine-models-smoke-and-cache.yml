@@ -151,14 +151,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          upload_one() {
+            local f="$1"
+            gh release upload "$RELEASE_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
+          }
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" \
-              artifacts/whisper-tiny-hf.tar.gz \
-              artifacts/kokoro-82m-hf.tar.gz \
-              artifacts/model-archives-sha256.txt \
-              artifacts/models/model-lock.json \
-              artifacts/models/activation-evidence.json \
-              --repo "$GITHUB_REPOSITORY" --clobber
+            upload_one artifacts/whisper-tiny-hf.tar.gz
+            upload_one artifacts/kokoro-82m-hf.tar.gz
+            upload_one artifacts/model-archives-sha256.txt
+            upload_one artifacts/models/model-lock.json
+            upload_one artifacts/models/activation-evidence.json
           else
             gh release create "$RELEASE_TAG" \
               artifacts/whisper-tiny-hf.tar.gz \
@@ -170,3 +172,13 @@ jobs:
               --title "Din Allah Engine Models $RELEASE_TAG" \
               --notes "Verified model cache: exact upstream revisions, SHA-256 inventory, real Whisper inference and Kokoro TTS smoke. No Corpus writes. Runtime activation is fail-closed."
           fi
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets > artifacts/release-final.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open("artifacts/release-final.json",encoding="utf-8"))
+          required={"whisper-tiny-hf.tar.gz","kokoro-82m-hf.tar.gz","model-archives-sha256.txt","model-lock.json","activation-evidence.json"}
+          names={a["name"] for a in x["assets"]}
+          missing=sorted(required-names)
+          assert not missing, "RELEASE_ASSETS_MISSING:"+",".join(missing)
+          print("ENGINE_MODEL_RELEASE_COMPLETE_OK",sorted(required))
+          PY
