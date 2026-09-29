@@ -63,6 +63,30 @@
       "license": "BSD-3-Clause",
       "licenseEvidence": "https://github.com/xinntao/Real-ESRGAN",
       "sha256": null
+    },
+    {
+      "id": "paddleocr-v5-mobile-det",
+      "engine": "paddleocr",
+      "upstreamRepository": "PaddlePaddle/PaddleOCR",
+      "upstreamRelease": "paddle3.0.0-model-release",
+      "upstreamUrl": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_mobile_det_infer.tar",
+      "assetName": "PP-OCRv5_mobile_det_infer.tar",
+      "license": "Apache-2.0 for PaddleOCR project; model-specific redistribution terms must be verified",
+      "licenseEvidence": "https://github.com/PaddlePaddle/PaddleOCR",
+      "storageClass": "draft-release-only-until-model-rights-verified",
+      "sha256": null
+    },
+    {
+      "id": "paddleocr-v5-arabic-rec",
+      "engine": "paddleocr",
+      "upstreamRepository": "PaddlePaddle/PaddleOCR",
+      "upstreamRelease": "paddle3.0.0-model-release",
+      "upstreamUrl": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/arabic_PP-OCRv5_mobile_rec_infer.tar",
+      "assetName": "arabic_PP-OCRv5_mobile_rec_infer.tar",
+      "license": "Apache-2.0 for PaddleOCR project; model-specific redistribution terms must be verified",
+      "licenseEvidence": "https://github.com/PaddlePaddle/PaddleOCR",
+      "storageClass": "draft-release-only-until-model-rights-verified",
+      "sha256": null
     }
   ],
   "dynamicSources": [
@@ -79,7 +103,7 @@
   ],
   "notes": [
     "Non-model software such as FFmpeg, Tesseract, COLMAP, Open3D and MediaMTX does not require model weights; their binaries are governed separately.",
-    "PaddleOCR model assets are intentionally not auto-populated by this release until an exact upstream model artifact URL and model-specific redistribution terms are recorded.",
-    "Release asset publication is separate from software activation; runtime verification remains required."
+    "Release asset publication is separate from software activation; runtime verification remains required.",
+    "PaddleOCR Arabic detection/recognition model archives are fetched only from official Paddle model hosting and remain draft-release-only until model-specific redistribution terms are verified."
   ]
 }
