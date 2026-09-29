@@ -40,9 +40,11 @@
     {
       "id": "openusd",
       "project": "PixarAnimationStudios/OpenUSD",
-      "version": "26.08",
-      "mode": "python/source-or-package",
-      "role": "3d-scene-interchange"
+      "version": "26.8",
+      "mode": "python-package",
+      "role": "3d-scene-interchange",
+      "package": "usd-core==26.8",
+      "licenseNote": "PyPI package currently lists LicenseRef-TOST-1.0; full OpenUSD distribution/code licensing must be reviewed separately."
     },
     {
       "id": "gltf",
@@ -50,7 +52,8 @@
       "version": "2.0-specification",
       "mode": "format-standard",
       "role": "web-3d-interchange",
-      "runtimeBinary": false
+      "runtimeBinary": false,
+      "install": "format-standard-no-install"
     },
     {
       "id": "gltf-validator",
@@ -105,8 +108,10 @@
       "id": "colmap",
       "project": "colmap/colmap",
       "version": "4.2.0",
-      "mode": "host-package-or-official-build",
-      "role": "multi-view-3d-reconstruction"
+      "mode": "docker-or-conda",
+      "role": "multi-view-3d-reconstruction",
+      "install": "conda-forge::colmap=4.2.0 or official CUDA Docker build",
+      "provenance": "prefer official release/attested PyPI pycolmap 4.2.0 when Python API is sufficient"
     },
     {
       "id": "open3d",
@@ -122,6 +127,26 @@
       "mode": "container",
       "image": "bluenviron/mediamtx:1.21.1",
       "role": "live-media-routing"
+    },
+    {
+      "id": "paddlepaddle",
+      "project": "PaddlePaddle/Paddle",
+      "version": "3.2.0",
+      "mode": "python-package-or-container",
+      "role": "PaddleOCR inference backend",
+      "requiredBy": [
+        "paddleocr"
+      ]
+    },
+    {
+      "id": "ditto-mongodb",
+      "project": "MongoDB",
+      "version": "8.0",
+      "mode": "container",
+      "role": "Eclipse Ditto backing datastore",
+      "requiredBy": [
+        "ditto"
+      ]
     }
   ],
   "python": {
