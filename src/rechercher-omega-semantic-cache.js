@@ -74,6 +74,7 @@ export function createCacheEntry({
 
 export function isCacheReusable(entry, key, now = Date.now()) {
   if (!entry || entry.key !== key) return false;
+  if (!entry.output_ref && !entry.output_sha256) return false;
   return entry.expires_at == null || now < entry.expires_at;
 }
 
