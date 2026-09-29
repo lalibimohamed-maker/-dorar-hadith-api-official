@@ -59,3 +59,19 @@ test("local execution fails closed without an explicit executable allowlist", ()
     /non-empty executable allowlist/
   );
 });
+
+
+test("local workers do not inherit process secrets unless explicitly requested", async () => {
+  const name = "OMEGA_TEST_SECRET";
+  process.env[name] = "must-not-cross-default-boundary";
+  try {
+    const { stdout } = await executeLocal({
+      command: "node",
+      args: ["-e", `process.stdout.write(process.env[${JSON.stringify(name)}] || "missing")`],
+      allowedExecutables: ["node"]
+    });
+    assert.equal(stdout, "missing");
+  } finally {
+    delete process.env[name];
+  }
+});
