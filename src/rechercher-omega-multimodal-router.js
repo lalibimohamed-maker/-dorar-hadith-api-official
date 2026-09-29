@@ -18,7 +18,10 @@ export function selectMultimodalModel({
   requireClearedWeights = true
 }) {
   const runtimes = new Set(availableRuntimes);
-  const candidates = fleet.models
+  const taskCandidates = fleet.models
+    .filter(m => m.tasks.includes(task))
+    .filter(m => runtimes.size === 0 || m.runtime.some(r => runtimes.has(r)));
+  const candidates = taskCandidates
     .filter(m => m.tasks.includes(task))
     .filter(m => runtimes.size === 0 || m.runtime.some(r => runtimes.has(r)))
     .filter(m => !requireClearedWeights || (m.license_status === "cleared" && m.weight_status === "cleared"))
@@ -31,6 +34,12 @@ export function selectMultimodalModel({
       reason:requireClearedWeights
         ? "no multimodal model/runtime with cleared license and weights is currently available"
         : "no eligible multimodal model/runtime is currently available",
+      blocked_candidates: requireClearedWeights ? taskCandidates.map(m => ({
+        id:m.id,
+        license_status:m.license_status ?? "unknown",
+        weight_status:m.weight_status ?? "unknown",
+        next_action:"acquire_and_verify_weight_artifact"
+      })) : [],
       corpus_write_allowed:false,
       generated_media_is_evidence:false
     };
