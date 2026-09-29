@@ -253,7 +253,7 @@
   "omegaBridge": {
     "manifest": "config/rechercher-omega-media-bridge-2026.json",
     "aiPr": 566,
-    "executionPr": 601,
+    "executionPr": 602,
     "mode": "stacked-branches",
     "aiLayer": [
       "Qwen",
@@ -280,7 +280,8 @@
       "OpenColorIO",
       "FFmpeg",
       "MediaMTX"
-    ]
+    ],
+    "executionBranch": "feat/omega-media-conversation-final-2026"
   },
   "conversationRuntime": {
     "manifest": "config/rechercher-omega-conversation-runtime-2026.json",
@@ -298,6 +299,10 @@
       "live-translation",
       "lip-sync-dubbing"
     ],
-    "aiBranchPr": 566
+    "aiBranchPr": 566,
+    "tools": [
+      "whisperx",
+      "kokoro"
+    ]
   }
 }
