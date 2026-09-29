@@ -10,16 +10,17 @@ export function buildVmafCommand({
   referencePath,
   distortedPath,
   outputPath,
-  model = "vmaf_v1.0.0",
+  model = "model/vmaf_v1.0.16/vmaf_v1.0.16_3d0h.json",
   logPath = null
 } = {}) {
   const reference = assertInputPath(referencePath, "referencePath");
   const distorted = assertInputPath(distortedPath, "distortedPath");
   const output = assertInputPath(outputPath, "outputPath");
   const log = logPath == null ? null : assertInputPath(logPath, "logPath");
+  const modelOption = model.startsWith("path=") || model.startsWith("version=") ? model : "path=" + model;
   const filter = log
-    ? "libvmaf=model_path=" + model + ":log_fmt=json:log_path=" + log
-    : "libvmaf=model_path=" + model;
+    ? "libvmaf=model=" + modelOption + ":log_fmt=json:log_path=" + log
+    : "libvmaf=model=" + modelOption;
   return {
     command: "ffmpeg",
     args: ["-i", distorted, "-i", reference, "-lavfi", filter, "-f", "null", output],
