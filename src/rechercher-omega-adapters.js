@@ -119,6 +119,7 @@ export async function executeLocal({
   timeoutMs = DEFAULT_TIMEOUT_MS,
   maxStdoutBytes = DEFAULT_MAX_RESPONSE_BYTES,
   maxStderrBytes = 1024 * 1024,
+  inheritEnvironment = false,
   ...input
 }) {
   assertNoCorpusWrite(input);
@@ -132,9 +133,19 @@ export async function executeLocal({
   }
 
   return new Promise((resolve, reject) => {
+    const safeEnvironment = inheritEnvironment
+      ? { ...process.env, ...env }
+      : {
+          PATH: process.env.PATH ?? "/usr/bin:/bin",
+          HOME: process.env.HOME,
+          LANG: process.env.LANG,
+          LC_ALL: process.env.LC_ALL,
+          TMPDIR: process.env.TMPDIR,
+          ...env
+        };
     const child = spawn(command, args, {
       cwd,
-      env: { ...process.env, ...env },
+      env: safeEnvironment,
       stdio: ["ignore", "pipe", "pipe"]
     });
     let stdout = "";
