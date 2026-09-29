@@ -3,7 +3,7 @@ name: Conversation Runtime — Release Cache
 on:
   push:
     branches:
-      - feat/open-interoperability-fabric-2026-stacked
+      - feat/omega-media-conversation-final-2026
     paths:
       - config/rechercher-omega-conversation-runtime-2026.json
       - config/rechercher-omega-conversation-weight-release-2026.json
@@ -154,11 +154,11 @@ PY
       - name: Flatten release assets and verify
         run: |
           set -euo pipefail
-          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -exec sh -c 'echo "[WEIGHT] $1"; mv "$1" "release-assets/weights/$(basename "$1")"' _ {} ;
+          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -exec sh -c 'echo "[WEIGHT] $1"; mv "$1" "release-assets/weights/$(basename "$1")"' _ {} \\;
           find release-assets/weights -mindepth 1 -type d -empty -delete || true
           if find release-assets/weights -type f -size +1900M -print -quit | grep -q .; then exit 1; fi
-          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -exec file --brief --mime-type {} ;
-          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -exec sha256sum {} ; > release-assets/conversation-weight-sha256.txt
+          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -exec file --brief --mime-type {} \\;
+          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -exec sha256sum {} \\; > release-assets/conversation-weight-sha256.txt
 
       - name: Publish weights release
         run: |
