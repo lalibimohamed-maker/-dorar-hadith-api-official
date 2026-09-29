@@ -944,24 +944,165 @@
       "integration": "reference_only",
       "auto_download": false,
       "notes": "The supplied organization/profile and git-tutorial sandbox could not be independently resolved from the accessible GitHub index; keep reference-only until repository identity is verified."
+    },
+    {
+      "id": "pipecat",
+      "kind": "realtime-voice-orchestration",
+      "source_repo": "https://github.com/pipecat-ai/pipecat",
+      "code_license": "BSD-2-Clause",
+      "model_license_status": "per_model",
+      "tasks": [
+        "realtime_voice_agent",
+        "turn_management",
+        "barge_in",
+        "live_translation",
+        "multimodal_conversation",
+        "webrtc"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "pion-webrtc",
+      "kind": "webrtc-transport",
+      "source_repo": "https://github.com/pion/webrtc",
+      "code_license": "MIT",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "webrtc_transport",
+        "realtime_audio",
+        "realtime_video"
+      ],
+      "integration": "media_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "deepfilternet",
+      "kind": "speech_enhancement",
+      "source_repo": "https://github.com/Rikorose/DeepFilterNet",
+      "code_license": "MIT-or-Apache-2.0",
+      "model_license_status": "review_required",
+      "tasks": [
+        "noise_suppression",
+        "speech_enhancement",
+        "microphone_cleanup"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "rnnoise",
+      "kind": "speech_noise_suppression",
+      "source_repo": "https://github.com/xiph/rnnoise",
+      "code_license": "BSD-3-Clause",
+      "model_license_status": "verified_source_license",
+      "tasks": [
+        "noise_suppression",
+        "realtime_microphone_cleanup"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "madlad400-3b-mt",
+      "kind": "international_machine_translation",
+      "source_repo": "https://huggingface.co/google/madlad400-3b-mt",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": [
+        "international_translation",
+        "multilingual_translation",
+        "419_language_translation"
+      ],
+      "integration": "local_or_gpu_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "opus-mt-ar-en",
+      "kind": "arabic_translation_pair",
+      "source_repo": "https://huggingface.co/Helsinki-NLP/opus-mt-ar-en",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": [
+        "arabic_to_english_translation"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "argos-translate",
+      "kind": "offline_machine_translation",
+      "source_repo": "https://github.com/argosopentech/argos-translate",
+      "code_license": "MIT-or-CC0",
+      "model_license_status": "package_specific_review_required",
+      "tasks": [
+        "offline_translation",
+        "pivot_translation"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "bergamot-translator",
+      "kind": "browser_machine_translation",
+      "source_repo": "https://github.com/browsermt/bergamot-translator",
+      "code_license": "MPL-2.0",
+      "model_license_status": "model_specific_review_required",
+      "tasks": [
+        "browser_translation",
+        "offline_translation"
+      ],
+      "integration": "browser_runtime",
+      "auto_download": false
+    },
+    {
+      "id": "comet",
+      "kind": "translation_quality_evaluation",
+      "source_repo": "https://github.com/Unbabel/COMET",
+      "code_license": "Apache-2.0-framework",
+      "model_license_status": "per_model",
+      "tasks": [
+        "translation_quality_estimation",
+        "translation_evaluation",
+        "candidate_comparison"
+      ],
+      "integration": "ci_validation",
+      "auto_download": false
     }
   ],
   "pipelines": {
     "voice": {
       "stages": [
-        "openwakeword",
+        "microphone",
+        "pipewire_or_webrtc",
+        "rnnoise_or_deepfilternet",
         "silero-vad",
-        "faster-whisper",
-        "qwen3-omni",
-        "cosyvoice_or_kokoro",
-        "pyannote-audio",
-        "habibi-tts"
+        "pyannote-audio_optional",
+        "whisper_or_whisper-cpp",
+        "madlad400_or_ara_pair",
+        "omega",
+        "cosyvoice_or_kokoro_or_piper",
+        "audio_post",
+        "webrtc_or_mediamtx"
       ],
       "arabic_speech": {
         "primary_understanding": "qwen3-omni",
         "fallback_asr": "faster-whisper"
       },
-      "canonical_quran_recitation": "arabic_audio_only"
+      "canonical_quran_recitation": "arabic_audio_only",
+      "live_translation": [
+        "capture",
+        "enhancement",
+        "VAD",
+        "speaker_diarization_optional",
+        "ASR",
+        "language_detection",
+        "MADLAD translation",
+        "Omega response_policy",
+        "TTS",
+        "captions",
+        "WebRTC"
+      ]
     },
     "document": {
       "stages": [
@@ -1028,6 +1169,14 @@
         "evidence_gate"
       ],
       "purpose": "iterative literature retrieval, graph navigation, parallel review and evidence packaging"
-    }
+    },
+    "translation_quality": [
+      "candidate_generation",
+      "evidence_and_domain_checks",
+      "COMET_optional",
+      "cross_model_agreement",
+      "human_review_when_required",
+      "provenance"
+    ]
   }
 }
