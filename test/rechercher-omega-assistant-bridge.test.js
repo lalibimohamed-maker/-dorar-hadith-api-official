@@ -85,3 +85,16 @@ test("assistant accepts bounded conversation history and untrusted evidence fram
   assert.equal(result.status, "ready");
   assert.equal(result.cache.hit, false);
 });
+
+
+test("assistant queues local execution until the runtime artifact is verified", async () => {
+  const result = await runGovernedAssistantTurn({
+    query: "اختبار",
+    evidence: [{ source_id: "s1", text: "verified" }],
+    availableBackends: ["openai-compatible"],
+    execute: true
+  });
+  assert.equal(result.status, "queued");
+  assert.equal(result.runtime_readiness.status, "blocked");
+  assert.match(result.runtime_readiness.reason, /revision, SHA-256 and license verification/);
+});
