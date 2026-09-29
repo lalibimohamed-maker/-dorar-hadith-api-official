@@ -42,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           . .venv/bin/activate
-          mkdir -p artifacts/models/whisper-tiny artifacts/models/kokoro-82m
+          mkdir -p artifacts/models/whisper-tiny artifacts/models/kokoro-82m artifacts/models/qwen3-0.6b
           python3 - <<'PY'
           import json, hashlib
           from pathlib import Path
@@ -54,11 +54,14 @@ jobs:
               "config.json","preprocessor_config.json","tokenizer.json","vocab.json","merges.txt","normalizer.json","model.safetensors"
             ]),
             ("kokoro-82m","hexgrad/Kokoro-82M",["config.json","kokoro-v1_0.pth","voices/af_heart.pt"]),
-            ("qwen3-0.6b","Qwen/Qwen3-0.6B",["__DYNAMIC__"])
+            ("qwen3-0.6b","Qwen/Qwen3-0.6B",[])
           ]
           lock={"schemaVersion":"1.0.0","models":[]}
           for mid,repo,files in specs:
             info=api.model_info(repo)
+            if mid == "qwen3-0.6b":
+              preferred=["config.json","generation_config.json","tokenizer.json","tokenizer_config.json","chat_template.jinja","model.safetensors"]
+              files=[x.rfilename for x in info.siblings if x.rfilename in preferred]
             entry={"id":mid,"repo":repo,"revision":info.sha,
                    "license":str(getattr(info.card_data, "license", "") if info.card_data else "") or "unknown"}
             copied=[]
