@@ -274,6 +274,56 @@
       "license_status": "review_required",
       "source_model_id": "Qwen/Qwen3-Coder-Next",
       "notes": "Dedicated coding/agentic-coding family; runtime selection remains benchmark-driven and isolated from scholarly Corpus."
+    },
+    {
+      "id": "madlad400-3b-mt",
+      "family": "multilingual-machine-translation",
+      "tasks": [
+        "text_translation",
+        "multilingual_translation",
+        "international_translation",
+        "language_detection_assist"
+      ],
+      "source": "https://huggingface.co/google/madlad400-3b-mt",
+      "status": "candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "source_model_id": "google/madlad400-3b-mt",
+      "coverage_languages": 419,
+      "acquisition_class": "github_release",
+      "release_tag": "dinullah-conversation-weights-v2026.09.29",
+      "notes": "Primary broad-coverage translation model; immutable model revision and SHA manifest required before promotion."
+    },
+    {
+      "id": "opus-mt-ar-en",
+      "family": "translation-pair",
+      "tasks": [
+        "ar_to_en_translation",
+        "translation_fallback"
+      ],
+      "source": "https://huggingface.co/Helsinki-NLP/opus-mt-ar-en",
+      "status": "candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "source_model_id": "Helsinki-NLP/opus-mt-ar-en",
+      "acquisition_class": "github_release",
+      "release_tag": "dinullah-conversation-weights-v2026.09.29"
+    },
+    {
+      "id": "seamless-m4t-v2",
+      "family": "speech-translation",
+      "tasks": [
+        "speech_to_speech_translation",
+        "speech_to_text_translation",
+        "text_to_speech_translation",
+        "speech_to_text",
+        "text_to_text_translation"
+      ],
+      "source": "https://huggingface.co/facebook/seamless-m4t-v2-large",
+      "status": "research_only",
+      "license_review": "restricted",
+      "license_status": "blocked",
+      "notes": "CC-BY-NC-4.0; not eligible for public runtime/release redistribution. Retained only as a documented research challenger."
     }
   ]
 }
