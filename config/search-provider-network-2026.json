@@ -1,0 +1,227 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "search-provider-network-2026",
+  "status": "governed-candidate-network",
+  "userSurface": "main-search-only",
+  "routingOrder": [
+    "quran",
+    "tafsir",
+    "hadith",
+    "books",
+    "fatwa",
+    "web"
+  ],
+  "layers": {
+    "quran": {
+      "priority": "specialized-first",
+      "fallback": "web"
+    },
+    "tafsir": {
+      "priority": "specialized-first",
+      "fallback": "web"
+    },
+    "hadith": {
+      "priority": "specialized-first",
+      "fallback": "web"
+    },
+    "books": {
+      "priority": "library-and-book-connectors-first",
+      "fallback": "web"
+    },
+    "fatwa": {
+      "priority": "qualified-fatwa-sources-first",
+      "fallback": "web"
+    },
+    "web": {
+      "priority": "multi-provider"
+    }
+  },
+  "limits": {
+    "maxConcurrentProviders": 8,
+    "providerTimeoutMs": 1200,
+    "boundedRetries": 1,
+    "cacheMode": "short-lived-optional"
+  },
+  "providerCandidates": {
+    "web": [
+      {
+        "id": "google",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      },
+      {
+        "id": "bing",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      },
+      {
+        "id": "brave",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false,
+        "resultRetention": "transient_only_unless_plan_explicitly_grants_storage",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true,
+        "termsReference": "https://api-dashboard.search.brave.com/documentation/resources/terms-of-service"
+      },
+      {
+        "id": "mojeek",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      },
+      {
+        "id": "yandex",
+        "status": "candidate",
+        "integration": "official_api_only",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      },
+      {
+        "id": "duckduckgo",
+        "status": "candidate",
+        "integration": "official_api_or_permitted_interface_only",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      }
+    ],
+    "quran": [
+      {
+        "id": "quran_sources",
+        "status": "candidate",
+        "integration": "source_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      }
+    ],
+    "tafsir": [
+      {
+        "id": "tafsir_sources",
+        "status": "candidate",
+        "integration": "source_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      }
+    ],
+    "hadith": [
+      {
+        "id": "hadith_sources",
+        "status": "candidate",
+        "integration": "source_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      }
+    ],
+    "books": [
+      {
+        "id": "book_sources",
+        "status": "candidate",
+        "integration": "library_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      }
+    ],
+    "fatwa": [
+      {
+        "id": "fatwa_sources",
+        "status": "candidate",
+        "integration": "source_authorized_api_or_permitted_interface",
+        "scrapingAllowed": false,
+        "resultRetention": "provider_terms_gated",
+        "cacheAllowed": false,
+        "retryAllowed": false,
+        "rateLimitsMustBeRespected": true
+      }
+    ]
+  },
+  "governance": {
+    "externalResultsAreDiscoveryOnly": true,
+    "provenanceRequiredBeforeVerification": true,
+    "rightsRequiredBeforeRedistribution": true,
+    "providerPresenceDoesNotImplyAuthority": true,
+    "scrapingForbidden": true,
+    "termsAndRateLimitsMustBeRespected": true,
+    "robotsOrProviderPolicyCannotBeBypassed": true,
+    "noCredentialEmbedding": true,
+    "noSyntheticTrafficAmplification": true
+  },
+  "providerRecordRequiredFields": [
+    "id",
+    "status",
+    "integration",
+    "scrapingAllowed"
+  ],
+  "response": {
+    "oneUnifiedAnswer": true,
+    "internalTopologyHidden": true
+  },
+  "connectorActivationPolicy": {
+    "defaultEnabled": false,
+    "activationRequires": [
+      "provider_explicit_access",
+      "official_or_provider_permitted_interface",
+      "credentials_not_committed",
+      "current_terms_reviewed"
+    ],
+    "externalProviderCaching": "opt_in_per_provider",
+    "externalProviderRetry": "opt_in_per_provider",
+    "rateLimitHandling": "fail_soft_without_bypass",
+    "scraping": "forbidden"
+  },
+  "providerIdentity": {
+    "runtimeUsesNeutralAdapterContract": true,
+    "externalServiceNamesAreConfigurationDataOnly": true,
+    "noProviderAvailabilityAssumption": true,
+    "adapterRequiredFields": [
+      "id",
+      "class",
+      "status",
+      "integration",
+      "scrapingAllowed",
+      "cacheAllowed",
+      "retryAllowed",
+      "rateLimitsMustBeRespected"
+    ],
+    "extensibility": "A new provider can be registered by configuration/adapter integration without modifying federation routing logic."
+  },
+  "providerCandidatesPolicy": {
+    "namesAreCandidatesNotDependencies": true,
+    "activationRequiresExplicitAccess": true,
+    "absenceOfCredentialsMeansDisabled": true,
+    "missingOfficialInterfaceMeansDisabled": true,
+    "noScrapingFallback": true
+  }
+}

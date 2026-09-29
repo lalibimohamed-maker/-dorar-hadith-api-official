@@ -1,0 +1,93 @@
+name: Global Reader Governance
+
+on:
+  pull_request:
+    paths:
+      - 'src/universal-reader-policy.js'
+      - 'src/universal-religious-scholarly-delivery.js'
+      - 'src/digital-book-pipeline.js'
+      - 'src/library-edition-registry.js'
+      - 'src/book-source-connector.js'
+      - 'src/book-source-connectors.js'
+      - 'config/global-reader-2026.json'
+      - 'docs/universal-reader.md'
+      - 'docs/universal-religious-scholarly-delivery.md'
+      - 'test/universal-reader-policy.test.js'
+      - 'test/universal-religious-scholarly-delivery.test.js'
+      - 'test/digital-book-pipeline.test.js'
+      - 'test/global-reader-governance.test.js'
+      - 'package.json'
+      - 'openapi.yaml'
+      - '.github/workflows/global-reader-governance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/universal-reader-policy.js'
+      - 'src/digital-book-pipeline.js'
+      - 'config/global-reader-2026.json'
+      - 'test/universal-reader-policy.test.js'
+      - 'test/digital-book-pipeline.test.js'
+      - 'test/global-reader-governance.test.js'
+      - 'package.json'
+      - 'openapi.yaml'
+      - '.github/workflows/global-reader-governance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-global-reader:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout trusted repository content
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate reader contract
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const x = JSON.parse(fs.readFileSync('config/global-reader-2026.json', 'utf8'));
+          const exportable = new Set(['redistributable','licensed','public-domain']);
+          const formats = new Set(['pdf','docx','epub']);
+          if (x.userFacingSurface !== 'universal-book-reader') throw new Error('reader surface contract missing');
+          if (x.languagePolicy.browserLanguageDefault !== true || x.languagePolicy.explicitRequestedLanguageWins !== true) {
+            throw new Error('reader language precedence contract missing');
+          }
+          if (!x.bookDiscovery.allowedSourceNetworkOnly) throw new Error('book source-network gate missing');
+          for (const status of x.rightsPolicy.redistributableStatuses) if (!exportable.has(status)) throw new Error('invalid redistribution status');
+          if (x.rightsPolicy.readDoesNotImplyRedistribution !== true) throw new Error('reading/redistribution separation missing');
+          if (x.rightsPolicy.copyTextRequiresPolicyAndSourcePermission !== true) throw new Error('Copy Text gate missing');
+          if (x.digitalMaster.requiresExplicitRedistributionRights !== true ||
+              x.digitalMaster.requiresProvenanceVerification !== true ||
+              x.digitalMaster.requiresValidation !== true) throw new Error('digital master governance gates missing');
+          for (const format of x.digitalMaster.supportedFormats) if (!formats.has(format)) throw new Error('unsupported export format in contract');
+          if (x.protectedBooks.fullDownloadForbiddenByIndexPresence !== true) throw new Error('protected full-download boundary missing');
+          if (x.scope?.inScope !== 'din-allah-religious-scholarly' || x.scope?.outOfScope !== 'general-world-books') {
+            throw new Error('religious scholarly scope contract missing');
+          }
+          if (x.scope?.comparativeCritical !== 'descriptive-critical-only-not-trusted-corpus') {
+            throw new Error('comparative-critical trust boundary missing');
+          }
+          const expectedPipeline = ['user-query','language-resolution','book-discovery-across-sources','edition-resolution','rights','provenance','multi-ocr','quality-control','digital-master','reader-download'];
+          if (JSON.stringify(x.deliveryPipeline) !== JSON.stringify(expectedPipeline)) {
+            throw new Error('full religious scholarly delivery pipeline drifted');
+          }
+          if (x.digitalMaster.multiOcrRequired !== true || x.digitalMaster.qualityControlRequired !== true || x.digitalMaster.minimumIndependentOcrEngines !== 2 || x.digitalMaster.alignmentRequired !== true) {
+            throw new Error('digital master OCR/alignment/quality gates missing');
+          }
+          if (x.quran.arabicTextCanonical !== true ||
+              x.quran.translationDoesNotReplaceArabic !== true ||
+              x.quran.translationLanguageRecorded !== true ||
+              x.quran.translationSourceRecorded !== true) throw new Error('Quran reading contract incomplete');
+          if (x.coreBoundary !== 'Reading Representation != Redistribution Master') throw new Error('core reader boundary missing');
+          console.log('Global reader governance contract: PASS');
+          NODE
+
+      - name: Run global reader tests
+        run: npm run test:reader

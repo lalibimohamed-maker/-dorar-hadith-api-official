@@ -1,6 +1,6 @@
 {
   "name": "deen-allah-encyclopedia-api",
-  "version": "0.9.2",
+  "version": "0.11.0",
   "private": true,
   "type": "module",
   "description": "Multilingual Deen Allah Encyclopedia API with source-aware Quran, hadith, tafsir, sirah, fiqh, creed and Tajweed resources.",
@@ -32,7 +32,13 @@
     "test:corpus-boundary": "node --test test/corpus-write-boundary.test.js",
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
-    "test:review-expiry": "node --test test/review-expiry.test.js"
+    "test:review-expiry": "node --test test/review-expiry.test.js",
+    "test:search-parallel": "node --test test/parallel-search-governance.test.js test/search-provider-federation.test.js",
+    "test:reader": "node --test test/universal-reader-policy.test.js test/universal-religious-scholarly-delivery.test.js test/digital-book-pipeline.test.js test/global-reader-governance.test.js",
+    "test:security-policy": "node --test test/security-policy.test.js",
+    "test:api-contract": "node --test test/api-contract-0.11.test.js",
+    "test:free-first": "node --test test/free-first-fallback-registry.test.js test/free-first-fallback-selector.test.js",
+    "test:continuous-evolution": "node --test test/continuous-evolution-policy.test.js"
   },
   "engines": {
     "node": ">=20"

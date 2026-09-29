@@ -1,0 +1,138 @@
+name: Continuous Evolution Policy
+
+on:
+  pull_request:
+    paths:
+      - 'config/continuous-evolution-policy-2026.json'
+      - 'docs/content/continuous-evolution-policy-2026.md'
+      - '.github/workflows/continuous-evolution-policy.yml'
+      - 'test/continuous-evolution-policy.test.js'
+  push:
+    branches: [main]
+    paths:
+      - 'config/continuous-evolution-policy-2026.json'
+      - 'docs/content/continuous-evolution-policy-2026.md'
+      - '.github/workflows/continuous-evolution-policy.yml'
+      - 'test/continuous-evolution-policy.test.js'
+  schedule:
+    - cron: '43 2 * * *'
+    - cron: '43 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: continuous-evolution-policy
+  cancel-in-progress: false
+
+jobs:
+  validate-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: 22
+
+      - name: Validate continuous evolution policy
+        run: npm run test:continuous-evolution
+
+      - name: Verify protected-main and reviewer controls
+        run: |
+          set -euo pipefail
+          test -f CODEOWNERS
+          test -f .github/CODEOWNERS
+          grep -F '/CODEOWNERS @lalibimohamed-maker' .github/CODEOWNERS
+          grep -F '/SECURITY.md @lalibimohamed-maker' .github/CODEOWNERS
+          grep -F '/package-lock.json @lalibimohamed-maker' .github/CODEOWNERS
+
+  scheduled-source-health:
+    permissions:
+      contents: read
+      issues: write
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: 22
+
+      - name: Run continuous content and source watch
+        id: watch
+        continue-on-error: true
+        run: node scripts/continuous-content-watch.mjs
+
+      - name: Publish watch report
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -f continuous-content-watch.md ]; then
+            {
+              echo "## Continuous Evolution — Source/Content Watch"
+              echo
+              cat continuous-content-watch.md
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Open or update review issue
+        if: steps.watch.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title="automation: continuous evolution watch requires review"
+          body="The scheduled source/content watch detected reachability or coverage findings. No authoritative Corpus promotion was performed."
+          if [ -f continuous-content-watch.md ]; then
+            body="$(cat continuous-content-watch.md)"
+          fi
+          existing="$(gh issue list --state open --search "$title in:title" --limit 1 --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
+
+  scheduled-history-revalidation:
+    if: github.event_name == 'schedule' && github.event.schedule == '43 3 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: 22
+
+      - name: Revalidate source-refresh history
+        run: |
+          set -euo pipefail
+          npm run test:source-refresh-history
+          npm run test:source-audit
+
+      - name: Revalidate quarantine/publication boundaries
+        run: |
+          set -euo pipefail
+          npm run test:source-refresh
+          npm run test:corpus-boundary

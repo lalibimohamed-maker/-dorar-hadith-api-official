@@ -1,0 +1,98 @@
+name: Parallel Search Governance
+
+on:
+  pull_request:
+    paths:
+      - 'src/parallel-search-governance.js'
+      - 'src/search-provider-federation.js'
+      - 'src/unified-search.js'
+      - 'config/search-parallel-governance-2026.json'
+      - 'config/search-provider-network-2026.json'
+      - 'config/unified-search-contract-2026.json'
+      - 'dorar_json_api.js'
+      - 'docs/parallel-search-governance-2026.md'
+      - 'test/parallel-search-governance.test.js'
+      - 'test/search-provider-federation.test.js'
+      - 'package.json'
+      - '.github/workflows/parallel-search-governance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/parallel-search-governance.js'
+      - 'src/search-provider-federation.js'
+      - 'src/unified-search.js'
+      - 'config/search-parallel-governance-2026.json'
+      - 'docs/parallel-search-governance-2026.md'
+      - 'test/parallel-search-governance.test.js'
+      - 'test/search-provider-federation.test.js'
+      - 'package.json'
+      - '.github/workflows/parallel-search-governance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-parallel-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout trusted repository content
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate governance contract
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const x = JSON.parse(fs.readFileSync('config/search-parallel-governance-2026.json', 'utf8'));
+          const network = JSON.parse(fs.readFileSync('config/search-provider-network-2026.json', 'utf8'));
+          const unified = JSON.parse(fs.readFileSync('config/unified-search-contract-2026.json', 'utf8'));
+          if (unified.endpoint !== '/search') throw new Error('unified search endpoint contract drifted');
+          if (unified.orchestration.officialDorarHadithRetrieval !== true) throw new Error('Dorar hadith orchestration contract missing');
+          if (unified.orchestration.sourceAwareKnowledgeIndex !== true) throw new Error('source-aware knowledge index contract missing');
+          if (unified.resultPolicy.sourceAttributionRequired !== true) throw new Error('unified search source attribution requirement missing');
+          if (unified.resultPolicy.potentialRelationshipsSeparate !== true || unified.resultPolicy.verifiedEvidenceSeparate !== true) {
+            throw new Error('potential/verified evidence separation missing');
+          }
+          if (unified.resultPolicy.discoveryDoesNotEqualAuthority !== true) throw new Error('discovery authority boundary missing');
+          if (x.providerNetworkRegistry !== 'config/search-provider-network-2026.json') throw new Error('provider network registry binding drifted');
+          if (network.limits.maxConcurrentProviders !== 8) throw new Error('provider network concurrency limit must be 8');
+          if (network.governance.scrapingForbidden !== true) throw new Error('provider network scraping prohibition missing');
+          if (network.connectorActivationPolicy.defaultEnabled !== false) throw new Error('external providers must remain opt-in');
+          if (network.providerIdentity?.runtimeUsesNeutralAdapterContract !== true) throw new Error('neutral provider adapter contract missing');
+          if (network.providerIdentity?.externalServiceNamesAreConfigurationDataOnly !== true) throw new Error('external service names must remain configuration data');
+          if (network.providerIdentity?.noProviderAvailabilityAssumption !== true) throw new Error('provider availability must not be assumed');
+          for (const provider of Object.values(network.providerCandidates).flat()) {
+            if (provider.scrapingAllowed !== false) throw new Error(`scraping policy invalid for ${provider.id}`);
+            if (provider.resultRetention !== 'transient_only_unless_plan_explicitly_grants_storage' && provider.resultRetention !== 'provider_terms_gated') {
+              throw new Error(`result retention policy missing for ${provider.id}`);
+            }
+            if (provider.rateLimitsMustBeRespected !== true) throw new Error(`rate-limit policy missing for ${provider.id}`);
+          }
+          if (x.limits.maxConcurrentProviders !== 8) throw new Error('max concurrent provider limit must be 8');
+          if (x.limits.defaultProviderTimeoutMs > 1200) throw new Error('provider timeout exceeds 1200ms');
+          if (x.providerPolicy.resultsAreDiscoveryMaterial !== true) throw new Error('discovery authority boundary missing');
+          if (x.providerPolicy.providerFailureIsFailSoft !== true) throw new Error('fail-soft provider policy missing');
+          if (x.governanceGates.provenanceRequired !== true || x.governanceGates.rightsIndependent !== true || x.governanceGates.validationIndependent !== true) {
+            throw new Error('governance gate separation missing');
+          }
+          if (x.responsePolicy.singleUnifiedAnswerSurface !== true || x.responsePolicy.internalProviderDetailsHidden !== true) {
+            throw new Error('single user-facing search surface policy missing');
+          }
+          const providers = Object.values(network.providerCandidates).flat();
+          for (const provider of providers) {
+            if (provider.scrapingAllowed !== false) throw new Error(`scraping must remain disabled: ${provider.id}`);
+            if (!provider.integration || (!provider.integration.includes('api') && !provider.integration.includes('interface'))) {
+              throw new Error(`provider integration must use an official/permitted interface: ${provider.id}`);
+            }
+          }
+          for (const layer of ['quran','tafsir','hadith','books','fatwa','web']) if (!x.routingLayers?.includes(layer)) throw new Error(`provider layer missing: ${layer}`);
+          console.log('Unified search + parallel search governance contract: PASS');
+          NODE
+
+      - name: Run parallel search governance tests
+        run: npm run test:search-parallel

@@ -1,0 +1,16 @@
+title = "Din Allah Gitleaks policy"
+
+[[allowlists]]
+description = "Historical public Rwanda Official Gazette evidence token is a URL locator, not a credential. Scope is limited to the exact historical commits, files, and 40-hex token."
+commits = [
+  "bc5864376c6b4acb7242ea43d0276ba231f9d1e8",
+  "3fc525e539c2ecc3365bc41d65d1771eecedf0ae",
+]
+paths = [
+  "^config/quran-multisource-translation-catalog-2026-09-22\\.json$",
+  "^config/quranenc-translation-provenance-2026-09-22\\.json$",
+]
+regexTarget = "match"
+regexes = [
+  "0a72c9f36e0694e727af1c50eeb47f730ca327e3",
+]

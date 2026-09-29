@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "global-reader-2026",
+  "userFacingSurface": "universal-book-reader",
+  "languagePolicy": {
+    "browserLanguageDefault": true,
+    "explicitRequestedLanguageWins": true,
+    "fallbackLanguage": "ar"
+  },
+  "bookDiscovery": {
+    "allowedSourceNetworkOnly": true,
+    "workflow": [
+      "discover",
+      "identify-work",
+      "resolve-edition",
+      "provenance",
+      "rights",
+      "validation",
+      "digital-processing"
+    ]
+  },
+  "rightsPolicy": {
+    "redistributableStatuses": [
+      "redistributable",
+      "licensed",
+      "public-domain"
+    ],
+    "readerOnlyStatuses": [
+      "read-only",
+      "read-copy",
+      "link-only"
+    ],
+    "readDoesNotImplyRedistribution": true,
+    "copyTextRequiresPolicyAndSourcePermission": true
+  },
+  "digitalMaster": {
+    "requiresExplicitRedistributionRights": true,
+    "requiresProvenanceVerification": true,
+    "requiresValidation": true,
+    "supportedFormats": [
+      "pdf",
+      "docx",
+      "epub"
+    ],
+    "multiOcrRequired": true,
+    "qualityControlRequired": true,
+    "minimumIndependentOcrEngines": 2,
+    "alignmentRequired": true
+  },
+  "protectedBooks": {
+    "fullDownloadForbiddenByIndexPresence": true,
+    "sourceReaderMayBeUsedWhenReadingPermitted": true,
+    "sourceLinkPreserved": true
+  },
+  "quran": {
+    "arabicTextCanonical": true,
+    "translationDoesNotReplaceArabic": true,
+    "translationBelowArabic": true,
+    "translationLanguageRecorded": true,
+    "translationSourceRecorded": true
+  },
+  "coreBoundary": "Reading Representation != Redistribution Master",
+  "scope": {
+    "inScope": "din-allah-religious-scholarly",
+    "outOfScope": "general-world-books",
+    "comparativeCritical": "descriptive-critical-only-not-trusted-corpus"
+  },
+  "deliveryPipeline": [
+    "user-query",
+    "language-resolution",
+    "book-discovery-across-sources",
+    "edition-resolution",
+    "rights",
+    "provenance",
+    "multi-ocr",
+    "quality-control",
+    "digital-master",
+    "reader-download"
+  ]
+}

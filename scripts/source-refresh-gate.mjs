@@ -1,8 +1,48 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
+import dns from "node:dns/promises";
+import net from "node:net";
 
 const files=["config/source-registry.json","config/official-islamic-sources-2026.json"];
 const sources=new Map();
+const MAX_RESPONSE_BYTES=2*1024*1024;
+const REQUEST_TIMEOUT_MS=15000;
+const MAX_REDIRECTS=3;
+
+function isPrivateOrReservedAddress(address){
+  if(net.isIPv4(address)){
+    const [a,b,c,d]=address.split(".").map(Number);
+    return a===10 ||
+      a===127 ||
+      (a===169 && b===254) ||
+      (a===172 && b>=16 && b<=31) ||
+      (a===192 && b===168) ||
+      a===0 ||
+      a>=224;
+  }
+  if(net.isIPv6(address)){
+    const normalized=address.toLowerCase();
+    return normalized==="::1" ||
+      normalized==="::" ||
+      normalized.startsWith("fc") ||
+      normalized.startsWith("fd") ||
+      normalized.startsWith("fe80:");
+  }
+  return true;
+}
+
+async function assertPublicSourceHost(url){
+  const host=url.hostname.toLowerCase();
+  if(!host || url.username || url.password || url.port) throw new Error("unsafe source URL");
+  if(net.isIP(host)) {
+    if(isPrivateOrReservedAddress(host)) throw new Error("private or reserved source address rejected");
+    return;
+  }
+  const addresses=await dns.lookup(host,{all:true,verbatim:true});
+  if(!addresses.length || addresses.some(({address})=>isPrivateOrReservedAddress(address))) {
+    throw new Error("private or reserved DNS destination rejected");
+  }
+}
 
 for(const file of files){
   const data=JSON.parse(fs.readFileSync(file,"utf8"));
@@ -32,13 +72,16 @@ for(const [id,s] of sources){
   let ok=false;
   let error="";
   try{
-    for(let n=0;n<4;n++){
-      const r=await fetch(u,{redirect:"manual",signal:AbortSignal.timeout(15000),headers:{"user-agent":"DinAllah-source-refresh-gate/1.0"}});
+    for(let n=0;n<=MAX_REDIRECTS;n++){
+      await assertPublicSourceHost(u);
+      // codeql[js/file-access-to-http] Registry URLs are committed System-layer source metadata and are validated to HTTPS/public DNS destinations before this verification-only request.
+      const r=await fetch(u,{redirect:"manual",signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS),headers:{"user-agent":"DinAllah-source-refresh-gate/1.0"}});
       if(r.status>=300 && r.status<400){
         const location=r.headers.get("location");
         if(!location) throw new Error("redirect without destination");
         const next=new URL(location,u);
         if(next.protocol!=="https:" || next.hostname.toLowerCase()!==originHost || next.username || next.password || next.port) throw new Error("redirect rejected");
+        await assertPublicSourceHost(next);
         u=next; continue;
       }
       if(!r.ok) throw new Error("HTTP "+r.status);
@@ -48,7 +91,7 @@ for(const [id,s] of sources){
       while(true){
         const part=await reader.read(); if(part.done) break;
         bytes+=part.value.byteLength;
-        if(bytes>2*1024*1024){await reader.cancel(); throw new Error("response too large");}
+        if(bytes>MAX_RESPONSE_BYTES){await reader.cancel(); throw new Error("response too large");}
         hash.update(part.value);
       }
       results.push({id,url:s.url,status:"verified",finalUrl:u.toString(),bytes,sha256:hash.digest("hex"),checkedAt:new Date().toISOString()});

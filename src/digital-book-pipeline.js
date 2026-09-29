@@ -11,7 +11,7 @@ import { RIGHTS } from './book-rights-resolver.js';
 
 const PRESENTATION_MODES = new Set(['paper', 'light', 'dark', 'sepia']);
 const EXPORT_FORMATS = new Set(['pdf', 'docx', 'epub', 'pptx']);
-const REDISTRIBUTABLE_RIGHTS = new Set([RIGHTS.REDISTRIBUTABLE]);
+const REDISTRIBUTABLE_RIGHTS = new Set(["redistributable", "licensed", "public-domain"]);
 
 export function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
@@ -69,6 +69,7 @@ export function evaluateOcrAlignment({ source, engines = [], alignment }) {
 }
 
 export function createDigitalMaster({ source, alignment, pages }) {
+  if (!REDISTRIBUTABLE_RIGHTS.has(source?.rights)) throw new Error('Digital master blocked: redistribution rights are not explicit');
   const gate = evaluateOcrAlignment({ source, engines: alignment?.engines, alignment });
   if (!gate.allowed) throw new Error(`Digital master blocked: ${gate.failures.join(',')}`);
   const representation = createDigitalRepresentation({ source, pages, extraction: 'multi-ocr-aligned' });

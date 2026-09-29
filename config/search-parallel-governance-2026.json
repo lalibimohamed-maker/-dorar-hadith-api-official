@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "search-parallel-governance-2026",
+  "status": "runtime-governed",
+  "principle": "The main search is the only user-facing search entrypoint; provider fan-out remains internal.",
+  "path": [
+    "user_query",
+    "language_resolution",
+    "main_search",
+    "parallel_provider_jobs",
+    "merge_deduplicate",
+    "rank_validate",
+    "answer"
+  ],
+  "limits": {
+    "maxConcurrentProviders": 8,
+    "defaultProviderTimeoutMs": 1200,
+    "minProviderTimeoutMs": 250,
+    "maxProviderTimeoutMs": 1200
+  },
+  "providerPolicy": {
+    "resultsAreDiscoveryMaterial": true,
+    "providerFailureIsFailSoft": true,
+    "providerTimeoutDoesNotFailWholeSearch": true,
+    "retryAllowed": true,
+    "cacheAllowed": true,
+    "topologyHiddenFromUser": true
+  },
+  "governanceGates": {
+    "provenanceRequired": true,
+    "rightsIndependent": true,
+    "validationIndependent": true,
+    "discoveryDoesNotEqualAuthority": true,
+    "redistributionRequiresRightsGate": true,
+    "corpusMutationNotPermittedBySearchFanout": true
+  },
+  "deduplication": {
+    "preserveProvenance": true,
+    "stableSourceIdentity": true,
+    "doNotDiscardDistinctResourceRoutes": true
+  },
+  "responsePolicy": {
+    "singleUnifiedAnswerSurface": true,
+    "internalProviderDetailsHidden": true
+  },
+  "providerNetworkRegistry": "config/search-provider-network-2026.json",
+  "routingLayers": [
+    "quran",
+    "tafsir",
+    "hadith",
+    "books",
+    "fatwa",
+    "web"
+  ],
+  "providerActivation": "explicit-per-provider",
+  "providerRightsPolicy": {
+    "externalSearchIntegration": "official_api_or_provider_permitted_interface_only",
+    "scraping": false,
+    "cache": "only_when_provider_contract_or_connector_policy_explicitly_allows",
+    "retry": "only_when_connector_policy_explicitly_allows_and_rate_limits_are_respected"
+  }
+}
