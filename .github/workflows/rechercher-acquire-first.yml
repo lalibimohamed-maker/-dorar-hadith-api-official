@@ -173,6 +173,9 @@ jobs:
           # catalog before switching branches so generated catalog state never blocks checkout
           # and is never accidentally carried into the protected review branch or Corpus.
           git restore --worktree --staged -- "$CATALOG_PATH" 2>/dev/null || true
+          # The review branch may retain legacy Git LFS PDF pointers. This reconciliation only needs manifests/evidence;
+          # never smudge legacy PDF blobs or spend the repository LFS budget just to switch branches.
+          export GIT_LFS_SKIP_SMUDGE=1
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
           git checkout "$ACQ_COMMIT" -- \
