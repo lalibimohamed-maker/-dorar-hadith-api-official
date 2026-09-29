@@ -210,7 +210,11 @@
     "Subtitle Composer installation/source check",
     "Flamenco render-manager package check",
     "Natron compositing package check",
-    "OpenImageIO import/version check"
+    "OpenImageIO import/version check",
+    "conversation runtime manifest/Release check",
+    "MADLAD/OPUS/Habibi weight lock check",
+    "Pipecat/WebRTC voice pipeline smoke check",
+    "lip-sync pipeline dependency/license check"
   ],
   "notes": [
     "NiFi 2.12.0 is the current upstream release as of 2026-09-29.",
@@ -277,5 +281,23 @@
       "FFmpeg",
       "MediaMTX"
     ]
+  },
+  "conversationRuntime": {
+    "manifest": "config/rechercher-omega-conversation-runtime-2026.json",
+    "releaseTag": "dinullah-conversation-runtime-v2026.09.29",
+    "weightsTag": "dinullah-conversation-weights-v2026.09.29",
+    "functions": [
+      "microphone",
+      "realtime-webrtc",
+      "vad",
+      "asr",
+      "language-detection",
+      "international-translation",
+      "tts",
+      "captions",
+      "live-translation",
+      "lip-sync-dubbing"
+    ],
+    "aiBranchPr": 566
   }
 }
