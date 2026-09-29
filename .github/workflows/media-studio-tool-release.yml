@@ -67,8 +67,9 @@ jobs:
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/kdenlive-26.08.1.tar.xz             https://download.kde.org/stable/release-service/26.08.1/src/kdenlive-26.08.1.tar.xz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ardour-9.8.0.tar.bz2             https://community.ardour.org/src/ardour-9.8.0.tar.bz2
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ImageMagick-7.1.2-32.tar.xz             https://download.imagemagick.org/releases/ImageMagick-7.1.2-32.tar.xz
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenTimelineIO-0.18.1.tar.gz             https://github.com/AcademySoftwareFoundation/OpenTimelineIO/archive/refs/tags/v0.18.1.tar.gz
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenColorIO-2.5.2.tar.gz             https://github.com/AcademySoftwareFoundation/OpenColorIO/releases/download/v2.5.2/OpenColorIO-2.5.2.tar.gz
+          gh api --method GET repos/AcademySoftwareFoundation/OpenTimelineIO/tarball/v0.18.1 > release-assets/OpenTimelineIO-0.18.1.tar.gz
+          gh release download v2.5.2 --repo AcademySoftwareFoundation/OpenColorIO --pattern 'OpenColorIO-2.5.2.tar.gz' --dir release-assets --clobber
+          test -s release-assets/OpenColorIO-2.5.2.tar.gz
           python3 - <<'PY'
           import html, re, urllib.request
           from pathlib import Path
