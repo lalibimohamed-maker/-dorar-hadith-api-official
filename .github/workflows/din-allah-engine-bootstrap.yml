@@ -2,6 +2,13 @@ name: Din Allah — Free Engine Bootstrap and Runtime Verification
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "feat/omega-media-conversation-final-2026-v3"
+    paths:
+      - "scripts/din-allah-engine-bootstrap.sh"
+      - "config/din-allah-engine-installation-manifest-2026.json"
+      - ".github/workflows/din-allah-engine-bootstrap.yml"
   pull_request:
     paths:
       - "scripts/din-allah-engine-bootstrap.sh"
