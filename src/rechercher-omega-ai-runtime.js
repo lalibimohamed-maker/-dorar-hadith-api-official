@@ -19,8 +19,6 @@ export async function loadOmegaEngineActivationRegistry(fileUrl = new URL("../co
 }
 
 import fs from "node:fs/promises";
-import path from "node:path";
-
 /**
  * Rechercher Ω — concrete multimodal AI execution graphs.
  *
