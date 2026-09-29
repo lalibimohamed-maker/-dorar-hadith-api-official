@@ -17,7 +17,8 @@ if command -v apt-get >/dev/null 2>&1; then
   export DEBIAN_FRONTEND=noninteractive
   apt-get update
   apt-get install -y --no-install-recommends \
-    ca-certificates curl git jq file ffmpeg tesseract-ocr \
+    ca-certificates curl git jq file ffmpeg tesseract-ocr imagemagick \
+    mediainfo frei0r-plugins pipewire wireplumber \
     python3 python3-venv python3-pip python3-dev \
     build-essential cmake ninja-build libgl1 libglib2.0-0 nodejs npm libvulkan1 vulkan-tools
 else
