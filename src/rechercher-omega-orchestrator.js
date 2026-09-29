@@ -20,6 +20,9 @@ async function readText(url) {
 }
 
 const TASK_MODEL_PRIORITY = Object.freeze({
+  scholarly_answer: ["qwen3", "gpt-oss", "qwen3-omni"],
+  evidence_synthesis: ["qwen3", "gpt-oss", "qwen3-omni"],
+  translation_evidence: ["qwen3", "gpt-oss", "qwen3-omni"],
   reasoning: ["qwen3", "gpt-oss", "qwen3-omni"],
   multimodal_understanding: ["qwen3-omni", "qwen3-vl", "paddleocr-vl"],
   document_understanding: ["paddleocr-vl", "qwen3-vl", "qwen3-omni"],
