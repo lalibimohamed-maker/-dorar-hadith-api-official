@@ -20,10 +20,10 @@ const contact = process.env.CROSSREF_MAILTO || 'rechercher-research@users.norepl
 if (!Number.isInteger(shardIndex) || !Number.isInteger(shardCount) || shardIndex < 0 || shardCount < 1 || shardIndex >= shardCount) {
   throw new Error(`Invalid shard ${shardIndex}/${shardCount}`);
 }
-if (registry.matrix.language_count !== 133 || registry.matrix.domain_count !== 24 || registry.matrix.expected_search_cells !== 3192) {
-  throw new Error('Global matrix contract is not 133 x 24 x 3192');
+if (registry.matrix.language_count !== 133 || registry.matrix.domain_count !== 37 || registry.matrix.expected_search_cells !== 4921) {
+  throw new Error('Global matrix contract is not 133 x 37 x 4921');
 }
-if (registry.resource_lanes.length !== 24 || matrix.cell_pipeline.length !== 9 || expansion.resource_routes.length !== 9) {
+if (registry.resource_lanes.length !== 37 || matrix.cell_pipeline.length !== 9 || expansion.resource_routes.length !== 9) {
   throw new Error('Resource lanes or nine-stage evidence pipeline changed unexpectedly');
 }
 
