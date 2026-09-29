@@ -150,6 +150,7 @@ jobs:
     with:
       shard_index: ${{ matrix.shard }}
       shard_count: 48
+      matrix_storage_repo: lalibimohamed-maker/dinullah-matrix-3192-storage-01
     secrets:
       RECHERCHER_MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
       RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}

@@ -10,23 +10,22 @@ import {resolveRights, RIGHTS} from '../src/book-rights-resolver.js';
 const ROOT=process.cwd();
 const LEDGER=path.join(ROOT,'research/evidence/global-multilingual/scientific-ledger.jsonl');
 const ADAPTERS=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/islamic-source-adapters-2026.json'),'utf8'));
-const SOURCE_REGISTRY_561_URL='https://raw.githubusercontent.com/lalibimohamed-maker/-dorar-hadith-api-official/feat/rechercher-worldwide-source-link-registry-2026-09-24/research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json';
-async function load561Registry(){
-  const r=await fetch(SOURCE_REGISTRY_561_URL,{headers:{accept:'application/json'}});
-  if(!r.ok) throw new Error('PR #561 registry fetch failed: HTTP '+r.status);
-  const d=await r.json();
+const SOURCE_REGISTRY_PATH=path.join(ROOT,'research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json');
+async function loadSourceRegistry(){
+  const d=JSON.parse(await fs.readFile(SOURCE_REGISTRY_PATH,'utf8'));
   const sources=Array.isArray(d.sources)?d.sources:[];
-  if(sources.length<1) throw new Error('PR #561 registry is empty');
+  if(sources.length<1) throw new Error('repository-local worldwide source registry is empty');
   const seen=new Set();
   const normalized=sources.filter(s=>s&&typeof s.url==='string'&&s.url.startsWith('https://')).map((s,i)=>{
-    const id=String(s.id||`world-561-${i+1}`);
+    const id=String(s.id||('worldwide-'+(i+1)));
     const capabilities=[...(Array.isArray(s.capabilities)?s.capabilities:[]),s.category,s.role].flat().filter(Boolean).map(x=>String(x).toLowerCase());
     const kinds=capabilities.flatMap(x=>x.split(/[^a-z0-9_]+/i).filter(Boolean));
     return {...s,id,status:'enabled',kinds:[...new Set(kinds)],capabilities:[...new Set(capabilities)]};
   }).filter(s=>{if(seen.has(s.url)) return false; seen.add(s.url); return true;});
+  if(normalized.length<500) throw new Error('repository-local worldwide source registry unexpectedly small: '+normalized.length);
   return {sources:normalized};
 }
-const MASTER=await load561Registry();
+const MASTER=await loadSourceRegistry();
 const EXISTING_INVENTORY=process.env.ACQUISITION_EXISTING_INVENTORY||path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition/existing-release-inventory.json');
 function normalizeCellId(value){
   return String(value||'').trim().replace(/\./g,':').replace(/\s+/g,' ').toLowerCase();
@@ -177,15 +176,17 @@ function languageIndexedSeedUrls(url,languageIso){
   const lang=String(languageIso||'').trim().toLowerCase();
   if(!ISO_639_1_CODES.has(lang)) return [url];
   try{
-    const u=new URL(url),parts=u.pathname.split('/');
+    const u=new URL(url),out=new Set([u.href]),parts=u.pathname.split('/');
+    // Path-indexed sites: /ar/, /en/, /fr/, ...
     const index=parts.findIndex((part,i)=>i>0&&ISO_639_1_CODES.has(String(part).toLowerCase()));
-    if(index<0) return [u.href];
-    parts[index]=lang;
-    u.pathname=parts.join('/');
-    return [u.href];
+    if(index>=0){const next=[...parts];next[index]=lang;u.pathname=next.join('/');out.add(u.href);}
+    // Query-indexed APIs/sites: ?language=ar, ?lang=ar, ?locale=ar
+    for(const key of ['language','lang','locale']){
+      if(u.searchParams.has(key)){const v=new URL(u.href);v.searchParams.set(key,lang);out.add(v.href);}
+    }
+    return [...out];
   }catch{return [url];}
 }
-
 async function archiveAssetUrls(json){
   const ids=new Set(),pdfs=new Set(),docxs=new Set();
   const scan=v=>{
@@ -344,10 +345,17 @@ function acquisitionType(r){
 function apiSeeds(adapter,row){
   if(!adapter?.api_base_url||!row.language_iso) return [];
   const result=[];
-  for(const [name,t] of Object.entries(adapter.api_endpoints||{})){
-    if(!/books|downloads|items|category_items/i.test(name)||!/\{language\}/.test(t)) continue;
-    const p=t.replaceAll('{language}',encodeURIComponent(String(row.language_iso).toLowerCase())).replaceAll('{sourceLanguage}','ar').replaceAll('{page}','1').replaceAll('{perPage}','100').replaceAll('{categoryId}','1').replaceAll('{type}','books');
-    const u=adapter.api_base_url.replace(/\/$/,'')+p;if(allow(u)) result.push(u);
+  const language=encodeURIComponent(String(row.language_iso).toLowerCase());
+  const values={language,sourceLanguage:'ar',source_language:'ar',page:'1',perPage:'100',per_page:'100',count:'100',type:'books',contentType:'books',content_type:'books'};
+  for(const t of Object.values(adapter.api_endpoints||{})){
+    const template=String(t||'');
+    if(!/\{language\}/i.test(template)) continue;
+    // Never fabricate identifiers: item/category IDs are discovered from API responses.
+    const unresolved=[...template.matchAll(/\{([A-Za-z0-9_]+)\}/g)].map(m=>m[1]).filter(k=>!(k in values));
+    if(unresolved.length) continue;
+    const p=template.replace(/\{([A-Za-z0-9_]+)\}/g,(_,k)=>values[k]);
+    const u=adapter.api_base_url.replace(/\/$/,'')+p;
+    if(allow(u)) result.push(u);
   }
   return [...new Set(result)];
 }
@@ -368,7 +376,7 @@ const manifest={
     source_format_priority:'pdf-first; docx-only fallback when no eligible PDF exists',
     docx_original_retained:true,derived_pdf_created:true,derived_pdf_is_not_source_original:true
   },
-  source_counts:{},source_registry_561_count:MASTER.sources.length,source_registry_561_loaded:true,cells:{},discovery:{urls_per_batch:DISCOVERY_URLS_PER_BATCH,pdf_candidates_per_batch:PDF_CANDIDATES_PER_BATCH,initial_depth:DISCOVERY_DEPTH_INITIAL,max_depth:DISCOVERY_DEPTH_MAX,continuation:true}
+  source_counts:{},source_registry_count:MASTER.sources.length,source_registry_loaded:true,cells:{},discovery:{urls_per_batch:DISCOVERY_URLS_PER_BATCH,pdf_candidates_per_batch:PDF_CANDIDATES_PER_BATCH,initial_depth:DISCOVERY_DEPTH_INITIAL,max_depth:DISCOVERY_DEPTH_MAX,continuation:true}
 };
 const claimed=new Set(),seenPdfSha256=new Map(),started=Date.now();
 function deferredCellEntry(row){
@@ -398,16 +406,18 @@ async function downloadPdf(url,dest){
     if(!allow(r.url||u.href)) throw new Error('untrusted PDF redirect');
     if(!r.ok) throw new Error('HTTP '+r.status);
     await fs.mkdir(path.dirname(dest),{recursive:true});
-    const h=await fs.open(part,'w'),hash=createHash('sha256');let total=0,header='';
+    const h=await fs.open(part,'w'),hash=createHash('sha256');let total=0,header='',nextProgress=1024*1024;
     try{
       for await(const chunk of r.body){
-        const b=Buffer.from(chunk);if(!header)header=b.subarray(0,4).toString();total+=b.length;
+        const b=Buffer.from(chunk);if(!header)header=b.subarray(0,5).toString();total+=b.length;
         if(total>PDF_LIMIT) throw new Error('PDF exceeds size limit');
         hash.update(b);await h.write(b);
+        while(total>=nextProgress){console.log('[PDF PROGRESS] '+Math.floor(nextProgress/1048576)+' MB url='+u.href);nextProgress+=1048576;}
       }
     }finally{await h.close();}
-    if(header!=='%PDF'){await fs.rm(part,{force:true});throw new Error('not a PDF');}
+    if(header!=='%PDF-'){await fs.rm(part,{force:true});throw new Error('not a PDF');}
     const sha256=hash.digest('hex');await fs.rename(part,dest);
+    console.log('[PDF DONE] '+(total/1048576).toFixed(1)+' MB sha256='+sha256+' url='+u.href);
     return {bytes:total,sha256,finalUrl:r.url||u.href,contentType:r.headers.get('content-type')||''};
   }catch(e){await fs.rm(part,{force:true});throw e;}finally{clearTimeout(timer);}
 }
@@ -420,16 +430,18 @@ async function downloadDocx(url,dest){
     if(!allow(r.url||u.href)) throw new Error('untrusted DOCX redirect');
     if(!r.ok) throw new Error('HTTP '+r.status);
     await fs.mkdir(path.dirname(dest),{recursive:true});
-    const h=await fs.open(part,'w'),hash=createHash('sha256');let total=0,header='';
+    const h=await fs.open(part,'w'),hash=createHash('sha256');let total=0,header='',nextProgress=1024*1024;
     try{
       for await(const chunk of r.body){
         const b=Buffer.from(chunk);if(!header)header=b.subarray(0,2).toString('hex').toLowerCase();total+=b.length;
         if(total>PDF_LIMIT) throw new Error('DOCX exceeds size limit');
         hash.update(b);await h.write(b);
+        while(total>=nextProgress){console.log('[DOCX PROGRESS] '+Math.floor(nextProgress/1048576)+' MB url='+u.href);nextProgress+=1048576;}
       }
     }finally{await h.close();}
     if(header!=='504b'){await fs.rm(part,{force:true});throw new Error('not a DOCX/ZIP container');}
     const sha256=hash.digest('hex');await fs.rename(part,dest);
+    console.log('[DOCX DONE] '+(total/1048576).toFixed(1)+' MB sha256='+sha256+' url='+u.href);
     return {bytes:total,sha256,finalUrl:r.url||u.href,contentType:r.headers.get('content-type')||''};
   }catch(e){await fs.rm(part,{force:true});throw e;}finally{clearTimeout(timer);}
 }
