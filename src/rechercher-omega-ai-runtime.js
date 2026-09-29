@@ -50,7 +50,7 @@ const DEFAULT_TOOLS = Object.freeze([
 function componentRuntimeEligibility(component, activationStates = {}) {
   if (!component || component.runtime_enabled === false) return false;
   const state = activationStates[component.id];
-  if (MODEL_BEARING_KINDS.test(component.kind ?? "") && state !== undefined && state !== "active") return false;
+  if (MODEL_BEARING_KINDS.test(component.kind ?? "") && state !== "active") return false;
   if (["architecture_reference", "reference_only"].includes(component.integration)) return false;
   if (component.model_license_status === "blocked") return false;
   if (MODEL_BEARING_KINDS.test(component.kind ?? "") && component.model_license_status === "review_required") return false;
