@@ -135,6 +135,14 @@ export function buildAiExecutionGraph(registry, {
   };
 }
 
+export async function buildVerifiedAiExecutionGraph(registry, options = {}) {
+  const activation = await loadOmegaEngineActivationRegistry();
+  return buildAiExecutionGraph(registry, {
+    ...options,
+    activationStates: options.activationStates ?? activation.states
+  });
+}
+
 export function buildMcpToolPolicy(requestedTools = DEFAULT_TOOLS) {
   const allow = [...new Set(requestedTools)]
     .filter(Boolean)
