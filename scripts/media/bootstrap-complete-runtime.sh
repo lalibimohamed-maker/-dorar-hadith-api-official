@@ -17,7 +17,7 @@ if command -v apt-get >/dev/null 2>&1; then
   export DEBIAN_FRONTEND=noninteractive
   apt-get update
   apt-get install -y --no-install-recommends \
-    ca-certificates curl git jq file ffmpeg tesseract-ocr imagemagick \
+    ca-certificates curl git jq file ffmpeg tesseract-ocr imagemagick inkscape \
     mediainfo frei0r-plugins pipewire wireplumber \
     python3 python3-venv python3-pip python3-dev \
     build-essential cmake ninja-build libgl1 libglib2.0-0 nodejs npm libvulkan1 vulkan-tools
@@ -68,5 +68,5 @@ node -e 'const v=require("gltf-validator"); console.log("GLTF_VALIDATOR_OK", v.v
 echo "COLMAP: build from official upstream tag 4.2.0 via runtime/colmap/Dockerfile"
 
 echo "RUNTIME_BASE_INSTALLED"
-echo "Note: Eclipse Ditto is started by the pinned upstream deployment bundle; Video2X is provided by the pinned official 6.4.0 GHCR image and requires GPU/Vulkan capability for acceleration."
+echo "Note: Eclipse Ditto is started by the pinned upstream deployment bundle; Video2X is provided by the official 6.4.0 GHCR image and requires GPU/Vulkan capability for acceleration."
 echo "Studio desktop applications are cached in the Din Allah Media Studio release and installed separately from this headless runtime."
