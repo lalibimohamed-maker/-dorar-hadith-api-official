@@ -8,6 +8,9 @@ import { buildPlan, createProvenanceRecord, loadModelRegistry } from "./recherch
 import { buildRuntimeGate, assertRuntimeGate } from "./rechercher-omega-runtime-gate.js";
 import { loadExecutionBackends, selectExecutionBackend, executeSelectedBackend } from "./rechercher-omega-execution-router.js";
 import { buildTelemetryContext, completeTelemetry } from "./rechercher-omega-observability.js";
+import { buildEvidenceEnvelope, buildScholarlySystemPrompt } from "./rechercher-omega-evidence-envelope.js";
+import { ConversationMemory } from "./rechercher-omega-conversation-memory.js";
+
 import { admitExecution } from "./rechercher-omega-resource-admission.js";
 import { buildSemanticCacheKey, createCacheEntry, isCacheReusable, DEFAULT_CACHE_TTLS_MS } from "./rechercher-omega-semantic-cache.js";
 
@@ -29,7 +32,8 @@ export async function runGovernedAssistantTurn({
   currentVramMb = 0,
   requiredVramMb = 0,
   cacheEntry = null,
-  cacheWriter = null
+  cacheWriter = null,
+  conversationHistory = []
 } = {}) {
   if (!String(query ?? "").trim()) throw new TypeError("assistant query is required");
 
@@ -160,12 +164,14 @@ export async function runGovernedAssistantTurn({
     };
   }
 
-  const evidenceText = evidence.map((item, index) => {
-    const source = item?.source_id ?? item?.id ?? "source-" + (index + 1);
-    const text = item?.text ?? item?.excerpt ?? item?.content ?? "";
-    return `[${source}] ${String(text)}`;
-  }).join("\n");
-
+  const memory = new ConversationMemory({ maxTurns: 20, maxCharsPerMessage: 12000 });
+  for (const turn of Array.isArray(conversationHistory) ? conversationHistory : []) {
+    if (turn && typeof turn === "object") {
+      try { memory.append({ role: turn.role, content: String(turn.content ?? ""), metadata: { source: "client-history" } }); } catch {}
+    }
+  }
+  const history = memory.snapshot();
+  const evidenceEnvelope = buildEvidenceEnvelope(evidence);
   const started = Date.now();
   const result = await executeSelectedBackend(gate, {
     messages: [
@@ -173,10 +179,7 @@ export async function runGovernedAssistantTurn({
         role: "system",
         content: [
           "You are Rechercher Ω.",
-          "Use only the supplied evidence for scholarly claims.",
-          "Do not invent sources, quotations, editions, rights or facts.",
-          "Treat generated output as derived analysis, never as Corpus evidence.",
-          `Answer language: ${language}`
+          buildScholarlySystemPrompt(language).split("\n").slice(1).join("\n")
         ].join("\n")
       },
       {
