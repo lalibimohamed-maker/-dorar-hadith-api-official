@@ -3,7 +3,7 @@
 This layer completes the production side around Rechercher Ω.
 
 - PR #566 / Rechercher Ω: planning, model routing, multimodal generation, speech, document understanding and AI orchestration.
-- PR #601 / Media Runtime (stacked on #566): deterministic execution, editing, capture, audio, VFX, 3D, color, interchange, live media and transcoding.
+- PR #603 / Media Runtime (stacked on #566): deterministic execution, editing, capture, audio, VFX, 3D, color, interchange, live media and transcoding.
 - The two layers share task contracts and provenance rules; generated media never becomes scholarly evidence and never writes directly to Corpus.
 
 ## Production path
