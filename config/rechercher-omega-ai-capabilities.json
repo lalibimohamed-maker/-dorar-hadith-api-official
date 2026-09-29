@@ -1124,11 +1124,13 @@
     "voice": {
       "stages": [
         "microphone",
+        "openwakeword",
         "pipewire_or_webrtc",
         "rnnoise_or_deepfilternet",
         "silero-vad",
         "pyannote-audio_optional",
-        "whisper_or_whisper-cpp",
+        "faster-whisper",
+        "qwen3-omni",
         "madlad400_or_ara_pair",
         "omega",
         "cosyvoice_or_kokoro_or_piper",
@@ -1152,7 +1154,21 @@
         "TTS",
         "captions",
         "WebRTC"
-      ]
+      ],
+      "fallbacks": {
+        "asr": [
+          "whisper",
+          "whisper-cpp"
+        ],
+        "tts": [
+          "kokoro",
+          "piper"
+        ],
+        "wake_word": [],
+        "vad": [
+          "silero-vad"
+        ]
+      }
     },
     "document": {
       "stages": [
