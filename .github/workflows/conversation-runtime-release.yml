@@ -154,6 +154,7 @@ jobs:
           while IFS= read -r -d '' f; do
             case "$f" in
               *.lock|*.metadata|*/.gitignore) rm -f "$f"; continue ;;
+              *conversation-weight-lock.json) continue ;;
             esac
             echo "[WEIGHT] $(basename "$f")"
             mv "$f" "release-assets/weights/$(basename "$f")"
