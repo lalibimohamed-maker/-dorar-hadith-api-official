@@ -34,6 +34,54 @@
       "role": "interoperable composition and interchange for complex 3D scenes",
       "activation": "candidate-until-runtime-deployment",
       "evidence": "https://openusd.org/"
+    },
+    {
+      "capability": "3d-web-asset-interchange",
+      "project": "KhronosGroup/glTF",
+      "license": "mixed/per-file; verify the specific release artifacts and specification terms before redistribution",
+      "role": "web-oriented 3D asset interchange",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "https://github.com/KhronosGroup/glTF"
+    },
+    {
+      "capability": "image-restoration",
+      "project": "xinntao/Real-ESRGAN",
+      "license": "BSD-3-Clause",
+      "role": "image restoration and super-resolution",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "https://github.com/xinntao/Real-ESRGAN"
+    },
+    {
+      "capability": "video-upscaling",
+      "project": "K4YT3X/video2x",
+      "license": "AGPL-3.0; verify backend/dependency licenses per release",
+      "role": "video upscaling and frame-interpolation orchestration",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "https://github.com/K4YT3X/video2x"
+    },
+    {
+      "capability": "media-transcoding",
+      "project": "FFmpeg/FFmpeg",
+      "license": "LGPL/GPL depending on build configuration",
+      "role": "decode, encode, filtering and container conversion",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "https://ffmpeg.org/legal.html"
+    },
+    {
+      "capability": "live-media-routing",
+      "project": "bluenviron/mediamtx",
+      "license": "MIT",
+      "role": "live media protocol routing and proxying",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "https://github.com/bluenviron/mediamtx"
+    },
+    {
+      "capability": "professional-media-studio",
+      "project": "dinullah-media-studio-toolchain",
+      "license": "per-component; see config/media-studio-toolchain-2026.json",
+      "role": "nonlinear editing, capture, audio production, raster/vector graphics, motion design, 3D/VFX, color management and timeline interchange",
+      "activation": "candidate-until-runtime-deployment",
+      "evidence": "config/media-studio-toolchain-2026.json"
     }
   ],
   "integration_rules": [
@@ -42,6 +90,7 @@
     "Open-source code remains subject to its upstream license, notices and attribution requirements.",
     "Unknown or unverified releases remain untrusted.",
     "A component may be replaced when a verified alternative scores better on security, quality, performance, compatibility, maintenance and license suitability.",
-    "Trusted Corpus and scholarly source material are never mutated by interoperability automation."
+    "Trusted Corpus and scholarly source material are never mutated by interoperability automation.",
+    "Media-processing components remain governed candidates; source media is preserved and derived artifacts keep explicit lineage."
   ]
 }
