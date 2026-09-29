@@ -7,6 +7,19 @@
 
 const DEFAULT_BACKENDS = new URL("../config/rechercher-omega-execution-backends.json", import.meta.url);
 
+async function assertRuntimeArtifactForPlan(plan, input) {
+  if (plan.weights_required !== true) return;
+  const { evaluateRuntimeArtifactReadiness } = await import("./rechercher-omega-runtime-readiness.js");
+  const result = evaluateRuntimeArtifactReadiness({
+    backendWeightsRequired: true,
+    artifactState: input?.runtimeArtifact?.state ?? "not_verified",
+    sha256Verified: input?.runtimeArtifact?.sha256_verified === true,
+    revisionVerified: input?.runtimeArtifact?.revision_verified === true,
+    licenseVerified: input?.runtimeArtifact?.license_verified === true
+  });
+  if (result.status !== "ready") throw new Error("execution blocked: runtime artifact is not verified");
+}
+
 export async function loadExecutionBackends(url = DEFAULT_BACKENDS) {
   const fs = await import("node:fs/promises");
   return JSON.parse(await fs.readFile(url, "utf8"));
@@ -90,6 +103,7 @@ export function assertExecutionBoundary(plan) {
 
 export async function executeSelectedBackend(plan, input = {}) {
   assertExecutionBoundary(plan);
+  await assertRuntimeArtifactForPlan(plan, input);
   if (plan.status !== "ready") throw new Error("Rechercher Ω cannot execute a non-ready plan");
   const adapters = await import("./rechercher-omega-adapters.js");
   const payload = { ...input, corpus_write_allowed: false, generated_media_is_evidence: false };
