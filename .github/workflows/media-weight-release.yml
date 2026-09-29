@@ -45,13 +45,14 @@ jobs:
           from pathlib import Path
           d=json.load(open('config/media-weight-release-manifest-2026.json',encoding='utf-8'))
           assert d['releaseModel']['maxAssetBytes'] < 2**31
+          allowed_hosts=('https://github.com/','https://paddle-model-ecology.bj.bcebos.com/')
           for item in d['weights']:
-              assert item['upstreamUrl'].startswith('https://github.com/')
-              assert item['assetName'].endswith(('.pth','.pt','.onnx','.safetensors','.bin'))
+              assert item['upstreamUrl'].startswith(allowed_hosts), item['upstreamUrl']
+              assert item['assetName'].endswith(('.pth','.pt','.onnx','.safetensors','.bin','.tar'))
           print('STATIC_WEIGHT_MANIFEST_OK')
           PY
 
-      - name: Download exact pinned Real-ESRGAN weights
+      - name: Download exact pinned model weights
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -121,7 +122,7 @@ jobs:
       - name: Create or update release
         env:
           RELEASE_TAG: ${{ inputs.release_tag || 'dinullah-media-weights-v2026.09.29' }}
-          PUBLISH: ${{ inputs.publish || 'true' }}
+          PUBLISH: ${{ inputs.publish || 'false' }}
         run: |
           set -euo pipefail
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
