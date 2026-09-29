@@ -36,7 +36,8 @@ python3 -m venv "${RUNTIME_ROOT}/venv"
   "pycolmap==4.2.0" \
   "realesrgan==0.3.0" \
   "usd-core==26.8" \
-  "opentimelineio==0.18.1"
+  "opentimelineio==0.18.1" \
+  "scenedetect-headless==0.7.1"
 
 require_cmd docker
 require_cmd gh
@@ -57,6 +58,8 @@ print("Open3D", open3d.__version__)
 print("PyCOLMAP", pycolmap.__version__)
 print("USD/PXR import", "OK")
 print("Real-ESRGAN import", "OK")
+import scenedetect
+print("PySceneDetect", getattr(scenedetect, "__version__", "installed"))
 PY
 
 # Verify the selected containers can be pulled without executing arbitrary URLs.
@@ -66,6 +69,13 @@ docker pull "bluenviron/mediamtx:1.21.1"
 docker pull "ghcr.io/k4yt3x/video2x:6.4.0@sha256:e21b6893269b4cb6f5603802726fd7537be241f6b39217b73530478861acbca1"
 node -e 'const v=require("gltf-validator"); console.log("GLTF_VALIDATOR_OK", v.version)'
 echo "COLMAP: build from official upstream tag 4.2.0 via runtime/colmap/Dockerfile"
+
+if ffmpeg -hide_banner -filters 2>/dev/null | grep -q "libvmaf"; then
+  echo "VMAF_FFMPEG_FILTER_OK"
+else
+  echo "VMAF_FFMPEG_FILTER_UNAVAILABLE"
+fi
+"${RUNTIME_ROOT}/venv/bin/scenedetect" version
 
 echo "RUNTIME_BASE_INSTALLED"
 echo "Note: Eclipse Ditto is started by the pinned upstream deployment bundle; Video2X is provided by the official 6.4.0 GHCR image and requires GPU/Vulkan capability for acceleration."
