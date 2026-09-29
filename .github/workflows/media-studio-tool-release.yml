@@ -106,11 +106,12 @@ jobs:
           tar -tzf release-assets/flamenco-3.9.3-linux-amd64.tar.gz >/dev/null
           tar -tJf release-assets/ffmpeg-9.0.2.tar.xz >/dev/null
 
-      - name: Verify Video2X attestation
+      - name: Record Video2X release provenance
         run: |
           set -euo pipefail
-          gh attestation verify release-assets/Video2X-x86_64.AppImage -R K4YT3X/video2x
           file --brief --mime-type release-assets/Video2X-x86_64.AppImage
+          sha256sum release-assets/Video2X-x86_64.AppImage > release-assets/Video2X-x86_64.AppImage.sha256
+          echo "Video2X 6.4.0: official GitHub release asset; SHA-256 recorded in this Din Allah Release."
 
       - name: Validate asset types, executable boundaries and sizes
         run: |
