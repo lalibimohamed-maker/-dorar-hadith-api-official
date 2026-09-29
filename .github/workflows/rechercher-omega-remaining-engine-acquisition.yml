@@ -97,7 +97,7 @@ jobs:
       - name: Install Hugging Face Hub
         run: python -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
 
-      - name: Validate gated Hugging Face access
+      - name: Validate gated Hugging Face file access
         id: gated_access
         if: matrix.id == 'flux1-schnell'
         env:
@@ -113,25 +113,29 @@ jobs:
           fi
           python - <<'PY'
           import os
+          import requests
           from huggingface_hub import HfApi
-          try:
-              HfApi(token=os.environ["HF_TOKEN"]).model_info(
-                  os.environ["MODEL_ID"],
-                  revision=os.environ["REQUESTED_REVISION"],
-                  files_metadata=False,
-              )
-          except Exception as exc:
-              response = getattr(exc, "response", None)
-              status = getattr(response, "status_code", None)
-              if status in (401, 403) or "GatedRepoError" in type(exc).__name__:
-                  with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
-                      f.write("state=blocked\n")
-                  print("[BLOCKED] Hugging Face denied access to the gated model revision; no weight download will be attempted.")
-                  raise SystemExit(0)
-              raise
+          model = os.environ["MODEL_ID"]
+          revision = os.environ["REQUESTED_REVISION"]
+          token = os.environ["HF_TOKEN"]
+          HfApi(token=token).model_info(model, revision=revision, files_metadata=False)
+          url = f"https://huggingface.co/{model}/resolve/{revision}/text_encoder/model.safetensors"
+          response = requests.head(
+              url,
+              headers={"Authorization": f"Bearer {token}"},
+              allow_redirects=True,
+              timeout=30,
+          )
+          if response.status_code in (401, 403):
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+                  f.write("state=blocked\n")
+              print(f"[BLOCKED] The actual FLUX weight file is not authorized (HTTP {response.status_code}); no release or download will be attempted.")
+              raise SystemExit(0)
+          if response.status_code >= 400:
+              raise SystemExit(f"Weight-file access preflight failed with HTTP {response.status_code}")
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
               f.write("state=ready\n")
-          print("[OK] Gated Hugging Face model access is authorized.")
+          print("[OK] Actual gated FLUX weight-file access is authorized.")
           PY
 
       - name: Mark non-gated jobs as ready
