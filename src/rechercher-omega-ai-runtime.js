@@ -26,8 +26,10 @@ const DEFAULT_TOOLS = Object.freeze([
   "provenance"
 ]);
 
-function componentRuntimeEligibility(component) {
+function componentRuntimeEligibility(component, activationStates = {}) {
   if (!component || component.runtime_enabled === false) return false;
+  const state = activationStates[component.id];
+  if (MODEL_BEARING_KINDS.test(component.kind ?? "") && state !== undefined && state !== "active") return false;
   if (["architecture_reference", "reference_only"].includes(component.integration)) return false;
   if (component.model_license_status === "blocked") return false;
   if (MODEL_BEARING_KINDS.test(component.kind ?? "") && component.model_license_status === "review_required") return false;
@@ -38,7 +40,8 @@ export function buildAiExecutionGraph(registry, {
   pipeline,
   availableComponents = [],
   disabledComponents = [],
-  requestedTools = DEFAULT_TOOLS
+  requestedTools = DEFAULT_TOOLS,
+  activationStates = {}
 } = {}) {
   const definition = registry.pipelines?.[pipeline];
   if (!definition) throw new Error("unknown AI pipeline: " + pipeline);
@@ -55,7 +58,7 @@ export function buildAiExecutionGraph(registry, {
     let candidates = choices.filter(component =>
       !disabled.has(component.id) &&
       (available.size === 0 || available.has(component.id)) &&
-      componentRuntimeEligibility(component)
+      componentRuntimeEligibility(component, activationStates)
     );
 
     if (!candidates.length && stage.includes("_or_")) {
@@ -87,7 +90,8 @@ export function buildAiExecutionGraph(registry, {
         integration: component.integration,
         local_first: LOCAL_FIRST_INTEGRATIONS.has(component.integration),
         model_license_status: component.model_license_status,
-        runtime_eligible: true
+        runtime_eligible: true,
+        activation_state: activationStates[component.id] ?? "not_supplied"
       })),
       rejected_candidates: allChoices.filter(candidate => !candidate.runtime_eligible)
     });
