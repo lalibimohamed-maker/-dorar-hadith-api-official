@@ -67,7 +67,7 @@ jobs:
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ImageMagick-7.1.2-32.tar.xz             https://download.imagemagick.org/releases/ImageMagick-7.1.2-32.tar.xz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenTimelineIO-0.18.1.tar.gz             https://github.com/AcademySoftwareFoundation/OpenTimelineIO/archive/refs/tags/v0.18.1.tar.gz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenColorIO-2.5.2.tar.gz             https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v2.5.2.tar.gz
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/inkscape-1.4.2-source.tar.gz             https://gitlab.com/inkscape/inkscape/-/archive/1.4.2/inkscape-1.4.2.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/inkscape-1.4.2-source.tar.gz             https://gitlab.com/inkscape/inkscape/-/archive/1.4.2/inkscape-1.4.2.tar.xz
 
       - name: Acquire remaining media foundation and production assets
         run: |
