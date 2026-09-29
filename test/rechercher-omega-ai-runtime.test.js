@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { loadAICapabilityRegistry } from "../src/rechercher-omega-ai-capability-registry.js";
-import { buildAiExecutionGraph, buildMcpToolPolicy, buildProgrammingGraph } from "../src/rechercher-omega-ai-runtime.js";
+import { buildAiExecutionGraph, buildMcpToolPolicy, buildProgrammingGraph, loadOmegaEngineActivationRegistry } from "../src/rechercher-omega-ai-runtime.js";
 
 test("voice execution graph includes wake, ASR and TTS capability stages", async () => {
   const registry = await loadAICapabilityRegistry();
@@ -55,4 +55,13 @@ test("model-bearing AI candidates require explicit active runtime state when sup
   });
   const activeAsr = active.nodes.find(n => n.stage === "faster-whisper");
   assert.ok(activeAsr.candidates.some(x => x.id === "faster-whisper"));
+});
+
+test("activation registry exposes only evidence-backed active model engines", async () => {
+  const registry = await loadOmegaEngineActivationRegistry();
+  assert.equal(registry.policy.failClosed, true);
+  assert.equal(registry.states.whisper, "active");
+  assert.equal(registry.states.kokoro, "active");
+  assert.notEqual(registry.states.qwen3, "active");
+  assert.notEqual(registry.states["hunyuanvideo-1.5"], "active");
 });
