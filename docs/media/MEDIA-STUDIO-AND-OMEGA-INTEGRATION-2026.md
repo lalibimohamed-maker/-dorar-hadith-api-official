@@ -13,3 +13,7 @@ Capture -> ingest -> AI planning/generation -> NLE edit -> audio -> subtitles ->
 ## Release policy
 
 Software tools are cached in the dedicated GitHub Release, while AI model weights stay in the separate model-weight release. Neither is stored inside Corpus.
+
+## Operational release boundary
+
+The studio tool release is built by `.github/workflows/media-studio-tool-release.yml` and is kept separate from the AI model-weight release. The headless runtime consumes only declared release-backed assets; desktop applications remain a separate production layer.
