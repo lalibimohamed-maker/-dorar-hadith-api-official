@@ -81,6 +81,7 @@ jobs:
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/Natron-2.5.0-Linux-x86_64.tgz https://github.com/NatronGitHub/Natron/releases/download/v2.5.0/Natron-2.5.0-Linux-x86_64.tgz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/flamenco-3.9.3-linux-amd64.tar.gz https://flamenco.blender.org/files/flamenco-3.9.3-linux-amd64.tar.gz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ffmpeg-9.0.2.tar.xz https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/Video2X-x86_64.AppImage https://github.com/K4YT3X/video2x/releases/download/6.4.0/Video2X-x86_64.AppImage
 
       - name: Verify publisher checksums
         run: |
@@ -104,6 +105,12 @@ jobs:
           tar -tzf release-assets/Natron-2.5.0-Linux-x86_64.tgz >/dev/null
           tar -tzf release-assets/flamenco-3.9.3-linux-amd64.tar.gz >/dev/null
           tar -tJf release-assets/ffmpeg-9.0.2.tar.xz >/dev/null
+
+      - name: Verify Video2X attestation
+        run: |
+          set -euo pipefail
+          gh attestation verify release-assets/Video2X-x86_64.AppImage -R K4YT3X/video2x
+          file --brief --mime-type release-assets/Video2X-x86_64.AppImage
 
       - name: Validate asset types, executable boundaries and sizes
         run: |
