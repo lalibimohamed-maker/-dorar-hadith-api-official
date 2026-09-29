@@ -8,6 +8,7 @@ set -euo pipefail
 require_cmd() { command -v "$1" >/dev/null 2>&1 || { echo "Missing command: $1" >&2; exit 1; }; }
 require_cmd curl
 require_cmd sha256sum
+require_cmd python3
 
 mkdir -p "$DINULLAH_RUNTIME_WEIGHTS_DIR"
 
@@ -44,15 +45,25 @@ done
 lock="$DINULLAH_RUNTIME_WEIGHTS_DIR/media-weight-lock.json"
 lock_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${DINULLAH_WEIGHT_RELEASE}/media-weight-lock.json"
 if curl --fail --location --retry 3 --proto '=https' --tlsv1.2 -o "$lock" "$lock_url"; then
-  python3 - "$lock" <<'PY'
+  python3 - "$lock" "$DINULLAH_RUNTIME_WEIGHTS_DIR" "$base" <<'PY'
 import json
+import os
+import subprocess
 import sys
-lock_path=sys.argv[1]
+lock_path, root, base = sys.argv[1:]
 data=json.load(open(lock_path,encoding="utf-8"))
 for entry in data.get("assets",[]):
     name=entry["assetName"]
-    if name.startswith("video2x-"):
-        print("[WEIGHT LOCKED]", name, entry["sha256"])
+    if not name.startswith("video2x-"):
+        continue
+    expected=entry["sha256"]
+    out=os.path.join(root,name)
+    print("[WEIGHT START]",name)
+    subprocess.run(["curl","--fail","--location","--retry","3","--proto","=https","--tlsv1.2","-o",out,f"{base}/{name}"],check=True)
+    actual=subprocess.check_output(["sha256sum",out],text=True).split()[0]
+    if actual.lower()!=expected.lower():
+        raise SystemExit(f"WEIGHT_SHA256_MISMATCH {name}")
+    print("[WEIGHT DONE]",name,actual)
 PY
 else
   echo "[WEIGHT NOTE] lock manifest is not published yet; static approved weights remain installable."
