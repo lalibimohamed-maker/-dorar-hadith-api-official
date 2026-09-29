@@ -25,8 +25,17 @@ export function sha256File(filePath) {
   const stream = fs.createReadStream(filePath);
   return new Promise((resolve, reject) => { stream.on('data', chunk => hash.update(chunk)); stream.on('end', () => resolve(hash.digest('hex'))); stream.on('error', reject); });
 }
-export function buildDerivedManifest({ inputPath, outputPath, mediaType, profile, engine }) {
-  return { schemaVersion: 1, mediaType, profile, engine, input: { path: inputPath, authoritative: true }, output: { path: outputPath, authoritative: false }, policy: { preserveOriginal: true, verifyBeforePromotion: true, noSilentTrustedReplacement: true }, generatedAt: new Date().toISOString() };
+export function buildDerivedManifest({ inputPath, outputPath, mediaType, profile, engine, inputSha256 = null, outputSha256 = null, qualityStatus = "pending" }) {
+  if (!["pending", "passed", "blocked"].includes(qualityStatus)) throw new Error("invalid media quality status");
+  return {
+    schemaVersion: 2,
+    mediaType, profile, engine,
+    input: { path: inputPath, authoritative: true, sha256: inputSha256 },
+    output: { path: outputPath, authoritative: false, sha256: outputSha256 },
+    quality: { gate: "rechercher-omega-quality-gates-2026", status: qualityStatus },
+    policy: { preserveOriginal: true, verifyBeforePromotion: true, noSilentTrustedReplacement: true, qualityGateRequired: true },
+    generatedAt: new Date().toISOString()
+  };
 }
 export function validateTargetDimensions(width, height, requested) {
   const target = selectImageProfile(width, height, requested);
