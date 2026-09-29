@@ -67,7 +67,21 @@ jobs:
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ImageMagick-7.1.2-32.tar.xz             https://download.imagemagick.org/releases/ImageMagick-7.1.2-32.tar.xz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenTimelineIO-0.18.1.tar.gz             https://github.com/AcademySoftwareFoundation/OpenTimelineIO/archive/refs/tags/v0.18.1.tar.gz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenColorIO-2.5.2.tar.gz             https://codeload.github.com/AcademySoftwareFoundation/OpenColorIO/tar.gz/refs/tags/v2.5.2
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/inkscape-1.4.2-source.tar.gz             https://gitlab.com/inkscape/inkscape/-/archive/INKSCAPE_1_4_2/inkscape-INKSCAPE_1_4_2.tar.xz
+          python3 - <<'PY'
+          import html, re, urllib.request
+          from pathlib import Path
+          page="https://inkscape.org/release/1.4.2/gnulinux/"
+          req=urllib.request.Request(page,headers={"User-Agent":"Dinullah-Media-Release/1.0"})
+          body=urllib.request.urlopen(req,timeout=30).read().decode("utf-8","replace")
+          hrefs=re.findall(r'href=["\\']([^"\\']+Inkscape[^"\\']+\\.AppImage)["\\']',body,re.I)
+          candidates=[html.unescape(h) for h in hrefs if "x86_64" in h.lower()]
+          if not candidates: raise SystemExit("No official Inkscape 1.4.2 x86_64 AppImage found.")
+          url=candidates[0]
+          if url.startswith("/"): url="https://inkscape.org"+url
+          urllib.request.urlretrieve(url,"release-assets/Inkscape-1.4.2-x86_64.AppImage")
+          Path("release-assets/Inkscape-1.4.2-source-url.txt").write_text(url+"\n",encoding="utf-8")
+          print("INKSCAPE_RESOLVED",url)
+          PY
 
       - name: Acquire remaining media foundation and production assets
         run: |
@@ -91,7 +105,9 @@ jobs:
           echo "772663b0b407be44232193b8402cde4da4665c7f6e81edb5b70e3b14e8b9b5b4  release-assets/audacity-linux-4.0.0-x86_64.AppImage" | sha256sum -c -
           grep 'GIMP-3.2.6-x86_64.AppImage' release-assets/GIMP-SHA256SUMS | (cd release-assets && sha256sum -c -)
           echo "8a0e2cc6451de6901fec778a8b6d00165399879233a264ca5bb1b1b283266513  release-assets/kdenlive-26.08.1.tar.xz" | sha256sum -c -
-          echo "Inkscape source: exact upstream tag 1.4.2; SHA-256 recorded in the release manifest."
+          test -s release-assets/Inkscape-1.4.2-x86_64.AppImage
+          sha256sum release-assets/Inkscape-1.4.2-x86_64.AppImage > release-assets/Inkscape-1.4.2-x86_64.AppImage.sha256
+          echo "Inkscape 1.4.2: official release-page binary; resolved URL and SHA-256 recorded."
 
       - name: Validate archive contents
         run: |
