@@ -438,9 +438,7 @@ jobs:
           if missing:
               raise SystemExit("MATRIX_RELEASE_SHA_VERIFY_FAIL "+json.dumps(missing,ensure_ascii=False))
           print("MATRIX_RELEASE_SHA_VERIFY_OK tag=%s verified_assets=%d total_release_assets=%d" % (release.get("tag_name"),len(expected),len(assets)))
-PY
-            total_releases=$((total_releases+1))
-            echo "MATRIX_SOURCE_RELEASE_OK part=$part tag=$tag"
+          PY
             total_releases=$((total_releases+1))
             echo "MATRIX_SOURCE_RELEASE_OK part=$part assets=$((end-i)) tag=$tag"
           done
