@@ -4,12 +4,25 @@ export async function loadOmegaEngineActivationRegistry(fileUrl = new URL("../co
   if (registry.policy?.failClosed !== true) throw new Error("engine activation registry must be fail-closed");
   const states = {};
   for (const [id, entry] of Object.entries(registry.engines ?? {})) {
+    const modelPresent =
+      entry.evidence?.modelPresent === undefined || entry.evidence?.modelPresent === true;
+    const gpuVerified =
+      id === "hunyuanvideo-1.5"
+        ? entry.evidence?.gpuSmokeTest === "passed"
+        : true;
+    const unificationVerified =
+      id === "hunyuanvideo-1.5"
+        ? ["passed", "stream-hash-verified"].includes(entry.evidence?.unification)
+        : true;
     const activeEvidence =
       entry.state === "active" &&
       entry.evidence?.sha256Inventory === true &&
+      modelPresent &&
       entry.evidence?.runtimeInstalled === true &&
       entry.evidence?.smokeTest === "passed" &&
       entry.evidence?.capabilityTest === "passed" &&
+      gpuVerified &&
+      unificationVerified &&
       entry.evidence?.corpusWriteAllowed === false &&
       typeof entry.release === "string" &&
       typeof entry.model === "string";
