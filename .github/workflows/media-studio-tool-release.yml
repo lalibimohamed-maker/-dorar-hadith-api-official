@@ -18,6 +18,7 @@ on:
       - config/media-studio-toolchain-2026.json
       - .github/workflows/media-studio-tool-release.yml
 
+# security-justification: this workflow publishes only verified release assets from pinned upstream sources after checksum, size and security gates.
 permissions:
   contents: write
 
