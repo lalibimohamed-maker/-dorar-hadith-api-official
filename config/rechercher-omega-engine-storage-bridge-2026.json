@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "storageRepository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+  "private": true,
+  "releaseAssetOnly": true,
+  "publicProjectMayStore": [
+    "manifests",
+    "capability-metadata",
+    "verification-results"
+  ],
+  "forbiddenInPublicRepo": [
+    "model-weights",
+    "private-gated-models",
+    "private-research-only-models"
+  ],
+  "engines": [
+    "hunyuanvideo-1.5",
+    "flux.1-schnell",
+    "ltx-2",
+    "nllb-200-distilled-600m",
+    "seamless-m4t-v2-large",
+    "f5-tts",
+    "pyannote-speaker-diarization-3.1",
+    "piper-voices",
+    "openwakeword"
+  ]
+}
