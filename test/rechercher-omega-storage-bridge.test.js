@@ -1,0 +1,2 @@
+import test from "node:test"; import assert from "node:assert/strict"; import fs from "node:fs";
+test("Omega storage bridge is private and release-only",()=>{const x=JSON.parse(fs.readFileSync("config/rechercher-omega-engine-storage-bridge-2026.json","utf8"));assert.equal(x.storageRepository,"lalibimohamed-maker/rechercher-omega-engine-storage");assert.equal(x.private,true);assert.equal(x.releaseAssetOnly,true);assert.ok(x.forbiddenInPublicRepo.includes("model-weights"));});
