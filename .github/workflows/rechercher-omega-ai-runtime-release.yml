@@ -1,0 +1,105 @@
+name: Rechercher Omega AI Runtime — Release Cache
+
+on:
+  push:
+    branches:
+      - feat/open-interoperability-fabric-2026-stacked
+    paths:
+      - config/rechercher-omega-ai-media-runtime-2026.json
+      - .github/workflows/rechercher-omega-ai-runtime-release.yml
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        required: true
+        default: "dinullah-omega-ai-runtime-v2026.09.29"
+      publish:
+        required: true
+        default: "true"
+
+# security-justification: release publishes only pinned open-source runtime packages after provenance, checksum and size checks.
+permissions:
+  contents: write
+
+jobs:
+  cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.release_tag || 'dinullah-omega-ai-runtime-v2026.09.29' }}
+      PUBLISH: ${{ inputs.publish || 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate manifest
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          d=json.load(open("config/rechercher-omega-ai-media-runtime-2026.json",encoding="utf-8"))
+          assert d["policy"]["freeFirst"] and not d["policy"]["paidDependencyAllowed"]
+          for x in d["components"]:
+              assert x["version"] and x["license"] and x["source"] and x["licenseEvidence"]
+          print("OMEGA_AI_MEDIA_RUNTIME_MANIFEST_OK")
+          PY
+          mkdir -p release-assets/packages release-assets/comfyui
+
+      - name: Download pinned PyPI wheels for Linux x86_64 / Python 3.12
+        run: |
+          set -euo pipefail
+          python3 -m pip download --only-binary=:all: --no-deps --platform manylinux_2_28_x86_64 --python-version 3.12 --implementation cp --dest release-assets/packages             torch==2.14.0 transformers==5.17.0 diffusers==0.40.0 accelerate==1.15.0 safetensors==0.8.0
+          python3 - <<'PY'
+          import glob,hashlib,json,os
+          rows=[]
+          for p in sorted(glob.glob("release-assets/packages/*")):
+              h=hashlib.sha256()
+              with open(p,"rb") as f:
+                  for b in iter(lambda:f.read(1024*1024),b""): h.update(b)
+              rows.append({"asset":os.path.basename(p),"bytes":os.path.getsize(p),"sha256":h.hexdigest()})
+          json.dump(rows,open("release-assets/ai-runtime-lock.json","w"),indent=2)
+          PY
+
+      - name: Download ComfyUI 0.37.0 source
+        run: |
+          set -euo pipefail
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/comfyui/ComfyUI-0.37.0.tar.gz             https://github.com/Comfy-Org/ComfyUI/archive/refs/tags/v0.37.0.tar.gz
+          sha256sum release-assets/comfyui/ComfyUI-0.37.0.tar.gz > release-assets/comfyui.sha256
+
+      - name: Security and size gate
+        run: |
+          set -euo pipefail
+          find release-assets -type f -size +1900M -print -quit | grep -q . && { echo "RELEASE_ASSET_TOO_LARGE"; exit 1; } || true
+          while IFS= read -r -d '' f; do
+            mime=$(file --brief --mime-type "$f")
+            echo "[AI ASSET] $f :: $mime"
+            test ! -x "$f" || { echo "Executable payload forbidden: $f"; exit 1; }
+          done < <(find release-assets -type f -print0)
+          sha256sum release-assets/packages/* > release-assets/ai-runtime-sha256.txt
+          sha256sum release-assets/comfyui/ComfyUI-0.37.0.tar.gz >> release-assets/ai-runtime-sha256.txt
+
+      - name: Generate third-party manifest
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          d=json.load(open("config/rechercher-omega-ai-media-runtime-2026.json",encoding="utf-8"))
+          out=["# Rechercher Omega AI Media Runtime — License & Provenance","",""]
+          for x in d["components"]:
+              out += [f"## {x['id']} {x['version']}",f"- License: {x['license']}",f"- Role: {x['role']}",f"- Source: {x['source']}",f"- License evidence: {x['licenseEvidence']}",""]
+          open("release-assets/THIRD_PARTY_AI_RUNTIME_LICENSES.md","w",encoding="utf-8").write("\n".join(out)+"\n")
+          PY
+
+      - name: Publish
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-assets/packages/* release-assets/comfyui/* release-assets/*.txt release-assets/*.json release-assets/*.md --repo "$GITHUB_REPOSITORY" --clobber
+          elif [ "$PUBLISH" = "true" ]; then
+            gh release create "$RELEASE_TAG" release-assets/packages/* release-assets/comfyui/* release-assets/*.txt release-assets/*.json release-assets/*.md --repo "$GITHUB_REPOSITORY" --title "Rechercher Omega AI Media Runtime $RELEASE_TAG" --notes "Pinned open-source AI media runtime software cache. Model weights remain separately governed and stored in model-weight releases."
+          else
+            gh release create "$RELEASE_TAG" release-assets/packages/* release-assets/comfyui/* release-assets/*.txt release-assets/*.json release-assets/*.md --repo "$GITHUB_REPOSITORY" --title "Rechercher Omega AI Media Runtime $RELEASE_TAG" --notes "Draft runtime cache." --draft
+          fi
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json name,tagName,isDraft,assets
