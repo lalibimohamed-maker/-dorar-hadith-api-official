@@ -68,11 +68,19 @@ test("activation registry exposes only evidence-backed active model engines", as
 
 test("verified execution graph automatically consumes the activation registry", async () => {
   const registry = await loadAICapabilityRegistry();
-  const graph = await buildVerifiedAiExecutionGraph(registry, { pipeline: "voice" });
-  const asr = graph.nodes.find(n => n.stage === "faster-whisper");
+  const graph = await buildVerifiedAiExecutionGraph(registry, {
+    pipeline: "voice",
+    availableComponents: ["whisper"]
+  });
+  const asr = graph.nodes.find(n => n.stage === "whisper");
   assert.ok(asr);
-  assert.equal(asr.activation_state, "not_supplied");
-  const qwenStage = graph.nodes.find(n => n.stage === "qwen3-omni");
-  assert.ok(qwenStage);
-  assert.equal(qwenStage.candidates.length, 0);
+  assert.equal(asr.candidates.some(x => x.id === "whisper" && x.activation_state === "active"), true);
+
+  const gated = await buildVerifiedAiExecutionGraph(registry, {
+    pipeline: "voice",
+    availableComponents: ["faster-whisper"]
+  });
+  const blockedAsr = gated.nodes.find(n => n.stage === "faster-whisper");
+  assert.ok(blockedAsr);
+  assert.equal(blockedAsr.candidates.length, 0);
 });
