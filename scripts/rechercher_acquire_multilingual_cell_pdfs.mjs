@@ -39,7 +39,9 @@ const rawInventoryCellCount=(existingInventory.cells||[]).length;
 const unmatchedInventoryCells=(existingInventory.cells||[]).filter(x=>!normalizeCellId(x)).length;
 console.log('ACQUISITION_RESUME existing_cells='+existingCellKeys.size+' raw_inventory_cells='+rawInventoryCellCount+' unmatched_inventory_cells='+unmatchedInventoryCells+' existing_sha256='+existingSha.size);
 const OUT=path.join(ROOT,'artifacts/rechercher/multilingual-pdf-acquisition');
-const EXPECTED=3192;
+const MATRIX=JSON.parse(await fs.readFile(path.join(ROOT,'config/rechercher/global-multilingual-search-matrix-2026.json'),'utf8'));
+const EXPECTED=Number(MATRIX.expected_search_cells);
+if (!Number.isInteger(EXPECTED) || EXPECTED < 1) throw new Error('invalid multilingual matrix expected_search_cells: '+MATRIX.expected_search_cells);
 const configuredSourceLimit=Number(process.env.ACQUISITION_MAX_SOURCES_PER_CELL||0);
 // By default inspect every relevant source registered by the worldwide registry.
 // A positive env value remains available only as an explicit operational throttle.
@@ -65,7 +67,7 @@ for(const row of rows){
   if(cells.has(row.cell_id)) throw new Error('duplicate cell '+row.cell_id);
   cells.set(row.cell_id,row);
 }
-if(cells.size!==EXPECTED) throw new Error('expected '+EXPECTED+' cells, found '+EXPECTED);
+if(cells.size!==EXPECTED) throw new Error('expected '+EXPECTED+' cells, found '+cells.size);
 
 const configuredShardIndex=Number(process.env.ACQUISITION_SHARD_INDEX||0);
 const configuredShardCount=Number(process.env.ACQUISITION_SHARD_COUNT||48);
