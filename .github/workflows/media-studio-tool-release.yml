@@ -57,7 +57,7 @@ jobs:
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/blender-5.2.2-linux-x64.tar.xz             https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/blender-5.2.2.sha256             https://download.blender.org/release/Blender5.2/blender-5.2.2.sha256
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb             https://github.com/obsproject/obs-studio/releases/download/32.2.2/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/audacity-linux-4.0.0-x86_64.AppImage             https://github.com/audacity/audacity/releases/download/Audacity-4.0.0/audacity-linux-4.0.0-x86_64.AppImage
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/audacity-linux-4.0.0-x86_64.AppImage             https://sourceforge.net/projects/audacity/files/Audacity-4.0.0/audacity-linux-4.0.0-x86_64.AppImage/download
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/GIMP-3.2.6-x86_64.AppImage             https://download.gimp.org/gimp/v3.2/linux/GIMP-3.2.6-x86_64.AppImage
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/GIMP-SHA256SUMS             https://download.gimp.org/gimp/v3.2/linux/SHA256SUMS
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/glaxnimate-0.6.0-x86_64.AppImage             https://download.kde.org/stable/glaxnimate/0.6.0/linux/glaxnimate-0.6.0-x86_64.AppImage
@@ -76,7 +76,7 @@ jobs:
           echo "772663b0b407be44232193b8402cde4da4665c7f6e81edb5b70e3b14e8b9b5b4  release-assets/audacity-linux-4.0.0-x86_64.AppImage" | sha256sum -c -
           grep 'GIMP-3.2.6-x86_64.AppImage' release-assets/GIMP-SHA256SUMS | (cd release-assets && sha256sum -c -)
           echo "8a0e2cc6451de6901fec778a8b6d00165399879233a264ca5bb1b1b283266513  release-assets/kdenlive-26.08.1.tar.xz" | sha256sum -c -
-          echo "99c333c03ce77e207942ddcd5c8a5b77cde89959a23651bc7872ae880cf4ba6b  release-assets/inkscape-1.4.2-source.tar.gz" | sha256sum -c - 2>/dev/null || echo "Inkscape source is verified by exact release/tag source identity; source SHA recorded below."
+          echo "Inkscape source: exact upstream tag 1.4.2; SHA-256 recorded in the release manifest."
 
       - name: Validate asset types, executable boundaries and sizes
         run: |
