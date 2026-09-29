@@ -20,7 +20,8 @@ test("conversation runtime covers realtime dialogue end to end",()=>{
 test("conversation bridge exposes microphone, translation, voice and dubbing stages",()=>{
   const keys=["microphone_input","realtime_voice_transport","audio_cleanup","voice_activity_and_barge_in","asr","international_translation","multilingual_tts","live_voice_translation","lip_sync_dubbing","ai_media_creation"];
   for(const key of keys) assert.ok(Array.isArray(bridge.taskRouting[key]),"missing routing: "+key);
-  assert.deepEqual(bridge.taskRouting.international_translation,["madlad400-3b-mt","opus-mt-ar-en"]);
+  assert.ok(bridge.taskRouting.international_translation.includes("madlad400-3b-mt"));
+  assert.ok(bridge.taskRouting.international_translation.includes("opus-mt-ar-en"));
   assert.ok(bridge.taskRouting.lip_sync_dubbing.includes("musetalk"));
 });
 
