@@ -6,10 +6,10 @@ test("VMAF planner creates a reference-quality analysis command without Corpus w
   const plan = buildVmafCommand({
     referencePath: "source.mp4",
     distortedPath: "derived.mp4",
-    outputPath: "NUL"
+    outputPath: "-"
   });
   assert.equal(plan.command, "ffmpeg");
-  assert.ok(plan.args.includes("libvmaf=model_path=vmaf_v1.0.0"));
+  assert.ok(plan.args.includes("libvmaf=model=path=model/vmaf_v1.0.16/vmaf_v1.0.16_3d0h.json"));
   assert.equal(plan.corpus_write_allowed, false);
 });
 
