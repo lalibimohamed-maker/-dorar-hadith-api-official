@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { loadAICapabilityRegistry } from "../src/rechercher-omega-ai-capability-registry.js";
-import { buildAiExecutionGraph, buildMcpToolPolicy, buildProgrammingGraph, loadOmegaEngineActivationRegistry } from "../src/rechercher-omega-ai-runtime.js";
+import { buildAiExecutionGraph, buildMcpToolPolicy, buildProgrammingGraph, buildVerifiedAiExecutionGraph, loadOmegaEngineActivationRegistry } from "../src/rechercher-omega-ai-runtime.js";
 
 test("voice execution graph includes wake, ASR and TTS capability stages", async () => {
   const registry = await loadAICapabilityRegistry();
@@ -64,4 +64,15 @@ test("activation registry exposes only evidence-backed active model engines", as
   assert.equal(registry.states.kokoro, "active");
   assert.equal(registry.states.qwen3, "active");
   assert.notEqual(registry.states["hunyuanvideo-1.5"], "active");
+});
+
+test("verified execution graph automatically consumes the activation registry", async () => {
+  const registry = await loadAICapabilityRegistry();
+  const graph = await buildVerifiedAiExecutionGraph(registry, { pipeline: "voice" });
+  const asr = graph.nodes.find(n => n.stage === "faster-whisper");
+  assert.ok(asr);
+  assert.equal(asr.activation_state, "not_supplied");
+  const qwenStage = graph.nodes.find(n => n.stage === "qwen3-omni");
+  assert.ok(qwenStage);
+  assert.equal(qwenStage.candidates.length, 0);
 });
