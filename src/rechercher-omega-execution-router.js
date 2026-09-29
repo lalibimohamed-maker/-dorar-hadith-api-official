@@ -12,19 +12,42 @@ export async function loadExecutionBackends(url = DEFAULT_BACKENDS) {
   return JSON.parse(await fs.readFile(url, "utf8"));
 }
 
+function backendIsHealthy(backend, backendHealth) {
+  const observed = backendHealth?.[backend.id];
+  if (observed == null) return backend.healthy !== false;
+  if (typeof observed === "boolean") return observed;
+  return observed.healthy !== false && observed.status !== "unhealthy";
+}
+
+function supportsRequirements(backend, { task, requiredCapabilities = [] } = {}) {
+  if (Array.isArray(backend.supported_tasks) && backend.supported_tasks.length && !backend.supported_tasks.includes(task)) {
+    return false;
+  }
+  if (Array.isArray(backend.capabilities) && backend.capabilities.length) {
+    return requiredCapabilities.every(capability => backend.capabilities.includes(capability));
+  }
+  return requiredCapabilities.length === 0;
+}
+
 export function selectExecutionBackend({
   backends,
   task,
   model,
   capabilities = {},
   availableBackends = [],
-  preferFree = true
+  preferFree = true,
+  backendHealth = {},
+  latencyBudgetMs = null,
+  requiredCapabilities = []
 }) {
   const allowed = new Set(availableBackends);
   const candidates = backends.backends
     .filter(b => allowed.size === 0 || allowed.has(b.id))
     .filter(b => !preferFree || b.free === true)
+    .filter(b => backendIsHealthy(b, backendHealth))
+    .filter(b => supportsRequirements(b, { task, requiredCapabilities }))
     .filter(b => capabilities.requires_gpu ? b.requires_gpu === true || b.kind === "remote_gpu" : true)
+    .filter(b => latencyBudgetMs == null || b.estimated_latency_ms == null || b.estimated_latency_ms <= latencyBudgetMs)
     .sort((a, b) => a.priority - b.priority);
 
   if (candidates.length === 0) {
@@ -49,6 +72,7 @@ export function selectExecutionBackend({
     free: selected.free === true,
     requires_api_key: selected.requires_api_key === true,
     weights_required: selected.weights_required === true,
+    health: backendHealth[selected.id] ?? { status: selected.healthy === false ? "unhealthy" : "assumed_healthy" },
     corpus_write_allowed: false,
     generated_media_is_evidence: false
   };
