@@ -1,3 +1,4 @@
+import test from 'node:test';
 import { strict as assert } from 'node:assert';
 import { runAssistantSearch, runVoiceQuestion, exportAssistantSession } from '../src/assistant-runtime.js';
 
@@ -34,11 +35,7 @@ const exported = await exportAssistantSession({
 assert.equal(exported.ok, true);
 assert.equal(exported.input.verifiedOnly, true);
 
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import { runAssistantSearch } from '../src/assistant-runtime.js';
-
-const searchStub = async (query, options) => ({
+const omegaSearchStub = async (query, options) => ({
   query,
   responseLanguage: options.responseLocale,
   hadith: { text: 'verified test evidence' },
@@ -49,7 +46,7 @@ test('assistant can invoke Omega as a governed opt-in layer', async () => {
   const result = await runAssistantSearch({
     query: 'اختبار',
     language: 'ar',
-    searchFn: searchStub,
+    searchFn: omegaSearchStub,
     useOmega: true,
     executeOmega: false,
     omegaOptions: { availableBackends: ['openai-compatible'] }
