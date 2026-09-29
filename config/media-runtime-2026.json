@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "1.0.0",
+  "runtimeId": "dinullah-open-media-runtime-2026",
+  "purpose": "Reproducible free-first runtime definition for the complete open interoperability/media toolchain.",
+  "activation": {
+    "reproducible": true,
+    "noPaidSaaSDependency": true,
+    "noUnknownBinaryExecution": true,
+    "sourceAndLicenseEvidenceRequired": true,
+    "runtimeVerificationRequired": true,
+    "releaseWeightsOnly": true
+  },
+  "software": [
+    {
+      "id": "nifi",
+      "project": "apache/nifi",
+      "version": "2.12.0",
+      "mode": "container",
+      "image": "apache/nifi:2.12.0",
+      "role": "dataflow/provenance"
+    },
+    {
+      "id": "ditto",
+      "project": "eclipse-ditto/ditto",
+      "version": "3.9.7",
+      "mode": "official-compose",
+      "role": "digital-twin/policy-connectivity",
+      "requires": [
+        "mongodb>=4.2"
+      ]
+    },
+    {
+      "id": "nats",
+      "project": "nats-io/nats-server",
+      "version": "2.15.0",
+      "mode": "container",
+      "image": "nats:2.15.0",
+      "role": "messaging"
+    },
+    {
+      "id": "openusd",
+      "project": "PixarAnimationStudios/OpenUSD",
+      "version": "26.08",
+      "mode": "python/source-or-package",
+      "role": "3d-scene-interchange"
+    },
+    {
+      "id": "gltf",
+      "project": "KhronosGroup/glTF",
+      "version": "2.0-specification",
+      "mode": "format-standard",
+      "role": "web-3d-interchange",
+      "runtimeBinary": false
+    },
+    {
+      "id": "gltf-validator",
+      "project": "KhronosGroup/glTF-Validator",
+      "version": "2.0.0-dev.3.10",
+      "mode": "npm/package",
+      "role": "gltf-validation"
+    },
+    {
+      "id": "real-esrgan",
+      "project": "xinntao/Real-ESRGAN",
+      "version": "0.3.0",
+      "mode": "python-package/source",
+      "role": "image-restoration"
+    },
+    {
+      "id": "video2x",
+      "project": "K4YT3X/video2x",
+      "version": "6.4.0",
+      "mode": "verified-release-binary",
+      "role": "video-upscaling/frame-interpolation",
+      "linuxAsset": "Video2X-x86_64.AppImage",
+      "requires": [
+        "Vulkan"
+      ]
+    },
+    {
+      "id": "ffmpeg",
+      "project": "FFmpeg/FFmpeg",
+      "version": "package-pinned-build",
+      "mode": "host-package",
+      "role": "decode/encode/transcode"
+    },
+    {
+      "id": "tesseract",
+      "project": "tesseract-ocr/tesseract",
+      "version": "package-pinned-build",
+      "mode": "host-package",
+      "role": "ocr"
+    },
+    {
+      "id": "paddleocr",
+      "project": "PaddlePaddle/PaddleOCR",
+      "version": "3.7.0",
+      "mode": "python-package",
+      "role": "modern-document-ocr",
+      "requires": [
+        "PaddlePaddle>=3.0"
+      ]
+    },
+    {
+      "id": "colmap",
+      "project": "colmap/colmap",
+      "version": "4.2.0",
+      "mode": "host-package-or-official-build",
+      "role": "multi-view-3d-reconstruction"
+    },
+    {
+      "id": "open3d",
+      "project": "isl-org/Open3D",
+      "version": "0.20.0",
+      "mode": "python-package",
+      "role": "3d-data-geometry-visualization"
+    },
+    {
+      "id": "mediamtx",
+      "project": "bluenviron/mediamtx",
+      "version": "1.21.1",
+      "mode": "container",
+      "image": "bluenviron/mediamtx:1.21.1",
+      "role": "live-media-routing"
+    }
+  ],
+  "python": {
+    "version": "3.12",
+    "packages": {
+      "paddleocr": "3.7.0",
+      "paddlepaddle": "3.2.0",
+      "open3d": "0.20.0",
+      "pycolmap": "4.2.0",
+      "realesrgan": "0.3.0"
+    }
+  },
+  "weightsRelease": {
+    "tag": "dinullah-media-weights-v2026.09.29",
+    "repository": "lalibimohamed-maker/-dorar-hadith-api-official",
+    "manifest": "config/media-weight-release-manifest-2026.json",
+    "sourceOfTruth": "github-release-assets",
+    "models": [
+      "Real-ESRGAN",
+      "Video2X RIFE",
+      "PaddleOCR Arabic"
+    ],
+    "noWeightsInGit": true
+  },
+  "services": {
+    "nifi": {
+      "health": "https://localhost:8443/nifi/"
+    },
+    "nats": {
+      "clientPort": 4222,
+      "monitorPort": 8222
+    },
+    "mediamtx": {
+      "apiOrControlPorts": [
+        8554,
+        8888,
+        8889
+      ]
+    },
+    "ditto": {
+      "entrypoint": "http://localhost:8080"
+    }
+  },
+  "verification": [
+    "binary-or-package-version check",
+    "container health check",
+    "python import/version check",
+    "gltf-validator smoke test",
+    "video2x --help with Vulkan capability probe",
+    "source/weight SHA-256 manifest",
+    "security scan before promotion",
+    "no trusted-source overwrite"
+  ],
+  "notes": [
+    "NiFi 2.12.0 is the current upstream release as of 2026-09-29.",
+    "Eclipse Ditto 3.9.7 is the current upstream release and requires its official multi-service deployment plus MongoDB.",
+    "NATS 2.15.0, OpenUSD 26.08, COLMAP 4.2.0 and Open3D 0.20.0 are current pinned choices based on official release evidence.",
+    "glTF is an interchange specification rather than a standalone runtime service; glTF-Validator is the executable validation layer.",
+    "Video2X requires Vulkan-capable hardware for actual acceleration; binary presence alone is not a performance proof.",
+    "Model weights are release assets and are never silently downloaded from discovery."
+  ]
+}
