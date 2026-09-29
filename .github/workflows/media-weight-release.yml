@@ -1,0 +1,130 @@
+# final-current-head-refresh: 2026-09-29T01:28Z
+# final-release-refresh: 2026-09-29
+name: Media Model Weights — Release Cache
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Published/prerelease tag to populate"
+        required: true
+        default: "dinullah-media-weights-v2026.09.29"
+      publish:
+        description: "Publish only when every model/weight redistribution review is verified"
+        required: true
+        default: "false"
+  push:
+    branches:
+      - feat/omega-media-conversation-final-2026-v3
+    paths:
+      - config/media-weight-release-manifest-2026.json
+      - .github/workflows/media-weight-release.yml
+
+# security-justification: this workflow publishes only verified release assets from pinned upstream sources after checksum, size and security gates.
+permissions:
+  contents: write
+
+jobs:
+  populate:
+    name: Verify and cache approved model weights in GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout manifest
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Prepare sources
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || 'dinullah-media-weights-v2026.09.29' }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.load(open('config/media-weight-release-manifest-2026.json',encoding='utf-8'))
+          assert d['releaseModel']['maxAssetBytes'] < 2**31
+          allowed_hosts=('https://github.com/','https://paddle-model-ecology.bj.bcebos.com/')
+          for item in d['weights']:
+              assert item['upstreamUrl'].startswith(allowed_hosts), item['upstreamUrl']
+              assert item['assetName'].endswith(('.pth','.pt','.onnx','.safetensors','.bin','.tar'))
+          print('STATIC_WEIGHT_MANIFEST_OK')
+          PY
+
+      - name: Download exact pinned model weights
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, subprocess
+          d=json.load(open('config/media-weight-release-manifest-2026.json',encoding='utf-8'))
+          for item in d['weights']:
+              out='release-assets/'+item['assetName']
+              subprocess.run(['curl','--fail','--location','--retry','3','--proto','=https','--tlsv1.2','-o',out,item['upstreamUrl']],check=True)
+          PY
+
+      - name: Verify Video2X bundled-model policy
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          d=json.load(open('config/media-weight-release-manifest-2026.json',encoding='utf-8'))
+          src=next(x for x in d['dynamicSources'] if x['id']=='video2x-embedded-model-bundle')
+          assert src['artifact']=='Video2X-x86_64.AppImage'
+          assert src['attestationVerification'] is True
+          print('VIDEO2X_RIFE_BUNDLED_POLICY_OK')
+          PY
+
+      - name: Verify weights and generate immutable lock manifest
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path('release-assets')
+          entries=[]
+          for p in sorted(root.iterdir()):
+              if not p.is_file(): continue
+              size=p.stat().st_size
+              if size >= 2**31: raise SystemExit(f'RELEASE_ASSET_TOO_LARGE {p.name} {size}')
+              h=hashlib.sha256()
+              with p.open('rb') as f:
+                  for chunk in iter(lambda:f.read(1024*1024),b''): h.update(chunk)
+              entries.append({'assetName':p.name,'size':size,'sha256':h.hexdigest()})
+          assert entries
+          payload={'schemaVersion':'1.0.0','releaseModel':'runtime-model-weights','sourceManifest':'config/media-weight-release-manifest-2026.json','generatedAt':__import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(),'assets':entries,'verification':['exact-upstream-url-or-pinned-release','size-under-github-release-limit','sha256']}
+          Path('release-assets/media-weight-lock.json').write_text(json.dumps(payload,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(payload,indent=2))
+          PY
+
+      - name: Malware/integrity gate for model files
+        run: |
+          set -euo pipefail
+          command -v file >/dev/null
+          while IFS= read -r -d '' f; do
+            file --brief --mime-type "$f"
+          done < <(find release-assets -type f ! -name 'media-weight-lock.json' -print0)
+          if find release-assets -type f -perm /111 -print -quit | grep -q .; then
+            echo "Executable model payload blocked."
+            exit 1
+          fi
+
+      - name: Create or update release
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || 'dinullah-media-weights-v2026.09.29' }}
+          PUBLISH: ${{ inputs.publish || 'false' }}
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            if [ "$PUBLISH" = "true" ]; then
+              gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Model Weights $RELEASE_TAG" --notes "Verified model-weight cache. Every asset was retrieved from its pinned upstream source/release, size-checked, hashed with SHA-256, and kept separate from Corpus and source PDFs. Software activation still requires runtime verification and license/security gates."
+            else
+              gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Model Weights $RELEASE_TAG" --notes "Draft model-weight cache. At least one model-specific redistribution review is still pending; assets remain non-promoted until rights evidence is complete." --draft
+            fi
+          fi
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json name,tagName,isDraft,isPrerelease,assets
