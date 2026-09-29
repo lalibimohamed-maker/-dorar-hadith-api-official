@@ -5,14 +5,14 @@ on:
     paths:
       - ".github/workflows/din-allah-engine-models-smoke-and-cache.yml"
       - "config/din-allah-engine-installation-manifest-2026.json"
-  pull_request:
-    paths:
-      - ".github/workflows/din-allah-engine-models-smoke-and-cache.yml"
-      - "config/din-allah-engine-installation-manifest-2026.json"
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: din-allah-engine-models-cache
+  cancel-in-progress: true
 
 jobs:
   model-runtime:
