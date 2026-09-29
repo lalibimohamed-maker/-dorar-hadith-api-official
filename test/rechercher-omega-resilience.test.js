@@ -53,9 +53,9 @@ test("runtime model router blocks models whose license is not runtime-cleared", 
   assert.ok(blockedPlan.rejected_models.some(item => item.id === "hunyuanvideo-1.5"));
 });
 
-test("local execution fails closed without an explicit executable allowlist", () => {
-  assert.throws(
-    () => executeLocal({ command: "sh", args: ["-c", "echo unsafe"], allowedExecutables: [] }),
+test("local execution fails closed without an explicit executable allowlist", async () => {
+  await assert.rejects(
+    executeLocal({ command: "sh", args: ["-c", "echo unsafe"], allowedExecutables: [] }),
     /non-empty executable allowlist/
   );
 });
