@@ -1,3 +1,26 @@
+
+export async function loadOmegaEngineActivationRegistry(fileUrl = new URL("../config/rechercher-omega-engine-activation-2026.json", import.meta.url)) {
+  const registry = JSON.parse(await fs.readFile(fileUrl, "utf8"));
+  if (registry.policy?.failClosed !== true) throw new Error("engine activation registry must be fail-closed");
+  const states = {};
+  for (const [id, entry] of Object.entries(registry.engines ?? {})) {
+    const activeEvidence =
+      entry.state === "active" &&
+      entry.evidence?.sha256Inventory === true &&
+      entry.evidence?.runtimeInstalled === true &&
+      entry.evidence?.smokeTest === "passed" &&
+      entry.evidence?.capabilityTest === "passed" &&
+      entry.evidence?.corpusWriteAllowed === false &&
+      typeof entry.release === "string" &&
+      typeof entry.model === "string";
+    states[id] = activeEvidence ? "active" : String(entry.state ?? "blocked");
+  }
+  return { schema_version: "1.0.0", states, policy: registry.policy };
+}
+
+import fs from "node:fs/promises";
+import path from "node:path";
+
 /**
  * Rechercher Ω — concrete multimodal AI execution graphs.
  *
