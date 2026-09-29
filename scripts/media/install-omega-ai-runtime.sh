@@ -41,7 +41,7 @@ tar -xzf "$DINULLAH_AI_RUNTIME_ROOT/comfyui/ComfyUI-0.37.0.tar.gz" -C "$DINULLAH
 mkdir -p "$DINULLAH_AI_RUNTIME_ROOT/venv"
 python3 -m venv "$DINULLAH_AI_RUNTIME_ROOT/venv"
 "$DINULLAH_AI_RUNTIME_ROOT/venv/bin/python" -m pip install --upgrade pip
-"$DINULLAH_AI_RUNTIME_ROOT/venv/bin/pip" install --no-index --find-links "$DINULLAH_AI_RUNTIME_ROOT/packages"   "torch==2.14.0" "transformers==5.17.0" "diffusers==0.40.0" "accelerate==1.15.0" "safetensors==0.8.0"
+"$DINULLAH_AI_RUNTIME_ROOT/venv/bin/pip" install --no-index --find-links "$DINULLAH_AI_RUNTIME_ROOT/packages"   "torch==2.14.0" "transformers==5.17.0" "diffusers==0.40.0" "accelerate==1.15.0" "safetensors==0.8.0" "kokoro==0.9.4"
 
 echo "[AI RUNTIME] Python runtime installed from release cache."
 echo "[AI RUNTIME] ComfyUI source unpacked under $DINULLAH_AI_RUNTIME_ROOT/comfyui"
