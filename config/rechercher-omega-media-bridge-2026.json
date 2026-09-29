@@ -94,6 +94,81 @@
     "subtitle_authoring": [
       "subtitlecomposer",
       "kdenlive"
+    ],
+    "microphone_input": [
+      "browser-microphone",
+      "pipewire",
+      "obs"
+    ],
+    "realtime_voice_transport": [
+      "pion-webrtc",
+      "mediamtx"
+    ],
+    "audio_cleanup": [
+      "rnnoise",
+      "deepfilternet",
+      "pipewire"
+    ],
+    "voice_activity_and_barge_in": [
+      "silero-vad",
+      "pipecat"
+    ],
+    "speaker_diarization": [
+      "pyannote-audio"
+    ],
+    "asr": [
+      "whisper",
+      "whisper-cpp",
+      "faster-whisper"
+    ],
+    "language_identification": [
+      "whisper",
+      "silero-vad"
+    ],
+    "international_translation": [
+      "madlad400-3b-mt",
+      "opus-mt-ar-en"
+    ],
+    "offline_translation": [
+      "argos-translate"
+    ],
+    "browser_translation": [
+      "bergamot-translator"
+    ],
+    "translation_quality": [
+      "comet"
+    ],
+    "multilingual_tts": [
+      "cosyvoice",
+      "piper",
+      "habibi-msa",
+      "habibi-alg"
+    ],
+    "live_voice_translation": [
+      "pipecat",
+      "whisper-cpp",
+      "madlad400-3b-mt",
+      "cosyvoice",
+      "piper"
+    ],
+    "captions_and_subtitles": [
+      "subtitlecomposer",
+      "kdenlive",
+      "ffmpeg"
+    ],
+    "lip_sync_dubbing": [
+      "musetalk",
+      "blender",
+      "ffmpeg"
+    ],
+    "ai_media_creation": [
+      "local-comfyui-pinned",
+      "local-omega-ai-runtime"
+    ],
+    "render_and_publish": [
+      "flamenco",
+      "ffmpeg",
+      "mediamtx"
     ]
   },
   "invariants": [
@@ -102,6 +177,9 @@
     "Media tools execute planned jobs; they do not write directly to Corpus.",
     "Weights and software binaries are release-backed and hash-verified before runtime promotion.",
     "No paid provider is required by the bridge.",
-    "ComfyUI API nodes that target paid services remain disabled for the free-first runtime."
+    "ComfyUI API nodes that target paid services remain disabled for the free-first runtime.",
+    "The conversation path preserves the detected source language and explicitly selects the target language; no hidden language mixing.",
+    "Translation is a presentation transformation and never changes canonical Corpus text.",
+    "Quran recitation remains Arabic audio; translation is rendered separately as text/subtitles or permitted explanatory speech."
   ]
 }
