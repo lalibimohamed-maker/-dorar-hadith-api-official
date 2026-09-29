@@ -91,19 +91,23 @@
   ],
   "dynamicSources": [
     {
-      "id": "video2x-rife-models",
+      "id": "video2x-embedded-model-bundle",
       "engine": "video2x",
       "upstreamRepository": "K4YT3X/video2x",
       "upstreamRelease": "6.4.0",
-      "assetSelectionRegex": "(?i)rife.*(v4\\.6|v4\\.25|v4\\.26).*",
-      "selectionReason": "Video2X 6.4.0 explicitly ships RIFE v4.6, v4.25 and v4.26 model files.",
+      "artifact": "Video2X-x86_64.AppImage",
+      "distribution": "official-release-binary",
+      "modelPackaging": "RIFE models bundled inside the verified Video2X distribution; no standalone RIFE release assets exist in 6.4.0",
+      "selectionReason": "Official 6.4.0 release API exposes the AppImage and Windows archives, not separate RIFE assets.",
       "licenseEvidence": "https://github.com/K4YT3X/video2x",
-      "sha256RecordedDuringRelease": true
+      "sha256RecordedDuringRelease": true,
+      "attestationVerification": true
     }
   ],
   "notes": [
     "Non-model software such as FFmpeg, Tesseract, COLMAP, Open3D and MediaMTX does not require model weights; their binaries are governed separately.",
     "Release asset publication is separate from software activation; runtime verification remains required.",
-    "PaddleOCR Arabic detection/recognition model archives are fetched only from official Paddle model hosting and remain draft-release-only until model-specific redistribution terms are verified."
+    "PaddleOCR Arabic detection/recognition model archives are fetched only from official Paddle model hosting and remain draft-release-only until model-specific redistribution terms are verified.",
+    "Video2X 6.4.0 RIFE models are bundled inside the official application binary; the separate weight release does not fabricate or extract nonexistent standalone RIFE assets."
   ]
 }
