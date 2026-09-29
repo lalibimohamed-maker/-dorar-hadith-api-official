@@ -150,6 +150,23 @@
       "requiredBy": [
         "ditto"
       ]
+    },
+    {
+      "id": "vmaf",
+      "project": "Netflix/vmaf",
+      "version": "3.x-line",
+      "mode": "source-or-package",
+      "role": "perceptual-video-quality-assessment",
+      "license": "BSD+Patent",
+      "source": "https://github.com/Netflix/vmaf"
+    },
+    {
+      "id": "pyscenedetect",
+      "project": "Breakthrough/PySceneDetect",
+      "version": "0.7.1",
+      "mode": "python-package-or-container",
+      "role": "scene-shot-detection-and-segmentation",
+      "source": "https://github.com/Breakthrough/PySceneDetect"
     }
   ],
   "python": {
@@ -214,7 +231,9 @@
     "conversation runtime manifest/Release check",
     "MADLAD/OPUS/Habibi weight lock check",
     "Pipecat/WebRTC voice pipeline smoke check",
-    "lip-sync pipeline dependency/license check"
+    "lip-sync pipeline dependency/license check",
+    "VMAF/PSNR/SSIM derived-output quality probe",
+    "PySceneDetect scene/shot segmentation smoke test"
   ],
   "notes": [
     "NiFi 2.12.0 is the current upstream release as of 2026-09-29.",
@@ -247,7 +266,9 @@
       "pipewire",
       "openimageio",
       "natron",
-      "flamenco"
+      "flamenco",
+      "vmaf",
+      "pyscenedetect"
     ]
   },
   "omegaBridge": {
