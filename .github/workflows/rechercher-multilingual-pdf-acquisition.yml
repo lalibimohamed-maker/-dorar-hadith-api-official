@@ -12,11 +12,6 @@ on:
         required: false
         type: string
         default: "48"
-      matrix_storage_repo:
-        description: "Existing durable matrix Release storage repository. The 3192 name is legacy; storage is not coupled to cell cardinality."
-        required: false
-        type: string
-        default: "lalibimohamed-maker/dinullah-matrix-3192-storage-01"
     secrets:
       RECHERCHER_MATRIX_STORAGE_TOKEN:
         required: true
@@ -41,9 +36,8 @@ jobs:
     env:
       ACQUISITION_SHARD_INDEX: ${{ inputs.shard_index }}
       ACQUISITION_SHARD_COUNT: ${{ inputs.shard_count }}
-      # The repository name is legacy (3192) while the current matrix is 4921 cells.
-      # Storage identity is deliberately independent from matrix cardinality.
-      MATRIX_STORAGE_REPO: ${{ inputs.matrix_storage_repo }}
+      # Existing durable matrix Release storage. Its 3192 name is legacy; storage is independent from the current 4921-cell cardinality.
+      MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
