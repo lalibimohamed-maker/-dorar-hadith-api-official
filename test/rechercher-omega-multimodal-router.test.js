@@ -32,3 +32,12 @@ test("multimodal jobs preserve provenance and Corpus boundaries", async () => {
   assert.equal(job.output_policy.provenance_required,true);
   assert.equal(job.output_policy.corpus_write_allowed,false);
 });
+
+
+test("multimodal fleet distinguishes verified license from uncleared runtime weights", async () => {
+  const fleet = await loadMultimodalFleet();
+  const wan = fleet.models.find(m => m.id === "wan2.2");
+  assert.equal(wan.license_status, "verified_source_license");
+  assert.equal(wan.weight_status, "review_required");
+  assert.equal(wan.runtime_status, "queued_until_weight_clearance");
+});
