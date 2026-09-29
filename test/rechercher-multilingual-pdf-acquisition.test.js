@@ -9,7 +9,7 @@ test('Corpus and translation boundaries remain closed',()=>{assert.ok(s.includes
 test('resume inventory matches canonical cell identities instead of re-running persisted cells',()=>{
   assert.ok(s.includes('function normalizeCellId(value)'));
   assert.ok(s.includes('const existingCellKeys=new Set((existingInventory.cells||[]).map(normalizeCellId).filter(Boolean))'));
-  assert.ok(s.includes('allRows.filter(row=>!existingCellKeys.has(normalizeCellId(row.cell_id)))'));
+  assert.ok(s.includes('shardRows.filter(row=>!existingCellKeys.has(normalizeCellId(row.cell_id)))'));
   assert.ok(s.includes('if(existingCellKeys.has(normalizeCellId(row.cell_id))) markAlreadyAcquired(row)'));
   assert.ok(s.includes('raw_inventory_cells='));
   assert.ok(s.includes('unmatched_inventory_cells='));

@@ -25,6 +25,8 @@ concurrency:
 env:
   NODE_VERSION: '24'
   EXPECTED_CELL_COUNT: '3192'
+  # Consume matrix manifests/evidence without materializing legacy LFS PDF pointers.
+  GIT_LFS_SKIP_SMUDGE: '1'
   MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
 
 jobs:
