@@ -40,4 +40,22 @@ for asset in "${assets[@]}"; do
   echo "[WEIGHT DONE] $asset"
 done
 
+# Record dynamically selected Video2X RIFE assets from the immutable release lock.
+lock="$DINULLAH_RUNTIME_WEIGHTS_DIR/media-weight-lock.json"
+lock_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${DINULLAH_WEIGHT_RELEASE}/media-weight-lock.json"
+if curl --fail --location --retry 3 --proto '=https' --tlsv1.2 -o "$lock" "$lock_url"; then
+  python3 - "$lock" <<'PY'
+import json
+import sys
+lock_path=sys.argv[1]
+data=json.load(open(lock_path,encoding="utf-8"))
+for entry in data.get("assets",[]):
+    name=entry["assetName"]
+    if name.startswith("video2x-"):
+        print("[WEIGHT LOCKED]", name, entry["sha256"])
+PY
+else
+  echo "[WEIGHT NOTE] lock manifest is not published yet; static approved weights remain installable."
+fi
+
 echo "WEIGHT_RUNTIME_READY"
