@@ -1,0 +1,28 @@
+name: Din Allah Media — Full Production Cycle Contract
+
+on:
+  pull_request:
+    paths:
+      - 'config/din-allah-media-production-cycle-2026.json'
+      - 'src/din-allah-media-production-cycle.js'
+      - 'test/din-allah-media-production-cycle.test.js'
+      - 'docs/media/DIN-ALLAH-MEDIA-COMPLETE-PRODUCTION-CYCLE-2026.md'
+      - '.github/workflows/din-allah-media-production-cycle.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-media-production-cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate full production cycle
+        run: node --test test/din-allah-media-production-cycle.test.js
