@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Restore previous acquisition checkpoint
@@ -39,7 +39,7 @@ jobs:
           else
             echo "No previous checkpoint artifact found; starting from the first pending language."
           fi
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
           node-version: 24
           cache: npm
@@ -65,7 +65,7 @@ jobs:
           console.log(`QuranEnc live editions: ${m.edition_count}; languages: ${m.language_count}; live-only editions: ${m.live_only_edition_count}`);
           NODE
       - name: Upload research-only acquisition
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: quranenc-translation-acquisition
           path: artifacts/quran-translation-acquisition
