@@ -36,13 +36,13 @@ test('machine translation remains explicitly separated from verified resources',
 });
 
 test('resource lanes include core Islamic knowledge domains', () => {
-  for (const lane of ['quran', 'tafsir', 'hadith', 'sunnah', 'sirah', 'aqidah', 'fiqh', 'fatwa', 'books', 'provenance', 'rights', 'verification']) {
+  for (const lane of ['quran', 'quran_sciences', 'tafsir', 'tajweed_qiraat', 'quran_miracles', 'quran_stories', 'hadith', 'hadith_sciences', 'hadith_terminology', 'hadith_explanation', 'sirah', 'shamail', 'aqidah', 'tawhid', 'fiqh', 'usul_al_fiqh', 'fiqh_schools_branches', 'fatwa', 'islamic_ethics', 'islamic_history', 'biographies_tabaqat', 'comparative_fiqh', 'dawah_islamic_culture', 'general_islamic_encyclopedias']) {
     assert.ok(registry.resource_lanes.includes(lane), `missing lane: ${lane}`);
   }
 });
 
 
-test('3192 matrix outputs use a dedicated storage repository', () => {
+test('4921 matrix outputs use a dedicated storage repository', () => {
   const storage = JSON.parse(fs.readFileSync(
     path.join(process.cwd(), 'config/rechercher/global-multilingual-storage.json'), 'utf8'
   ));
