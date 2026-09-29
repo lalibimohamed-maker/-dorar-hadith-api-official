@@ -154,20 +154,22 @@ jobs:
           set -euo pipefail
           while IFS= read -r -d '' f; do
             case "$f" in
-              *.lock|*.metadata|*/.gitignore) rm -f "$f"; continue ;;
-              *conversation-weight-lock.json) continue ;;
+              *conversation-weight-lock.json|*/.gitignore) continue ;;
             esac
-            echo "[WEIGHT] $(basename "$f")"
-            mv "$f" "release-assets/weights/$(basename "$f")"
-          done < <(find release-assets/weights -type f -print0)
-          find release-assets/weights -mindepth 1 -type d -empty -delete || true
-          if find release-assets/weights -type f -size +1900M -print -quit | grep -q .; then
+            parent="$(basename "$(dirname "$f")")"
+            base="$(basename "$f")"
+            case "$parent" in
+              weights) name="$base" ;;
+              *) name="${parent}__${base}" ;;
+            esac
+            echo "[WEIGHT] $parent/$base -> $name"
+            mv "$f" "release-assets/weights/$name"
+          done < <(find release-assets/weights -mindepth 2 -type f -print0)
+          find release-assets/weights -type f -size +1900M -print -quit | grep -q . && {
             echo "RELEASE_ASSET_TOO_LARGE"
             exit 1
-          fi
-          while IFS= read -r -d '' f; do
-            file --brief --mime-type "$f"
-          done < <(find release-assets/weights -type f -print0)
+          } || true
+          while IFS= read -r -d '' f; do file --brief --mime-type "$f"; done < <(find release-assets/weights -type f -print0)
           find release-assets/weights -type f -print0 | xargs -0 sha256sum > release-assets/conversation-weight-sha256.txt
 
       - name: Publish weights release
