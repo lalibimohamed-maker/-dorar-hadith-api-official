@@ -1068,6 +1068,22 @@
       ],
       "integration": "ci_validation",
       "auto_download": false
+    },
+    {
+      "id": "whisperx",
+      "kind": "word_timestamp_alignment",
+      "source_repo": "https://github.com/m-bain/whisperX",
+      "code_license": "BSD-2-Clause",
+      "model_license_status": "inherited_from_selected_ASR_and_alignment_models",
+      "tasks": [
+        "word_level_timestamps",
+        "alignment",
+        "diarization",
+        "subtitle_timing",
+        "lip_sync_timing"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false
     }
   ],
   "pipelines": {
