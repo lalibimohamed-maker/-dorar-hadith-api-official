@@ -136,19 +136,16 @@ jobs:
         run: |
           set -euo pipefail
           tar -tJf release-assets/blender-5.2.2-linux-x64.tar.xz >/dev/null
-          tar -tzf release-assets/kdenlive-26.08.1.tar.xz >/dev/null 2>/dev/null || tar -tJf release-assets/kdenlive-26.08.1.tar.xz >/dev/null
-          tar -tzf release-assets/OpenColorIO-2.5.2.tar.gz >/dev/null
-          tar -tzf release-assets/OpenTimelineIO-0.18.1.tar.gz >/dev/null
-          tar -tzf release-assets/mlt-7.40.0.tar.gz >/dev/null
-          tar -tzf release-assets/frei0r-3.5.0.tar.gz >/dev/null
-          tar -tzf release-assets/MediaInfo-26.05.tar.gz >/dev/null
-          tar -tzf release-assets/subtitlecomposer-0.8.2.tar.gz >/dev/null
-          tar -tzf release-assets/pipewire-1.6.0.tar.gz >/dev/null
-          tar -tzf release-assets/openimageio-3.1.17.0.tar.gz >/dev/null
-          file --brief release-assets/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb
-          file --brief release-assets/GIMP-3.2.6-x86_64.AppImage
-          file --brief release-assets/glaxnimate-0.6.0-x86_64.AppImage
-          file --brief release-assets/Video2X-x86_64.AppImage
+          if [ -s release-assets/kdenlive-26.08.1.tar.xz ]; then tar -tJf release-assets/kdenlive-26.08.1.tar.xz >/dev/null; fi
+          if [ -s release-assets/OpenColorIO-2.5.2.tar.gz ]; then tar -tzf release-assets/OpenColorIO-2.5.2.tar.gz >/dev/null; fi
+          if [ -s release-assets/OpenTimelineIO-0.18.1.tar.gz ]; then tar -tzf release-assets/OpenTimelineIO-0.18.1.tar.gz >/dev/null; fi
+          for f in mlt-7.40.0.tar.gz frei0r-3.5.0.tar.gz MediaInfo-26.05.tar.gz subtitlecomposer-0.8.2.tar.gz pipewire-1.6.0.tar.gz openimageio-3.1.17.0.tar.gz; do
+            [ -s "release-assets/$f" ] && tar -tzf "release-assets/$f" >/dev/null
+          done
+          if [ -s release-assets/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb ]; then file --brief release-assets/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb; fi
+          for f in GIMP-3.2.6-x86_64.AppImage glaxnimate-0.6.0-x86_64.AppImage Video2X-x86_64.AppImage; do
+            [ -s "release-assets/$f" ] && file --brief "release-assets/$f"
+          done
 
       - name: Record Video2X release provenance
         run: |
