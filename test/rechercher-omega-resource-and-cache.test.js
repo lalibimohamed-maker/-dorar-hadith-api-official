@@ -36,6 +36,6 @@ test("semantic cache stores references without raw conversation content", () => 
 
 test("memory cache evicts oldest entry when bounded", () => {
   const cache=new MemorySemanticCache({maxEntries:2});
-  cache.set(createCacheEntry({key:"a"})); cache.set(createCacheEntry({key:"b"})); cache.set(createCacheEntry({key:"c"}));
+  cache.set(createCacheEntry({key:"a",outputRef:"artifact://a"})); cache.set(createCacheEntry({key:"b",outputRef:"artifact://b"})); cache.set(createCacheEntry({key:"c",outputRef:"artifact://c"}));
   assert.equal(cache.get("a"),null); assert.ok(cache.get("b")); assert.ok(cache.get("c"));
 });
