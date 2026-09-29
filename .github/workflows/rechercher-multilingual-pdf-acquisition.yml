@@ -424,26 +424,26 @@ jobs:
             done
             gh api --fail -H "Accept: application/vnd.github+json" "/repos/$MATRIX_STORAGE_REPO/releases/tags/$tag" > "$release_root/release-${part}.json"
             python3 - "$release_root/release-${part}.json" "$release_root/uploaded-${part}.tsv" <<'PY'
-import json,sys
-release=json.load(open(sys.argv[1],encoding="utf-8"))
-expected=[]
-try:
-    with open(sys.argv[2],encoding="utf-8") as f:
-        for line in f:
-            line=line.rstrip("\n")
-            if line:
-                digest,name=line.split("\t",1)
-                expected.append((digest,name))
-except FileNotFoundError:
-    expected=[]
-assets={a.get("name"):a.get("digest","") for a in release.get("assets") or [] if a.get("state")=="uploaded"}
-missing=[]
-for digest,name in expected:
-    if assets.get(name) != "sha256:"+digest:
-        missing.append({"name":name,"expected":"sha256:"+digest,"actual":assets.get(name)})
-if missing:
-    raise SystemExit("MATRIX_RELEASE_SHA_VERIFY_FAIL "+json.dumps(missing,ensure_ascii=False))
-print("MATRIX_RELEASE_SHA_VERIFY_OK tag=%s verified_assets=%d total_release_assets=%d" % (release.get("tag_name"),len(expected),len(assets)))
+          import json,sys
+          release=json.load(open(sys.argv[1],encoding="utf-8"))
+          expected=[]
+          try:
+              with open(sys.argv[2],encoding="utf-8") as f:
+                  for line in f:
+                      line=line.rstrip("\n")
+                      if line:
+                          digest,name=line.split("\t",1)
+                          expected.append((digest,name))
+          except FileNotFoundError:
+              expected=[]
+          assets={a.get("name"):a.get("digest","") for a in release.get("assets") or [] if a.get("state")=="uploaded"}
+          missing=[]
+          for digest,name in expected:
+              if assets.get(name) != "sha256:"+digest:
+                  missing.append({"name":name,"expected":"sha256:"+digest,"actual":assets.get(name)})
+          if missing:
+              raise SystemExit("MATRIX_RELEASE_SHA_VERIFY_FAIL "+json.dumps(missing,ensure_ascii=False))
+          print("MATRIX_RELEASE_SHA_VERIFY_OK tag=%s verified_assets=%d total_release_assets=%d" % (release.get("tag_name"),len(expected),len(assets)))
 PY
             total_releases=$((total_releases+1))
             echo "MATRIX_SOURCE_RELEASE_OK part=$part tag=$tag"
