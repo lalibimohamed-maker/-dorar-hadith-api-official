@@ -236,7 +236,11 @@
     "PySceneDetect scene/shot segmentation smoke test",
     "resource admission and GPU-concurrency policy check",
     "semantic cache invalidation check",
-    "public publication readiness gate check"
+    "public publication readiness gate check",
+    "loudness normalization probe",
+    "frame-signature duplicate-analysis probe",
+    "subtitle timing quality check",
+    "public publication readiness gate"
   ],
   "notes": [
     "NiFi 2.12.0 is the current upstream release as of 2026-09-29.",
@@ -350,5 +354,6 @@
       }
     },
     "saturationAction": "queue"
-  }
+  },
+  "mediaPublicationGate": "config/media-publication-gate-2026.json"
 }
