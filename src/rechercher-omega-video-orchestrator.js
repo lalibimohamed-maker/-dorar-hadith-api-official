@@ -35,7 +35,7 @@ export function orchestrateVideoPlan({studioPlan, fleet, runtimeConfig, requireC
           task:"source_asset",
           job_id:job.job_id
         }),
-        output_policy:{corpus_write_allowed:false,generated_media_is_evidence:false,provenance_required:true}
+        output_policy:{corpus_write_allowed:false,generated_media_is_evidence:false,provenance_required:true,quality_gate_required:true,quality_gate:"rechercher-omega-quality-gates-2026"}
       };
     }
 
@@ -112,6 +112,7 @@ export function orchestrateVideoPlan({studioPlan, fleet, runtimeConfig, requireC
     composition,
     execution_contract:{
       deterministic_jobs:true,
+      quality_gate:"rechercher-omega-quality-gates-2026",
       idempotency_key_field:"idempotency_key",
       retryable_states:["retryable"],
       terminal_states:["succeeded","cancelled","dead_letter"],
