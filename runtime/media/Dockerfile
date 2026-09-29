@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl file git python3 python3-venv python3-pip \
     ffmpeg tesseract-ocr imagemagick libgl1 libglib2.0-0 \
-    libvulkan1 vulkan-tools && \
+    libvulkan1 vulkan-tools nodejs npm && \
     rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv "$VIRTUAL_ENV" && \
@@ -21,9 +21,10 @@ RUN python3 -m venv "$VIRTUAL_ENV" && \
       "pycolmap==4.2.0" \
       "realesrgan==0.3.0" \
       "usd-core==26.8" \
-      "opentimelineio==0.18.1"
+      "opentimelineio==0.18.1" && \
+    npm install --global --omit=dev "gltf-validator@2.0.0-dev.3.10"
 
-RUN npm --version >/dev/null 2>&1 || true
+RUN node -e 'const v=require("gltf-validator"); console.log("GLTF_VALIDATOR_OK", v.version)'
 
 RUN python3 - <<'PY'
 import importlib
