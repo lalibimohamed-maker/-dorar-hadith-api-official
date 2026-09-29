@@ -68,6 +68,7 @@ jobs:
       - name: Security gate
         run: |
           set -euo pipefail
+          find release-assets/weights -type f \( -name '*.lock' -o -name '*.metadata' -o -name '.gitignore' \) -delete
           while IFS= read -r -d '' f; do
             file --brief --mime-type "$f"
           done < <(find release-assets -type f -print0)
