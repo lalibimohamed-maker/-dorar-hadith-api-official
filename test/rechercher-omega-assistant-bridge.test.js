@@ -51,8 +51,13 @@ test("assistant can return a deterministic semantic-cache hit", async () => {
     execute: false
   });
   const cacheEntry = {
-    ...seed.cache.entry,
-    output_ref: "artifact://cached/1"
+    key: seed.cache.key,
+    output_ref: "artifact://cached/1",
+    output_sha256: null,
+    provenance_id: "prov-1",
+    created_at: Date.now(),
+    expires_at: Date.now() + 60000,
+    privacy: { raw_prompt_stored: false, raw_evidence_stored: false, raw_user_query_stored: false }
   };
   const hit = await runGovernedAssistantTurn({
     query: "اختبار",
