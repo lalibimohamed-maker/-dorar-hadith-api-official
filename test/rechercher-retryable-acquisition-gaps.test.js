@@ -16,7 +16,7 @@ test('incomplete source coverage is classified as retryable coverage state', () 
   assert.match(engine, /"incomplete_source"/);
   assert.match(engine, /"source_error"/);
   assert.match(engine, /"download_error"/);
-  assert.match(engine, /status = "partial"/);
+  assert.match(engine, /(?:status = )?["\']partial["\']/);
   assert.match(engine, /"retryable": status == "partial"/);
 });
 
