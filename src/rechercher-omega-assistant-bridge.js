@@ -209,17 +209,21 @@ export async function runGovernedAssistantTurn({
       {
         role: "system",
         content: [
-          "You are Rechercher Ω.",
-          buildScholarlySystemPrompt(language).split("\n").slice(1).join("\n")
+          buildScholarlySystemPrompt(language)
         ].join("\n")
       },
       {
         role: "user",
-        content: [String(query).trim(), evidenceText ? "Evidence:\n" + evidenceText : ""].filter(Boolean).join("\n\n")
+        content: [
+          history.length ? "Bounded conversation context (volatile):\n" + JSON.stringify(history) : "",
+          "Current user query:\n" + String(query).trim(),
+          evidenceEnvelope
+        ].filter(Boolean).join("\n\n")
       }
     ],
     corpus_write_allowed: false,
-    generated_media_is_evidence: false
+    generated_media_is_evidence: false,
+    runtimeArtifact
   });
 
   const cache = createCacheEntry({
