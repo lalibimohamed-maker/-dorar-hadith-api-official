@@ -84,3 +84,26 @@ test("verified execution graph automatically consumes the activation registry", 
   assert.ok(blockedAsr);
   assert.equal(blockedAsr.candidates.length, 0);
 });
+
+test("Hunyuan cannot become active without unified and GPU evidence", async () => {
+  const fs = await import("node:fs/promises");
+  const os = await import("node:os");
+  const source = await loadOmegaEngineActivationRegistry();
+  assert.notEqual(source.states["hunyuanvideo-1.5"], "active");
+
+  const tmp = await fs.mkdtemp((await os.tmpdir()) + "/dinullah-omega-");
+  const file = new URL("file://" + tmp + "/activation.json");
+  const raw = JSON.parse(await fs.readFile(new URL("../config/rechercher-omega-engine-activation-2026.json", import.meta.url), "utf8"));
+  raw.engines["hunyuanvideo-1.5"].state = "active";
+  raw.engines["hunyuanvideo-1.5"].evidence.sha256Inventory = true;
+  raw.engines["hunyuanvideo-1.5"].evidence.runtimeInstalled = true;
+  raw.engines["hunyuanvideo-1.5"].evidence.smokeTest = "passed";
+  raw.engines["hunyuanvideo-1.5"].evidence.capabilityTest = "passed";
+  raw.engines["hunyuanvideo-1.5"].evidence.corpusWriteAllowed = false;
+  raw.engines["hunyuanvideo-1.5"].evidence.modelPresent = true;
+  raw.engines["hunyuanvideo-1.5"].evidence.unification = "pending";
+  raw.engines["hunyuanvideo-1.5"].evidence.gpuSmokeTest = "pending";
+  await fs.writeFile(file, JSON.stringify(raw), "utf8");
+  const loaded = await loadOmegaEngineActivationRegistry(file);
+  assert.notEqual(loaded.states["hunyuanvideo-1.5"], "active");
+});
