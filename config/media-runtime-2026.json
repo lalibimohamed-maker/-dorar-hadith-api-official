@@ -198,7 +198,9 @@
     "video2x --help with Vulkan capability probe",
     "source/weight SHA-256 manifest",
     "security scan before promotion",
-    "no trusted-source overwrite"
+    "no trusted-source overwrite",
+    "studio release asset and license manifest check",
+    "Omega media bridge contract check"
   ],
   "notes": [
     "NiFi 2.12.0 is the current upstream release as of 2026-09-29.",
@@ -207,5 +209,55 @@
     "glTF is an interchange specification rather than a standalone runtime service; glTF-Validator is the executable validation layer.",
     "Video2X requires Vulkan-capable hardware for actual acceleration; binary presence alone is not a performance proof.",
     "Model weights are release assets and are never silently downloaded from discovery."
-  ]
+  ],
+  "studioToolchain": {
+    "manifest": "config/media-studio-toolchain-2026.json",
+    "releaseTag": "dinullah-media-studio-v2026.09.29",
+    "activation": "desktop-production-layer",
+    "tools": [
+      "kdenlive",
+      "blender",
+      "obs",
+      "ardour",
+      "audacity",
+      "gimp",
+      "inkscape",
+      "glaxnimate",
+      "imagemagick",
+      "opentimelineio",
+      "opencolorio"
+    ]
+  },
+  "omegaBridge": {
+    "manifest": "config/rechercher-omega-media-bridge-2026.json",
+    "aiPr": 566,
+    "executionPr": 600,
+    "mode": "stacked-branches",
+    "aiLayer": [
+      "Qwen",
+      "Wan2.2",
+      "HunyuanVideo-1.5",
+      "LTX-2",
+      "CogVideoX",
+      "Whisper",
+      "CosyVoice",
+      "FLUX",
+      "PaddleOCR-VL"
+    ],
+    "executionLayer": [
+      "Kdenlive",
+      "Blender",
+      "OBS",
+      "Ardour",
+      "Audacity",
+      "GIMP",
+      "Inkscape",
+      "Glaxnimate",
+      "ImageMagick",
+      "OpenTimelineIO",
+      "OpenColorIO",
+      "FFmpeg",
+      "MediaMTX"
+    ]
+  }
 }
