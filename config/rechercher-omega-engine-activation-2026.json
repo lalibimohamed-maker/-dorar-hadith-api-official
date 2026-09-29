@@ -12,7 +12,7 @@
       "state": "active",
       "release": "dinullah-engine-models-v2026.09.29",
       "model": "openai/whisper-tiny",
-      "verificationRun": 36598184146,
+      "verificationRun": 36600528957,
       "evidence": {
         "license": "apache-2.0",
         "sha256Inventory": true,
@@ -26,7 +26,7 @@
       "state": "active",
       "release": "dinullah-engine-models-v2026.09.29",
       "model": "hexgrad/Kokoro-82M",
-      "verificationRun": 36598184146,
+      "verificationRun": 36600528957,
       "evidence": {
         "license": "apache-2.0",
         "sha256Inventory": true,
@@ -37,15 +37,16 @@
       }
     },
     "qwen3": {
-      "state": "pending-runtime-verification",
+      "state": "active",
       "release": "dinullah-engine-models-v2026.09.29",
       "model": "Qwen/Qwen3-0.6B",
+      "verificationRun": 36600528957,
       "evidence": {
         "license": "apache-2.0",
-        "sha256Inventory": "pending",
+        "sha256Inventory": true,
         "runtimeInstalled": true,
-        "smokeTest": "pending",
-        "capabilityTest": "pending",
+        "smokeTest": "passed",
+        "capabilityTest": "passed",
         "corpusWriteAllowed": false
       }
     },
