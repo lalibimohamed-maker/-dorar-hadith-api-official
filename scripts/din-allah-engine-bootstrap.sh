@@ -1,66 +1,34 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-# Free-first bootstrap for a disposable Linux runner.
-# It installs runtimes, never stores binaries/models in Git, and emits a
-# machine-readable verification manifest. Model weights remain external.
-
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OUT="${ROOT}/artifacts/engine-runtime"
+OUT="$ROOT/artifacts/engine-runtime"
 mkdir -p "$OUT"
-
-echo "[ENGINE] installing system runtimes"
+export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update
-sudo apt-get install -y --no-install-recommends ffmpeg blender python3 python3-pip python3-venv
-
-echo "[ENGINE] creating isolated Python runtime"
+sudo apt-get install -y --no-install-recommends ffmpeg blender kdenlive audacity python3 python3-venv python3-pip jq curl
 python3 -m venv "$OUT/venv"
-# shellcheck disable=SC1091
 source "$OUT/venv/bin/activate"
 python -m pip install --upgrade pip setuptools wheel
-python -m pip install "openai-whisper" "faster-whisper" "whisperx" "scenedetect[opencv]" "opentimelineio" "docling" "openvino"
-
-echo "[ENGINE] optional OCR stack"
-python -m pip install "paddleocr"
-
-echo "[ENGINE] verifying binaries"
-ffmpeg -version | head -n 1
-ffprobe -version | head -n 1
-blender --version | head -n 1
-scenedetect version
-
-echo "[ENGINE] verifying Python modules"
+python -m pip install "openai-whisper" "faster-whisper" "whisperx" "scenedetect[opencv]" "opentimelineio" "docling" "openvino" "paddleocr" "qdrant-client" "piper-tts" "kokoro"
 python - <<'PY'
-import importlib.util, json, platform
-mods = {
-  "whisper": "whisper",
-  "faster_whisper": "faster_whisper",
-  "whisperx": "whisperx",
-  "opentimelineio": "opentimelineio",
-  "docling": "docling",
-  "openvino": "openvino",
-  "paddleocr": "paddleocr",
-}
-result = {k: bool(importlib.util.find_spec(v)) for k, v in mods.items()}
-print(json.dumps({"python": platform.python_version(), "modules": result}, indent=2))
-if not all(result.values()):
-    raise SystemExit("engine bootstrap verification failed")
+import importlib.util
+mods={"whisper":"whisper","faster-whisper":"faster_whisper","whisperx":"whisperx","opentimelineio":"opentimelineio","docling":"docling","openvino":"openvino","paddleocr-vl":"paddleocr","qdrant-client":"qdrant_client","kokoro":"kokoro","piper":"piper"}
+bad=[k for k,v in mods.items() if not importlib.util.find_spec(v)]
+print({"missing":bad})
+if bad: raise SystemExit("python runtime verification failed")
 PY
-
-cat > "$OUT/runtime-manifest.json" <<JSON
-{
-  "schemaVersion": "1.0.0",
-  "generatedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "platform": "$(uname -a | sed 's/"/\\"/g')",
-  "engines": {
-    "ffmpeg": "$(ffmpeg -version | head -n1 | sed 's/"/\\"/g')",
-    "ffprobe": "$(ffprobe -version | head -n1 | sed 's/"/\\"/g')",
-    "blender": "$(blender --version | head -n1 | sed 's/"/\\"/g')",
-    "scenedetect": "$(scenedetect version | head -n1 | sed 's/"/\\"/g')"
-  },
-  "modelsDownloaded": false,
-  "corpusModified": false
-}
-JSON
-
-echo "[ENGINE] bootstrap complete: $OUT/runtime-manifest.json"
+for x in ffmpeg ffprobe blender kdenlive audacity; do command -v "$x" >/dev/null || { echo "missing binary: $x"; exit 1; }; "$x" --version 2>&1 | head -n 1 || true; done
+scenedetect version
+blender --background --factory-startup --python-expr 'print("BLENDER_HEADLESS_SMOKE_OK")'
+python - <<'PY'
+import opentimelineio as otio, tempfile, pathlib
+p=pathlib.Path(tempfile.mkdtemp())/"smoke.otio"
+s=otio.schema.SerializableCollection([otio.schema.Clip(name="smoke")])
+otio.adapters.write_to_file(s,str(p)); otio.adapters.read_from_file(str(p)); print("OTIO_READ_WRITE_SMOKE_OK")
+PY
+python - <<'PY'
+import json,datetime,pathlib
+p=pathlib.Path("artifacts/engine-runtime/runtime-manifest.json")
+p.write_text(json.dumps({"schemaVersion":"2.0.0","generatedAt":datetime.datetime.now(datetime.timezone.utc).isoformat(),"modelsDownloaded":False,"corpusModified":False,"installed":["ffmpeg","ffprobe","blender","kdenlive","audacity","pyscenedetect","whisper","faster-whisper","whisperx","opentimelineio","docling","openvino","paddleocr-vl","qdrant-client","piper","kokoro"]},indent=2)+"\n")
+PY
+echo "[ENGINE] complete CPU runtime verification passed"
