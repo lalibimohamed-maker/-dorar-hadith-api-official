@@ -15,6 +15,15 @@ test('global matrix is exactly 133 unique languages by 37 matrix lanes (24 knowl
   assert.equal(matrix.domains.length, matrix.domain_count);
   assert.equal(new Set(matrix.domains).size, matrix.domain_count);
   assert.equal(matrix.language_count * matrix.domain_count, 4921);
+  assert.deepEqual(matrix.knowledge_domains, [
+    'quran','quran_sciences','tafsir','tajweed_qiraat','quran_miracles','quran_stories',
+    'hadith','hadith_sciences','hadith_terminology','hadith_explanation','sirah','shamail',
+    'aqidah','tawhid','fiqh','usul_al_fiqh','fiqh_schools_branches','fatwa','islamic_ethics',
+    'islamic_history','biographies_tabaqat','comparative_fiqh','dawah_islamic_culture',
+    'general_islamic_encyclopedias'
+  ]);
+  assert.equal(matrix.knowledge_domains.length, 24);
+  assert.equal(matrix.support_lanes.length, 13);
   assert.equal(matrix.expected_search_cells, 4921);
   assert.ok(languages.includes('Bengali'));
   assert.ok(languages.includes('Malagasy'));
