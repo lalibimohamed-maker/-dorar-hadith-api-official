@@ -18,7 +18,7 @@ test('complete runtime manifest covers every selected interoperability/media com
 
 test('professional studio toolchain covers the production stack',()=>{
   const ids=new Set(studio.tools.map(x=>x.id));
-  for(const id of ['kdenlive','blender','obs','ardour','audacity','gimp','inkscape','glaxnimate','imagemagick','opentimelineio','opencolorio']) {
+  for(const id of ['kdenlive','blender','obs','ardour','audacity','gimp','inkscape','glaxnimate','imagemagick','opentimelineio','opencolorio','mlt','frei0r','mediainfo','subtitlecomposer','pipewire','openimageio','natron','flamenco']) {
     assert.equal(ids.has(id),true,`missing studio tool: ${id}`);
   }
   for(const tool of studio.tools) {
@@ -54,4 +54,13 @@ test('all heavyweight runtimes have explicit pinned versions',()=>{
     const item=runtime.software.find(x=>x.id===id);
     assert.ok(item.version);
   }
+});
+
+
+test('Omega AI media runtime is release-backed and pinned',()=>{
+  const ai=JSON.parse(fs.readFileSync(path.join(root,'config/rechercher-omega-ai-media-runtime-2026.json'),'utf8'));
+  assert.equal(ai.integration.sourcePr,566);
+  assert.equal(ai.integration.executionPr,601);
+  assert.equal(ai.release.tag,'dinullah-omega-ai-media-runtime-v2026.09.29');
+  for(const id of ['comfyui','pytorch','transformers','diffusers','accelerate','safetensors']) assert.ok(ai.components.find(x=>x.id===id)?.version);
 });
