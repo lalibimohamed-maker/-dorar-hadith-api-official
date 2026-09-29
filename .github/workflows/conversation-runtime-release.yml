@@ -23,11 +23,13 @@ on:
 
 # security-justification: this workflow publishes only declared open-source conversation runtime assets after source, license, size and SHA-256 gates.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   software:
     name: Cache conversational software
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -87,6 +89,8 @@ jobs:
 
   weights:
     name: Cache license-cleared conversation weights
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
