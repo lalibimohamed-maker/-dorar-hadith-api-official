@@ -47,23 +47,24 @@
     },
     {
       "id": "ardour",
-      "version": "9.8.0",
-      "license": "GPL-2.0",
+      "version": "pinned-master-2026-09-29",
+      "license": "GPL-2.0-or-later",
       "role": "multitrack-audio-recording-editing-mixing-mastering",
-      "distribution": "official-source",
-      "source": "https://community.ardour.org/src/ardour-9.8.0.tar.bz2",
-      "licenseEvidence": "https://community.ardour.org/download"
+      "distribution": "official-github-source-mirror",
+      "source": "https://github.com/Ardour/ardour/archive/7abcc0eba5578d531e4710db5a6adb9235f88d62.tar.gz",
+      "licenseEvidence": "https://github.com/Ardour/ardour/blob/7abcc0eba5578d531e4710db5a6adb9235f88d62/COPYING",
+      "pinnedCommit": "7abcc0eba5578d531e4710db5a6adb9235f88d62"
     },
     {
       "id": "audacity",
       "version": "4.0.0",
       "license": "GPL-3.0-or-later",
       "role": "audio-editing-cleanup-recording",
-      "distribution": "official-linux-binary",
-      "source": "https://www.audacityteam.org/download/linux/",
+      "distribution": "official-github-release-binary",
+      "source": "https://github.com/audacity/audacity/releases/download/Audacity-4.0.0/audacity-linux-4.0.0-x86_64.AppImage",
       "asset": "audacity-linux-4.0.0-x86_64.AppImage",
       "sha256": "772663b0b407be44232193b8402cde4da4665c7f6e81edb5b70e3b14e8b9b5b4",
-      "licenseEvidence": "https://www.audacityteam.org/audacity-4/"
+      "licenseEvidence": "https://github.com/audacity/audacity"
     },
     {
       "id": "gimp",
