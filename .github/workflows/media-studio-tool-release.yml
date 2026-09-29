@@ -73,11 +73,13 @@ jobs:
           page="https://inkscape.org/release/1.4.2/gnulinux/"
           req=urllib.request.Request(page,headers={"User-Agent":"Dinullah-Media-Release/1.0"})
           body=urllib.request.urlopen(req,timeout=30).read().decode("utf-8","replace")
-          hrefs=re.findall(r'href=["\\']([^"\\']+Inkscape[^"\\']+\\.AppImage)["\\']',body,re.I)
-          candidates=[html.unescape(h) for h in hrefs if "x86_64" in h.lower()]
+          pattern = r'href=[\\"]([^\\"]*Inkscape[^\\"]*\\.AppImage)[\\"]'
+          hrefs = re.findall(pattern, body, re.I)
+          candidates = [html.unescape(h) for h in hrefs if "x86_64" in h.lower()]
           if not candidates: raise SystemExit("No official Inkscape 1.4.2 x86_64 AppImage found.")
           url=candidates[0]
           if url.startswith("/"): url="https://inkscape.org"+url
+          if url.startswith("//"): url="https:"+url
           urllib.request.urlretrieve(url,"release-assets/Inkscape-1.4.2-x86_64.AppImage")
           Path("release-assets/Inkscape-1.4.2-source-url.txt").write_text(url+"\n",encoding="utf-8")
           print("INKSCAPE_RESOLVED",url)
