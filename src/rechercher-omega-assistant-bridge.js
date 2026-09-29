@@ -4,21 +4,12 @@
  * Search supplies evidence; Omega supplies the execution plan and backend.
  * Generated answers remain derived output and never write to Corpus.
  */
-import {
-  buildPlan,
-  createProvenanceRecord,
-  loadModelRegistry
-} from "./rechercher-omega-orchestrator.js";
-import {
-  buildRuntimeGate,
-  assertRuntimeGate
-} from "./rechercher-omega-runtime-gate.js";
-import {
-  loadExecutionBackends,
-  selectExecutionBackend,
-  executeSelectedBackend
-} from "./rechercher-omega-execution-router.js";
+import { buildPlan, createProvenanceRecord, loadModelRegistry } from "./rechercher-omega-orchestrator.js";
+import { buildRuntimeGate, assertRuntimeGate } from "./rechercher-omega-runtime-gate.js";
+import { loadExecutionBackends, selectExecutionBackend, executeSelectedBackend } from "./rechercher-omega-execution-router.js";
 import { buildTelemetryContext, completeTelemetry } from "./rechercher-omega-observability.js";
+import { admitExecution } from "./rechercher-omega-resource-admission.js";
+import { buildSemanticCacheKey, createCacheEntry, isCacheReusable, DEFAULT_CACHE_TTLS_MS } from "./rechercher-omega-semantic-cache.js";
 
 export async function runGovernedAssistantTurn({
   query,
@@ -32,7 +23,13 @@ export async function runGovernedAssistantTurn({
   execute = false,
   registry = null,
   backends = null,
-  search_context = {}
+  search_context = {},
+  resourcePool = null,
+  currentJobs = 0,
+  currentVramMb = 0,
+  requiredVramMb = 0,
+  cacheEntry = null,
+  cacheWriter = null
 } = {}) {
   if (!String(query ?? "").trim()) throw new TypeError("assistant query is required");
 
@@ -77,6 +74,15 @@ export async function runGovernedAssistantTurn({
     model_versions: [selectedModel.id]
   });
 
+  const cacheKey = buildSemanticCacheKey({
+    task: "scholarly_answer",
+    model: selectedModel.id,
+    modelRevision: selectedModel.starter_revision ?? selectedModel.revision ?? "unknown",
+    prompt: String(query).trim(),
+    evidence,
+    language
+  });
+
   const telemetryContext = buildTelemetryContext({
     workflow: "omega.assistant.turn",
     task: "scholarly_answer",
@@ -85,6 +91,21 @@ export async function runGovernedAssistantTurn({
     backend: backend.backend ?? null
   });
 
+  if (cacheEntry && isCacheReusable(cacheEntry, cacheKey)) {
+    return {
+      status: "cache_hit",
+      plan,
+      backend,
+      gate,
+      provenance,
+      cache: { hit: true, key: cacheKey, entry: cacheEntry },
+      telemetry: completeTelemetry(telemetryContext, { status: "cache_hit", cache_hit: true }),
+      corpus_write_allowed: false,
+      quality_gate_required: true,
+      quality_gate: "rechercher-omega-quality-gates-2026"
+    };
+  }
+
   if (!execute) {
     return {
       status: backend.status,
@@ -92,11 +113,36 @@ export async function runGovernedAssistantTurn({
       backend,
       gate,
       provenance,
-      telemetry: completeTelemetry(telemetryContext, { status: backend.status }),
+      cache: { hit: false, key: cacheKey, ttl_ms: DEFAULT_CACHE_TTLS_MS.scholarly_answer },
+      telemetry: completeTelemetry(telemetryContext, { status: backend.status, cache_hit: false }),
       corpus_write_allowed: false,
       quality_gate_required: true,
       quality_gate: "rechercher-omega-quality-gates-2026"
     };
+  }
+
+  if (resourcePool) {
+    const admission = admitExecution({
+      pool: resourcePool,
+      currentJobs,
+      currentVramMb,
+      requiredVramMb
+    });
+    if (admission.status !== "admitted") {
+      return {
+        status: "queued",
+        plan,
+        backend,
+        gate,
+        provenance,
+        resource_admission: admission,
+        cache: { hit: false, key: cacheKey },
+        telemetry: completeTelemetry(telemetryContext, { status: "queued", cache_hit: false, error_type: admission.reason }),
+        corpus_write_allowed: false,
+        quality_gate_required: true,
+        quality_gate: "rechercher-omega-quality-gates-2026"
+      };
+    }
   }
 
   if (backend.status !== "ready") {
@@ -106,7 +152,8 @@ export async function runGovernedAssistantTurn({
       backend,
       gate,
       provenance,
-      telemetry: completeTelemetry(telemetryContext, { status: "queued" }),
+      cache: { hit: false, key: cacheKey },
+      telemetry: completeTelemetry(telemetryContext, { status: "queued", cache_hit: false }),
       corpus_write_allowed: false,
       quality_gate_required: true,
       quality_gate: "rechercher-omega-quality-gates-2026"
@@ -134,21 +181,21 @@ export async function runGovernedAssistantTurn({
       },
       {
         role: "user",
-        content: [
-          String(query).trim(),
-          evidenceText ? "Evidence:\n" + evidenceText : ""
-        ].filter(Boolean).join("\n\n")
+        content: [String(query).trim(), evidenceText ? "Evidence:\n" + evidenceText : ""].filter(Boolean).join("\n\n")
       }
     ],
     corpus_write_allowed: false,
     generated_media_is_evidence: false
   });
 
-  const telemetry = completeTelemetry(telemetryContext, {
-    status: "succeeded",
-    latency_ms: Date.now() - started,
-    provenance_id: provenance.input_sha256 ?? null
+  const cache = createCacheEntry({
+    key: cacheKey,
+    outputRef: result?.output_ref ?? null,
+    outputSha256: result?.output_sha256 ?? null,
+    provenanceId: provenance.input_sha256 ?? null,
+    ttlMs: DEFAULT_CACHE_TTLS_MS.scholarly_answer
   });
+  if (typeof cacheWriter === "function") await cacheWriter(cache);
 
   return {
     status: "succeeded",
@@ -156,7 +203,13 @@ export async function runGovernedAssistantTurn({
     backend: gate,
     result,
     provenance,
-    telemetry,
+    cache: { hit: false, key: cacheKey, entry: cache },
+    telemetry: completeTelemetry(telemetryContext, {
+      status: "succeeded",
+      latency_ms: Date.now() - started,
+      cache_hit: false,
+      provenance_id: provenance.input_sha256 ?? null
+    }),
     corpus_write_allowed: false,
     quality_gate_required: true,
     quality_gate: "rechercher-omega-quality-gates-2026"
