@@ -68,7 +68,7 @@ export function buildAiExecutionGraph(registry, {
         .filter(component =>
           component &&
           (available.size === 0 || available.has(component.id)) &&
-          componentRuntimeEligibility(component)
+          componentRuntimeEligibility(component, activationStates)
         );
     }
 
@@ -76,7 +76,7 @@ export function buildAiExecutionGraph(registry, {
       .filter(component => !disabled.has(component.id) && (available.size === 0 || available.has(component.id)))
       .map(component => ({
         id: component.id,
-        runtime_eligible: componentRuntimeEligibility(component),
+        runtime_eligible: componentRuntimeEligibility(component, activationStates),
         integration: component.integration,
         local_first: LOCAL_FIRST_INTEGRATIONS.has(component.integration),
         model_license_status: component.model_license_status
