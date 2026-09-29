@@ -197,6 +197,84 @@
       "distribution": "official-linux-binary",
       "source": "https://flamenco.blender.org/download/",
       "licenseEvidence": "https://flamenco.blender.org/download/"
+    },
+    {
+      "id": "mlt",
+      "version": "7.40.0",
+      "license": "LGPL-2.1",
+      "role": "professional-media-framework-for-kdenlive",
+      "distribution": "official-source",
+      "source": "https://github.com/mltframework/mlt/archive/refs/tags/v7.40.0.tar.gz",
+      "licenseEvidence": "https://github.com/mltframework/mlt",
+      "requiredBy": [
+        "kdenlive"
+      ]
+    },
+    {
+      "id": "frei0r",
+      "version": "3.5.0",
+      "license": "GPL-compatible-free-software",
+      "role": "video-effect-transition-plugin-suite",
+      "distribution": "official-source",
+      "source": "https://github.com/dyne/frei0r/archive/refs/tags/v3.5.0.tar.gz",
+      "licenseEvidence": "https://github.com/dyne/frei0r",
+      "requiredBy": [
+        "kdenlive"
+      ]
+    },
+    {
+      "id": "mediainfo",
+      "version": "26.05",
+      "license": "BSD-2-Clause",
+      "role": "media-metadata-inspection",
+      "distribution": "official-source",
+      "source": "https://github.com/MediaArea/MediaInfo/archive/refs/tags/v26.05.tar.gz",
+      "licenseEvidence": "https://github.com/MediaArea/MediaInfo"
+    },
+    {
+      "id": "subtitlecomposer",
+      "version": "0.8.2",
+      "license": "GPL-2.0-or-later",
+      "role": "subtitle-authoring-and-timing",
+      "distribution": "official-source",
+      "source": "https://github.com/KDE/subtitlecomposer/archive/refs/tags/v0.8.2.tar.gz",
+      "licenseEvidence": "https://github.com/KDE/subtitlecomposer"
+    },
+    {
+      "id": "pipewire",
+      "version": "1.6.0",
+      "license": "MIT-with-component-exceptions",
+      "role": "low-latency-audio-video-graph",
+      "distribution": "official-source",
+      "source": "https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/1.6.0/pipewire-1.6.0.tar.gz",
+      "licenseEvidence": "https://github.com/PipeWire/pipewire"
+    },
+    {
+      "id": "openimageio",
+      "version": "3.1.17.0",
+      "license": "Apache-2.0",
+      "role": "image-io-and-vfx-processing",
+      "distribution": "python-package-or-source",
+      "source": "https://pypi.org/project/OpenImageIO/3.1.17.0/",
+      "licenseEvidence": "https://github.com/AcademySoftwareFoundation/OpenImageIO"
+    },
+    {
+      "id": "natron",
+      "version": "2.5.0",
+      "license": "GPL-2.0",
+      "role": "node-based-vfx-compositing-challenger",
+      "distribution": "official-linux-binary",
+      "source": "https://github.com/NatronGitHub/Natron/releases/tag/v2.5.0",
+      "licenseEvidence": "https://github.com/NatronGitHub/Natron"
+    },
+    {
+      "id": "flamenco",
+      "version": "3.9.3",
+      "license": "GPL",
+      "role": "distributed-blender-render-manager-and-worker",
+      "distribution": "official-linux-binary",
+      "source": "https://flamenco.blender.org/download/",
+      "licenseEvidence": "https://flamenco.blender.org/download/"
     }
   ],
   "sharedWith": {
