@@ -7,6 +7,7 @@
  */
 
 const DEFAULT_REGISTRY = new URL("../config/rechercher-omega-model-registry.json", import.meta.url);
+const EXECUTABLE_LICENSE_STATUS = "verified_source_license";
 
 export async function loadModelRegistry(url = DEFAULT_REGISTRY) {
   const raw = await readText(url);
@@ -14,13 +15,14 @@ export async function loadModelRegistry(url = DEFAULT_REGISTRY) {
 }
 
 async function readText(url) {
-  if (typeof url === "string") {
-    return import("node:fs/promises").then(fs => fs.readFile(url, "utf8"));
-  }
-  return import("node:fs/promises").then(fs => fs.readFile(url, "utf8"));
+  const fs = await import("node:fs/promises");
+  return fs.readFile(url, "utf8");
 }
 
 const TASK_MODEL_PRIORITY = Object.freeze({
+  scholarly_answer: ["qwen3", "gpt-oss", "qwen3-omni"],
+  evidence_synthesis: ["qwen3", "gpt-oss", "qwen3-omni"],
+  translation_evidence: ["qwen3", "gpt-oss", "qwen3-omni"],
   reasoning: ["qwen3", "gpt-oss", "qwen3-omni"],
   multimodal_understanding: ["qwen3-omni", "qwen3-vl", "paddleocr-vl"],
   document_understanding: ["paddleocr-vl", "qwen3-vl", "qwen3-omni"],
@@ -31,7 +33,7 @@ const TASK_MODEL_PRIORITY = Object.freeze({
   text_to_video: ["wan2.2", "hunyuanvideo-1.5", "ltx-2", "cogvideox"],
   image_to_video: ["hunyuanvideo-1.5", "wan2.2", "ltx-2", "cogvideox"],
   audio_video: ["ltx-2", "qwen3-omni"],
-  text_to_speech: ["cosyvoice"],
+  text_to_speech: ["cosyvoice", "kokoro"],
   text_to_image: ["flux"],
   inference_runtime: ["sglang"],
   safety_audit: ["gpt-oss-safeguard"],
@@ -44,17 +46,41 @@ const SCHOLARLY_TASKS = new Set([
   "translation_evidence"
 ]);
 
+export function isModelRuntimeEligible(model) {
+  if (!model || typeof model !== "object") return false;
+  if (model.runtime_enabled === false) return false;
+  if (model.status === "blocked" || model.status === "research_only") return false;
+  return model.license_status === EXECUTABLE_LICENSE_STATUS;
+}
+
 export function selectModels(registry, task, { allowed = [], blocked = [] } = {}) {
   const ids = TASK_MODEL_PRIORITY[task] ?? [];
   const allowedSet = new Set(allowed);
   const blockedSet = new Set(blocked);
-  const available = new Map(registry.models.map(model => [model.id, model]));
+  const available = new Map((registry.models ?? []).map(model => [model.id, model]));
 
   return ids
     .filter(id => available.has(id))
     .filter(id => !blockedSet.has(id))
     .filter(id => allowed.length === 0 || allowedSet.has(id))
-    .map(id => available.get(id));
+    .map(id => available.get(id))
+    .filter(isModelRuntimeEligible);
+}
+
+function findBlockedModels(registry, task, requestedModels = []) {
+  const ids = TASK_MODEL_PRIORITY[task] ?? [];
+  const requested = requestedModels.length ? new Set(requestedModels) : null;
+  const models = (registry.models ?? []).filter(model =>
+    ids.includes(model.id) && (!requested || requested.has(model.id)) && !isModelRuntimeEligible(model)
+  );
+  return models.map(model => ({
+    id: model.id,
+    license_status: model.license_status ?? "unknown",
+    status: model.status ?? "unknown",
+    reason: model.license_status !== EXECUTABLE_LICENSE_STATUS
+      ? "runtime requires verified_source_license"
+      : "model is disabled for runtime"
+  }));
 }
 
 export function buildPlan(input, registry) {
@@ -71,21 +97,27 @@ export function buildPlan(input, registry) {
     ? selectModels(registry, task, { allowed: requested_models, blocked: blocked_models })
     : selectModels(registry, task, { blocked: blocked_models });
 
+  const rejectedModels = findBlockedModels(registry, task, requested_models);
+
   const plan = {
-    schema_version: "1.0.0",
+    schema_version: "1.1.0",
     engine: "rechercher-omega",
     task,
     output_kind,
     models: models.map(m => ({
       id: m.id,
       source: m.source,
-      license_review: m.license_review
+      license_review: m.license_review,
+      license_status: m.license_status,
+      runtime_eligible: true
     })),
+    rejected_models: rejectedModels,
     evidence_count: evidence.length,
     rights_status,
     gates: {
       evidence_required: SCHOLARLY_TASKS.has(task),
       rights_required_for_publication: output_kind === "public_media" || output_kind === "public_dataset",
+      runtime_license_required: true,
       corpus_write_allowed: false,
       generated_media_is_evidence: false
     }
@@ -105,7 +137,9 @@ export function buildPlan(input, registry) {
 
   if (models.length === 0) {
     plan.status = "blocked";
-    plan.block_reason = "no registered model worker matches task constraints";
+    plan.block_reason = rejectedModels.length
+      ? "registered models exist but none are runtime-eligible"
+      : "no registered model worker matches task constraints";
     return plan;
   }
 
@@ -133,7 +167,16 @@ export function buildTournamentPlan({ task, candidate_models = [], constraints =
     task,
     candidates: [...new Set(candidate_models)],
     constraints,
-    metrics: ["task_success", "evidence_fidelity", "prompt_adherence", "temporal_consistency", "arabic_text_fidelity", "latency_ms", "peak_vram_mb", "output_size_bytes"],
+    metrics: [
+      "task_success",
+      "evidence_fidelity",
+      "prompt_adherence",
+      "temporal_consistency",
+      "arabic_text_fidelity",
+      "latency_ms",
+      "peak_vram_mb",
+      "output_size_bytes"
+    ],
     selection: "benchmark_results_only"
   };
 }
@@ -172,7 +215,6 @@ export function assertOutputBoundary({ plan, provenance }) {
   }
   return true;
 }
-
 
 /** Build the worldwide source-discovery plan through the canonical Ω generator. */
 export async function buildGlobalSourceDiscoveryPlan(input = {}) {
