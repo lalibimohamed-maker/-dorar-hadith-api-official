@@ -50,7 +50,7 @@ jobs:
       - name: Download pinned PyPI wheels for Linux x86_64 / Python 3.12
         run: |
           set -euo pipefail
-          python3 -m pip download --only-binary=:all: --platform manylinux_2_28_x86_64 --python-version 3.12 --implementation cp --dest release-assets/packages             torch==2.14.0 transformers==5.17.0 diffusers==0.40.0 accelerate==1.15.0 safetensors==0.8.0
+          python3 -m pip download --only-binary=:all: --platform manylinux_2_28_x86_64 --python-version 3.12 --implementation cp --dest release-assets/packages             torch==2.14.0 transformers==5.17.0 diffusers==0.40.0 accelerate==1.15.0 safetensors==0.8.0 kokoro==0.9.4
           python3 - <<'PY'
           import glob,hashlib,json,os
           rows=[]
