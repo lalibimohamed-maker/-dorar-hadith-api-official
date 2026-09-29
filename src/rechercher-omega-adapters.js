@@ -127,11 +127,11 @@ export async function executeLocal({
   if (!Array.isArray(allowedExecutables) || allowedExecutables.length === 0) {
     throw new Error("local execution requires a non-empty executable allowlist");
   }
+  const normalizedAllowed = allowedExecutables.map(String);
   const base = path.basename(command);
-  if (command.includes("/") || !allowedExecutables.includes(base)) {
+  if (command.includes("/") || !normalizedAllowed.includes(base)) {
     throw new Error("local executable is not allowlisted: " + base);
   }
-
   return new Promise((resolve, reject) => {
     const safeEnvironment = inheritEnvironment
       ? { ...process.env, ...env }
