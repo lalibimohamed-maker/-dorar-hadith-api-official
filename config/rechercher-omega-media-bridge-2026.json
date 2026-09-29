@@ -6,26 +6,80 @@
     "branch": "feat/rechercher-omega-multimodal-intelligence"
   },
   "executionBranch": {
-    "pr": 600,
-    "branch": "feat/open-interoperability-fabric-2026"
+    "pr": 601,
+    "branch": "feat/open-interoperability-fabric-2026-stacked"
   },
-  "contract": "PR566-plans-media-jobs; PR600-executes-free-first-media-runtime",
+  "contract": "PR566-plans-media-jobs; PR601-executes-free-first-media-runtime",
   "taskRouting": {
-    "text_to_video": ["wan2.2", "hunyuanvideo-1.5", "ltx-2", "cogvideox"],
-    "image_to_video": ["wan2.2", "hunyuanvideo-1.5", "ltx-2", "cogvideox"],
-    "text_to_image": ["flux"],
-    "image_editing": ["flux", "gimp", "imagemagick"],
-    "video_editing": ["kdenlive", "ffmpeg", "opentimelineio"],
-    "audio_recording_and_mix": ["ardour", "audacity"],
-    "speech_to_text": ["whisper", "paddleocr"],
-    "text_to_speech": ["cosyvoice"],
-    "ocr_and_document_parsing": ["paddleocr-vl", "paddleocr", "tesseract"],
-    "motion_graphics": ["glaxnimate", "blender"],
-    "compositing_vfx": ["blender", "opencolorio"],
-    "3d": ["blender", "openusd", "gltf", "colmap", "open3d"],
-    "capture_and_live": ["obs", "mediamtx"],
-    "transcode_and_export": ["ffmpeg", "kdenlive"],
-    "orchestration_and_provenance": ["nifi", "nats", "ditto"]
+    "text_to_video": [
+      "wan2.2",
+      "hunyuanvideo-1.5",
+      "ltx-2",
+      "cogvideox"
+    ],
+    "image_to_video": [
+      "wan2.2",
+      "hunyuanvideo-1.5",
+      "ltx-2",
+      "cogvideox"
+    ],
+    "text_to_image": [
+      "flux"
+    ],
+    "image_editing": [
+      "flux",
+      "gimp",
+      "imagemagick"
+    ],
+    "video_editing": [
+      "kdenlive",
+      "ffmpeg",
+      "opentimelineio"
+    ],
+    "audio_recording_and_mix": [
+      "ardour",
+      "audacity"
+    ],
+    "speech_to_text": [
+      "whisper",
+      "paddleocr"
+    ],
+    "text_to_speech": [
+      "cosyvoice"
+    ],
+    "ocr_and_document_parsing": [
+      "paddleocr-vl",
+      "paddleocr",
+      "tesseract"
+    ],
+    "motion_graphics": [
+      "glaxnimate",
+      "blender"
+    ],
+    "compositing_vfx": [
+      "blender",
+      "opencolorio"
+    ],
+    "3d": [
+      "blender",
+      "openusd",
+      "gltf",
+      "colmap",
+      "open3d"
+    ],
+    "capture_and_live": [
+      "obs",
+      "mediamtx"
+    ],
+    "transcode_and_export": [
+      "ffmpeg",
+      "kdenlive"
+    ],
+    "orchestration_and_provenance": [
+      "nifi",
+      "nats",
+      "ditto"
+    ]
   },
   "invariants": [
     "AI-generated media is presentation output, never scholarly evidence.",
