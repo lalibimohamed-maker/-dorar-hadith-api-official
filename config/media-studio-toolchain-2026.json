@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "1.0.0",
+  "runtimeId": "dinullah-media-studio-toolchain-2026",
+  "purpose": "Free-first professional media creation, editing, VFX, audio, capture and interchange toolchain shared by Rechercher Omega and the media runtime.",
+  "policy": {
+    "freeAndOpenSourceRequired": true,
+    "paidDependencyAllowed": false,
+    "sourceAndLicenseEvidenceRequired": true,
+    "releaseCache": true,
+    "notCorpus": true,
+    "noSilentSubstitution": true,
+    "platformProfile": "linux-x86_64-primary",
+    "sourceArchivesAllowedWhenBinaryRedistributionIsNotDirectlyPackaged": true,
+    "installationVerificationRequired": true
+  },
+  "tools": [
+    {
+      "id": "kdenlive",
+      "version": "26.08.1",
+      "license": "GPL-3.0-or-later",
+      "role": "nonlinear-video-editing",
+      "distribution": "official-source",
+      "source": "https://download.kde.org/stable/release-service/26.08.1/src/kdenlive-26.08.1.tar.xz",
+      "sha256": "8a0e2cc6451de6901fec778a8b6d00165399879233a264ca5bb1b1b283266513",
+      "licenseEvidence": "https://docs.kdenlive.org/en/getting_started/introduction.html"
+    },
+    {
+      "id": "blender",
+      "version": "5.2.2",
+      "license": "GPL-3.0-or-later",
+      "role": "3d-modeling-animation-compositor-video-sequencer",
+      "distribution": "official-linux-binary",
+      "source": "https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz",
+      "checksumSource": "https://download.blender.org/release/Blender5.2/blender-5.2.2.sha256",
+      "licenseEvidence": "https://www.blender.org/about/license/"
+    },
+    {
+      "id": "obs",
+      "version": "32.2.2",
+      "license": "GPL-2.0",
+      "role": "screen-camera-audio-capture-live-production",
+      "distribution": "official-linux-binary",
+      "source": "https://github.com/obsproject/obs-studio/releases/tag/32.2.2",
+      "asset": "OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb",
+      "sha256": "b6557ca2059287210332accc94c267094050489cffffc5c832e746e3a418dab0",
+      "licenseEvidence": "https://github.com/obsproject/obs-studio/"
+    },
+    {
+      "id": "ardour",
+      "version": "pinned-master-2026-09-29",
+      "license": "GPL-2.0-or-later",
+      "role": "multitrack-audio-recording-editing-mixing-mastering",
+      "distribution": "official-github-source-mirror",
+      "source": "https://github.com/Ardour/ardour/archive/7abcc0eba5578d531e4710db5a6adb9235f88d62.tar.gz",
+      "licenseEvidence": "https://github.com/Ardour/ardour/blob/7abcc0eba5578d531e4710db5a6adb9235f88d62/COPYING",
+      "pinnedCommit": "7abcc0eba5578d531e4710db5a6adb9235f88d62",
+      "releaseCache": "optional-source-cache-disabled-until-stable-primary-download",
+      "runtimeRequired": true
+    },
+    {
+      "id": "audacity",
+      "version": "4.0.0",
+      "license": "GPL-3.0-or-later",
+      "role": "audio-editing-cleanup-recording",
+      "distribution": "official-github-release-binary",
+      "source": "https://github.com/audacity/audacity/releases/download/Audacity-4.0.0/audacity-linux-4.0.0-x86_64.AppImage",
+      "asset": "audacity-linux-4.0.0-x86_64.AppImage",
+      "sha256": "772663b0b407be44232193b8402cde4da4665c7f6e81edb5b70e3b14e8b9b5b4",
+      "licenseEvidence": "https://github.com/audacity/audacity",
+      "releaseCache": "optional-source-cache-disabled-until-stable-primary-download",
+      "runtimeRequired": true
+    },
+    {
+      "id": "gimp",
+      "version": "3.2.6",
+      "license": "GPL-3.0-or-later",
+      "role": "raster-image-editing",
+      "distribution": "official-linux-binary",
+      "source": "https://download.gimp.org/gimp/v3.2/linux/GIMP-3.2.6-x86_64.AppImage",
+      "sha256": "79ea41bc9b06f78fda181849a9ca8e42d83f1124dedb756f4d52352e2465010f",
+      "licenseEvidence": "https://www.gimp.org/docs/userfaq.html"
+    },
+    {
+      "id": "inkscape",
+      "version": "1.4.2",
+      "license": "GPL-2.0-or-later",
+      "role": "vector-graphics-diagrams",
+      "distribution": "ubuntu-package",
+      "source": "https://packages.ubuntu.com/noble/inkscape",
+      "licenseEvidence": "https://inkscape.org/about/license/",
+      "acquisition": "resolve-official-linux-x86_64-AppImage-from-release-page",
+      "provenance": "The workflow resolves the official 1.4.2 Linux AppImage URL from Inkscape's release page and records the resolved URL and SHA-256.",
+      "releaseCache": "not-cached",
+      "runtimeRequired": true
+    },
+    {
+      "id": "glaxnimate",
+      "version": "0.6.0",
+      "license": "GPL-3.0-or-later",
+      "role": "vector-animation-motion-design",
+      "distribution": "official-linux-binary",
+      "source": "https://download.kde.org/stable/glaxnimate/0.6.0/linux/glaxnimate-0.6.0-x86_64.AppImage",
+      "licenseEvidence": "https://apps.kde.org/glaxnimate/"
+    },
+    {
+      "id": "imagemagick",
+      "version": "7.1.2-32",
+      "license": "ImageMagick License",
+      "role": "batch-image-processing-conversion",
+      "distribution": "official-source",
+      "source": "https://download.imagemagick.org/releases/ImageMagick-7.1.2-32.tar.xz",
+      "licenseEvidence": "https://imagemagick.org/license/",
+      "releaseCache": "optional-source-cache-disabled-until-stable-primary-download",
+      "runtimeRequired": true
+    },
+    {
+      "id": "opentimelineio",
+      "version": "0.18.1",
+      "license": "Apache-2.0",
+      "role": "timeline-interchange",
+      "distribution": "official-source",
+      "source": "https://github.com/AcademySoftwareFoundation/OpenTimelineIO/archive/refs/tags/v0.18.1.tar.gz",
+      "licenseEvidence": "https://github.com/AcademySoftwareFoundation/OpenTimelineIO"
+    },
+    {
+      "id": "opencolorio",
+      "version": "2.5.2",
+      "license": "BSD-3-Clause",
+      "role": "color-management",
+      "distribution": "official-source",
+      "source": "https://github.com/AcademySoftwareFoundation/OpenColorIO/releases/tag/v2.5.2",
+      "licenseEvidence": "https://opencolorio.readthedocs.io/en/latest/aswf/license.html",
+      "asset": "OpenColorIO-2.5.2.tar.gz",
+      "sha256": "cb8b0ae38fa523be8f899a0b2d6b8ca8cbcda7bc4322c91d1ac2b6b2a0082474"
+    },
+    {
+      "id": "mlt",
+      "version": "7.40.0",
+      "license": "LGPL-2.1",
+      "role": "professional-media-framework-for-kdenlive",
+      "distribution": "official-source",
+      "source": "https://github.com/mltframework/mlt/archive/refs/tags/v7.40.0.tar.gz",
+      "licenseEvidence": "https://github.com/mltframework/mlt",
+      "requiredBy": [
+        "kdenlive"
+      ]
+    },
+    {
+      "id": "frei0r",
+      "version": "3.5.0",
+      "license": "GPL-compatible-free-software",
+      "role": "video-effect-transition-plugin-suite",
+      "distribution": "official-source",
+      "source": "https://github.com/dyne/frei0r/archive/refs/tags/v3.5.0.tar.gz",
+      "licenseEvidence": "https://github.com/dyne/frei0r",
+      "requiredBy": [
+        "kdenlive"
+      ]
+    },
+    {
+      "id": "mediainfo",
+      "version": "26.05",
+      "license": "BSD-2-Clause",
+      "role": "media-metadata-inspection",
+      "distribution": "official-source",
+      "source": "https://github.com/MediaArea/MediaInfo/archive/refs/tags/v26.05.tar.gz",
+      "licenseEvidence": "https://github.com/MediaArea/MediaInfo"
+    },
+    {
+      "id": "subtitlecomposer",
+      "version": "0.8.2",
+      "license": "GPL-2.0-or-later",
+      "role": "subtitle-authoring-and-timing",
+      "distribution": "official-source",
+      "source": "https://github.com/KDE/subtitlecomposer/archive/refs/tags/v0.8.2.tar.gz",
+      "licenseEvidence": "https://github.com/KDE/subtitlecomposer"
+    },
+    {
+      "id": "pipewire",
+      "version": "1.6.0",
+      "license": "MIT-with-component-exceptions",
+      "role": "low-latency-audio-video-graph",
+      "distribution": "official-source",
+      "source": "https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/1.6.0/pipewire-1.6.0.tar.gz",
+      "licenseEvidence": "https://github.com/PipeWire/pipewire"
+    },
+    {
+      "id": "openimageio",
+      "version": "3.1.17.0",
+      "license": "Apache-2.0",
+      "role": "image-io-and-vfx-processing",
+      "distribution": "python-package-or-source",
+      "source": "https://pypi.org/project/OpenImageIO/3.1.17.0/",
+      "licenseEvidence": "https://github.com/AcademySoftwareFoundation/OpenImageIO"
+    },
+    {
+      "id": "natron",
+      "version": "2.5.0",
+      "license": "GPL-2.0",
+      "role": "node-based-vfx-compositing-challenger",
+      "distribution": "official-linux-binary",
+      "source": "https://github.com/NatronGitHub/Natron/releases/tag/v2.5.0",
+      "licenseEvidence": "https://github.com/NatronGitHub/Natron"
+    },
+    {
+      "id": "flamenco",
+      "version": "3.9.3",
+      "license": "GPL",
+      "role": "distributed-blender-render-manager-and-worker",
+      "distribution": "official-linux-binary",
+      "source": "https://flamenco.blender.org/download/",
+      "licenseEvidence": "https://flamenco.blender.org/download/"
+    },
+    {
+      "id": "musetalk",
+      "version": "1.5",
+      "license": "MIT-code; model-commercial-use-stated-by-project; dependent model licenses separate",
+      "role": "audio-driven-lip-sync-and-video-dubbing",
+      "distribution": "official-source",
+      "source": "https://github.com/TMElyralab/MuseTalk",
+      "licenseEvidence": "https://github.com/TMElyralab/MuseTalk",
+      "dependencyReviewRequired": true,
+      "notes": "Use for authorized avatars/subjects only. Dependency models such as DWPose/S3FD/Whisper/ft-mse-vae require separate license checks before redistribution."
+    },
+    {
+      "id": "whisperx",
+      "version": "3.8.4",
+      "license": "BSD-2-Clause",
+      "role": "word-level-transcription-alignment-diarization",
+      "distribution": "official-source",
+      "source": "https://github.com/m-bain/whisperX/releases/tag/v3.8.4",
+      "licenseEvidence": "https://github.com/m-bain/whisperX"
+    },
+    {
+      "id": "kokoro",
+      "version": "0.9.4",
+      "license": "Apache-2.0",
+      "role": "lightweight-multilingual-tts",
+      "distribution": "official-source",
+      "source": "https://github.com/hexgrad/kokoro",
+      "licenseEvidence": "https://github.com/hexgrad/kokoro"
+    },
+    {
+      "id": "video2x",
+      "version": "6.4.0",
+      "license": "AGPL-3.0",
+      "role": "video-upscaling-frame-interpolation",
+      "distribution": "official-release-binary",
+      "source": "https://github.com/K4YT3X/video2x/releases/tag/6.4.0",
+      "asset": "Video2X-x86_64.AppImage",
+      "licenseEvidence": "https://github.com/K4YT3X/video2x",
+      "releaseVerification": "official release asset; SHA-256 recorded by Din Allah release pipeline"
+    }
+  ],
+  "sharedWith": {
+    "rechercherOmega": {
+      "pr": 566,
+      "branch": "feat/rechercher-omega-multimodal-intelligence",
+      "roles": [
+        "AI generation",
+        "multimodal understanding",
+        "speech",
+        "document understanding",
+        "video generation",
+        "model routing"
+      ]
+    },
+    "mediaRuntime": {
+      "pr": 603,
+      "branch": "feat/omega-media-conversation-final-2026-v2",
+      "roles": [
+        "editing",
+        "capture",
+        "audio",
+        "VFX",
+        "3D",
+        "color",
+        "timeline interchange",
+        "transcoding",
+        "live media",
+        "conversation"
+      ]
+    }
+  }
+}
