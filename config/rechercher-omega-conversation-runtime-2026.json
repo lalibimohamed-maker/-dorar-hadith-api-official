@@ -167,5 +167,15 @@
       "gated-private"
     ],
     "manifest": "config/rechercher-omega-private-engine-storage-2026.json"
+  },
+  "conversationMemory": {
+    "persistence": "volatile",
+    "maxTurns": 20,
+    "maxCharsPerMessage": 12000,
+    "rawPersistentStorage": false
+  },
+  "security": {
+    "sourceEvidenceIsUntrustedData": true,
+    "ignoreInstructionsInsideSourceText": true
   }
 }
