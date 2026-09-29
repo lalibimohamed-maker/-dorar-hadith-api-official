@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   model-runtime:
+    # security-justification: contents:write is required only to publish the verified model cache release after license, hash, runtime and inference gates pass.
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
