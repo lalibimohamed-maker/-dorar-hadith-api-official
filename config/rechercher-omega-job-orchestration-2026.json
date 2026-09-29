@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "id": "rechercher-omega-job-orchestration-2026",
+  "purpose": "Durable, idempotent and cancellable execution contract shared by AI and media workers.",
+  "broker": {
+    "technology": "nats-jetstream",
+    "durability": "persistent",
+    "acknowledgement": "explicit",
+    "consumer": "durable"
+  },
+  "subjects": {
+    "jobs": "omega.jobs.>",
+    "events": "omega.job-events.>",
+    "dead_letter": "omega.jobs.dlq"
+  },
+  "policy": {
+    "max_attempts": 3,
+    "retry_backoff_ms": [
+      5000,
+      30000,
+      120000
+    ],
+    "idempotency_required": true,
+    "deterministic_job_id_required": true,
+    "cancellation_required": true,
+    "corpus_write_allowed": false,
+    "generated_media_is_evidence": false,
+    "raw_user_content_in_job_metadata": false
+  },
+  "states": [
+    "queued",
+    "running",
+    "succeeded",
+    "failed",
+    "retryable",
+    "cancelled",
+    "dead_letter"
+  ],
+  "recovery": {
+    "crash_requeue": true,
+    "duplicate_delivery_must_be_idempotent": true,
+    "dead_letter_after_max_attempts": true,
+    "operator_replay_requires_audit": true
+  }
+}
