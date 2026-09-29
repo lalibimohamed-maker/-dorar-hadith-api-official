@@ -20,22 +20,46 @@ export function getCapability(registry, id) {
   return registry.components.find(component => component.id === id) ?? null;
 }
 
+function resolveStageChoice(registry, stage, overrides = {}) {
+  const mappedOverride =
+    (stage.startsWith("cosyvoice_or_") && overrides.tts) ||
+    overrides[stage] ||
+    null;
+
+  if (mappedOverride && getCapability(registry, mappedOverride)) {
+    return [getCapability(registry, mappedOverride)];
+  }
+
+  if (stage.includes("_or_")) {
+    const alternatives = stage.split("_or_");
+    const candidates = alternatives.map(id => getCapability(registry, id)).filter(Boolean);
+    if (candidates.length) return [candidates[0]];
+  }
+
+  const direct = getCapability(registry, stage);
+  return direct ? [direct] : [];
+}
+
 export function buildPipelinePlan(registry, pipeline, { overrides = {}, disabled = [] } = {}) {
   const definition = registry.pipelines?.[pipeline];
   if (!definition) throw new Error("unknown Rechercher Ω AI pipeline: " + pipeline);
 
   const disabledSet = new Set(disabled);
-  const ids = [];
-  for (const id of definition.stages ?? []) {
-    const mapped = id === "cosyvoice_or_kokoro"
-      ? (overrides.tts ?? "cosyvoice")
-      : id;
-    if (!disabledSet.has(mapped) && getCapability(registry, mapped)) ids.push(mapped);
+  const selected = [];
+
+  for (const stage of definition.stages ?? []) {
+    const choices = resolveStageChoice(registry, stage, overrides);
+    for (const component of choices) {
+      if (!disabledSet.has(component.id)) selected.push(component);
+    }
   }
 
-  const components = ids.map(id => getCapability(registry, id));
+  const components = selected.filter(
+    (component, index, array) => array.findIndex(item => item.id === component.id) === index
+  );
+
   return {
-    schema_version: "1.0.0",
+    schema_version: "1.1.0",
     engine: "rechercher-omega",
     pipeline,
     components: components.map(component => ({
