@@ -73,12 +73,15 @@
       "id": "video2x",
       "project": "K4YT3X/video2x",
       "version": "6.4.0",
-      "mode": "verified-release-binary",
+      "mode": "container",
       "role": "video-upscaling/frame-interpolation",
-      "linuxAsset": "Video2X-x86_64.AppImage",
       "requires": [
         "Vulkan"
-      ]
+      ],
+      "image": "ghcr.io/k4yt3x/video2x:6.4.0",
+      "digest": "sha256:e21b6893269b4cb6f5603802726fd7537be241f6b39217b73530478861acbca1",
+      "license": "AGPL-3.0",
+      "provenance": "official GHCR image pinned by immutable digest; upstream project release 6.4.0"
     },
     {
       "id": "ffmpeg",
