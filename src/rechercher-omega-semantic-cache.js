@@ -36,11 +36,11 @@ export function buildSemanticCacheKey({
     model: model ?? "unknown",
     modelRevision,
     prompt,
-    evidence: evidence.map(item => ({
-      source_id: item?.source_id ?? item?.id ?? null,
-      content_hash: digest(item?.text ?? item?.excerpt ?? item?.content ?? ""),
-      rights: item?.rights ?? null,
-      verification: item?.verification ?? null
+    evidence: evidence.map((item, index) => ({
+      source_id: typeof item === "string" ? item : (item?.source_id ?? item?.id ?? `source-${index + 1}`),
+      content_hash: digest(typeof item === "string" ? item : (item?.text ?? item?.excerpt ?? item?.content ?? "")),
+      rights: typeof item === "string" ? null : (item?.rights ?? null),
+      verification: typeof item === "string" ? null : (item?.verification ?? null)
     })),
     generationConfig,
     language
