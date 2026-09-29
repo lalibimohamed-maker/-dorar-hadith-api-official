@@ -93,7 +93,9 @@ export async function runGovernedAssistantTurn({
       gate,
       provenance,
       telemetry: completeTelemetry(telemetryContext, { status: backend.status }),
-      corpus_write_allowed: false
+      corpus_write_allowed: false,
+      quality_gate_required: true,
+      quality_gate: "rechercher-omega-quality-gates-2026"
     };
   }
 
@@ -105,7 +107,9 @@ export async function runGovernedAssistantTurn({
       gate,
       provenance,
       telemetry: completeTelemetry(telemetryContext, { status: "queued" }),
-      corpus_write_allowed: false
+      corpus_write_allowed: false,
+      quality_gate_required: true,
+      quality_gate: "rechercher-omega-quality-gates-2026"
     };
   }
 
@@ -153,6 +157,8 @@ export async function runGovernedAssistantTurn({
     result,
     provenance,
     telemetry,
-    corpus_write_allowed: false
+    corpus_write_allowed: false,
+    quality_gate_required: true,
+    quality_gate: "rechercher-omega-quality-gates-2026"
   };
 }
