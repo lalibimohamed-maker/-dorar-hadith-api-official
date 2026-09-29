@@ -62,6 +62,6 @@ test("activation registry exposes only evidence-backed active model engines", as
   assert.equal(registry.policy.failClosed, true);
   assert.equal(registry.states.whisper, "active");
   assert.equal(registry.states.kokoro, "active");
-  assert.notEqual(registry.states.qwen3, "active");
+  assert.equal(registry.states.qwen3, "active");
   assert.notEqual(registry.states["hunyuanvideo-1.5"], "active");
 });
