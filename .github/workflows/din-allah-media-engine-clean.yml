@@ -4,9 +4,14 @@ on:
   pull_request:
     paths:
       - 'config/din-allah-media-engine-clean-2026.json'
+      - 'config/din-allah-media-production-cycle-2026.json'
       - 'src/din-allah-media-engine-contract.js'
+      - 'src/din-allah-media-production-cycle.js'
       - 'test/din-allah-media-engine-clean.test.js'
+      - 'test/din-allah-media-production-cycle.test.js'
+      - 'docs/media/DIN-ALLAH-MEDIA-COMPLETE-PRODUCTION-CYCLE-2026.md'
       - '.github/workflows/din-allah-media-engine-clean.yml'
+      - '.github/workflows/din-allah-media-production-cycle.yml'
   workflow_dispatch:
 
 permissions:
@@ -25,3 +30,6 @@ jobs:
 
       - name: Validate clean Media Engine
         run: node --test test/din-allah-media-engine-clean.test.js
+
+      - name: Validate complete Media Production Cycle
+        run: node --test test/din-allah-media-production-cycle.test.js
