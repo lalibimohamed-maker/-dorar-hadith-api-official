@@ -21,7 +21,12 @@ test('required interoperability capabilities are represented', () => {
     'dataflow-orchestration',
     'digital-twin-and-device-interoperability',
     'messaging-fabric',
-    '3d-scene-interchange'
+    '3d-scene-interchange',
+    '3d-web-asset-interchange',
+    'image-restoration',
+    'video-upscaling',
+    'media-transcoding',
+    'live-media-routing'
   ]) {
     assert.equal(capabilities.has(capability), true, `missing ${capability}`);
   }
