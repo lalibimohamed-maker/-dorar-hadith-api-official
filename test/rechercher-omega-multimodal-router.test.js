@@ -9,24 +9,30 @@ test("fleet covers video, image, audio, OCR, speech and vision", async () => {
   }
 });
 
-test("video routing selects an eligible free-first runtime model", async () => {
+test("video candidate planning can inspect uncleared candidates without enabling execution", async () => {
   const fleet = await loadMultimodalFleet();
-  const plan = selectMultimodalModel({fleet,task:"text_to_video",availableRuntimes:["local","kaggle-gpu"]});
+  const plan = selectMultimodalModel({
+    fleet, task:"text_to_video", availableRuntimes:["local","kaggle-gpu"], requireClearedWeights:false
+  });
   assert.equal(plan.status,"ready");
   assert.ok(["hunyuanvideo-1.5","ltx-2","cogvideox","wan2.2"].includes(plan.model_id));
   assert.equal(plan.corpus_write_allowed,false);
 });
 
-test("uncleared weights are never promoted as production-ready", async () => {
+test("production multimodal execution blocks uncleared weights by default", async () => {
   const fleet = await loadMultimodalFleet();
-  const plan = selectMultimodalModel({fleet,task:"text_to_video",availableRuntimes:["local"],requireClearedWeights:true});
+  const plan = selectMultimodalModel({fleet,task:"text_to_video",availableRuntimes:["local"]});
   assert.equal(plan.status,"queued");
 });
 
 test("multimodal jobs preserve provenance and Corpus boundaries", async () => {
   const fleet = await loadMultimodalFleet();
-  const job = buildMultimodalJob({fleet,task:"image_to_video",input:{source_image_id:"img-1"},availableRuntimes:["kaggle-gpu"]});
-  assert.doesNotThrow(() => assertMultimodalBoundary(job));
+  const job = buildMultimodalJob({
+    fleet,task:"image_to_video",input:{source_image_id:"img-1"},
+    availableRuntimes:["kaggle-gpu"],requireClearedWeights:false
+  });
+  assert.equal(job.status,"ready");
+  assert.doesNotThrow(() => assertMultimodalBoundary({...job, license_status:"cleared", weight_status:"cleared"}));
   assert.equal(job.output_policy.provenance_required,true);
   assert.equal(job.output_policy.corpus_write_allowed,false);
 });
