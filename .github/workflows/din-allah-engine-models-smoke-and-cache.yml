@@ -22,7 +22,7 @@ jobs:
       contents: write
     env:
       RELEASE_TAG: dinullah-engine-models-v2026.09.29
-      HF_HOME: \${{ github.workspace }}/artifacts/hf-cache
+      HF_HOME: ${{ github.workspace }}/artifacts/hf-cache
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -58,7 +58,7 @@ jobs:
           for mid,repo,files in specs:
             info=api.model_info(repo)
             entry={"id":mid,"repo":repo,"revision":info.sha,
-                   "license":str(info.card_data.get("license") if info.card_data else "") or "unknown"}
+                   "license":str(getattr(info.card_data, "license", "") if info.card_data else "") or "unknown"}
             copied=[]
             base=out/mid
             base.mkdir(parents=True,exist_ok=True)
@@ -147,7 +147,7 @@ jobs:
 
       - name: Publish verified model cache
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
