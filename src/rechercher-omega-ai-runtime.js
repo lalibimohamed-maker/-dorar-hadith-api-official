@@ -14,6 +14,8 @@ const LOCAL_FIRST_INTEGRATIONS = new Set([
   "openai_compatible"
 ]);
 
+const MODEL_BEARING_KINDS = /model|vlm|ocr|embedding|reranker|reasoning|speech_recognition|text_to_speech|generation|vision_language|multimodal/i;
+
 const DEFAULT_TOOLS = Object.freeze([
   "source_search",
   "source_metadata",
@@ -23,6 +25,14 @@ const DEFAULT_TOOLS = Object.freeze([
   "rights_check",
   "provenance"
 ]);
+
+function componentRuntimeEligibility(component) {
+  if (!component || component.runtime_enabled === false) return false;
+  if (["architecture_reference", "reference_only"].includes(component.integration)) return false;
+  if (component.model_license_status === "blocked") return false;
+  if (MODEL_BEARING_KINDS.test(component.kind ?? "") && component.model_license_status === "review_required") return false;
+  return true;
+}
 
 export function buildAiExecutionGraph(registry, {
   pipeline,
@@ -39,22 +49,35 @@ export function buildAiExecutionGraph(registry, {
 
   for (const stage of definition.stages ?? []) {
     const choices = registry.components.filter(component =>
-      component.id === stage ||
-      component.tasks.includes(stage)
+      component.id === stage || component.tasks.includes(stage)
     );
 
-    const candidates = choices.filter(component =>
+    let candidates = choices.filter(component =>
       !disabled.has(component.id) &&
-      (available.size === 0 || available.has(component.id))
+      (available.size === 0 || available.has(component.id)) &&
+      componentRuntimeEligibility(component)
     );
 
     if (!candidates.length && stage.includes("_or_")) {
       const alternatives = stage.split("_or_").filter(id => !disabled.has(id));
-      for (const id of alternatives) {
-        const component = registry.components.find(item => item.id === id);
-        if (component && (available.size === 0 || available.has(id))) candidates.push(component);
-      }
+      candidates = alternatives
+        .map(id => registry.components.find(item => item.id === id))
+        .filter(component =>
+          component &&
+          (available.size === 0 || available.has(component.id)) &&
+          componentRuntimeEligibility(component)
+        );
     }
+
+    const allChoices = choices
+      .filter(component => !disabled.has(component.id) && (available.size === 0 || available.has(component.id)))
+      .map(component => ({
+        id: component.id,
+        runtime_eligible: componentRuntimeEligibility(component),
+        integration: component.integration,
+        local_first: LOCAL_FIRST_INTEGRATIONS.has(component.integration),
+        model_license_status: component.model_license_status
+      }));
 
     nodes.push({
       stage,
@@ -63,14 +86,16 @@ export function buildAiExecutionGraph(registry, {
         id: component.id,
         integration: component.integration,
         local_first: LOCAL_FIRST_INTEGRATIONS.has(component.integration),
-        model_license_status: component.model_license_status
-      }))
+        model_license_status: component.model_license_status,
+        runtime_eligible: true
+      })),
+      rejected_candidates: allChoices.filter(candidate => !candidate.runtime_eligible)
     });
   }
 
   const toolSet = [...new Set(requestedTools)].filter(Boolean);
   return {
-    schema_version: "1.0.0",
+    schema_version: "1.1.0",
     engine: "rechercher-omega",
     pipeline,
     nodes,
@@ -86,7 +111,16 @@ export function buildAiExecutionGraph(registry, {
 }
 
 export function buildMcpToolPolicy(requestedTools = DEFAULT_TOOLS) {
-  const allow = [...new Set(requestedTools)].filter(Boolean);
+  const allow = [...new Set(requestedTools)]
+    .filter(Boolean)
+    .filter(tool => ![
+      "unrestricted_shell",
+      "credential_read",
+      "secret_search",
+      "arbitrary_repository_write",
+      "raw_external_code_execution"
+    ].includes(tool));
+
   const denied = [
     "unrestricted_shell",
     "credential_read",
@@ -94,11 +128,13 @@ export function buildMcpToolPolicy(requestedTools = DEFAULT_TOOLS) {
     "arbitrary_repository_write",
     "raw_external_code_execution"
   ];
+
   return {
-    schema_version: "1.0.0",
+    schema_version: "1.1.0",
     protocol: "mcp",
     allow,
     deny: denied,
+    unknown_tools_default: "deny",
     confirmation_required: [
       "public_publication",
       "rights_promotion",
