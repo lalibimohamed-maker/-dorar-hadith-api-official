@@ -1084,6 +1084,40 @@
       ],
       "integration": "local_runtime",
       "auto_download": false
+    },
+    {
+      "id": "vmaf",
+      "kind": "video_quality_assessment",
+      "source_repo": "https://github.com/Netflix/vmaf",
+      "code_license": "BSD+Patent",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "video_quality_assessment",
+        "vmaf",
+        "psnr",
+        "ssim",
+        "ms_ssim",
+        "cambi"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Full-reference quality gate for derived video; never substitutes source provenance."
+    },
+    {
+      "id": "pyscenedetect",
+      "kind": "scene_detection",
+      "source_repo": "https://github.com/Breakthrough/PySceneDetect",
+      "code_license": "BSD-3-Clause",
+      "model_license_status": "not_applicable",
+      "tasks": [
+        "scene_detection",
+        "shot_detection",
+        "video_segmentation",
+        "chapter_generation"
+      ],
+      "integration": "local_runtime",
+      "auto_download": false,
+      "notes": "Use to detect scene boundaries and create deterministic chapter/clip candidates."
     }
   ],
   "pipelines": {
