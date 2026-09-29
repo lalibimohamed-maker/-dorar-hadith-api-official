@@ -1124,11 +1124,12 @@
     "voice": {
       "stages": [
         "microphone",
+        "openwakeword",
         "pipewire_or_webrtc",
         "rnnoise_or_deepfilternet",
         "silero-vad",
         "pyannote-audio_optional",
-        "whisper_or_whisper-cpp",
+        "faster-whisper_or_whisper_or_whisper-cpp",
         "madlad400_or_ara_pair",
         "omega",
         "cosyvoice_or_kokoro_or_piper",
