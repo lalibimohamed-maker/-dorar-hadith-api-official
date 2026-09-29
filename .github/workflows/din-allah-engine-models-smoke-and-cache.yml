@@ -53,7 +53,10 @@ jobs:
             ("whisper-tiny","openai/whisper-tiny",[
               "config.json","preprocessor_config.json","tokenizer.json","vocab.json","merges.txt","normalizer.json","model.safetensors"
             ]),
-            ("kokoro-82m","hexgrad/Kokoro-82M",["config.json","kokoro-v1_0.pth","voices/af_heart.pt"])
+            ("kokoro-82m","hexgrad/Kokoro-82M",["config.json","kokoro-v1_0.pth","voices/af_heart.pt"]),
+            ("qwen3-0.6b","Qwen/Qwen3-0.6B",[
+              "config.json","generation_config.json","tokenizer.json","tokenizer_config.json","special_tokens_map.json","chat_template.jinja","model.safetensors"
+            ])
           ]
           lock={"schemaVersion":"1.0.0","models":[]}
           for mid,repo,files in specs:
@@ -110,6 +113,27 @@ jobs:
           test -s artifacts/smoke/kokoro/output.wav
           ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 artifacts/smoke/kokoro/output.wav
 
+      - name: Real Qwen3 Arabic inference smoke
+        run: |
+          set -euo pipefail
+          . .venv/bin/activate
+          python3 - <<'PY'
+          import torch
+          from transformers import AutoTokenizer, AutoModelForCausalLM
+          path="artifacts/models/qwen3-0.6b"
+          tok=AutoTokenizer.from_pretrained(path,trust_remote_code=False)
+          model=AutoModelForCausalLM.from_pretrained(path,torch_dtype=torch.float32,device_map="cpu")
+          messages=[{"role":"user","content":"عرّف موسوعة دين الله في جملة عربية واحدة."}]
+          prompt=tok.apply_chat_template(messages,tokenize=False,add_generation_prompt=True,enable_thinking=False)
+          inputs=tok(prompt,return_tensors="pt")
+          with torch.no_grad():
+            out=model.generate(**inputs,max_new_tokens=32,do_sample=False)
+          generated=tok.decode(out[0][inputs["input_ids"].shape[1]:],skip_special_tokens=True).strip()
+          assert generated and len(generated)>5, "QWEN3_EMPTY_OR_TOO_SHORT"
+          print("QWEN3_0_6B_ARABIC_INFERENCE_OK",generated)
+          open("artifacts/smoke/qwen3-inference.txt","w",encoding="utf-8").write(generated+"\n")
+          PY
+
       - name: Build fail-closed activation evidence
         run: |
           set -euo pipefail
@@ -125,7 +149,7 @@ jobs:
               "asset-integrity": all(len(f["sha256"])==64 and f["bytes"]>0 for x in lock["models"] for f in x["files"]),
               "runtime-installed": True,
               "model-present": all(x["files"] for x in lock["models"]),
-              "smoke-test": Path("artifacts/smoke/whisper/transcription.txt").stat().st_size>0 and Path("artifacts/smoke/kokoro/output.wav").stat().st_size>0,
+              "smoke-test": Path("artifacts/smoke/whisper/transcription.txt").stat().st_size>0 and Path("artifacts/smoke/kokoro/output.wav").stat().st_size>0 and Path("artifacts/smoke/qwen3-inference.txt").stat().st_size>0,
               "capability-test": True,
               "provenance": all(len(x["revision"])>=40 for x in lock["models"])
             },
@@ -144,6 +168,7 @@ jobs:
           set -euo pipefail
           tar -czf artifacts/whisper-tiny-hf.tar.gz -C artifacts/models whisper-tiny
           tar -czf artifacts/kokoro-82m-hf.tar.gz -C artifacts/models kokoro-82m
+          tar -czf artifacts/qwen3-0.6b-hf.tar.gz -C artifacts/models qwen3-0.6b
           sha256sum artifacts/*.tar.gz > artifacts/model-archives-sha256.txt
 
       - name: Publish verified model cache
@@ -158,6 +183,7 @@ jobs:
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             upload_one artifacts/whisper-tiny-hf.tar.gz
             upload_one artifacts/kokoro-82m-hf.tar.gz
+            upload_one artifacts/qwen3-0.6b-hf.tar.gz
             upload_one artifacts/model-archives-sha256.txt
             upload_one artifacts/models/model-lock.json
             upload_one artifacts/models/activation-evidence.json
@@ -165,6 +191,7 @@ jobs:
             gh release create "$RELEASE_TAG" \
               artifacts/whisper-tiny-hf.tar.gz \
               artifacts/kokoro-82m-hf.tar.gz \
+              artifacts/qwen3-0.6b-hf.tar.gz \
               artifacts/model-archives-sha256.txt \
               artifacts/models/model-lock.json \
               artifacts/models/activation-evidence.json \
