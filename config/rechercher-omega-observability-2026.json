@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0.0",
+  "id": "rechercher-omega-observability-2026",
+  "purpose": "Privacy-preserving telemetry for AI, research, conversation and media execution.",
+  "standard": "OpenTelemetry semantic-convention-aligned",
+  "policy": {
+    "raw_prompt_recorded": false,
+    "raw_user_query_recorded": false,
+    "tool_arguments_recorded": false,
+    "secrets_recorded": false,
+    "sensitive_content_opt_in_only": true
+  },
+  "required_fields": [
+    "trace_id",
+    "span_id",
+    "workflow",
+    "task",
+    "model_id",
+    "provider",
+    "backend",
+    "job_id",
+    "status",
+    "queue_wait_ms",
+    "latency_ms",
+    "input_tokens",
+    "output_tokens",
+    "media_bytes_in",
+    "media_bytes_out",
+    "peak_vram_mb",
+    "cache_hit",
+    "error_type",
+    "provenance_id"
+  ],
+  "metric_groups": [
+    "model_latency",
+    "model_error_rate",
+    "queue_depth",
+    "queue_wait",
+    "token_usage",
+    "media_throughput",
+    "render_success_rate",
+    "asr_wer",
+    "translation_quality",
+    "ocr_confidence",
+    "rights_denials",
+    "provenance_failures"
+  ],
+  "retention": {
+    "default_days": 30,
+    "aggregates_longer_than_raw_events": true
+  }
+}
