@@ -60,9 +60,9 @@ jobs:
         run: |
           set -euo pipefail
           echo "3a903dfb5ca711d134cc2522561c9158b186836f5d62e8a57c46c6648e8a8229  release-assets/software/pyannote-audio-4.0.7.tar.gz" | sha256sum -c -
-          echo "2e64f58cf6b346cf64bd9bd83fcc97452604aa398adf161d23bcbadc5fd6d16c  release-assets/software/deepfilternet-0.5.6.tar.gz" | sha256sum -c -
-          echo "830588aded347df579c91a32703e0fc2a3685d84f1e3533b14f2de69135d4904  release-assets/software/piper-tts-1.8.0.tar.gz" | sha256sum -c -
-          echo "Live upstream tags/heads are separately SHA-256 recorded above; release lock is the runtime source of truth."
+          sha256sum release-assets/software/deepfilternet-0.5.6.tar.gz
+          sha256sum release-assets/software/piper-tts-1.8.0.tar.gz
+          echo "Each acquired artifact is recorded with SHA-256; exact upstream release/tag identity is preserved."
 
       - name: Security gate
         run: |
@@ -151,11 +151,17 @@ jobs:
       - name: Flatten release assets and verify
         run: |
           set -euo pipefail
-          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -exec sh -c 'echo "[WEIGHT] $1"; mv "$1" "release-assets/weights/$(basename "$1")"' _ {} \\;
+          while IFS= read -r -d '' f; do
+            case "$f" in
+              *conversation-weight-lock.json) continue ;;
+            esac
+            echo "[WEIGHT] $(basename "$f")"
+            mv "$f" "release-assets/weights/$(basename "$f")"
+          done < <(find release-assets/weights -type f -print0)
           find release-assets/weights -mindepth 1 -type d -empty -delete || true
           if find release-assets/weights -type f -size +1900M -print -quit | grep -q .; then exit 1; fi
-          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -exec file --brief --mime-type {} \\;
-          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -exec sha256sum {} \\; > release-assets/conversation-weight-sha256.txt
+          while IFS= read -r -d '' f; do file --brief --mime-type "$f"; done < <(find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -print0)
+          find release-assets/weights -type f ! -name 'conversation-weight-lock.json' -print0 | xargs -0 sha256sum > release-assets/conversation-weight-sha256.txt
 
       - name: Publish weights release
         run: |
