@@ -27,8 +27,8 @@ test('professional studio toolchain covers the production stack',()=>{
 
 test('Omega bridge links AI production tasks to execution tools',()=>{
   assert.equal(bridge.aiBranch.pr,566);
-  assert.equal(bridge.executionBranch.pr,600);
-  assert.equal(bridge.executionBranch.branch,'feat/open-interoperability-fabric-2026');
+  assert.equal(bridge.executionBranch.pr,601);
+  assert.equal(bridge.executionBranch.branch,'feat/open-interoperability-fabric-2026-stacked');
   const execution=new Set([
     ...runtime.software.map(x=>x.id),
     ...studio.tools.map(x=>x.id)
