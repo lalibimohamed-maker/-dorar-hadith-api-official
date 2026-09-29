@@ -54,9 +54,7 @@ jobs:
               "config.json","preprocessor_config.json","tokenizer.json","vocab.json","merges.txt","normalizer.json","model.safetensors"
             ]),
             ("kokoro-82m","hexgrad/Kokoro-82M",["config.json","kokoro-v1_0.pth","voices/af_heart.pt"]),
-            ("qwen3-0.6b","Qwen/Qwen3-0.6B",[
-              "config.json","generation_config.json","tokenizer.json","tokenizer_config.json","special_tokens_map.json","chat_template.jinja","model.safetensors"
-            ])
+            ("qwen3-0.6b","Qwen/Qwen3-0.6B",["__DYNAMIC__"])
           ]
           lock={"schemaVersion":"1.0.0","models":[]}
           for mid,repo,files in specs:
