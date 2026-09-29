@@ -10,6 +10,7 @@ import { loadExecutionBackends, selectExecutionBackend, executeSelectedBackend }
 import { buildTelemetryContext, completeTelemetry } from "./rechercher-omega-observability.js";
 import { buildEvidenceEnvelope, buildScholarlySystemPrompt } from "./rechercher-omega-evidence-envelope.js";
 import { ConversationMemory } from "./rechercher-omega-conversation-memory.js";
+import { evaluateRuntimeArtifactReadiness } from "./rechercher-omega-runtime-readiness.js";
 
 import { admitExecution } from "./rechercher-omega-resource-admission.js";
 import { buildSemanticCacheKey, createCacheEntry, isCacheReusable, DEFAULT_CACHE_TTLS_MS } from "./rechercher-omega-semantic-cache.js";
@@ -33,7 +34,8 @@ export async function runGovernedAssistantTurn({
   requiredVramMb = 0,
   cacheEntry = null,
   cacheWriter = null,
-  conversationHistory = []
+  conversationHistory = [],
+  runtimeArtifact = null
 } = {}) {
   if (!String(query ?? "").trim()) throw new TypeError("assistant query is required");
 
@@ -87,6 +89,14 @@ export async function runGovernedAssistantTurn({
     language
   });
 
+  const runtimeReadiness = evaluateRuntimeArtifactReadiness({
+    backendWeightsRequired: backend.weights_required === true,
+    artifactState: runtimeArtifact?.state ?? "not_verified",
+    sha256Verified: runtimeArtifact?.sha256_verified === true,
+    revisionVerified: runtimeArtifact?.revision_verified === true,
+    licenseVerified: runtimeArtifact?.license_verified === true
+  });
+
   const telemetryContext = buildTelemetryContext({
     workflow: "omega.assistant.turn",
     task: "scholarly_answer",
@@ -117,6 +127,7 @@ export async function runGovernedAssistantTurn({
       backend,
       gate,
       provenance,
+      runtime_readiness: runtimeReadiness,
       cache: { hit: false, key: cacheKey, ttl_ms: DEFAULT_CACHE_TTLS_MS.scholarly_answer },
       telemetry: completeTelemetry(telemetryContext, { status: backend.status, cache_hit: false }),
       corpus_write_allowed: false,
@@ -147,6 +158,26 @@ export async function runGovernedAssistantTurn({
         quality_gate: "rechercher-omega-quality-gates-2026"
       };
     }
+  }
+
+  if (runtimeReadiness.status !== "ready") {
+    return {
+      status: "queued",
+      plan,
+      backend,
+      gate,
+      provenance,
+      runtime_readiness: runtimeReadiness,
+      cache: { hit: false, key: cacheKey },
+      telemetry: completeTelemetry(telemetryContext, {
+        status: "queued",
+        cache_hit: false,
+        error_type: "runtime_artifact_not_ready"
+      }),
+      corpus_write_allowed: false,
+      quality_gate_required: true,
+      quality_gate: "rechercher-omega-quality-gates-2026"
+    };
   }
 
   if (backend.status !== "ready") {
@@ -206,6 +237,7 @@ export async function runGovernedAssistantTurn({
     backend: gate,
     result,
     provenance,
+    runtime_readiness: runtimeReadiness,
     cache: { hit: false, key: cacheKey, entry: cache },
     telemetry: completeTelemetry(telemetryContext, {
       status: "succeeded",
