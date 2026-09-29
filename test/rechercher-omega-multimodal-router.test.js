@@ -36,3 +36,12 @@ test("multimodal jobs preserve provenance and Corpus boundaries", async () => {
   assert.equal(job.output_policy.provenance_required,true);
   assert.equal(job.output_policy.corpus_write_allowed,false);
 });
+
+
+test("production queue reports the weight-promotion action instead of silently failing", async () => {
+  const fleet = await loadMultimodalFleet();
+  const plan = selectMultimodalModel({fleet,task:"text_to_video",availableRuntimes:["local"]});
+  assert.equal(plan.status,"queued");
+  assert.ok(Array.isArray(plan.blocked_candidates));
+  assert.ok(plan.blocked_candidates.every(item => item.next_action === "acquire_and_verify_weight_artifact"));
+});
