@@ -233,7 +233,10 @@
     "Pipecat/WebRTC voice pipeline smoke check",
     "lip-sync pipeline dependency/license check",
     "VMAF/PSNR/SSIM derived-output quality probe",
-    "PySceneDetect scene/shot segmentation smoke test"
+    "PySceneDetect scene/shot segmentation smoke test",
+    "resource admission and GPU-concurrency policy check",
+    "semantic cache invalidation check",
+    "public publication readiness gate check"
   ],
   "notes": [
     "NiFi 2.12.0 is the current upstream release as of 2026-09-29.",
@@ -325,5 +328,27 @@
       "whisperx",
       "kokoro"
     ]
+  },
+  "resourceAdmission": {
+    "manifest": "config/rechercher-omega-resource-and-cache-2026.json",
+    "liveObservationRequired": true,
+    "pools": {
+      "local_cpu": {
+        "max_concurrency": 2
+      },
+      "local_gpu": {
+        "max_concurrency": 1
+      },
+      "local_comfyui": {
+        "max_concurrency": 1
+      },
+      "kaggle_gpu": {
+        "max_concurrency": 1
+      },
+      "api": {
+        "max_concurrency": 4
+      }
+    },
+    "saturationAction": "queue"
   }
 }
