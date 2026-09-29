@@ -17,8 +17,8 @@ test("studio tooling is complete and deduplicated",()=>{
 });
 test("AI-to-media conversation bridge points to PR 602",()=>{
  assert.equal(bridge.aiBranch.pr,566);
- assert.equal(bridge.executionBranch.pr,602);
- assert.equal(bridge.executionBranch.branch,"feat/omega-media-conversation-final-2026");
+ assert.equal(bridge.executionBranch.pr,603);
+ assert.equal(bridge.executionBranch.branch,"feat/omega-media-conversation-final-2026-v2");
  for(const key of ["microphone_input","international_translation","multilingual_tts","live_voice_translation","lip_sync_dubbing","ai_media_creation","subtitle_timing"]) assert.ok(Array.isArray(bridge.taskRouting[key]),key);
 });
 test("runtime keeps model weights in Releases",()=>{
