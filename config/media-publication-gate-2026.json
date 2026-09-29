@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "id": "dinullah-media-publication-readiness-2026",
+  "purpose": "Fail-closed public publication gate for generated and derived media.",
+  "required_gates": {
+    "rights": "passed",
+    "provenance": "passed",
+    "quality": "passed",
+    "safety": "passed",
+    "accessibility": "passed"
+  },
+  "outputs": {
+    "public_promotion_allowed": "all_required_gates_pass",
+    "corpus_write_allowed": false,
+    "generated_media_is_evidence": false
+  },
+  "accessibility_requirements": {
+    "captions_or_transcript_required_when_speech_present": true,
+    "audio_description_supported": true,
+    "alt_text_or_media_description_supported": true
+  },
+  "policy": {
+    "generated_media_never_becomes_scholarly_evidence": true,
+    "rights_are_asset_specific": true,
+    "missing_gate_blocks_publication": true
+  }
+}
