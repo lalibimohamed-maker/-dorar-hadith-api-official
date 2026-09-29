@@ -1,121 +1,12 @@
-name: Din Allah — Qwen3 Small Runtime Install, Smoke and Cache
+name: Din Allah — Qwen3 Small Runtime (manual fallback)
 on:
-  push:
-    branches: ["feat/omega-media-conversation-final-2026-v3"]
-    paths:
-      - ".github/workflows/din-allah-qwen3-small-runtime.yml"
   workflow_dispatch:
-
 permissions:
   contents: read
-
-concurrency:
-  group: din-allah-qwen3-small-runtime
-  cancel-in-progress: true
-
+# Primary Qwen3 verification now lives in din-allah-engine-models-smoke-and-cache.yml.
+# This workflow is retained as a manual fallback only and does not auto-acquire assets.
 jobs:
-  qwen3:
-    # security-justification: contents:write is required only to publish the verified Qwen3 model cache after license, hash and real Arabic inference gates pass.
+  notice:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Install runtime
-        run: |
-          set -euo pipefail
-          python3 -m venv .venv
-          . .venv/bin/activate
-          python -m pip install --disable-pip-version-check "huggingface_hub==0.34.4" "transformers>=4.57,<5" "torch>=2.2" safetensors
-
-      - name: Acquire exact Qwen3 revision
-        run: |
-          set -euo pipefail
-          . .venv/bin/activate
-          mkdir -p artifacts/qwen3-0.6b
-          python3 - <<'PY'
-          import hashlib, json
-          from pathlib import Path
-          from huggingface_hub import HfApi, hf_hub_download
-          repo="Qwen/Qwen3-0.6B"
-          api=HfApi()
-          info=api.model_info(repo)
-          allowed={"config.json","generation_config.json","tokenizer.json","tokenizer_config.json","special_tokens_map.json","chat_template.jinja","model.safetensors"}
-          files=[x.rfilename for x in info.siblings if x.rfilename in allowed]
-          assert "model.safetensors" in files
-          lock={"schemaVersion":"1.0.0","id":"qwen3-0.6b","repo":repo,"revision":info.sha,
-                "license":str(getattr(info.card_data,"license","") if info.card_data else "") or "unknown","files":[]}
-          base=Path("artifacts/qwen3-0.6b")
-          for rel in files:
-            p=Path(hf_hub_download(repo_id=repo,filename=rel,revision=info.sha,local_dir=str(base),local_dir_use_symlinks=False))
-            lock["files"].append({"path":rel,"bytes":p.stat().st_size,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()})
-          Path("artifacts/qwen3-model-lock.json").write_text(json.dumps(lock,ensure_ascii=False,indent=2)+"
-",encoding="utf-8")
-          PY
-
-      - name: Real Qwen3 Arabic inference smoke
-        run: |
-          set -euo pipefail
-          . .venv/bin/activate
-          python3 - <<'PY'
-          import torch
-          from transformers import AutoTokenizer, AutoModelForCausalLM
-          path="artifacts/qwen3-0.6b"
-          tok=AutoTokenizer.from_pretrained(path,trust_remote_code=False)
-          model=AutoModelForCausalLM.from_pretrained(path,torch_dtype=torch.float32,device_map="cpu")
-          messages=[{"role":"user","content":"عرّف موسوعة دين الله في جملة عربية واحدة."}]
-          prompt=tok.apply_chat_template(messages,tokenize=False,add_generation_prompt=True,enable_thinking=False)
-          inputs=tok(prompt,return_tensors="pt")
-          with torch.no_grad():
-            out=model.generate(**inputs,max_new_tokens=32,do_sample=False)
-          generated=tok.decode(out[0][inputs["input_ids"].shape[1]:],skip_special_tokens=True).strip()
-          assert generated and len(generated)>5, "QWEN3_EMPTY_OR_TOO_SHORT"
-          print("QWEN3_0_6B_ARABIC_INFERENCE_OK",generated)
-          open("artifacts/qwen3-inference.txt","w",encoding="utf-8").write(generated+"
-")
-          PY
-
-      - name: Build activation evidence
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          lock=json.load(open("artifacts/qwen3-model-lock.json",encoding="utf-8"))
-          assert lock["license"]=="apache-2.0"
-          assert len(lock["revision"])>=40
-          assert all(len(x["sha256"])==64 and x["bytes"]>0 for x in lock["files"])
-          assert Path("artifacts/qwen3-inference.txt").stat().st_size>0
-          evidence={"schemaVersion":"1.0.0","engine":"qwen3-0.6b",
-                    "gates":{"source-license":True,"asset-integrity":True,"runtime-installed":True,
-                             "model-present":True,"smoke-test":True,"capability-test":True,"provenance":True},
-                    "smoke":{"status":"passed","language":"ar"},
-                    "capability":{"status":"passed","task":"text-generation"},
-                    "corpus_write_allowed":False}
-          Path("artifacts/qwen3-activation-evidence.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+"
-",encoding="utf-8")
-          PY
-
-      - name: Package and hash verified cache
-        run: |
-          set -euo pipefail
-          tar -czf artifacts/qwen3-0.6b-hf.tar.gz -C artifacts qwen3-0.6b
-          sha256sum artifacts/qwen3-0.6b-hf.tar.gz > artifacts/qwen3-0.6b-hf.tar.gz.sha256
-
-      - name: Publish verified Qwen3 cache
-        run: |
-          set -euo pipefail
-          export GH_TOKEN="$GITHUB_TOKEN"
-          tag="dinullah-qwen3-0.6b-v2026.09.29"
-          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            for f in artifacts/qwen3-0.6b-hf.tar.gz artifacts/qwen3-0.6b-hf.tar.gz.sha256 artifacts/qwen3-model-lock.json artifacts/qwen3-activation-evidence.json; do
-              gh release upload "$tag" "$f" --repo "$GITHUB_REPOSITORY" --clobber
-            done
-          else
-            gh release create "$tag" artifacts/qwen3-0.6b-hf.tar.gz artifacts/qwen3-0.6b-hf.tar.gz.sha256 artifacts/qwen3-model-lock.json artifacts/qwen3-activation-evidence.json --repo "$GITHUB_REPOSITORY" --title "Din Allah Qwen3-0.6B Verified Runtime" --notes "Apache-2.0 Qwen3-0.6B. Exact revision, SHA-256 inventory and real Arabic CPU inference smoke passed. No Corpus writes."
-          fi
-          gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets
+      - run: echo "Use din-allah-engine-models-smoke-and-cache.yml for Qwen3 acquisition and activation."
