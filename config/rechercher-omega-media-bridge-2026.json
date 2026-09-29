@@ -58,6 +58,7 @@
     ],
     "compositing_vfx": [
       "blender",
+      "natron",
       "opencolorio"
     ],
     "3d": [
@@ -79,6 +80,20 @@
       "nifi",
       "nats",
       "ditto"
+    ],
+    "ai_generation_runtime": [
+      "local-comfyui-pinned",
+      "local-omega-ai-runtime"
+    ],
+    "render_queue": [
+      "flamenco"
+    ],
+    "media_metadata": [
+      "mediainfo"
+    ],
+    "subtitle_authoring": [
+      "subtitlecomposer",
+      "kdenlive"
     ]
   },
   "invariants": [
@@ -86,6 +101,7 @@
     "AI models are selected by task/resource/license gates; they do not redefine source truth.",
     "Media tools execute planned jobs; they do not write directly to Corpus.",
     "Weights and software binaries are release-backed and hash-verified before runtime promotion.",
-    "No paid provider is required by the bridge."
+    "No paid provider is required by the bridge.",
+    "ComfyUI API nodes that target paid services remain disabled for the free-first runtime."
   ]
 }
