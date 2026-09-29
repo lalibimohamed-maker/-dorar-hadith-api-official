@@ -1,0 +1,185 @@
+# final-current-head-refresh: 2026-09-29T01:28Z
+name: Conversation Runtime — Release Cache
+
+on:
+  push:
+    branches:
+      - feat/omega-media-conversation-final-2026-v2
+    paths:
+      - config/rechercher-omega-conversation-runtime-2026.json
+      - config/rechercher-omega-conversation-weight-release-2026.json
+      - .github/workflows/conversation-runtime-release.yml
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        required: true
+        default: "dinullah-conversation-runtime-v2026.09.29"
+      weights_tag:
+        required: true
+        default: "dinullah-conversation-weights-v2026.09.29"
+      publish:
+        required: true
+        default: "true"
+
+# security-justification: this workflow publishes only declared open-source conversation runtime assets after source, license, size and SHA-256 gates.
+permissions:
+  contents: write
+
+jobs:
+  software:
+    name: Cache conversational software
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.release_tag || 'dinullah-conversation-runtime-v2026.09.29' }}
+      PUBLISH: ${{ inputs.publish || 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Prepare
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets/software
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/pipecat-1.12.0.tar.gz https://github.com/pipecat-ai/pipecat/archive/refs/tags/v1.12.0.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/pion-webrtc-4.0.0.tar.gz https://github.com/pion/webrtc/archive/refs/tags/v4.0.0.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/whisper.cpp-1.9.4.tar.gz https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v1.9.4.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/whisperX-3.8.4.tar.gz https://github.com/m-bain/whisperX/archive/refs/tags/v3.8.4.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/deepfilternet-0.5.6.tar.gz https://github.com/Rikorose/DeepFilterNet/archive/refs/tags/v0.5.6.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/rnnoise-0.2.tar.gz https://github.com/xiph/rnnoise/archive/refs/tags/v0.2.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/pyannote-audio-4.0.7.tar.gz https://pypi.org/packages/source/p/pyannote-audio/pyannote_audio-4.0.7.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/piper-tts-1.8.0.tar.gz https://files.pythonhosted.org/packages/source/p/piper-tts/piper_tts-1.8.0.tar.gz
+          MUSYTALK_SHA=$(python3 -c 'import json,urllib.request; req=urllib.request.Request("https://api.github.com/repos/TMElyralab/MuseTalk/commits/main",headers={"Accept":"application/vnd.github+json","User-Agent":"Dinullah-conversation-runtime"}); print(json.load(urllib.request.urlopen(req,timeout=30))["sha"])')
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/MuseTalk-${MUSYTALK_SHA}.tar.gz https://github.com/TMElyralab/MuseTalk/archive/${MUSYTALK_SHA}.tar.gz
+
+          sha256sum release-assets/software/* > release-assets/software-sha256.txt
+
+      - name: Verify known provenance
+        run: |
+          set -euo pipefail
+          echo "3a903dfb5ca711d134cc2522561c9158b186836f5d62e8a57c46c6648e8a8229  release-assets/software/pyannote-audio-4.0.7.tar.gz" | sha256sum -c -
+          sha256sum release-assets/software/deepfilternet-0.5.6.tar.gz
+          sha256sum release-assets/software/piper-tts-1.8.0.tar.gz
+          echo "Each acquired artifact is recorded with SHA-256; exact upstream release/tag identity is preserved."
+
+      - name: Security gate
+        run: |
+          set -euo pipefail
+          find release-assets/weights -type f \( -name '*.lock' -o -name '*.metadata' -o -name '.gitignore' \) -delete
+          while IFS= read -r -d '' f; do
+            file --brief --mime-type "$f"
+          done < <(find release-assets -type f -print0)
+          find release-assets -type f -size +1900M -print -quit | grep -q . && exit 1 || true
+
+      - name: Publish software release
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --clobber
+          elif [ "$PUBLISH" = "true" ]; then
+            gh release create "$RELEASE_TAG" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Free/open conversation runtime cache: realtime orchestration, WebRTC transport, ASR, speech enhancement, diarization runtime, Piper and lip-sync source. Model weights are governed separately."
+          else
+            gh release create "$RELEASE_TAG" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Draft conversation runtime cache." --draft
+          fi
+
+  weights:
+    name: Cache license-cleared conversation weights
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.weights_tag || 'dinullah-conversation-weights-v2026.09.29' }}
+      PUBLISH: ${{ inputs.publish || 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Hugging Face API helper
+        run: python3 -m pip install --disable-pip-version-check "huggingface_hub==0.34.4"
+
+      - name: Acquire and lock model weights
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets/weights
+          python3 - <<'PY'
+          import os, json, hashlib, urllib.request, urllib.parse, re, subprocess
+          from huggingface_hub import HfApi, hf_hub_download
+          from pathlib import Path
+
+          manifest=json.load(open("config/rechercher-omega-conversation-weight-release-2026.json",encoding="utf-8"))
+          api=HfApi()
+          entries=[]
+          allowed=re.compile(r"^(config\.json|generation_config\.json|tokenizer.*|special_tokens_map\.json|.*safetensors(\.index\.json)?|.*\.bin|.*\.spm|.*\.model|vocab\.json|merges\.txt|source\.spm)$",re.I)
+
+          for model in manifest["models"]:
+              mid=model["id"]
+              if mid=="habibi-msa":
+                  repo="SWivid/Habibi-TTS"; rev=model["commit"]; files=["Specialized/MSA/model_200000.safetensors","Specialized/MSA/vocab.txt"]
+              elif mid=="habibi-alg":
+                  repo="SWivid/Habibi-TTS"; rev=model["commit"]; files=["Specialized/ALG/model_100000.safetensors","Specialized/ALG/vocab.txt"]
+              else:
+                  repo=model["model"]
+                  info=api.model_info(repo)
+                  rev=info.sha
+                  siblings=[x.rfilename for x in info.siblings if allowed.match(x.rfilename)]
+                  files=siblings
+              base=Path("release-assets/weights")/mid
+              base.mkdir(parents=True,exist_ok=True)
+              for rel in files:
+                  out=hf_hub_download(repo_id=repo,filename=rel,revision=rev,local_dir=str(base),local_dir_use_symlinks=False)
+                  p=Path(out)
+                  size=p.stat().st_size
+                  if size<=1900000000:
+                      h=hashlib.sha256(p.read_bytes()).hexdigest()
+                      entries.append({"model_id":mid,"revision":rev,"source_path":rel,"asset_name":f"{mid}__{rel.replace('/','__')}","sha256":h,"bytes":size,"parts":[]})
+                  else:
+                      prefix=base/(p.name+".part-")
+                      subprocess.run(["split","-b","1800M","-d","-a","3",str(p),str(prefix)],check=True)
+                      p.unlink()
+                      parts=[]
+                      for part in sorted(base.glob(p.name+".part-*")):
+                          h=hashlib.sha256(part.read_bytes()).hexdigest()
+                          parts.append({"asset_name":f"{mid}__{rel.replace('/','__')}__{part.name.split('-')[-1]}","sha256":h,"bytes":part.stat().st_size})
+                      entries.append({"model_id":mid,"revision":rev,"source_path":rel,"asset_name":None,"sha256":None,"bytes":size,"parts":parts})
+          lock={"schemaVersion":"1.0.0","releaseTag":os.environ["RELEASE_TAG"],"models":manifest["models"],"files":entries}
+          Path("release-assets/weights/conversation-weight-lock.json").write_text(json.dumps(lock,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          PY
+
+      - name: Flatten release assets and verify
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' f; do
+            case "$f" in
+              *conversation-weight-lock.json|*/.gitignore) continue ;;
+            esac
+            parent="$(basename "$(dirname "$f")")"
+            base="$(basename "$f")"
+            case "$parent" in
+              weights) name="$base" ;;
+              *) name="${parent}__${base}" ;;
+            esac
+            echo "[WEIGHT] $parent/$base -> $name"
+            mv "$f" "release-assets/weights/$name"
+          done < <(find release-assets/weights -mindepth 2 -type f -print0)
+          find release-assets/weights -type f -size +1900M -print -quit | grep -q . && {
+            echo "RELEASE_ASSET_TOO_LARGE"
+            exit 1
+          } || true
+          while IFS= read -r -d '' f; do file --brief --mime-type "$f"; done < <(find release-assets/weights -type f -print0)
+          find release-assets/weights -type f -print0 | xargs -0 sha256sum > release-assets/conversation-weight-sha256.txt
+
+      - name: Publish weights release
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-assets/weights/* release-assets/conversation-weight-sha256.txt --repo "$GITHUB_REPOSITORY" --clobber
+          elif [ "$PUBLISH" = "true" ]; then
+            gh release create "$RELEASE_TAG" release-assets/weights/* release-assets/conversation-weight-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Weights $RELEASE_TAG" --notes "License-cleared multilingual translation and Arabic TTS weights. Restricted/non-commercial/gated models are not included."
+          else
+            gh release create "$RELEASE_TAG" release-assets/weights/* release-assets/conversation-weight-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Weights $RELEASE_TAG" --notes "Draft conversation weights release." --draft
+          fi
