@@ -1,8 +1,8 @@
-# Rechercher — Global 133 × 24 Search Matrix
+# Rechercher — Global 133 × 37 Search Matrix
 
 ## Objective
 
-Rechercher now treats the current first-party IslamHouse snapshot of **133 enumerated languages** as a concrete research universe across 24 Islamic knowledge/resource domains: **3,192 deterministic search cells**.
+Rechercher now treats the current first-party IslamHouse snapshot of **133 enumerated languages** as a concrete research universe across **24 Islamic knowledge domains plus 13 supporting resource/governance lanes**: **4,921 deterministic search cells**.
 
 The previous 132-language snapshot had one missing enumerated language. The current official IslamHouse catalogue reports 133 languages and explicitly includes **Bengali** in the language selector. Bengali is therefore promoted from the discrepancy state into the evidence-backed language registry; no language was invented or inferred.
 
@@ -29,13 +29,42 @@ Additional explicit states:
 
 The canonical Arabic Quran is an isolated corpus layer. Human translations are separate resources. Machine translations are separate unverified fallback resources. No translation lane can overwrite canonical Arabic Quran content.
 
-## Resource domains
+## Knowledge domains (24)
 
-Quran, tafsir, hadith, hadith explanation, Sunnah, sirah, aqidah, fiqh, usul al-fiqh, fatwa, Islamic terms, Islamic history, Islamic ethics, dua/adhkar, education, books, articles, audio, video, PDF, structured metadata, provenance, rights, verification.
+1. Quran
+2. Quran sciences
+3. Tafsir
+4. Tajweed and Qiraat
+5. Quranic inimitability
+6. Quranic stories
+7. Prophetic hadith
+8. Hadith sciences
+9. Hadith terminology
+10. Hadith explanation
+11. Prophetic biography (Sirah)
+12. Prophetic characteristics (Shamail)
+13. Aqidah
+14. Tawhid
+15. Fiqh
+16. Usul al-Fiqh
+17. Fiqh branches / madhahib
+18. Fatwas
+19. Spiritual refinement, manners and ethics
+20. Islamic history
+21. Biographies and Tabaqat
+22. Comparative fiqh and juristic disagreement
+23. Da'wah and Islamic culture
+24. General Islamic encyclopedias and references
+
+## Supporting matrix lanes (13)
+
+Sunnah, Islamic terms, Dua/Adhkar, Education, Books, Articles, Audio, Video, PDF, Structured metadata, Provenance, Rights, Verification.
+
+The 13 supporting lanes remain in the matrix for resource/support/governance coverage and are distinct from the 24 scholarly knowledge domains.
 
 ## Expansion rule
 
-106 is a minimum evidence-backed target, not a ceiling. Newly evidenced languages and sources enter the queue beyond 106. Rechercher must prefer discovering real resources over manufacturing complete-looking language coverage.
+106 is a minimum evidence-backed language-lane target, not a ceiling. The active matrix is 133 × 37 = 4,921 queue cells. Newly evidenced languages and sources enter the queue beyond 106. Rechercher must prefer discovering real resources over manufacturing complete-looking language coverage.
 
 ## First-party anchors
 
