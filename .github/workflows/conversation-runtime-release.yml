@@ -50,13 +50,9 @@ jobs:
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/rnnoise-0.2.tar.gz https://github.com/xiph/rnnoise/archive/refs/tags/v0.2.tar.gz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/pyannote-audio-4.0.7.tar.gz https://pypi.org/packages/source/p/pyannote-audio/pyannote_audio-4.0.7.tar.gz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/piper-tts-1.8.0.tar.gz https://files.pythonhosted.org/packages/source/p/piper-tts/piper_tts-1.8.0.tar.gz
-          MUSYTALK_SHA=$(python3 - <<'PY'
-import json,urllib.request
-req=urllib.request.Request('https://api.github.com/repos/TMElyralab/MuseTalk/commits/main',headers={'Accept':'application/vnd.github+json','User-Agent':'Dinullah-conversation-runtime'})
-print(json.load(urllib.request.urlopen(req,timeout=30))['sha'])
-PY
-)
+          MUSYTALK_SHA=$(python3 -c 'import json,urllib.request; req=urllib.request.Request("https://api.github.com/repos/TMElyralab/MuseTalk/commits/main",headers={"Accept":"application/vnd.github+json","User-Agent":"Dinullah-conversation-runtime"}); print(json.load(urllib.request.urlopen(req,timeout=30))["sha"])')
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/software/MuseTalk-${MUSYTALK_SHA}.tar.gz https://github.com/TMElyralab/MuseTalk/archive/${MUSYTALK_SHA}.tar.gz
+
           sha256sum release-assets/software/* > release-assets/software-sha256.txt
 
       - name: Verify known provenance
