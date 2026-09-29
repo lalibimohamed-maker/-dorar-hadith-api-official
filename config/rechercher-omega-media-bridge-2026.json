@@ -6,10 +6,10 @@
     "branch": "feat/rechercher-omega-multimodal-intelligence"
   },
   "executionBranch": {
-    "pr": 601,
-    "branch": "feat/open-interoperability-fabric-2026-stacked"
+    "pr": 602,
+    "branch": "feat/omega-media-conversation-final-2026"
   },
-  "contract": "PR566-plans-media-jobs; PR601-executes-free-first-media-runtime",
+  "contract": "PR566-plans-media-jobs; PR602-executes-conversational-media-runtime",
   "taskRouting": {
     "text_to_video": [
       "wan2.2",
@@ -119,7 +119,8 @@
     "asr": [
       "whisper",
       "whisper-cpp",
-      "faster-whisper"
+      "faster-whisper",
+      "whisperx"
     ],
     "language_identification": [
       "whisper",
@@ -169,6 +170,14 @@
       "flamenco",
       "ffmpeg",
       "mediamtx"
+    ],
+    "subtitle_timing": [
+      "whisperx",
+      "subtitlecomposer",
+      "kdenlive"
+    ],
+    "tts_lightweight": [
+      "kokoro"
     ]
   },
   "invariants": [
