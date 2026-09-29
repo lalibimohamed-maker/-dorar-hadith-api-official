@@ -123,7 +123,7 @@ jobs:
           from transformers import AutoTokenizer, AutoModelForCausalLM
           path="artifacts/models/qwen3-0.6b"
           tok=AutoTokenizer.from_pretrained(path,trust_remote_code=False)
-          model=AutoModelForCausalLM.from_pretrained(path,torch_dtype=torch.float32,device_map="cpu")
+          model=AutoModelForCausalLM.from_pretrained(path,torch_dtype=torch.float32)
           messages=[{"role":"user","content":"عرّف موسوعة دين الله في جملة عربية واحدة."}]
           prompt=tok.apply_chat_template(messages,tokenize=False,add_generation_prompt=True,enable_thinking=False)
           inputs=tok(prompt,return_tensors="pt")
