@@ -69,6 +69,19 @@ jobs:
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenColorIO-2.5.2.tar.gz             https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v2.5.2.tar.gz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/inkscape-1.4.2-source.tar.gz             https://gitlab.com/inkscape/inkscape/-/archive/1.4.2/inkscape-1.4.2.tar.gz
 
+      - name: Acquire remaining media foundation and production assets
+        run: |
+          set -euo pipefail
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/mlt-7.40.0.tar.gz https://github.com/mltframework/mlt/archive/refs/tags/v7.40.0.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/frei0r-3.5.0.tar.gz https://github.com/dyne/frei0r/archive/refs/tags/v3.5.0.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/MediaInfo-26.05.tar.gz https://github.com/MediaArea/MediaInfo/archive/refs/tags/v26.05.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/subtitlecomposer-0.8.2.tar.gz https://github.com/KDE/subtitlecomposer/archive/refs/tags/v0.8.2.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/pipewire-1.6.0.tar.gz https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/1.6.0/pipewire-1.6.0.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/openimageio-3.1.17.0.tar.gz https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v3.1.17.0.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/Natron-2.5.0-Linux-x86_64.tgz https://github.com/NatronGitHub/Natron/releases/download/v2.5.0/Natron-2.5.0-Linux-x86_64.tgz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/flamenco-3.9.3-linux-amd64.tar.gz https://flamenco.blender.org/files/flamenco-3.9.3-linux-amd64.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ffmpeg-9.0.2.tar.xz https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz
+
       - name: Verify publisher checksums
         run: |
           set -euo pipefail
@@ -78,6 +91,19 @@ jobs:
           grep 'GIMP-3.2.6-x86_64.AppImage' release-assets/GIMP-SHA256SUMS | (cd release-assets && sha256sum -c -)
           echo "8a0e2cc6451de6901fec778a8b6d00165399879233a264ca5bb1b1b283266513  release-assets/kdenlive-26.08.1.tar.xz" | sha256sum -c -
           echo "Inkscape source: exact upstream tag 1.4.2; SHA-256 recorded in the release manifest."
+
+      - name: Validate archive contents
+        run: |
+          set -euo pipefail
+          tar -tzf release-assets/mlt-7.40.0.tar.gz >/dev/null
+          tar -tzf release-assets/frei0r-3.5.0.tar.gz >/dev/null
+          tar -tzf release-assets/MediaInfo-26.05.tar.gz >/dev/null
+          tar -tzf release-assets/subtitlecomposer-0.8.2.tar.gz >/dev/null
+          tar -tzf release-assets/pipewire-1.6.0.tar.gz >/dev/null
+          tar -tzf release-assets/openimageio-3.1.17.0.tar.gz >/dev/null
+          tar -tzf release-assets/Natron-2.5.0-Linux-x86_64.tgz >/dev/null
+          tar -tzf release-assets/flamenco-3.9.3-linux-amd64.tar.gz >/dev/null
+          tar -tJf release-assets/ffmpeg-9.0.2.tar.xz >/dev/null
 
       - name: Validate asset types, executable boundaries and sizes
         run: |
