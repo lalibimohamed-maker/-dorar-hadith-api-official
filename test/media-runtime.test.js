@@ -5,11 +5,38 @@ import path from 'node:path';
 
 const root=process.cwd();
 const runtime=JSON.parse(fs.readFileSync(path.join(root,'config/media-runtime-2026.json'),'utf8'));
+const studio=JSON.parse(fs.readFileSync(path.join(root,'config/media-studio-toolchain-2026.json'),'utf8'));
+const bridge=JSON.parse(fs.readFileSync(path.join(root,'config/rechercher-omega-media-bridge-2026.json'),'utf8'));
 
 test('complete runtime manifest covers every selected interoperability/media component',()=>{
   const ids=new Set(runtime.software.map(x=>x.id));
   for(const id of ['nifi','ditto','nats','openusd','gltf','gltf-validator','real-esrgan','video2x','ffmpeg','tesseract','paddleocr','colmap','open3d','mediamtx']) {
     assert.equal(ids.has(id),true,`missing runtime component: ${id}`);
+  }
+});
+
+test('professional studio toolchain covers the production stack',()=>{
+  const ids=new Set(studio.tools.map(x=>x.id));
+  for(const id of ['kdenlive','blender','obs','ardour','audacity','gimp','inkscape','glaxnimate','imagemagick','opentimelineio','opencolorio']) {
+    assert.equal(ids.has(id),true,`missing studio tool: ${id}`);
+  }
+  for(const tool of studio.tools) {
+    assert.ok(tool.version && tool.license && tool.source && tool.licenseEvidence, `incomplete provenance for ${tool.id}`);
+  }
+});
+
+test('Omega bridge links AI production tasks to execution tools',()=>{
+  assert.equal(bridge.aiBranch.pr,566);
+  assert.equal(bridge.executionBranch.pr,600);
+  assert.equal(bridge.executionBranch.branch,'feat/open-interoperability-fabric-2026');
+  const execution=new Set([
+    ...runtime.software.map(x=>x.id),
+    ...studio.tools.map(x=>x.id)
+  ]);
+  for(const tools of Object.values(bridge.taskRouting)) {
+    for(const tool of tools) {
+      assert.equal(execution.has(tool) || studio.tools.some(x=>x.id===tool) || tool==='wan2.2' || tool==='hunyuanvideo-1.5' || tool==='ltx-2' || tool==='cogvideox' || tool==='flux' || tool==='whisper' || tool==='cosyvoice' || tool==='paddleocr-vl', true, `unresolved bridge tool/model: ${tool}`);
+    }
   }
 });
 
