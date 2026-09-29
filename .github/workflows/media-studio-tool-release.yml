@@ -119,6 +119,7 @@ jobs:
       - name: Validate archive contents
         run: |
           set -euo pipefail
+          tar -tzf release-assets/ardour-source-7abcc0eba5578d531e4710db5a6adb9235f88d62.tar.gz >/dev/null
           tar -tzf release-assets/mlt-7.40.0.tar.gz >/dev/null
           tar -tzf release-assets/frei0r-3.5.0.tar.gz >/dev/null
           tar -tzf release-assets/MediaInfo-26.05.tar.gz >/dev/null
