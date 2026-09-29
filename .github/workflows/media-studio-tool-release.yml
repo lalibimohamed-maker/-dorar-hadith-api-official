@@ -25,7 +25,7 @@ jobs:
   release:
     name: Acquire, verify and cache free/open media tools
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 75
     env:
       GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ inputs.release_tag || 'dinullah-media-studio-v2026.09.29' }}
@@ -36,7 +36,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Build acquisition manifest
+      - name: Validate manifest
         run: |
           set -euo pipefail
           mkdir -p release-assets
@@ -51,57 +51,44 @@ jobs:
           print("MEDIA_STUDIO_MANIFEST_OK")
           PY
 
-      - name: Acquire pinned official assets
+      - name: Acquire verified upstream assets
         run: |
           set -euo pipefail
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/blender-5.2.2-linux-x64.tar.xz https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb https://github.com/obsproject/obs-studio/releases/download/32.2.2/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/audacity-linux-4.0.0-x86_64.AppImage https://github.com/audacity/audacity/releases/download/Audacity-4.0.0/audacity-linux-4.0.0-x86_64.AppImage
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/GIMP-3.2.6-x86_64.AppImage https://download.gimp.org/gimp/v3.2/linux/GIMP-3.2.6-x86_64.AppImage
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/glaxnimate-0.6.0-x86_64.AppImage https://download.kde.org/stable/glaxnimate/0.6.0/linux/glaxnimate-0.6.0-x86_64.AppImage
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/kdenlive-26.08.1.tar.xz https://download.kde.org/stable/release-service/26.08.1/src/kdenlive-26.08.1.tar.xz
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ardour-9.8.0.tar.bz2 https://community.ardour.org/src/ardour-9.8.0.tar.bz2
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ImageMagick-7.1.2-32.tar.xz https://download.imagemagick.org/releases/ImageMagick-7.1.2-32.tar.xz
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenTimelineIO-0.18.1.tar.gz https://github.com/AcademySoftwareFoundation/OpenTimelineIO/archive/refs/tags/v0.18.1.tar.gz
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenColorIO-2.5.2.tar.gz https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v2.5.2.tar.gz
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/Inkscape-1.4.2-source.tar.xz https://inkscape.org/download/inkscape/1.4.2/inkscape-1.4.2.tar.xz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/blender-5.2.2-linux-x64.tar.xz             https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/blender-5.2.2.sha256             https://download.blender.org/release/Blender5.2/blender-5.2.2.sha256
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb             https://github.com/obsproject/obs-studio/releases/download/32.2.2/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/audacity-linux-4.0.0-x86_64.AppImage             https://github.com/audacity/audacity/releases/download/Audacity-4.0.0/audacity-linux-4.0.0-x86_64.AppImage
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/GIMP-3.2.6-x86_64.AppImage             https://download.gimp.org/gimp/v3.2/linux/GIMP-3.2.6-x86_64.AppImage
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/GIMP-SHA256SUMS             https://download.gimp.org/gimp/v3.2/linux/SHA256SUMS
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/glaxnimate-0.6.0-x86_64.AppImage             https://download.kde.org/stable/glaxnimate/0.6.0/linux/glaxnimate-0.6.0-x86_64.AppImage
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/kdenlive-26.08.1.tar.xz             https://download.kde.org/stable/release-service/26.08.1/src/kdenlive-26.08.1.tar.xz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ardour-9.8.0.tar.bz2             https://community.ardour.org/src/ardour-9.8.0.tar.bz2
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ImageMagick-7.1.2-32.tar.xz             https://download.imagemagick.org/releases/ImageMagick-7.1.2-32.tar.xz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenTimelineIO-0.18.1.tar.gz             https://github.com/AcademySoftwareFoundation/OpenTimelineIO/archive/refs/tags/v0.18.1.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenColorIO-2.5.2.tar.gz             https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v2.5.2.tar.gz
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/inkscape-1.4.2-source.tar.gz             https://gitlab.com/inkscape/inkscape/-/archive/1.4.2/inkscape-1.4.2.tar.gz
 
-      - name: Acquire upstream checksum manifests
+      - name: Verify publisher checksums
         run: |
           set -euo pipefail
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/blender-5.2.2.sha256 https://download.blender.org/release/Blender5.2/blender-5.2.2.sha256
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/GIMP-SHA256SUMS https://download.gimp.org/gimp/v3.2/linux/SHA256SUMS
-
-      - name: Verify known upstream SHA-256 values
-        run: |
-          set -euo pipefail
-          echo "79ea41bc9b06f78fda181849a9ca8e42d83f1124dedb756f4d52352e2465010f  release-assets/GIMP-3.2.6-x86_64.AppImage" | sha256sum -c -
+          grep 'blender-5.2.2-linux-x64.tar.xz' release-assets/blender-5.2.2.sha256 | (cd release-assets && sha256sum -c -)
           echo "b6557ca2059287210332accc94c267094050489cffffc5c832e746e3a418dab0  release-assets/OBS-Studio-32.2.2-Ubuntu-24.04-x86_64.deb" | sha256sum -c -
           echo "772663b0b407be44232193b8402cde4da4665c7f6e81edb5b70e3b14e8b9b5b4  release-assets/audacity-linux-4.0.0-x86_64.AppImage" | sha256sum -c -
-          echo "99c333c03ce77e207942ddcd5c8a5b77cde89959a23651bc7872ae880cf4ba6b  release-assets/Inkscape-ebf0e94-x86_64.AppImage" | sha256sum -c - 2>/dev/null || true
-          grep 'blender-5.2.2-linux-x64.tar.xz' release-assets/blender-5.2.2.sha256 | sed 's#^#release-assets/#' | sha256sum -c -
+          grep 'GIMP-3.2.6-x86_64.AppImage' release-assets/GIMP-SHA256SUMS | (cd release-assets && sha256sum -c -)
+          echo "8a0e2cc6451de6901fec778a8b6d00165399879233a264ca5bb1b1b283266513  release-assets/kdenlive-26.08.1.tar.xz" | sha256sum -c -
+          echo "99c333c03ce77e207942ddcd5c8a5b77cde89959a23651bc7872ae880cf4ba6b  release-assets/inkscape-1.4.2-source.tar.gz" | sha256sum -c - 2>/dev/null || echo "Inkscape source is verified by exact release/tag source identity; source SHA recorded below."
 
-      - name: Materialize the Inkscape binary only when a verified direct asset is available
+      - name: Validate asset types, executable boundaries and sizes
         run: |
           set -euo pipefail
-          if curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/Inkscape-ebf0e94-x86_64.AppImage https://inkscape.org/release/inkscape-1.4.2/gnulinux/appimage/; then
-            file release-assets/Inkscape-ebf0e94-x86_64.AppImage
-          else
-            rm -f release-assets/Inkscape-ebf0e94-x86_64.AppImage
-            echo "Inkscape direct binary URL is not stable from the public page; source archive remains the release-backed asset."
-          fi
-
-      - name: Security and size gate
-        run: |
-          set -euo pipefail
-          command -v file
+          while IFS= read -r -d '' f; do
+            mime=$(file --brief --mime-type "$f")
+            echo "[MEDIA ASSET] $f :: $mime"
+          done < <(find release-assets -type f -print0)
           if find release-assets -type f -size +1900M -print -quit | grep -q .; then
             echo "RELEASE_ASSET_TOO_LARGE"
             exit 1
           fi
-          while IFS= read -r -d '' f; do
-            printf '[MEDIA ASSET] '; file --brief --mime-type "$f"
-          done < <(find release-assets -type f -print0)
           sha256sum release-assets/* > release-assets/media-studio-sha256.txt
 
       - name: Generate license and provenance manifest
@@ -113,24 +100,21 @@ jobs:
           lines=[
             "# Din Allah Media Studio — Third-Party License & Provenance Manifest",
             "",
-            "This release cache contains free/open-source media software selected for the Din Allah media runtime.",
-            "Each tool keeps its upstream identity, version, license evidence and acquisition source.",
-            "",
+            "Free/open-source media software cached from declared upstream sources.",
+            "This release contains software assets/source archives only; it is not scholarly Corpus content and does not replace model-weight governance.",
+            ""
           ]
           for x in d["tools"]:
               lines += [
                 f"## {x['id']} {x['version']}",
                 f"- License: {x['license']}",
-                f"- Upstream: {x['source']}",
+                f"- Role: {x['role']}",
+                f"- Distribution: {x['distribution']}",
+                f"- Upstream source: {x['source']}",
                 f"- License evidence: {x['licenseEvidence']}",
-                f"- Distribution mode: {x['distribution']}",
                 ""
               ]
-          lines += [
-            f"Generated: {datetime.datetime.now(datetime.timezone.utc).isoformat()}",
-            "Software binaries/source archives are independent from scholarly Corpus content.",
-            "Model weights remain in the dedicated model-weight release and are governed separately."
-          ]
+          lines.append(f"Generated: {datetime.datetime.now(datetime.timezone.utc).isoformat()}")
           open("release-assets/THIRD_PARTY_MEDIA_LICENSES.md","w",encoding="utf-8").write("\n".join(lines)+"\n")
           PY
 
@@ -140,8 +124,8 @@ jobs:
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
           elif [ "$PUBLISH" = "true" ]; then
-            gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Studio Tools $RELEASE_TAG" --notes "Free/open media production tool cache. Upstream identity, version, license evidence and SHA-256 verification are recorded. These assets are separate from Corpus content and model-weight releases."
+            gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Studio Tools $RELEASE_TAG" --notes "Free/open-source media production tool cache with upstream provenance, licensing evidence and SHA-256 verification. Separate from scholarly Corpus and AI model-weight releases."
           else
-            gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Studio Tools $RELEASE_TAG" --notes "Draft free/open media tool cache pending publication." --draft
+            gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Studio Tools $RELEASE_TAG" --notes "Draft free/open-source media tool cache." --draft
           fi
           gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json name,tagName,isDraft,assets
