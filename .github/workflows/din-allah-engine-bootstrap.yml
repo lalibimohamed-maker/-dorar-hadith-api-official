@@ -1,42 +1,25 @@
-name: Din Allah — Free Engine Bootstrap and Runtime Verification
-
+name: Din Allah — Complete Engine Runtime Verification
 on:
   workflow_dispatch:
   push:
-    branches:
-      - "feat/omega-media-conversation-final-2026-v3"
-    paths:
-      - "scripts/din-allah-engine-bootstrap.sh"
-      - "config/din-allah-engine-installation-manifest-2026.json"
-      - ".github/workflows/din-allah-engine-bootstrap.yml"
+    branches: ["feat/omega-media-conversation-final-2026-v3"]
+    paths: ["scripts/din-allah-engine-bootstrap.sh","config/din-allah-engine-installation-manifest-2026.json",".github/workflows/din-allah-engine-bootstrap.yml"]
   pull_request:
-    paths:
-      - "scripts/din-allah-engine-bootstrap.sh"
-      - "config/din-allah-engine-installation-manifest-2026.json"
-      - ".github/workflows/din-allah-engine-bootstrap.yml"
-
+    paths: ["scripts/din-allah-engine-bootstrap.sh","config/din-allah-engine-installation-manifest-2026.json",".github/workflows/din-allah-engine-bootstrap.yml"]
 permissions:
   contents: read
-
 jobs:
-  bootstrap:
+  cpu-runtime:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
-      - name: Bootstrap and verify free engines
-        run: |
-          chmod +x scripts/din-allah-engine-bootstrap.sh
-          scripts/din-allah-engine-bootstrap.sh
-
-      - name: Upload runtime verification manifest
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - run: chmod +x scripts/din-allah-engine-bootstrap.sh && scripts/din-allah-engine-bootstrap.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: din-allah-engine-runtime-manifest
+          name: din-allah-complete-engine-runtime-manifest
           path: artifacts/engine-runtime/runtime-manifest.json
           if-no-files-found: error
           retention-days: 7
