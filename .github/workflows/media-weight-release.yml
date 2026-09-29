@@ -64,26 +64,16 @@ jobs:
               subprocess.run(['curl','--fail','--location','--retry','3','--proto','=https','--tlsv1.2','-o',out,item['upstreamUrl']],check=True)
           PY
 
-      - name: Download pinned Video2X RIFE weights
+      - name: Verify Video2X bundled-model policy
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json, os, re, subprocess, urllib.request
+          import json
           d=json.load(open('config/media-weight-release-manifest-2026.json',encoding='utf-8'))
-          src=d['dynamicSources'][0]
-          api='https://api.github.com/repos/'+src['upstreamRepository']+'/releases/tags/'+src['upstreamRelease']
-          req=urllib.request.Request(api,headers={'Accept':'application/vnd.github+json','User-Agent':'Din-Allah-media-weight-release'})
-          with urllib.request.urlopen(req,timeout=30) as r:
-              release=json.load(r)
-          rx=re.compile(src['assetSelectionRegex'])
-          selected=[a for a in release.get('assets',[]) if rx.match(a.get('name',''))]
-          if not selected:
-              raise SystemExit('No pinned RIFE model assets matched the verified Video2X release.')
-          for a in selected:
-              name=a['name']
-              out='release-assets/video2x-'+name
-              subprocess.run(['curl','--fail','--location','--retry','3','--proto','=https','--tlsv1.2','-o',out,a['browser_download_url']],check=True)
-          print('SELECTED_RIFE_ASSETS=', [a['name'] for a in selected])
+          src=next(x for x in d['dynamicSources'] if x['id']=='video2x-embedded-model-bundle')
+          assert src['artifact']=='Video2X-x86_64.AppImage'
+          assert src['attestationVerification'] is True
+          print('VIDEO2X_RIFE_BUNDLED_POLICY_OK')
           PY
 
       - name: Verify weights and generate immutable lock manifest
