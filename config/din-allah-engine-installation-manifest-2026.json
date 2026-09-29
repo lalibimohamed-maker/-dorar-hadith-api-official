@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Free-first runtime inventory and license/provenance manifest for Media and Rechercher Omega engines.",
+  "policy": {
+    "freeFirst": true,
+    "openSourceFirst": true,
+    "noPaidCoreDependency": true,
+    "noCorpusMutation": true,
+    "noLargeBinariesInGit": true,
+    "noModelWeightsInGit": true,
+    "failClosedOnLicenseUnknown": true
+  },
+  "engines": [
+    {"id":"ffmpeg","layer":"media","license":"LGPL-2.1-or-later; optional GPL-2.0-or-later parts","source":"https://ffmpeg.org/","install":"apt","runtime":"ffmpeg"},
+    {"id":"ffprobe","layer":"media","license":"LGPL-2.1-or-later; optional GPL-2.0-or-later parts","source":"https://ffmpeg.org/","install":"apt","runtime":"ffprobe"},
+    {"id":"blender","layer":"media","license":"GPL-3.0-or-later","source":"https://www.blender.org/","install":"apt","runtime":"blender"},
+    {"id":"pyscenedetect","layer":"media","license":"BSD-3-Clause","source":"https://github.com/Breakthrough/PySceneDetect","install":"pip","runtime":"scenedetect"},
+    {"id":"opentimelineio","layer":"media","license":"Apache-2.0","source":"https://github.com/AcademySoftwareFoundation/OpenTimelineIO","install":"pip","runtime":"python-module"},
+    {"id":"whisper","layer":"ai","license":"MIT (code and model weights per upstream)","source":"https://github.com/openai/whisper","install":"pip","runtime":"python-module"},
+    {"id":"faster-whisper","layer":"ai","license":"MIT code; model weights retain their own upstream terms","source":"https://github.com/SYSTRAN/faster-whisper","install":"pip","runtime":"python-module"},
+    {"id":"whisperx","layer":"ai","license":"BSD-2-Clause","source":"https://github.com/m-bain/whisperX","install":"pip","runtime":"python-module"},
+    {"id":"paddleocr-vl","layer":"ai","license":"Apache-2.0 code; model terms tracked separately","source":"https://github.com/PaddlePaddle/PaddleOCR","install":"pip","runtime":"python-module"},
+    {"id":"docling","layer":"ai","license":"MIT code; model terms tracked separately","source":"https://github.com/docling-project/docling","install":"pip","runtime":"python-module"},
+    {"id":"bge-m3","layer":"ai","license":"MIT code; model terms tracked separately","source":"https://github.com/FlagOpen/FlagEmbedding","install":"pip","runtime":"model"},
+    {"id":"bge-reranker-v2-m3","layer":"ai","license":"MIT code; model terms tracked separately","source":"https://github.com/FlagOpen/FlagEmbedding","install":"pip","runtime":"model"},
+    {"id":"qdrant","layer":"ai","license":"Apache-2.0","source":"https://github.com/qdrant/qdrant","install":"container-or-service","runtime":"service"},
+    {"id":"ollama","layer":"ai","license":"MIT software; each model has its own terms","source":"https://github.com/ollama/ollama","install":"optional-runtime","runtime":"service"},
+    {"id":"llama-cpp","layer":"ai","license":"MIT software; each model has its own terms","source":"https://github.com/ggml-org/llama.cpp","install":"optional-runtime","runtime":"binary"},
+    {"id":"vllm","layer":"ai","license":"Apache-2.0 software; each model has its own terms","source":"https://github.com/vllm-project/vllm","install":"optional-runtime","runtime":"service"},
+    {"id":"localai","layer":"ai","license":"MIT software; each model has its own terms","source":"https://github.com/mudler/LocalAI","install":"optional-runtime","runtime":"service"},
+    {"id":"openvino","layer":"ai","license":"Apache-2.0","source":"https://github.com/openvinotoolkit/openvino","install":"pip","runtime":"python-module"}
+  ]
+}
