@@ -28,3 +28,39 @@ test("governed assistant blocks scholarly turns without evidence", async () => {
   assert.equal(result.status, "blocked");
   assert.equal(result.plan.status, "blocked");
 });
+
+
+test("assistant queues before execution when the resource pool is saturated", async () => {
+  const result = await runGovernedAssistantTurn({
+    query: "اختبار",
+    evidence: [{ source_id: "s1", text: "verified" }],
+    availableBackends: ["openai-compatible"],
+    execute: true,
+    resourcePool: { max_concurrency: 1 },
+    currentJobs: 1
+  });
+  assert.equal(result.status, "queued");
+  assert.equal(result.resource_admission.reason, "concurrency_limit");
+});
+
+test("assistant can return a deterministic semantic-cache hit", async () => {
+  const seed = await runGovernedAssistantTurn({
+    query: "اختبار",
+    evidence: [{ source_id: "s1", text: "verified" }],
+    availableBackends: ["openai-compatible"],
+    execute: false
+  });
+  const cacheEntry = {
+    ...seed.cache.entry,
+    output_ref: "artifact://cached/1"
+  };
+  const hit = await runGovernedAssistantTurn({
+    query: "اختبار",
+    evidence: [{ source_id: "s1", text: "verified" }],
+    availableBackends: ["openai-compatible"],
+    cacheEntry
+  });
+  assert.equal(hit.status, "cache_hit");
+  assert.equal(hit.cache.hit, true);
+  assert.equal(hit.cache.entry.output_ref, "artifact://cached/1");
+});
