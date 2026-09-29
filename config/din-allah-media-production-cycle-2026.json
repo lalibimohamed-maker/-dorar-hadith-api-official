@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0.0",
+  "engineId": "din-allah-media-production-cycle-2026",
+  "status": "production-contract",
+  "purpose": "End-to-end governed media production for the Din Allah Encyclopedia without mutating the scholarly Corpus.",
+  "principles": {
+    "freeFirst": true,
+    "openSourceFirst": true,
+    "selfHostedPreferred": true,
+    "noPaidCoreDependency": true,
+    "optionalPaidAdaptersMustBeNonBlocking": true,
+    "corpusIsImmutable": true,
+    "canonicalQuranArabicIsImmutable": true,
+    "translationsRemainDistinct": true,
+    "rightsRequiredPerAsset": true,
+    "provenanceRequiredPerAsset": true,
+    "evidenceRequiredPerClaim": true,
+    "humanReviewBeforePublication": true,
+    "failClosed": true,
+    "reproducibleBuilds": true,
+    "noSilentAssetReplacement": true,
+    "noGeneratedQuranText": true,
+    "noGeneratedQuranRecitation": true
+  },
+  "lifecycle": [
+    "intake",
+    "brief",
+    "research",
+    "evidence_packet",
+    "claim_verification",
+    "script",
+    "storyboard",
+    "asset_plan",
+    "media_discovery",
+    "rights_and_license_gate",
+    "asset_ingest",
+    "malware_and_integrity_scan",
+    "original_visual_generation",
+    "scientific_graphics_and_simulation",
+    "voice_and_recitation_selection",
+    "transcription_and_alignment",
+    "translation_and_localization",
+    "semantic_scene_composition",
+    "timeline_edit",
+    "captions_and_accessibility",
+    "audio_mix_and_master",
+    "visual_quality_control",
+    "scientific_and_religious_fidelity_check",
+    "provenance_manifest",
+    "deterministic_render",
+    "delivery_variants",
+    "publication_gate",
+    "publish",
+    "archive",
+    "rollback_and_rebuild"
+  ],
+  "claimPolicy": {
+    "requiredRecord": ["claimId", "claimText", "claimType", "evidenceIds", "verificationStatus"],
+    "allowedVerificationStatus": ["verified", "qualified", "disputed", "unverified"],
+    "publicationRule": "unverified claims cannot enter a published timeline",
+    "interpretiveRule": "interpretive links must never be silently promoted to scientific fact or doctrine"
+  },
+  "quranPolicy": {
+    "arabicSource": "verified_canonical_quran_source",
+    "arabicHandling": "verbatim_only",
+    "generatedArabicText": "forbidden",
+    "translationHandling": "separate_meanings_asset_with_language_and_source",
+    "recitationHandling": "separate_rights_cleared_asset",
+    "wordAlignment": "only_against_verified_source_text_and_rights_cleared_recitation"
+  },
+  "assetPolicy": {
+    "allowedClasses": ["public_domain", "compatible_open_license", "explicit_permission", "original_generated"],
+    "referenceOnlyClass": "reference_only_not_embeddable",
+    "requiredManifestFields": [
+      "assetId", "assetType", "sourceUrl", "creator", "license", "licenseEvidence",
+      "retrievedAt", "sha256", "usageScope", "attribution", "modelOrTool", "modelVersion",
+      "parentAssetIds", "createdBy", "createdAt"
+    ],
+    "replacementRule": "derived assets keep parentAssetIds and never overwrite source assets"
+  },
+  "qualityGates": {
+    "sourceIntegrity": ["sha256", "container_probe", "malware_scan"],
+    "visual": ["resolution", "frame_rate", "aspect_ratio", "black_frame_scan", "duplicate_frame_scan", "temporal_consistency", "text_legibility"],
+    "audio": ["codec_probe", "sample_rate", "channel_layout", "loudness", "clipping", "silence_scan", "speech_alignment"],
+    "scientific": ["claim_to_evidence_mapping", "diagram_label_check", "unit_check", "no_unsupported_inference"],
+    "religious": ["quran_exact_match", "hadith_reference_check", "grading_metadata_check", "translation_source_check"],
+    "accessibility": ["captions", "transcript", "language_metadata", "audio_description_when_required"],
+    "provenance": ["complete_manifest", "hashes", "tool_versions", "model_versions", "license_evidence"]
+  },
+  "renderPolicy": {
+    "master": "highest_verified_capability_of_source_and_runtime",
+    "profiles": ["web", "mobile", "archive", "audio_only", "subtitle_only"],
+    "resolution": "open_ended",
+    "nativeResolutionClaimsRequireEvidence": true,
+    "textLayers": "render_from_vectors_or_verified_source_at_target_resolution",
+    "upscaling": "derived_only_and_never_described_as_native",
+    "determinism": "record_all_parameters_and_versions"
+  },
+  "freeToolchain": {
+    "core": [
+      {"id": "ffmpeg", "role": "decode_encode_mux_filter_probe", "license": "LGPL/GPL depending on build"},
+      {"id": "opentimelineio", "role": "deterministic_timeline_exchange", "license": "Apache-2.0"},
+      {"id": "blender", "role": "3d_science_visualization_and_rendering", "license": "GPL-3.0-or-later"},
+      {"id": "kdenlive", "role": "human_editing_and_review", "license": "GPL-3.0-or-later"},
+      {"id": "audacity", "role": "audio_editing_and_cleanup", "license": "GPL-3.0-or-later"},
+      {"id": "pyscenedetect", "role": "shot_detection", "license": "BSD-3-Clause"},
+      {"id": "whisper", "role": "speech_transcription", "license": "MIT"},
+      {"id": "whisperx", "role": "word_level_alignment", "license": "verify_current_release_terms"}
+    ],
+    "optionalAdapters": [
+      {"id": "local_video_generation", "rule": "open_model_and_checkpoint_terms_must_be_verified_before_public_use"},
+      {"id": "local_image_generation", "rule": "open_model_and_checkpoint_terms_must_be_verified_before_public_use"},
+      {"id": "local_tts", "rule": "voice_model_and_dataset_terms_must_be verified_before_public_use"},
+      {"id": "super_resolution", "rule": "code_and_weight_license_must_be_verified"},
+      {"id": "external_ai_service", "rule": "never a required production dependency"}
+    ]
+  },
+  "publicationGate": {
+    "required": [
+      "evidence_verified",
+      "rights_verified",
+      "integrity_verified",
+      "quran_verified",
+      "audio_verified",
+      "visual_quality_passed",
+      "accessibility_passed",
+      "provenance_complete",
+      "human_review_approved",
+      "ci_passed"
+    ],
+    "blockedStates": [
+      "missing_evidence",
+      "missing_rights",
+      "unknown_license",
+      "integrity_failure",
+      "invalid_quran_text",
+      "generated_quran_text",
+      "generated_quran_recitation",
+      "audio_failure",
+      "visual_failure",
+      "provenance_failure",
+      "human_review_missing",
+      "ci_failure"
+    ]
+  },
+  "delivery": {
+    "publicWeb": ["adaptive_video", "progressive_video", "poster", "captions", "transcript"],
+    "archive": ["master", "source_manifest", "timeline", "provenance_manifest", "checksums"],
+    "offline": ["mp4", "webm", "wav", "vtt", "srt"],
+    "streamingCandidate": ["HLS", "DASH"],
+    "largeFileRule": "range_requests_and_resumable_delivery_when supported",
+    "noApplicationMediaSizeCeiling": true
+  },
+  "observability": {
+    "requiredEvents": ["job_created", "stage_started", "stage_completed", "stage_failed", "asset_created", "asset_rejected", "gate_blocked", "render_completed", "publication_completed"],
+    "requiredMetrics": ["stage_duration_ms", "asset_count", "render_time_ms", "bytes_read", "bytes_written", "quality_failures", "rights_failures"],
+    "correlationId": "required_per_production"
+  },
+  "recovery": {
+    "checkpointEveryStage": true,
+    "resumeFromLastVerifiedStage": true,
+    "immutableInputs": true,
+    "rebuildDerivedArtifacts": true,
+    "rollbackPublication": true,
+    "neverDeleteAuthoritativeCorpus": true
+  },
+  "repositoryRules": {
+    "noGeneratedMediaCommitted": true,
+    "noLargeMediaAssetsInGit": true,
+    "noRuntimeModelDownloadInCi": true,
+    "configurationAndManifestsOnly": true,
+    "externalArtifactsUseGovernedStorage": true
+  }
+}
