@@ -11,7 +11,9 @@
     "noSilentSubstitution": true,
     "platformProfile": "linux-x86_64-primary",
     "sourceArchivesAllowedWhenBinaryRedistributionIsNotDirectlyPackaged": true,
-    "installationVerificationRequired": true
+    "installationVerificationRequired": true,
+    "qualityMeasurementRequired": true,
+    "sceneAnalysisAvailable": true
   },
   "tools": [
     {
@@ -250,6 +252,24 @@
       "asset": "Video2X-x86_64.AppImage",
       "licenseEvidence": "https://github.com/K4YT3X/video2x",
       "releaseVerification": "official release asset; SHA-256 recorded by Din Allah release pipeline"
+    },
+    {
+      "id": "vmaf",
+      "version": "3.x-line",
+      "license": "BSD+Patent",
+      "role": "perceptual-video-quality-assessment",
+      "distribution": "official-source",
+      "source": "https://github.com/Netflix/vmaf",
+      "licenseEvidence": "https://github.com/Netflix/vmaf"
+    },
+    {
+      "id": "pyscenedetect",
+      "version": "0.7.1",
+      "license": "BSD-3-Clause",
+      "role": "scene-shot-detection-chapter-generation",
+      "distribution": "official-python-package-or-container",
+      "source": "https://github.com/Breakthrough/PySceneDetect",
+      "licenseEvidence": "https://www.scenedetect.com/docs/"
     }
   ],
   "sharedWith": {
@@ -267,7 +287,7 @@
     },
     "mediaRuntime": {
       "pr": 603,
-      "branch": "feat/omega-media-conversation-final-2026-v3-v3",
+      "branch": "feat/omega-media-conversation-final-2026-v2",
       "roles": [
         "editing",
         "capture",
