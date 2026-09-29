@@ -3,6 +3,7 @@
  * It selects a model + runtime path but never promotes generated media to evidence
  * and never writes generated output directly into Corpus.
  */
+
 const DEFAULT_FLEET = new URL("../config/rechercher-omega-multimodal-fleet.json", import.meta.url);
 
 export async function loadMultimodalFleet(url = DEFAULT_FLEET) {
@@ -14,10 +15,13 @@ export function selectMultimodalModel({
   fleet,
   task,
   availableRuntimes = [],
-  requireClearedWeights = false
+  requireClearedWeights = true
 }) {
   const runtimes = new Set(availableRuntimes);
-  const candidates = fleet.models
+  const taskCandidates = fleet.models
+    .filter(m => m.tasks.includes(task))
+    .filter(m => runtimes.size === 0 || m.runtime.some(r => runtimes.has(r)));
+  const candidates = taskCandidates
     .filter(m => m.tasks.includes(task))
     .filter(m => runtimes.size === 0 || m.runtime.some(r => runtimes.has(r)))
     .filter(m => !requireClearedWeights || (m.license_status === "cleared" && m.weight_status === "cleared"))
@@ -27,7 +31,15 @@ export function selectMultimodalModel({
     return {
       status:"queued",
       task,
-      reason:"no eligible multimodal model/runtime is currently available",
+      reason:requireClearedWeights
+        ? "no multimodal model/runtime with cleared license and weights is currently available"
+        : "no eligible multimodal model/runtime is currently available",
+      blocked_candidates: requireClearedWeights ? taskCandidates.map(m => ({
+        id:m.id,
+        license_status:m.license_status ?? "unknown",
+        weight_status:m.weight_status ?? "unknown",
+        next_action:"acquire_and_verify_weight_artifact"
+      })) : [],
       corpus_write_allowed:false,
       generated_media_is_evidence:false
     };
@@ -55,7 +67,7 @@ export function buildMultimodalJob({
   task,
   input,
   availableRuntimes = [],
-  requireClearedWeights = false
+  requireClearedWeights = true
 }) {
   const plan = selectMultimodalModel({fleet,task,availableRuntimes,requireClearedWeights});
   return {
@@ -74,5 +86,8 @@ export function assertMultimodalBoundary(plan) {
   if (plan.corpus_write_allowed) throw new Error("multimodal boundary violation: Corpus writes are forbidden");
   if (plan.generated_media_is_evidence) throw new Error("multimodal boundary violation: generated media cannot be evidence");
   if (plan.status === "ready" && !plan.provenance_required) throw new Error("multimodal boundary violation: provenance is required");
+  if (plan.status === "ready" && (plan.license_status !== "cleared" || plan.weight_status !== "cleared")) {
+    throw new Error("multimodal boundary violation: production execution requires cleared license and weights");
+  }
   return true;
 }
