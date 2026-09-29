@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "1.0.0",
+  "releaseModel": {
+    "repository": "lalibimohamed-maker/-dorar-hadith-api-official",
+    "tag": "dinullah-media-weights-v2026.09.29",
+    "kind": "runtime-model-weights",
+    "publishedAssetsOnlyAfterVerification": true,
+    "maxAssetBytes": 2147483647,
+    "storage": "github-release-assets",
+    "notStoredInGit": true,
+    "notStoredInCorpus": true
+  },
+  "selectionPolicy": {
+    "exactUpstreamIdentityRequired": true,
+    "exactReleasePinned": true,
+    "licenseEvidenceRequired": true,
+    "checksumRecordedAfterAcquisition": true,
+    "executableFilesForbidden": true,
+    "modelWeightsOnly": true,
+    "futureReleaseRecheckRequired": true
+  },
+  "weights": [
+    {
+      "id": "realesrgan-x4plus",
+      "engine": "real-esrgan",
+      "upstreamRepository": "xinntao/Real-ESRGAN",
+      "upstreamRelease": "v0.1.0",
+      "upstreamUrl": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+      "assetName": "RealESRGAN_x4plus.pth",
+      "license": "BSD-3-Clause",
+      "licenseEvidence": "https://github.com/xinntao/Real-ESRGAN",
+      "sha256": null
+    },
+    {
+      "id": "realesrgan-x2plus",
+      "engine": "real-esrgan",
+      "upstreamRepository": "xinntao/Real-ESRGAN",
+      "upstreamRelease": "v0.2.1",
+      "upstreamUrl": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth",
+      "assetName": "RealESRGAN_x2plus.pth",
+      "license": "BSD-3-Clause",
+      "licenseEvidence": "https://github.com/xinntao/Real-ESRGAN",
+      "sha256": null
+    },
+    {
+      "id": "realesr-general-x4v3",
+      "engine": "real-esrgan",
+      "upstreamRepository": "xinntao/Real-ESRGAN",
+      "upstreamRelease": "v0.2.5.0",
+      "upstreamUrl": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-general-x4v3.pth",
+      "assetName": "realesr-general-x4v3.pth",
+      "license": "BSD-3-Clause",
+      "licenseEvidence": "https://github.com/xinntao/Real-ESRGAN",
+      "sha256": null
+    },
+    {
+      "id": "realesr-general-wdn-x4v3",
+      "engine": "real-esrgan",
+      "upstreamRepository": "xinntao/Real-ESRGAN",
+      "upstreamRelease": "v0.2.5.0",
+      "upstreamUrl": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-general-wdn-x4v3.pth",
+      "assetName": "realesr-general-wdn-x4v3.pth",
+      "license": "BSD-3-Clause",
+      "licenseEvidence": "https://github.com/xinntao/Real-ESRGAN",
+      "sha256": null
+    },
+    {
+      "id": "paddleocr-v5-mobile-det",
+      "engine": "paddleocr",
+      "upstreamRepository": "PaddlePaddle/PaddleOCR",
+      "upstreamRelease": "paddle3.0.0-model-release",
+      "upstreamUrl": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_mobile_det_infer.tar",
+      "assetName": "PP-OCRv5_mobile_det_infer.tar",
+      "license": "Apache-2.0 for PaddleOCR project; model-specific redistribution terms must be verified",
+      "licenseEvidence": "https://github.com/PaddlePaddle/PaddleOCR",
+      "storageClass": "draft-release-only-until-model-rights-verified",
+      "sha256": null
+    },
+    {
+      "id": "paddleocr-v5-arabic-rec",
+      "engine": "paddleocr",
+      "upstreamRepository": "PaddlePaddle/PaddleOCR",
+      "upstreamRelease": "paddle3.0.0-model-release",
+      "upstreamUrl": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/arabic_PP-OCRv5_mobile_rec_infer.tar",
+      "assetName": "arabic_PP-OCRv5_mobile_rec_infer.tar",
+      "license": "Apache-2.0 for PaddleOCR project; model-specific redistribution terms must be verified",
+      "licenseEvidence": "https://github.com/PaddlePaddle/PaddleOCR",
+      "storageClass": "draft-release-only-until-model-rights-verified",
+      "sha256": null
+    }
+  ],
+  "dynamicSources": [
+    {
+      "id": "video2x-rife-models",
+      "engine": "video2x",
+      "upstreamRepository": "K4YT3X/video2x",
+      "upstreamRelease": "6.4.0",
+      "assetSelectionRegex": "(?i)rife.*(v4\\.6|v4\\.25|v4\\.26).*",
+      "selectionReason": "Video2X 6.4.0 explicitly ships RIFE v4.6, v4.25 and v4.26 model files.",
+      "licenseEvidence": "https://github.com/K4YT3X/video2x",
+      "sha256RecordedDuringRelease": true
+    }
+  ],
+  "notes": [
+    "Non-model software such as FFmpeg, Tesseract, COLMAP, Open3D and MediaMTX does not require model weights; their binaries are governed separately.",
+    "Release asset publication is separate from software activation; runtime verification remains required.",
+    "PaddleOCR Arabic detection/recognition model archives are fetched only from official Paddle model hosting and remain draft-release-only until model-specific redistribution terms are verified."
+  ]
+}
