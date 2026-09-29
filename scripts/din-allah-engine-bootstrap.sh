@@ -23,7 +23,7 @@ blender --background --factory-startup --python-expr 'print("BLENDER_HEADLESS_SM
 python - <<'PY'
 import opentimelineio as otio, tempfile, pathlib
 p=pathlib.Path(tempfile.mkdtemp())/"smoke.otio"
-s=otio.schema.SerializableCollection([otio.schema.Clip(name="smoke")])
+s=otio.schema.SerializableCollection(name="smoke", children=[otio.schema.Clip(name="smoke")])
 otio.adapters.write_to_file(s,str(p)); otio.adapters.read_from_file(str(p)); print("OTIO_READ_WRITE_SMOKE_OK")
 PY
 python - <<'PY'
