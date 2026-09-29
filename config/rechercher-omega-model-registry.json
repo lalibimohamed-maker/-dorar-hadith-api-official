@@ -324,6 +324,22 @@
       "license_review": "restricted",
       "license_status": "blocked",
       "notes": "CC-BY-NC-4.0; not eligible for public runtime/release redistribution. Retained only as a documented research challenger."
+    },
+    {
+      "id": "kokoro",
+      "family": "text-to-speech",
+      "tasks": [
+        "text_to_speech",
+        "multilingual_speech"
+      ],
+      "source": "https://github.com/hexgrad/kokoro",
+      "status": "candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "source_model_id": "hexgrad/Kokoro-82M",
+      "acquisition_class": "github_release",
+      "release_tag": "dinullah-conversation-weights-v2026.09.29",
+      "notes": "Lightweight 82M-parameter TTS path; keep voice files and auxiliary G2P dependencies separately governed."
     }
   ]
 }
