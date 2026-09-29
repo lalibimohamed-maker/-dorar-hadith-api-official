@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const dir = process.argv[2] || 'artifacts/rechercher/global-multilingual-research';
-const expected = Number(process.env.EXPECTED_CELL_COUNT || 3192);
+const expected = Number(process.env.EXPECTED_CELL_COUNT || 4921);
 const registry = JSON.parse(await fs.readFile('config/rechercher/global-multilingual-resource-discovery-2026.json', 'utf8'));
 const languages = registry.enumerated_islamhouse_languages;
 const domains = registry.resource_lanes;
@@ -22,7 +22,7 @@ for (const file of files) {
   const rows = (await fs.readFile(path.join(dir, file), 'utf8')).trim().split('\n').filter(Boolean).map(JSON.parse);
   const shard = file.match(/^shard-(\d+)\.jsonl$/)[1];
   perShard[shard] = rows.length;
-  if (rows.length !== expected / 3) throw new Error(`${file}: expected ${expected / 3} rows, found ${rows.length}`);
+  if (rows.length !== (Math.floor(expected / files.length) + (Number(shard) < expected % files.length ? 1 : 0))) throw new Error(`${file}: expected ${expected / 3} rows, found ${rows.length}`);
   for (const row of rows) {
     if (!row.cell_id) throw new Error(`${file}: missing cell_id`);
     if (!expectedCells.has(row.cell_id)) throw new Error(`${file}: unexpected cell_id ${row.cell_id}`);
