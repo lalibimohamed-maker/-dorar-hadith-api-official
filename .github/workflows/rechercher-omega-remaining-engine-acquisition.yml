@@ -98,16 +98,50 @@ jobs:
         run: python -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
 
       - name: Validate gated Hugging Face access
+        id: gated_access
         if: matrix.id == 'flux1-schnell'
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REQUESTED_REVISION: ${{ matrix.revision }}
         run: |
           set -euo pipefail
-          test -n "${HF_TOKEN:-}" || { echo "HF_TOKEN is required to acquire gated FLUX.1-schnell weights"; exit 1; }
-          echo "[OK] HF_TOKEN is present for gated FLUX acquisition"
+          if [ -z "${HF_TOKEN:-}" ]; then
+            echo "state=blocked" >> "$GITHUB_OUTPUT"
+            echo "[BLOCKED] HF_TOKEN is not configured for gated FLUX.1-schnell; acquisition will remain gated."
+            exit 0
+          fi
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+          try:
+              HfApi(token=os.environ["HF_TOKEN"]).model_info(
+                  os.environ["MODEL_ID"],
+                  revision=os.environ["REQUESTED_REVISION"],
+                  files_metadata=False,
+              )
+          except Exception as exc:
+              response = getattr(exc, "response", None)
+              status = getattr(response, "status_code", None)
+              if status in (401, 403) or "GatedRepoError" in type(exc).__name__:
+                  with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+                      f.write("state=blocked\n")
+                  print("[BLOCKED] Hugging Face denied access to the gated model revision; no weight download will be attempted.")
+                  raise SystemExit(0)
+              raise
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("state=ready\n")
+          print("[OK] Gated Hugging Face model access is authorized.")
+          PY
+
+      - name: Mark non-gated jobs as ready
+        id: gated_access_default
+        if: matrix.id != 'flux1-schnell'
+        run: echo "state=ready" >> "$GITHUB_OUTPUT"
 
       - name: Resolve immutable revision
         id: revision
+        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
         env:
           MODEL_ID: ${{ matrix.model_id }}
           REQUESTED_REVISION: ${{ matrix.revision }}
@@ -130,6 +164,7 @@ jobs:
           PY
 
       - name: Ensure dedicated Release exists
+        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -150,6 +185,7 @@ jobs:
           echo "OMEGA_RELEASE_ID=$release_id" >> "$GITHUB_ENV"
           echo "[OK] Release ID: $release_id"
       - name: Stream weights directly into Release
+        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           OMEGA_STORAGE_REPOSITORY: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -235,6 +271,7 @@ jobs:
 
       # release-manifest.json is a weights-only manifest; it never declares runtime completeness.
       - name: Verify weights manifest
+        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -280,3 +317,27 @@ jobs:
           assets="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name')"
           test -n "$(grep -Fx "hunyuanvideo15-release-readiness.json" <<<"$assets")"
           echo "[OK] release-manifest.json is not the runtime completeness signal"
+
+      - name: Record blocked gated model state
+        if: matrix.id == 'flux1-schnell' && steps.gated_access.outputs.state == 'blocked'
+        run: |
+          set -euo pipefail
+          cat > "${RUNNER_TEMP}/flux1-schnell-access-state.json" <<'JSON'
+          {
+            "model_id": "black-forest-labs/FLUX.1-schnell",
+            "status": "blocked",
+            "reason": "Hugging Face gated-access authorization is unavailable to this runtime.",
+            "download_attempted": false,
+            "release_promotion": false,
+            "next_action": "obtain_authorized_model_access_and_rerun",
+            "rights_required": true
+          }
+          JSON
+
+      - name: Upload blocked gated model state
+        if: matrix.id == 'flux1-schnell' && steps.gated_access.outputs.state == 'blocked'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: omega-flux1-schnell-access-state
+          path: ${{ runner.temp }}/flux1-schnell-access-state.json
+          if-no-files-found: error
