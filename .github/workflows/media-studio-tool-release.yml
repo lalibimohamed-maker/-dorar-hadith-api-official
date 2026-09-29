@@ -68,7 +68,7 @@ jobs:
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ardour-9.8.0.tar.bz2             https://community.ardour.org/src/ardour-9.8.0.tar.bz2
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/ImageMagick-7.1.2-32.tar.xz             https://download.imagemagick.org/releases/ImageMagick-7.1.2-32.tar.xz
           curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenTimelineIO-0.18.1.tar.gz             https://github.com/AcademySoftwareFoundation/OpenTimelineIO/archive/refs/tags/v0.18.1.tar.gz
-          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenColorIO-2.5.2.tar.gz             https://codeload.github.com/AcademySoftwareFoundation/OpenColorIO/tar.gz/refs/tags/v2.5.2
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenColorIO-2.5.2.tar.gz             https://github.com/AcademySoftwareFoundation/OpenColorIO/releases/download/v2.5.2/OpenColorIO-2.5.2.tar.gz
           python3 - <<'PY'
           import html, re, urllib.request
           from pathlib import Path
@@ -111,12 +111,13 @@ jobs:
           sha256sum release-assets/Inkscape-1.4.2-x86_64.AppImage > release-assets/Inkscape-1.4.2-x86_64.AppImage.sha256
           echo "Inkscape 1.4.2: official release-page binary; resolved URL and SHA-256 recorded."
 
-      - name: Record OpenColorIO release provenance
+      - name: Verify OpenColorIO release asset
         run: |
           set -euo pipefail
-          test -s release-assets/OpenColorIO-2.5.2.tar.gz
-          sha256sum release-assets/OpenColorIO-2.5.2.tar.gz > release-assets/OpenColorIO-2.5.2.tar.gz.sha256
-          echo "OpenColorIO 2.5.2 source archive captured and SHA-256 recorded."
+          echo "cb8b0ae38fa523be8f899a0b2d6b8ca8cbcda7bc4322c91d1ac2b6b2a0082474  release-assets/OpenColorIO-2.5.2.tar.gz" | sha256sum -c -
+          curl -fL --proto '=https' --tlsv1.2 --retry 3 -o release-assets/OpenColorIO-2.5.2.tar.gz.sigstore.json https://github.com/AcademySoftwareFoundation/OpenColorIO/releases/download/v2.5.2/OpenColorIO-2.5.2.tar.gz.sigstore.json
+          test -s release-assets/OpenColorIO-2.5.2.tar.gz.sigstore.json
+          echo "OpenColorIO 2.5.2 release asset + Sigstore metadata verified."
 
       - name: Validate archive contents
         run: |
