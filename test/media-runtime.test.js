@@ -25,3 +25,16 @@ test("runtime keeps model weights in Releases",()=>{
  assert.equal(runtime.weightsRelease.sourceOfTruth,"github-release-assets");
  assert.equal(runtime.weightsRelease.noWeightsInGit,true);
 });
+
+test("runtime keeps Video2X version-pinned without an unverified digest",()=>{
+ const v=runtime.software.find(x=>x.id==="video2x");
+ assert.ok(v);
+ assert.equal(v.version,"6.4.0");
+ assert.equal(v.image,"ghcr.io/k4yt3x/video2x:6.4.0");
+ assert.equal("digest" in v,false);
+});
+test("headless bootstrap includes Inkscape host runtime",()=>{
+ const fs2=require("node:fs");
+ const boot=fs2.readFileSync("scripts/media/bootstrap-complete-runtime.sh","utf8");
+ assert.match(boot,/\binkscape\b/);
+});
