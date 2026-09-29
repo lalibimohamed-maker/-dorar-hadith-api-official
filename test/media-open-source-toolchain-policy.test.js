@@ -16,6 +16,14 @@ test('media registry remains fail-closed for automatic software adoption', () =>
   assert.equal(registry.policy.futureReleaseIsNotAutomaticallyFreeForever, true);
 });
 
+test('Video2X registry points to the current upstream identity and remains a candidate', () => {
+  const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+  const video = registry.capabilities.find((entry) => entry.id === 'video-upscaling');
+  assert.equal(video.preferredProject, 'K4YT3X/video2x');
+  assert.equal(video.upstream, 'https://github.com/K4YT3X/video2x');
+  assert.match(video.currentLicenseEvidence, /AGPL-3\.0/);
+});
+
 test('bootstrap does not download models or execute arbitrary URLs', () => {
   const script = fs.readFileSync(bootstrapPath, 'utf8');
   assert.match(script, /MEDIA_TOOLCHAIN_INSTALL/);
