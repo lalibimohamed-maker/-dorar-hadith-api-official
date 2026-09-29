@@ -29,9 +29,6 @@ permissions:
   contents: none
 
 env:
-  # The repository name is legacy (3192) while the current matrix is 4921 cells.
-  # Storage identity is deliberately independent from matrix cardinality.
-  MATRIX_STORAGE_REPO: ${{ inputs.matrix_storage_repo }}
   # PDF bytes are persisted as GitHub Release assets; do not smudge legacy LFS pointers.
   GIT_LFS_SKIP_SMUDGE: '1'
 concurrency:
@@ -44,6 +41,9 @@ jobs:
     env:
       ACQUISITION_SHARD_INDEX: ${{ inputs.shard_index }}
       ACQUISITION_SHARD_COUNT: ${{ inputs.shard_count }}
+      # The repository name is legacy (3192) while the current matrix is 4921 cells.
+      # Storage identity is deliberately independent from matrix cardinality.
+      MATRIX_STORAGE_REPO: ${{ inputs.matrix_storage_repo }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
