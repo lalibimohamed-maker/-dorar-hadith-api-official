@@ -37,3 +37,22 @@ test("programming graph requires tests and scoped changes", async () => {
   assert.equal(graph.code_policy.tests_required, true);
   assert.ok(graph.tools.includes("typecheck"));
 });
+
+test("model-bearing AI candidates require explicit active runtime state when supplied", async () => {
+  const registry = await loadAICapabilityRegistry();
+  const blocked = buildAiExecutionGraph(registry, {
+    pipeline: "voice",
+    activationStates: { "faster-whisper": "blocked", "whisper": "blocked" }
+  });
+  const asr = blocked.nodes.find(n => n.stage === "faster-whisper");
+  assert.ok(asr);
+  assert.equal(asr.candidates.length, 0);
+  assert.ok(asr.rejected_candidates.some(x => x.id === "faster-whisper"));
+
+  const active = buildAiExecutionGraph(registry, {
+    pipeline: "voice",
+    activationStates: { "faster-whisper": "active", "whisper": "active" }
+  });
+  const activeAsr = active.nodes.find(n => n.stage === "faster-whisper");
+  assert.ok(activeAsr.candidates.some(x => x.id === "faster-whisper"));
+});
