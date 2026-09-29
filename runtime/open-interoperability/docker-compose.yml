@@ -43,11 +43,20 @@ services:
       retries: 10
 
   colmap:
-    image: colmap/colmap:latest
+    build:
+      context: ../../
+      dockerfile: runtime/colmap/Dockerfile
     restart: "no"
     entrypoint: ["colmap"]
     command: ["-h"]
     profiles: ["3d"]
+
+  video2x:
+    image: ghcr.io/k4yt3x/video2x:6.4.0@sha256:e21b6893269b4cb6f5603802726fd7537be241f6b39217b73530478861acbca1
+    restart: "no"
+    command: ["--help"]
+    profiles: ["gpu"]
+    gpus: all
 
   media-runtime:
     build:
