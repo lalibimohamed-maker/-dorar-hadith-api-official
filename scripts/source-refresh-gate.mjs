@@ -74,6 +74,7 @@ for(const [id,s] of sources){
   try{
     for(let n=0;n<=MAX_REDIRECTS;n++){
       await assertPublicSourceHost(u);
+      // codeql[js/file-access-to-http] Registry URLs are committed System-layer source metadata and are validated to HTTPS/public DNS destinations before this verification-only request.
       const r=await fetch(u,{redirect:"manual",signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS),headers:{"user-agent":"DinAllah-source-refresh-gate/1.0"}});
       if(r.status>=300 && r.status<400){
         const location=r.headers.get("location");
