@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "dinullah-omega-ai-media-runtime-2026",
+  "purpose": "Reproducible free/open local AI execution runtime shared by Rechercher Omega and the media studio.",
+  "policy": {
+    "freeFirst": true,
+    "paidDependencyAllowed": false,
+    "modelWeightsSeparate": true,
+    "noUnknownBinaryExecution": true,
+    "releaseCache": true,
+    "corpusWriteAllowed": false
+  },
+  "components": [
+    {
+      "id": "comfyui",
+      "version": "0.37.0",
+      "license": "GPL-3.0",
+      "role": "graph-based-image-video-audio-3d-generation-runtime",
+      "distribution": "official-source-tag",
+      "source": "https://github.com/Comfy-Org/ComfyUI/tree/v0.37.0",
+      "licenseEvidence": "https://github.com/Comfy-Org/ComfyUI/blob/master/LICENSE"
+    },
+    {
+      "id": "pytorch",
+      "version": "2.14.0",
+      "license": "BSD-style",
+      "role": "GPU-deep-learning-runtime",
+      "distribution": "PyPI-wheel",
+      "source": "https://pypi.org/project/torch/2.14.0/",
+      "licenseEvidence": "https://github.com/pytorch/pytorch/blob/main/LICENSE"
+    },
+    {
+      "id": "transformers",
+      "version": "5.17.0",
+      "license": "Apache-2.0",
+      "role": "LLM/VLM-model-runtime",
+      "distribution": "PyPI-wheel",
+      "source": "https://pypi.org/project/transformers/5.17.0/",
+      "licenseEvidence": "https://pypi.org/project/transformers/5.17.0/"
+    },
+    {
+      "id": "diffusers",
+      "version": "0.40.0",
+      "license": "Apache-2.0",
+      "role": "diffusion-image-video-audio-runtime",
+      "distribution": "PyPI-wheel",
+      "source": "https://pypi.org/project/diffusers/0.40.0/",
+      "licenseEvidence": "https://pypi.org/project/diffusers/0.40.0/"
+    },
+    {
+      "id": "accelerate",
+      "version": "1.15.0",
+      "license": "Apache-2.0",
+      "role": "distributed-and-memory-efficient-inference",
+      "distribution": "PyPI-wheel",
+      "source": "https://pypi.org/project/accelerate/1.15.0/",
+      "licenseEvidence": "https://pypi.org/project/accelerate/1.15.0/"
+    },
+    {
+      "id": "safetensors",
+      "version": "0.8.0",
+      "license": "Apache-2.0",
+      "role": "safe-model-weight-format-loader",
+      "distribution": "PyPI-wheel",
+      "source": "https://pypi.org/project/safetensors/0.8.0/",
+      "licenseEvidence": "https://pypi.org/project/safetensors/0.8.0/"
+    }
+  ],
+  "release": {
+    "tag": "dinullah-omega-ai-runtime-v2026.09.29",
+    "storage": "github-release-assets",
+    "notInGit": true,
+    "notInCorpus": true
+  },
+  "integration": {
+    "sourcePr": 566,
+    "executionPr": 601,
+    "bridge": "config/rechercher-omega-media-bridge-2026.json",
+    "weightSource": "dedicated model-weight releases"
+  }
+}
