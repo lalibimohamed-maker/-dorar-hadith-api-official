@@ -50,6 +50,14 @@
       "sha256": "d376ce3da8a07e5f407fce09751d03de22e3634262b1850918ae71077136244c",
       "bytes": 1348751153,
       "status": "approved-for-release-after-verification"
+    },
+    {
+      "id": "kokoro",
+      "model": "hexgrad/Kokoro-82M",
+      "revisionPolicy": "resolve-and-lock-current-upstream-commit-during-release",
+      "license": "Apache-2.0",
+      "status": "approved-for-release-after-immutable-revision-and-sha-verification",
+      "filesPolicy": "weights/config/tokenizer/voice files selected from exact revision; split any release file above 1.9GB"
     }
   ],
   "excluded": {
