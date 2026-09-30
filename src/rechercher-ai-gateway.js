@@ -28,9 +28,13 @@ function decodeCursor(cursor){
   }catch{ throw new Error("INVALID_CURSOR: cursor is invalid"); }
 }
 function paginateSearch(data,{q,cursor,limit}){
+  const items=Array.isArray(data?.sourceMatches)?data.sourceMatches:[];
+  const upstreamPagination=data?.pagination;
+  if(upstreamPagination && Object.prototype.hasOwnProperty.call(upstreamPagination,"next_cursor")){
+    return {...data,pagination:{...upstreamPagination,limit,cursor:cursor??upstreamPagination.cursor??null,total:upstreamPagination.total??items.length,next_cursor:upstreamPagination.next_cursor??null}};
+  }
   const page=decodeCursor(cursor);
   if(page.q!==null&&page.q!==q) throw new Error("INVALID_CURSOR: cursor does not belong to this query");
-  const items=Array.isArray(data?.sourceMatches)?data.sourceMatches:[];
   const start=page.offset;
   const end=Math.min(items.length,start+limit);
   const next=end<items.length?encodeCursor({q,offset:end}):null;
