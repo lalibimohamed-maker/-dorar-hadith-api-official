@@ -97,6 +97,28 @@ GPUDevice exposes uncapturederror and lost; there is no navigator.gpu.onuncaught
 
 navigator.storage.persist() requests persistent storage and may be denied according to browser heuristics. WebKit documents eviction under storage pressure and persistent-mode exemptions, including on supported iOS/iPadOS Home Screen web apps. References: https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist and https://webkit.org/blog/14403/updates-to-storage-policy/.
 
+
+## Offline Corpus synchronization
+
+Future server-to-device Corpus corrections use a signed atomic delta rather than an uncoordinated IndexedDB merge.
+
+The delta format is \`dinullah/omega-offline-evidence-delta\` v1.0.0. It carries:
+
+- \`base_snapshot_sha256\`
+- \`target_snapshot_sha256\`
+- \`snapshot_algorithm: omega-evidence-snapshot-v2\`
+- monotonic \`sequence\`
+- ordered upsert/delete operations with \`previous_content_sha256\` preconditions
+- an Ed25519 signature covering the canonical delta envelope
+
+The sync snapshot root covers the complete verified evidence record, not only \`content_sha256\`. Therefore metadata changes such as citation/source/language/update timestamp also alter the sync root.
+
+The device rejects a delta when the local state is marked dirty, the stored snapshot root conflicts with a recomputed root, the base root does not match, a per-record precondition fails, the target root does not recompute, the sequence is stale, or signature verification fails.
+
+After all checks pass, the Service Worker executes one IndexedDB \`readwrite\` transaction spanning the evidence and sync-state stores. Either all requested changes and the target snapshot metadata commit, or the transaction aborts and the previous state remains. IndexedDB transactions are atomic and abort rolls back the transaction's writes. citeturn101516search0turn101516search1
+
+This is an update mechanism for the local evidence snapshot; it does not rewrite the canonical server Corpus. A device without a matching base snapshot must receive a full verified bundle instead of applying an incompatible delta.
+
 ## Scope
 No Corpus scholarly text is modified.
 No model weights are committed.
