@@ -348,14 +348,16 @@
 
     const verified = [];
     for (const record of bundle.records) verified.push(await putEvidence(record));
+    let syncSnapshot = null;
     if (bundle.integrity?.merkle_root_sha256) {
       const actualRoot = (await merkleRoot(verified.slice().sort((a, b) => a.node_id.localeCompare(b.node_id)))).toLowerCase();
       if (actualRoot !== String(bundle.integrity.merkle_root_sha256).toLowerCase()) {
         throw new Error("OFFLINE_BUNDLE_MERKLE_MISMATCH");
       }
-      await markManagedSnapshot(actualRoot, Number(bundle.sequence) || 0);
+      syncSnapshot = await snapshotMerkleRoot(verified);
+      await markManagedSnapshot(syncSnapshot, Number(bundle.sequence) || 0);
     }
-    return Object.freeze({ imported: verified.length, bundle_sha256: actual, snapshot_sha256: bundle.integrity?.merkle_root_sha256 ?? null });
+    return Object.freeze({ imported: verified.length, bundle_sha256: actual, snapshot_sha256: syncSnapshot });
   }
 
   async function importEvidenceBundleFile(file, { workerUrl = "./omega-offline-evidence-worker.js", mainThreadFallbackMaxBytes = 4 * 1024 * 1024 } = {}) {
