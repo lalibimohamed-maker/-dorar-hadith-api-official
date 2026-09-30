@@ -20,3 +20,45 @@ test("strict schema files are valid JSON",async()=>{
     assert.equal(typeof value,"object");
   }
 });
+
+
+import { strictAnchoringDescription, enforceMcpResponseAnchoring } from "../src/rechercher-ai/mcp-strict-anchoring.js";
+
+test("MCP strict anchoring exposes explicit governance rules",async()=>{
+  const description=strictAnchoringDescription("deen_verify_answer");
+  assert.match(description,/DINULLAH STRICT EVIDENCE ANCHOR/);
+  assert.match(description,/server-side verification/i);
+  assert.match(description,/NO_EVIDENCE_FOUND/);
+  assert.match(description,/diacritics/);
+  const { TOOLS } = await import("../src/rechercher-ai-mcp-server.js").catch(()=>({TOOLS:[]}));
+  if (Array.isArray(TOOLS) && TOOLS.length) {
+    const verifyTool=TOOLS.find(tool=>tool.name==="deen_verify_answer");
+    assert.equal(verifyTool.annotations.readOnlyHint,true);
+    assert.equal(verifyTool.annotations.destructiveHint,false);
+  }
+});
+
+test("MCP anchoring rejects altered primary text and returns deterministic fallback",()=>{
+  const node={
+    text_raw:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",
+    provenance:{source:"Sahih al-Bukhari",page:1}
+  };
+  const rejected=enforceMcpResponseAnchoring({
+    agentOutput:"إنما الأعمال بالنية.",
+    verifiedNode:node
+  });
+  assert.equal(rejected.status,"REJECTED");
+  assert.equal(rejected.reason,"STRICT_ALIGNMENT_MISMATCH");
+  assert.equal(rejected.fallback_output,node.text_raw);
+  assert.deepEqual(rejected.provenance,node.provenance);
+});
+
+test("MCP anchoring accepts canonical-equivalent Unicode representation",()=>{
+  const node={text_raw:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",provenance:{}};
+  const equivalent=node.text_raw.normalize("NFKD").normalize("NFC");
+  const approved=enforceMcpResponseAnchoring({
+    agentOutput:"النص: "+equivalent,
+    verifiedNode:node
+  });
+  assert.equal(approved.status,"APPROVED");
+});

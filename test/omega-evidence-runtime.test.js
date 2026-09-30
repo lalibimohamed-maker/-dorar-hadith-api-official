@@ -14,7 +14,7 @@ const base = {
   language: "ar",
   rights_status: "cleared",
   provenance: "verified",
-  sha256: "abc123",
+  sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   verification_status: "verified",
   authenticity_status: "sahih"
 };
@@ -97,4 +97,17 @@ test("final grounded gate accepts only claims linked to returned evidence", () =
   const result = buildGroundedGenerationContext(evidence, [{ claim: "نص موثق", evidence_id: "good:1" }]);
   assert.equal(result.ok, true);
   assert.equal(result.code, "EVIDENCE_READY");
+});
+
+test("schema-shaped provenance can satisfy the hard gate", () => {
+  const schemaShaped = {
+    ...base,
+    source: undefined,
+    document_id: undefined,
+    provenance: { source: "sahih-bukhari", document_id: "bukhari:1" },
+    sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  };
+  const decision = applyEvidenceHardGate([schemaShaped]);
+  assert.equal(decision.accepted.length, 1);
+  assert.equal(decision.rejected.length, 0);
 });
