@@ -1,6 +1,8 @@
 import { OmegaHardwareGuardian } from "./omega-hardware-guardian.js";
 
 let generator = null;
+let generatorModule = null;
+let generatorOptions = {};
 let runtimeBackend = "webgpu";
 let fallbackChunkSize = 128;
 let stopWatchingGpu = null;
@@ -19,7 +21,7 @@ function resolveGpuDevice(instance) {
   return instance?.gpuDevice || instance?.webgpuDevice || instance?.device || null;
 }
 
-function activateWasmFallback(detail) {
+async function activateWasmFallback(detail) {
   runtimeBackend = "wasm";
   fallbackChunkSize = Math.max(1, Number(detail?.suggested_chunk_size) || Math.floor(fallbackChunkSize / 2) || 1);
 
@@ -42,6 +44,27 @@ function activateWasmFallback(detail) {
       type: "backend-switch-error",
       error: String(error?.message ?? error)
     });
+  }
+
+  if (!switched && generatorModule && typeof generatorModule.createGenerator === "function") {
+    try {
+      const nextOptions = {
+        ...generatorOptions,
+        backend: "wasm",
+        chunk_size: fallbackChunkSize
+      };
+      generator = await generatorModule.createGenerator(nextOptions);
+      generatorOptions = nextOptions;
+      switched = true;
+      attachGpuGuardian();
+    } catch (error) {
+      self.postMessage({
+        id: null,
+        ok: false,
+        type: "backend-reinit-error",
+        error: String(error?.message ?? error)
+      });
+    }
   }
 
   self.postMessage({
@@ -79,7 +102,9 @@ self.addEventListener("message", async event => {
       if (typeof module.createGenerator !== "function") {
         throw new Error("LOCAL_GENERATOR_FACTORY_MISSING");
       }
-      generator = await module.createGenerator(message.options ?? {});
+      generatorModule = module;
+      generatorOptions = { ...(message.options ?? {}) };
+      generator = await module.createGenerator(generatorOptions);
       attachGpuGuardian();
       self.postMessage({ id: message.id ?? null, ok: true, type: "ready", backend: runtimeBackend, chunk_size: fallbackChunkSize });
       return;
