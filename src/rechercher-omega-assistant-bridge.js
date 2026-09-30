@@ -224,6 +224,7 @@ export async function runGovernedAssistantTurn({
     throw new TypeError("sessionId is required when distributed memory is mandatory");
   }
   let distributedMemoryState = hasDistributedMemory ? "configured" : "volatile_only";
+  let distributedMemoryUsable = hasDistributedMemory;
   const distributedEvidenceIds = evidence
     .map(item => item?.source_id ?? item?.sourceId ?? item?.id ?? item?.node_id ?? item?.hadith_id)
     .filter(Boolean)
@@ -242,6 +243,7 @@ export async function runGovernedAssistantTurn({
         verified: false
       });
     } catch (error) {
+      distributedMemoryUsable = false;
       distributedMemoryState = "unavailable";
       if (requireDistributedMemory) {
         return {
@@ -309,7 +311,7 @@ export async function runGovernedAssistantTurn({
       claimProvenance: Array.isArray(claimProvenance) ? claimProvenance : []
     });
 
-    if (hasDistributedMemory) {
+    if (hasDistributedMemory && distributedMemoryUsable) {
       try {
         await distributedMemory.appendDigest({
           sessionId,
@@ -377,6 +379,7 @@ export async function runGovernedAssistantTurn({
     plan,
     backend: gate,
     result,
+    verification,
     provenance,
     runtime_readiness: runtimeReadiness,
     distributed_memory: { state: distributedMemoryState, session_id: sessionId },
