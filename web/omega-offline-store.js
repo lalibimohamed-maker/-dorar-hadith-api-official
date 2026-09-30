@@ -31,6 +31,25 @@
     return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
   }
 
+  async function merkleRoot(records) {
+    let level = [];
+    for (const record of records) {
+      const leafMaterial = "dinullah:omega:evidence:leaf:v1\\u0000" + String(record?.node_id ?? "") + "\\u0000" + String(record?.content_sha256 ?? "").toLowerCase();
+      level.push(await sha256Text(leafMaterial));
+    }
+    if (!level.length) return sha256Text("dinullah:omega:evidence:empty:v1\\u0000");
+    while (level.length > 1) {
+      const next = [];
+      for (let i = 0; i < level.length; i += 2) {
+        const left = level[i];
+        const right = level[i + 1] || left;
+        next.push(await sha256Text("dinullah:omega:evidence:parent:v1\\u0000" + left + "\\u0000" + right));
+      }
+      level = next;
+    }
+    return level[0];
+  }
+
   function openDb() {
     if (dbPromise) return dbPromise;
     dbPromise = new Promise((resolve, reject) => {
@@ -162,6 +181,10 @@
       format: "dinullah/omega-offline-evidence-bundle",
       generated_at: new Date().toISOString(),
       count: records.length,
+      integrity: {
+        algorithm: "omega-merkle-sha256-v1",
+        merkle_root_sha256: await merkleRoot(records)
+      },
       records
     };
     const canonical = JSON.stringify(canonicalize(payload)) + "\n";
@@ -190,16 +213,67 @@
       format: bundle.format,
       generated_at: bundle.generated_at,
       count: bundle.count,
+      ...(bundle.integrity ? { integrity: bundle.integrity } : {}),
       records: [...bundle.records].sort((a, b) => String(a?.node_id ?? "").localeCompare(String(b?.node_id ?? "")))
     };
     const canonical = JSON.stringify(canonicalize(payload)) + "\n";
     const actual = await sha256Text(canonical);
     if (actual !== claimed) throw new Error("OFFLINE_BUNDLE_HASH_MISMATCH");
     if (Number(bundle.count) !== bundle.records.length) throw new Error("OFFLINE_BUNDLE_COUNT_MISMATCH");
+    if (bundle.integrity?.merkle_root_sha256) {
+      const expectedRoot = String(bundle.integrity.merkle_root_sha256).toLowerCase();
+      if (!HEX_SHA256.test(expectedRoot)) throw new Error("OFFLINE_BUNDLE_MERKLE_HASH_INVALID");
+      const actualRoot = (await merkleRoot(payload.records)).toLowerCase();
+      if (actualRoot !== expectedRoot) throw new Error("OFFLINE_BUNDLE_MERKLE_MISMATCH");
+    }
 
     const verified = [];
     for (const record of bundle.records) verified.push(await putEvidence(record));
     return Object.freeze({ imported: verified.length, bundle_sha256: actual });
+  }
+
+  async function importEvidenceBundleFile(file, { workerUrl = "./omega-offline-evidence-worker.js", mainThreadFallbackMaxBytes = 4 * 1024 * 1024 } = {}) {
+    if (!file || typeof file.text !== "function") throw new Error("OFFLINE_BUNDLE_FILE_INVALID");
+
+    if (typeof Worker !== "function") {
+      if (Number(file.size || 0) > mainThreadFallbackMaxBytes) {
+        throw new Error("OFFLINE_INTEGRITY_WORKER_UNAVAILABLE");
+      }
+      return importEvidenceBundle(JSON.parse(await file.text()));
+    }
+
+    const url = new URL(workerUrl, location.href);
+    if (url.origin !== location.origin) throw new Error("OFFLINE_INTEGRITY_WORKER_MUST_BE_SAME_ORIGIN");
+
+    const worker = new Worker(url);
+    return await new Promise((resolve, reject) => {
+      let settled = false;
+      const finish = (error, result) => {
+        if (settled) return;
+        settled = true;
+        worker.terminate();
+        if (error) reject(error);
+        else resolve(result);
+      };
+
+      worker.onmessage = event => {
+        const message = event.data || {};
+        if (message.type === "progress") {
+          window.dispatchEvent(new CustomEvent("deenallah:omega-integrity-progress", { detail: message }));
+          return;
+        }
+        if (message.type === "result") {
+          if (message.ok) finish(null, message.result);
+          else finish(new Error(String(message.error || "OFFLINE_BUNDLE_REJECTED")));
+        }
+      };
+      worker.onerror = event => finish(new Error(String(event.message || "OFFLINE_INTEGRITY_WORKER_FAILED")));
+      try {
+        worker.postMessage({ type: "import-file", file });
+      } catch (error) {
+        finish(error);
+      }
+    });
   }
 
   async function clearEvidence() {
@@ -219,7 +293,8 @@
     queryVariants: variants,
     exportEvidenceBundle,
     exportEvidenceBundleText,
-    importEvidenceBundle
+    importEvidenceBundle,
+    importEvidenceBundleFile
   });
   window.dispatchEvent(new CustomEvent("deenallah:omega-store-ready"));
 })();
