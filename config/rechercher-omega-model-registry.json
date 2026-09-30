@@ -403,6 +403,40 @@
         "google/gemma-2-2b-it",
         "LTX-2.3 VAE"
       ]
+    },
+    {
+      "id": "sana-video-2b-720p",
+      "family": "video-generation",
+      "tasks": [
+        "text_to_video",
+        "image_to_video"
+      ],
+      "source": "https://huggingface.co/Efficient-Large-Model/SANA-Video_2B_720p",
+      "source_revision": "dee6b63d48ebbc47682b30fcb3fb6525ea0018a6",
+      "status": "candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "acquisition_class": "github_release",
+      "release_tag": "rechercher-omega-sana-video2b-720p-v1.0.0",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "runtime_status": "verified_remote_asset"
+    },
+    {
+      "id": "sana-video2-5b-720p",
+      "family": "video-generation",
+      "tasks": [
+        "text_to_video",
+        "image_to_video"
+      ],
+      "source": "https://huggingface.co/Efficient-Large-Model/SANA-Video_2.0_5B_720p",
+      "source_revision": "f2d95fa06400f186fd1b077d12c69c8ac58aba48",
+      "status": "candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "acquisition_class": "github_release",
+      "release_tag": "rechercher-omega-sana-video2-5b-720p-v1.0.0",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "runtime_status": "verified_remote_asset"
     }
   ]
 }
