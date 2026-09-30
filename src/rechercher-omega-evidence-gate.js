@@ -22,14 +22,14 @@ function declaredHash(item){
   return item?.text_hash ?? item?.sha256 ?? null;
 }
 
-function ensureHashIntegrity(item,key){
+function ensureHashIntegrity(item,key,{required=false}={}){
   const text=evidenceText(item);
   const expected=declaredHash(item);
 
+  if(required && expected===null) throw new Error("EVIDENCE_HASH_REQUIRED: "+key);
   if(expected!==null && !HEX_SHA256.test(String(expected))){
     throw new Error("INVALID_EVIDENCE_HASH: "+key);
   }
-
   if(expected!==null && sha256(text)!==String(expected)){
     throw new Error("EVIDENCE_TEXT_HASH_MISMATCH: "+key);
   }
@@ -73,17 +73,17 @@ export function verifyEvidenceGate({
 
     if(!item) throw new Error("CITATION_NOT_IN_EVIDENCE: "+key);
 
-    const expected=ensureHashIntegrity(item,key);
-    if(!expected){
-      throw new Error("EVIDENCE_TEXT_MISSING: "+key);
-    }
+    const strictQuote=item.exact_quote_required || item.kind==="primary_text" || item.category==="quran";
+    const expected=ensureHashIntegrity(item,key,{required:strictQuote});
+
+    if(!expected) throw new Error("EVIDENCE_TEXT_MISSING: "+key);
 
     const citedHash=citation?.text_hash ?? null;
     if(citedHash!==null && String(citedHash)!==sha256(expected)){
       throw new Error("CITED_TEXT_HASH_MISMATCH: "+key);
     }
 
-    if(item.exact_quote_required || item.kind==="primary_text" || item.category==="quran"){
+    if(strictQuote){
       if(!answer.includes(expected)){
         throw new Error("STRICT_ALIGNMENT_MISMATCH: cited source text is not present byte-for-byte in answer: "+key);
       }
