@@ -1,35 +1,7 @@
-name: Rechercher Omega — strict evidence + live Redis E2E
-
 on:
-  push:
-    branches:
-      - feat/rechercher-omega-e2e-governance-redis-2026-09-30
-    paths:
-      - src/rechercher-omega-evidence-gate.js
-      - src/rechercher-omega-claim-gate.js
-      - src/rechercher-omega-redis-memory.js
-      - src/rechercher-omega-answer-verifier.js
-      - src/rechercher-ai-gateway.js
-      - src/rechercher-ai-mcp-server.js
-      - src/rechercher-omega-assistant-bridge.js
-      - src/rechercher-omega-governed-run.js
-      - test/rechercher-omega-governed-run.test.js
-      - test/rechercher-omega-claim-gate.test.js
-      - test/rechercher-omega-evidence-api-mcp.integration.test.js
-      - test/rechercher-omega-governance-redis-e2e.integration.test.js
-      - test/rechercher-omega-assistant-redis.integration.test.js
-      - runtime/redis/docker-compose.yml
-      - config/rechercher-omega-memory-production-2026.json
-      - .github/workflows/rechercher-omega-strict-governance-redis-e2e.yml
-      - package.json
-      - .github/workflows/rechercher-omega-engine-release.yml
-      - test/rechercher-omega-integrity-sharding.test.js
-      - scripts/omega-file-reassembler.js
-      - scripts/omega-file-sharder.js
-      - src/rechercher-omega-arabic-integrity.js
-      - test/rechercher-ai-mcp-server.test.js
-      - src/rechercher-ai/mcp-strict-anchoring.js
-
+  # PRs are the authoritative merge gate. The old push trigger created a
+  # second check with the same concurrency group and could be cancelled by
+  # the pull_request run, leaving a red "push" check on the PR.
   pull_request:
     branches:
       - main
@@ -42,7 +14,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: rechercher-omega-strict-governance-redis-e2e
+  group: rechercher-omega-strict-governance-redis-e2e-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
