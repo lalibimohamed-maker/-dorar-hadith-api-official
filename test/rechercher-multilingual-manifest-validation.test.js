@@ -34,7 +34,7 @@ const runValidator=async(manifestPath)=>{
 const makeFixture=async(deduplicated=true)=>{
   const dir=await fs.mkdtemp(path.join(os.tmpdir(),'rechercher-manifest-gate-'));
   const cells={};
-  for(let i=0;i<4921;i++){
+  for(let i=0;i<6384;i++){
     cells[`cell-${String(i+1).padStart(4,'0')}`]={language:'Fixture',domain:'quran',files:[]};
   }
   cells['cell-0001'].files=[{
@@ -48,7 +48,7 @@ const makeFixture=async(deduplicated=true)=>{
     duplicate_of:deduplicated?'durable-release-inventory':undefined
   }];
   const file=path.join(dir,'manifest.json');
-  await fs.writeFile(file,JSON.stringify({schema:'rechercher/multilingual-resource-acquisition/v4',cell_count:4921,total_files:0,cells},null,2));
+  await fs.writeFile(file,JSON.stringify({schema:'rechercher/multilingual-resource-acquisition/v4',cell_count:6384,total_files:0,cells},null,2));
   return {dir,file};
 };
 
@@ -76,7 +76,7 @@ test('strict gate still rejects a non-deduplicated file with no PDF path',async(
 const makeDocxDerivedFixture=async()=>{
   const dir=await fs.mkdtemp(path.join(os.tmpdir(),'rechercher-docx-manifest-gate-'));
   const cells={};
-  for(let i=0;i<4921;i++){
+  for(let i=0;i<6384;i++){
     cells[`cell-${String(i+1).padStart(4,'0')}`]={language:'Fixture',domain:'quran',files:[]};
   }
   const docxSha='1'.repeat(64);
@@ -112,7 +112,7 @@ const makeDocxDerivedFixture=async()=>{
     }
   ];
   const file=path.join(dir,'manifest.json');
-  await fs.writeFile(file,JSON.stringify({schema:'rechercher/multilingual-resource-acquisition/v5',cell_count:4921,total_files:2,cells},null,2));
+  await fs.writeFile(file,JSON.stringify({schema:'rechercher/multilingual-resource-acquisition/v5',cell_count:6384,total_files:2,cells},null,2));
   return {dir,file};
 };
 
