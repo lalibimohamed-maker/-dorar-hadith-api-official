@@ -66,15 +66,25 @@
     );
 
     for (const record of sorted) {
-      const leaf = [
-        "dinullah:omega:evidence:leaf:v1",
-        String(record?.node_id ?? ""),
-        String(record?.content_sha256 ?? "").toLowerCase()
-      ].join("\u0000");
-      level.push(await sha256Text(leaf));
+      const canonical = JSON.stringify(canonicalize({
+        node_id: String(record?.node_id ?? ""),
+        content_sha256: String(record?.content_sha256 ?? "").toLowerCase(),
+        verification_status: String(record?.verification_status ?? ""),
+        title: String(record?.title ?? ""),
+        text: String(record?.text ?? ""),
+        citation: String(record?.citation ?? ""),
+        source_id: String(record?.source_id ?? record?.sourceId ?? ""),
+        language: String(record?.language ?? ""),
+        updated_at: String(record?.updated_at ?? "")
+      }));
+      level.push(await sha256Text(
+        "dinullah:omega:evidence:snapshot-leaf:v2\u0000" + canonical
+      ));
     }
 
-    if (!level.length) return sha256Text("dinullah:omega:evidence:empty:v1\u0000");
+    if (!level.length) {
+      return sha256Text("dinullah:omega:evidence:snapshot-empty:v2\u0000");
+    }
 
     while (level.length > 1) {
       const next = [];
@@ -82,7 +92,7 @@
         const left = level[i];
         const right = level[i + 1] || left;
         next.push(await sha256Text(
-          ["dinullah:omega:evidence:parent:v1", left, right].join("\u0000")
+          "dinullah:omega:evidence:snapshot-parent:v2\u0000" + left + "\u0000" + right
         ));
       }
       level = next;
@@ -333,9 +343,17 @@
     }
 
     const stateRoot = snapshot.state?.dirty === false &&
+      snapshot.state?.snapshot_algorithm === "omega-evidence-snapshot-v2" &&
       HEX_SHA256.test(String(snapshot.state?.snapshot_sha256 || ""))
       ? String(snapshot.state.snapshot_sha256).toLowerCase()
       : snapshot.computed_root_sha256;
+
+    if (snapshot.state?.snapshot_algorithm === "omega-evidence-snapshot-v2" &&
+        snapshot.state?.dirty === false &&
+        HEX_SHA256.test(String(snapshot.state.snapshot_sha256 || "")) &&
+        String(snapshot.state.snapshot_sha256).toLowerCase() !== snapshot.computed_root_sha256) {
+      throw new Error("OFFLINE_DELTA_LOCAL_SNAPSHOT_CORRUPT");
+    }
 
     if (stateRoot !== payload.base_snapshot_sha256) {
       throw new Error("OFFLINE_DELTA_BASE_SNAPSHOT_MISMATCH");
@@ -371,6 +389,7 @@
       stateRequest.onsuccess = () => {
         const currentState = stateRequest.result;
         const currentRoot = currentState?.dirty === false &&
+          currentState?.snapshot_algorithm === "omega-evidence-snapshot-v2" &&
           HEX_SHA256.test(String(currentState?.snapshot_sha256 || ""))
           ? String(currentState.snapshot_sha256).toLowerCase()
           : null;
