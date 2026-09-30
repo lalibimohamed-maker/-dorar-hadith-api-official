@@ -16,7 +16,7 @@ test("AI gateway handles concurrent strict verification requests",async()=>{
  const server=createAiGateway({host:"127.0.0.1",port:0});
  try{
   const port=await listeningPort(server);
-  const evidence=[{sourceId:"b",citation:"p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ"}];
+  const evidence=[{sourceId:"b",citation:"p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",text_hash:"b0282fe41fa1cd9e3224fcf46fbd7180eb6c954396bfcb7b92a858e0220c9c28"}];
   const body=JSON.stringify({answer:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",evidence,citations:[{sourceId:"b",citation:"p.1"}]});
   const responses=await Promise.all(Array.from({length:100},()=>fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json"},body})));
   assert.equal(responses.filter(x=>x.status===200).length,100);
