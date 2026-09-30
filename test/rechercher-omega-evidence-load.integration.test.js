@@ -16,8 +16,13 @@ async function stop(server){
  if(server.listening) await new Promise(resolve=>server.close(resolve));
 }
 
-const evidence=[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ"}];
-const citations=[{sourceId:"bukhari",citation:"vol.1 p.1"}];
+const evidence=[{
+ sourceId:"bukhari",evidence_id:"h:1",citation:"vol.1 p.1",kind:"primary_text",type:"hadith",
+ exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",sha256:"b0282fe41fa1cd9e3224fcf46fbd7180eb6c954396bfcb7b92a858e0220c9c28",
+ source:"sahih-bukhari",document_id:"bukhari:1",rights_status:"cleared",provenance:"verified",
+ verification_status:"verified",authenticity_status:"sahih"
+}];
+const citations=[{sourceId:"bukhari",citation:"vol.1 p.1",text_hash:"b0282fe41fa1cd9e3224fcf46fbd7180eb6c954396bfcb7b92a858e0220c9c28"}];
 const validBody=()=>({answer:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",evidence,citations});
 
 test("AI gateway survives concurrent strict-verification load",async()=>{
