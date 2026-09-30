@@ -1,0 +1,57 @@
+{
+  "version": "2026-08-30",
+  "purpose": "Cross-system audit and integration contract for the Deen Allah Encyclopedia.",
+  "freeFirst": true,
+  "noPaidDependencyRequired": true,
+  "auditedSystems": [
+    "corpus-and-provenance",
+    "hadith-and-rijal",
+    "quran-and-tafsir",
+    "fiqh-and-faraid",
+    "books-and-digitalization",
+    "global-research-search",
+    "statement-extraction-and-detailing",
+    "knowledge-graph",
+    "media-and-voice",
+    "security-and-supply-chain",
+    "recovery-and-resilience",
+    "accessibility-and-i18n",
+    "api-and-web-runtime"
+  ],
+  "mandatoryCrossSystemControls": [
+    "source-lineage",
+    "quote-context",
+    "entity-resolution",
+    "temporal-consistency",
+    "rights-and-license-gating",
+    "external-content-trust-boundary",
+    "semantic-deduplication",
+    "negative-evidence-tracking",
+    "claim-to-evidence-linking",
+    "contradiction-detection",
+    "evidence-completeness",
+    "model-and-tool-version-provenance",
+    "global-integration-test",
+    "resource-and-cost-governor"
+  ],
+  "knownFindings": [
+    {"id":"esm-test-module-mismatch","severity":"high","status":"fix-required","scope":"PR-330"},
+    {"id":"unpinned-actions-in-faith-proximity-workflows","severity":"high","status":"fix-required","scope":"PR-323"},
+    {"id":"cross-system-integration-gate-missing","severity":"high","status":"addressed-by-this-policy"},
+    {"id":"remote-content-prompt-injection-boundary","severity":"high","status":"addressed-by-this-policy"}
+  ],
+  "hiddenCapabilityClasses": [
+    "document-understanding",
+    "web-content-extraction",
+    "arabic-nlp",
+    "knowledge-graph-querying",
+    "multimedia-alignment",
+    "speaker-attribution",
+    "source-lineage-and-edition-resolution",
+    "negative-evidence",
+    "evaluation-and-benchmarking",
+    "license-intelligence",
+    "resource-budgeting"
+  ],
+  "promotionRule": "No subsystem is promoted to trusted scholarly output unless its provenance, rights, safety, evidence and integration gates pass."
+}

@@ -1,0 +1,43 @@
+{
+  "version": "2026-08-30",
+  "purpose": "Global benchmark registry comparing Deen Allah Encyclopedia capability coverage against major Islamic digital resources and research libraries.",
+  "method": "Compare capabilities, not authority; an external platform is evidence of a feature, not evidence of religious truth.",
+  "benchmarks": [
+    {"id":"dorar","name":"الدرر السنية","strengths":["hadith search","hadith grading and filters","scholarly methodology","tafsir","fiqh","usul","qawaid","aqeedah","history","Arabic language"],"observed_gap_to_close":["unified cross-domain search","multimodal book processing","source-lineage graph across external sources","research-engine orchestration"]},
+    {"id":"quran-com","name":"Quran.com","strengths":["clean Quran reading UX","multiple translations and tafsir","audio recitation","word-by-word following","bookmarks and notes","reading goals","API"],"observed_gap_to_close":["deep scholarly source graph","cross-domain Islamic corpus integration","rights-aware book digitization workflow"]},
+    {"id":"altafsir","name":"Altafsir","strengths":["large tafsir collection","multi-madhhab coverage","Quran sciences","parallel tafsir views","word and thematic search","qiraat and recitation","multiple languages"],"observed_gap_to_close":["unified hadith/fiqh/rijal/graph/search fabric","automated provenance and evidence synthesis","modern document/OCR pipeline"]},
+    {"id":"sunnah-com","name":"Sunnah.com","strengths":["fast hadith search","phrase search","fuzzy search","Boolean operators","major hadith collections"],"observed_gap_to_close":["Arabic scholarly provenance mesh","cross-domain source graph","rights-aware corpus ingestion","multimodal document processing"]},
+    {"id":"waqfeya","name":"المكتبة الوقفية","strengths":["book browsing","advanced search","author index","series","centuries","keywords","download/browse PDFs"],"observed_gap_to_close":["verified OCR ensemble","page-level visual diff","semantic cross-book graph","integrated scholarly answer synthesis"]},
+    {"id":"open-library","name":"Open Library","strengths":["global book discovery","inside-book search","bibliographic metadata","developer APIs"],"observed_gap_to_close":["Arabic-Islamic scholarly taxonomy","religious source authority model","hadith/tafsir/fiqh integration"]},
+    {"id":"internet-archive","name":"Internet Archive","strengths":["large digitized archive","books","audio/video","OCR derivatives","metadata"],"observed_gap_to_close":["specialized Islamic scholarly verification","rights-aware promotion into trusted corpus","cross-source evidence synthesis"]}
+  ],
+  "priorityGaps": [
+    {"id":"research-ux-parity","priority":"P0","description":"Unified query -> specialist fan-out -> evidence table -> citations -> conflicts -> drill-down experience."},
+    {"id":"quran-study-ux","priority":"P0","description":"Match leading Quran study UX: audio, translations, tafsir switching, word-level navigation, bookmarks/notes, progress and accessible mobile presentation."},
+    {"id":"tafsir-depth-parity","priority":"P0","description":"Provide broad tafsir coverage with parallel comparison, commentator metadata, Quran-science linking and precise verse-level navigation."},
+    {"id":"library-discovery","priority":"P0","description":"Expose author/book/series/century/keyword facets and downloadable/readable editions where rights permit."},
+    {"id":"bibliographic-identity","priority":"P0","description":"Canonical work identity + edition identity + origin clustering so mirrors/translations/copies do not inflate independence."},
+    {"id":"research-reproducibility","priority":"P0","description":"Store query, source set, retrieval timestamp, ranking inputs, evidence links, and uncertainty state for reproducible research."},
+    {"id":"citation-graph","priority":"P1","description":"Cross-link books, authors, statements, verses, hadith, citations, editions and derived claims as a navigable graph."},
+    {"id":"multimedia-study","priority":"P1","description":"Synchronize text, audio, video, page images, timestamps and speaker attribution with provenance."},
+    {"id":"personal-study","priority":"P1","description":"Bookmarks, notes, reading lists, study goals and saved searches without changing authoritative corpus."},
+    {"id":"accessibility-and-localization","priority":"P1","description":"Keyboard/screen-reader/mobile support, RTL correctness, multilingual search and language-aware UI/voice."},
+    {"id":"benchmark-evaluation","priority":"P1","description":"Continuous retrieval/evidence benchmarks for Arabic queries, source precision, recall, citation accuracy and contradiction handling."}
+  ],
+  "ourDistinctivesToPreserve": [
+    "source-and-edition lineage",
+    "rights-aware ingestion",
+    "no-single-engine scholarly authority",
+    "remote-content trust boundary",
+    "fail-closed uncertainty",
+    "corpus write boundary",
+    "blank-marker-local-background preservation",
+    "global cross-system integration gate",
+    "free-first provider-neutral architecture"
+  ],
+  "nonGoals": [
+    "copy competitor content without permission",
+    "declare a competitor wrong merely because it lacks our controls",
+    "replace the trusted Corpus with benchmark discoveries"
+  ]
+}

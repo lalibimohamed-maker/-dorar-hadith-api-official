@@ -1,0 +1,40 @@
+{
+  "engineId": "statement-detailing-engine-2026",
+  "name": "محرك التفصيل",
+  "purpose": "تحويل القول أو الادعاء المستخرج إلى وحدة معرفة مفصلة قابلة للتحقق دون اختلاق تفاصيل.",
+  "pipeline": [
+    "statement-normalization",
+    "context-expansion",
+    "entity-and-term-resolution",
+    "premise-and-consequence-extraction",
+    "supporting-evidence-expansion",
+    "source-cross-check",
+    "contradiction-detection",
+    "citation-preservation",
+    "uncertainty-labeling"
+  ],
+  "rules": {
+    "never_invent_details": true,
+    "preserve_original_claim": true,
+    "distinguish_source_text_from_analysis": true,
+    "require_provenance_for_added_detail": true,
+    "surface_missing_evidence": true,
+    "surface_conflicting_evidence": true
+  },
+  "output": [
+    "core_statement",
+    "context",
+    "definitions",
+    "supporting_points",
+    "qualifications",
+    "exceptions",
+    "implications",
+    "counterevidence",
+    "evidence_map",
+    "confidence_and_gaps"
+  ],
+  "cost_policy": {
+    "free_first": true,
+    "paid_dependency_required": false
+  }
+}
