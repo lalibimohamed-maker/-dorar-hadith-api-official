@@ -227,6 +227,58 @@
     return JSON.stringify(await exportEvidenceBundle(), null, 2) + "\n";
   }
 
+  async function computeEvidenceSnapshotRoot() {
+    return (await merkleRoot((await getAllEvidence()).sort((a, b) => a.node_id.localeCompare(b.node_id)))).toLowerCase();
+  }
+
+  async function markManagedSnapshot(snapshotSha256, sequence = 0) {
+    if (!HEX_SHA256.test(String(snapshotSha256 ?? ""))) throw new Error("SYNC_SNAPSHOT_HASH_INVALID");
+    const db = await openDb();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(META_STORE, "readwrite");
+      tx.objectStore(META_STORE).put({
+        id: "evidence",
+        snapshot_sha256: String(snapshotSha256).toLowerCase(),
+        dirty: false,
+        sequence: Math.max(0, Number(sequence) || 0),
+        updated_at: new Date().toISOString()
+      });
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error || new Error("SYNC_STATE_WRITE_FAILED"));
+      tx.onabort = () => reject(tx.error || new Error("SYNC_STATE_WRITE_ABORTED"));
+    });
+  }
+
+  async function getManagedSnapshotState() {
+    const db = await openDb();
+    const current = await new Promise((resolve, reject) => {
+      const tx = db.transaction(META_STORE, "readonly");
+      const request = tx.objectStore(META_STORE).get("evidence");
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => reject(request.error || new Error("SYNC_STATE_READ_FAILED"));
+    });
+
+    if (current?.dirty === false && HEX_SHA256.test(String(current.snapshot_sha256 ?? ""))) {
+      return Object.freeze(current);
+    }
+
+    const snapshot = await computeEvidenceSnapshotRoot();
+    await markManagedSnapshot(snapshot, current?.sequence || 0);
+    return Object.freeze({
+      id: "evidence",
+      snapshot_sha256: snapshot,
+      dirty: false,
+      sequence: Math.max(0, Number(current?.sequence) || 0)
+    });
+  }
+
+  async function finalizeImportedBundle(bundle) {
+    const root = String(bundle?.integrity?.merkle_root_sha256 ?? "").toLowerCase();
+    if (!HEX_SHA256.test(root)) throw new Error("OFFLINE_BUNDLE_MERKLE_HASH_INVALID");
+    await markManagedSnapshot(root, Number(bundle?.sequence) || 0);
+    return root;
+  }
+
   async function importEvidenceBundle(bundle) {
     if (!bundle || typeof bundle !== "object") throw new Error("OFFLINE_BUNDLE_INVALID");
     if (bundle.schema_version !== "1.0.0" || bundle.format !== "dinullah/omega-offline-evidence-bundle") {
@@ -257,7 +309,14 @@
 
     const verified = [];
     for (const record of bundle.records) verified.push(await putEvidence(record));
-    return Object.freeze({ imported: verified.length, bundle_sha256: actual });
+    if (bundle.integrity?.merkle_root_sha256) {
+      const actualRoot = (await merkleRoot(verified.slice().sort((a, b) => a.node_id.localeCompare(b.node_id)))).toLowerCase();
+      if (actualRoot !== String(bundle.integrity.merkle_root_sha256).toLowerCase()) {
+        throw new Error("OFFLINE_BUNDLE_MERKLE_MISMATCH");
+      }
+      await markManagedSnapshot(actualRoot, Number(bundle.sequence) || 0);
+    }
+    return Object.freeze({ imported: verified.length, bundle_sha256: actual, snapshot_sha256: bundle.integrity?.merkle_root_sha256 ?? null });
   }
 
   async function importEvidenceBundleFile(file, { workerUrl = "./omega-offline-evidence-worker.js", mainThreadFallbackMaxBytes = 4 * 1024 * 1024 } = {}) {
@@ -334,7 +393,11 @@
     exportEvidenceBundle,
     exportEvidenceBundleText,
     importEvidenceBundle,
-    importEvidenceBundleFile
+    importEvidenceBundleFile,
+    computeEvidenceSnapshotRoot,
+    markManagedSnapshot,
+    getManagedSnapshotState,
+    finalizeImportedBundle
   });
   window.dispatchEvent(new CustomEvent("deenallah:omega-store-ready"));
 })();
