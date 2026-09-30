@@ -13,12 +13,6 @@ on:
         description: "Publish the release after all verification gates"
         required: true
         default: "false"
-  push:
-    branches:
-      - feat/omega-media-conversation-final-2026-v3
-    paths:
-      - config/media-studio-toolchain-2026.json
-      - .github/workflows/media-studio-tool-release.yml
 
 # security-justification: this workflow publishes only verified release assets from pinned upstream sources after checksum, size and security gates.
 permissions:
