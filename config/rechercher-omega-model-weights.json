@@ -244,6 +244,37 @@
       "download_template": "https://github.com/lalibimohamed-maker/-dorar-hadith-api-official/releases/download/rechercher-omega-engines-v0.1.0/<asset>"
     },
     {
+      "model_id": "sana-sprint",
+      "source_repo": "https://github.com/NVlabs/Sana",
+      "source_model_id": "Efficient-Large-Model/Sana_Sprint_1.6B_1024px",
+      "revision": "9f6866d6962d5d91d213f113e162cb18bffe741c",
+      "revision_type": "immutable_hf_commit",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "release_tag": "rechercher-omega-sana-sprint16-v1.0.0",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "runtime_manifest_asset": "sana-sprint16-release-readiness.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "release_assets": [
+        "omega__checkpoints__Sana_Sprint_1.6B_1024px.pth.part-*",
+        "release-manifest.json",
+        "LICENSE",
+        "sana-sprint16-runtime-files.tar.gz",
+        "sana-sprint16-dependencies.json",
+        "sana-sprint16-release-readiness.json"
+      ],
+      "rights_promotion_status": "weights_clear_runtime_dependency_blocked",
+      "runtime_dependency": {
+        "model_id": "google/gemma-2-2b-it",
+        "embedded": false,
+        "status": "clearance_required"
+      }
+    },
+    {
       "model_id": "flux",
       "source_repo": "https://github.com/black-forest-labs/flux",
       "revision": "f095d56c608128f5ec5e80e7c515697d15d02fa6",
