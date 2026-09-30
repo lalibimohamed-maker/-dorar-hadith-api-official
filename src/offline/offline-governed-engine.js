@@ -53,11 +53,13 @@ export class OfflineIslamicAIEngine {
     modelArtifact = null
   } = {}) {
     if (!MODES.has(mode)) throw new TypeError("unsupported offline engine mode");
-    if (!localSearch || typeof localSearch.searchLocal !== "function") {
-      throw new TypeError("localSearch.searchLocal is required");
+    if (mode !== "online_only" &&
+        (!localSearch || typeof localSearch.searchLocal !== "function")) {
+      throw new TypeError("localSearch.searchLocal is required unless mode=online_only");
     }
-    if (!localGenerator || typeof localGenerator.generate !== "function") {
-      throw new TypeError("localGenerator.generate is required");
+    if (mode !== "online_only" &&
+        (!localGenerator || typeof localGenerator.generate !== "function")) {
+      throw new TypeError("localGenerator.generate is required unless mode=online_only");
     }
 
     this.mode = mode;
@@ -68,6 +70,9 @@ export class OfflineIslamicAIEngine {
     this.modelArtifact = modelArtifact;
     this.profile = null;
     this.localReady = false;
+    this.localAvailable =
+      typeof this.localSearch?.searchLocal === "function" &&
+      typeof this.localGenerator?.generate === "function";
   }
 
   async init() {
@@ -75,6 +80,17 @@ export class OfflineIslamicAIEngine {
     if (this.mode === "online_only") {
       this.localReady = false;
       this.fit = Object.freeze({ status: "disabled", reason: "online_only" });
+      return this.profile;
+    }
+
+    if (!this.localAvailable) {
+      this.fit = Object.freeze({
+        status: "unavailable",
+        reason: "local_runtime_not_configured"
+      });
+      if (this.mode === "offline_only") {
+        throw new Error("OFFLINE_MODEL_NOT_READY: local runtime is not configured");
+      }
       return this.profile;
     }
 
