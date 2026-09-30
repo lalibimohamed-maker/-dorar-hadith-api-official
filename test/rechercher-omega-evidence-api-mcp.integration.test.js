@@ -3,18 +3,19 @@ import assert from "node:assert/strict";
 
 async function shutdown(server){
   if(typeof server.closeAllConnections==="function") server.closeAllConnections();
-  await new Promise(resolve=>server.close(resolve));
+  await new Promise(resolve=>{let done=false; const finish=()=>{if(!done){done=true;resolve();}}; server.close(finish); setTimeout(finish,250);});
 }
 
-test("AI gateway exposes the strict evidence verifier",async()=>{
+test("AI gateway exposes the strict evidence verifier",{timeout:8000},async()=>{
  const {createAiGateway}=await import("../src/rechercher-ai-gateway.js");
  const server=createAiGateway({host:"127.0.0.1",port:0});
+ server.unref();
  const port=server.address().port;
  try{
   const evidence=[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ"}];
   const citations=[{sourceId:"bukhari",citation:"vol.1 p.1"}];
   const body={answer:"قال رسول الله ﷺ: إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ.",evidence,citations};
-  const ok=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},body:JSON.stringify(body)});
+  const ok=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},signal:AbortSignal.timeout(3000),body:JSON.stringify(body)});
   const good=await ok.json(); assert.equal(ok.status,200); assert.equal(good.data.verified,true);
   const bad=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},body:JSON.stringify({...body,answer:"قال رسول الله ﷺ: إنما الأعمال بالنية."})});
   const rejected=await bad.json(); assert.equal(bad.status,422); assert.equal(rejected.data.verified,false); assert.equal(rejected.data.error.code,"STRICT_ALIGNMENT_MISMATCH"); assert.equal(rejected.data.fallback,evidence[0].text);
@@ -23,9 +24,10 @@ test("AI gateway exposes the strict evidence verifier",async()=>{
  }finally{await shutdown(server);}
 });
 
-test("MCP exposes the same strict verifier as a read-only tool",async()=>{
+test("MCP exposes the same strict verifier as a read-only tool",{timeout:8000},async()=>{
  const {createMcpServer}=await import("../src/rechercher-ai-mcp-server.js");
  const server=createMcpServer({host:"127.0.0.1",port:0});
+ server.unref();
  const port=server.address().port;
  try{
   const evidence=[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ"}];
