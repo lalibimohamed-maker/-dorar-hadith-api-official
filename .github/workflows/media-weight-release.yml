@@ -23,6 +23,7 @@ jobs:
     name: Verify and cache approved model weights in GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    if: github.ref == 'refs/heads/main'
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -116,9 +117,9 @@ jobs:
             gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
           else
             if [ "$PUBLISH" = "true" ]; then
-              gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Model Weights $RELEASE_TAG" --notes "Verified model-weight cache. Every asset was retrieved from its pinned upstream source/release, size-checked, hashed with SHA-256, and kept separate from Corpus and source PDFs. Software activation still requires runtime verification and license/security gates."
+              gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Model Weights $RELEASE_TAG" --notes "Verified model-weight cache. Every asset was retrieved from its pinned upstream source/release, size-checked, hashed with SHA-256, and kept separate from Corpus and source PDFs. Software activation still requires runtime verification and license/security gates."
             else
-              gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Model Weights $RELEASE_TAG" --notes "Draft model-weight cache. At least one model-specific redistribution review is still pending; assets remain non-promoted until rights evidence is complete." --draft
+              gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Model Weights $RELEASE_TAG" --notes "Draft model-weight cache. At least one model-specific redistribution review is still pending; assets remain non-promoted until rights evidence is complete." --draft
             fi
           fi
           gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json name,tagName,isDraft,isPrerelease,assets
