@@ -4,9 +4,11 @@ on:
     branches: [feat/rechercher-omega-multimodal-intelligence]
     paths:
       - src/rechercher-omega-graphrag-runtime.js
+      - src/rechercher-omega-corpus-graphrag.js
       - src/rechercher-omega-qdrant.js
       - src/rechercher-omega-redis-memory.js
       - test/rechercher-omega-graphrag-runtime.test.js
+      - test/rechercher-omega-corpus-graphrag.integration.test.js
       - test/rechercher-omega-redis-memory*.test.js
       - runtime/redis/docker-compose.yml
       - .github/workflows/rechercher-omega-graphrag-memory-integration.yml
@@ -39,4 +41,4 @@ jobs:
           node-version: 22
           package-manager-cache: false
       - name: GraphRAG deterministic integration
-        run: node --test test/rechercher-omega-graphrag-runtime.test.js test/rechercher-omega-redis-memory.unit.test.js test/rechercher-omega-redis-memory.integration.test.js
+        run: node --test test/rechercher-omega-graphrag-runtime.test.js test/rechercher-omega-corpus-graphrag.integration.test.js test/rechercher-omega-redis-memory.unit.test.js test/rechercher-omega-redis-memory.integration.test.js
