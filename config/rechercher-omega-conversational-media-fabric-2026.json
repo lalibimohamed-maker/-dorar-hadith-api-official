@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "dinullah-omega-conversational-media-fabric-2026",
+  "purpose": "Free/open multilingual conversational media fabric connecting microphone, realtime transport, speech recognition, language detection, translation, Omega reasoning, speech synthesis, subtitles and live media.",
+  "policy": {
+    "freeFirst": true,
+    "paidDependencyAllowed": false,
+    "generatedSpeechIsEvidence": false,
+    "corpusWriteAllowed": false,
+    "canonicalQuranAudioIsArabicOnly": true,
+    "sourceAndWeightLicensesSeparated": true,
+    "weightRedistributionRequiresExplicitClearance": true,
+    "noSilentLanguageOrVoiceSwitching": true
+  },
+  "input": {
+    "capture": [
+      "browser-microphone",
+      "WebRTC",
+      "OBS",
+      "PipeWire"
+    ],
+    "transport": [
+      "Pion-WebRTC",
+      "MediaMTX"
+    ],
+    "preprocessing": [
+      "RNNoise",
+      "DeepFilterNet",
+      "PipeWire"
+    ],
+    "voice_activity": [
+      "Silero-VAD"
+    ],
+    "wake_word": {
+      "runtime": "openWakeWord",
+      "status": "code-enabled-model-review-required",
+      "note": "Bundled pretrained models are CC-BY-NC-SA; do not redistribute them in a general public release without separate clearance."
+    }
+  },
+  "speech": {
+    "asr": [
+      "whisper.cpp",
+      "faster-whisper",
+      "Whisper"
+    ],
+    "diarization": {
+      "engine": "pyannote.audio",
+      "version": "4.0.7",
+      "model": "pyannote/speaker-diarization-3.1",
+      "license": "MIT",
+      "access": "gated-user-conditions"
+    },
+    "turn_management": "Pipecat",
+    "language_detection": [
+      "Silero-VAD-language-classifier",
+      "Whisper-language-identification"
+    ]
+  },
+  "translation": {
+    "primary": {
+      "id": "madlad400-3b-mt",
+      "model": "google/madlad400-3b-mt",
+      "coverage": "419 languages",
+      "license": "Apache-2.0",
+      "status": "candidate"
+    },
+    "arabicPairFallback": {
+      "id": "opus-mt-ar-en",
+      "model": "Helsinki-NLP/opus-mt-ar-en",
+      "license": "Apache-2.0",
+      "status": "candidate"
+    },
+    "offlineRuntime": {
+      "id": "argos-translate",
+      "version": "runtime-current",
+      "license": "MIT-or-CC0-code",
+      "modelPackages": "license-review-required"
+    },
+    "browserRuntime": {
+      "id": "bergamot-translator",
+      "license": "MPL-2.0-code",
+      "modelPackages": "redistribution-review-required"
+    },
+    "restrictedChallengers": [
+      {
+        "id": "seamless-m4t-v2",
+        "model": "facebook/seamless-m4t-v2-large",
+        "license": "CC-BY-NC-4.0",
+        "status": "research-only-no-public-release"
+      },
+      {
+        "id": "nllb-200",
+        "model": "facebook/nllb-200-distilled-600M",
+        "license": "CC-BY-NC-4.0",
+        "status": "research-only-no-public-release"
+      }
+    ]
+  },
+  "response": {
+    "intelligence": "Rechercher-Omega-#566",
+    "evidenceGate": "Omega evidence gate",
+    "responsePolicy": "source-bound scholarly response; generated language is presentation"
+  },
+  "synthesis": {
+    "primary": [
+      "CosyVoice2-0.5B"
+    ],
+    "alternatives": [
+      "Kokoro-82M",
+      "Piper 1.8.0",
+      "Habibi-TTS"
+    ],
+    "audioPost": [
+      "RNNoise",
+      "DeepFilterNet"
+    ],
+    "voiceSwitchPolicy": "user-language-selected voice; no hidden language mixing",
+    "quranPolicy": "Quran recitation audio remains Arabic recitation; translated Quran text is displayed/translated separately."
+  },
+  "liveMedia": {
+    "realtimePipeline": "Pipecat",
+    "transport": [
+      "WebRTC",
+      "MediaMTX"
+    ],
+    "conferenceTranslation": "speaker-diarization + STT + MT + TTS + subtitle track",
+    "interruption": "barge-in via Silero VAD + turn manager",
+    "captions": "WebVTT/SRT/embedded subtitle track"
+  },
+  "integration": {
+    "aiPr": 566,
+    "mediaPr": 601,
+    "bridge": "config/rechercher-omega-media-bridge-2026.json",
+    "studioRelease": "dinullah-media-studio-v2026.09.29",
+    "aiRuntimeRelease": "dinullah-omega-ai-media-runtime-v2026.09.29",
+    "weights": "separate model-weight releases"
+  }
+}

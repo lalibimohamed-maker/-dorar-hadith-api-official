@@ -1,0 +1,220 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "dinullah-rechercher-omega-media-bridge-2026",
+  "aiBranch": {
+    "pr": 566,
+    "branch": "feat/rechercher-omega-multimodal-intelligence"
+  },
+  "executionBranch": {
+    "pr": 604,
+    "branch": "feat/omega-media-conversation-final-2026-v3"
+  },
+  "contract": "PR566-plans-media-jobs; PR604-executes-conversational-media-runtime",
+  "taskRouting": {
+    "text_to_video": [
+      "wan2.2",
+      "hunyuanvideo-1.5",
+      "ltx-2",
+      "cogvideox"
+    ],
+    "image_to_video": [
+      "wan2.2",
+      "hunyuanvideo-1.5",
+      "ltx-2",
+      "cogvideox"
+    ],
+    "text_to_image": [
+      "flux"
+    ],
+    "image_editing": [
+      "flux",
+      "gimp",
+      "imagemagick"
+    ],
+    "video_editing": [
+      "kdenlive",
+      "ffmpeg",
+      "opentimelineio"
+    ],
+    "audio_recording_and_mix": [
+      "ardour",
+      "audacity"
+    ],
+    "speech_to_text": [
+      "whisper",
+      "whisper-cpp",
+      "faster-whisper",
+      "whisperx"
+    ],
+    "text_to_speech": [
+      "cosyvoice",
+      "kokoro",
+      "piper",
+      "habibi-msa",
+      "habibi-alg"
+    ],
+    "ocr_and_document_parsing": [
+      "paddleocr-vl",
+      "paddleocr",
+      "tesseract",
+      "docling",
+      "olmocr"
+    ],
+    "motion_graphics": [
+      "glaxnimate",
+      "blender"
+    ],
+    "compositing_vfx": [
+      "blender",
+      "natron"
+    ],
+    "color_management": [
+      "opencolorio"
+    ],
+    "3d": [
+      "blender",
+      "openusd",
+      "gltf",
+      "colmap",
+      "open3d"
+    ],
+    "capture_and_live": [
+      "obs",
+      "mediamtx"
+    ],
+    "transcode_and_export": [
+      "ffmpeg",
+      "kdenlive"
+    ],
+    "orchestration_and_provenance": [
+      "nifi",
+      "nats",
+      "ditto",
+      "media-quality-orchestrator"
+    ],
+    "ai_generation_runtime": [
+      "local-comfyui-pinned",
+      "local-omega-ai-runtime"
+    ],
+    "render_queue": [
+      "flamenco"
+    ],
+    "media_metadata": [
+      "mediainfo"
+    ],
+    "subtitle_authoring": [
+      "subtitlecomposer",
+      "kdenlive"
+    ],
+    "microphone_input": [
+      "browser-microphone",
+      "pipewire",
+      "obs"
+    ],
+    "realtime_voice_transport": [
+      "pion-webrtc",
+      "mediamtx"
+    ],
+    "audio_cleanup": [
+      "rnnoise",
+      "deepfilternet",
+      "pipewire"
+    ],
+    "voice_activity_and_barge_in": [
+      "silero-vad",
+      "pipecat"
+    ],
+    "speaker_diarization": [
+      "pyannote-audio"
+    ],
+    "asr": [
+      "whisper",
+      "whisper-cpp",
+      "faster-whisper",
+      "whisperx"
+    ],
+    "language_identification": [
+      "whisper",
+      "faster-whisper",
+      "qwen3-omni"
+    ],
+    "international_translation": [
+      "madlad400-3b-mt",
+      "opus-mt-ar-en",
+      "argos-translate",
+      "bergamot-translator"
+    ],
+    "offline_translation": [
+      "argos-translate",
+      "bergamot-translator"
+    ],
+    "browser_translation": [
+      "bergamot-translator"
+    ],
+    "translation_quality": [
+      "comet"
+    ],
+    "multilingual_tts": [
+      "cosyvoice",
+      "kokoro",
+      "piper",
+      "habibi-msa",
+      "habibi-alg"
+    ],
+    "live_voice_translation": [
+      "pipecat",
+      "whisper-cpp",
+      "madlad400-3b-mt",
+      "cosyvoice",
+      "piper"
+    ],
+    "captions_and_subtitles": [
+      "subtitlecomposer",
+      "kdenlive",
+      "ffmpeg"
+    ],
+    "lip_sync_dubbing": [
+      "musetalk",
+      "blender",
+      "ffmpeg"
+    ],
+    "ai_media_creation": [
+      "local-comfyui-pinned",
+      "local-omega-ai-runtime"
+    ],
+    "render_and_publish": [
+      "flamenco",
+      "ffmpeg",
+      "mediamtx"
+    ],
+    "subtitle_timing": [
+      "whisperx",
+      "subtitlecomposer",
+      "kdenlive"
+    ],
+    "tts_lightweight": [
+      "kokoro"
+    ],
+    "video_quality_assessment": [
+      "vmaf",
+      "ffmpeg"
+    ],
+    "scene_detection_and_chapters": [
+      "pyscenedetect",
+      "ffmpeg",
+      "opentimelineio"
+    ]
+  },
+  "invariants": [
+    "AI-generated media is presentation output, never scholarly evidence.",
+    "AI models are selected by task/resource/license gates; they do not redefine source truth.",
+    "Media tools execute planned jobs; they do not write directly to Corpus.",
+    "Weights and software binaries are release-backed and hash-verified before runtime promotion.",
+    "No paid provider is required by the bridge.",
+    "ComfyUI API nodes that target paid services remain disabled for the free-first runtime.",
+    "The conversation path preserves the detected source language and explicitly selects the target language; no hidden language mixing.",
+    "Translation is a presentation transformation and never changes canonical Corpus text.",
+    "Quran recitation remains Arabic audio; translation is rendered separately as text/subtitles or permitted explanatory speech.",
+    "Every render/generation job has a deterministic idempotency key and privacy-preserving telemetry context."
+  ]
+}

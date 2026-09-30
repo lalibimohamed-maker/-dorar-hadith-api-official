@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "rechercher-omega-private-engine-storage-pointer-2026",
+  "repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+  "visibility": "private",
+  "releaseTag": "rechercher-omega-private-conversation-assets-v2026.09.29",
+  "access": "owner-or-authorized-private-repository-access",
+  "publicReleasePolicy": "never-copy-private-assets-to-public-releases",
+  "corpusPolicy": "never-store-corpus-content",
+  "privateAssets": {
+    "privateResearchOnly": [
+      "seamless-m4t-v2-large",
+      "nllb-200-distilled-600m",
+      "f5-tts-pretrained-weights",
+      "openwakeword-pretrained-models"
+    ],
+    "gatedPrivate": [
+      "pyannote-speaker-diarization",
+      "piper-voice-packages"
+    ]
+  },
+  "integration": {
+    "aiBranchPr": 566,
+    "mediaIntegrationPr": 603,
+    "conversationRuntime": "config/rechercher-omega-conversation-runtime-2026.json",
+    "bridge": "config/rechercher-omega-media-bridge-2026.json"
+  },
+  "states": {
+    "privateResearchOnly": "stored for internal/non-commercial/research use subject to upstream terms",
+    "gatedPrivate": "stored only when upstream access conditions are satisfied",
+    "publicRedistribution": "blocked"
+  }
+}

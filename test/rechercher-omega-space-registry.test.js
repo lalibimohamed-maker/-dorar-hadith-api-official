@@ -1,0 +1,97 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  loadOmegaSpaceRegistry,
+  selectOmegaSpaceReferences,
+  buildOmegaSpacePlan,
+  assertOmegaSpaceBoundary
+} from "../src/rechercher-omega-space-registry.js";
+
+test("curated Space registry contains verified useful references", async () => {
+  const registry = await loadOmegaSpaceRegistry();
+  assert.ok(registry.spaces.length >= 7);
+  assert.ok(registry.spaces.some(space => space.space_id === "lfoppiano/document-qa"));
+  assert.ok(registry.spaces.some(space => space.space_id === "LovnishVerma/rag"));
+  assert.ok(registry.spaces.some(space => space.space_id === "aizip-dev/SLM-RAG-Arena"));
+  assert.ok(registry.spaces.some(space => space.space_id === "k2-fsa/OmniVoice"));
+});
+
+test("PaddleOCR-VL references resolve as document parsing capabilities", async () => {
+  const registry = await loadOmegaSpaceRegistry();
+  const references = selectOmegaSpaceReferences({
+    registry,
+    capabilities: ["document_parsing", "ocr", "layout"]
+  });
+  assert.ok(references.some(space => space.space_id === "PaddlePaddle/PaddleOCR-VL_Online_Demo"));
+  assert.ok(references.some(space => space.space_id === "Upsampler/paddleocr-vl"));
+  assert.ok(references.every(space => space.use === "reference"));
+});
+
+test("document capabilities resolve only reference Spaces", async () => {
+  const registry = await loadOmegaSpaceRegistry();
+  const references = selectOmegaSpaceReferences({
+    registry,
+    capabilities: ["document_qa", "pdf_rag"]
+  });
+  assert.ok(references.some(space => space.space_id === "lfoppiano/document-qa"));
+  assert.ok(references.some(space => space.space_id === "LovnishVerma/rag"));
+  assert.ok(references.every(space => space.use === "reference"));
+});
+
+test("Arabic speech capability resolves the Lahgtna reference", async () => {
+  const registry = await loadOmegaSpaceRegistry();
+  const plan = buildOmegaSpacePlan({
+    registry,
+    capabilities: ["arabic_speech"]
+  });
+  assert.equal(plan.status, "reference_available");
+  assert.ok(plan.references.some(space => space.space_id === "oddadmix/Lahgtna-OmniVoice-Demo"));
+  assert.equal(plan.executable, false);
+});
+
+test("paused tokenizer Space is excluded by default", async () => {
+  const registry = await loadOmegaSpaceRegistry();
+  const references = selectOmegaSpaceReferences({
+    registry,
+    capabilities: ["arabic_token_analysis"]
+  });
+  assert.equal(references.length, 0);
+});
+
+test("Space registry is fail-closed", async () => {
+  const registry = await loadOmegaSpaceRegistry();
+  const plan = buildOmegaSpacePlan({
+    registry,
+    capabilities: ["document_qa"]
+  });
+  assert.doesNotThrow(() => assertOmegaSpaceBoundary(plan));
+  assert.equal(plan.corpus_write_allowed, false);
+  assert.equal(plan.generated_media_is_evidence, false);
+});
+
+
+test("hfviewer is tracked only as a reference viewer", async () => {
+  const registry = await loadOmegaSpaceRegistry();
+  const viewer = registry.spaces.find(space => space.space_id === "embedl/hfviewer");
+  assert.ok(viewer);
+  assert.equal(viewer.use, "reference");
+  assert.equal(viewer.executable, undefined);
+  assert.equal(viewer.license_status, "review_required");
+});
+
+
+test("complete PaddleOCR-VL census contains all 28 discovered Spaces", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const { fileURLToPath } = await import("node:url");
+  const { dirname, join } = await import("node:path");
+  const dir = dirname(fileURLToPath(import.meta.url));
+  const census = JSON.parse(await readFile(
+    join(dir, "../config/rechercher-omega-paddleocr-space-census.json"),
+    "utf8"
+  ));
+  assert.equal(census.source.reported_space_count, 28);
+  assert.equal(census.spaces.length, 28);
+  assert.ok(census.spaces.every(space => space.executable === false));
+  assert.ok(census.spaces.some(space => space.space_id === "embedl/hfviewer"));
+  assert.ok(census.spaces.some(space => space.space_id === "vivekreddyr/PaddleOCR-VL-Doc-Editor"));
+});

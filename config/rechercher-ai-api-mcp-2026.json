@@ -1,0 +1,36 @@
+{
+  "schemaVersion":"1.0.0",
+  "id":"rechercher-ai-api-mcp-2026",
+  "purpose":"Machine-facing API and MCP boundary for Din Allah Encyclopedia. The AI layer may retrieve, classify, reason and present; it cannot mutate canonical Corpus.",
+  "freeFirst":true,
+  "paidApiRequired":false,
+  "corpusWriteAllowed":false,
+  "api":{
+    "openapi":"3.1.0",
+    "basePath":"/api/v1",
+    "strictSchemas":true,
+    "pagination":{"defaultLimit":20,"maxLimit":100,"cursorPreferred":true},
+    "errors":{"machineReadable":true,"stableCodes":true},
+    "auth":{"apiKeyHeader":"x-api-key","publicReadMayBeAnonymous":true},
+    "rateLimit":{"algorithm":"token-bucket","defaultPerMinute":60,"burst":20}
+  },
+  "mcp":{
+    "protocolVersion":"2026-07-28",
+    "transport":"streamable-http",
+    "endpoint":"/mcp",
+    "stateless":true,
+    "serverDiscover":true,
+    "tools":["deen_search","deen_concept","deen_quran_ayah","deen_source","deen_health"],
+    "corpusWriteTools":[],
+    "requiredMeta":["io.modelcontextprotocol/protocolVersion"],
+    "failClosedOnUnsupportedVersion":true
+  },
+  "evidencePolicy":{
+    "requiredFields":["source","document_id","provenance","rights_status","verification_status","sha256"],
+    "noEvidenceCode":"NO_EVIDENCE",
+    "unknownRights":"reject",
+    "unknownProvenance":"reject",
+    "generatedTextIsEvidence":false,
+    "canonicalQuranGeneratedByModel":false
+  }
+}

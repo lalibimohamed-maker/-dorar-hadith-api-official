@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "logical_id": "hunyuanvideo-1.5",
+  "model_id": "tencent/HunyuanVideo-1.5",
+  "model_revision": "9b49404b3f5df2a8f0b31df27a0c7ab872e7b038",
+  "upstream_repo": "Tencent-Hunyuan/HunyuanVideo-1.5",
+  "upstream_commit": "60783e704160023913bee78f0b47036d393d4dfa",
+  "release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+  "status_policy": {
+    "weights_manifest": "weights_acquired",
+    "runtime_bundle": "required",
+    "license_notice": "required",
+    "external_dependencies": "required_for_runnable",
+    "runnable_requires_all_external_dependencies": true
+  },
+  "model_runtime_paths": [
+    "config.json",
+    "scheduler/*.json",
+    "transformer/**/*.json",
+    "upsampler/**/*.json",
+    "vae/**/*.json"
+  ],
+  "external_dependencies": [
+    {
+      "id": "qwen2.5-vl-7b-instruct",
+      "model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+      "target_path": "text_encoder/llm",
+      "required": true,
+      "source": "huggingface",
+      "license": "apache-2.0",
+      "status": "public_dependency_not_embedded"
+    },
+    {
+      "id": "byt5-small",
+      "model_id": "google/byt5-small",
+      "target_path": "text_encoder/byt5-small",
+      "required": true,
+      "source": "huggingface",
+      "license": "apache-2.0",
+      "status": "public_dependency_not_embedded"
+    },
+    {
+      "id": "glyph-sdxl-v2",
+      "model_id": "AI-ModelScope/Glyph-SDXL-v2",
+      "target_path": "text_encoder/Glyph-SDXL-v2",
+      "required": true,
+      "source": "modelscope",
+      "license": "review_required",
+      "status": "rights_review_required"
+    },
+    {
+      "id": "flux-redux-dev",
+      "model_id": "black-forest-labs/FLUX.1-Redux-dev",
+      "target_path": "vision_encoder/siglip",
+      "required": true,
+      "source": "huggingface",
+      "license": "flux-1-dev-non-commercial-license",
+      "status": "gated_access_required"
+    }
+  ]
+}

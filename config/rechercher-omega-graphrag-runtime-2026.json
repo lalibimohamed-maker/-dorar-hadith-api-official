@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "id": "rechercher-omega-graphrag-runtime-2026",
+  "purpose": "Production bridge from streamed verified Corpus records to graph plus vector persistence.",
+  "pipeline": [
+    "corpus_stream",
+    "normalize_source_record",
+    "stable_document_id",
+    "graph_node_and_evidence",
+    "embedding",
+    "vector_upsert",
+    "hybrid_query",
+    "graph_context_join",
+    "deterministic_evidence_gate"
+  ],
+  "backends": {
+    "graph": "deen-graph-runtime",
+    "vector": "qdrant",
+    "local_test_vector": "in-memory"
+  },
+  "invariant": {
+    "corpus_write_allowed": false,
+    "model_is_not_source": true,
+    "generated_media_is_evidence": false,
+    "sourceId_and_citation_required": true,
+    "unverified_evidence_rejected_downstream": true
+  },
+  "production_env": [
+    "QDRANT_URL"
+  ],
+  "ingestion": {
+    "batch_size": 64,
+    "streaming_supported": true,
+    "idempotent_by_stable_document_id": true
+  }
+}

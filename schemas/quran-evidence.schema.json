@@ -1,0 +1,18 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://dinullah.example/schemas/quran-evidence.schema.json",
+  "title":"Din Allah Canonical Quran Evidence",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["surah_number","ayah_number","text_raw","canonical_source","sha256","verification_status"],
+  "properties":{
+    "surah_number":{"type":"integer","minimum":1,"maximum":114},
+    "ayah_number":{"type":"integer","minimum":1},
+    "text_raw":{"type":"string","minLength":1},
+    "canonical_source":{"type":"string","minLength":1},
+    "sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "verification_status":{"type":"string","enum":["verified","rejected"]},
+    "translation_ids":{"type":"array","items":{"type":"string"}},
+    "tafsir_ids":{"type":"array","items":{"type":"string"}}
+  }
+}

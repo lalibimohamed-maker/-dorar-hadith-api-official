@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "name": "Din Allah Omega open image model fleet",
+  "purpose": "Long-lived self-hosted image generation/editing fleet; model weights are published only through dedicated GitHub Releases and never committed to Git or Git LFS.",
+  "storage_policy": {
+    "authoritative_targets": [
+      "lalibimohamed-maker/-dorar-hadith-api-official",
+      "lalibimohamed-maker/rechercher-omega-engine-storage"
+    ],
+    "release_storage_target": "lalibimohamed-maker/rechercher-omega-engine-storage",
+    "check_both_targets_before_acquisition": true,
+    "never_redownload_verified_release": true,
+    "never_commit_weights_to_git": true,
+    "git_lfs": "forbidden"
+  },
+  "arabic_text_policy": {
+    "status": "separate_verified_typography_layer_required",
+    "model_generated_arabic_text_is_not_source_authority": true,
+    "source_text_must_be_composited_after_generation": true,
+    "ocr_verification_required": true
+  },
+  "models": [
+    {
+      "id": "sana-sprint-1.6b",
+      "model_id": "Efficient-Large-Model/Sana_Sprint_1.6B_1024px",
+      "release_tag": "rechercher-omega-sana-sprint16-v1.0.0",
+      "license": "Apache-2.0",
+      "roles": ["fast-generation", "1024px"],
+      "status": "already-acquired"
+    },
+    {
+      "id": "sana-1600m-2k",
+      "model_id": "Efficient-Large-Model/Sana_1600M_2Kpx_BF16",
+      "release_tag": "rechercher-omega-sana1600m-2k-v1.0.0",
+      "license": "Apache-2.0",
+      "roles": ["2K-generation", "high-resolution"],
+      "runtime_dependency": "google/gemma-2-2b-it"
+    },
+    {
+      "id": "sana-1600m-4k",
+      "model_id": "Efficient-Large-Model/Sana_1600M_4Kpx_BF16",
+      "release_tag": "rechercher-omega-sana1600m-4k-v1.0.0",
+      "license": "Apache-2.0",
+      "roles": ["4K-generation", "high-resolution"],
+      "runtime_dependency": "google/gemma-2-2b-it"
+    },
+    {
+      "id": "boogu-image-base",
+      "model_id": "Boogu/Boogu-Image-0.1-Base",
+      "release_tag": "rechercher-omega-boogu-image01-base-v1.0.0",
+      "license": "Apache-2.0",
+      "roles": ["text-to-image", "text-rendering", "1K-2K"]
+    },
+    {
+      "id": "boogu-image-edit",
+      "model_id": "Boogu/Boogu-Image-0.1-Edit",
+      "release_tag": "rechercher-omega-boogu-image01-edit-v1.0.0",
+      "license": "Apache-2.0",
+      "roles": ["image-editing", "image-to-image", "up-to-2K"]
+    },
+    {
+      "id": "boogu-image-edit-turbo",
+      "model_id": "Boogu/Boogu-Image-0.1-Edit-Turbo",
+      "release_tag": "rechercher-omega-boogu-image01-edit-turbo-v1.0.0",
+      "license": "Apache-2.0",
+      "roles": ["fast-image-editing", "image-to-image", "1K-1.5K"]
+    },
+    {
+      "id": "boogu-image-turbo",
+      "model_id": "Boogu/Boogu-Image-0.1-Turbo",
+      "release_tag": "rechercher-omega-boogu-image01-turbo-v1.0.0",
+      "license": "Apache-2.0",
+      "roles": ["fast-generation", "photorealistic-generation"]
+    },
+    {
+      "id": "llada-image",
+      "model_id": "inclusionAI/LLaDA-Image",
+      "release_tag": "rechercher-omega-llada-image-v1.0.0",
+      "license": "Apache-2.0",
+      "roles": ["photorealistic-generation", "image-editing", "image-to-image"]
+    },
+    {
+      "id": "lumina-image-2",
+      "model_id": "Alpha-VLLM/Lumina-Image-2.0",
+      "release_tag": "rechercher-omega-lumina-image2-v1.0.0",
+      "license": "Apache-2.0",
+      "roles": ["text-to-image", "2B-class-fallback"]
+    }
+  ]
+}

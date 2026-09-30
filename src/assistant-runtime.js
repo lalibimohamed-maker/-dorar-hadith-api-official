@@ -2,11 +2,42 @@ import { unifiedSearch } from './unified-search.js';
 import { createMultimodalSession, normalizeLanguage, speechPolicy, exportRequest } from './multimodal-runtime.js';
 import { transcribe, synthesize, quranRecitation, exportMedia } from './media-provider-adapters.js';
 import { createAlQuranCloudRecitationProvider } from './quran-recitation-source.js';
+import { runGovernedAssistantTurn } from './rechercher-omega-assistant-bridge.js';
+
+function buildOmegaEvidence(search) {
+  const evidence = [];
+  if (search?.hadith != null) {
+    evidence.push({
+      source_id: 'dorar-hadith',
+      text: JSON.stringify(search.hadith),
+      citation: search.hadith?.source ?? search.hadith?.reference ?? 'dorar-hadith',
+      verification: 'source-backed-api-result'
+    });
+  }
+  for (const item of (search?.sourceMatches ?? []).slice(0, 30)) {
+    evidence.push({
+      source_id: item.id ?? item.source ?? item.work,
+      text: [
+        item.title,
+        item.work,
+        item.author,
+        item.methodology,
+        item.verification,
+        item.source
+      ].filter(Boolean).join(' | '),
+      verification: item.verification ?? 'unknown',
+      rights: item.rights ?? 'unknown',
+      citation: item.citation ?? item.provenance?.citation ?? item.source ?? item.evidence?.source ?? item.id ?? item.work ?? null,
+      provenance: item.provenance ?? item.evidence?.provenance ?? null
+    });
+  }
+  return evidence;
+}
 
 /**
- * Orchestrates the public assistant flow without embedding provider secrets.
- * Search remains the source of truth; media providers only render verified
- * input/output around that result.
+ * Public assistant flow. Search remains the evidence layer; Omega is the
+ * governed reasoning/execution layer and is opt-in for execution so clients
+ * can preserve the existing search-only contract.
  */
 export async function runAssistantSearch({
   query,
@@ -16,6 +47,10 @@ export async function runAssistantSearch({
   searchFn = unifiedSearch,
   records,
   graph,
+  useOmega = false,
+  executeOmega = false,
+  omegaOptions = {},
+  graphRagRuntime = null,
 } = {}) {
   const normalizedLanguage = normalizeLanguage(language);
   const session = createMultimodalSession({ language: normalizedLanguage });
@@ -24,7 +59,7 @@ export async function runAssistantSearch({
     responseLocale: normalizedLanguage,
   });
 
-  return {
+  const response = {
     session,
     search: result,
     speech: speechPolicy({ language: normalizedLanguage }),
@@ -33,16 +68,65 @@ export async function runAssistantSearch({
       voiceOutput: Boolean(providers.textToSpeech),
       exports: Boolean(providers.export),
       quranRecitation: Boolean(providers.quranRecitation),
+      omega: Boolean(useOmega),
     },
   };
+
+  if (useOmega) {
+    let graphRag = null;
+    if (graphRagRuntime) {
+      graphRag = await graphRagRuntime.search(query, { limit: Number(omegaOptions.graphRagLimit || 8) });
+    }
+    const omegaEvidence = [
+      ...buildOmegaEvidence(result),
+      ...(Array.isArray(graphRag) ? graphRag.map(item => ({
+        source_id: item?.payload?.sourceId ?? item?.sourceId ?? item?.id ?? 'graphrag',
+        text: item?.payload?.text ?? item?.text ?? '',
+        verification: item?.payload?.verification ?? 'source-backed-vector-retrieval',
+        provenance: item?.payload?.provenance ?? null
+      })) : [])
+    ].filter(item => item.text);
+    response.omega = await runGovernedAssistantTurn({
+      query,
+      language: normalizedLanguage,
+      evidence: omegaEvidence,
+      output_kind: omegaOptions.output_kind ?? 'analysis',
+      requested_models: omegaOptions.requested_models ?? [],
+      blocked_models: omegaOptions.blocked_models ?? [],
+      availableBackends: omegaOptions.availableBackends ?? [],
+      backendHealth: omegaOptions.backendHealth ?? {},
+      execute: Boolean(executeOmega),
+      search_context: { rights_status: omegaOptions.rights_status ?? 'unknown' },
+    });
+    response.omega.graphRag = { enabled: Boolean(graphRagRuntime), results: Array.isArray(graphRag) ? graphRag.length : 0 };
+  }
+
+  return response;
 }
 
-export async function runVoiceQuestion({ provider, audio, language, searchOptions = {}, searchFn = unifiedSearch } = {}) {
+export async function runVoiceQuestion({
+  provider,
+  audio,
+  language,
+  searchOptions = {},
+  searchFn = unifiedSearch,
+  useOmega = false,
+  executeOmega = false,
+  omegaOptions = {},
+} = {}) {
   const normalizedLanguage = normalizeLanguage(language);
   const transcript = await transcribe({ provider, audio, language: normalizedLanguage });
   const query = typeof transcript === 'string' ? transcript : transcript?.text;
   if (!query) throw new Error('Speech provider returned no transcript');
-  const response = await runAssistantSearch({ query, language: normalizedLanguage, searchOptions, searchFn });
+  const response = await runAssistantSearch({
+    query,
+    language: normalizedLanguage,
+    searchOptions,
+    searchFn,
+    useOmega,
+    executeOmega,
+    omegaOptions,
+  });
   return { transcript, ...response };
 }
 

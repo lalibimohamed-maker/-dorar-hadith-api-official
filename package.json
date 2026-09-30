@@ -11,6 +11,7 @@
     "start:corpus": "node src/index.js",
     "health": "find . -type f -name '*.js' -not -path './node_modules/*' -print0 | xargs -0 -n1 node --check",
     "test": "node --test 'test/**/*.test.js'",
+    "test:omega-evidence": "node --test test/omega-evidence-runtime.test.js",
     "test:governance": "node test/orchestration-kernel.test.js",
     "test:corpus": "node test/corpus_search.test.js && node test/corpus_repository.test.js && node test/corpus_api.integration.test.js && node test/http_server.integration.test.js",
     "test:ghaib": "node test/ghaib-evidence-router.test.js && node test/hadith-evidence-registry.test.js && node test/hadith-scholar-linker.test.js",
@@ -32,7 +33,19 @@
     "test:corpus-boundary": "node --test test/corpus-write-boundary.test.js",
     "test:review-boundary": "node --test test/review-queue-boundary.test.js",
     "test:reviewer-separation": "node --test test/reviewer-separation.test.js",
-    "test:review-expiry": "node --test test/review-expiry.test.js"
+    "test:review-expiry": "node --test test/review-expiry.test.js",
+    "test:ai": "node --test test/rechercher-ai-engine.test.js",
+    "test:rechercher-ai": "npm run test:ai",
+    "test:omega-global-search": "node --test test/rechercher-omega-global-deep-search.test.js",
+    "test:omega-ai": "node --test test/rechercher-omega-ai-capability-registry.test.js test/rechercher-omega-ai-runtime.test.js test/rechercher-omega-repository-intelligence.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-resilience.test.js test/rechercher-omega-assistant-bridge.test.js test/rechercher-omega-quality-gates.test.js test/rechercher-omega-multimodal-router.test.js",
+    "mcp": "node src/rechercher-ai-mcp-server.js",
+    "test:mcp": "node --test test/rechercher-ai-mcp-server.test.js",
+    "ai-gateway": "node src/rechercher-ai-gateway.js",
+    "test:omega-e2e": "node --test test/rechercher-omega-governed-run.test.js test/rechercher-omega-evidence-api-mcp.integration.test.js test/rechercher-omega-governance-redis-e2e.integration.test.js test/rechercher-omega-assistant-redis.integration.test.js test/rechercher-omega-integrity-sharding.test.js test/rechercher-omega-claim-gate.test.js test/offline-governed-engine.test.js",
+    "test:omega-integrity": "node --test test/rechercher-omega-integrity-sharding.test.js",
+    "test:omega-claims": "node --test test/rechercher-omega-claim-gate.test.js",
+    "test:offline": "node --test test/offline-governed-engine.test.js test/offline-runtime-profile.test.js",
+    "test:omega-engine-identity": "node --test test/rechercher-omega-engine-identity.test.js"
   },
   "engines": {
     "node": ">=20"

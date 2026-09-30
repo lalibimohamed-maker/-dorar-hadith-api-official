@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.1.0",
+  "purpose": "Free-first execution backends for Rechercher Ω. Backends are execution paths, never scholarly evidence.",
+  "policy": {
+    "prefer_free": true,
+    "never_auto_charge": true,
+    "generated_media_is_evidence": false,
+    "corpus_write_allowed": false,
+    "secrets_from_registry": true,
+    "api_keys_must_be_environment_injected": true
+  },
+  "backends": [
+    {
+      "id": "local",
+      "kind": "local",
+      "free": true,
+      "requires_gpu": false,
+      "weights_required": true,
+      "priority": 10
+    },
+    {
+      "id": "openai-compatible",
+      "kind": "local_or_self_hosted",
+      "provider": "openai-compatible",
+      "free": true,
+      "quota": "hardware_or_hosted_runtime_dependent",
+      "requires_api_key": false,
+      "weights_required": true,
+      "priority": 11,
+      "supported_runtimes": ["ollama", "llama-cpp", "vllm", "sglang", "localai", "lm-studio", "transformers-serve"]
+    },
+    {
+      "id": "gemini-free-tier",
+      "kind": "remote_api",
+      "provider": "google",
+      "free": true,
+      "quota": "provider_free_tier",
+      "requires_api_key": true,
+      "priority": 20
+    },
+    {
+      "id": "groq-free-plan",
+      "kind": "remote_api",
+      "provider": "groq",
+      "free": true,
+      "quota": "provider_free_plan",
+      "requires_api_key": true,
+      "priority": 30
+    },
+    {
+      "id": "huggingface-inference",
+      "kind": "remote_api",
+      "provider": "huggingface",
+      "free": true,
+      "quota": "provider_free_or_account_quota",
+      "requires_api_key": true,
+      "priority": 40
+    },
+    {
+      "id": "kaggle-gpu",
+      "kind": "remote_gpu",
+      "provider": "kaggle",
+      "free": true,
+      "quota": "availability_dependent",
+      "requires_api_key": true,
+      "priority": 50
+    }
+  ]
+}

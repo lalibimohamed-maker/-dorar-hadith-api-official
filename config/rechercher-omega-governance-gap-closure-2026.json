@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Close mandatory AI governance gaps without changing scholarly Corpus content.",
+  "stages": [
+    "query_normalization",
+    "source_retrieval",
+    "graph_or_vector_evidence_retrieval",
+    "deterministic_evidence_gate",
+    "conflict_preservation",
+    "model_generation",
+    "citation_emission",
+    "runtime_provenance_audit"
+  ],
+  "invariants": {
+    "model_is_not_source": true,
+    "no_evidence_no_answer": true,
+    "citation_must_exist_in_retrieved_evidence": true,
+    "evidence_text_hash_verification": true,
+    "conflicts_must_preserve_all_sources": true,
+    "generated_media_is_evidence": false,
+    "corpus_write_allowed": false,
+    "paid_core_dependency": false
+  },
+  "conversation_memory": {
+    "raw_persistence_default": false,
+    "store_injection_allowed": true
+  },
+  "storage": {
+    "weights_only_in_github_releases": true,
+    "git_lfs": false,
+    "check_primary_and_omega_storage_before_acquisition": true
+  }
+}\n

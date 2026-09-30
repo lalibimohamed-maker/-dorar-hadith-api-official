@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "id": "rechercher-omega-resource-and-cache-2026",
+  "resource_admission": {
+    "fail_closed": true,
+    "live_state_source": "runtime_observer",
+    "pools": {
+      "local_cpu": {
+        "max_concurrency": 2,
+        "vram_budget_mb": null
+      },
+      "local_gpu": {
+        "max_concurrency": 1,
+        "vram_budget_mb": null
+      },
+      "api": {
+        "max_concurrency": 4,
+        "vram_budget_mb": null
+      },
+      "kaggle_gpu": {
+        "max_concurrency": 1,
+        "vram_budget_mb": null
+      }
+    },
+    "on_saturation": "queue",
+    "no_automatic_paid_fallback": true
+  },
+  "semantic_cache": {
+    "key_inputs": [
+      "task",
+      "model",
+      "model_revision",
+      "prompt",
+      "evidence_content_hashes",
+      "rights",
+      "verification",
+      "generation_config",
+      "language"
+    ],
+    "raw_prompt_storage": false,
+    "raw_evidence_storage": false,
+    "invalidation": [
+      "model_revision_change",
+      "evidence_change",
+      "rights_change",
+      "generation_config_change",
+      "language_change"
+    ],
+    "default_ttl_ms": 900000,
+    "backend_options": [
+      "in_process",
+      "nats_kv",
+      "sqlite"
+    ],
+    "corpus_write_allowed": false
+  }
+}

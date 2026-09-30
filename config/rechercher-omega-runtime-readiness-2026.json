@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "id": "rechercher-omega-runtime-readiness-2026",
+  "purpose": "Explicit separation between model metadata, source license evidence and verified runtime artifact readiness.",
+  "states": [
+    "verified_installed",
+    "verified_remote_asset",
+    "download_required",
+    "not_verified",
+    "blocked"
+  ],
+  "execution_rule": "A weights-required backend may execute only from verified_installed or verified_remote_asset with immutable revision, SHA-256 and applicable license verification.",
+  "planning_rule": "Not-ready artifacts may remain visible for planning/benchmarking but are never silently executed.",
+  "persistence_rule": "Runtime artifact state is operational metadata; it never mutates scholarly Corpus."
+}

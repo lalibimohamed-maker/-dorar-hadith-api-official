@@ -1,0 +1,40 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://dinullah.example/schemas/islamic-corpus-node.schema.json",
+  "title":"Din Allah Islamic Corpus Node",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["node_id","category","text_raw","provenance","rights_status","verification_status","sha256"],
+  "properties":{
+    "node_id":{"type":"string","minLength":8},
+    "category":{"type":"string","enum":["quran","hadith","tafsir","fiqh","aqidah","sirah","tarajum","scholarly","translation"]},
+    "text_raw":{"type":"string"},
+    "text_search":{"type":"string"},
+    "provenance":{"$ref":"#/$defs/provenance"},
+    "rights_status":{"type":"string","enum":["cleared","restricted","unknown","blocked","review_required"]},
+    "verification_status":{"type":"string","enum":["verified","approved","candidate","unverified","rejected"]},
+    "sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "language":{"type":"string","minLength":2},
+    "edition":{"type":["string","null"]},
+    "volume":{"type":["integer","null"],"minimum":1},
+    "page":{"type":["integer","null"],"minimum":1}
+  },
+  "$defs":{
+    "provenance":{
+      "type":"object","additionalProperties":false,
+      "required":["source","document_id"],
+      "properties":{
+        "source":{"type":"string","minLength":1},
+        "document_id":{"type":"string","minLength":1},
+        "book_title":{"type":["string","null"]},
+        "author":{"type":["string","null"]},
+        "publisher":{"type":["string","null"]},
+        "publication_year":{"type":["integer","null"]},
+        "edition":{"type":["string","null"]},
+        "volume":{"type":["integer","null"],"minimum":1},
+        "page":{"type":["integer","null"],"minimum":1},
+        "url":{"type":["string","null"],"format":"uri"}
+      }
+    }
+  }
+}

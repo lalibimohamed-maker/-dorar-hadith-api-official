@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0.0",
+  "policy": {
+    "default_mode": "auto",
+    "offline_only_must_never_require_network": true,
+    "online_is_explicit_alternative": true,
+    "online_fallback_is_allowed_only_in_auto_mode": true,
+    "corpus_write_allowed": false,
+    "generated_media_is_evidence": false,
+    "scholarly_truth_scope": "verified_corpus_only"
+  },
+  "local_runtime": {
+    "browser": {
+      "inference": [
+        "Transformers.js",
+        "ONNX Runtime Web",
+        "WebAssembly",
+        "WebGPU"
+      ],
+      "search": [
+        "Orama",
+        "USearch"
+      ],
+      "relations": [
+        "DuckDB-Wasm",
+        "SQLite-Wasm-compatible adapter"
+      ],
+      "inference_policy": {
+        "onnx_models_only": true,
+        "remote_model_downloads": false,
+        "local_files_only": true
+      }
+    },
+    "desktop": {
+      "llm": [
+        "llama.cpp"
+      ],
+      "model_formats": [
+        "GGUF",
+        "ONNX"
+      ],
+      "gguf_note": "GGUF is handled by llama.cpp, not ONNX Runtime Web"
+    },
+    "speech": [
+      "sherpa-onnx"
+    ]
+  },
+  "model_policy": {
+    "offline_artifact_requires": [
+      "sha256_verified",
+      "revision_verified",
+      "license_verified",
+      "estimated_peak_ram_bytes"
+    ],
+    "quantization": [
+      "q4",
+      "q8",
+      "int8",
+      "fp16"
+    ],
+    "no_unverified_weight_loading": true,
+    "no_git_lfs": true,
+    "release_asset_distribution": "github-releases"
+  },
+  "device_policy": {
+    "browser_memory_budget_fraction": 0.35,
+    "default_reserve_bytes": 268435456,
+    "never_assume_that_file_size_equals_peak_ram": true,
+    "4gb_devices_are_not_promised_to_run_1_8gb_models": true
+  },
+  "validated_tool_versions": {
+    "onnxruntime-web": "1.30.0",
+    "@huggingface/transformers": "4.3.0",
+    "@orama/orama": "3.1.18",
+    "usearch": "2.26.2",
+    "@duckdb/duckdb-wasm": "1.5.5",
+    "sherpa-onnx": "1.13.8"
+  }
+}

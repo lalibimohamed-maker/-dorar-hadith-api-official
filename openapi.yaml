@@ -5,6 +5,7 @@ info:
   description: Multilingual source-attributed research API for Quran, hadith, tafsir, creed, fiqh, sirah, maqasid, faraid and Quran learning. Search and five-second long-press concept cards respond in the selected language without a separate meaning-translation layer.
 servers:
   - url: https://YOUR_DEPLOYED_API_HOST
+    description: Deployment base URL; do not treat generated model output as scholarly evidence
 paths:
   /health:
     get:
@@ -79,6 +80,54 @@ paths:
       responses:
         '200': {description: Project created for source review and video rendering}
         '400': {description: Invalid project}
+  /api/v1/agents/search:
+    get:
+      operationId: agentSearch
+      summary: Machine-facing verified search with pagination and provenance envelope
+      parameters:
+        - {name: q, in: query, required: true, schema: {type: string, minLength: 1, maxLength: 300}}
+        - {name: lang, in: query, schema: {type: string, maxLength: 35}}
+        - {name: cursor, in: query, schema: {type: string, maxLength: 512}}
+        - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
+      responses:
+        '200': {description: Strict evidence envelope}
+        '400': {description: Machine-readable validation error}
+        '429': {description: Rate limit exceeded}
+  /api/v1/agents/verify:
+    post:
+      operationId: verifyAgentAnswer
+      summary: Deterministically verify generated answer text against retrieved source evidence
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [answer, evidence, citations]
+              properties:
+                answer: {type: string, maxLength: 20000}
+                evidence: {type: array, items: {$ref: '#/components/schemas/IslamicCorpusNode'}}
+                citations: {type: array, items: {type: object, required: [sourceId, citation]}}
+      responses:
+        '200': {description: Source-backed answer verified}
+        '422': {description: Verification rejected; deterministic source fallback may be returned}
+        '429': {description: Rate limit exceeded}
+  /mcp:
+    post:
+      operationId: mcp
+      summary: Stateless Model Context Protocol 2026-07-28 gateway
+      description: Exposes read-only Din Allah tools to AI agents. No Corpus write tools are exposed.
+      parameters:
+        - {name: MCP-Protocol-Version, in: header, required: false, schema: {type: string, enum: [2026-07-28, 2025-11-25]}}
+      requestBody:
+        required: true
+        content:
+          application/json: {schema: {$ref: '#/components/schemas/McpJsonRpcRequest'}}
+      responses:
+        '200': {description: JSON-RPC response}
+        '400': {description: Invalid JSON-RPC request}
+        '415': {description: Unsupported media type}
+        '429': {description: Rate limit exceeded}
   /search:
     get:
       operationId: search
@@ -129,6 +178,33 @@ paths:
       responses:
         '200': {description: Tajweed lesson}
 components:
+  schemas:
+    EvidenceProvenance:
+      type: object
+      required: [source, document_id]
+      properties:
+        source: {type: string}
+        document_id: {type: string}
+        book_title: {type: [string, 'null']}
+        author: {type: [string, 'null']}
+        edition: {type: [string, 'null']}
+        volume: {type: [integer, 'null'], minimum: 1}
+        page: {type: [integer, 'null'], minimum: 1}
+    HadithEvidence:
+      $ref: './schemas/hadith-evidence.schema.json'
+    QuranEvidence:
+      $ref: './schemas/quran-evidence.schema.json'
+    IslamicCorpusNode:
+      $ref: './schemas/islamic-corpus-node.schema.json'
+    McpJsonRpcRequest:
+      type: object
+      required: [jsonrpc, method]
+      properties:
+        jsonrpc: {type: string, enum: ['2.0']}
+        id: {type: [string, integer, 'null']}
+        method: {type: string}
+        params: {type: object}
+        _meta: {type: object}
   securitySchemes:
     ApiKey:
       type: apiKey

@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Omega Piper voice acquisition and rights evidence; this registry never modifies the canonical Corpus.",
+  "sourceRegistry": "rhasspy/piper-voices",
+  "softwareEngine": {
+    "id": "piper1-gpl",
+    "source": "https://github.com/OHF-Voice/piper1-gpl",
+    "license": "GPL-3.0"
+  },
+  "policy": {
+    "voiceModelLicenseDistinctFromSoftware": true,
+    "datasetLicenseRequired": true,
+    "originalDatasetSourceRequired": true,
+    "failClosedOnAmbiguousLicense": true,
+    "restrictedAncestryBlocked": true,
+    "releaseOnlyBinaryStorage": true,
+    "gitLfsForOmegaWeights": false
+  },
+  "voices": [
+    {
+      "id": "en-us-libritts-high",
+      "locale": "en_US",
+      "sourcePath": "en/en_US/libritts/high/en_US-libritts-high.onnx",
+      "voiceLicense": "MIT (repository metadata)",
+      "datasetLicense": "CC BY 4.0",
+      "datasetSource": "http://www.openslr.org/60/",
+      "training": "trained from scratch on train-clean-360",
+      "rightsState": "workflow-verified-before-release"
+    },
+    {
+      "id": "de-de-mls-medium",
+      "locale": "de_DE",
+      "sourcePath": "de/de_DE/mls/medium/de_DE-mls-medium.onnx",
+      "voiceLicense": "MIT (repository metadata)",
+      "datasetLicense": "CC BY 4.0",
+      "datasetSource": "http://openslr.org/94/",
+      "training": "trained from scratch",
+      "rightsState": "workflow-verified-before-release"
+    },
+    {
+      "id": "fr-fr-mls-medium",
+      "locale": "fr_FR",
+      "sourcePath": "fr/fr_FR/mls/medium/fr_FR-mls-medium.onnx",
+      "voiceLicense": "MIT (repository metadata)",
+      "datasetLicense": "CC BY 4.0",
+      "datasetSource": "http://openslr.org/94/",
+      "training": "trained from scratch",
+      "rightsState": "workflow-verified-before-release"
+    },
+    {
+      "id": "nl-nl-mls-medium",
+      "locale": "nl_NL",
+      "sourcePath": "nl/nl_NL/mls/medium/nl_NL-mls-medium.onnx",
+      "voiceLicense": "MIT (repository metadata)",
+      "datasetLicense": "CC BY 4.0",
+      "datasetSource": "http://openslr.org/94/",
+      "training": "trained from scratch",
+      "rightsState": "workflow-verified-before-release"
+    },
+    {
+      "id": "ar-jo-kareem-low",
+      "locale": "ar_JO",
+      "sourcePath": "ar/ar_JO/kareem/low/ar_JO-kareem-low.onnx",
+      "status": "rights_blocked_until_original_dataset_license_is_resolved",
+      "reason": "Piper model card points to a dataset license source rather than stating an explicit redistributable license; the workflow must not infer permission."
+    }
+  ]
+}
