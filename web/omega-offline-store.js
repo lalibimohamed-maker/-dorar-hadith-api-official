@@ -1,7 +1,8 @@
 (() => {
   const DB_NAME = "deen-allah-omega-local-v1";
-  const DB_VERSION = 1;
+  const DB_VERSION = 2;
   const STORE_NAME = "evidence";
+  const META_STORE = "sync_state";
   const HEX_SHA256 = /^[a-f0-9]{64}$/i;
   const TASHKEEL = /[\u064B-\u065F\u0670]/gu;
   const TATWEEL = /\u0640+/gu;
@@ -61,6 +62,9 @@
           objectStore.createIndex("source_id", "source_id", { unique: false });
           objectStore.createIndex("verification_status", "verification_status", { unique: false });
         }
+        if (!database.objectStoreNames.contains(META_STORE)) {
+          database.createObjectStore(META_STORE, { keyPath: "id" });
+        }
       };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error || new Error("INDEXEDDB_OPEN_FAILED"));
@@ -79,6 +83,18 @@
     return new Promise((resolve, reject) => {
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error || new Error("INDEXEDDB_REQUEST_FAILED"));
+    });
+  }
+
+  function allStoreTransaction(mode) {
+    return openDb().then(db => {
+      const tx = db.transaction([STORE_NAME, META_STORE], mode);
+      return {
+        db,
+        evidenceStore: tx.objectStore(STORE_NAME),
+        metaStore: tx.objectStore(META_STORE),
+        tx
+      };
     });
   }
 
@@ -108,8 +124,20 @@
       updated_at: new Date().toISOString()
     };
 
-    const { objectStore } = await transaction("readwrite");
-    await requestToPromise(objectStore.put(record));
+    const { evidenceStore, metaStore, tx } = await allStoreTransaction("readwrite");
+    evidenceStore.put(record);
+    metaStore.put({
+      id: "evidence",
+      snapshot_sha256: null,
+      dirty: true,
+      sequence: 0,
+      updated_at: new Date().toISOString()
+    });
+    await new Promise((resolve, reject) => {
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error || new Error("INDEXEDDB_WRITE_FAILED"));
+      tx.onabort = () => reject(tx.error || new Error("INDEXEDDB_WRITE_ABORTED"));
+    });
     return Object.freeze(record);
   }
 
@@ -277,8 +305,20 @@
   }
 
   async function clearEvidence() {
-    const { objectStore } = await transaction("readwrite");
-    await requestToPromise(objectStore.clear());
+    const { evidenceStore, metaStore, tx } = await allStoreTransaction("readwrite");
+    evidenceStore.clear();
+    metaStore.put({
+      id: "evidence",
+      snapshot_sha256: null,
+      dirty: true,
+      sequence: 0,
+      updated_at: new Date().toISOString()
+    });
+    await new Promise((resolve, reject) => {
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error || new Error("INDEXEDDB_CLEAR_FAILED"));
+      tx.onabort = () => reject(tx.error || new Error("INDEXEDDB_CLEAR_ABORTED"));
+    });
   }
 
   window.deenAllahOmegaLocalStore = Object.freeze({
