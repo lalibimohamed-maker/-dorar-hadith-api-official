@@ -4,6 +4,9 @@ export const MCP_PROTOCOL_VERSION = "2026-07-28";
 export const SUPPORTED_MCP_VERSIONS = Object.freeze([MCP_PROTOCOL_VERSION, "2025-11-25"]);
 const DEFAULT_BASE = process.env.DEEN_ALLAH_API_BASE || "http://127.0.0.1:3000";
 const MAX_BODY = 1024 * 1024;
+const RATE_LIMIT_PER_MINUTE = Number(process.env.MCP_RATE_LIMIT_PER_MINUTE || 60);
+const RATE_BURST = Number(process.env.MCP_RATE_BURST || 20);
+const rateBuckets = new Map();
 
 const TOOLS = Object.freeze([
   { name:"deen_search", description:"Search the verified Din Allah API. Search is discovery only; returned evidence must still pass provenance/rights/verification gates.", inputSchema:{type:"object",additionalProperties:false,required:["q"],properties:{q:{type:"string",minLength:1,maxLength:300},lang:{type:"string",maxLength:35},comparative:{type:"boolean"},limit:{type:"integer",minimum:1,maximum:100}}}},
@@ -20,6 +23,24 @@ function json(res,status,payload,headers={}) {
 
 function protocolVersion(req,body) {
   return req.headers["mcp-protocol-version"] || body?._meta?.["io.modelcontextprotocol/protocolVersion"] || body?._meta?.["io.modelcontextprotocol/protocolVersion"] || null;
+}
+
+function clientAddress(req) { return String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(",")[0].trim(); }
+
+function allowRequest(req) {
+  const now = Date.now();
+  const key = clientAddress(req);
+  const bucket = rateBuckets.get(key) || { tokens: RATE_BURST, updated: now };
+  const elapsed = Math.max(0, now - bucket.updated);
+  bucket.tokens = Math.min(RATE_BURST, bucket.tokens + (elapsed / 60000) * RATE_LIMIT_PER_MINUTE);
+  bucket.updated = now;
+  if (bucket.tokens < 1) { rateBuckets.set(key, bucket); return false; }
+  bucket.tokens -= 1;
+  rateBuckets.set(key, bucket);
+  if (rateBuckets.size > 10000) {
+    for (const [k,v] of rateBuckets) if (now - v.updated > 120000) rateBuckets.delete(k);
+  }
+  return true;
 }
 
 function rpcError(id,code,message,data) {
@@ -113,6 +134,7 @@ export function createMcpServer({host="0.0.0.0",port=process.env.MCP_PORT||8787}
   const server=http.createServer(async(req,res)=>{
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"*","access-control-allow-methods":"POST,OPTIONS","access-control-allow-headers":"content-type,mcp-protocol-version,x-api-key"});return res.end();}
     if(req.method!=="POST" || new URL(req.url||"/","http://localhost").pathname!=="/mcp") return json(res,404,{error:"not_found"});
+    if(!allowRequest(req)) return json(res,429,{error:"rate_limit_exceeded",code:"MCP_RATE_LIMIT_EXCEEDED"},{"retry-after":"60"});
     try {
       const raw=await readBody(req);
       const body=JSON.parse(raw);
