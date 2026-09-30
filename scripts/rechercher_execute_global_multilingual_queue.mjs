@@ -20,11 +20,11 @@ const contact = process.env.CROSSREF_MAILTO || 'rechercher-research@users.norepl
 if (!Number.isInteger(shardIndex) || !Number.isInteger(shardCount) || shardIndex < 0 || shardCount < 1 || shardIndex >= shardCount) {
   throw new Error(`Invalid shard ${shardIndex}/${shardCount}`);
 }
-if (registry.matrix.language_count !== 133 || registry.matrix.domain_count !== 37 || registry.matrix.expected_search_cells !== 4921) {
-  throw new Error('Global matrix contract is not 133 x 37 x 4921');
+if (registry.matrix.language_count !== 133 || registry.matrix.domain_count !== 48 || registry.matrix.expected_search_cells !== 6384) {
+  throw new Error('Global matrix contract is not 133 x 48 x 6384');
 }
-if (registry.resource_lanes.length !== 37 || matrix.cell_pipeline.length !== 9 || expansion.resource_routes.length !== 9) {
-  throw new Error('Resource lanes or nine-stage evidence pipeline changed unexpectedly');
+if (registry.resource_lanes.length !== 48 || matrix.domains.length !== 48 || matrix.cell_pipeline.length !== 9 || expansion.resource_routes.length !== 9) {
+  throw new Error('48-domain matrix or nine-stage evidence pipeline changed unexpectedly');
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
