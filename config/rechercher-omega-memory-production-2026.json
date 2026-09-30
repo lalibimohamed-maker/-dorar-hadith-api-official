@@ -1,16 +1,27 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "deployment": "docker-compose-free-open-source",
   "backend": "redis",
+  "persistence_mode": "redis-digest-only",
   "raw_conversation_persistence": false,
+  "max_turns": 20,
+  "ttl_seconds": 3600,
   "stored_fields": [
     "role",
     "content_sha256",
     "chars",
-    "timestamp"
+    "timestamp",
+    "evidence_ids",
+    "output_sha256",
+    "verified"
   ],
+  "session_id_storage": "sha256-prefix-32",
   "secrets_never_stored_in_memory": true,
   "corpus_write_allowed": false,
-  "fail_closed_if_redis_unavailable": true,
-  "portability": "session digests are operational metadata; scholarly truth remains in verified Corpus"
+  "fail_closed_if_redis_unavailable": "when session memory is explicitly required",
+  "bounded_memory_required": true,
+  "atomic_append": "MULTI_EXEC",
+  "operational_scope": "session continuity/audit metadata only",
+  "scholarly_truth_scope": "verified Corpus only",
+  "portability": "Redis records are operational metadata; they are never promoted to scholarly evidence"
 }
