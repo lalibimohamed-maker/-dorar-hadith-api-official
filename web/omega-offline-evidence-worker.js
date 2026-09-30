@@ -39,6 +39,36 @@ async function merkleRoot(records) {
   return level[0];
 }
 
+async function snapshotMerkleRoot(records) {
+  let level = [];
+  const sorted = [...records].sort((a, b) => String(a?.node_id ?? "").localeCompare(String(b?.node_id ?? "")));
+  for (const record of sorted) {
+    const canonical = JSON.stringify(canonicalize({
+      node_id: String(record?.node_id ?? ""),
+      content_sha256: String(record?.content_sha256 ?? "").toLowerCase(),
+      verification_status: String(record?.verification_status ?? ""),
+      title: String(record?.title ?? ""),
+      text: String(record?.text ?? ""),
+      citation: String(record?.citation ?? ""),
+      source_id: String(record?.source_id ?? ""),
+      language: String(record?.language ?? ""),
+      updated_at: String(record?.updated_at ?? "")
+    }));
+    level.push(await sha256Text("dinullah:omega:evidence:snapshot-leaf:v2\\u0000" + canonical));
+  }
+  if (!level.length) return sha256Text("dinullah:omega:evidence:snapshot-empty:v2\\u0000");
+  while (level.length > 1) {
+    const next = [];
+    for (let index = 0; index < level.length; index += 2) {
+      const left = level[index];
+      const right = level[index + 1] || left;
+      next.push(await sha256Text("dinullah:omega:evidence:snapshot-parent:v2\\u0000" + left + "\\u0000" + right));
+    }
+    level = next;
+  }
+  return level[0];
+}
+
 function openDb() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -144,9 +174,7 @@ async function importBundleFile(file) {
   }
 
   self.postMessage({ type: "progress", stage: "writing", completed: 0, total: verified.length });
-  const snapshotSha256 = bundle.integrity?.merkle_root_sha256
-    ? String(bundle.integrity.merkle_root_sha256).toLowerCase()
-    : (await merkleRoot(verified)).toLowerCase();
+  const snapshotSha256 = (await snapshotMerkleRoot(verified)).toLowerCase();
   await putRecords(verified, snapshotSha256, bundle.sequence);
   self.postMessage({ type: "progress", stage: "writing", completed: verified.length, total: verified.length });
   return { imported: verified.length, bundle_sha256: actualBundleHash, snapshot_sha256: snapshotSha256 };
