@@ -17,7 +17,9 @@ import { admitExecution } from "./rechercher-omega-resource-admission.js";
 import { buildSemanticCacheKey, createCacheEntry, isCacheReusable, DEFAULT_CACHE_TTLS_MS } from "./rechercher-omega-semantic-cache.js";
 
 
-const SCHOLARLY_TASKS = new Set(["scholarly_answer","evidence_synthesis","translation_evidence"]);\n\nfunction extractGeneratedText(result) {
+const SCHOLARLY_TASKS = new Set(["scholarly_answer","evidence_synthesis","translation_evidence"]);
+
+function extractGeneratedText(result) {
   if (typeof result?.text === "string") return result.text;
   if (typeof result?.output_text === "string") return result.output_text;
   const choice = result?.choices?.[0];
