@@ -10,7 +10,7 @@ const RATE_BURST = Number(process.env.MCP_RATE_BURST || 20);
 const rateBuckets = new Map();
 
 const TOOLS = Object.freeze([
-  { name:"deen_search", description:"Search the verified Din Allah API. Search is discovery only; returned evidence must still pass provenance/rights/verification gates.", inputSchema:{type:"object",additionalProperties:false,required:["q"],properties:{q:{type:"string",minLength:1,maxLength:300},lang:{type:"string",maxLength:35},comparative:{type:"boolean"},limit:{type:"integer",minimum:1,maximum:100}}}},
+  { name:"deen_search", description:"Search the verified Din Allah API with cursor pagination. Search is discovery only; returned evidence must still pass provenance/rights/verification gates.", inputSchema:{type:"object",additionalProperties:false,required:["q"],properties:{q:{type:"string",minLength:1,maxLength:300},lang:{type:"string",maxLength:35},comparative:{type:"boolean"},limit:{type:"integer",minimum:1,maximum:100},cursor:{type:"string",maxLength:1024}}}},
   { name:"deen_concept", description:"Retrieve a source-aware concept card from the encyclopedia.", inputSchema:{type:"object",additionalProperties:false,required:["term"],properties:{term:{type:"string",minLength:1,maxLength:300},context:{type:"string",maxLength:500},lang:{type:"string",maxLength:35}}}},
   { name:"deen_quran_ayah", description:"Retrieve canonical Quran ayah context. The model is never permitted to generate or rewrite canonical Quran text.", inputSchema:{type:"object",additionalProperties:false,required:["verse"],properties:{verse:{type:"string",minLength:1,maxLength:80},translationIds:{type:"string",maxLength:500},tafsirIds:{type:"string",maxLength:500},words:{type:"boolean"}}}},
   { name:"deen_source", description:"Retrieve a named encyclopedia source record with provenance metadata.", inputSchema:{type:"object",additionalProperties:false,required:["id"],properties:{id:{type:"string",minLength:1,maxLength:200}}}},
@@ -61,6 +61,23 @@ function readBody(req) {
     req.on("end",()=>resolve(Buffer.concat(chunks).toString("utf8")));
     req.on("error",reject);
   });
+}
+
+function encodeCursor(payload){return Buffer.from(JSON.stringify(payload),"utf8").toString("base64url");}
+function decodeCursor(cursor){
+  if(!cursor)return {offset:0,q:null};
+  try{
+    const value=JSON.parse(Buffer.from(String(cursor),"base64url").toString("utf8"));
+    if(!Number.isInteger(value.offset)||value.offset<0||value.offset>1000000)throw new Error("invalid offset");
+    return {offset:value.offset,q:value.q==null?null:String(value.q)};
+  }catch{throw new Error("INVALID_CURSOR: cursor is invalid");}
+}
+function paginateSearch(data,{q,cursor,limit}){
+  const page=decodeCursor(cursor);
+  if(page.q!==null&&page.q!==q)throw new Error("INVALID_CURSOR: cursor does not belong to this query");
+  const items=Array.isArray(data?.sourceMatches)?data.sourceMatches:[];
+  const start=page.offset, end=Math.min(items.length,start+limit);
+  return {...data,sourceMatches:items.slice(start,end),pagination:{limit,cursor:cursor||null,next_cursor:end<items.length?encodeCursor({q,offset:end}):null,total:items.length}};
 }
 
 function tool(name) { return TOOLS.find(x=>x.name===name) || null; }
@@ -132,7 +149,10 @@ async function handleRpc(req,body) {
           const data=verifyAgentAnswer({answer:args.answer,evidence,citations});
           return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:!data.verified});
         }
-        const data=await callApi(name,args);
+        let data=await callApi(name,args);
+        if(name==="deen_search"){
+          data=paginateSearch(data,{q:args.q,cursor:args.cursor||null,limit:Number(args.limit||20)});
+        }
         return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:false});
       }catch(error){
         return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"UPSTREAM_ERROR",message:error.message,data:error.data||null})}],isError:true});
