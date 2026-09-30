@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "policy": {
+    "default": "volatile",
+    "production_optional": "redis",
+    "raw_conversation_persistence": false,
+    "digest_only_persistence": true,
+    "secrets_never_stored_in_messages": true,
+    "corpus_write_allowed": false
+  },
+  "redis": {
+    "host_env": "REDIS_HOST",
+    "port_env": "REDIS_PORT",
+    "password_env": "REDIS_PASSWORD",
+    "compose": "runtime/conversation/redis/docker-compose.yml",
+    "key_prefix": "dinullah:conversation:"
+  },
+  "health": {
+    "required_for_production_redis_mode": [
+      "PING",
+      "appendDigest",
+      "snapshotDigests",
+      "clear"
+    ]
+  }
+}
