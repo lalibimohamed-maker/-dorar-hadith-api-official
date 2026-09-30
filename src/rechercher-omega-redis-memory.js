@@ -1,24 +1,37 @@
 import net from "node:net";
 import { createHash } from "node:crypto";
 
-function digest(value){return createHash("sha256").update(String(value??""),"utf8").digest("hex");}
+const digest=value=>createHash("sha256").update(String(value??""),"utf8").digest("hex");
 
 function encodeCommand(parts){
   return "*"+parts.length+"\r\n"+parts.map(p=>"$"+Buffer.byteLength(String(p))+"\r\n"+String(p)+"\r\n").join("");
 }
-function readReply(socket){
-  return new Promise((resolve,reject)=>{
-    let data="";
-    const onData=chunk=>{data+=chunk.toString(); if(data.includes("\r\n")){socket.off("data",onData);const line=data.split("\r\n",1)[0];if(line.startsWith("-"))reject(new Error(line.slice(1)));else resolve(line);}};
-    socket.on("data",onData); socket.once("error",reject);
-  });
+
+function parseResp(buffer){
+  const text=buffer.toString();
+  let pos=0;
+  function line(){const end=text.indexOf("\r\n",pos);if(end<0)throw new Error("incomplete redis reply");const out=text.slice(pos,end);pos=end+2;return out;}
+  function value(){
+    const head=text[pos++];
+    if(head==="+") return line();
+    if(head==="-") throw new Error(line());
+    if(head==":") return Number(line());
+    if(head==="$"){const len=Number(line());if(len===-1)return null;const out=text.slice(pos,pos+len);pos+=len+2;return out;}
+    if(head==="*"){const n=Number(line());const arr=[];for(let i=0;i<n;i++)arr.push(value());return arr;}
+    throw new Error("unsupported redis reply");
+  }
+  return value();
 }
+
 async function command({host,port,password},parts){
   return new Promise((resolve,reject)=>{
     const socket=net.createConnection({host,port},async()=>{
       try{
-        if(password){socket.write(encodeCommand(["AUTH",password]));await readReply(socket);}
-        socket.write(encodeCommand(parts)); const result=await readReply(socket); socket.end(); resolve(result);
+        if(password){socket.write(encodeCommand(["AUTH",password]));await new Promise((res,rej)=>{let b=Buffer.alloc(0);const on=c=>{b=Buffer.concat([b,c]);try{parseResp(b);socket.off("data",on);res();}catch{}};socket.on("data",on);socket.once("error",rej);});}
+        socket.write(encodeCommand(parts));
+        let buffer=Buffer.alloc(0);
+        const onData=chunk=>{buffer=Buffer.concat([buffer,chunk]);try{const reply=parseResp(buffer);socket.off("data",onData);socket.end();resolve(reply);}catch{}};
+        socket.on("data",onData); socket.once("error",reject);
       }catch(e){socket.destroy();reject(e);}
     });
     socket.once("error",reject);
@@ -37,8 +50,7 @@ export function createRedisConversationMemory({host=process.env.REDIS_HOST||"127
     },
     async snapshotDigests({sessionId}={}){
       if(!sessionId) throw new TypeError("sessionId is required");
-      const raw=await command({host,port,password},["LRANGE",keyPrefix+sessionId,"0","-1"]);
-      return raw==="*"||raw==="$-1"?[]:raw;
+      return (await command({host,port,password},["LRANGE",keyPrefix+sessionId,"0","-1"]))||[];
     },
     async clear({sessionId}={}){
       if(!sessionId) throw new TypeError("sessionId is required");
