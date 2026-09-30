@@ -16,6 +16,11 @@
       request.onupgradeneeded = () => {
         const db = request.result;
         if (!db.objectStoreNames.contains("audio_sessions")) db.createObjectStore("audio_sessions", { keyPath: "session_id" });
+        if (!db.objectStoreNames.contains("audio_frames")) {
+          const store = db.createObjectStore("audio_frames", { keyPath: ["session_id", "sequence"] });
+          store.createIndex("session_id", "session_id", { unique: false });
+          store.createIndex("session_offset", ["session_id", "byte_offset"], { unique: false });
+        }
       };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error || new Error("AUDIO_CHECKPOINT_DB_OPEN_FAILED"));
