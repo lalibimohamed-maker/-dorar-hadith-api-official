@@ -29,7 +29,7 @@ async function hashFile(filePath){
 export async function shardModelFile(
   filePath,
   outputDir,
-  {chunkBytes=DEFAULT_CHUNK_BYTES,cleanOutput=false}={}
+  {chunkBytes=DEFAULT_CHUNK_BYTES,cleanOutput=false,assetPrefix=null}={}
 ){
   chunkBytes=parsePositiveInteger(chunkBytes,"chunkBytes");
   if(chunkBytes>=MAX_GITHUB_RELEASE_ASSET_BYTES) {
@@ -58,7 +58,7 @@ export async function shardModelFile(
     for(let index=0;index<totalChunks;index++){
       const remaining=totalSize-offset;
       const target=Math.min(chunkBytes,remaining);
-      const name=chunkName(modelName,index,width);
+      const name=chunkName(assetPrefix ?? modelName,index,width);
       const targetPath=path.join(out,name);
       const output=fs.createWriteStream(targetPath,{flags:"wx"});
       const chunkHash=createHash("sha256");
@@ -114,10 +114,11 @@ export async function shardModelFile(
 if(import.meta.url===`file://${process.argv[1]}`){
   const [, , input, output, ...args]=process.argv;
   if(!input||!output){
-    console.error("usage: omega-file-sharder.js <input> <output-dir> [chunk-bytes]");
+    console.error("usage: omega-file-sharder.js <input> <output-dir> [chunk-bytes] [asset-prefix]");
     process.exit(2);
   }
   const chunkBytes=args[0]?Number(args[0]):DEFAULT_CHUNK_BYTES;
-  const result=await shardModelFile(input,output,{chunkBytes});
+  const assetPrefix=args[1]||null;
+  const result=await shardModelFile(input,output,{chunkBytes,assetPrefix});
   console.log(JSON.stringify(result.manifest,null,2));
 }
