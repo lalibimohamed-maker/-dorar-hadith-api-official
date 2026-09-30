@@ -68,7 +68,7 @@
       '<button type="button" data-omega-mode="online_only" aria-pressed="false">متصل</button>',
       '<span data-omega-storage class="muted"></span>',
       "</div>",
-      '<div class="omega-progress" data-omega-progress hidden><span></span></div>'
+      '<div class="omega-progress" data-omega-progress hidden><span></span></div><span data-omega-integrity-progress class="muted" aria-live="polite"></span>'
     ].join("");
 
     host.querySelectorAll("[data-omega-mode]").forEach(button => {
@@ -119,7 +119,7 @@
           toast("مخزن الأدلة المحلي غير جاهز.");
           return;
         }
-        const result = await store.importEvidenceBundle(JSON.parse(await file.text()));
+        const result = await store.importEvidenceBundleFile(file);
         toast("تم استيراد " + result.imported + " دليلًا موثقًا بعد التحقق.");
         await renderStorage();
       } catch (error) {
@@ -197,6 +197,18 @@
       $("query")?.focus();
     });
   }
+
+
+  window.addEventListener("deenallah:omega-integrity-progress", event => {
+    const label = document.querySelector("[data-omega-integrity-progress]");
+    const detail = event.detail || {};
+    if (!label) return;
+    const stage = String(detail.stage || "");
+    const completed = Number(detail.completed || 0);
+    const total = Number(detail.total || 0);
+    const names = { reading: "قراءة الحزمة", "bundle-hash": "تحقق SHA-256 للحزمة", records: "تحقق الأدلة", merkle: "تحقق Merkle", writing: "حفظ الأدلة الموثقة" };
+    label.textContent = stage ? " · " + (names[stage] || stage) + (total ? " " + completed + "/" + total : "") : "";
+  });
 
   window.addEventListener("online", () => {
     render();
