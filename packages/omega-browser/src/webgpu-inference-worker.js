@@ -28,13 +28,13 @@ async function activateWasmFallback(detail) {
   let switched = false;
   try {
     if (typeof generator?.switchBackend === "function") {
-      generator.switchBackend("wasm", { chunk_size: fallbackChunkSize, reason: detail?.reason });
+      await generator.switchBackend("wasm", { chunk_size: fallbackChunkSize, reason: detail?.reason });
       switched = true;
     } else if (typeof generator?.setBackend === "function") {
       generator.setBackend("wasm");
       switched = true;
     } else if (typeof generator?.onBackendLoss === "function") {
-      generator.onBackendLoss({ backend: "wasm", chunk_size: fallbackChunkSize, reason: detail?.reason });
+      await generator.onBackendLoss({ backend: "wasm", chunk_size: fallbackChunkSize, reason: detail?.reason });
       switched = true;
     }
   } catch (error) {
