@@ -114,6 +114,9 @@
             record: normalizedRecord(op.record)
           };
         }
+        if (op.op !== "delete") {
+          throw new Error("OFFLINE_DELTA_OPERATION_UNSUPPORTED");
+        }
         return {
           op: "delete",
           node_id: String(op.node_id ?? ""),
