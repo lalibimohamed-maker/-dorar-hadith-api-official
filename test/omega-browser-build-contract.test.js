@@ -9,6 +9,7 @@ test("browser package build is isolated and network-free", async () => {
   const gitignore = await readFile("packages/omega-browser/.gitignore", "utf8");
   const core = await readFile("packages/omega-browser/src/omega-client-core.js", "utf8");
   const buildPackage = await readFile("packages/omega-browser/build.js", "utf8");
+  const worker = await readFile("packages/omega-browser/src/webgpu-inference-worker.js", "utf8");
 
   assert.equal(packageJson.name, "@dinullah/omega-browser");
   assert.equal(lock.name, "@dinullah/omega-browser");
@@ -21,6 +22,7 @@ test("browser package build is isolated and network-free", async () => {
   assert.match(buildPackage, /omega-hardware-guardian\.js/);
   assert.match(buildPackage, /omega-audio-session\.js/);
   assert.match(buildPackage, /omega-client-core\.js/);
-  assert.doesNotMatch(await readFile("packages/omega-browser/src/webgpu-inference-worker.js", "utf8"), /importScripts\(/);
+  assert.doesNotMatch(worker, /importScripts\(/);
+  assert.match(worker, /GPUDevice|gpuDevice|webgpuDevice/);
   assert.equal(gitignore.includes("dist/"), true);
 });
