@@ -98,3 +98,16 @@ test("final grounded gate accepts only claims linked to returned evidence", () =
   assert.equal(result.ok, true);
   assert.equal(result.code, "EVIDENCE_READY");
 });
+
+test("schema-shaped provenance can satisfy the hard gate", () => {
+  const schemaShaped = {
+    ...base,
+    source: undefined,
+    document_id: undefined,
+    provenance: { source: "sahih-bukhari", document_id: "bukhari:1" },
+    sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  };
+  const decision = applyEvidenceHardGate([schemaShaped]);
+  assert.equal(decision.accepted.length, 1);
+  assert.equal(decision.rejected.length, 0);
+});
