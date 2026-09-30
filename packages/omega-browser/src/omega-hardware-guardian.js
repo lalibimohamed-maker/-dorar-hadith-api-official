@@ -173,6 +173,22 @@ export class OmegaHardwareGuardian {
     };
   }
 
+  static bindAudioSessionResilience(audioContext, session, options = {}) {
+    if (!session || typeof session.pause !== "function" || typeof session.resume !== "function") {
+      throw new TypeError("audio session must expose pause() and resume()");
+    }
+    return this.monitorAudioContextResilience(audioContext, {
+      ...options,
+      onInterrupt: detail => {
+        session.pause();
+        options.onInterrupt?.(detail);
+      },
+      onResume: detail => {
+        Promise.resolve(session.resume()).then(() => options.onResume?.(detail)).catch(() => {});
+      }
+    });
+  }
+
   static watchWebGPUDeviceLoss(gpuDevice, {
     fallbackToWasmCallback = () => {},
     initialChunkSize = DEFAULT_WASM_CHUNK_SIZE
