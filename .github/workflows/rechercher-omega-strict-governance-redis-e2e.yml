@@ -6,12 +6,15 @@ on:
       - feat/rechercher-omega-e2e-governance-redis-2026-09-30
     paths:
       - src/rechercher-omega-evidence-gate.js
+      - src/rechercher-omega-claim-gate.js
       - src/rechercher-omega-redis-memory.js
       - src/rechercher-omega-answer-verifier.js
       - src/rechercher-ai-gateway.js
       - src/rechercher-ai-mcp-server.js
       - src/rechercher-omega-assistant-bridge.js
+      - src/rechercher-omega-governed-run.js
       - test/rechercher-omega-governed-run.test.js
+      - test/rechercher-omega-claim-gate.test.js
       - test/rechercher-omega-evidence-api-mcp.integration.test.js
       - test/rechercher-omega-governance-redis-e2e.integration.test.js
       - test/rechercher-omega-assistant-redis.integration.test.js
@@ -26,10 +29,12 @@ on:
       - src/rechercher-omega-arabic-integrity.js
       - test/rechercher-ai-mcp-server.test.js
       - src/rechercher-ai/mcp-strict-anchoring.js
+
   pull_request:
     branches:
       - main
       - feat/rechercher-omega-multimodal-intelligence
+
   merge_group:
   workflow_dispatch:
 
@@ -42,7 +47,7 @@ concurrency:
 
 jobs:
   strict-e2e:
-    name: Strict evidence gate + live Redis + concurrency
+    name: Strict evidence gate + claims + live Redis + concurrency
     runs-on: ubuntu-24.04
     timeout-minutes: 10
 
@@ -87,13 +92,7 @@ jobs:
           MCP_RATE_BURST: "1000"
         run: |
           set -euo pipefail
-          node --test \
-            test/rechercher-omega-governed-run.test.js \
-            test/rechercher-omega-evidence-api-mcp.integration.test.js \
-            test/rechercher-omega-governance-redis-e2e.integration.test.js \
-            test/rechercher-omega-assistant-redis.integration.test.js \
-            test/rechercher-omega-integrity-sharding.test.js \
-            test/rechercher-ai-mcp-server.test.js
+          node --test             test/rechercher-omega-governed-run.test.js             test/rechercher-omega-claim-gate.test.js             test/rechercher-omega-evidence-api-mcp.integration.test.js             test/rechercher-omega-governance-redis-e2e.integration.test.js             test/rechercher-omega-assistant-redis.integration.test.js             test/rechercher-omega-integrity-sharding.test.js             test/rechercher-ai-mcp-server.test.js
 
       - name: Shutdown Redis
         if: always()
