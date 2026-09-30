@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Production integration contract for indexing the full verified Corpus into graph and vector retrieval layers.",
+  "pipeline": [
+    "load_corpus",
+    "validate_provenance",
+    "embed",
+    "vector_upsert",
+    "graph_upsert",
+    "link_upsert",
+    "index_count_verification"
+  ],
+  "stores": {
+    "graph": "deen-graph-runtime-compatible; persistent adapter may be supplied",
+    "vector": "Qdrant REST or equivalent"
+  },
+  "invariants": {
+    "full_record_coverage": true,
+    "provenance_required": true,
+    "model_is_not_source": true,
+    "generated_content_not_indexed_as_evidence": true,
+    "corpus_write_from_ai": false,
+    "deterministic_text_hash": true
+  }
+}
