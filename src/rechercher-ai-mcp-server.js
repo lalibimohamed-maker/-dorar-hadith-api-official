@@ -121,9 +121,17 @@ async function handleRpc(req,body) {
       try {
         const args=body.params?.arguments || {};
         validateArguments(def,args);
-        if(name==="deen_verify_answer"){\n        let evidence,citations;\n        try{evidence=JSON.parse(args.evidence_json);citations=JSON.parse(args.citations_json);}catch(error){return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"INVALID_VERIFICATION_JSON",message:error.message})}],isError:true});}\n        const data=verifyAgentAnswer({answer:args.answer,evidence,citations});\n        return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:!data.verified});\n      }\n      const data=await callApi(name,args);\n        return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:false});
-      } catch(error) {
-        return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"UPSTREAM_ERROR",message:error.message,data:error.data||null})}],isError:true});
+        if(name==="deen_verify_answer"){
+          let evidence,citations;
+          try{
+            evidence=JSON.parse(args.evidence_json);
+            citations=JSON.parse(args.citations_json);
+          }catch(error){
+            return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"INVALID_VERIFICATION_JSON",message:error.message})}],isError:true});
+          }
+          const data=verifyAgentAnswer({answer:args.answer,evidence,citations});
+          return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:!data.verified});
+        }
       }
     }
     default:
