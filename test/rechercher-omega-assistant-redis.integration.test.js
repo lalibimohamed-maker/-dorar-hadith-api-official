@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { runGovernedAssistantTurn } from "../src/rechercher-omega-assistant-bridge.js";
 import { sha256 } from "../src/rechercher-omega-redis-memory.js";
 
@@ -69,6 +70,18 @@ function storeFixture({ping=true, appendFailure=false}={}){
   };
 }
 
+function claimRecord(statement){
+  const normalized=statement.normalize("NFKC").normalize("NFC").replace(/\s+/gu," ").trim();
+  return {
+    claim_text:normalized,
+    claim_sha256:createHash("sha256").update(normalized,"utf8").digest("hex"),
+    verification_status:"verified",
+    support_type:"knowledge_graph",
+    support_id:"kg:fixture:bridge",
+    citations
+  };
+}
+
 test("governed assistant persists only digest metadata on green path",async()=>{
   const store=storeFixture();
   const result=await runGovernedAssistantTurn({
@@ -96,6 +109,41 @@ test("governed assistant persists only digest metadata on green path",async()=>{
   assert.equal(store.rows[1].outputSha256,sha256(evidence[0].text));
   assert.equal("content" in store.rows[0],false);
   assert.equal("content" in store.rows[1],false);
+});
+
+test("governed assistant blocks a scholarly inference unless trusted claim provenance is supplied",async()=>{
+  const store=storeFixture();
+  const statement="وهذا الحديث يدل على وجوب النية في العمل";
+
+  const blocked=await runGovernedAssistantTurn({
+    query:"حديث الأعمال بالنيات",
+    evidence,
+    availableBackends:["local"],
+    backendHealth:{local:{status:"healthy"}},
+    execute:true,
+    registry,
+    backends,
+    runtimeArtifact:runtimeArtifact(),
+    executor:async()=>({provider:"fixture",model:"qwen3",text:evidence[0].text+". "+statement+"."})
+  });
+  assert.equal(blocked.status,"blocked");
+  assert.equal(blocked.verification.error.code,"UNSUPPORTED_CLAIM");
+  assert.equal(blocked.fallback,evidence[0].text);
+
+  const allowed=await runGovernedAssistantTurn({
+    query:"حديث الأعمال بالنيات",
+    evidence,
+    availableBackends:["local"],
+    backendHealth:{local:{status:"healthy"}},
+    execute:true,
+    registry,
+    backends,
+    runtimeArtifact:runtimeArtifact(),
+    claimProvenance:[claimRecord(statement)],
+    executor:async()=>({provider:"fixture",model:"qwen3",text:evidence[0].text+". "+statement+"."})
+  });
+  assert.equal(allowed.status,"succeeded");
+  assert.equal(allowed.verification.claimVerification.ok,true);
 });
 
 test("governed assistant records hallucination attempt as unverified digest and returns corpus fallback",async()=>{
