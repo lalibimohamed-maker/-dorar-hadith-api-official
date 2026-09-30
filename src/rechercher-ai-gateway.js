@@ -1,4 +1,5 @@
 import http from "node:http";
+import { verifyAgentAnswer } from "./rechercher-omega-answer-verifier.js";
 
 const PORT = Number(process.env.AI_GATEWAY_PORT || 8790);
 const UPSTREAM = process.env.DEEN_ALLAH_API_BASE || "http://127.0.0.1:3000";
@@ -40,6 +41,7 @@ export function createAiGateway({host="0.0.0.0",port=PORT}={}){
       }
       if(url.pathname==="/api/v1/agents/concept"){if(!url.searchParams.get("term"))return send(res,400,errorBody("INVALID_TERM","term is required."));const data=await upstream("/api/v1/concept",req);return send(res,200,envelope(data));}
       if(url.pathname==="/api/v1/agents/quran"){if(!url.searchParams.get("verse"))return send(res,400,errorBody("INVALID_VERSE","verse is required."));const data=await upstream("/api/v1/quran/ayah",req);return send(res,200,envelope(data));}
+      if(url.pathname==="/api/v1/agents/verify" && req.method==="POST"){\n        const body=JSON.parse(await readJson(req));\n        const result=verifyAgentAnswer(body);\n        return send(res,result.verified?200:422,envelope(result));\n      }
       if(url.pathname.startsWith("/api/v1/agents/source/")){const id=decodeURIComponent(url.pathname.slice("/api/v1/agents/source/".length));if(!id)return send(res,400,errorBody("INVALID_SOURCE","source id is required."));const data=await upstream("/api/v1/encyclopedia/source/"+encodeURIComponent(id),req);return send(res,200,envelope(data));}
       return send(res,404,errorBody("NOT_FOUND","Agent endpoint not found."));
     }catch(e){return send(res,e.status===429?429:502,errorBody("UPSTREAM_ERROR",e.message,e.data||null));}
