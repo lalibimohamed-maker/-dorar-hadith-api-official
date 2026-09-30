@@ -24,6 +24,8 @@ on:
       - scripts/omega-file-reassembler.js
       - scripts/omega-file-sharder.js
       - src/rechercher-omega-arabic-integrity.js
+      - test/rechercher-ai-mcp-server.test.js
+      - src/rechercher-ai/mcp-strict-anchoring.js
   pull_request:
     branches:
       - main
@@ -90,7 +92,8 @@ jobs:
             test/rechercher-omega-evidence-api-mcp.integration.test.js \
             test/rechercher-omega-governance-redis-e2e.integration.test.js \
             test/rechercher-omega-assistant-redis.integration.test.js \
-            test/rechercher-omega-integrity-sharding.test.js
+            test/rechercher-omega-integrity-sharding.test.js \
+            test/rechercher-ai-mcp-server.test.js
 
       - name: Shutdown Redis
         if: always()
