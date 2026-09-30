@@ -76,7 +76,7 @@ jobs:
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --clobber
           elif [ "$PUBLISH" = "true" ]; then
-            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Free/open conversation runtime cache: realtime orchestration, WebRTC transport, ASR, speech enhancement, diarization runtime, Piper and lip-sync source. Model weights are governed separately."
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Free/open conversation runtime cache: realtime orchestration, WebRTC transport, ASR, speech enhancement, diarization runtime, Piper and lip-sync source. Model weights are governed separately."
           else
             gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Draft conversation runtime cache." --draft
           fi
