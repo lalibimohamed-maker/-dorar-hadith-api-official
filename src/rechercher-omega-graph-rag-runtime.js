@@ -45,7 +45,7 @@ export function createInMemoryVectorStore(){
 export function createQdrantVectorStore({url=process.env.QDRANT_URL,collection="dinullah_corpus",apiKey=process.env.QDRANT_API_KEY,fetchImpl=globalThis.fetch}={}){
   if(!url) throw new Error("QDRANT_URL is required for Qdrant runtime");
   const base=String(url).replace(/\/$/,"");
-  const headers={"content-type":"application/json","accept":"application/json",...(apiKey?{api-key:apiKey}:{})};
+  const headers={"content-type":"application/json","accept":"application/json",...(apiKey?{"api-key":apiKey}:{})};
   async function request(path,options={}){
     const response=await fetchImpl(base+path,{...options,headers:{...headers,...(options.headers||{})}});
     if(!response.ok) throw new Error("QDRANT_HTTP_"+response.status);
