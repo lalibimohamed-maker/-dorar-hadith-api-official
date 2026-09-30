@@ -107,7 +107,15 @@
       const usage = Number(result.usage || 0);
       const quota = Number(result.quota || 0);
       const mb = value => Math.round(value / 1024 / 1024);
-      target.textContent = quota ? "التخزين: " + mb(usage) + "/" + mb(quota) + " MB" : "";
+      const base = quota ? "التخزين: " + mb(usage) + "/" + mb(quota) + " MB" : "";
+      let evidenceLabel = "";
+      if (window.deenAllahOmegaLocalStore?.countEvidence) {
+        try {
+          const count = await window.deenAllahOmegaLocalStore.countEvidence();
+          evidenceLabel = " · الأدلة المحلية الموثقة: " + count;
+        } catch {}
+      }
+      target.textContent = base + evidenceLabel;
     } catch {}
   }
 
