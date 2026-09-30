@@ -50,7 +50,7 @@ async function upstream(path,req){
   const r=await fetch(u,{headers:h,signal:AbortSignal.timeout(15000)}); const t=await r.text(); let data; try{data=JSON.parse(t)}catch{data={raw:t}};
   if(!r.ok){const e=new Error("upstream request failed");e.status=r.status;e.data=data;throw e;} return data;
 }
-function envelope(data,{cursor=null,limit=20}={}){return {schema_version:"1.0.0",data,meta:{limit,cursor,next_cursor:null,source_of_truth:"Din Allah API",generated_text_is_evidence:false}};}
+export function envelope(data,{cursor=null,limit=20}={}){const next_cursor=data?.pagination?.next_cursor??data?.next_cursor??null;return {schema_version:"1.0.0",data,meta:{limit,cursor,next_cursor,source_of_truth:"Din Allah API",generated_text_is_evidence:false}};}
 export function createAiGateway({host="0.0.0.0",port=PORT,ratePerMinute=Number(process.env.AI_GATEWAY_RATE_PER_MINUTE||60),rateBurst=Number(process.env.AI_GATEWAY_BURST||20)}={}){
   return http.createServer(async(req,res)=>{
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"*","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"content-type,x-api-key"});return res.end();}
