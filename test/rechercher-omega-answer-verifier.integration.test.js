@@ -45,3 +45,15 @@ test("stale evidence hash is rejected before trusting a citation",()=>{
  assert.equal(r.verified,false);
  assert.equal(r.error.code,"EVIDENCE_TEXT_HASH_MISMATCH");
 });
+
+test("strict primary-text verification requires a source hash",()=>{
+ const source={...evidence[0]};
+ delete source.sha256;
+ const r=verifyAgentAnswer({
+  answer:source.text,
+  evidence:[source],
+  citations:[{...citations[0],text_hash:undefined}]
+ });
+ assert.equal(r.verified,false);
+ assert.equal(r.error.code,"EVIDENCE_HASH_REQUIRED");
+});
