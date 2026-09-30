@@ -61,6 +61,13 @@ jobs:
             license: tencent-hunyuan-community
             release_mode: draft
             chunk_bytes: 536870912
+          - id: sana-sprint-1.6b
+            model_id: Efficient-Large-Model/Sana_Sprint_1.6B_1024px
+            revision: 9f6866d6962d5d91d213f113e162cb18bffe741c
+            release_tag: rechercher-omega-sana-sprint16-v1.0.0
+            license: apache-2.0
+            release_mode: prerelease
+            chunk_bytes: 536870912
           - id: flux1-schnell
             model_id: black-forest-labs/FLUX.1-schnell
             revision: f095d56c608128f5ec5e80e7c515697d15d02fa6
@@ -200,6 +207,91 @@ jobs:
           CHUNK_BYTES: ${{ matrix.chunk_bytes }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python scripts/rechercher-omega-release-stream.py
+
+      - name: Attach SANA-Sprint license from immutable HF revision
+        if: matrix.id == 'sana-sprint-1.6b'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from huggingface_hub import hf_hub_download
+          path=hf_hub_download(repo_id=os.environ["MODEL_ID"], filename="LICENSE", revision=os.environ["REVISION"])
+          print(path)
+          with open(path,"rb") as src, open("/tmp/SANA-LICENSE","wb") as dst:
+              dst.write(src.read())
+          PY
+          test -s /tmp/SANA-LICENSE
+          gh release upload "$RELEASE_TAG" /tmp/SANA-LICENSE#LICENSE --repo "$REPO" --clobber
+
+      - name: Build SANA-Sprint 1.6B runtime metadata
+        if: matrix.id == 'sana-sprint-1.6b'
+        env:
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+          OUTPUT_DIR: ${{ runner.temp }}/sana-sprint16-runtime
+        run: |
+          set -euo pipefail
+          rm -rf "$OUTPUT_DIR"
+          mkdir -p "$OUTPUT_DIR/runtime-files"
+          python - <<'PY'
+          import os, json
+          from pathlib import Path
+          from huggingface_hub import hf_hub_download
+          model=os.environ["MODEL_ID"]; revision=os.environ["REVISION"]
+          out=Path(os.environ["OUTPUT_DIR"])
+          downloaded=[]
+          for name in ["README.md","config.json",".gitattributes"]:
+              try:
+                  src=Path(hf_hub_download(repo_id=model, filename=name, revision=revision))
+                  (out/"runtime-files"/name).write_bytes(src.read_bytes())
+                  downloaded.append(name)
+              except Exception as exc:
+                  print(f"[INFO] optional runtime file {name} unavailable: {exc}")
+          deps=[
+            {"id":"gemma-2-2b-it","model_id":"google/gemma-2-2b-it","required":True,"embedded":False,"status":"clearance_required"},
+            {"id":"dc-ae","model_id":"mit-han-lab/dc-ae-lite-f32c32-sana-1.1-diffusers","required":False,"embedded":False,"status":"optional_acceleration_dependency"}
+          ]
+          readiness={
+            "logical_id":"sana-sprint-1.6b",
+            "status":"dependency_blocked",
+            "weights_acquired":True,
+            "weights_release_manifest":"release-manifest.json",
+            "runtime":"diffusers:SanaSprintPipeline",
+            "resolution":"1024px",
+            "recommended_steps":[1,2],
+            "max_steps":4,
+            "dtype":"bfloat16",
+            "runtime_dependency_required":"google/gemma-2-2b-it",
+            "runtime_dependency_embedded":False,
+            "reason":"SANA-Sprint requires Gemma2-2B-IT as its fixed pretrained text encoder; no bypass or unlicensed redistribution is attempted.",
+            "runtime_files":downloaded
+          }
+          (out/"sana-sprint16-dependencies.json").write_text(json.dumps(deps,indent=2)+"\n")
+          (out/"sana-sprint16-release-readiness.json").write_text(json.dumps(readiness,indent=2)+"\n")
+          PY
+          tar -C "$OUTPUT_DIR/runtime-files" -czf "$OUTPUT_DIR/sana-sprint16-runtime-files.tar.gz" .
+          test -s "$OUTPUT_DIR/sana-sprint16-runtime-files.tar.gz"
+
+      - name: Publish SANA-Sprint runtime metadata
+        if: matrix.id == 'sana-sprint-1.6b'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          OUTPUT_DIR: ${{ runner.temp }}/sana-sprint16-runtime
+        run: |
+          set -euo pipefail
+          gh release upload "$RELEASE_TAG" \
+            "$OUTPUT_DIR/sana-sprint16-runtime-files.tar.gz" \
+            "$OUTPUT_DIR/sana-sprint16-dependencies.json" \
+            "$OUTPUT_DIR/sana-sprint16-release-readiness.json" \
+            --repo "$REPO" --clobber
 
       - name: Attach LTX-2 license from the immutable HF model revision
         if: matrix.id == 'ltx-2'
