@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "name": "Rechercher Algorithmic Network",
+  "purpose": "Connect global and country source federation to discovery, provenance, rights, acquisition, release and downstream execution without modifying the canonical Corpus.",
+  "nodes": [
+    "global-registry",
+    "country-registry",
+    "source-federation",
+    "discovery",
+    "provenance",
+    "rights-gate",
+    "acquisition",
+    "verification",
+    "release-distribution",
+    "omega-control-plane",
+    "execution-plane",
+    "offline-distribution",
+    "canonical-corpus"
+  ],
+  "edges": [
+    {"from":"global-registry","to":"source-federation","contract":"SourceIdentity"},
+    {"from":"country-registry","to":"source-federation","contract":"SourceIdentity"},
+    {"from":"source-federation","to":"discovery","contract":"SourceCandidate"},
+    {"from":"discovery","to":"provenance","contract":"ProvenanceRecord"},
+    {"from":"discovery","to":"rights-gate","contract":"RightsEvidence"},
+    {"from":"rights-gate","to":"acquisition","condition":"redistributable_or_explicitly_permitted"},
+    {"from":"acquisition","to":"verification","contract":"AcquisitionResult"},
+    {"from":"verification","to":"release-distribution","condition":"artifact_verified"},
+    {"from":"release-distribution","to":"omega-control-plane","contract":"ArtifactManifest"},
+    {"from":"omega-control-plane","to":"execution-plane","contract":"EngineIdentity"},
+    {"from":"release-distribution","to":"offline-distribution","contract":"ArtifactManifest"},
+    {"from":"verification","to":"canonical-corpus","condition":"scholarly_ingestion_policy_only"}
+  ],
+  "invariants": [
+    "source existence does not imply redistribution rights",
+    "discovery does not promote evidence",
+    "generated media is never scholarly evidence",
+    "offline evidence is not a second source of truth",
+    "release artifacts require provenance and integrity metadata",
+    "canonical Corpus is never written directly by media or execution runtimes",
+    "ambiguous rights fail closed"
+  ],
+  "status_model": [
+    "discovered",
+    "metadata_verified",
+    "rights_verified",
+    "acquisition_pending",
+    "acquired",
+    "integrity_verified",
+    "release_backed",
+    "runtime_registered",
+    "runtime_active"
+  ]
+}
