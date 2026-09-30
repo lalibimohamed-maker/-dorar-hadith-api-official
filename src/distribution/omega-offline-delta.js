@@ -83,7 +83,14 @@ export function computeEvidenceSnapshotRoot(records = []) {
 }
 
 export function canonicalizeOfflineDeltaForHash(delta) {
-  const operations = [...(delta?.operations ?? [])]
+  const rawOperations = [...(delta?.operations ?? [])];
+  for (const operation of rawOperations) {
+    if (operation?.op !== "upsert" && operation?.op !== "delete") {
+      throw new Error("OFFLINE_DELTA_OPERATION_UNSUPPORTED");
+    }
+  }
+
+  const operations = rawOperations
     .map(operation => operation.op === "upsert"
       ? {
           op: "upsert",
