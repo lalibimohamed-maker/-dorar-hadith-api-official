@@ -11,6 +11,12 @@ test("offline UI exposes explicit modes, network state and quick access", async 
   assert.match(ui, /prefers-reduced-motion/);
 });
 
+test("PWA shell includes the offline UI and provider bridge", async () => {
+  const sw = await readFile("web/sw.js", "utf8");
+  assert.match(sw, /\.\/offline-omega-ui\.js/);
+  assert.match(sw, /\.\/omega-local-provider\.js/);
+});
+
 test("web app has a no-network branch for offline-only mode", async () => {
   const app = await readFile("web/app.js", "utf8");
   assert.match(app, /getOmegaMode\(\)==="offline_only"/);
