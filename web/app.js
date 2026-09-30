@@ -20,7 +20,19 @@ async function api(path, options = {}) {
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
 }
-async function registerOfflineAppShell() {
+async function omegaDeltaSync({ url, trustedPublicKeys = {} } = {}) {
+  if (!url) throw new TypeError("delta update URL is required");
+  if (!navigator.serviceWorker?.controller) {
+    throw new Error("OFFLINE_DELTA_SERVICE_WORKER_NOT_READY");
+  }
+  navigator.serviceWorker.controller.postMessage({
+    type: "OMEGA_APPLY_EVIDENCE_DELTA",
+    url,
+    trustedPublicKeys
+  });
+}
+
+function registerOfflineAppShell() {
   if (!("serviceWorker" in navigator)) return null;
   try {
     return await navigator.serviceWorker.register("./sw.js", { scope: "./" });
@@ -161,6 +173,7 @@ async function checkApi(){
 }
 function saveApi(){const value=$("api-base").value.trim().replace(/\/$/,"");localStorage.setItem("deenAllahApiBase",value);location.search=value?`?api=${encodeURIComponent(value)}`:"";}
 function installLearningHubLink(){const header=document.querySelector("header");if(!header||document.getElementById("learning-hub-link"))return;const a=document.createElement("a");a.id="learning-hub-link";a.href="./learning-hub.html";a.textContent="🎓 مركز التعلم التفاعلي — عبادات • قرآن • قبلة • مواقيت • زكاة";a.style.cssText="display:inline-block;margin-top:14px;padding:10px 16px;border-radius:999px;background:#fff;color:#0d4b36;text-decoration:none;font-weight:700";header.appendChild(a);}
+window.deenAllahOmegaDeltaSync = omegaDeltaSync;
 ensureConceptModal();installLearningHubLink();installMultimodalGuardBoundary();installVisualPrunerBoundary();installAudioSessionBoundary();installHardwareGuardianBoundary();installLocalStoreBoundary();installLocalProviderBoundary();installOfflineOmegaUI();registerOfflineAppShell();$("api-base").value=apiBase;$("search-btn").addEventListener("click",search);$("query").addEventListener("keydown",e=>{if(e.key==="Enter")search();});$("save-api").addEventListener("click",saveApi);$("api-check").addEventListener("click",checkApi);document.querySelectorAll("[data-category]").forEach(el=>el.addEventListener("click",()=>loadSources(el.dataset.category)));checkApi();
 const quranRecitationScript=document.createElement("script");quranRecitationScript.src="./quran-recitation.js";quranRecitationScript.defer=true;document.head.appendChild(quranRecitationScript);
 const voiceScript=document.createElement("script");voiceScript.src="./voice.js";voiceScript.defer=true;document.head.appendChild(voiceScript);
