@@ -1,4 +1,5 @@
 import http from "node:http";
+import { verifyAgentAnswer } from "./rechercher-omega-answer-verifier.js";
 
 export const MCP_PROTOCOL_VERSION = "2026-07-28";
 export const SUPPORTED_MCP_VERSIONS = Object.freeze([MCP_PROTOCOL_VERSION, "2025-11-25"]);
@@ -13,6 +14,7 @@ const TOOLS = Object.freeze([
   { name:"deen_concept", description:"Retrieve a source-aware concept card from the encyclopedia.", inputSchema:{type:"object",additionalProperties:false,required:["term"],properties:{term:{type:"string",minLength:1,maxLength:300},context:{type:"string",maxLength:500},lang:{type:"string",maxLength:35}}}},
   { name:"deen_quran_ayah", description:"Retrieve canonical Quran ayah context. The model is never permitted to generate or rewrite canonical Quran text.", inputSchema:{type:"object",additionalProperties:false,required:["verse"],properties:{verse:{type:"string",minLength:1,maxLength:80},translationIds:{type:"string",maxLength:500},tafsirIds:{type:"string",maxLength:500},words:{type:"boolean"}}}},
   { name:"deen_source", description:"Retrieve a named encyclopedia source record with provenance metadata.", inputSchema:{type:"object",additionalProperties:false,required:["id"],properties:{id:{type:"string",minLength:1,maxLength:200}}}},
+  { name:"deen_verify_answer", description:"Strictly verify generated text against supplied source evidence. A mismatch is rejected and the exact source text is returned as deterministic fallback.", inputSchema:{type:"object",additionalProperties:false,required:["answer","evidence_json","citations_json"],properties:{answer:{type:"string",minLength:1,maxLength:20000},evidence_json:{type:"string",minLength:2,maxLength:500000},citations_json:{type:"string",minLength:2,maxLength:100000}}}},
   { name:"deen_health", description:"Return API health information.", inputSchema:{type:"object",additionalProperties:false,properties:{}}}
 ]);
 
@@ -119,8 +121,7 @@ async function handleRpc(req,body) {
       try {
         const args=body.params?.arguments || {};
         validateArguments(def,args);
-        const data=await callApi(name,args);
-        return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:false});
+        if(name==="deen_verify_answer"){\n        let evidence,citations;\n        try{evidence=JSON.parse(args.evidence_json);citations=JSON.parse(args.citations_json);}catch(error){return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"INVALID_VERIFICATION_JSON",message:error.message})}],isError:true});}\n        const data=verifyAgentAnswer({answer:args.answer,evidence,citations});\n        return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:!data.verified});\n      }\n      const data=await callApi(name,args);\n        return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:false});
       } catch(error) {
         return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"UPSTREAM_ERROR",message:error.message,data:error.data||null})}],isError:true});
       }
