@@ -8,6 +8,10 @@ import { once } from "node:events";
 export const DEFAULT_CHUNK_BYTES = 1900 * 1024 * 1024;
 export const MAX_GITHUB_RELEASE_ASSET_BYTES = 2147483647;
 
+export function sha256(value){
+  return createHash("sha256").update(Buffer.isBuffer(value) ? value : String(value??""),"utf8").digest("hex");
+}
+
 function parsePositiveInteger(value,name){
   const n=Number(value);
   if(!Number.isSafeInteger(n)||n<1) throw new RangeError(name+" must be a positive integer");
