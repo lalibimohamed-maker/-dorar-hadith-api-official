@@ -20,11 +20,26 @@
 
   function plan(width, height, runtimeProfile = {}, modelProfile = {}) {
     const profile = { ...DEFAULTS, ...modelProfile };
-    const align = alignment(profile);
-    const budget = Math.max(1, Math.floor(positive(profile.target_visual_tokens, DEFAULTS.target_visual_tokens)));
+    const contextPlan = runtimeProfile?.contextWindowTokens && window.OmegaMultimodalContextGuard
+      ? window.OmegaMultimodalContextGuard.plan({
+          contextWindow: runtimeProfile.contextWindowTokens,
+          evidenceTokens: runtimeProfile.evidenceTokens,
+          textTokens: runtimeProfile.textTokens,
+          requestedVisualTokens: profile.target_visual_tokens,
+          reservedGenerationTokens: runtimeProfile.reservedGenerationTokens,
+          safetyMarginTokens: runtimeProfile.safetyMarginTokens,
+          minimumVisualTokens: runtimeProfile.minimumVisualTokens
+        })
+      : null;
+    if (contextPlan && window.OmegaMultimodalContextGuard?.assertEvidencePreserved) {
+      window.OmegaMultimodalContextGuard.assertEvidencePreserved(contextPlan);
+    }
+    const effectiveProfile = contextPlan ? { ...profile, target_visual_tokens: contextPlan.available_visual_tokens } : profile;
+    const align = alignment(effectiveProfile);
+    const budget = Math.max(1, Math.floor(positive(effectiveProfile.target_visual_tokens, DEFAULTS.target_visual_tokens)));
     const maxPixels = Math.max(
-      positive(profile.min_pixels, DEFAULTS.min_pixels),
-      Math.min(positive(profile.max_pixels, DEFAULTS.max_pixels), budget * align * align)
+      positive(effectiveProfile.min_pixels, DEFAULTS.min_pixels),
+      Math.min(positive(effectiveProfile.max_pixels, DEFAULTS.max_pixels), budget * align * align)
     );
     const sourceWidth = Math.max(1, Number(width) || 1);
     const sourceHeight = Math.max(1, Number(height) || 1);
@@ -51,8 +66,9 @@
       target: { width: targetWidth, height: targetHeight },
       alignment: align,
       max_pixels: maxPixels,
-      estimated_visual_tokens: estimate(targetWidth, targetHeight, profile),
-      target_visual_tokens: budget
+      estimated_visual_tokens: estimate(targetWidth, targetHeight, effectiveProfile),
+      target_visual_tokens: budget,
+      context_plan: contextPlan
     });
   }
 
