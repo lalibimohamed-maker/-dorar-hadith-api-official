@@ -205,6 +205,7 @@ export class OmegaHardwareGuardian {
       if (!active || triggered) return;
       triggered = true;
       chunkSize = Math.max(1, Math.floor(chunkSize / 2));
+      if (String(info?.reason || "") === "destroyed") return;
       const detail = Object.freeze({
         backend: "wasm",
         reason: String(info?.reason || "unknown"),
@@ -213,7 +214,7 @@ export class OmegaHardwareGuardian {
         timestamp: Date.now()
       });
       dispatchRuntimeEvent("deenallah:omega-webgpu-fallback", detail);
-      try { fallbackToWasmCallback(detail); } catch {}
+      try { void Promise.resolve(fallbackToWasmCallback(detail)); } catch {}
     };
 
     const uncapturedHandler = event => {
