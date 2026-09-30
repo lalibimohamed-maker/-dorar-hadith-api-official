@@ -1,10 +1,12 @@
 import { verifyEvidenceHit } from "./omega-local-bridge.js";
+import { OmegaHardwareGuardian } from "./omega-hardware-guardian.js";
 import { resolveLocalRuntime } from "./local-bundle-loader.js";
 import { searchWithArabicQueryPlan } from "./arabic-query-normalizer.js";
 
 export const OMEGA_CLIENT_MODES = Object.freeze(["auto", "offline_only", "online_only"]);
 
 export async function prepareOmegaLocalRuntime(options = {}) {
+  await OmegaHardwareGuardian.securePersistentStorage();
   return resolveLocalRuntime(options);
 }
 
