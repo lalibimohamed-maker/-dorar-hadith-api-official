@@ -1,0 +1,48 @@
+import http from "node:http";
+
+const PORT = Number(process.env.AI_GATEWAY_PORT || 8790);
+const UPSTREAM = process.env.DEEN_ALLAH_API_BASE || "http://127.0.0.1:3000";
+const MAX_BODY = 64 * 1024;
+const MAX_LIMIT = 100;
+const buckets = new Map();
+
+function bucketKey(req){return String(req.headers["x-forwarded-for"]||req.socket.remoteAddress||"unknown").split(",")[0].trim();}
+function allow(req){
+  const now=Date.now(), key=bucketKey(req), perMinute=Number(process.env.AI_GATEWAY_RATE_PER_MINUTE||60), burst=Number(process.env.AI_GATEWAY_BURST||20);
+  const b=buckets.get(key)||{tokens:burst,updated:now};
+  b.tokens=Math.min(burst,b.tokens+((now-b.updated)/60000)*perMinute); b.updated=now;
+  if(b.tokens<1){buckets.set(key,b);return false;} b.tokens-=1;buckets.set(key,b);
+  if(buckets.size>10000) for(const [k,v] of buckets) if(now-v.updated>120000)buckets.delete(k);
+  return true;
+}
+function errorBody(code,message,details=null){return {error:{code,message,details}};}
+function send(res,status,payload,extra={}){res.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff",...extra});res.end(JSON.stringify(payload));}
+function readJson(req){return new Promise((resolve,reject)=>{let n=0,c=[];req.on("data",x=>{n+=x.length;if(n>MAX_BODY){reject(new Error("body too large"));req.destroy();return;}c.push(x)});req.on("end",()=>resolve(Buffer.concat(c).toString("utf8")));req.on("error",reject);});}
+async function upstream(path,req){
+  const u=new URL(UPSTREAM); u.pathname=path; u.search=new URL(req.url||"/","http://local").search;
+  const h={"accept":"application/json"}; if(process.env.DEEN_ALLAH_API_KEY)h["x-api-key"]=process.env.DEEN_ALLAH_API_KEY;
+  const r=await fetch(u,{headers:h,signal:AbortSignal.timeout(15000)}); const t=await r.text(); let data; try{data=JSON.parse(t)}catch{data={raw:t}};
+  if(!r.ok){const e=new Error("upstream request failed");e.status=r.status;e.data=data;throw e;} return data;
+}
+function envelope(data,{cursor=null,limit=20}={}){return {schema_version:"1.0.0",data,meta:{limit,cursor,next_cursor:null,source_of_truth:"Din Allah API",generated_text_is_evidence:false}};}
+export function createAiGateway({host="0.0.0.0",port=PORT}={}){
+  return http.createServer(async(req,res)=>{
+    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"*","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"content-type,x-api-key"});return res.end();}
+    if(req.method!=="GET"&&req.method!=="POST")return send(res,405,errorBody("METHOD_NOT_ALLOWED","Only GET/POST are supported."));
+    if(!allow(req))return send(res,429,errorBody("RATE_LIMIT_EXCEEDED","AI gateway rate limit exceeded."),{"retry-after":"60"});
+    try{
+      const url=new URL(req.url||"/","http://local");
+      if(url.pathname==="/api/v1/agents/health"){return send(res,200,envelope({status:"ok",mcp:"/mcp"}));}
+      if(url.pathname==="/api/v1/agents/search"){
+        const q=url.searchParams.get("q"); if(!q||q.length>300)return send(res,400,errorBody("INVALID_QUERY","q is required and must be <=300 characters."));
+        const limit=Math.min(MAX_LIMIT,Math.max(1,Number(url.searchParams.get("limit")||20)));
+        const data=await upstream("/api/v1/search",req); return send(res,200,envelope(data,{cursor:url.searchParams.get("cursor"),limit}));
+      }
+      if(url.pathname==="/api/v1/agents/concept"){if(!url.searchParams.get("term"))return send(res,400,errorBody("INVALID_TERM","term is required."));const data=await upstream("/api/v1/concept",req);return send(res,200,envelope(data));}
+      if(url.pathname==="/api/v1/agents/quran"){if(!url.searchParams.get("verse"))return send(res,400,errorBody("INVALID_VERSE","verse is required."));const data=await upstream("/api/v1/quran/ayah",req);return send(res,200,envelope(data));}
+      if(url.pathname.startsWith("/api/v1/agents/source/")){const id=decodeURIComponent(url.pathname.slice("/api/v1/agents/source/".length));if(!id)return send(res,400,errorBody("INVALID_SOURCE","source id is required."));const data=await upstream("/api/v1/encyclopedia/source/"+encodeURIComponent(id),req);return send(res,200,envelope(data));}
+      return send(res,404,errorBody("NOT_FOUND","Agent endpoint not found."));
+    }catch(e){return send(res,e.status===429?429:502,errorBody("UPSTREAM_ERROR",e.message,e.data||null));}
+  }).listen(Number(port),host,()=>console.log(`Din Allah AI gateway listening on ${host}:${port}`));
+}
+if(import.meta.url===`file://${process.argv[1]}`)createAiGateway();
