@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dinullah.example/schemas/offline-install-manifest-1.0.0.json",
+  "title": "Dinullah Omega Offline Installation Manifest",
+  "type": "object",
+  "required": ["schema_version","artifact","tokenizer","runtime_profile","evidence_index","distribution","verification_policy"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "artifact": {
+      "type": "object",
+      "required": ["model_id","version","revision","license","total_size_bytes","total_sha256","signature"],
+      "properties": {
+        "model_id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "minLength": 1 },
+        "license": { "type": "string", "minLength": 1 },
+        "total_size_bytes": { "type": "integer", "minimum": 1 },
+        "total_sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+        "signature": {
+          "type": "object",
+          "required": ["algorithm","public_key_id","signature_base64"],
+          "properties": {
+            "algorithm": { "const": "ed25519" },
+            "public_key_id": { "type": "string", "minLength": 1 },
+            "signature_base64": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "tokenizer": {
+      "type": "object",
+      "required": ["files","unicode_test_profile"],
+      "properties": {
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name","bytes","sha256"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "bytes": { "type": "integer", "minimum": 1 },
+              "sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }
+            }
+          }
+        },
+        "unicode_test_profile": { "type": "string", "minLength": 1 }
+      }
+    },
+    "runtime_profile": {
+      "type": "object",
+      "required": ["estimated_peak_ram_bytes","runtime_overhead_bytes","index_peak_ram_bytes","tokenizer_runtime_bytes","concurrent_buffer_bytes","safety_margin_bytes","supported_runtimes"],
+      "properties": {
+        "estimated_peak_ram_bytes": { "type": "integer", "minimum": 1 },
+        "runtime_overhead_bytes": { "type": "integer", "minimum": 1 },
+        "index_peak_ram_bytes": { "type": "integer", "minimum": 1 },
+        "tokenizer_runtime_bytes": { "type": "integer", "minimum": 1 },
+        "concurrent_buffer_bytes": { "type": "integer", "minimum": 1 },
+        "safety_margin_bytes": { "type": "integer", "minimum": 1 },
+        "supported_runtimes": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "platform_caps_bytes": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 1 } }
+      }
+    },
+    "evidence_index": {
+      "type": "object",
+      "required": ["type","index_sha256","content_sha256_field","node_id_field"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "index_sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+        "content_sha256_field": { "const": "content_sha256" },
+        "node_id_field": { "const": "node_id" }
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "required": ["release_asset","chunks","resume"],
+      "properties": {
+        "release_asset": { "type": "string", "minLength": 1 },
+        "chunks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["index","asset","bytes","sha256","blocks"],
+            "properties": {
+              "index": { "type": "integer", "minimum": 0 },
+              "asset": { "type": "string", "minLength": 1 },
+              "bytes": { "type": "integer", "minimum": 1 },
+              "sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+              "blocks": { "type": "array", "minItems": 1 }
+            }
+          }
+        },
+        "resume": {
+          "type": "object",
+          "required": ["supports_http_range","requires_content_range_206","validator"],
+          "properties": {
+            "supports_http_range": { "const": true },
+            "requires_content_range_206": { "const": true },
+            "validator": { "const": "etag-or-last-modified" }
+          }
+        }
+      }
+    },
+    "verification_policy": {
+      "type": "object",
+      "required": ["fail_closed","offline_only_must_never_network","no_corpus_writes","no_unverified_weight_loading","no_git_lfs"],
+      "properties": {
+        "fail_closed": { "const": true },
+        "offline_only_must_never_network": { "const": true },
+        "no_corpus_writes": { "const": true },
+        "no_unverified_weight_loading": { "const": true },
+        "no_git_lfs": { "const": true }
+      }
+    }
+  }
+}
