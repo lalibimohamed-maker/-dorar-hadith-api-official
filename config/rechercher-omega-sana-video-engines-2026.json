@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "engines": [
+    {
+      "id": "sana-video-2b-720p",
+      "family": "video-generation",
+      "tasks": [
+        "text_to_video",
+        "image_to_video"
+      ],
+      "model_id": "Efficient-Large-Model/SANA-Video_2B_720p",
+      "revision": "dee6b63d48ebbc47682b30fcb3fb6525ea0018a6",
+      "license": "apache-2.0",
+      "release_tag": "rechercher-omega-sana-video2b-720p-v1.0.0",
+      "dependency_contract": [
+        "LTX-2 VAE"
+      ]
+    },
+    {
+      "id": "sana-video2-5b-720p",
+      "family": "video-generation",
+      "tasks": [
+        "text_to_video",
+        "image_to_video"
+      ],
+      "model_id": "Efficient-Large-Model/SANA-Video_2.0_5B_720p",
+      "revision": "f2d95fa06400f186fd1b077d12c69c8ac58aba48",
+      "license": "apache-2.0",
+      "release_tag": "rechercher-omega-sana-video2-5b-720p-v1.0.0",
+      "dependency_contract": [
+        "google/gemma-2-2b-it",
+        "LTX-2.3 VAE"
+      ]
+    }
+  ],
+  "policy": {
+    "model_is_not_source": true,
+    "generated_media_is_evidence": false,
+    "weights_only_in_releases": true,
+    "dual_storage_gate_required": true
+  }
+}
