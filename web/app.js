@@ -45,6 +45,7 @@ function installMultimodalGuardBoundary() {
   script.id = "omega-multimodal-context-guard-script";
   script.src = "./omega-multimodal-context-guard.js";
   script.defer = true;
+  script.async = false;
   document.head.appendChild(script);
 }
 
@@ -54,6 +55,7 @@ function installVisualPrunerBoundary() {
   script.id = "omega-visual-pruner-script";
   script.src = "./omega-visual-pruner.js";
   script.defer = true;
+  script.async = false;
   document.head.appendChild(script);
 }
 
@@ -63,6 +65,7 @@ function installAudioSessionBoundary() {
   script.id = "omega-audio-session-script";
   script.src = "./omega-audio-session.js";
   script.defer = true;
+  script.async = false;
   document.head.appendChild(script);
 }
 function installHardwareGuardianBoundary() {
@@ -71,6 +74,7 @@ function installHardwareGuardianBoundary() {
   script.id = "omega-hardware-guardian-script";
   script.src = "./omega-hardware-guardian.js";
   script.defer = true;
+  script.async = false;
   document.head.appendChild(script);
 }
 function installLocalStoreBoundary() {
