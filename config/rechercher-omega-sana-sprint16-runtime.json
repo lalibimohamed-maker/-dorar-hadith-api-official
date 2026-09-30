@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "logical_id": "sana-sprint-1.6b",
+  "model_id": "Efficient-Large-Model/Sana_Sprint_1.6B_1024px",
+  "revision": "9f6866d6962d5d91d213f113e162cb18bffe741c",
+  "weights_license": "apache-2.0",
+  "release_tag": "rechercher-omega-sana-sprint16-v1.0.0",
+  "resolution": "1024px",
+  "recommended_steps": [1,2],
+  "max_steps": 4,
+  "dtype": "bfloat16",
+  "runtime": "diffusers:SanaSprintPipeline",
+  "runtime_status": "dependency_blocked",
+  "required_external_dependencies": [
+    {
+      "id": "gemma-2-2b-it",
+      "model_id": "google/gemma-2-2b-it",
+      "required": true,
+      "embedded": false,
+      "status": "clearance_required"
+    }
+  ],
+  "optional_external_dependencies": [
+    {
+      "id": "dc-ae-lite",
+      "model_id": "mit-han-lab/dc-ae-lite-f32c32-sana-1.1-diffusers",
+      "required": false,
+      "embedded": false,
+      "status": "optional_acceleration_dependency"
+    }
+  ],
+  "policy": {
+    "never_commit_weights": true,
+    "release_assets_only": true,
+    "fail_closed_on_dependency_rights": true,
+    "corpus_write_allowed": false
+  }
+}
