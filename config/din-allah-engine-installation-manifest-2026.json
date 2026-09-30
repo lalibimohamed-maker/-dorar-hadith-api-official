@@ -1,0 +1,286 @@
+{
+  "schemaVersion": "2.0.0",
+  "purpose": "Free-first runtime inventory and license/provenance manifest for Media and Rechercher Omega engines.",
+  "policy": {
+    "freeFirst": true,
+    "openSourceFirst": true,
+    "noPaidCoreDependency": true,
+    "noCorpusMutation": true,
+    "noLargeBinariesInGit": true,
+    "noModelWeightsInGit": true,
+    "failClosedOnLicenseUnknown": true,
+    "runtimeEnabledOnlyAfterSmokeTest": true
+  },
+  "engines": [
+    {
+      "id": "ffmpeg",
+      "layer": "media",
+      "license": "LGPL-2.1-or-later; optional GPL-2.0-or-later parts",
+      "source": "https://ffmpeg.org/",
+      "install": "apt",
+      "runtime": "ffmpeg"
+    },
+    {
+      "id": "ffprobe",
+      "layer": "media",
+      "license": "LGPL-2.1-or-later; optional GPL-2.0-or-later parts",
+      "source": "https://ffmpeg.org/",
+      "install": "apt",
+      "runtime": "ffprobe"
+    },
+    {
+      "id": "blender",
+      "layer": "media",
+      "license": "GPL-3.0-or-later",
+      "source": "https://www.blender.org/",
+      "install": "apt",
+      "runtime": "blender"
+    },
+    {
+      "id": "pyscenedetect",
+      "layer": "media",
+      "license": "BSD-3-Clause",
+      "source": "https://github.com/Breakthrough/PySceneDetect",
+      "install": "pip",
+      "runtime": "scenedetect"
+    },
+    {
+      "id": "opentimelineio",
+      "layer": "media",
+      "license": "Apache-2.0",
+      "source": "https://github.com/AcademySoftwareFoundation/OpenTimelineIO",
+      "install": "pip",
+      "runtime": "python-module"
+    },
+    {
+      "id": "whisper",
+      "layer": "ai",
+      "license": "MIT (code and model weights per upstream)",
+      "source": "https://github.com/openai/whisper",
+      "install": "pip",
+      "runtime": "python-module"
+    },
+    {
+      "id": "faster-whisper",
+      "layer": "ai",
+      "license": "MIT code; model weights retain their own upstream terms",
+      "source": "https://github.com/SYSTRAN/faster-whisper",
+      "install": "pip",
+      "runtime": "python-module"
+    },
+    {
+      "id": "whisperx",
+      "layer": "ai",
+      "license": "BSD-2-Clause",
+      "source": "https://github.com/m-bain/whisperX",
+      "install": "pip",
+      "runtime": "python-module"
+    },
+    {
+      "id": "paddleocr-vl",
+      "layer": "ai",
+      "license": "Apache-2.0 code; model terms tracked separately",
+      "source": "https://github.com/PaddlePaddle/PaddleOCR",
+      "install": "pip",
+      "runtime": "python-module"
+    },
+    {
+      "id": "docling",
+      "layer": "ai",
+      "license": "MIT code; model terms tracked separately",
+      "source": "https://github.com/docling-project/docling",
+      "install": "pip",
+      "runtime": "python-module"
+    },
+    {
+      "id": "bge-m3",
+      "layer": "ai",
+      "license": "MIT code; model terms tracked separately",
+      "source": "https://github.com/FlagOpen/FlagEmbedding",
+      "install": "pip",
+      "runtime": "model"
+    },
+    {
+      "id": "bge-reranker-v2-m3",
+      "layer": "ai",
+      "license": "MIT code; model terms tracked separately",
+      "source": "https://github.com/FlagOpen/FlagEmbedding",
+      "install": "pip",
+      "runtime": "model"
+    },
+    {
+      "id": "qdrant",
+      "layer": "ai",
+      "license": "Apache-2.0",
+      "source": "https://github.com/qdrant/qdrant",
+      "install": "container-or-service",
+      "runtime": "service"
+    },
+    {
+      "id": "ollama",
+      "layer": "ai",
+      "license": "MIT software; each model has its own terms",
+      "source": "https://github.com/ollama/ollama",
+      "install": "optional-runtime",
+      "runtime": "service"
+    },
+    {
+      "id": "llama-cpp",
+      "layer": "ai",
+      "license": "MIT software; each model has its own terms",
+      "source": "https://github.com/ggml-org/llama.cpp",
+      "install": "optional-runtime",
+      "runtime": "binary"
+    },
+    {
+      "id": "vllm",
+      "layer": "ai",
+      "license": "Apache-2.0 software; each model has its own terms",
+      "source": "https://github.com/vllm-project/vllm",
+      "install": "optional-runtime",
+      "runtime": "service"
+    },
+    {
+      "id": "localai",
+      "layer": "ai",
+      "license": "MIT software; each model has its own terms",
+      "source": "https://github.com/mudler/LocalAI",
+      "install": "optional-runtime",
+      "runtime": "service"
+    },
+    {
+      "id": "openvino",
+      "layer": "ai",
+      "license": "Apache-2.0",
+      "source": "https://github.com/openvinotoolkit/openvino",
+      "install": "pip",
+      "runtime": "python-module"
+    },
+    {
+      "id": "real-esrgan",
+      "kind": "super_resolution",
+      "install": "pip",
+      "runtime": "realesrgan",
+      "license": "BSD-3-Clause code; model terms separate",
+      "source": "https://github.com/xinntao/Real-ESRGAN",
+      "modelRequired": true
+    },
+    {
+      "id": "video2x",
+      "kind": "video_upscaling",
+      "install": "external-release-or-source",
+      "runtime": "video2x",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/K4YT3X/video2x",
+      "modelRequired": true
+    },
+    {
+      "id": "kdenlive",
+      "kind": "editor",
+      "install": "apt",
+      "runtime": "kdenlive",
+      "license": "GPL-3.0-or-later",
+      "source": "https://invent.kde.org/multimedia/kdenlive"
+    },
+    {
+      "id": "audacity",
+      "kind": "audio-editor",
+      "install": "apt",
+      "runtime": "audacity",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/audacity/audacity"
+    },
+    {
+      "id": "piper",
+      "kind": "tts",
+      "install": "pip",
+      "runtime": "piper",
+      "license": "MIT code; voice-model terms separate",
+      "source": "https://github.com/rhasspy/piper",
+      "modelRequired": true
+    },
+    {
+      "id": "kokoro",
+      "kind": "tts",
+      "install": "pip",
+      "runtime": "python-module",
+      "license": "Apache-2.0 code; model/voice terms separate",
+      "source": "https://github.com/hexgrad/kokoro",
+      "modelRequired": true
+    },
+    {
+      "id": "cosyvoice",
+      "kind": "multilingual-tts",
+      "install": "source-or-pip",
+      "runtime": "python-module",
+      "license": "Apache-2.0 code; model terms separate",
+      "source": "https://github.com/FunAudioLLM/CosyVoice",
+      "modelRequired": true
+    },
+    {
+      "id": "qwen3",
+      "kind": "llm",
+      "install": "external-model-runtime",
+      "runtime": "ollama-or-llama.cpp-or-vllm",
+      "license": "model-specific",
+      "source": "https://github.com/QwenLM/Qwen3",
+      "modelRequired": true
+    },
+    {
+      "id": "qwen3-vl",
+      "kind": "vision-llm",
+      "install": "external-model-runtime",
+      "runtime": "ollama-or-vllm",
+      "license": "model-specific",
+      "source": "https://github.com/QwenLM/Qwen3-VL",
+      "modelRequired": true
+    },
+    {
+      "id": "qwen3-omni",
+      "kind": "omnimodal",
+      "install": "external-model-runtime",
+      "runtime": "vllm-or-supported-runtime",
+      "license": "model-specific",
+      "source": "https://github.com/QwenLM/Qwen3-Omni",
+      "modelRequired": true,
+      "gpuRequired": true
+    },
+    {
+      "id": "gpt-oss",
+      "kind": "reasoning-llm",
+      "install": "external-model-runtime",
+      "runtime": "ollama-or-llama.cpp-or-vllm",
+      "license": "Apache-2.0",
+      "source": "https://github.com/openai/gpt-oss",
+      "modelRequired": true
+    },
+    {
+      "id": "llama.cpp",
+      "kind": "model-runtime",
+      "install": "source-build",
+      "runtime": "llama-server",
+      "license": "MIT",
+      "source": "https://github.com/ggml-org/llama.cpp"
+    },
+    {
+      "id": "olmocr",
+      "kind": "vlm-ocr",
+      "install": "pip-or-source",
+      "runtime": "python-module",
+      "license": "Apache-2.0 code; model terms separate",
+      "source": "https://github.com/allenai/olmocr",
+      "modelRequired": true,
+      "gpuRequired": true
+    },
+    {
+      "id": "deepseek-ocr",
+      "kind": "vision-ocr",
+      "install": "pip-or-source",
+      "runtime": "python-module",
+      "license": "MIT code; model terms separate",
+      "source": "https://github.com/deepseek-ai/DeepSeek-OCR",
+      "modelRequired": true,
+      "gpuRequired": true
+    }
+  ]
+}

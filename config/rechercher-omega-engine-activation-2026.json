@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "1.0.0",
+  "policy": {
+    "failClosed": true,
+    "activeRequiresReleaseEvidence": true,
+    "activeRequiresSmokeTest": true,
+    "activeRequiresCapabilityTest": true,
+    "noCorpusWrite": true
+  },
+  "engines": {
+    "whisper": {
+      "state": "active",
+      "release": "dinullah-engine-models-v2026.09.29",
+      "model": "openai/whisper-tiny",
+      "verificationRun": 36600528957,
+      "evidence": {
+        "license": "apache-2.0",
+        "sha256Inventory": true,
+        "runtimeInstalled": true,
+        "smokeTest": "passed",
+        "capabilityTest": "passed",
+        "corpusWriteAllowed": false
+      }
+    },
+    "kokoro": {
+      "state": "active",
+      "release": "dinullah-engine-models-v2026.09.29",
+      "model": "hexgrad/Kokoro-82M",
+      "verificationRun": 36600528957,
+      "evidence": {
+        "license": "apache-2.0",
+        "sha256Inventory": true,
+        "runtimeInstalled": true,
+        "smokeTest": "passed",
+        "capabilityTest": "passed",
+        "corpusWriteAllowed": false
+      }
+    },
+    "qwen3": {
+      "state": "active",
+      "release": "dinullah-engine-models-v2026.09.29",
+      "model": "Qwen/Qwen3-0.6B",
+      "verificationRun": 36600528957,
+      "evidence": {
+        "license": "apache-2.0",
+        "sha256Inventory": true,
+        "runtimeInstalled": true,
+        "modelPresent": true,
+        "smokeTest": "passed",
+        "capabilityTest": "passed",
+        "arabicInference": "passed",
+        "corpusWriteAllowed": false
+      }
+    },
+    "hunyuanvideo-1.5": {
+      "state": "blocked-pending-gpu-runtime",
+      "release": "rechercher-omega-hunyuanvideo15-v1.0.0",
+      "selectedAsset": "omega__transformer__480p_i2v_step_distilled__diffusion_pytorch_model.safetensors",
+      "evidence": {
+        "transportInventory": "verified",
+        "transportParts": 63,
+        "unifiedBytes": 33325523336,
+        "unifiedSha256": "29418e43ef5bfa1868703c26f9b45c622b473960c479dc5be43bba7bd0004f6d",
+        "unification": "stream-hash-verified",
+        "runtimeInstalled": false,
+        "gpuSmokeTest": "pending",
+        "capabilityTest": "pending-gpu",
+        "corpusWriteAllowed": false,
+        "streamVerificationRun": 36602176772,
+        "sha256Inventory": true,
+        "modelPresent": true,
+        "smokeTest": "pending-gpu"
+      }
+    },
+    "ltx-2": {
+      "state": "blocked-license-review",
+      "release": "rechercher-omega-ltx2-v1.0.0"
+    },
+    "flux1-schnell": {
+      "state": "acquisition-manifest-only",
+      "release": "rechercher-omega-flux1-schnell-v1.0.0"
+    }
+  }
+}

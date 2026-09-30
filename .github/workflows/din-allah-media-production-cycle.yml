@@ -1,16 +1,12 @@
-name: Din Allah Media Engine — Clean Contract
+name: Din Allah Media — Full Production Cycle Contract
 
 on:
   pull_request:
     paths:
-      - 'config/din-allah-media-engine-clean-2026.json'
       - 'config/din-allah-media-production-cycle-2026.json'
-      - 'src/din-allah-media-engine-contract.js'
       - 'src/din-allah-media-production-cycle.js'
-      - 'test/din-allah-media-engine-clean.test.js'
       - 'test/din-allah-media-production-cycle.test.js'
       - 'docs/media/DIN-ALLAH-MEDIA-COMPLETE-PRODUCTION-CYCLE-2026.md'
-      - '.github/workflows/din-allah-media-engine-clean.yml'
       - '.github/workflows/din-allah-media-production-cycle.yml'
   workflow_dispatch:
 
@@ -18,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  validate-clean-contract:
+  validate-media-production-cycle:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -28,8 +24,5 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Validate clean Media Engine
-        run: node --test test/din-allah-media-engine-clean.test.js
-
-      - name: Validate complete Media Production Cycle
+      - name: Validate full production cycle
         run: node --test test/din-allah-media-production-cycle.test.js

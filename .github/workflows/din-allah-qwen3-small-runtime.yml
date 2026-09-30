@@ -1,0 +1,12 @@
+name: Din Allah — Qwen3 Small Runtime (manual fallback)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+# Primary Qwen3 verification now lives in din-allah-engine-models-smoke-and-cache.yml.
+# This workflow is retained as a manual fallback only and does not auto-acquire assets.
+jobs:
+  notice:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Use din-allah-engine-models-smoke-and-cache.yml for Qwen3 acquisition and activation."

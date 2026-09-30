@@ -50,7 +50,8 @@ export function orchestrateVideoPlan({
           generated_media_is_evidence: false,
           provenance_required: true,
           quality_gate_required: true,
-          quality_gate: "rechercher-omega-quality-gates-2026"
+          quality_gate: "rechercher-omega-quality-gates-2026",
+          publication_gate: "media-publication-readiness"
         }
       };
     }
@@ -181,7 +182,8 @@ export function orchestrateVideoPlan({
       generated_media_is_evidence: false,
       rights_gate_required: true,
       provenance_required: true,
-      quality_gate_required: true
+      quality_gate_required: true,
+      publication_gate: "media-publication-readiness"
     }
   };
 }

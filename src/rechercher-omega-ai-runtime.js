@@ -1,3 +1,37 @@
+
+export async function loadOmegaEngineActivationRegistry(fileUrl = new URL("../config/rechercher-omega-engine-activation-2026.json", import.meta.url)) {
+  const registry = JSON.parse(await fs.readFile(fileUrl, "utf8"));
+  if (registry.policy?.failClosed !== true) throw new Error("engine activation registry must be fail-closed");
+  const states = {};
+  for (const [id, entry] of Object.entries(registry.engines ?? {})) {
+    const modelPresent =
+      entry.evidence?.modelPresent === undefined || entry.evidence?.modelPresent === true;
+    const gpuVerified =
+      id === "hunyuanvideo-1.5"
+        ? entry.evidence?.gpuSmokeTest === "passed"
+        : true;
+    const unificationVerified =
+      id === "hunyuanvideo-1.5"
+        ? ["passed", "stream-hash-verified"].includes(entry.evidence?.unification)
+        : true;
+    const activeEvidence =
+      entry.state === "active" &&
+      entry.evidence?.sha256Inventory === true &&
+      modelPresent &&
+      entry.evidence?.runtimeInstalled === true &&
+      entry.evidence?.smokeTest === "passed" &&
+      entry.evidence?.capabilityTest === "passed" &&
+      gpuVerified &&
+      unificationVerified &&
+      entry.evidence?.corpusWriteAllowed === false &&
+      typeof entry.release === "string" &&
+      typeof entry.model === "string";
+    states[id] = activeEvidence ? "active" : String(entry.state ?? "blocked");
+  }
+  return { schema_version: "1.0.0", states, policy: registry.policy };
+}
+
+import fs from "node:fs/promises";
 /**
  * Rechercher Ω — concrete multimodal AI execution graphs.
  *
@@ -26,8 +60,10 @@ const DEFAULT_TOOLS = Object.freeze([
   "provenance"
 ]);
 
-function componentRuntimeEligibility(component) {
+function componentRuntimeEligibility(component, activationStates = {}) {
   if (!component || component.runtime_enabled === false) return false;
+  const state = activationStates[component.id];
+  if (MODEL_BEARING_KINDS.test(component.kind ?? "") && state !== "active") return false;
   if (["architecture_reference", "reference_only"].includes(component.integration)) return false;
   if (component.model_license_status === "blocked") return false;
   if (MODEL_BEARING_KINDS.test(component.kind ?? "") && component.model_license_status === "review_required") return false;
@@ -38,7 +74,8 @@ export function buildAiExecutionGraph(registry, {
   pipeline,
   availableComponents = [],
   disabledComponents = [],
-  requestedTools = DEFAULT_TOOLS
+  requestedTools = DEFAULT_TOOLS,
+  activationStates = {}
 } = {}) {
   const definition = registry.pipelines?.[pipeline];
   if (!definition) throw new Error("unknown AI pipeline: " + pipeline);
@@ -55,7 +92,7 @@ export function buildAiExecutionGraph(registry, {
     let candidates = choices.filter(component =>
       !disabled.has(component.id) &&
       (available.size === 0 || available.has(component.id)) &&
-      componentRuntimeEligibility(component)
+      componentRuntimeEligibility(component, activationStates)
     );
 
     if (!candidates.length && stage.includes("_or_")) {
@@ -65,7 +102,7 @@ export function buildAiExecutionGraph(registry, {
         .filter(component =>
           component &&
           (available.size === 0 || available.has(component.id)) &&
-          componentRuntimeEligibility(component)
+          componentRuntimeEligibility(component, activationStates)
         );
     }
 
@@ -73,7 +110,7 @@ export function buildAiExecutionGraph(registry, {
       .filter(component => !disabled.has(component.id) && (available.size === 0 || available.has(component.id)))
       .map(component => ({
         id: component.id,
-        runtime_eligible: componentRuntimeEligibility(component),
+        runtime_eligible: componentRuntimeEligibility(component, activationStates),
         integration: component.integration,
         local_first: LOCAL_FIRST_INTEGRATIONS.has(component.integration),
         model_license_status: component.model_license_status
@@ -87,7 +124,8 @@ export function buildAiExecutionGraph(registry, {
         integration: component.integration,
         local_first: LOCAL_FIRST_INTEGRATIONS.has(component.integration),
         model_license_status: component.model_license_status,
-        runtime_eligible: true
+        runtime_eligible: true,
+        activation_state: activationStates[component.id] ?? "not_supplied"
       })),
       rejected_candidates: allChoices.filter(candidate => !candidate.runtime_eligible)
     });
@@ -108,6 +146,14 @@ export function buildAiExecutionGraph(registry, {
       corpus_write_allowed: false
     }
   };
+}
+
+export async function buildVerifiedAiExecutionGraph(registry, options = {}) {
+  const activation = await loadOmegaEngineActivationRegistry();
+  return buildAiExecutionGraph(registry, {
+    ...options,
+    activationStates: options.activationStates ?? activation.states
+  });
 }
 
 export function buildMcpToolPolicy(requestedTools = DEFAULT_TOOLS) {

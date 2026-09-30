@@ -1,0 +1,10 @@
+{
+  "schema_version":"1.0.0",
+  "routes":{
+    "text_to_video":["sana-video2-5b-720p","sana-video-2b-720p"],
+    "image_to_video":["sana-video2-5b-720p","sana-video-2b-720p"]
+  },
+  "runtime_rule":"execute only when the corresponding Omega Release tag exists in at least one verified storage target with release-manifest.json and SHA-256 entries",
+  "fallback_rule":"existing Wan/Hunyuan/LTX/CogVideo routes remain available; no source truth is changed",
+  "evidence_rule":"generated video is never scholarly evidence"
+}
