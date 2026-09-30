@@ -179,6 +179,8 @@ export class OmegaHardwareGuardian {
     }
     return this.monitorAudioContextResilience(audioContext, {
       ...options,
+      getByteOffset: () => session.getCheckpoint().byte_offset,
+      getSequence: () => session.getCheckpoint().sequence,
       onInterrupt: detail => {
         session.pause();
         options.onInterrupt?.(detail);
