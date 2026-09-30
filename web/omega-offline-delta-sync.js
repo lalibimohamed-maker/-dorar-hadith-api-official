@@ -129,6 +129,7 @@
     return {
       schema_version: SCHEMA_VERSION,
       format: FORMAT,
+      snapshot_algorithm: "omega-evidence-snapshot-v2",
       sequence: Math.max(1, Number(delta.sequence) || 0),
       generated_at: String(delta.generated_at || ""),
       base_snapshot_sha256: String(delta.base_snapshot_sha256 || "").toLowerCase(),
@@ -150,7 +151,9 @@
 
   async function verifyDeltaEnvelope(delta, trustedPublicKeys = {}) {
     if (!delta || typeof delta !== "object") throw new Error("OFFLINE_DELTA_INVALID");
-    if (delta.schema_version !== SCHEMA_VERSION || delta.format !== FORMAT) {
+    if (delta.schema_version !== SCHEMA_VERSION ||
+        delta.format !== FORMAT ||
+        delta.snapshot_algorithm !== "omega-evidence-snapshot-v2") {
       throw new Error("OFFLINE_DELTA_SCHEMA_UNSUPPORTED");
     }
 
@@ -443,7 +446,17 @@
       throw new Error("OFFLINE_DELTA_NETWORK_BLOCKED");
     }
 
-    const response = await fetch(String(url), {
+    const parsedUrl = new URL(String(url), globalThis.location?.href || "http://localhost/");
+    if (parsedUrl.protocol !== "https:" &&
+        parsedUrl.protocol !== "http:") {
+      throw new Error("OFFLINE_DELTA_URL_PROTOCOL_REJECTED");
+    }
+    if (globalThis.location?.origin &&
+        parsedUrl.origin !== globalThis.location.origin) {
+      throw new Error("OFFLINE_DELTA_CROSS_ORIGIN_REJECTED");
+    }
+
+    const response = await fetch(parsedUrl.href, {
       credentials: "same-origin",
       cache: "no-store",
       headers: { Accept: "application/json" }
