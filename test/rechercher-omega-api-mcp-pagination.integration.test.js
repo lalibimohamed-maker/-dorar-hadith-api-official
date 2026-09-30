@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import http from "node:http";
 import { once } from "node:events";
 
-async function start(server){await once(server,"listening");server.unref();return server.address().port;}
-async function stop(server){server.closeAllConnections?.();if(server.listening)await new Promise(resolve=>server.close(resolve));}
+async function start(server){if(!server.listening)await once(server,"listening");return server.address().port;}
+async function stop(server){if(server.closeAllConnections)server.closeAllConnections();if(server.listening)await new Promise(resolve=>{let done=false;const finish=()=>{if(!done){done=true;resolve();}};server.close(finish);setTimeout(finish,250);});}
 
 function pagedMatches(reqUrl){
  const u=new URL(reqUrl,"http://upstream"); const cursor=u.searchParams.get("cursor");
