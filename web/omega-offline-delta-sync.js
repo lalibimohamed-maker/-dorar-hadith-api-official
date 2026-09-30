@@ -328,6 +328,10 @@
     }
 
     const snapshot = await readState();
+    if (snapshot.state?.dirty === true) {
+      throw new Error("OFFLINE_DELTA_LOCAL_STATE_DIRTY");
+    }
+
     const stateRoot = snapshot.state?.dirty === false &&
       HEX_SHA256.test(String(snapshot.state?.snapshot_sha256 || ""))
       ? String(snapshot.state.snapshot_sha256).toLowerCase()
@@ -371,7 +375,8 @@
           ? String(currentState.snapshot_sha256).toLowerCase()
           : null;
 
-        if (currentRoot !== payload.base_snapshot_sha256) {
+        if (currentRoot !== payload.base_snapshot_sha256 ||
+            Number(currentState?.sequence || 0) >= payload.sequence) {
           tx.abort();
           return;
         }
