@@ -165,7 +165,7 @@ export class OmegaResilientAudioSession {
     return Object.freeze({ replayed, checkpoint: this.getCheckpoint() });
   }
 
-  getCheckpoint()
+  getCheckpoint() {
     return Object.freeze({
       session_id: this.sessionId,
       byte_offset: this.byteOffset,
