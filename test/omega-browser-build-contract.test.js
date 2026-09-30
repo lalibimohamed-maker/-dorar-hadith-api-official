@@ -19,5 +19,8 @@ test("browser package build is isolated and network-free", async () => {
   assert.match(core, /\.\/arabic-query-normalizer\.js/);
   assert.match(core, /omega-hardware-guardian\.js/);
   assert.match(buildPackage, /omega-hardware-guardian\.js/);
+  assert.match(buildPackage, /omega-audio-session\.js/);
+  assert.match(buildPackage, /omega-client-core\.js/);
+  assert.doesNotMatch(await readFile("packages/omega-browser/src/webgpu-inference-worker.js", "utf8"), /importScripts\(/);
   assert.equal(gitignore.includes("dist/"), true);
 });
