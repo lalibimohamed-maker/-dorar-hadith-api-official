@@ -116,20 +116,20 @@ jobs:
 
             if [ "$distribution" = "sharded" ]; then
               python3 - "$generated_shard_manifest" "$manifest" <<'PY'
-import json, sys
-generated = json.load(open(sys.argv[1], encoding="utf-8"))
-release_manifest = json.load(open(sys.argv[2], encoding="utf-8"))
-release_manifest["reconstruction"] = {
-    "method": "omega_file_sharder",
-    "output": generated["model_name"],
-    "chunk_size_bytes": generated["chunk_size_bytes"],
-    "chunk_count": generated["chunk_count"],
-    "total_size": generated["total_size"],
-    "total_sha256": generated["total_sha256"]
-}
-release_manifest["shards"] = generated["chunks"]
-open(sys.argv[2], "w", encoding="utf-8").write(json.dumps(release_manifest, ensure_ascii=False, indent=2) + "\n")
-PY
+          import json, sys
+          generated = json.load(open(sys.argv[1], encoding="utf-8"))
+          release_manifest = json.load(open(sys.argv[2], encoding="utf-8"))
+          release_manifest["reconstruction"] = {
+              "method": "omega_file_sharder",
+              "output": generated["model_name"],
+              "chunk_size_bytes": generated["chunk_size_bytes"],
+              "chunk_count": generated["chunk_count"],
+              "total_size": generated["total_size"],
+              "total_sha256": generated["total_sha256"]
+          }
+          release_manifest["shards"] = generated["chunks"]
+          open(sys.argv[2], "w", encoding="utf-8").write(json.dumps(release_manifest, ensure_ascii=False, indent=2) + "\n")
+          PY
               asset_paths+=( "$generated_shard_manifest" )
             fi
 
