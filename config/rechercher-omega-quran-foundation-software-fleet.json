@@ -1,0 +1,194 @@
+{
+  "schema_version": "1.0.0",
+  "generated": "2026-09-27",
+  "provider": "Quran Foundation",
+  "purpose": "Machine-readable software fleet specification for developer integrations across Dinullah applications, @Rechercher and Rechercher Ω.",
+  "governance": {
+    "layer": "System/Capability layer above Corpus",
+    "corpus_write_allowed": false,
+    "generated_output_is_not_corpus_truth": true,
+    "api_access_is_not_redistribution_permission": true,
+    "environment_isolation_required": true,
+    "secrets_never_in_browser_or_mobile_bundle": true
+  },
+  "environments": {
+    "production": {
+      "label": "production",
+      "rule": "Use only production OAuth/API/callback/session endpoints and production credentials."
+    },
+    "prelive": {
+      "label": "pre-live",
+      "rule": "Use pre-live OAuth/API/callback/session endpoints and pre-live test data. Never mix production sessions or user data into pre-live testing.",
+      "reference": "https://api-docs.quran.com/docs/user_related_apis_prelive/user-related-apis/"
+    }
+  },
+  "api_families": [
+    {
+      "id": "content",
+      "capability": "Quran text, chapters, verses, translations, tafsir, audio, recitations, pages, juz, hizb, ruku, manzil and related resources.",
+      "auth": "app token / client credentials",
+      "server_required": true,
+      "docs": "https://api-docs.quran.com/docs/content_apis_versioned/content-apis/"
+    },
+    {
+      "id": "search",
+      "capability": "Programmatic Quran search across verses, chapters, juz, pages and translations.",
+      "auth": "OAuth2 app token with search scope",
+      "server_required": true,
+      "docs": "https://api-docs.quran.com/docs/search_apis_versioned/1.0.0/quran-foundation-search-api/"
+    },
+    {
+      "id": "user",
+      "capability": "Bookmarks, collections, notes, reading sessions, goals, preferences, profiles, rooms, posts, comments, tags and other user data.",
+      "auth": "OAuth2 user session token + client ID",
+      "server_required": "usually",
+      "production_docs": "https://api-docs.quran.com/docs/user_related_apis_versioned/user-related-apis/",
+      "prelive_docs": "https://api-docs.quran.com/docs/user_related_apis_prelive/user-related-apis/"
+    },
+    {
+      "id": "oauth2_oidc",
+      "capability": "Authorize, token exchange, token introspection, token revocation, OIDC userinfo and logout/session revocation.",
+      "auth": "OAuth2/OIDC",
+      "docs": "https://api-docs.quran.com/docs/oauth2_apis_versioned/1.0.0/oauth-2-apis/"
+    },
+    {
+      "id": "content_sync",
+      "capability": "Incremental change polling, sync tokens, snapshots, offline cache refresh and recovery.",
+      "auth": "same protected API access as synchronized resource family",
+      "docs": "https://api-docs.quran.com/docs/tutorials/content-sync/getting-started/"
+    }
+  ],
+  "sdk_fleet": [
+    {
+      "id": "js_server",
+      "runtime": "Node.js/serverless/workers/SSR/cron",
+      "package": "@quranjs/api/server",
+      "use_for": [
+        "Content",
+        "Search",
+        "confidential OAuth2",
+        "server-side User APIs"
+      ],
+      "secret_boundary": "server-only",
+      "docs": "https://api-docs.quran.com/docs/sdk/javascript/server-quickstart/"
+    },
+    {
+      "id": "js_public",
+      "runtime": "browser/mobile/React Native",
+      "package": "@quranjs/api/public",
+      "use_for": [
+        "approved public-client PKCE",
+        "user-session flows"
+      ],
+      "secret_boundary": "no client_secret",
+      "docs": "https://api-docs.quran.com/docs/sdk/javascript/public-quickstart/"
+    },
+    {
+      "id": "python",
+      "runtime": "server/jobs/notebooks/AI workflows",
+      "package": "quran-foundation-api",
+      "import_name": "quran_foundation",
+      "use_for": [
+        "Content",
+        "Search",
+        "User APIs",
+        "batch jobs"
+      ],
+      "secret_boundary": "server or trusted job only",
+      "docs": "https://api-docs.quran.com/docs/sdk/python/"
+    },
+    {
+      "id": "official_oauth_example",
+      "runtime": "JavaScript/Node",
+      "repository": "https://github.com/quran/quran-oauth2-client-example",
+      "use_for": [
+        "OAuth2 integration reference",
+        "flow debugging"
+      ],
+      "secret_boundary": "follow current server/public auth matrix"
+    }
+  ],
+  "polyglot_http_fleet": [
+    {
+      "language": "cURL",
+      "client": "curl"
+    },
+    {
+      "language": "Python",
+      "client": "requests"
+    },
+    {
+      "language": "Java",
+      "client": "OkHttp"
+    },
+    {
+      "language": "Go",
+      "client": "net/http"
+    },
+    {
+      "language": "Node.js",
+      "client": "axios"
+    },
+    {
+      "language": "Ruby",
+      "client": "Net::HTTP"
+    },
+    {
+      "language": "C#",
+      "client": "RestSharp"
+    },
+    {
+      "language": "PHP",
+      "client": "cURL"
+    },
+    {
+      "language": "PowerShell",
+      "client": "Invoke-RestMethod"
+    }
+  ],
+  "runtime_rules": {
+    "backend": "When Content or Search is required, use the server runtime and keep client credentials server-side.",
+    "browser_mobile": "Use the public runtime only for flows explicitly supported for public clients; PKCE does not make a client_secret safe to ship.",
+    "edge": "Workers/serverless can run the server SDK when secrets are provided by the platform secret manager.",
+    "python_kaggle": "Suitable for controlled research/batch jobs; never place client secrets or access tokens in public notebooks, logs or artifacts."
+  },
+  "auth_lifecycle": [
+    "documented",
+    "environment_selected",
+    "credentialed",
+    "token_acquired",
+    "scope_verified",
+    "endpoint_contract_verified",
+    "provenance_verified",
+    "rights_verified",
+    "acquisition_allowed"
+  ],
+  "sync_rules": {
+    "source_of_truth": "Quran Foundation server content",
+    "local_role": "readable cache",
+    "state_separation": "sync state must be separate from cached rows",
+    "idempotency_key": "resourceGroup + resourceId + recordType + recordKey",
+    "incremental_preference": true,
+    "snapshot_replacement": "replace a full resource atomically when snapshot_url is returned",
+    "recovery": "re-bootstrap/full-copy when incremental state is invalid"
+  },
+  "fleet_consumers": [
+    "@Rechercher source/API connectors",
+    "Rechercher Ω model/tool agents",
+    "Dinullah Matrix multilingual resource workers",
+    "Quran reader/search web application",
+    "mobile/offline applications",
+    "voice interface surfaces such as يا بوابة العلم",
+    "developer examples and integration tests"
+  ],
+  "source_links": {
+    "api_reference": "https://api-docs.quran.com/docs/api-reference/",
+    "sdk_hub": "https://api-docs.quran.com/docs/sdk/",
+    "javascript": "https://api-docs.quran.com/docs/sdk/javascript/",
+    "python": "https://api-docs.quran.com/docs/sdk/python/",
+    "request_access": "https://api-docs.quran.com/request-access/",
+    "content_sync": "https://api-docs.quran.com/docs/tutorials/content-sync/getting-started/",
+    "offline_cache": "https://api-docs.quran.com/docs/tutorials/content-sync/offline-cache-patterns/",
+    "oauth2_oidc": "https://api-docs.quran.com/docs/oauth2_apis_versioned/1.0.0/oauth-2-apis/"
+  }
+}

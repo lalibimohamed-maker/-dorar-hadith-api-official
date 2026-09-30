@@ -1,0 +1,347 @@
+name: Rechercher Ω — acquire remaining engine fleet
+
+on:
+  # Every push to this acquisition branch is an explicit continuation trigger.
+  # Path filters are intentionally avoided so a recovery/fix commit cannot
+  # leave the fleet idle after a failed acquisition attempt.
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+
+run-name: Rechercher Omega — acquire/resume remaining engine fleet
+
+# storage-target-enforced: private Rechercher Omega engine storage via dedicated GitHub Releases
+
+# continuation-touch: trigger an explicit acquisition continuation after the repair.
+
+# network-write-justification: publishes immutable model acquisition assets to dedicated GitHub Releases; no repository files are written.
+permissions:
+  contents: read
+
+# security-justification: publishes immutable, license-cleared model artifacts to dedicated GitHub Releases; no model bytes are committed to git or Corpus.
+
+concurrency:
+  group: rechercher-omega-remaining-engine-acquisition
+  cancel-in-progress: true
+
+jobs:
+  acquire:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.number == 566 }}
+    name: ${{ matrix.id }}
+    env:
+      RECHERCHER_OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - id: ltx-2
+            model_id: Lightricks/LTX-2
+            revision: dfcc210
+            release_tag: rechercher-omega-ltx2-v1.0.0
+            license: ltx-2-community-license-agreement
+            license_asset: LICENSE-2
+            license_source_repo: Lightricks/LTX-2
+            license_source_commit: a95ab856bf29407b6b066ede0abe1846050db56c
+            license_source_path: LICENSE-2
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: hunyuanvideo-1.5
+            model_id: tencent/HunyuanVideo-1.5
+            revision: 9b49404b3f5df2a8f0b31df27a0c7ab872e7b038
+            release_tag: rechercher-omega-hunyuanvideo15-v1.0.0
+            license: tencent-hunyuan-community
+            release_mode: draft
+            chunk_bytes: 536870912
+          - id: flux1-schnell
+            model_id: black-forest-labs/FLUX.1-schnell
+            revision: f095d56c608128f5ec5e80e7c515697d15d02fa6
+            release_tag: rechercher-omega-flux1-schnell-v1.0.0
+            license: apache-2.0
+            release_mode: prerelease
+            chunk_bytes: 536870912
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Validate Omega storage access
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          TARGET_REPOSITORY: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+        run: |
+          set -euo pipefail
+          test -n "$GH_TOKEN" || { echo "RECHERCHER_OMEGA_STORAGE_TOKEN is missing"; exit 1; }
+          actual="$(gh api "repos/$TARGET_REPOSITORY" --jq '.full_name')"
+          test "$actual" = "$TARGET_REPOSITORY"
+          can_push="$(gh api "repos/$TARGET_REPOSITORY" --jq '.permissions.push // false')"
+          test "$can_push" = "true" || { echo "Token does not have push permission on $TARGET_REPOSITORY"; exit 1; }
+          echo "[OK] Storage target: $TARGET_REPOSITORY"
+          echo "[OK] Token has repository write access"
+
+      - name: Setup Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: "3.12"
+
+      - name: Install Hugging Face Hub
+        run: python -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Validate gated Hugging Face file access
+        id: gated_access
+        if: matrix.id == 'flux1-schnell'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REQUESTED_REVISION: ${{ matrix.revision }}
+        run: |
+          set -euo pipefail
+          if [ -z "${HF_TOKEN:-}" ]; then
+            echo "state=blocked" >> "$GITHUB_OUTPUT"
+            echo "[BLOCKED] HF_TOKEN is not configured for gated FLUX.1-schnell; acquisition will remain gated."
+            exit 0
+          fi
+          python - <<'PY'
+          import os
+          import requests
+          from huggingface_hub import HfApi
+          model = os.environ["MODEL_ID"]
+          revision = os.environ["REQUESTED_REVISION"]
+          token = os.environ["HF_TOKEN"]
+          HfApi(token=token).model_info(model, revision=revision, files_metadata=False)
+          url = f"https://huggingface.co/{model}/resolve/{revision}/text_encoder/model.safetensors"
+          response = requests.head(
+              url,
+              headers={"Authorization": f"Bearer {token}"},
+              allow_redirects=True,
+              timeout=30,
+          )
+          if response.status_code in (401, 403):
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+                  f.write("state=blocked\n")
+              print(f"[BLOCKED] The actual FLUX weight file is not authorized (HTTP {response.status_code}); no release or download will be attempted.")
+              raise SystemExit(0)
+          if response.status_code >= 400:
+              raise SystemExit(f"Weight-file access preflight failed with HTTP {response.status_code}")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("state=ready\n")
+          print("[OK] Actual gated FLUX weight-file access is authorized.")
+          PY
+
+      - name: Mark non-gated jobs as ready
+        id: gated_access_default
+        if: matrix.id != 'flux1-schnell'
+        run: echo "state=ready" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve immutable revision
+        id: revision
+        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
+        env:
+          MODEL_ID: ${{ matrix.model_id }}
+          REQUESTED_REVISION: ${{ matrix.revision }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          from huggingface_hub import HfApi
+          info=HfApi().model_info(
+              os.environ["MODEL_ID"],
+              revision=os.environ["REQUESTED_REVISION"],
+              files_metadata=False,
+          )
+          if not re.fullmatch(r"[0-9a-f]{40}", info.sha):
+              raise SystemExit("Requested revision did not resolve to a full immutable SHA")
+          print("Resolved revision:", info.sha)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("sha="+info.sha+"\n")
+          PY
+
+      - name: Ensure dedicated Release exists
+        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          RELEASE_MODE: ${{ matrix.release_mode }}
+        run: |
+          set -euo pipefail
+          RELEASE_MODE="${RELEASE_MODE:-prerelease}"
+          if gh release view "$RELEASE_TAG" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Release already exists: $RELEASE_TAG"
+          elif [ "$RELEASE_MODE" = "draft" ]; then
+            gh release create "$RELEASE_TAG" --repo "$REPO" --draft --title "$RELEASE_TAG" --notes "Rechercher Omega draft: license/territory review required."
+          else
+            gh release create "$RELEASE_TAG" --repo "$REPO" --prerelease --title "$RELEASE_TAG" --notes "Rechercher Omega prerelease: license terms accompany redistribution."
+          fi
+          release_id="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json databaseId --jq '.databaseId')"
+          test -n "$release_id"
+          echo "OMEGA_RELEASE_ID=$release_id" >> "$GITHUB_ENV"
+          echo "[OK] Release ID: $release_id"
+      - name: Stream weights directly into Release
+        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          OMEGA_STORAGE_REPOSITORY: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          LICENSE_ID: ${{ matrix.license }}
+          CHUNK_BYTES: ${{ matrix.chunk_bytes }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/rechercher-omega-release-stream.py
+
+      - name: Attach LTX-2 license from the immutable HF model revision
+        if: matrix.id == 'ltx-2'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          LICENSE_ASSET: ${{ matrix.license_asset }}
+          LICENSE_SOURCE_REPO: ${{ matrix.license_source_repo }}
+          LICENSE_SOURCE_COMMIT: ${{ matrix.license_source_commit }}
+          LICENSE_SOURCE_PATH: ${{ matrix.license_source_path }}
+        run: |
+          set -euo pipefail
+          license="${RUNNER_TEMP}/${LICENSE_ASSET}"
+          curl --fail --location --retry 3 --silent --show-error             "https://raw.githubusercontent.com/${LICENSE_SOURCE_REPO}/${LICENSE_SOURCE_COMMIT}/${LICENSE_SOURCE_PATH}"             -o "$license"
+          test -s "$license"
+          gh release upload "$RELEASE_TAG" "$license" --repo "$REPO" --clobber
+
+      - name: Normalize Hunyuan license assets
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          while IFS= read -r name; do
+            case "$name" in
+              tmp.*)
+                echo "Removing obsolete temporary license/notice asset: $name"
+                gh release delete-asset "$RELEASE_TAG" "$name" --repo "$REPO" --yes
+                ;;
+            esac
+          done < <(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name')
+
+      - name: Attach Hunyuan license and notice with canonical names
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error             "https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/60783e704160023913bee78f0b47036d393d4dfa/LICENSE"             -o "${RUNNER_TEMP}/LICENSE"
+          curl --fail --location --retry 3 --silent --show-error             "https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanVideo-1.5/60783e704160023913bee78f0b47036d393d4dfa/NOTICE"             -o "${RUNNER_TEMP}/NOTICE"
+          test -s "${RUNNER_TEMP}/LICENSE"
+          test -s "${RUNNER_TEMP}/NOTICE"
+          gh release upload "$RELEASE_TAG" "${RUNNER_TEMP}/LICENSE" "${RUNNER_TEMP}/NOTICE" --repo "$REPO" --clobber
+
+      - name: Build HunyuanVideo 1.5 runtime bundle
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+          SOURCE_REPO: Tencent-Hunyuan/HunyuanVideo-1.5
+          SOURCE_COMMIT: 60783e704160023913bee78f0b47036d393d4dfa
+          OUTPUT_DIR: ${{ runner.temp }}/hunyuanvideo15-runtime
+          CONFIG_PATH: ${{ github.workspace }}/config/rechercher-omega-hunyuanvideo15-runtime.json
+        run: |
+          set -euo pipefail
+          python scripts/rechercher-omega-hunyuan-runtime.py
+
+      - name: Publish HunyuanVideo 1.5 runtime bundle
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          OUTPUT_DIR: ${{ runner.temp }}/hunyuanvideo15-runtime
+        run: |
+          set -euo pipefail
+          gh release upload "$RELEASE_TAG"             "$OUTPUT_DIR/omega__hunyuanvideo15__runtime.tar.gz"             "$OUTPUT_DIR/hunyuanvideo15-runtime-manifest.json"             "$OUTPUT_DIR/hunyuanvideo15-dependencies.json"             "$OUTPUT_DIR/hunyuanvideo15-release-readiness.json"             --repo "$REPO" --clobber
+
+      # release-manifest.json is a weights-only manifest; it never declares runtime completeness.
+      - name: Verify weights manifest
+        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name' | grep -Fxq "release-manifest.json"
+          echo "[OK] Weights manifest exists for $RELEASE_TAG"
+
+      - name: Verify Hunyuan runtime completeness
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          VERIFY_DIR: ${{ runner.temp }}/hunyuanvideo15-verify
+        run: |
+          set -euo pipefail
+          rm -rf "$VERIFY_DIR"
+          mkdir -p "$VERIFY_DIR"
+          assets="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name')"
+          for required in             "release-manifest.json"             "LICENSE"             "NOTICE"             "omega__hunyuanvideo15__runtime.tar.gz"             "hunyuanvideo15-runtime-manifest.json"             "hunyuanvideo15-dependencies.json"             "hunyuanvideo15-release-readiness.json"
+          do
+            grep -Fxq "$required" <<<"$assets" || { echo "Missing Release asset: $required"; exit 1; }
+          done
+          if grep -Eq '^tmp\.' <<<"$assets"; then
+            echo "Temporary license/notice assets remain in Hunyuan Release"
+            exit 1
+          fi
+          gh release download "$RELEASE_TAG"             --repo "$REPO"             --pattern "hunyuanvideo15-release-readiness.json"             --dir "$VERIFY_DIR"
+          status="$(python3 -c "import json; print(json.load(open('$VERIFY_DIR/hunyuanvideo15-release-readiness.json'))['status'])")"
+          test "$status" = "dependency_blocked"
+          echo "[OK] Runtime completeness gate passed: core packaged, runnable state explicitly blocked by declared external dependencies."
+
+      - name: Enforce runtime completeness semantics
+        if: matrix.id == 'hunyuanvideo-1.5'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          assets="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name')"
+          test -n "$(grep -Fx "hunyuanvideo15-release-readiness.json" <<<"$assets")"
+          echo "[OK] release-manifest.json is not the runtime completeness signal"
+
+      - name: Record blocked gated model state
+        if: matrix.id == 'flux1-schnell' && steps.gated_access.outputs.state == 'blocked'
+        run: |
+          set -euo pipefail
+          cat > "${RUNNER_TEMP}/flux1-schnell-access-state.json" <<'JSON'
+          {
+            "model_id": "black-forest-labs/FLUX.1-schnell",
+            "status": "blocked",
+            "reason": "Hugging Face gated-access authorization is unavailable to this runtime.",
+            "download_attempted": false,
+            "release_promotion": false,
+            "next_action": "obtain_authorized_model_access_and_rerun",
+            "rights_required": true
+          }
+          JSON
+
+      - name: Upload blocked gated model state
+        if: matrix.id == 'flux1-schnell' && steps.gated_access.outputs.state == 'blocked'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: omega-flux1-schnell-access-state
+          path: ${{ runner.temp }}/flux1-schnell-access-state.json
+          if-no-files-found: error

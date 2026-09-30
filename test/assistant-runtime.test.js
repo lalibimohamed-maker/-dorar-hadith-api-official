@@ -1,3 +1,4 @@
+import test from 'node:test';
 import { strict as assert } from 'node:assert';
 import { runAssistantSearch, runVoiceQuestion, exportAssistantSession } from '../src/assistant-runtime.js';
 
@@ -33,3 +34,32 @@ const exported = await exportAssistantSession({
 });
 assert.equal(exported.ok, true);
 assert.equal(exported.input.verifiedOnly, true);
+
+const omegaSearchStub = async (query, options) => ({
+  query,
+  responseLanguage: options.responseLocale,
+  hadith: { text: 'verified test evidence' },
+  sourceMatches: [{ id: 'src-1', title: 'Test source', verification: 'verified', source: 'test://' }],
+});
+
+test('assistant can invoke Omega as a governed opt-in layer', async () => {
+  const result = await runAssistantSearch({
+    query: 'اختبار',
+    language: 'ar',
+    searchFn: omegaSearchStub,
+    useOmega: true,
+    executeOmega: false,
+    omegaOptions: { availableBackends: ['openai-compatible'] }
+  });
+  assert.equal(result.capabilities.omega, true);
+  assert.equal(result.omega.plan.task, 'scholarly_answer');
+  assert.equal(result.omega.plan.status, 'ready');
+  assert.equal(result.omega.backend.backend, 'openai-compatible');
+  assert.equal(result.omega.provenance.corpus_write, false);
+});
+
+test('assistant preserves legacy search-only mode by default', async () => {
+  const result = await runAssistantSearch({ query:'اختبار', language:'ar', searchFn:searchStub });
+  assert.equal(result.capabilities.omega, false);
+  assert.equal('omega' in result, false);
+});

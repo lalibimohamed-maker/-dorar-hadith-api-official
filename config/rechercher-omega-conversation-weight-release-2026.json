@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "dinullah-conversation-weights-2026",
+  "releaseTag": "dinullah-conversation-weights-v2026.09.29",
+  "storage": "github-release-assets",
+  "notInGit": true,
+  "notInCorpus": true,
+  "policy": {
+    "exactRevisionRequired": true,
+    "sha256Required": true,
+    "modelLicenseRequired": true,
+    "nonCommercialModelsBlocked": true,
+    "gatedModelsNotRedistributed": true,
+    "maxAssetBytes": 1900000000
+  },
+  "models": [
+    {
+      "id": "madlad400-3b-mt",
+      "model": "google/madlad400-3b-mt",
+      "license": "Apache-2.0",
+      "coverageLanguages": 419,
+      "revisionResolution": "Hugging Face model API commit SHA captured during release",
+      "filesPolicy": "runtime config/tokenizer/weights from exact revision; split any file above 1.9GB",
+      "status": "approved-for-release-after-verification"
+    },
+    {
+      "id": "opus-mt-ar-en",
+      "model": "Helsinki-NLP/opus-mt-ar-en",
+      "license": "Apache-2.0",
+      "coverageLanguages": "Arabic→English",
+      "revisionResolution": "Hugging Face model API commit SHA captured during release",
+      "status": "approved-for-release-after-verification"
+    },
+    {
+      "id": "habibi-msa",
+      "model": "SWivid/Habibi-TTS/Specialized/MSA",
+      "commit": "880b7c927ebfba74438836c08530636602baa02f",
+      "license": "Apache-2.0",
+      "weight": "Specialized/MSA/model_200000.safetensors",
+      "sha256": "708a107b05a734523b4e967111dba68f73a7e29f76093f67bb7493204f434cd1",
+      "bytes": 1348683569,
+      "status": "approved-for-release-after-verification"
+    },
+    {
+      "id": "habibi-alg",
+      "model": "SWivid/Habibi-TTS/Specialized/ALG",
+      "commit": "880b7c927ebfba74438836c08530636602baa02f",
+      "license": "Apache-2.0",
+      "weight": "Specialized/ALG/model_100000.safetensors",
+      "sha256": "d376ce3da8a07e5f407fce09751d03de22e3634262b1850918ae71077136244c",
+      "bytes": 1348751153,
+      "status": "approved-for-release-after-verification"
+    },
+    {
+      "id": "kokoro",
+      "model": "hexgrad/Kokoro-82M",
+      "revisionPolicy": "resolve-and-lock-current-upstream-commit-during-release",
+      "license": "Apache-2.0",
+      "status": "approved-for-release-after-immutable-revision-and-sha-verification",
+      "filesPolicy": "weights/config/tokenizer/voice files selected from exact revision; split any release file above 1.9GB"
+    }
+  ],
+  "excluded": {
+    "seamless-m4t-v2": "CC-BY-NC-4.0; research-only",
+    "nllb-200": "CC-BY-NC-4.0; research-only",
+    "openwakeword-models": "CC-BY-NC-SA-4.0; model redistribution not approved",
+    "pyannote-speaker-diarization": "gated model terms; runtime only until access conditions are separately accepted",
+    "piper-voices": "per-voice model licenses; no blanket redistribution",
+    "f5-tts-official": "CC-BY-NC-4.0 pretrained weights"
+  }
+}

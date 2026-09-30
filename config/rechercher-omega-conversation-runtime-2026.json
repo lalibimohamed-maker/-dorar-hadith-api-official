@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "dinullah-conversation-runtime-2026",
+  "purpose": "Free/open runtime for multilingual conversational voice, live translation, dialogue turn-taking and media dubbing shared by Rechercher Omega and Media Studio.",
+  "policy": {
+    "freeFirst": true,
+    "paidDependencyAllowed": false,
+    "releaseBackedSoftware": true,
+    "releaseBackedClearedWeightsOnly": true,
+    "corpusWriteAllowed": false,
+    "generatedSpeechIsEvidence": false,
+    "canonicalQuranRecitationArabicOnly": true
+  },
+  "software": [
+    {
+      "id": "pipecat",
+      "version": "1.12.0",
+      "license": "BSD-2-Clause",
+      "role": "realtime-voice-multimodal-conversation-orchestration",
+      "source": "https://github.com/pipecat-ai/pipecat",
+      "licenseEvidence": "https://github.com/pipecat-ai/pipecat/blob/main/LICENSE"
+    },
+    {
+      "id": "pion-webrtc",
+      "version": "4.0.0",
+      "license": "MIT",
+      "role": "realtime-WebRTC-transport",
+      "source": "https://github.com/pion/webrtc",
+      "licenseEvidence": "https://github.com/pion/webrtc"
+    },
+    {
+      "id": "whisper-cpp",
+      "version": "1.9.4",
+      "license": "MIT",
+      "role": "edge-and-streaming-ASR",
+      "source": "https://github.com/ggml-org/whisper.cpp",
+      "licenseEvidence": "https://github.com/ggml-org/whisper.cpp"
+    },
+    {
+      "id": "deepfilternet",
+      "version": "0.5.6",
+      "license": "MIT-or-Apache-2.0-code; model-specific",
+      "role": "speech-enhancement",
+      "source": "https://github.com/Rikorose/DeepFilterNet",
+      "licenseEvidence": "https://github.com/Rikorose/DeepFilterNet"
+    },
+    {
+      "id": "rnnoise",
+      "version": "0.2",
+      "license": "BSD-3-Clause",
+      "role": "realtime-noise-suppression",
+      "source": "https://github.com/xiph/rnnoise",
+      "licenseEvidence": "https://github.com/xiph/rnnoise"
+    },
+    {
+      "id": "pyannote-audio",
+      "version": "4.0.7",
+      "license": "MIT",
+      "role": "speaker-diarization",
+      "source": "https://github.com/pyannote/pyannote-audio",
+      "licenseEvidence": "https://github.com/pyannote/pyannote-audio",
+      "modelTerms": "gated-user-conditions"
+    },
+    {
+      "id": "argos-translate",
+      "version": "runtime-pinned",
+      "license": "MIT-or-CC0-code; model-package-specific",
+      "role": "offline-machine-translation",
+      "source": "https://github.com/argosopentech/argos-translate",
+      "licenseEvidence": "https://github.com/argosopentech/argos-translate"
+    },
+    {
+      "id": "bergamot-translator",
+      "version": "source-pinned",
+      "license": "MPL-2.0-code; model-specific",
+      "role": "browser-offline-machine-translation",
+      "source": "https://github.com/browsermt/bergamot-translator",
+      "licenseEvidence": "https://github.com/browsermt/bergamot-translator"
+    },
+    {
+      "id": "comet",
+      "version": "framework-pinned",
+      "license": "Apache-2.0-framework; per-model",
+      "role": "machine-translation-quality-evaluation",
+      "source": "https://github.com/Unbabel/COMET",
+      "licenseEvidence": "https://github.com/Unbabel/COMET"
+    },
+    {
+      "id": "piper",
+      "version": "1.8.0",
+      "license": "GPL-3.0-or-later-code; per-voice-model",
+      "role": "local-multilingual-TTS",
+      "source": "https://github.com/OHF-Voice/piper1-gpl",
+      "licenseEvidence": "https://github.com/OHF-Voice/piper1-gpl/docs/VOICES.md"
+    },
+    {
+      "id": "musetalk",
+      "version": "1.5",
+      "license": "MIT-code; model-use-per-project; dependencies separate",
+      "role": "lip-sync-and-dubbing",
+      "source": "https://github.com/TMElyralab/MuseTalk",
+      "licenseEvidence": "https://github.com/TMElyralab/MuseTalk"
+    }
+  ],
+  "translationModels": [
+    {
+      "id": "madlad400-3b-mt",
+      "model": "google/madlad400-3b-mt",
+      "license": "Apache-2.0",
+      "coverageLanguages": 419,
+      "redistribution": "eligible-after-immutable-revision-and-sha-verification"
+    },
+    {
+      "id": "opus-mt-ar-en",
+      "model": "Helsinki-NLP/opus-mt-ar-en",
+      "license": "Apache-2.0",
+      "redistribution": "eligible-after-immutable-revision-and-sha-verification"
+    }
+  ],
+  "restrictedModels": [
+    {
+      "id": "seamless-m4t-v2",
+      "model": "facebook/seamless-m4t-v2-large",
+      "license": "CC-BY-NC-4.0",
+      "status": "research-only"
+    },
+    {
+      "id": "nllb-200",
+      "model": "facebook/nllb-200-distilled-600M",
+      "license": "CC-BY-NC-4.0",
+      "status": "research-only"
+    }
+  ],
+  "pipeline": {
+    "microphone": "browser-getUserMedia-or-OBS",
+    "realtimeTransport": "WebRTC",
+    "audioEnhancement": "RNNoise-or-DeepFilterNet",
+    "activityAndTurn": "Silero-VAD + Pipecat turn management",
+    "speakers": "pyannote optional",
+    "asr": "Whisper/faster-whisper/whisper.cpp",
+    "languageDetection": "Whisper or Silero language classifier",
+    "translation": "MADLAD-400 primary; OPUS-MT pair fallback; Argos/Bergamot where package/model licenses permit",
+    "omega": "Rechercher Omega evidence gate + reasoning/tool routing",
+    "tts": "CosyVoice/Kokoro/Piper according to language and cleared voice",
+    "captions": "WebVTT/SRT + Subtitle Composer/Kdenlive",
+    "dubbing": "MuseTalk when the subject and all dependency models are authorized",
+    "output": "WebRTC/MediaMTX/FFmpeg"
+  },
+  "release": {
+    "softwareTag": "dinullah-conversation-runtime-v2026.09.29",
+    "weightsTag": "dinullah-conversation-weights-v2026.09.29",
+    "storage": "github-release-assets",
+    "notInGit": true,
+    "notInCorpus": true
+  },
+  "integration": {
+    "aiPr": 566,
+    "mediaPr": 601,
+    "bridge": "config/rechercher-omega-media-bridge-2026.json"
+  },
+  "privateEngineStorage": {
+    "repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+    "releaseTag": "rechercher-omega-private-conversation-assets-v2026.09.29",
+    "publicPromotion": false,
+    "assetClasses": [
+      "private-research-only",
+      "gated-private"
+    ],
+    "manifest": "config/rechercher-omega-private-engine-storage-2026.json"
+  },
+  "conversationMemory": {
+    "persistence": "volatile",
+    "maxTurns": 20,
+    "maxCharsPerMessage": 12000,
+    "rawPersistentStorage": false
+  },
+  "security": {
+    "sourceEvidenceIsUntrustedData": true,
+    "ignoreInstructionsInsideSourceText": true
+  }
+}

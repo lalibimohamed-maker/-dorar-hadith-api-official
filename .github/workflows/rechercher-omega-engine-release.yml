@@ -1,0 +1,143 @@
+name: Rechercher Ω — publish starter engine release
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - "config/rechercher-omega-engine-release.json"
+      - ".github/workflows/rechercher-omega-engine-release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# security-justification: required only to create/update the dedicated model Release assets; no source or Corpus writes are performed.
+
+concurrency:
+  group: rechercher-omega-engine-release
+  cancel-in-progress: false
+
+jobs:
+  publish-release:
+    name: Publish persistent starter engine release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install Hugging Face Hub client
+        run: python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Verify GitHub CLI
+        run: gh --version
+
+      - name: Create release when absent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="$(python3 -c 'import json; print(json.load(open("config/rechercher-omega-engine-release.json"))["release_tag"])')"
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG"               --target "$GITHUB_SHA"               --title "Rechercher Ω Starter Engines v0.1.0"               --prerelease               --notes "Persistent lightweight starter engines for Rechercher Ω. Binary weights are distributed as Release assets; Git history contains manifests and code only."
+          fi
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+
+      - name: Publish engines according to distribution policy
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKDIR: ${{ runner.temp }}/omega-release
+        run: |
+          set -euo pipefail
+          rm -rf "$WORKDIR"
+          mkdir -p "$WORKDIR"
+
+          publish_engine() {
+            local id="$1"
+            local model="$2"
+            local revision="$3"
+            local license="$4"
+            local distribution="$5"
+            local shard_bytes="$6"
+            shift 6
+            local -a files=( "$@" )
+
+            local dir="$WORKDIR/$id"
+            local bundle="$WORKDIR/$id-runtime-files.tar.gz"
+            local manifest="$WORKDIR/$id-release-manifest.json"
+
+            rm -rf "$dir"
+            mkdir -p "$dir"
+
+            echo "=== Downloading $id ($distribution) ==="
+            hf download "$model" "${files[@]}" --revision "$revision" --local-dir "$dir"
+            test -s "$dir/model.safetensors"
+
+            asset_paths=()
+
+            if [ "$distribution" = "sharded" ]; then
+              prefix="$WORKDIR/$id-model.safetensors.part-"
+              split -b "$shard_bytes" -d -a 2 "$dir/model.safetensors" "$prefix"
+              rm "$dir/model.safetensors"
+              for shard in "$prefix"*; do
+                test "$(stat -c '%s' "$shard")" -lt 2147483647
+                asset_paths+=( "$shard" )
+              done
+              reconstruction_method="cat_sorted_parts"
+            else
+              model_asset="$WORKDIR/$id-model.safetensors"
+              mv "$dir/model.safetensors" "$model_asset"
+              test "$(stat -c '%s' "$model_asset")" -lt 2147483647
+              asset_paths+=( "$model_asset" )
+              reconstruction_method="direct"
+            fi
+
+            tar -C "$dir" -czf "$bundle" .
+            test "$(stat -c '%s' "$bundle")" -lt 2147483647
+            asset_paths+=( "$bundle" )
+
+            printf '{\n  "schema_version":"1.0.0",\n  "logical_id":"%s",\n  "model_id":"%s",\n  "revision":"%s",\n  "license":"%s",\n  "source_url":"https://huggingface.co/%s/tree/%s",\n  "reconstruction":{"method":"%s","output":"model.safetensors"%s},\n  "assets":[\n'               "$id" "$model" "$revision" "$license" "$model" "$revision" "$reconstruction_method"               "$( [ "$distribution" = "sharded" ] && printf ',\"part_size_bytes\":%s' "$shard_bytes" )" > "$manifest"
+
+            first=1
+            for asset in "${asset_paths[@]}"; do
+              [ "$first" -eq 1 ] || printf ',\n' >> "$manifest"
+              first=0
+              printf '    {"name":"%s","bytes":%s,"sha256":"%s"}'                 "$(basename "$asset")"                 "$(stat -c '%s' "$asset")"                 "$(sha256sum "$asset" | awk '{print $1}')" >> "$manifest"
+            done
+            printf '\n  ]\n}\n' >> "$manifest"
+
+            asset_paths+=( "$manifest" )
+            gh release upload "$TAG" "${asset_paths[@]}" --clobber
+
+            rm -rf "$dir"
+            for asset in "${asset_paths[@]}"; do rm -f "$asset"; done
+            echo "=== Published $id ==="
+          }
+
+          publish_engine             "qwen3" "Qwen/Qwen3-0.6B"             "c1899de289a04d12100db370d81485cdf75e47ca"             "apache-2.0" "monolithic" 0             model.safetensors LICENSE README.md .gitattributes config.json generation_config.json merges.txt tokenizer.json tokenizer_config.json vocab.json
+
+          publish_engine             "paddleocr-vl" "PaddlePaddle/PaddleOCR-VL"             "7fa00a8c55b735ba51ba49a9058f3f9c57a99a11"             "apache-2.0" "sharded" 134217728             model.safetensors LICENSE README.md .gitattributes config.json configuration_paddleocr_vl.py generation_config.json image_processing_paddleocr_vl.py inference.yml modeling_paddleocr_vl.py preprocessor_config.json processing_paddleocr_vl.py processor_config.json special_tokens_map.json tokenizer.json tokenizer.model tokenizer_config.json
+
+          publish_engine             "whisper-tiny" "openai/whisper-tiny"             "169d4a4341b33bc18d8881c4b69c2e104e1cc0af"             "apache-2.0" "monolithic" 0             model.safetensors LICENSE README.md .gitattributes added_tokens.json config.json generation_config.json merges.txt normalizer.json preprocessor_config.json special_tokens_map.json tokenizer.json tokenizer_config.json vocab.json
+
+      - name: Verify published Release inventory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, subprocess
+          m=json.load(open("config/rechercher-omega-engine-release.json"))
+          actual=set(subprocess.check_output(
+              ["gh","release","view",m["release_tag"],"--json","assets","--jq",".assets[].name"],
+              text=True
+          ).splitlines())
+          expected={name for e in m["engines"] for name in e["asset_plan"]}
+          missing=sorted(expected-actual)
+          if missing:
+              raise SystemExit("missing Release assets: "+", ".join(missing))
+          print("Release inventory verified:",len(expected),"expected assets present.")
+          PY

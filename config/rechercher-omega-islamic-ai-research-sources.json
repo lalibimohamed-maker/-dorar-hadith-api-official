@@ -1,0 +1,686 @@
+{
+  "schema": "rechercher/omega/islamic-ai-research-sources/v1",
+  "purpose": "Research-only registry for open Islamic NLP, retrieval, knowledge-graph and model-engineering sources that can inform Rechercher Ω. These are engineering inputs and evidence candidates, never canonical religious authority.",
+  "policy": {
+    "free_first": true,
+    "paid_fallback_allowed": false,
+    "corpus_write_allowed": false,
+    "model_or_code_license_must_be_verified": true,
+    "dataset_rights_must_be_verified_per_source": true,
+    "generated_model_output_is_not_corpus_truth": true,
+    "religious_claims_require_grounded_evidence": true
+  },
+  "sources": [
+    {
+      "id": "quran_nlp_engine",
+      "name": "QURAN-NLP",
+      "url": "https://github.com/islamAndAi/QURAN-NLP",
+      "role": "Quran/Hadith NLP, morphology, semantic search, tafsir and narrator-graph tooling",
+      "license": "Apache-2.0 code; individual datasets/translations retain their own terms",
+      "integration": "study semantic search, morphology, tafsir and isnad/narrator graph tooling; use as retrieval/linguistic research infrastructure only, with dataset-level provenance and rights kept separate",
+      "status": "research-approved"
+    },
+    {
+      "id": "adhkar_duaa_db",
+      "name": "Adhkar-Duaa Multilingual Database",
+      "url": "https://github.com/Kind-Unes/Adhkar-Duaa-Multilingual-Database",
+      "role": "multilingual adhkar/duaa structured data",
+      "integration": "candidate multilingual schema and ingestion patterns; verify each data item's provenance",
+      "status": "research-approved"
+    },
+    {
+      "id": "islampack_core",
+      "name": "Arabic NLP GitHub topic/repository family",
+      "url": "https://github.com/topics/arabic-nlp?o=desc&s=updated",
+      "role": "discover Arabic NLP libraries/models",
+      "integration": "discovery only; promote individual repositories after license and technical review",
+      "status": "discovery"
+    },
+    {
+      "id": "quranic_corpus",
+      "name": "Quranic Arabic Corpus",
+      "url": "https://corpus.quran.com/",
+      "role": "morphology, syntax and linguistic annotation",
+      "integration": "linguistic evidence/feature engineering; canonical Quran text remains separate",
+      "status": "research-approved"
+    },
+    {
+      "id": "fiqh_rag_reference",
+      "name": "Fiqh RAG Engine reference",
+      "url": "https://github.com/JaedenRotondo/fiqh-mcp-server",
+      "role": "MCP/RAG architecture reference for source-cited fiqh retrieval",
+      "integration": "architecture study only; do not import its conclusions as religious authority",
+      "status": "research-approved"
+    },
+    {
+      "id": "fiqh_embedding_benchmark",
+      "name": "Arabic Embeddings + FlashRank Fiqh RAG benchmark",
+      "url": "https://github.com/hbenayed1976/evaluating-flashrank-impact-in-rag-with-arabic-embeddings-",
+      "role": "Arabic embedding/reranking evaluation methodology",
+      "integration": "benchmark design for retrieval/reranking; license and dataset provenance must be reviewed",
+      "status": "research-approved"
+    },
+    {
+      "id": "fiqh_embed_candidate",
+      "name": "Fiqh-Embed AR/FA",
+      "url": "https://huggingface.co/sadiqoon/fiqh-embed-ar-fa-gguf",
+      "role": "Islamic-jurisprudence embedding model candidate",
+      "integration": "evaluate only as retrieval model; current model targets Ja'fari/Imami jurisprudence and must not silently mix into Sunni evidence lanes",
+      "license": "MIT",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "minsa_nlp_api",
+      "name": "MINSA NLP API",
+      "role": "user-proposed Islamic/Arabic NLP source",
+      "integration": "candidate architecture/API inspiration only until exact repository, endpoint and license are verified",
+      "status": "unverified-candidate"
+    },
+    {
+      "id": "islamic_fiqh_ontology_owl",
+      "name": "Integrated Islamic Fiqh Ontology & Knowledge Graph",
+      "role": "user-proposed RDF/OWL/SPARQL ontology",
+      "integration": "ontology architecture candidate; exact repository and ontology provenance must be verified",
+      "status": "unverified-candidate"
+    },
+    {
+      "id": "fiqh_vector_pipeline",
+      "name": "Islamic Jurisprudence Embeddings Pipeline",
+      "role": "user-proposed vector/RAG pipeline",
+      "integration": "RAG/vector architecture candidate; evaluate against grounded-evidence gate and benchmarked retrieval",
+      "status": "unverified-candidate"
+    },
+    {
+      "id": "awqaf_llm_weights",
+      "name": "Awqaf-LLM / Awqaf-Gemma Weights",
+      "role": "user-proposed Islamic LLM weights",
+      "integration": "do not acquire/use until exact official model repository, weights, license, training-data provenance and evaluation are verified",
+      "status": "unverified-candidate"
+    },
+    {
+      "id": "arena_ai_coding_agent",
+      "name": "Arena AI Coding Agent (GitHub App)",
+      "url": "https://github.com/apps/arena-ai-coding-agent",
+      "role": "external GitHub coding-agent integration",
+      "integration": "evaluate as an optional agent worker for repository tasks; use branch/PR isolation, least-privilege permissions and human review; never grant direct Corpus-write authority",
+      "status": "evaluation-candidate",
+      "notes": "Third-party GitHub App; exact installation permissions, data handling and terms must be verified before installation."
+    },
+    {
+      "id": "goose_agent",
+      "name": "goose",
+      "url": "https://github.com/aaif-goose/goose",
+      "role": "open-source general-purpose AI agent with CLI/API and MCP extensions",
+      "integration": "candidate execution worker for research automation, repo maintenance and MCP-connected Rechercher tools; keep Corpus boundary and approval gates",
+      "license": "Apache-2.0",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "qwen_code_agent",
+      "name": "Qwen Code",
+      "url": "https://github.com/QwenLM/qwen-code",
+      "role": "open-source coding agent with MCP, subagents, agent teams, memory and multi-provider support",
+      "integration": "candidate coding/review worker for Rechercher Ω; useful for MCP orchestration and local/open-model workflows; verify model/provider terms separately",
+      "license": "Apache-2.0",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "openhands_agent",
+      "name": "OpenHands",
+      "url": "https://github.com/All-Hands-AI/OpenHands",
+      "role": "open-source autonomous software-development agent with CLI/headless/MCP workflows",
+      "integration": "candidate CI/repository engineering worker; use only in isolated branches/worktrees with tests and review",
+      "license": "MIT for core; enterprise directory has separate terms",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "openhikmah_quran_graph",
+      "name": "OpenHikmah",
+      "url": "https://github.com/OpenHikmah/openhikmah-web",
+      "role": "AI-powered Quran knowledge graph and verse relationship exploration",
+      "integration": "study graph UX, verse-linking, root/thematic relationship modeling and scholarly safeguards; generated relationships remain non-canonical until evidence-validated",
+      "license": "GPL-3.0",
+      "status": "research-approved"
+    },
+    {
+      "id": "jamia_hadith_kg",
+      "name": "الجامع — Hadith Knowledge Graph",
+      "url": "https://github.com/qataruts/hadith",
+      "role": "Arabic-first hadith knowledge graph with isnad, narrator, jarh/ta'dil, meaning-group and subject-tree relationships",
+      "integration": "research candidate for hadith entity graph, isnad visualization, semantic retrieval and citation-aware research tooling; verify corpus provenance and rights before any reuse",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "integrated_islamic_ontology",
+      "name": "Integrated Islamic Ontology",
+      "url": "https://github.com/Ibtisam-a/Integrated-Islamic-Ontology",
+      "role": "Arabic-English Islamic ontology integrating Quran/Hadith resources",
+      "integration": "ontology/semantic-layer research input for entity alignment and RDF/OWL/SPARQL modeling; never treat ontology-derived relations as religious authority",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "arabic_pdf_ocr",
+      "name": "Arabic-PDF-OCR",
+      "url": "https://github.com/Huscs/Arabic-PDF-OCR",
+      "role": "Arabic scanned-PDF OCR pipeline using Tesseract with TXT/Markdown/HTML output",
+      "integration": "small reference implementation for Arabic OCR output/RTL handling; compare against Rechercher's multi-engine OCR and QC pipeline before adoption",
+      "license": "MIT",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "arabic_document_ocr_ai",
+      "name": "arabic-document-ocr-ai",
+      "url": "https://github.com/Yaman-dot/arabic-document-ocr-ai",
+      "role": "Arabic document OCR using Surya/Qwen with bilingual document understanding and spatial text reconstruction",
+      "integration": "benchmark/reference for Arabic document layout, bilingual OCR and positioned text; isolate model/runtime licenses and provenance",
+      "license": "MIT",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "arabic_knowledge_mcp",
+      "name": "arabic-knowledge-mcp",
+      "url": "https://github.com/SanaAraj/arabic-knowledge-mcp",
+      "role": "MCP server for Quran, Sunni Hadith collections and Arabic knowledge sources",
+      "integration": "study as an Arabic MCP source adapter and grounding pattern; verify upstream rights and source contracts before ingestion",
+      "license": "MIT",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "quran_mcp",
+      "name": "quran-mcp",
+      "url": "https://github.com/quran/quran-mcp",
+      "role": "MCP server for Quran text, translations, tafsir, morphology and search",
+      "integration": "architecture/reference for Quran grounding, MCP resources and deterministic scripture retrieval; verify Quran Foundation licensing and deployment terms per resource",
+      "license": "QFGPL-1.0",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "islamic_corpus_mcp",
+      "name": "IslamicCorpusMCP",
+      "url": "https://github.com/ayzekhdawy/IslamicCorpusMCP",
+      "role": "secure MCP corpus server for Quran, tafsir and Hadith with structured database retrieval",
+      "integration": "evaluate as a corpus-query/MCP architecture reference; compare normalization, matching, security and provenance against Rechercher gates",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "ilm_islamic_search",
+      "name": "ilm",
+      "url": "https://github.com/arriqaaq/ilm",
+      "role": "Islamic scholarship search with Quran, hadith, narrators, isnad graphs, hybrid search and local GraphRAG",
+      "integration": "strong architecture reference for graph+vector+full-text retrieval, narrator graphs, manuscript presentation and local LLM grounding; independently verify datasets and grading methodology",
+      "license": "Apache-2.0",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "quranic_nlp",
+      "name": "Quranic NLP / quranic-nlp",
+      "url": "https://github.com/language-ml/quranic-nlp",
+      "role": "Quranic NLP: POS, dependency parsing, lemmatization, multilingual search, extraction and graphs",
+      "integration": "candidate linguistic feature layer for Arabic search and morphology; verify dataset licensing and freshness",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "quran_pattern_search_research",
+      "name": "HQDR/HQPS pattern-search research",
+      "url": "https://link.springer.com/article/10.1007/s44443-026-00934-w",
+      "role": "character/grapheme-level Quran repository and deterministic pattern search with MCP interface",
+      "integration": "architecture inspiration for exact Quran search at grapheme level; implement only with independently verified canonical text and rights",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "manuscript_ocr_workbench",
+      "name": "Manuscript OCR Workbench",
+      "url": "https://github.com/mguechaoui/Archatext_HTR_OCR_DEMO",
+      "role": "self-hosted Arabic manuscript OCR/HTR pipeline using segmentation plus recognition with Kraken and optional HATFormer",
+      "integration": "evaluate as a derived-text acquisition worker; retain page/image provenance and require multi-engine QC before promotion",
+      "status": "research-approved"
+    },
+    {
+      "id": "rasam_maghribi_htr",
+      "name": "RASAM Maghrebi Arabic HTR Dataset",
+      "url": "https://github.com/calfa-co/rasam-dataset",
+      "role": "open ground-truth dataset for Arabic Maghrebi handwritten text recognition",
+      "integration": "benchmark Maghrebi manuscript OCR/HTR and layout/transcription validation; benchmark labels remain derived data",
+      "status": "research-approved"
+    },
+    {
+      "id": "tarima_maghribi_htr",
+      "name": "TariMa Maghrebi Arabic HTR Dataset",
+      "url": "https://github.com/calfa-co/tarima",
+      "role": "ground-truth for HTR/OCR of Maghrebi Arabic manuscripts and prints with IIIF-linked sources",
+      "integration": "use for Maghrebi manuscript acquisition/OCR evaluation and IIIF provenance alignment",
+      "status": "research-approved"
+    },
+    {
+      "id": "hifzlink_quran_relations",
+      "name": "HifzLink",
+      "url": "https://github.com/srmdn/hifzlink",
+      "role": "Quran similarity and mutashabihat relation tooling with deterministic validation",
+      "integration": "study relation schema and Quran dataset validation; generated relations remain derived metadata",
+      "status": "research-approved"
+    },
+    {
+      "id": "arabic_islamic_knowledge_base_aslam",
+      "name": "Aslam Islamic Knowledge Base",
+      "url": "https://github.com/asim/aslam",
+      "role": "searchable Quran, hadith, seerah, adhkar and scholarly reference datasets with provenance-oriented resource API",
+      "integration": "source/metadata discovery candidate; verify item-level rights and source provenance before acquisition",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "bonyan_unified_api_architecture",
+      "name": "Bonyan-API",
+      "url": "https://github.com/BonyanOSS/Bonyan-API",
+      "role": "unified Islamic API with Quran, audio reciters, tafsir, hadith, azkar, prayer, Hijri and Qibla plus upstream fallback",
+      "integration": "architecture reference for typed multi-provider fallback and normalized Islamic API contracts; provider rights and source provenance must remain explicit",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "soliman_islamic_api",
+      "name": "Islamic API by SolimanAnas",
+      "url": "https://github.com/SolimanAnas/islamic-api",
+      "role": "FastAPI aggregation of Quran, 13 hadith collections, tafsir, adhkar, duas, prayer and audio",
+      "integration": "evaluate endpoint coverage, test strategy and local/self-hosted data packaging; upstream licenses and provenance remain authoritative",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "islamic_radio_api",
+      "name": "Islamic Radio API",
+      "url": "https://github.com/uthumany/islamic-radio-api",
+      "role": "open JSON API for Quran and Islamic radio station streams and metadata",
+      "integration": "audio/radio connector reference; retain station/provider attribution and verify stream redistribution terms before caching",
+      "license": "CC0 for API code/data declaration; individual streams remain provider-specific",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "asim_reminder",
+      "name": "Reminder — Quran/Hadith/Names API and local RAG",
+      "url": "https://github.com/asim/reminder",
+      "role": "local-first Quran, hadith and Names of Allah app/API with RAG and Ollama option",
+      "integration": "study local RAG, API, reminder and offline architecture; generated answers remain grounded application output, not canonical evidence",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_asr",
+      "name": "Quran ASR",
+      "url": "https://github.com/fazals3/quran-asr",
+      "role": "Quran recitation ASR, verse guessing and word/ayah alignment",
+      "integration": "candidate local/self-hosted speech worker for recitation transcription; useful for multi-engine ASR comparison, timing metrics and ayah alignment; keep original audio and derived transcripts separate and verify all upstream model licenses",
+      "status": "evaluation-candidate",
+      "license": "project license not selected; upstream model licenses must be checked separately"
+    },
+    {
+      "id": "tadabur_quran_audio",
+      "name": "Tadabur — Quran Audio Dataset",
+      "url": "https://github.com/fherran/tadabur",
+      "role": "large-scale Quran speech dataset with automatic word-level timestamps and Qur'an-focused ASR/embedding models",
+      "integration": "research benchmark for recitation ASR, word timing and audio embeddings; dataset/model rights remain separate and the published dataset declares CC BY-NC 4.0, so do not treat it as a public-redistribution asset",
+      "status": "evaluation-candidate",
+      "license": "CC BY-NC 4.0 for the published dataset"
+    },
+    {
+      "id": "quran_frequency_audit",
+      "name": "Quran Word Frequency Audit",
+      "url": "https://github.com/taziksh/quran-frequencies",
+      "role": "reproducible Quran word-frequency and claims-audit pipeline using QAC morphology and canonical-text validation",
+      "integration": "use methodology for deterministic counting, occurrence-level provenance and false-claim auditing; never infer religious conclusions from frequency counts",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_analysis_core_rust",
+      "name": "Quran Analysis Core Rust",
+      "url": "https://github.com/Itqan-community/quran-analysis-core-rust",
+      "role": "offline Rust Quran semantic search, morphology, ontology exploration and deterministic QA/search utilities",
+      "integration": "reference implementation for local-first Arabic search, root-based expansion, OWL/RDF concept navigation and tested offline analysis; source texts and annotations retain their upstream licenses",
+      "status": "architecture-reference",
+      "license": "MIT for project code; bundled datasets retain upstream terms"
+    },
+    {
+      "id": "escriptorium_htr",
+      "name": "eScriptorium",
+      "url": "https://github.com/kineticsquid/escriptorium",
+      "role": "open-source historical-document OCR/HTR platform with segmentation, transcription, annotation, collaborative workflow and Kraken integration",
+      "integration": "candidate orchestration layer for manuscript-image ingestion and human-corrected HTR; preserve page/image provenance, transcription versions and model lineage",
+      "status": "integration-candidate",
+      "license": "MIT"
+    },
+    {
+      "id": "kraken_htr",
+      "name": "Kraken OCR/HTR",
+      "url": "https://github.com/mittagessen/kraken",
+      "role": "open-source OCR/HTR engine for historical documents with layout segmentation and trainable recognition models",
+      "integration": "secondary OCR/HTR engine for Rechercher multi-engine validation, especially Arabic/manuscript pages; use alongside Tesseract/other engines and compare outputs before canonical promotion",
+      "status": "integration-candidate",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "camel_tools_arabic_nlp",
+      "name": "CAMeL Tools",
+      "url": "https://github.com/CAMeL-Lab/camel_tools",
+      "role": "open Arabic NLP toolkit: preprocessing, morphology, disambiguation, dialect identification and named-entity utilities",
+      "integration": "candidate Arabic preprocessing/linguistic feature layer for Rechercher search, entity extraction and normalization; package/model data licenses must be tracked separately because not every downloadable package shares the code license",
+      "license": "MIT for toolkit; individual data/model packages can have distinct licenses",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "qdrant_vector_engine",
+      "name": "Qdrant",
+      "url": "https://github.com/qdrant/qdrant",
+      "role": "self-hostable vector database and similarity-search engine with payload filtering",
+      "integration": "candidate local vector retrieval backend for embeddings, multilingual search and provenance-aware filtering; use self-hosted/open-source deployment rather than assuming managed-cloud rights or availability",
+      "license": "Apache-2.0",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "llama_cpp_local_inference",
+      "name": "llama.cpp",
+      "url": "https://github.com/ggml-org/llama.cpp",
+      "role": "portable local LLM/VLM inference runtime with quantization and an OpenAI-compatible server",
+      "integration": "candidate free/local inference worker for Rechercher Ω on CPU/GPU; model weights remain separately licensed and must pass the model-license/provenance gate before use",
+      "license": "MIT for runtime; model weights retain their own licenses",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "arabic_nougat_ocr",
+      "name": "Arabic-Nougat",
+      "url": "https://github.com/MohamedAliRashad/arabic-nougat",
+      "role": "Arabic book-page OCR and structured Markdown extraction with Arabic-specific tokenization and long-context variants",
+      "integration": "candidate OCR engine for Arabic books; compare against OCRmyPDF/Tesseract/Kraken and preserve page-level provenance. Model, dataset and code licenses must be tracked separately; repository README contains distinct license statements, so treat rights as review-required",
+      "status": "evaluation-candidate",
+      "license": "review_required"
+    },
+    {
+      "id": "ketaba_ocr_lora",
+      "name": "Ketaba-OCR-LoRA",
+      "url": "https://github.com/HasanBGit/Ketaba-OCR-LoRA",
+      "role": "parameter-efficient Arabic manuscript HTR using QLoRA/DoRA/RSLoRA and ensemble decoding",
+      "integration": "candidate specialist HTR worker for Arabic manuscripts; useful for a third recognition signal and confidence/error metrics. Base model, adapter, training corpus and weights retain separate provenance/licensing",
+      "status": "evaluation-candidate",
+      "license": "Apache-2.0 repository code; model/data provenance and weight licensing require separate verification"
+    },
+    {
+      "id": "quran_timing_helper",
+      "name": "Quran Timing Helper",
+      "url": "https://github.com/quraniio/quran-timing-helper",
+      "role": "Quran word-level recitation timing generation and validation using Whisper plus wav2vec2 CTC forced alignment",
+      "integration": "evaluation/reference for a two-stage audio alignment worker; keep canonical Quran text fixed and treat generated timestamps as derived evidence requiring validation",
+      "license": "Free-use tool with a free-products-only redistribution condition; inspect LICENSE before deployment",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "quran_word_alignment_local",
+      "name": "Quran Word Alignment",
+      "url": "https://github.com/rekarhiwa/quran-word-alignment",
+      "role": "local-first Quran word timing pipeline with CTC forced alignment, review UI and JSON/CSV/SRT export",
+      "integration": "reference implementation for auditable alignment workers with confidence thresholds, manual corrections and reproducible batch exports; never generate canonical Quran text from speech",
+      "license": "Repository license not established from the reviewed README; review repository and model licenses separately",
+      "status": "evaluation-candidate"
+    },
+    {
+      "id": "faster_whisper",
+      "name": "faster-whisper",
+      "url": "https://github.com/SYSTRAN/faster-whisper",
+      "role": "CTranslate2-based Whisper inference runtime with quantized/local execution",
+      "integration": "free/local transcription backend candidate for Ω audio agents; pin runtime revision and track the separate Whisper model license/provenance",
+      "license": "MIT runtime; model weights retain their own licensing",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "pyannote_audio",
+      "name": "pyannote.audio",
+      "url": "https://github.com/pyannote/pyannote-audio",
+      "role": "open-source speaker diarization, speech activity, speaker-change and overlap detection toolkit",
+      "integration": "optional audio-segmentation/diarization worker for lectures, lessons and multi-speaker recordings; keep community/open models distinct from any premium hosted pipeline and gate model agreements",
+      "license": "MIT code; pretrained model/pipeline terms are separate and may require acceptance",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "whisperx",
+      "name": "WhisperX",
+      "url": "https://github.com/m-bain/whisperX",
+      "role": "time-accurate ASR with word-level timestamps, alignment and optional speaker diarization",
+      "integration": "reference for long-form Islamic lecture and recitation transcription workers; pin revision, retain source audio provenance, and treat alignment/diarization as derived evidence",
+      "license": "BSD-2-Clause code; referenced models have separate licenses/agreements",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "mms_multilingual_asr",
+      "name": "Massively Multilingual Speech (MMS) ASR",
+      "url": "https://huggingface.co/facebook/mms-1b-all",
+      "role": "multilingual wav2vec2 ASR model family covering 1,000+ languages",
+      "integration": "research-only fallback for language identification and multilingual speech transcription when Whisper coverage is insufficient; separate Arabic/Quran evaluation from generic multilingual ASR and do not promote model output to canonical text",
+      "license": "CC BY-NC 4.0 for MMS code and model weights",
+      "status": "research-only"
+    },
+    {
+      "id": "seamless_communication",
+      "name": "Seamless Communication",
+      "url": "https://github.com/facebookresearch/seamless_communication",
+      "role": "multilingual speech/text translation and transcription research stack with forced-alignment components",
+      "integration": "research reference for multilingual audio pipelines and forced alignment; keep it outside public acquisition/runtime unless the applicable model-specific license permits the intended use",
+      "license": "Mixed: MIT for specified non-generative components; SeamlessM4T/Streaming models CC BY-NC 4.0; other Seamless models use the Seamless Licensing Agreement",
+      "status": "research-only"
+    },
+    {
+      "id": "openalex_scholarly_graph",
+      "name": "OpenAlex",
+      "url": "https://developers.openalex.org/",
+      "role": "open scholarly graph for works, authors, institutions, sources, topics, languages, locations, open-access status and references",
+      "integration": "bibliographic identity and scholarly-discovery worker for books/articles/theses and institutional research about Islamic studies; use DOI/OpenAlex IDs to reconcile records while keeping religious evidence provenance separate from scholarly metadata",
+      "license": "API access terms apply; open-access/full-text licensing is item-specific and must be verified from each location",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "semantic_scholar_academic_graph",
+      "name": "Semantic Scholar Academic Graph API",
+      "url": "https://api.semanticscholar.org/api-docs/",
+      "role": "paper/author graph with citations, references, search and optional embeddings; supports DOI, arXiv, ACL and other identifiers",
+      "integration": "citation-graph and scholarly-search worker for finding studies about manuscripts, Arabic NLP, Quran/Hadith digitization and Islamic studies; metadata is discovery/bibliography evidence, not canonical religious evidence",
+      "license": "API usage governed by Semantic Scholar terms/rate limits; retrieved paper/full-text rights remain item-specific",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "quranjs_api_sdk",
+      "name": "@quranjs/api",
+      "url": "https://github.com/quran/api-js",
+      "role": "official JavaScript/TypeScript SDK for Quran Foundation Content and User APIs with server/client runtime separation",
+      "integration": "preferred typed connector foundation for Rechercher's Quran Foundation adapter; server client handles OAuth2 Content token retrieval, caching, expiry and required headers, while public client supports PKCE User APIs. Keep secrets server-side and pin SDK versions.",
+      "license": "Verify repository package license and dependency licenses before inclusion in production; API/content rights remain governed by Quran Foundation terms",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "quran_foundation_oauth_reference",
+      "name": "Quran Foundation OAuth2 API reference",
+      "url": "https://api-docs.quran.com/docs/oauth2_apis_versioned/1.0.0/oauth-2-token-exchange/",
+      "role": "OAuth2/OIDC token exchange reference for Quran Foundation connectors",
+      "integration": "implementation/security reference for confidential Client Credentials and Authorization Code/PKCE flows; never store client secrets in frontend/mobile code; tokens are environment-specific",
+      "status": "integration-reference"
+    },
+    {
+      "id": "quran_foundation_js_server_sdk_runtime",
+      "name": "Quran Foundation JS/TS Server SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/server-quickstart/",
+      "role": "official server-side SDK runtime for Content/Search and confidential OAuth2",
+      "integration": "Use in Node.js, serverless functions, workers, cron jobs and SSR; keep client_secret on the backend; suitable connector foundation for Rechercher acquisition/search workers.",
+      "status": "integration-candidate",
+      "license": "SDK package terms must be verified separately",
+      "notes": "Current docs recommend @quranjs/api/server for Content and Search."
+    },
+    {
+      "id": "quran_foundation_js_public_sdk_runtime",
+      "name": "Quran Foundation JS/TS Public SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/public-quickstart/",
+      "role": "official browser/mobile-facing SDK runtime for approved public clients and PKCE user flows",
+      "integration": "Use only for public-client/user-session cases; never place client_secret in browser/mobile bundles; pair with backend/BFF when confidential exchange is required.",
+      "status": "integration-candidate",
+      "license": "SDK package terms must be verified separately"
+    },
+    {
+      "id": "quran_foundation_js_runtime_matrix",
+      "name": "Quran Foundation JavaScript Runtime Matrix",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/runtime-matrix/",
+      "role": "runtime selection matrix",
+      "integration": "Drive Rechercher connector selection between server and public entrypoints; encode Content/Search backend requirement as a testable capability rule.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_js_auth_matrix",
+      "name": "Quran Foundation JavaScript Auth Matrix",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/auth-matrix/",
+      "role": "OAuth2 client-type and code-exchange architecture matrix",
+      "integration": "Use to generate secure auth plans: confidential backend, approved public PKCE, or frontend+backend confidential-proxy.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_js_apis_by_runtime",
+      "name": "Quran Foundation APIs By Runtime Matrix",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/apis-by-runtime/",
+      "role": "API-family to runtime capability matrix",
+      "integration": "Use as a connector guard so Content/Search are not incorrectly wired to public/browser-only paths and token introspection remains server-only.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_js_full_stack",
+      "name": "Quran Foundation JavaScript Full-Stack Quickstart",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/full-stack/",
+      "role": "reference full-stack application architecture",
+      "integration": "Study official frontend/backend split, OAuth2 session handling and API access patterns for Dinullah web apps.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_python_sdk",
+      "name": "Quran Foundation Python SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/python/",
+      "role": "official Python SDK for server applications, scripts, jobs, notebooks and AI workflows",
+      "integration": "Candidate Python connector for Kaggle research, batch acquisition, sync jobs, evaluation and Rechercher Ω workers; keep tokens/secrets off public notebooks and clients.",
+      "status": "integration-candidate",
+      "license": "Package terms must be verified separately"
+    },
+    {
+      "id": "quran_foundation_python_sdk_auth",
+      "name": "Quran Foundation Python Authentication Helpers",
+      "url": "https://api-docs.quran.com/docs/sdk/python/authentication/",
+      "role": "Python authentication implementation reference",
+      "integration": "Use to standardize app-token vs user-token handling and prevent secrets/tokens from entering logs or public artifacts.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_python_content_helpers",
+      "name": "Quran Foundation Python Content API Helpers",
+      "url": "https://api-docs.quran.com/docs/sdk/python/content/",
+      "role": "Python helper coverage for Content APIs",
+      "integration": "Map chapter/verse/audio/resource/content operations into Rechercher's typed adapter surface.",
+      "status": "integration-reference"
+    },
+    {
+      "id": "quran_foundation_content_sync_engine",
+      "name": "Quran Foundation Content Sync Engine Pattern",
+      "url": "https://api-docs.quran.com/docs/tutorials/content-sync/getting-started/",
+      "role": "incremental content synchronization protocol",
+      "integration": "Implement source-of-truth sync with sync tokens, change events, resource filters and snapshot replacement; keep synced content in a governed cache layer before any Corpus promotion.",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "quran_foundation_offline_cache_patterns",
+      "name": "Quran Foundation Offline Cache Patterns",
+      "url": "https://api-docs.quran.com/docs/tutorials/content-sync/offline-cache-patterns/",
+      "role": "idempotent local cache and background refresh patterns",
+      "integration": "Use separate sync-state/cache tables and stable resource keys; adapt this pattern to multilingual Quran resource caching and application offline mode.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_full_copy_recovery",
+      "name": "Quran Foundation Full Copies and Recovery",
+      "url": "https://api-docs.quran.com/docs/tutorials/content-sync/full-copies-and-recovery/",
+      "role": "full snapshot replacement and recovery pattern",
+      "integration": "Use as the recovery path when incremental sync is invalid or a resource must be rebuilt atomically; capture snapshot provenance and checksums in Rechercher manifests.",
+      "status": "architecture-reference"
+    },
+    {
+      "id": "quran_foundation_oauth_oidc_lifecycle",
+      "name": "Quran Foundation OAuth2/OIDC Lifecycle",
+      "url": "https://api-docs.quran.com/docs/oauth2_apis_versioned/1.0.0/oauth-2-apis/",
+      "role": "authorization, token exchange, introspection, revocation, OIDC userinfo and logout lifecycle",
+      "integration": "Model auth as a lifecycle adapter with explicit environment, scope and token-state checks; isolate production from pre-live and never treat authentication as redistribution permission.",
+      "status": "integration-reference"
+    },
+    {
+      "id": "quran_foundation_search_sdk",
+      "name": "Quran Foundation JavaScript Search SDK",
+      "url": "https://api-docs.quran.com/docs/sdk/javascript/search/",
+      "role": "official SDK path for Quran search",
+      "integration": "Candidate low-latency Quran search connector for @Rechercher; return source-aware Quran results and preserve Arabic canonical text separately from translations.",
+      "status": "integration-candidate"
+    },
+    {
+      "id": "quran_foundation_official_oauth_example",
+      "name": "Quran Foundation OAuth2 Client Example",
+      "url": "https://github.com/quran/quran-oauth2-client-example",
+      "role": "official/open repository reference for OAuth2 client integration",
+      "integration": "Use as executable reference when implementing OAuth2 flows; validate current dependency versions and compare with the documented server/public auth matrix.",
+      "status": "evaluation-candidate",
+      "license": "Repository license must be verified"
+    },
+    {
+      "id": "quran_foundation_mobile_sync",
+      "name": "Quran Foundation Mobile Sync",
+      "url": "https://github.com/quran/mobile-sync",
+      "role": "official mobile synchronization engine reference",
+      "integration": "Study mobile offline synchronization, cache refresh and resource consistency patterns for Dinullah mobile clients.",
+      "status": "architecture-reference",
+      "license": "Repository license must be verified"
+    },
+    {
+      "id": "quran_foundation_mobile_sync_spm",
+      "name": "Quran Foundation Mobile Sync SPM",
+      "url": "https://github.com/quran/mobile-sync-spm",
+      "role": "official Swift Package integration for mobile sync",
+      "integration": "Candidate Swift/iOS package reference for local Quran resource synchronization and offline support.",
+      "status": "architecture-reference",
+      "license": "Repository license must be verified"
+    },
+    {
+      "id": "quran_foundation_api_docs_repo",
+      "name": "Quran Foundation API Documentation Repository",
+      "url": "https://github.com/quran/qf-api-docs",
+      "role": "official source repository for the API documentation portal",
+      "integration": "Pin documentation revisions/links in connector tests and detect upstream documentation changes that may alter endpoint or SDK contracts.",
+      "status": "research-approved",
+      "license": "Repository license must be verified"
+    },
+    {
+      "id": "quran_foundation_polyglot_http_examples",
+      "name": "Quran Foundation Polyglot HTTP Example Fleet",
+      "url": "https://api-docs.quran.com/docs/sdk/",
+      "role": "developer-facing implementation patterns across common HTTP clients",
+      "integration": "Track cURL, Python/requests, Java/OkHttp, Go/native HTTP, Node.js/axios, Ruby/Net::HTTP, C#/RestSharp, PHP/cURL and PowerShell/Invoke-RestMethod as interchangeable adapter examples; keep endpoint-level verification and auth semantics separate from language syntax.",
+      "status": "architecture-reference",
+      "notes": "Language set is recorded as a developer-support fleet. Exact availability can vary by endpoint/documentation view; verify each endpoint page before copying a sample into production."
+    }
+  ],
+  "design_note": {
+    "minsa": "Added as engineering research candidate, not as trusted religious source.",
+    "ontology": "OWL/RDF can model relationships and support SPARQL, but cannot manufacture fiqh conclusions; every derived claim remains tied to source evidence.",
+    "embeddings": "Embeddings are retrieval infrastructure, not truth or authority; evidence IDs, provenance, rights and verification status must persist through retrieval.",
+    "llm": "LLM weights can assist synthesis only after the evidence gate and never replace source-grounded evidence or scholar review.",
+    "arena": "Arena is an optional external coding-agent worker; repository access must remain least-privilege and all changes flow through isolated branches, tests, evidence and review.",
+    "agent_fleet": "Multiple agents are capability workers, not authorities. Rechercher Ω remains the orchestrator; no agent may write directly to the canonical Corpus.",
+    "islamic_graphs": "Islamic knowledge-graph projects are research inputs only. Preserve source IDs, provenance, rights and uncertainty through graph construction and retrieval.",
+    "mcp_grounding": "MCP servers are connector/query infrastructure, not religious authorities. Rechercher must retain source IDs, exact text, edition/language metadata, provenance, rights and retrieval evidence.",
+    "manuscript_ocr": "Maghrebi and manuscript OCR resources can improve acquisition and transcription, but OCR output remains a derived artifact requiring multi-engine comparison and human/QC validation before canonical use.",
+    "quran_audio_alignment": "Quran ASR and Tadabur provide recitation transcription/timing research inputs. Audio, transcripts, model weights and timing annotations remain distinct derived/source layers with separate rights and provenance.",
+    "htr_stack": "eScriptorium plus Kraken strengthen the manuscript OCR/HTR lane. Rechercher should preserve page images, line segmentation, recognition outputs, model/version metadata and human corrections, then require multi-engine agreement/QC before promotion.",
+    "deterministic_quran_analysis": "Exact counting and search tools are evidence-processing infrastructure only. Preserve canonical Quran text separately from morphology, frequency claims, ontology relations and generated answers.",
+    "registry_dedup": "Canonicalize research-source entries by URL. When an existing project later gains richer metadata, merge into the original entry instead of creating a second ID.",
+    "arabic_nlp": "CAMeL Tools can provide reusable Arabic linguistic preprocessing, but model/data packages are not assumed to inherit the toolkit's MIT license.",
+    "local_retrieval": "Qdrant is a candidate self-hosted vector layer; every point should carry source/work/edition/language/provenance/rights identifiers so retrieval never detaches evidence metadata.",
+    "local_inference": "llama.cpp is runtime infrastructure only. Rechercher Ω selects models separately and applies the model repository/weights license gate before inference assets are admitted.",
+    "arabic_book_ocr": "Arabic-Nougat adds a book-page OCR path producing structured Markdown. Because its README presents code/model/data licensing separately and includes differing license references, it remains review_required until each artifact is individually verified.",
+    "arabic_manuscript_htr_2026": "Ketaba-OCR-LoRA is a current Arabic manuscript HTR research candidate. Rechercher should use it as a derived transcription worker only; no OCR output becomes canonical without multi-engine comparison, page provenance, checksum and human/QC review."
+  },
+  "last_refresh": {
+    "date": "2026-09-27",
+    "added": 19,
+    "scope": "Quran Foundation SDK, runtime/auth matrices, OAuth2/OIDC lifecycle, Search, Python, content sync, mobile sync and polyglot developer examples"
+  }
+}
