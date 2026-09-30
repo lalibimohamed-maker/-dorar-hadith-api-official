@@ -14,7 +14,7 @@ test("AI gateway exposes the strict evidence verifier",async()=>{
   const rejected=await bad.json(); assert.equal(bad.status,422); assert.equal(rejected.data.verified,false); assert.equal(rejected.data.error.code,"STRICT_ALIGNMENT_MISMATCH"); assert.equal(rejected.data.fallback,body.evidence[0].text);
   const none=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({answer:"ذاكرة النموذج",evidence:[],citations:[]})});
   const empty=await none.json(); assert.equal(none.status,422); assert.equal(empty.data.error.code,"NO_EVIDENCE_FOUND");
- }finally{await new Promise(resolve=>server.close(resolve));}
+ }finally{server.closeAllConnections?.();await new Promise(resolve=>server.close(resolve));}
 });
 
 test("MCP exposes the same strict verifier as a read-only tool",async()=>{
