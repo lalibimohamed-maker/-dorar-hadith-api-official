@@ -12,7 +12,7 @@ function openCheckpointDb(indexedDBObject = globalThis.indexedDB) {
   if (!indexedDBObject) return Promise.reject(new Error("INDEXEDDB_UNAVAILABLE"));
   if (checkpointDbPromise) return checkpointDbPromise;
   checkpointDbPromise = new Promise((resolve, reject) => {
-    const request = indexedDBObject.open("deen-allah-omega-runtime-v1", 1);
+    const request = indexedDBObject.open("deen-allah-omega-runtime-v1", 2);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains("audio_sessions")) {
