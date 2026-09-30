@@ -7,6 +7,8 @@ const APP_SHELL = [
   "./omega-offline-store.js",
   "./omega-hardware-guardian.js",
   "./omega-audio-session.js",
+  "./omega-visual-pruner.js",
+  "./omega-multimodal-context-guard.js",
   "./omega-offline-evidence-worker.js",
   "./offline-omega-ui.js",
   "./omega-local-provider.js",
