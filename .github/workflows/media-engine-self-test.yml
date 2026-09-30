@@ -1,0 +1,148 @@
+name: Media Engine — Release-backed activation self-test
+
+on:
+  workflow_run:
+    workflows:
+      - "Media Model Weights — Release Cache"
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag to verify
+        required: true
+        default: dinullah-media-weights-v2026.09.29
+
+permissions:
+  contents: read
+
+jobs:
+  verify-release-and-runtime:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.release_tag || 'dinullah-media-weights-v2026.09.29' }}
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download release assets
+        run: |
+          set -euo pipefail
+          mkdir -p runtime-data/weights
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern 'media-weight-lock.json' --pattern '*.pth' --pattern '*.tar' --dir runtime-data/weights --clobber
+
+      - name: Verify expected weights are present
+        run: |
+          set -euo pipefail
+          expected=(
+            RealESRGAN_x4plus.pth
+            RealESRGAN_x2plus.pth
+            realesr-general-x4v3.pth
+            realesr-general-wdn-x4v3.pth
+            PP-OCRv5_mobile_det_infer.tar
+            arabic_PP-OCRv5_mobile_rec_infer.tar
+            media-weight-lock.json
+          )
+          for f in "${expected[@]}"; do
+            test -s "runtime-data/weights/$f" || { echo "MISSING_RELEASE_ASSET $f"; exit 1; }
+          done
+          find runtime-data/weights -type f -printf '%f %s bytes\\n' | sort
+
+      - name: Verify SHA-256 lock manifest
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path("runtime-data/weights")
+          lock=json.loads((root/"media-weight-lock.json").read_text())
+          by_name={x["assetName"]:x for x in lock.get("assets",[])}
+          checked=0
+          for p in root.iterdir():
+              if p.name == "media-weight-lock.json" or not p.is_file():
+                  continue
+              entry=by_name.get(p.name)
+              if not entry:
+                  raise SystemExit(f"UNLOCKED_RELEASE_ASSET {p.name}")
+              h=hashlib.sha256(p.read_bytes()).hexdigest()
+              if h != entry["sha256"]:
+                  raise SystemExit(f"SHA256_MISMATCH {p.name}")
+              checked += 1
+          if checked < 6:
+              raise SystemExit(f"TOO_FEW_LOCKED_ASSETS {checked}")
+          print(f"SHA256_VERIFIED={checked}")
+          PY
+
+      - name: Install lightweight runtime smoke-test dependencies
+        run: |
+          set -euo pipefail
+          python3 -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --disable-pip-version-check --no-input             "paddlepaddle==3.2.0"             "paddleocr==3.7.0"             "realesrgan==0.3.0"             "open3d==0.20.0"             "pycolmap==4.2.0"             "usd-core==26.8"             "opentimelineio==0.18.1"
+
+      - name: Run CPU-safe engine smoke tests
+        run: |
+          set -euo pipefail
+          . .venv/bin/activate
+          ffmpeg -version | head -n 1
+          tesseract --version | head -n 1
+          python - <<'PY'
+          import importlib
+          modules=["paddle","paddleocr","realesrgan","open3d","pycolmap","pxr","opentimelineio"]
+          for name in modules:
+              importlib.import_module(name)
+              print("IMPORT_OK",name)
+          PY
+          python - <<'PY'
+          import paddle
+          print("PADDLE_DEVICE_OK", paddle.device.get_device())
+          PY
+
+      - name: Inspect OCR model archives without executing payloads
+        run: |
+          set -euo pipefail
+          tar -tf runtime-data/weights/PP-OCRv5_mobile_det_infer.tar >/dev/null
+          tar -tf runtime-data/weights/arabic_PP-OCRv5_mobile_rec_infer.tar >/dev/null
+          echo OCR_MODEL_ARCHIVES_READABLE
+
+      - name: Probe Video2X pinned runtime
+        run: |
+          set -euo pipefail
+          docker pull ghcr.io/k4yt3x/video2x:6.4.0@sha256:e21b6893269b4cb6f5603802726fd7537be241f6b39217b73530478861acbca1
+          docker run --rm ghcr.io/k4yt3x/video2x:6.4.0@sha256:e21b6893269b4cb6f5603802726fd7537be241f6b39217b73530478861acbca1 --help >/dev/null
+          echo VIDEO2X_RUNTIME_OK
+
+      - name: Produce activation report
+        if: always()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report={
+            "releaseTag":"dinullah-media-weights-v2026.09.29",
+            "artifactState":"release-assets-verified",
+            "activationStages":[
+              "registered",
+              "installed",
+              "sha256_verified",
+              "runtime_import_verified",
+              "engine_smoke_tested"
+            ],
+            "rightsState":"kept-separate; ambiguous model redistribution remains non-promoted",
+            "corpusMutation":False
+          }
+          Path("media-engine-activation-report.json").write_text(json.dumps(report,indent=2)+"\\n")
+          PY
+      - name: Preserve activation report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: media-engine-activation-report
+          path: media-engine-activation-report.json
+          if-no-files-found: error
+          retention-days: 30
