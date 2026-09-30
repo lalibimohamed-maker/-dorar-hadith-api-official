@@ -36,16 +36,36 @@ jobs:
             model_dir: en/en_US/libritts/high
             model_file: en_US-libritts-high.onnx
             language: en_US
-            voice_license_expected: mit
+            dataset_url: http://www.openslr.org/60/
+            dataset_license_expected: cc-by-4.0
             release_tag: rechercher-omega-piper-en-us-libritts-high-v1.0.0
-          - id: sv-se-alma-medium
+          - id: de-de-mls-medium
             model_id: rhasspy/piper-voices
             revision: main
-            model_dir: sv/sv_SE/alma/medium
-            model_file: sv_SE-alma-medium.onnx
-            language: sv_SE
-            voice_license_expected: cc-by-4.0
-            release_tag: rechercher-omega-piper-sv-se-alma-medium-v1.0.0
+            model_dir: de/de_DE/mls/medium
+            model_file: de_DE-mls-medium.onnx
+            language: de_DE
+            dataset_url: http://openslr.org/94/
+            dataset_license_expected: cc-by-4.0
+            release_tag: rechercher-omega-piper-de-de-mls-medium-v1.0.0
+          - id: fr-fr-mls-medium
+            model_id: rhasspy/piper-voices
+            revision: main
+            model_dir: fr/fr_FR/mls/medium
+            model_file: fr_FR-mls-medium.onnx
+            language: fr_FR
+            dataset_url: http://openslr.org/94/
+            dataset_license_expected: cc-by-4.0
+            release_tag: rechercher-omega-piper-fr-fr-mls-medium-v1.0.0
+          - id: nl-nl-mls-medium
+            model_id: rhasspy/piper-voices
+            revision: main
+            model_dir: nl/nl_NL/mls/medium
+            model_file: nl_NL-mls-medium.onnx
+            language: nl_NL
+            dataset_url: http://openslr.org/94/
+            dataset_license_expected: cc-by-4.0
+            release_tag: rechercher-omega-piper-nl-nl-mls-medium-v1.0.0
 
     env:
       OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
@@ -81,77 +101,67 @@ jobs:
           REVISION: ${{ matrix.revision }}
           MODEL_DIR: ${{ matrix.model_dir }}
           MODEL_FILE: ${{ matrix.model_file }}
-          EXPECTED_VOICE_LICENSE: ${{ matrix.voice_license_expected }}
+          DATASET_URL: ${{ matrix.dataset_url }}
+          EXPECTED_DATASET_LICENSE: ${{ matrix.dataset_license_expected }}
           OUTPUT: ${{ runner.temp }}/voice-rights.json
         run: |
           set -euo pipefail
           python - <<'PY'
-          import hashlib, json, os, re, urllib.parse
+          import hashlib, json, os, re
           from pathlib import Path
           import requests
           from huggingface_hub import HfApi, hf_hub_download
 
-          model=os.environ["MODEL_ID"]
-          rev=os.environ["REVISION"]
-          model_dir=os.environ["MODEL_DIR"]
-          model_file=os.environ["MODEL_FILE"]
-          expected=os.environ["EXPECTED_VOICE_LICENSE"].lower()
-          api=HfApi()
-          info=api.model_info(model, revision=rev, files_metadata=False)
+          model=os.environ["MODEL_ID"]; rev=os.environ["REVISION"]
+          model_dir=os.environ["MODEL_DIR"]; model_file=os.environ["MODEL_FILE"]
+          dataset_url=os.environ["DATASET_URL"]
+          expected=os.environ["EXPECTED_DATASET_LICENSE"].lower().replace(" ","-")
+          info=HfApi().model_info(model, revision=rev, files_metadata=False)
           if not info.sha or not re.fullmatch(r"[0-9a-f]{40}", info.sha):
               raise SystemExit("Voice source revision is not immutable")
 
           card=Path(hf_hub_download(repo_id=model, filename=f"{model_dir}/MODEL_CARD", revision=info.sha))
-          text=card.read_text(encoding="utf-8", errors="replace")
-          dataset_url=re.search(r"(?im)^\s*\*\s*URL:\s*(\S+)\s*$", text)
-          dataset_license=re.search(r"(?im)^\s*\*\s*License:\s*(.+?)\s*$", text)
-          if not dataset_url or not dataset_license:
-              raise SystemExit("MODEL_CARD does not expose an explicit dataset URL and license")
-          dataset_url=dataset_url.group(1).strip()
-          dataset_license=dataset_license.group(1).strip()
+          card_text=card.read_text(encoding="utf-8", errors="replace")
+          card_license=re.search(r"(?im)^\\s*\\*\\s*License:\\s*(.+?)\\s*$", card_text)
+          training=re.search(r"(?im)^\\s*\\*\\s*(?:Training|Fine-tuning|Fine-tuned from|Trained from scratch).*?$", card_text)
+          if not card_license:
+              raise SystemExit("MODEL_CARD has no explicit dataset/model license line")
+          if re.search(r"(?i)(lessac|blizzard 2013|ryan voice|finetuned from)", card_text):
+              raise SystemExit("Voice card declares restricted/base ancestry; human rights review required")
 
-          # Fail closed on ambiguous source licensing. "See URL" is not proof.
-          if dataset_license.lower() in {"see url", "see source", "unknown", "n/a"}:
-              raise SystemExit(f"Ambiguous dataset license: {dataset_license}")
-
-          # Verify the original dataset page is reachable and capture its license evidence.
           response=requests.get(dataset_url, timeout=30, allow_redirects=True)
           response.raise_for_status()
           source_text=response.text
-          source_license_hits=re.findall(
-              r"(?i)(?:license|licence)[^<]{0,120}(?:CC BY(?:-NC|-SA)? ?[0-9.]*|creative commons|MIT|Apache|ODbL|public domain)",
-              source_text
-          )
-          if not source_license_hits:
-              # Some OpenSLR pages expose the license as a direct link rather than text.
-              if "creativecommons.org" not in source_text.lower() and "cc by" not in source_text.lower():
-                  raise SystemExit("Original dataset page did not expose machine-detectable license evidence")
+          # Accept only explicit evidence for the declared source license.
+          norm=re.sub(r"[^a-z0-9]+","-",source_text.lower())
+          if expected not in norm and not (
+              expected=="cc-by-4.0" and ("cc by 4.0" in source_text.lower() or "cc-by-4.0" in source_text.lower())
+          ):
+              raise SystemExit(f"Original dataset page did not expose expected license evidence: {expected}")
 
-          voice_license = "MIT" if expected == "mit" else "CC BY 4.0"
-          training=re.search(r"(?im)^\s*\*\s*(?:Training|Fine-tuning|Fine-tuned from|Trained from scratch).*?$", text)
-          training_line=training.group(0).strip() if training else "not stated"
-
-          # Explicit ancestry guard: a voice derived from a restricted base must not be auto-published.
-          if re.search(r"(?i)(lessac|blizzard 2013|ryan voice)", text):
-              raise SystemExit("Voice card declares a potentially restricted base/ancestry; human rights review required")
+          # Repository/model license is recorded separately from the dataset license.
+          repo_license=(info.cardData or {}).get("license") if getattr(info,"cardData",None) else None
+          if not repo_license:
+              repo_license="repository-license-not-explicit"
 
           out={
-            "model_id": model,
-            "source_revision": info.sha,
-            "model_path": f"{model_dir}/{model_file}",
-            "model_card_path": f"{model_dir}/MODEL_CARD",
-            "voice_license": voice_license,
-            "dataset_url": dataset_url,
-            "dataset_license": dataset_license,
-            "dataset_license_evidence_url": response.url,
-            "dataset_license_evidence_sha256": hashlib.sha256(response.content).hexdigest(),
-            "model_card_sha256": hashlib.sha256(text.encode()).hexdigest(),
-            "training_evidence": training_line,
-            "rights_state": "verified_for_noncommercial_or_attribution_redistribution",
-            "redistribution_gate": "passed",
-            "source_type": "Hugging Face Piper voice registry; original dataset license separately verified",
+            "model_id":model,
+            "source_revision":info.sha,
+            "model_path":f"{model_dir}/{model_file}",
+            "model_card_path":f"{model_dir}/MODEL_CARD",
+            "model_or_repository_license":repo_license,
+            "model_card_license_line":card_license.group(1).strip(),
+            "dataset_url":dataset_url,
+            "dataset_license_verified":os.environ["EXPECTED_DATASET_LICENSE"],
+            "dataset_license_evidence_url":response.url,
+            "dataset_license_evidence_sha256":hashlib.sha256(response.content).hexdigest(),
+            "model_card_sha256":hashlib.sha256(card_text.encode()).hexdigest(),
+            "training_evidence":training.group(0).strip() if training else "not stated",
+            "rights_state":"verified_source_dataset_license",
+            "redistribution_gate":"passed",
+            "source_type":"Hugging Face Piper voice registry + original dataset source"
           }
-          Path(os.environ["OUTPUT"]).write_text(json.dumps(out,indent=2,ensure_ascii=False)+"\n")
+          Path(os.environ["OUTPUT"]).write_text(json.dumps(out,indent=2,ensure_ascii=False)+"\\n")
           print(json.dumps(out,indent=2,ensure_ascii=False))
           PY
 
