@@ -68,6 +68,78 @@ jobs:
             license: apache-2.0
             release_mode: prerelease
             chunk_bytes: 536870912
+          - id: sana-1600m-2k
+            model_id: Efficient-Large-Model/Sana_1600M_2Kpx_BF16
+            revision: main
+            release_tag: rechercher-omega-sana1600m-2k-v1.0.0
+            license: apache-2.0
+            license_asset: LICENSE-APACHE-2.0
+            license_url: https://www.apache.org/licenses/LICENSE-2.0.txt
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: sana-1600m-4k
+            model_id: Efficient-Large-Model/Sana_1600M_4Kpx_BF16
+            revision: main
+            release_tag: rechercher-omega-sana1600m-4k-v1.0.0
+            license: apache-2.0
+            license_asset: LICENSE-APACHE-2.0
+            license_url: https://www.apache.org/licenses/LICENSE-2.0.txt
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: boogu-image-base
+            model_id: Boogu/Boogu-Image-0.1-Base
+            revision: main
+            release_tag: rechercher-omega-boogu-image01-base-v1.0.0
+            license: apache-2.0
+            license_asset: LICENSE-APACHE-2.0
+            license_url: https://www.apache.org/licenses/LICENSE-2.0.txt
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: boogu-image-edit
+            model_id: Boogu/Boogu-Image-0.1-Edit
+            revision: main
+            release_tag: rechercher-omega-boogu-image01-edit-v1.0.0
+            license: apache-2.0
+            license_asset: LICENSE-APACHE-2.0
+            license_url: https://www.apache.org/licenses/LICENSE-2.0.txt
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: boogu-image-edit-turbo
+            model_id: Boogu/Boogu-Image-0.1-Edit-Turbo
+            revision: main
+            release_tag: rechercher-omega-boogu-image01-edit-turbo-v1.0.0
+            license: apache-2.0
+            license_asset: LICENSE-APACHE-2.0
+            license_url: https://www.apache.org/licenses/LICENSE-2.0.txt
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: boogu-image-turbo
+            model_id: Boogu/Boogu-Image-0.1-Turbo
+            revision: main
+            release_tag: rechercher-omega-boogu-image01-turbo-v1.0.0
+            license: apache-2.0
+            license_asset: LICENSE-APACHE-2.0
+            license_url: https://www.apache.org/licenses/LICENSE-2.0.txt
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: llada-image
+            model_id: inclusionAI/LLaDA-Image
+            revision: main
+            release_tag: rechercher-omega-llada-image-v1.0.0
+            license: apache-2.0
+            license_asset: LICENSE-APACHE-2.0
+            license_url: https://www.apache.org/licenses/LICENSE-2.0.txt
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: lumina-image-2
+            model_id: Alpha-VLLM/Lumina-Image-2.0
+            revision: main
+            release_tag: rechercher-omega-lumina-image2-v1.0.0
+            license: apache-2.0
+            license_asset: LICENSE-APACHE-2.0
+            license_url: https://www.apache.org/licenses/LICENSE-2.0.txt
+            release_mode: prerelease
+            chunk_bytes: 536870912
           - id: flux1-schnell
             model_id: black-forest-labs/FLUX.1-schnell
             revision: f095d56c608128f5ec5e80e7c515697d15d02fa6
@@ -150,51 +222,6 @@ jobs:
         if: matrix.id != 'flux1-schnell'
         run: echo "state=ready" >> "$GITHUB_OUTPUT"
 
-      - name: Resolve immutable revision
-        id: revision
-        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && steps.existing_release.outputs.complete != 'true' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
-        env:
-          MODEL_ID: ${{ matrix.model_id }}
-          REQUESTED_REVISION: ${{ matrix.revision }}
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import os, re
-          from huggingface_hub import HfApi
-          info=HfApi().model_info(
-              os.environ["MODEL_ID"],
-              revision=os.environ["REQUESTED_REVISION"],
-              files_metadata=False,
-          )
-          if not re.fullmatch(r"[0-9a-f]{40}", info.sha):
-              raise SystemExit("Requested revision did not resolve to a full immutable SHA")
-          print("Resolved revision:", info.sha)
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
-              f.write("sha="+info.sha+"\n")
-          PY
-
-      - name: Ensure dedicated Release exists
-        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
-        env:
-          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
-          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
-          RELEASE_TAG: ${{ matrix.release_tag }}
-          RELEASE_MODE: ${{ matrix.release_mode }}
-        run: |
-          set -euo pipefail
-          RELEASE_MODE="${RELEASE_MODE:-prerelease}"
-          if gh release view "$RELEASE_TAG" --repo "$REPO" >/dev/null 2>&1; then
-            echo "Release already exists: $RELEASE_TAG"
-          elif [ "$RELEASE_MODE" = "draft" ]; then
-            gh release create "$RELEASE_TAG" --repo "$REPO" --draft --title "$RELEASE_TAG" --notes "Rechercher Omega draft: license/territory review required."
-          else
-            gh release create "$RELEASE_TAG" --repo "$REPO" --prerelease --title "$RELEASE_TAG" --notes "Rechercher Omega prerelease: license terms accompany redistribution."
-          fi
-          release_id="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json databaseId --jq '.databaseId')"
-          test -n "$release_id"
-          echo "OMEGA_RELEASE_ID=$release_id" >> "$GITHUB_ENV"
-          echo "[OK] Release ID: $release_id"
       - name: Check both authoritative storage targets
         id: storage_reconciliation
         env:
@@ -223,6 +250,51 @@ jobs:
             echo "Release is missing a verified release-manifest.json; acquisition may proceed."
           fi
 
+      - name: Resolve immutable revision
+        id: revision
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && steps.existing_release.outputs.complete != 'true' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
+        env:
+          MODEL_ID: ${{ matrix.model_id }}
+          REQUESTED_REVISION: ${{ matrix.revision }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          from huggingface_hub import HfApi
+          info=HfApi().model_info(
+              os.environ["MODEL_ID"],
+              revision=os.environ["REQUESTED_REVISION"],
+              files_metadata=False,
+          )
+          if not re.fullmatch(r"[0-9a-f]{40}", info.sha):
+              raise SystemExit("Requested revision did not resolve to a full immutable SHA")
+          print("Resolved revision:", info.sha)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("sha="+info.sha+"\n")
+          PY
+
+      - name: Ensure dedicated Release exists
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && steps.existing_release.outputs.complete != 'true' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          RELEASE_MODE: ${{ matrix.release_mode }}
+        run: |
+          set -euo pipefail
+          RELEASE_MODE="${RELEASE_MODE:-prerelease}"
+          if gh release view "$RELEASE_TAG" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Release already exists: $RELEASE_TAG"
+          elif [ "$RELEASE_MODE" = "draft" ]; then
+            gh release create "$RELEASE_TAG" --repo "$REPO" --draft --title "$RELEASE_TAG" --notes "Rechercher Omega draft: license/territory review required."
+          else
+            gh release create "$RELEASE_TAG" --repo "$REPO" --prerelease --title "$RELEASE_TAG" --notes "Rechercher Omega prerelease: license terms accompany redistribution."
+          fi
+          release_id="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json databaseId --jq '.databaseId')"
+          test -n "$release_id"
+          echo "OMEGA_RELEASE_ID=$release_id" >> "$GITHUB_ENV"
+          echo "[OK] Release ID: $release_id"
       - name: Stream weights directly into Release
         if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
         env:
@@ -256,6 +328,21 @@ jobs:
           PY
           test -s /tmp/SANA-LICENSE
           gh release upload "$RELEASE_TAG" /tmp/SANA-LICENSE#LICENSE --repo "$REPO" --clobber
+
+      - name: Publish canonical Apache-2.0 license asset
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.license == 'apache-2.0' && matrix.id != 'sana-sprint-1.6b'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          LICENSE_ASSET: ${{ matrix.license_asset }}
+          LICENSE_URL: ${{ matrix.license_url }}
+        run: |
+          set -euo pipefail
+          test -n "${LICENSE_URL:-}"
+          curl --fail --location --retry 3 --silent --show-error "$LICENSE_URL" -o "${RUNNER_TEMP}/$LICENSE_ASSET"
+          test -s "${RUNNER_TEMP}/$LICENSE_ASSET"
+          gh release upload "$RELEASE_TAG" "${RUNNER_TEMP}/$LICENSE_ASSET#$LICENSE_ASSET" --repo "$REPO" --clobber
 
       - name: Build SANA-Sprint 1.6B runtime metadata
         if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'sana-sprint-1.6b'
@@ -392,6 +479,29 @@ jobs:
         run: |
           set -euo pipefail
           gh release upload "$RELEASE_TAG"             "$OUTPUT_DIR/omega__hunyuanvideo15__runtime.tar.gz"             "$OUTPUT_DIR/hunyuanvideo15-runtime-manifest.json"             "$OUTPUT_DIR/hunyuanvideo15-dependencies.json"             "$OUTPUT_DIR/hunyuanvideo15-release-readiness.json"             --repo "$REPO" --clobber
+
+      - name: Record SANA 2K/4K runtime dependency metadata
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && (matrix.id == 'sana-1600m-2k' || matrix.id == 'sana-1600m-4k')
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ steps.revision.outputs.sha }}
+        run: |
+          set -euo pipefail
+          cat > "${RUNNER_TEMP}/sana-runtime-dependencies.json" <<JSON
+          {
+            "model_id": "$MODEL_ID",
+            "revision": "$REVISION",
+            "license": "Apache-2.0",
+            "runtime_status": "dependency_blocked",
+            "required_external_dependency": "google/gemma-2-2b-it",
+            "embedded": false,
+            "reason": "The SANA 2K/4K model card identifies Gemma2-2B-IT as a fixed pretrained text encoder; no dependency redistribution or bypass is attempted."
+          }
+          JSON
+          gh release upload "$RELEASE_TAG" "${RUNNER_TEMP}/sana-runtime-dependencies.json" --repo "$REPO" --clobber
 
       # release-manifest.json is a weights-only manifest; it never declares runtime completeness.
       - name: Skip acquisition when Omega Release is already complete
