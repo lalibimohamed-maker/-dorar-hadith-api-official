@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Omega Piper voice acquisition and rights evidence; this registry never modifies the canonical Corpus.",
+  "sourceRegistry": "rhasspy/piper-voices",
+  "softwareEngine": {
+    "id": "piper1-gpl",
+    "source": "https://github.com/OHF-Voice/piper1-gpl",
+    "license": "GPL-3.0"
+  },
+  "policy": {
+    "voiceModelLicenseDistinctFromSoftware": true,
+    "datasetLicenseRequired": true,
+    "originalDatasetSourceRequired": true,
+    "failClosedOnAmbiguousLicense": true,
+    "restrictedAncestryBlocked": true,
+    "releaseOnlyBinaryStorage": true,
+    "gitLfsForOmegaWeights": false
+  },
+  "voices": [
+    {
+      "id": "en-us-libritts-high",
+      "locale": "en_US",
+      "sourcePath": "en/en_US/libritts/high/en_US-libritts-high.onnx",
+      "voiceLicense": "MIT",
+      "datasetLicense": "CC BY 4.0",
+      "datasetSource": "http://www.openslr.org/60/",
+      "training": "trained from scratch on train-clean-360",
+      "rightsState": "verification_enforced_by_workflow"
+    },
+    {
+      "id": "sv-se-alma-medium",
+      "locale": "sv_SE",
+      "sourcePath": "sv/sv_SE/alma/medium/sv_SE-alma-medium.onnx",
+      "voiceLicense": "CC BY 4.0",
+      "datasetLicense": "CC BY 4.0",
+      "datasetSource": "NST Swedish TTS Dataset",
+      "rightsState": "verification_enforced_by_workflow"
+    },
+    {
+      "id": "ar-jo-kareem-low",
+      "locale": "ar_JO",
+      "sourcePath": "ar/ar_JO/kareem/low/ar_JO-kareem-low.onnx",
+      "status": "rights_blocked_until_original_dataset_license_is_resolved",
+      "reason": "Piper model card points to a dataset license source rather than stating an explicit redistributable license; the workflow must not infer permission."
+    }
+  ]
+}
