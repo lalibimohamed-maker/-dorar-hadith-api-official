@@ -21,6 +21,8 @@ test("browser package build is isolated and network-free", async () => {
   assert.match(core, /omega-hardware-guardian\.js/);
   assert.match(buildPackage, /omega-hardware-guardian\.js/);
   assert.match(buildPackage, /omega-audio-session\.js/);
+  assert.match(buildPackage, /omega-visual-pruner\.js/);
+  assert.match(buildPackage, /omega-multimodal-context-guard\.js/);
   assert.match(buildPackage, /omega-client-core\.js/);
   assert.doesNotMatch(worker, /importScripts\(/);
   assert.match(worker, /GPUDevice|gpuDevice|webgpuDevice/);
