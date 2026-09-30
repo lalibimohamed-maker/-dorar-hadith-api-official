@@ -35,16 +35,50 @@
   async function merkleRoot(records) {
     let level = [];
     for (const record of records) {
-      const leafMaterial = "dinullah:omega:evidence:leaf:v1\\u0000" + String(record?.node_id ?? "") + "\\u0000" + String(record?.content_sha256 ?? "").toLowerCase();
+      const leafMaterial = "dinullah:omega:evidence:leaf:v1\u0000" + String(record?.node_id ?? "") + "\u0000" + String(record?.content_sha256 ?? "").toLowerCase();
       level.push(await sha256Text(leafMaterial));
     }
-    if (!level.length) return sha256Text("dinullah:omega:evidence:empty:v1\\u0000");
+    if (!level.length) return sha256Text("dinullah:omega:evidence:empty:v1\u0000");
     while (level.length > 1) {
       const next = [];
       for (let i = 0; i < level.length; i += 2) {
         const left = level[i];
         const right = level[i + 1] || left;
-        next.push(await sha256Text("dinullah:omega:evidence:parent:v1\\u0000" + left + "\\u0000" + right));
+        next.push(await sha256Text("dinullah:omega:evidence:parent:v1\u0000" + left + "\u0000" + right));
+      }
+      level = next;
+    }
+    return level[0];
+  }
+
+  async function snapshotMerkleRoot(records) {
+    let level = [];
+    const sorted = [...records].sort((a, b) => String(a?.node_id ?? "").localeCompare(String(b?.node_id ?? "")));
+    for (const record of sorted) {
+      level.push(await sha256Text(
+        "dinullah:omega:evidence:snapshot-leaf:v2\u0000" +
+        JSON.stringify(canonicalize({
+          node_id: String(record?.node_id ?? ""),
+          content_sha256: String(record?.content_sha256 ?? "").toLowerCase(),
+          verification_status: String(record?.verification_status ?? ""),
+          title: String(record?.title ?? ""),
+          text: String(record?.text ?? ""),
+          citation: String(record?.citation ?? ""),
+          source_id: String(record?.source_id ?? ""),
+          language: String(record?.language ?? ""),
+          updated_at: String(record?.updated_at ?? "")
+        }))
+      ));
+    }
+    if (!level.length) return sha256Text("dinullah:omega:evidence:snapshot-empty:v2\u0000");
+    while (level.length > 1) {
+      const next = [];
+      for (let i = 0; i < level.length; i += 2) {
+        const left = level[i];
+        const right = level[i + 1] || left;
+        next.push(await sha256Text(
+          "dinullah:omega:evidence:snapshot-parent:v2\u0000" + left + "\u0000" + right
+        ));
       }
       level = next;
     }
