@@ -51,8 +51,43 @@ The web UI exposes:
 
 The page can register local providers through `window.deenAllahRegisterLocalOmegaProviders({ search, concept })`. This is an integration boundary; absence of a provider is shown as unavailable local evidence.
 
-## Scope
+## Mobile field resilience
 
+The browser runtime now includes OmegaHardwareGuardian and a resumable local audio frame journal.
+
+### Storage persistence
+
+The runtime requests navigator.storage.persist() and re-checks persisted(); a positive result changes the origin to persistent storage mode where supported. This is a request governed by browser policy, not an unconditional OS whitelist. When persistence is denied or unavailable, the UI must continue to surface the condition rather than claim protection.
+
+### Audio interruption
+
+OmegaHardwareGuardian.monitorAudioContextResilience() observes AudioContext.state and page visibility. On suspension/interruption it records a session checkpoint in IndexedDB. OmegaResilientAudioSession journals each PCM frame before feeding it into the STT adapter, assigning a monotonically increasing sequence and byte offset; pending frames are replayed in order after resume.
+
+This makes the byte-offset boundary explicit. It does not claim that an arbitrary third-party STT implementation is lossless unless that adapter feeds the journal before consuming each frame.
+
+### WebGPU device loss
+
+The inference worker observes the GPUDevice.uncapturederror event and GPUDevice.lost. On non-intentional loss, the worker switches to a smaller WASM chunk size and, when the generator does not expose a backend-switch method, recreates the local generator with backend: wasm. The worker never interprets an error event as a successful generation.
+
+### Manual device matrix
+
+These conditions require real-device validation because CI cannot reproduce mobile OS resource arbitration reliably:
+
+- iOS/iPadOS Safari or Home Screen Web App: start microphone capture, background the app, trigger an interruption, return, and verify the same session ID resumes from the stored sequence/byte offset.
+- Android Chrome: repeat background/foreground and an audio-focus interruption; verify pending PCM frames replay in order.
+- Storage pressure: fill device storage sufficiently to create pressure, verify the UI reports persistence status and that import failures are explicit rather than silently deleting or replacing the local index.
+- WebGPU: start local generation, provoke a device-loss condition where reproducible, and verify the worker emits runtime-fallback with backend: wasm and reduced chunk_size.
+- Low-memory import: import a large evidence bundle and verify the UI remains responsive while worker progress events continue.
+
+These tests complement, rather than replace, the deterministic CI contracts.
+
+## Browser API compatibility notes
+
+GPUDevice exposes uncapturederror and lost; there is no navigator.gpu.onuncaughterror event used by this runtime. The guard therefore attaches to the actual GPUDevice object. See the cited Web API documentation.
+
+navigator.storage.persist() requests persistent storage and may be denied according to browser heuristics. WebKit documents eviction under storage pressure and persistent-mode exemptions, including on supported iOS/iPadOS Home Screen web apps. See the cited Web API and WebKit documentation.
+
+## Scope
 No Corpus scholarly text is modified.
 No model weights are committed.
 No Git LFS is introduced.
