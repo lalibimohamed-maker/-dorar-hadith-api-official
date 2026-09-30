@@ -28,7 +28,8 @@ permissions:
 
 concurrency:
   group: rechercher-omega-remaining-engine-acquisition
-  cancel-in-progress: true
+  # Keep long-running model acquisitions queued instead of cancelling matrix jobs on a newer push.
+  cancel-in-progress: false
 
 jobs:
   acquire:
