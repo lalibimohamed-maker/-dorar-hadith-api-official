@@ -1,6 +1,6 @@
 import http from "node:http";
 import { verifyAgentAnswer } from "./rechercher-omega-answer-verifier.js";
-import { strictAnchoringDescription, buildStrictEvidenceRecord } from "./rechercher-ai/mcp-strict-anchoring.js";
+import { MCP_STRICT_ANCHORING_VERSION, strictAnchoringDescription, buildStrictEvidenceRecord } from "./rechercher-ai/mcp-strict-anchoring.js";
 
 export const MCP_PROTOCOL_VERSION = "2026-07-28";
 export const SUPPORTED_MCP_VERSIONS = Object.freeze([MCP_PROTOCOL_VERSION, "2025-11-25"]);
