@@ -122,7 +122,7 @@ test("Reassembler rejects manifest path traversal",async()=>{
 
 test("Reassembler disk preflight requires 1.2x logical model size",async()=>{
   assert.equal(requiredPreflightBytes(1000),1200);
-  assert.throws(
+  assert.rejects(
     ()=>assertDiskPreflight("/tmp",1000,{getFreeBytes:async()=>1199}),
     /DISK_SPACE_PREFLIGHT_FAILED/
   );
