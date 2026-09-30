@@ -152,7 +152,7 @@ jobs:
 
       - name: Resolve immutable revision
         id: revision
-        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
+        if: steps.existing_release.outputs.complete != 'true' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
         env:
           MODEL_ID: ${{ matrix.model_id }}
           REQUESTED_REVISION: ${{ matrix.revision }}
@@ -195,6 +195,23 @@ jobs:
           test -n "$release_id"
           echo "OMEGA_RELEASE_ID=$release_id" >> "$GITHUB_ENV"
           echo "[OK] Release ID: $release_id"
+      - name: Check existing Omega Release assets before streaming
+        id: existing_release
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          json="$(gh api "repos/$REPO/releases/tags/$RELEASE_TAG" 2>/dev/null || true)"
+          if [ -n "$json" ] && python -c 'import json,sys; j=json.load(sys.stdin); a={x["name"] for x in j.get("assets",[])}; sys.exit(0 if "release-manifest.json" in a else 1)' <<<"$json"; then
+            echo "complete=true" >> "$GITHUB_OUTPUT"
+            echo "Existing complete Release detected: $RELEASE_TAG"
+          else
+            echo "complete=false" >> "$GITHUB_OUTPUT"
+            echo "Release is missing a verified release-manifest.json; acquisition may proceed."
+          fi
+
       - name: Stream weights directly into Release
         if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
         env:
@@ -366,7 +383,10 @@ jobs:
           gh release upload "$RELEASE_TAG"             "$OUTPUT_DIR/omega__hunyuanvideo15__runtime.tar.gz"             "$OUTPUT_DIR/hunyuanvideo15-runtime-manifest.json"             "$OUTPUT_DIR/hunyuanvideo15-dependencies.json"             "$OUTPUT_DIR/hunyuanvideo15-release-readiness.json"             --repo "$REPO" --clobber
 
       # release-manifest.json is a weights-only manifest; it never declares runtime completeness.
-      - name: Verify weights manifest
+      - name: Skip acquisition when Omega Release is already complete
+        if: steps.existing_release.outputs.complete == 'true'
+        run: echo "Existing verified Release is authoritative; no duplicate weight download."
+
         if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
