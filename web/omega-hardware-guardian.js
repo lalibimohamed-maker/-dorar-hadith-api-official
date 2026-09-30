@@ -12,7 +12,7 @@
     if (!window.indexedDB) return Promise.reject(new Error("INDEXEDDB_UNAVAILABLE"));
     if (checkpointDbPromise) return checkpointDbPromise;
     checkpointDbPromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open("deen-allah-omega-runtime-v1", 1);
+      const request = indexedDB.open("deen-allah-omega-runtime-v1", 2);
       request.onupgradeneeded = () => {
         const db = request.result;
         if (!db.objectStoreNames.contains("audio_sessions")) db.createObjectStore("audio_sessions", { keyPath: "session_id" });
