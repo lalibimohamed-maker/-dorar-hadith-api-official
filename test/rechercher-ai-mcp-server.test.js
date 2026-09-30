@@ -24,7 +24,7 @@ test("strict schema files are valid JSON",async()=>{
 
 import { strictAnchoringDescription, enforceMcpResponseAnchoring } from "../src/rechercher-ai/mcp-strict-anchoring.js";
 
-test("MCP strict anchoring exposes explicit governance rules",()=>{
+test("MCP strict anchoring exposes explicit governance rules",async()=>{
   const description=strictAnchoringDescription("deen_verify_answer");
   assert.match(description,/DINULLAH STRICT EVIDENCE ANCHOR/);
   assert.match(description,/server-side verification/i);
