@@ -7,10 +7,14 @@ on:
       - src/rechercher-omega-answer-verifier.js
       - src/rechercher-ai-gateway.js
       - src/rechercher-ai-mcp-server.js
+      - src/rechercher-omega-governed-run.js
       - test/rechercher-omega-answer-verifier.integration.test.js
       - test/rechercher-omega-evidence-api-mcp.integration.test.js
       - test/rechercher-omega-evidence-load.integration.test.js
+      - test/rechercher-omega-api-mcp-load.integration.test.js
       - test/rechercher-omega-api-mcp-pagination.integration.test.js
+      - test/rechercher-omega-governed-run.test.js
+      - test/rechercher-omega-governance-gap-closure.test.js
       - .github/workflows/rechercher-omega-evidence-integration.yml
   pull_request:
     branches: [main]
@@ -22,16 +26,54 @@ concurrency:
   group: rechercher-omega-evidence-integration
   cancel-in-progress: true
 jobs:
-  integration:
+  deterministic-unit:
+    name: Deterministic gate/unit tests
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
+        with: {persist-credentials: false}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: 22
           package-manager-cache: false
-      - name: Run deterministic evidence gate tests
-        run: node --test test/rechercher-omega-answer-verifier.integration.test.js test/rechercher-omega-evidence-api-mcp.integration.test.js test/rechercher-omega-evidence-load.integration.test.js test/rechercher-omega-governed-run.test.js test/rechercher-omega-governance-gap-closure.test.js test/rechercher-omega-api-mcp-load.integration.test.js test/rechercher-omega-api-mcp-pagination.integration.test.js
+      - run: timeout 20s node --test test/rechercher-omega-answer-verifier.integration.test.js test/rechercher-omega-governed-run.test.js test/rechercher-omega-governance-gap-closure.test.js
+
+  api-mcp-e2e:
+    name: API and MCP end-to-end
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - run: timeout 20s node --test test/rechercher-omega-evidence-api-mcp.integration.test.js
+
+  api-mcp-load:
+    name: API and MCP concurrent load
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - run: timeout 20s node --test test/rechercher-omega-evidence-load.integration.test.js test/rechercher-omega-api-mcp-load.integration.test.js
+
+  pagination:
+    name: API and MCP pagination
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - run: timeout 20s node --test test/rechercher-omega-api-mcp-pagination.integration.test.js
