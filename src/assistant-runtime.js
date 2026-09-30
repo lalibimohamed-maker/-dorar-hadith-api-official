@@ -10,6 +10,7 @@ function buildOmegaEvidence(search) {
     evidence.push({
       source_id: 'dorar-hadith',
       text: JSON.stringify(search.hadith),
+      citation: search.hadith?.source ?? search.hadith?.reference ?? 'dorar-hadith',
       verification: 'source-backed-api-result'
     });
   }
@@ -25,7 +26,9 @@ function buildOmegaEvidence(search) {
         item.source
       ].filter(Boolean).join(' | '),
       verification: item.verification ?? 'unknown',
-      rights: item.rights ?? 'unknown'
+      rights: item.rights ?? 'unknown',
+      citation: item.citation ?? item.provenance?.citation ?? item.source ?? item.evidence?.source ?? item.id ?? item.work ?? null,
+      provenance: item.provenance ?? item.evidence?.provenance ?? null
     });
   }
   return evidence;
