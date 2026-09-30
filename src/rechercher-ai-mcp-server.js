@@ -1,0 +1,131 @@
+import http from "node:http";
+
+export const MCP_PROTOCOL_VERSION = "2026-07-28";
+export const SUPPORTED_MCP_VERSIONS = Object.freeze([MCP_PROTOCOL_VERSION, "2025-11-25"]);
+const DEFAULT_BASE = process.env.DEEN_ALLAH_API_BASE || "http://127.0.0.1:3000";
+const MAX_BODY = 1024 * 1024;
+
+const TOOLS = Object.freeze([
+  { name:"deen_search", description:"Search the verified Din Allah API. Search is discovery only; returned evidence must still pass provenance/rights/verification gates.", inputSchema:{type:"object",additionalProperties:false,required:["q"],properties:{q:{type:"string",minLength:1,maxLength:300},lang:{type:"string",maxLength:35},comparative:{type:"boolean"},limit:{type:"integer",minimum:1,maximum:100}}}},
+  { name:"deen_concept", description:"Retrieve a source-aware concept card from the encyclopedia.", inputSchema:{type:"object",additionalProperties:false,required:["term"],properties:{term:{type:"string",minLength:1,maxLength:300},context:{type:"string",maxLength:500},lang:{type:"string",maxLength:35}}}},
+  { name:"deen_quran_ayah", description:"Retrieve canonical Quran ayah context. The model is never permitted to generate or rewrite canonical Quran text.", inputSchema:{type:"object",additionalProperties:false,required:["verse"],properties:{verse:{type:"string",minLength:1,maxLength:80},translationIds:{type:"string",maxLength:500},tafsirIds:{type:"string",maxLength:500},words:{type:"boolean"}}}},
+  { name:"deen_source", description:"Retrieve a named encyclopedia source record with provenance metadata.", inputSchema:{type:"object",additionalProperties:false,required:["id"],properties:{id:{type:"string",minLength:1,maxLength:200}}}},
+  { name:"deen_health", description:"Return API health information.", inputSchema:{type:"object",additionalProperties:false,properties:{}}}
+]);
+
+function json(res,status,payload,headers={}) {
+  res.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff",...headers});
+  res.end(JSON.stringify(payload));
+}
+
+function protocolVersion(req,body) {
+  return req.headers["mcp-protocol-version"] || body?._meta?.["io.modelcontextprotocol/protocolVersion"] || body?._meta?.["io.modelcontextprotocol/protocolVersion"] || null;
+}
+
+function rpcError(id,code,message,data) {
+  return {jsonrpc:"2.0",id,error:{code,message,...(data===undefined?{}:{data})}};
+}
+
+function validateVersion(version,id) {
+  if (!version || SUPPORTED_MCP_VERSIONS.includes(version)) return null;
+  return rpcError(id,-32022,"Unsupported protocol version",{supported:SUPPORTED_MCP_VERSIONS,requested:version});
+}
+
+function readBody(req) {
+  return new Promise((resolve,reject)=>{
+    let size=0, chunks=[];
+    req.on("data",chunk=>{size+=chunk.length;if(size>MAX_BODY){req.destroy();reject(new Error("request body too large"));return;}chunks.push(chunk);});
+    req.on("end",()=>resolve(Buffer.concat(chunks).toString("utf8")));
+    req.on("error",reject);
+  });
+}
+
+function tool(name) { return TOOLS.find(x=>x.name===name) || null; }
+
+function validateArguments(def,args={}) {
+  if (!args || typeof args!=="object" || Array.isArray(args)) throw new Error("tool arguments must be an object");
+  for (const key of Object.keys(args)) if (!def.inputSchema.properties?.[key]) throw new Error(`unknown tool argument: ${key}`);
+  for (const key of def.inputSchema.required || []) {
+    if (typeof args[key] !== "string" || !args[key].trim()) throw new Error(`missing required argument: ${key}`);
+  }
+}
+
+function buildUrl(name,args) {
+  const url=new URL(DEFAULT_BASE);
+  if(name==="deen_search"){url.pathname="/api/v1/search";url.search=new URLSearchParams({q:args.q,...(args.lang?{lang:args.lang}:{}),...(args.comparative!==undefined?{comparative:String(args.comparative)}:{})}).toString();}
+  else if(name==="deen_concept"){url.pathname="/api/v1/concept";url.search=new URLSearchParams({term:args.term,...(args.context?{context:args.context}:{}),...(args.lang?{lang:args.lang}:{})}).toString();}
+  else if(name==="deen_quran_ayah"){url.pathname="/api/v1/quran/ayah";url.search=new URLSearchParams({verse:args.verse,...(args.translationIds?{translationIds:args.translationIds}:{}),...(args.tafsirIds?{tafsirIds:args.tafsirIds}:{}),...(args.words!==undefined?{words:String(args.words)}:{})}).toString();}
+  else if(name==="deen_source"){url.pathname="/api/v1/encyclopedia/source/"+encodeURIComponent(args.id);}
+  else if(name==="deen_health"){url.pathname="/health";}
+  else throw new Error("unknown tool");
+  return url;
+}
+
+async function callApi(name,args) {
+  const url=buildUrl(name,args);
+  const headers={"accept":"application/json"};
+  if(process.env.DEEN_ALLAH_API_KEY) headers["x-api-key"]=process.env.DEEN_ALLAH_API_KEY;
+  const response=await fetch(url,{headers,signal:AbortSignal.timeout(15000)});
+  const text=await response.text();
+  let data;
+  try { data=JSON.parse(text); } catch { data={raw:text}; }
+  if(!response.ok) {
+    const error=new Error(`Din Allah API returned HTTP ${response.status}`);
+    error.data={status:response.status,body:data};
+    throw error;
+  }
+  return data;
+}
+
+function mcpResult(id,result) {
+  return {jsonrpc:"2.0",id,result:{...result,_meta:{"io.modelcontextprotocol/serverInfo":{name:"din-allah-rechercher-mcp",version:"1.0.0"}}}};
+}
+
+async function handleRpc(req,body) {
+  const id=body.id ?? null;
+  const version=protocolVersion(req,body);
+  const versionError=validateVersion(version,id);
+  if(versionError) return versionError;
+  switch(body.method){
+    case "server/discover":
+      return mcpResult(id,{protocolVersions:SUPPORTED_MCP_VERSIONS,capabilities:{tools:{listChanged:false}},serverInfo:{name:"din-allah-rechercher-mcp",version:"1.0.0"}});
+    case "tools/list":
+      return mcpResult(id,{tools:TOOLS});
+    case "tools/call":{
+      const name=body.params?.name;
+      const def=tool(name);
+      if(!def) return rpcError(id,-32602,"Unknown tool",{name});
+      try {
+        const args=body.params?.arguments || {};
+        validateArguments(def,args);
+        const data=await callApi(name,args);
+        return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:false});
+      } catch(error) {
+        return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"UPSTREAM_ERROR",message:error.message,data:error.data||null})}],isError:true});
+      }
+    }
+    default:
+      return rpcError(id,-32601,"Method not found",{method:body.method});
+  }
+}
+
+export function createMcpServer({host="0.0.0.0",port=process.env.MCP_PORT||8787}={}) {
+  const server=http.createServer(async(req,res)=>{
+    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"*","access-control-allow-methods":"POST,OPTIONS","access-control-allow-headers":"content-type,mcp-protocol-version,x-api-key"});return res.end();}
+    if(req.method!=="POST" || new URL(req.url||"/","http://localhost").pathname!=="/mcp") return json(res,404,{error:"not_found"});
+    try {
+      const raw=await readBody(req);
+      const body=JSON.parse(raw);
+      if(body.jsonrpc!=="2.0") return json(res,400,rpcError(body.id??null,-32600,"Invalid JSON-RPC version"));
+      const response=await handleRpc(req,body);
+      return json(res,200,response,{"access-control-allow-origin":"*","mcp-protocol-version":MCP_PROTOCOL_VERSION});
+    } catch(error) {
+      return json(res,400,{jsonrpc:"2.0",id:null,error:{code:-32700,message:error.message}});
+    }
+  });
+  server.requestTimeout=20000;
+  server.headersTimeout=25000;
+  return server.listen(Number(port),host,()=>console.log(`Din Allah MCP server listening on ${host}:${port}/mcp`));
+}
+
+if (import.meta.url===`file://${process.argv[1]}`) createMcpServer();
