@@ -15,11 +15,11 @@
   },
   "matrix": {
     "language_count": 133,
-    "domain_count": 37,
-    "expected_search_cells": 4921,
-    "definition": "Every enumerated language is paired with every configured knowledge domain and support lane; each pair is an independent evidence-research queue cell.",
-    "knowledge_domain_count": 24,
-    "support_lane_count": 13
+    "domain_count": 48,
+    "expected_search_cells": 6384,
+    "definition": "Every enumerated language is paired with every one of the 48 configured Islamic knowledge domains; each pair is an independent evidence-research queue cell.",
+    "knowledge_domain_count": 48,
+    "support_lane_count": 0
   },
   "evidence_sources": [
     {
@@ -221,7 +221,7 @@
     "phase_2": "Normalize language names to ISO codes only after evidence-backed mapping.",
     "phase_3": "Intersect language sets across Quran, hadith, tafsir, books and terminology resources.",
     "phase_4": "Attach provenance, rights and verification state to every resource, not merely to the language.",
-    "phase_5": "Promote at least 106 evidence-backed language lanes; keep additional discovered lanes queued.",
+    "phase_5": "Execute all 48 configured Islamic knowledge domains for every evidence-backed language; domain 48 captures otherwise-unclassified Islamic knowledge and automatically classifies it by subject.",
     "phase_6": "Search regional, scholarly and institutional sources for languages underrepresented by the major global providers."
   },
   "resource_lanes": [
@@ -230,38 +230,49 @@
     "tafsir",
     "tajweed_qiraat",
     "quran_miracles",
+    "quran_tadabbur",
     "quran_stories",
     "hadith",
     "hadith_sciences",
     "hadith_terminology",
     "hadith_explanation",
-    "sirah",
-    "shamail",
+    "sirah_nabawiyyah",
+    "shamail_nabawiyyah",
     "aqidah",
     "tawhid",
     "fiqh",
     "usul_al_fiqh",
     "fiqh_schools_branches",
     "fatwa",
-    "islamic_ethics",
+    "raqaiq_adab_akhlaq",
     "islamic_history",
     "biographies_tabaqat",
     "comparative_fiqh",
     "dawah_islamic_culture",
     "general_islamic_encyclopedias",
-    "sunnah",
-    "islamic_terms",
-    "dua_adhkar",
-    "education",
-    "books",
-    "articles",
-    "audio",
-    "video",
-    "pdf",
-    "structured_metadata",
-    "provenance",
-    "rights",
-    "verification"
+    "scientific_miracles",
+    "maqasid_kulliyat",
+    "legal_maxims",
+    "athar",
+    "adhkar_dua",
+    "prophets_stories",
+    "ghaib",
+    "sirah_maghazi",
+    "companions_followers",
+    "scholars_biographies_rijal_tabaqat",
+    "ethics_adab",
+    "worship_transactions",
+    "family_inheritance_judiciary",
+    "siyasah_finance_waqf",
+    "contemporary_dawah_education",
+    "scientific_encyclopedias_lectures",
+    "arabic_language",
+    "literature_poetry",
+    "manuscripts_editions_bibliography",
+    "research_institutions_terms_translation",
+    "places_dates",
+    "questions_answers",
+    "other_islamic_domains"
   ],
   "cell_pipeline": [
     "primary_or_institutional_source",
@@ -274,7 +285,7 @@
     "rights",
     "verification"
   ],
-  "expansion_rule": "Never stop at the first 106. Every newly evidenced language becomes a resource lane candidate and is promoted according to verification evidence.",
+  "expansion_rule": "The 48 domains are the current fixed execution matrix. Domain 48 is an automatic catch-all: newly discovered Islamic subjects not matching domains 1-47 are classified there first and may later be promoted to a dedicated domain without changing the provenance/rights contract.",
   "no_auto_translation_rule": "Automatic translation may only be stored as an explicitly labelled fallback and must never overwrite canonical Arabic or source-verified human translations.",
   "knowledge_domains": [
     "quran",
@@ -282,39 +293,387 @@
     "tafsir",
     "tajweed_qiraat",
     "quran_miracles",
+    "quran_tadabbur",
     "quran_stories",
     "hadith",
     "hadith_sciences",
     "hadith_terminology",
     "hadith_explanation",
-    "sirah",
-    "shamail",
+    "sirah_nabawiyyah",
+    "shamail_nabawiyyah",
     "aqidah",
     "tawhid",
     "fiqh",
     "usul_al_fiqh",
     "fiqh_schools_branches",
     "fatwa",
-    "islamic_ethics",
+    "raqaiq_adab_akhlaq",
     "islamic_history",
     "biographies_tabaqat",
     "comparative_fiqh",
     "dawah_islamic_culture",
-    "general_islamic_encyclopedias"
+    "general_islamic_encyclopedias",
+    "scientific_miracles",
+    "maqasid_kulliyat",
+    "legal_maxims",
+    "athar",
+    "adhkar_dua",
+    "prophets_stories",
+    "ghaib",
+    "sirah_maghazi",
+    "companions_followers",
+    "scholars_biographies_rijal_tabaqat",
+    "ethics_adab",
+    "worship_transactions",
+    "family_inheritance_judiciary",
+    "siyasah_finance_waqf",
+    "contemporary_dawah_education",
+    "scientific_encyclopedias_lectures",
+    "arabic_language",
+    "literature_poetry",
+    "manuscripts_editions_bibliography",
+    "research_institutions_terms_translation",
+    "places_dates",
+    "questions_answers",
+    "other_islamic_domains"
   ],
-  "support_lanes": [
-    "sunnah",
-    "islamic_terms",
-    "dua_adhkar",
-    "education",
-    "books",
-    "articles",
-    "audio",
-    "video",
-    "pdf",
-    "structured_metadata",
-    "provenance",
-    "rights",
-    "verification"
+  "support_lanes": [],
+  "domain_catalog": [
+    {
+      "index": 1,
+      "id": "quran",
+      "nameAr": "القرآن الكريم",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 2,
+      "id": "quran_sciences",
+      "nameAr": "علوم القرآن",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 3,
+      "id": "tafsir",
+      "nameAr": "التفسير",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 4,
+      "id": "tajweed_qiraat",
+      "nameAr": "التجويد والقراءات",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 5,
+      "id": "quran_miracles",
+      "nameAr": "إعجاز القرآن",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 6,
+      "id": "quran_tadabbur",
+      "nameAr": "تدبر القرآن",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 7,
+      "id": "quran_stories",
+      "nameAr": "قصص القرآن",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 8,
+      "id": "hadith",
+      "nameAr": "الحديث النبوي",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 9,
+      "id": "hadith_sciences",
+      "nameAr": "علوم الحديث",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 10,
+      "id": "hadith_terminology",
+      "nameAr": "مصطلح الحديث",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 11,
+      "id": "hadith_explanation",
+      "nameAr": "شرح الحديث",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 12,
+      "id": "sirah_nabawiyyah",
+      "nameAr": "السيرة النبوية",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 13,
+      "id": "shamail_nabawiyyah",
+      "nameAr": "الشمائل النبوية",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 14,
+      "id": "aqidah",
+      "nameAr": "العقيدة",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 15,
+      "id": "tawhid",
+      "nameAr": "التوحيد",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 16,
+      "id": "fiqh",
+      "nameAr": "الفقه",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 17,
+      "id": "usul_al_fiqh",
+      "nameAr": "أصول الفقه",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 18,
+      "id": "fiqh_schools_branches",
+      "nameAr": "الفروع الفقهية / المذاهب",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 19,
+      "id": "fatwa",
+      "nameAr": "الفتاوى",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 20,
+      "id": "raqaiq_adab_akhlaq",
+      "nameAr": "الرقائق والآداب والأخلاق",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 21,
+      "id": "islamic_history",
+      "nameAr": "التاريخ الإسلامي",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 22,
+      "id": "biographies_tabaqat",
+      "nameAr": "التراجم والطبقات",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 23,
+      "id": "comparative_fiqh",
+      "nameAr": "الفقه المقارن والخلاف الفقهي",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 24,
+      "id": "dawah_islamic_culture",
+      "nameAr": "الدعوة والثقافة الإسلامية",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 25,
+      "id": "general_islamic_encyclopedias",
+      "nameAr": "الموسوعات والمراجع الإسلامية العامة",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 26,
+      "id": "scientific_miracles",
+      "nameAr": "الإعجاز العلمي",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 27,
+      "id": "maqasid_kulliyat",
+      "nameAr": "مقاصد الشريعة والكليات الخمس",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 28,
+      "id": "legal_maxims",
+      "nameAr": "القواعد الفقهية",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 29,
+      "id": "athar",
+      "nameAr": "الآثار",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 30,
+      "id": "adhkar_dua",
+      "nameAr": "الذكر والأدعية",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 31,
+      "id": "prophets_stories",
+      "nameAr": "الأنبياء والرسل وقصصهم",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 32,
+      "id": "ghaib",
+      "nameAr": "أخبار الغيب",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 33,
+      "id": "sirah_maghazi",
+      "nameAr": "السيرة والمغازي",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 34,
+      "id": "companions_followers",
+      "nameAr": "الصحابة والتابعون",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 35,
+      "id": "scholars_biographies_rijal_tabaqat",
+      "nameAr": "العلماء والتراجم والرجال والطبقات",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 36,
+      "id": "ethics_adab",
+      "nameAr": "الأخلاق والآداب",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 37,
+      "id": "worship_transactions",
+      "nameAr": "العبادات والمعاملات",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 38,
+      "id": "family_inheritance_judiciary",
+      "nameAr": "الأسرة والمواريث والقضاء",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 39,
+      "id": "siyasah_finance_waqf",
+      "nameAr": "السياسة الشرعية والاقتصاد الإسلامي والوقف",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 40,
+      "id": "contemporary_dawah_education",
+      "nameAr": "القضايا المعاصرة والدعوة والتعليم",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 41,
+      "id": "scientific_encyclopedias_lectures",
+      "nameAr": "الموسوعات العلمية والمحاضرات",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 42,
+      "id": "arabic_language",
+      "nameAr": "اللغة العربية والمعاجم والنحو والصرف والبلاغة",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 43,
+      "id": "literature_poetry",
+      "nameAr": "الأدب والشعر",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 44,
+      "id": "manuscripts_editions_bibliography",
+      "nameAr": "المخطوطات والتحقيقات والطبعات والببليوغرافيا",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 45,
+      "id": "research_institutions_terms_translation",
+      "nameAr": "البحث والمؤسسات والمصطلحات والترجمة",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 46,
+      "id": "places_dates",
+      "nameAr": "الأماكن والتواريخ",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 47,
+      "id": "questions_answers",
+      "nameAr": "الأسئلة والأجوبة",
+      "discovery": "standard",
+      "auto_classification": false
+    },
+    {
+      "index": 48,
+      "id": "other_islamic_domains",
+      "nameAr": "مجالات في دين الإسلام أخرى غير مذكورة — تُكتشف وتُصنّف تلقائيًا",
+      "discovery": "standard",
+      "auto_classification": true
+    }
   ]
 }
