@@ -24,7 +24,12 @@
       "relations": [
         "DuckDB-Wasm",
         "SQLite-Wasm-compatible adapter"
-      ]
+      ],
+      "inference_policy": {
+        "onnx_models_only": true,
+        "remote_model_downloads": false,
+        "local_files_only": true
+      }
     },
     "desktop": {
       "llm": [
@@ -33,7 +38,8 @@
       "model_formats": [
         "GGUF",
         "ONNX"
-      ]
+      ],
+      "gguf_note": "GGUF is handled by llama.cpp, not ONNX Runtime Web"
     },
     "speech": [
       "sherpa-onnx"
@@ -61,5 +67,13 @@
     "default_reserve_bytes": 268435456,
     "never_assume_that_file_size_equals_peak_ram": true,
     "4gb_devices_are_not_promised_to_run_1_8gb_models": true
+  },
+  "validated_tool_versions": {
+    "onnxruntime-web": "1.30.0",
+    "@huggingface/transformers": "4.3.0",
+    "@orama/orama": "3.1.18",
+    "usearch": "2.26.2",
+    "@duckdb/duckdb-wasm": "1.5.5",
+    "sherpa-onnx": "1.13.8"
   }
 }
