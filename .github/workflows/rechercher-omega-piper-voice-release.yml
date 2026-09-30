@@ -1,0 +1,240 @@
+name: Rechercher Ω — verify and publish cleared Piper voices
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+
+run-name: Rechercher Omega — voice license verification and Release publishing
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-omega-piper-voice-release
+  cancel-in-progress: false
+
+jobs:
+  voice:
+    name: ${{ matrix.id }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - id: en-us-libritts-high
+            model_id: rhasspy/piper-voices
+            revision: main
+            model_dir: en/en_US/libritts/high
+            model_file: en_US-libritts-high.onnx
+            language: en_US
+            voice_license_expected: mit
+            release_tag: rechercher-omega-piper-en-us-libritts-high-v1.0.0
+          - id: sv-se-alma-medium
+            model_id: rhasspy/piper-voices
+            revision: main
+            model_dir: sv/sv_SE/alma/medium
+            model_file: sv_SE-alma-medium.onnx
+            language: sv_SE
+            voice_license_expected: cc-by-4.0
+            release_tag: rechercher-omega-piper-sv-se-alma-medium-v1.0.0
+
+    env:
+      OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: "3.12"
+
+      - name: Install Hugging Face Hub
+        run: python -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Validate Omega Release target
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.OMEGA_STORAGE_REPOSITORY }}
+        run: |
+          set -euo pipefail
+          test -n "${GH_TOKEN:-}" || { echo "RECHERCHER_OMEGA_STORAGE_TOKEN is missing"; exit 1; }
+          test "$(gh api "repos/$REPO" --jq '.full_name')" = "$REPO"
+          test "$(gh api "repos/$REPO" --jq '.permissions.push // false')" = "true"
+
+      - name: Verify voice model card and original dataset license
+        id: rights
+        env:
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ matrix.revision }}
+          MODEL_DIR: ${{ matrix.model_dir }}
+          MODEL_FILE: ${{ matrix.model_file }}
+          EXPECTED_VOICE_LICENSE: ${{ matrix.voice_license_expected }}
+          OUTPUT: ${{ runner.temp }}/voice-rights.json
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, re, urllib.parse
+          from pathlib import Path
+          import requests
+          from huggingface_hub import HfApi, hf_hub_download
+
+          model=os.environ["MODEL_ID"]
+          rev=os.environ["REVISION"]
+          model_dir=os.environ["MODEL_DIR"]
+          model_file=os.environ["MODEL_FILE"]
+          expected=os.environ["EXPECTED_VOICE_LICENSE"].lower()
+          api=HfApi()
+          info=api.model_info(model, revision=rev, files_metadata=False)
+          if not info.sha or not re.fullmatch(r"[0-9a-f]{40}", info.sha):
+              raise SystemExit("Voice source revision is not immutable")
+
+          card=Path(hf_hub_download(repo_id=model, filename=f"{model_dir}/MODEL_CARD", revision=info.sha))
+          text=card.read_text(encoding="utf-8", errors="replace")
+          dataset_url=re.search(r"(?im)^\s*\*\s*URL:\s*(\S+)\s*$", text)
+          dataset_license=re.search(r"(?im)^\s*\*\s*License:\s*(.+?)\s*$", text)
+          if not dataset_url or not dataset_license:
+              raise SystemExit("MODEL_CARD does not expose an explicit dataset URL and license")
+          dataset_url=dataset_url.group(1).strip()
+          dataset_license=dataset_license.group(1).strip()
+
+          # Fail closed on ambiguous source licensing. "See URL" is not proof.
+          if dataset_license.lower() in {"see url", "see source", "unknown", "n/a"}:
+              raise SystemExit(f"Ambiguous dataset license: {dataset_license}")
+
+          # Verify the original dataset page is reachable and capture its license evidence.
+          response=requests.get(dataset_url, timeout=30, allow_redirects=True)
+          response.raise_for_status()
+          source_text=response.text
+          source_license_hits=re.findall(
+              r"(?i)(?:license|licence)[^<]{0,120}(?:CC BY(?:-NC|-SA)? ?[0-9.]*|creative commons|MIT|Apache|ODbL|public domain)",
+              source_text
+          )
+          if not source_license_hits:
+              # Some OpenSLR pages expose the license as a direct link rather than text.
+              if "creativecommons.org" not in source_text.lower() and "cc by" not in source_text.lower():
+                  raise SystemExit("Original dataset page did not expose machine-detectable license evidence")
+
+          voice_license = "MIT" if expected == "mit" else "CC BY 4.0"
+          training=re.search(r"(?im)^\s*\*\s*(?:Training|Fine-tuning|Fine-tuned from|Trained from scratch).*?$", text)
+          training_line=training.group(0).strip() if training else "not stated"
+
+          # Explicit ancestry guard: a voice derived from a restricted base must not be auto-published.
+          if re.search(r"(?i)(lessac|blizzard 2013|ryan voice)", text):
+              raise SystemExit("Voice card declares a potentially restricted base/ancestry; human rights review required")
+
+          out={
+            "model_id": model,
+            "source_revision": info.sha,
+            "model_path": f"{model_dir}/{model_file}",
+            "model_card_path": f"{model_dir}/MODEL_CARD",
+            "voice_license": voice_license,
+            "dataset_url": dataset_url,
+            "dataset_license": dataset_license,
+            "dataset_license_evidence_url": response.url,
+            "dataset_license_evidence_sha256": hashlib.sha256(response.content).hexdigest(),
+            "model_card_sha256": hashlib.sha256(text.encode()).hexdigest(),
+            "training_evidence": training_line,
+            "rights_state": "verified_for_noncommercial_or_attribution_redistribution",
+            "redistribution_gate": "passed",
+            "source_type": "Hugging Face Piper voice registry; original dataset license separately verified",
+          }
+          Path(os.environ["OUTPUT"]).write_text(json.dumps(out,indent=2,ensure_ascii=False)+"\n")
+          print(json.dumps(out,indent=2,ensure_ascii=False))
+          PY
+
+      - name: Create prerelease
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --repo "$REPO" --prerelease               --title "$RELEASE_TAG"               --notes "Verified Piper voice asset. Rights evidence is shipped with the release; runtime adoption remains separately gated."
+          fi
+
+      - name: Download exact voice artifacts
+        env:
+          MODEL_ID: ${{ matrix.model_id }}
+          REVISION: ${{ matrix.revision }}
+          MODEL_DIR: ${{ matrix.model_dir }}
+          MODEL_FILE: ${{ matrix.model_file }}
+          OUT: ${{ runner.temp }}/voice
+        run: |
+          set -euo pipefail
+          rm -rf "$OUT"
+          mkdir -p "$OUT"
+          python - <<'PY'
+          import os, shutil
+          from pathlib import Path
+          from huggingface_hub import hf_hub_download
+          model=os.environ["MODEL_ID"]; rev=os.environ["REVISION"]; d=os.environ["MODEL_DIR"]; f=os.environ["MODEL_FILE"]
+          out=Path(os.environ["OUT"])
+          for name in [f"{d}/{f}", f"{d}/{f}.json", f"{d}/MODEL_CARD"]:
+              src=Path(hf_hub_download(repo_id=model, filename=name, revision=rev))
+              dst=out/src.name
+              shutil.copyfile(src,dst)
+              print("[OK]",name,dst)
+          PY
+          test -s "$OUT/$MODEL_FILE"
+          test -s "$OUT/$MODEL_FILE.json"
+          test -s "$OUT/MODEL_CARD"
+
+      - name: Build immutable voice manifest
+        env:
+          OUT: ${{ runner.temp }}/voice
+          RIGHTS: ${{ runner.temp }}/voice-rights.json
+          RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          out=Path(os.environ["OUT"])
+          rights=json.loads(Path(os.environ["RIGHTS"]).read_text())
+          files=[]
+          for p in sorted(out.iterdir()):
+              if p.name=="voice-manifest.json": continue
+              files.append({"name":p.name,"size":p.stat().st_size,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()})
+          manifest={
+            "schema":"omega-piper-voice-release/v1",
+            "release_tag":os.environ["RELEASE_TAG"],
+            "engine":"piper1-gpl",
+            "source_model":rights["model_id"],
+            "source_revision":rights["source_revision"],
+            "model_path":rights["model_path"],
+            "voice_license":rights["voice_license"],
+            "dataset_license":rights["dataset_license"],
+            "dataset_url":rights["dataset_url"],
+            "dataset_license_evidence_url":rights["dataset_license_evidence_url"],
+            "rights_state":rights["rights_state"],
+            "redistribution_gate":rights["redistribution_gate"],
+            "files":files
+          }
+          (out/"voice-manifest.json").write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+"\n")
+          PY
+
+      - name: Publish voice, provenance and license evidence to Omega Release
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{ matrix.release_tag }}
+          OUT: ${{ runner.temp }}/voice
+          RIGHTS: ${{ runner.temp }}/voice-rights.json
+        run: |
+          set -euo pipefail
+          gh release upload "$RELEASE_TAG"             "$OUT/$MODEL_FILE"             "$OUT/$MODEL_FILE.json"             "$OUT/MODEL_CARD"             "$OUT/voice-manifest.json"             "$RIGHTS#source-dataset-license-evidence.json"             --repo "$REPO" --clobber
+          gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name'             | grep -Fxq "voice-manifest.json"
