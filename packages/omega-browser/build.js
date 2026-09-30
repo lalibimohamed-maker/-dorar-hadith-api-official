@@ -16,7 +16,9 @@ const files = [
   "arabic-query-normalizer.js",
   "webgpu-inference-worker.js",
   "omega-hardware-guardian.js",
-  "omega-audio-session.js"
+  "omega-audio-session.js",
+  "omega-visual-pruner.js",
+  "omega-multimodal-context-guard.js"
 ];
 
 for (const file of files) {
@@ -31,7 +33,9 @@ await writeFile(
     'export * from "./local-bundle-loader.js";',
     'export * from "./arabic-query-normalizer.js";',
     'export * from "./omega-hardware-guardian.js";',
-    'export * from "./omega-audio-session.js";'
+    'export * from "./omega-audio-session.js";',
+    'export * from "./omega-visual-pruner.js";',
+    'export * from "./omega-multimodal-context-guard.js";'
   ].join("\n") + "\n",
   "utf8"
 );
