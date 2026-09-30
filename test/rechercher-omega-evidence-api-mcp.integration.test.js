@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
+import { once } from "node:events";
 
 async function start(server){
   await once(server,"listening");
