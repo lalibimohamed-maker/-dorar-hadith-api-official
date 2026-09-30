@@ -330,7 +330,7 @@ jobs:
           gh release upload "$RELEASE_TAG" /tmp/SANA-LICENSE#LICENSE --repo "$REPO" --clobber
 
       - name: Publish canonical Apache-2.0 license asset
-        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.license == 'apache-2.0' && matrix.id != 'sana-sprint-1.6b'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.license == 'apache-2.0' && matrix.id != 'sana-sprint-1.6b' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
