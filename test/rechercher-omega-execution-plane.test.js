@@ -43,7 +43,32 @@ test("media controller submits through one execution boundary",async()=>{
   const r=createCapabilityRouter({registry:registry()});
   const s=createResourceScheduler([{resource_id:"cpu",enabled:true,priority:1,capacity:{memoryMB:4096}}]);
   const e=createExecutionService({router:r,scheduler:s,adapters:{"test-runtime":adapter()}});
-  const c=createMediaExecutionController({execution:{execute:(x)=>e.run(x)}});
+  const c=createMediaExecutionController({execution:e});
   const result=await c.generateVideo({job_id:"media-1",input:"x"});
   assert.equal(result.state,"succeeded");
+});
+
+
+test("execution cancellation aborts the active runtime and releases the resource",async()=>{
+  let releaseObserved=false;
+  let resolveExecution;
+  const slow=createRuntimeAdapter({
+    runtime:"test-runtime",
+    load:async()=>{},
+    execute:async(task,{signal})=>new Promise((resolve,reject)=>{
+      resolveExecution=resolve;
+      signal.addEventListener("abort",()=>reject(Object.assign(new Error("execution cancelled"),{code:"ABORT_ERR"})),{once:true});
+    })
+  });
+  const r=createCapabilityRouter({registry:registry()});
+  const s=createResourceScheduler([{resource_id:"cpu",enabled:true,priority:1,capacity:{memoryMB:4096}}]);
+  const e=createExecutionService({router:r,scheduler:s,adapters:{"test-runtime":slow}});
+  const pending=e.run({job_id:"cancel-1",capability:"reasoning",input:"hello",resourceRequirements:{memoryMB:512}}).catch(err=>err);
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(e.cancel("cancel-1"),true);
+  const result=await pending;
+  assert.equal(result.job.state,"cancelled");
+  releaseObserved=s.list().find(x=>x.resource_id==="cpu");
+  assert.equal(releaseObserved.activeJobs,0);
+  assert.equal(typeof resolveExecution,"function");
 });
