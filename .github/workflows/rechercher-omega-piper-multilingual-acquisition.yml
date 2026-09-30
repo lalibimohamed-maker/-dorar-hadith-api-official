@@ -1,0 +1,238 @@
+name: Rechercher Ω — discover and acquire Piper voices by locale
+
+on:
+  workflow_dispatch:
+    inputs:
+      refresh_catalog:
+        description: Refresh upstream Piper voice catalog
+        required: false
+        default: "true"
+        type: boolean
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+    paths:
+      - .github/workflows/rechercher-omega-piper-multilingual-acquisition.yml
+
+run-name: Piper multilingual acquisition — discover locales and resume eligible voice assets
+
+permissions:
+  contents: read
+
+concurrency:
+  group: omega-piper-multilingual-acquisition
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      locales: ${{ steps.catalog.outputs.locales }}
+      voice_count: ${{ steps.catalog.outputs.voice_count }}
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Setup Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: "3.12"
+      - name: Discover upstream locale and voice inventory
+        id: catalog
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+          python - <<'PY'
+          import json, re
+          from huggingface_hub import HfApi
+          api=HfApi()
+          repo="rhasspy/piper-voices"
+          paths=api.list_repo_files(repo_id=repo, repo_type="model")
+          cards=[p for p in paths if p.endswith("/MODEL_CARD")]
+          voices=[]
+          for card in cards:
+              parts=card.split("/")
+              if len(parts)<5:
+                  continue
+              locale=parts[1]
+              if not re.fullmatch(r"[a-z]{2,3}_[A-Z]{2}(?:_[A-Z0-9]+)?",locale):
+                  continue
+              base=card.rsplit("/",1)[0]
+              onnx=[p for p in paths if p.startswith(base+"/") and p.endswith(".onnx")]
+              if not onnx:
+                  continue
+              for model in onnx:
+                  if model+".json" in paths:
+                      voices.append({"locale":locale,"card":card,"model":model,"config":model+".json"})
+          locales=sorted({v["locale"] for v in voices})
+          if not locales:
+              raise SystemExit("No Piper voice/model-card entries discovered; refusing empty success.")
+          with open("piper-discovery.json","w",encoding="utf-8") as f:
+              json.dump({"repo":repo,"locales":locales,"voice_count":len(voices),"voices":voices},f,ensure_ascii=False,indent=2)
+          import os
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as f:
+              f.write("locales="+json.dumps(locales,separators=(",",":"))+"\n")
+              f.write("voice_count="+str(len(voices))+"\n")
+          print(f"Discovered {len(voices)} complete voice candidates across {len(locales)} locales.")
+          print("Locales:",", ".join(locales))
+          PY
+      - name: Preserve discovery inventory
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: piper-discovery-inventory
+          path: piper-discovery.json
+          if-no-files-found: error
+          retention-days: 30
+
+  acquire:
+    needs: discover
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        locale: ${{ fromJSON(needs.discover.outputs.locales) }}
+    env:
+      OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Setup Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: "3.12"
+      - name: Install acquisition dependencies
+        run: python -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1" requests
+      - name: Validate private Omega Release storage access
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.OMEGA_STORAGE_REPOSITORY }}
+        run: |
+          set -euo pipefail
+          test -n "${GH_TOKEN:-}" || { echo "RECHERCHER_OMEGA_STORAGE_TOKEN is missing"; exit 1; }
+          test "$(gh api "repos/$REPO" --jq '.full_name')" = "$REPO"
+          test "$(gh api "repos/$REPO" --jq '.permissions.push // false')" = "true"
+      - name: Discover, rights-screen, download and package eligible voices for locale
+        id: acquire
+        env:
+          LOCALE: ${{ matrix.locale }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          OUT: ${{ runner.temp }}/piper-${{ matrix.locale }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, re, shutil, tarfile, time
+          from pathlib import Path
+          from huggingface_hub import HfApi, hf_hub_download
+
+          repo="rhasspy/piper-voices"
+          locale=os.environ["LOCALE"]
+          out=Path(os.environ["OUT"])
+          out.mkdir(parents=True,exist_ok=True)
+          token=os.environ.get("HF_TOKEN") or None
+          api=HfApi(token=token)
+          paths=api.list_repo_files(repo_id=repo,repo_type="model",token=token)
+          cards=[p for p in paths if p.endswith("/MODEL_CARD") and len(p.split("/"))>=5 and p.split("/")[1]==locale]
+          allowed=re.compile(r"(?i)\b(?:CC0(?:-1\.0)?|CC[- ]BY(?:[- ]NC)?(?:[- ]SA)?[- ](?:2\.0|3\.0|4\.0)|MIT|Apache[- ]2\.0|BSD[- ][23][- ]Clause|ISC|ODC[- ]BY)\b")
+          blocked_ancestry=re.compile(r"(?i)(lessac|blizzard\s*2013|ryan voice|finetuned from restricted|non.?redistributable)")
+          entries=[]; acquired=0; blocked=0; failed=0
+          for card_path in sorted(cards):
+              base=card_path.rsplit("/",1)[0]
+              models=[p for p in paths if p.startswith(base+"/") and p.endswith(".onnx") and p+".json" in paths]
+              if not models:
+                  continue
+              for model_path in sorted(models):
+                  voice_id=base.replace("/","__")
+                  record={"voice_id":voice_id,"locale":locale,"source_repo":repo,"source_card":card_path,"source_model":model_path,"source_revision":None,"state":"discovered"}
+                  try:
+                      info=api.model_info(repo,files_metadata=False,token=token)
+                      revision=info.sha
+                      record["source_revision"]=revision
+                      card_file=Path(hf_hub_download(repo_id=repo,filename=card_path,revision=revision,token=token))
+                      card_text=card_file.read_text(encoding="utf-8",errors="replace")
+                      license_match=re.search(r"(?im)^\s*(?:\*\s*)?License\s*:\s*(.+?)\s*$",card_text)
+                      license_text=license_match.group(1).strip() if license_match else ""
+                      record["declared_dataset_or_voice_license"]=license_text or "not-explicit"
+                      if not license_text or "see url" in license_text.lower() or not allowed.search(license_text):
+                          record["state"]="blocked_rights_review"
+                          record["reason"]="No explicit recognized license in voice MODEL_CARD; no binary copied."
+                          entries.append(record); blocked+=1; continue
+                      if blocked_ancestry.search(card_text):
+                          record["state"]="blocked_ancestry_review"
+                          record["reason"]="Potential restricted/base-voice ancestry; no binary copied."
+                          entries.append(record); blocked+=1; continue
+                      # Copy only public artifacts with explicit license evidence. Rights remain separately
+                      # recorded and never imply that public redistribution is automatically permitted.
+                      voice_dir=out/voice_id
+                      voice_dir.mkdir(parents=True,exist_ok=True)
+                      local_files=[]
+                      for source_path in [model_path,model_path+".json",card_path]:
+                          src=Path(hf_hub_download(repo_id=repo,filename=source_path,revision=revision,token=token))
+                          target=voice_dir/Path(source_path).name
+                          shutil.copyfile(src,target)
+                          digest=hashlib.sha256(target.read_bytes()).hexdigest()
+                          local_files.append({"name":target.name,"size":target.stat().st_size,"sha256":digest})
+                      archive=out/(voice_id+".tar.gz")
+                      with tarfile.open(archive,"w:gz") as tf:
+                          for p in sorted(voice_dir.iterdir()):
+                              tf.add(p,arcname=p.name)
+                      if archive.stat().st_size >= 1900*1024*1024:
+                          archive.unlink(missing_ok=True)
+                          raise RuntimeError("Voice bundle approaches GitHub Release per-asset size ceiling; kept out of Release.")
+                      record.update({"state":"downloaded_private_candidate","license_evidence_source":card_path,"files":local_files,"bundle":{"name":archive.name,"size":archive.stat().st_size,"sha256":hashlib.sha256(archive.read_bytes()).hexdigest()},"public_redistribution":"not-approved-by-this-workflow"})
+                      acquired+=1
+                      print(f"[DOWNLOADED] {locale} {voice_id} {archive.stat().st_size} bytes")
+                  except Exception as exc:
+                      record["state"]="failed"
+                      record["reason"]=str(exc)[:500]
+                      failed+=1
+                      print(f"[FAILED] {locale} {voice_id}: {exc}")
+                  entries.append(record)
+          manifest={"schema":"omega-piper-locale-acquisition/v1","source_repo":repo,"source_revision_policy":"immutable commit SHA per voice","locale":locale,"voice_candidates":len(entries),"downloaded_private_candidates":acquired,"blocked_rights_review":blocked,"failed":failed,"voices":entries}
+          manifest_path=out/"piper-locale-manifest.json"
+          manifest_path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as f:
+              f.write(f"downloaded={acquired}\nblocked={blocked}\nfailed={failed}\n")
+          print(json.dumps({k:manifest[k] for k in ["locale","voice_candidates","downloaded_private_candidates","blocked_rights_review","failed"]},ensure_ascii=False))
+          if not entries:
+              raise SystemExit("No voice candidates discovered for this locale; refusing empty success.")
+          PY
+      - name: Create or resume private locale Release
+        if: steps.acquire.outputs.downloaded != '0'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.OMEGA_STORAGE_REPOSITORY }}
+          LOCALE: ${{ matrix.locale }}
+        run: |
+          set -euo pipefail
+          TAG="rechercher-omega-piper-locale-$(echo "$LOCALE" | tr '[:upper:]_' '[:lower:]-' )-v1.0.0"
+          if ! gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$REPO" --prerelease --title "Piper locale $LOCALE — private evaluation" --notes "Private candidate bundles and per-voice provenance manifest. Public redistribution and user activation are not implied; review each voice license and source terms."
+          fi
+          echo "RELEASE_TAG=$TAG" >> "$GITHUB_ENV"
+      - name: Publish downloaded candidate bundles and manifest to Omega Release
+        if: steps.acquire.outputs.downloaded != '0'
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.OMEGA_STORAGE_REPOSITORY }}
+          OUT: ${{ runner.temp }}/piper-${{ matrix.locale }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=("$OUT"/*.tar.gz)
+          test "${#files[@]}" -gt 0
+          gh release upload "$RELEASE_TAG" "${files[@]}" "$OUT/piper-locale-manifest.json" --repo "$REPO" --clobber
+          gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name' | grep -Fxq "piper-locale-manifest.json"
+      - name: Preserve locale report even if some voices fail
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: piper-locale-report-${{ matrix.locale }}
+          path: ${{ runner.temp }}/piper-${{ matrix.locale }}/piper-locale-manifest.json
+          if-no-files-found: warn
+          retention-days: 30
