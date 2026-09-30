@@ -6,10 +6,10 @@
   let dbPromise = null;
 
   function openDb() {
-    if (!indexedDB) return Promise.reject(new Error("INDEXEDDB_UNAVAILABLE"));
+    if (!window.indexedDB) return Promise.reject(new Error("INDEXEDDB_UNAVAILABLE"));
     if (dbPromise) return dbPromise;
     dbPromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      const request = window.indexedDB.open(DB_NAME, DB_VERSION);
       request.onupgradeneeded = () => {
         const db = request.result;
         if (!db.objectStoreNames.contains("audio_sessions")) {
@@ -38,16 +38,16 @@
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, mode);
       const store = tx.objectStore(STORE_NAME);
+      let result;
       let req;
       try { req = action(store); } catch (error) { reject(error); return; }
-      if (!req) {
-        tx.oncomplete = () => resolve(undefined);
-        tx.onerror = () => reject(tx.error || new Error("AUDIO_FRAME_TX_FAILED"));
-        tx.onabort = () => reject(tx.error || new Error("AUDIO_FRAME_TX_ABORTED"));
-        return;
+      if (req) {
+        req.onsuccess = () => { result = req.result; };
+        req.onerror = () => reject(req.error || new Error("AUDIO_FRAME_REQUEST_FAILED"));
       }
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error || new Error("AUDIO_FRAME_REQUEST_FAILED"));
+      tx.oncomplete = () => resolve(result);
+      tx.onerror = () => reject(tx.error || new Error("AUDIO_FRAME_TX_FAILED"));
+      tx.onabort = () => reject(tx.error || new Error("AUDIO_FRAME_TX_ABORTED"));
     });
   }
 
@@ -95,6 +95,13 @@
       const db = await openDb();
       const rows = await request(db, "readonly", store => store.getAll());
       return rows.filter(row => row?.session_id === this.sessionId).sort((a, b) => Number(a.sequence) - Number(b.sequence));
+    }
+    async restoreCheckpoint(checkpoint) {
+      if (!checkpoint || String(checkpoint.session_id || "") !== this.sessionId) throw new Error("AUDIO_CHECKPOINT_SESSION_MISMATCH");
+      this.nextSequence = Math.max(0, Number(checkpoint.sequence) || 0);
+      this.byteOffset = Math.max(0, Number(checkpoint.byte_offset) || 0);
+      this.paused = String(checkpoint.status || "") !== "RUNNING";
+      return this.getCheckpoint();
     }
     async resume() {
       this.paused = false;
