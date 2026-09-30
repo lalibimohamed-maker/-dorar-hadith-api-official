@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "deployment": "docker-compose-free-open-source",
+  "backend": "redis",
+  "raw_conversation_persistence": false,
+  "stored_fields": [
+    "role",
+    "content_sha256",
+    "chars",
+    "timestamp"
+  ],
+  "secrets_never_stored_in_memory": true,
+  "corpus_write_allowed": false,
+  "fail_closed_if_redis_unavailable": true,
+  "portability": "session digests are operational metadata; scholarly truth remains in verified Corpus"
+}
