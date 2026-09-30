@@ -1,6 +1,8 @@
 import {
   computeChunkIntegrity,
-  computeDistributionIntegrity
+  computeDistributionIntegrity,
+  computeRollingStep,
+  ROLLING_SHA256_INITIAL
 } from "./omega-integrity-chain.js";
 import { assertVerifiedEd25519ManifestSignature } from "./omega-manifest-signature.js";
 
@@ -105,6 +107,13 @@ export function validateOfflineInstallManifest(manifest, {
       sha256(chunk.rolling_root_sha256, "distribution.chunks[" + index + "].rolling_root_sha256");
       sha256(chunk.merkle_root_sha256, "distribution.chunks[" + index + "].merkle_root_sha256");
       const computed = computeChunkIntegrity(chunk.blocks);
+      let rollingState = ROLLING_SHA256_INITIAL;
+      for (const block of chunk.blocks) {
+        rollingState = computeRollingStep(rollingState, block);
+        if (block.rolling_sha256 !== rollingState) {
+          throw new Error("block rolling state mismatch at chunk " + index + ", block " + block.index);
+        }
+      }
       if (computed.rolling_root_sha256 !== String(chunk.rolling_root_sha256).toLowerCase()) {
         throw new Error("chunk rolling root mismatch at " + index);
       }
