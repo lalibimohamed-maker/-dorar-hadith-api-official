@@ -131,7 +131,7 @@
     let triggered = false;
     let chunkSize = Math.max(1, Number(initialChunkSize) || DEFAULT_WASM_CHUNK_SIZE);
     const fallback = info => {
-      if (!active || triggered) return;
+      if (!active || triggered || String(info?.reason || "") === "destroyed") return;
       triggered = true;
       chunkSize = Math.max(1, Math.floor(chunkSize / 2));
       const detail = Object.freeze({
