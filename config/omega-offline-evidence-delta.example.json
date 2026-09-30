@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "format": "dinullah/omega-offline-evidence-delta",
+  "sequence": 1,
+  "generated_at": "2026-09-30T00:00:00Z",
+  "base_snapshot_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "target_snapshot_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "delta_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "operations": [
+    {
+      "op": "upsert",
+      "node_id": "example-node",
+      "previous_content_sha256": null,
+      "record": {
+        "node_id": "example-node",
+        "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "verification_status": "verified",
+        "title": "Example",
+        "text": "REPLACE_WITH_VERIFIED_TEXT",
+        "citation": "REPLACE_WITH_VERIFIED_CITATION",
+        "source_id": "REPLACE_WITH_SOURCE_ID",
+        "language": "ar",
+        "updated_at": "2026-09-30T00:00:00Z"
+      }
+    }
+  ],
+  "signature": {
+    "algorithm": "ed25519",
+    "public_key_id": "omega-release-root-v1",
+    "signature_base64": "REPLACE_WITH_VERIFIED_SIGNATURE_BASE64"
+  }
+}
