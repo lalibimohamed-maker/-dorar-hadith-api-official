@@ -14,7 +14,8 @@ function isSameOriginModule(moduleUrl, locationObject = globalThis.location) {
   const parsed = new URL(String(moduleUrl), locationObject?.href || "http://localhost/");
   if (!["https:", "http:", "file:"].includes(parsed.protocol)) return false;
   if (parsed.protocol === "file:") return true;
-  return !locationObject || parsed.origin === locationObject.origin;
+  if (!locationObject?.origin) return false;
+  return parsed.origin === locationObject.origin;
 }
 
 export function preloadLocalBrowserModule(moduleUrl, {
