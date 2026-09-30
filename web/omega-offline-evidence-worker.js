@@ -1,5 +1,5 @@
 const DB_NAME = "deen-allah-omega-local-v1";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = "evidence";
 const HEX_SHA256 = /^[a-f0-9]{64}$/i;
 const BUNDLE_FORMAT = "dinullah/omega-offline-evidence-bundle";
@@ -55,12 +55,20 @@ function openDb() {
   });
 }
 
-async function putRecords(records) {
+async function putRecords(records, snapshotSha256, sequence = 0) {
   const db = await openDb();
   await new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
+    const tx = db.transaction([STORE_NAME, "sync_state"], "readwrite");
     const store = tx.objectStore(STORE_NAME);
+    const meta = tx.objectStore("sync_state");
     for (const record of records) store.put(record);
+    meta.put({
+      id: "evidence",
+      snapshot_sha256: String(snapshotSha256).toLowerCase(),
+      dirty: false,
+      sequence: Math.max(0, Number(sequence) || 0),
+      updated_at: new Date().toISOString()
+    });
     tx.oncomplete = resolve;
     tx.onerror = () => reject(tx.error || new Error("INDEXEDDB_WRITE_FAILED"));
     tx.onabort = () => reject(tx.error || new Error("INDEXEDDB_WRITE_ABORTED"));
@@ -133,9 +141,12 @@ async function importBundleFile(file) {
   }
 
   self.postMessage({ type: "progress", stage: "writing", completed: 0, total: verified.length });
-  await putRecords(verified);
+  const snapshotSha256 = bundle.integrity?.merkle_root_sha256
+    ? String(bundle.integrity.merkle_root_sha256).toLowerCase()
+    : (await merkleRoot(verified)).toLowerCase();
+  await putRecords(verified, snapshotSha256, bundle.sequence);
   self.postMessage({ type: "progress", stage: "writing", completed: verified.length, total: verified.length });
-  return { imported: verified.length, bundle_sha256: actualBundleHash };
+  return { imported: verified.length, bundle_sha256: actualBundleHash, snapshot_sha256: snapshotSha256 };
 }
 
 self.addEventListener("message", event => {
