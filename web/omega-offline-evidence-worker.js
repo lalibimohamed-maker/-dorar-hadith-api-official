@@ -98,6 +98,7 @@ async function putRecords(records, snapshotSha256, sequence = 0) {
     meta.put({
       id: "evidence",
       snapshot_sha256: String(snapshotSha256).toLowerCase(),
+      snapshot_algorithm: "omega-evidence-snapshot-v2",
       dirty: false,
       sequence: Math.max(0, Number(sequence) || 0),
       updated_at: new Date().toISOString()
