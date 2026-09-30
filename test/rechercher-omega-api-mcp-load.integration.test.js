@@ -1,14 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-process.env.AI_GATEWAY_RATE_PER_MINUTE="10000";
-process.env.AI_GATEWAY_BURST="1000";
-process.env.MCP_RATE_LIMIT_PER_MINUTE="10000";
-process.env.MCP_RATE_BURST="1000";
-
 test("AI API verifier survives concurrent fail/green requests without leaking rejected text",async()=>{
  const {createAiGateway}=await import("../src/rechercher-ai-gateway.js");
- const server=createAiGateway({host:"127.0.0.1",port:0});
+ const server=createAiGateway({host:"127.0.0.1",port:0,ratePerMinute:10000,rateBurst:1000});
  const port=server.address().port;
  const evidence=[{sourceId:"b",citation:"p.1",kind:"primary_text",exact_quote_required:true,text:"النص الموثق"}];
  try{
@@ -26,7 +21,7 @@ test("AI API verifier survives concurrent fail/green requests without leaking re
 
 test("MCP tool discovery survives 120 concurrent read-only requests",async()=>{
  const {createMcpServer}=await import("../src/rechercher-ai-mcp-server.js");
- const server=createMcpServer({host:"127.0.0.1",port:0});
+ const server=createMcpServer({host:"127.0.0.1",port:0,ratePerMinute:10000,rateBurst:1000});
  const port=server.address().port;
  try{
   const payload=JSON.stringify({jsonrpc:"2.0",id:1,method:"tools/list"});
