@@ -26,9 +26,8 @@ export function preloadLocalBrowserModule(moduleUrl, {
   }
   if (!documentObject?.head?.appendChild) return false;
 
-  const existing = documentObject.querySelector?.(
-    'link[rel="modulepreload"][data-omega-module="' + String(moduleUrl).replace(/"/g, "") + '"]'
-  );
+  const existing = [...(documentObject.querySelectorAll?.('link[rel="modulepreload"][data-omega-module]') || [])]
+    .find(node => node.dataset?.omegaModule === String(moduleUrl));
   if (existing) return true;
 
   const link = documentObject.createElement("link");
