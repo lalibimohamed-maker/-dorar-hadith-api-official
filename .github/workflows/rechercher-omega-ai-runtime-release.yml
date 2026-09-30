@@ -3,12 +3,6 @@
 name: Rechercher Omega AI Runtime — Release Cache
 
 on:
-  push:
-    branches:
-      - feat/omega-media-conversation-final-2026-v3
-    paths:
-      - config/rechercher-omega-ai-media-runtime-2026.json
-      - .github/workflows/rechercher-omega-ai-runtime-release.yml
   workflow_dispatch:
     inputs:
       release_tag:
@@ -16,7 +10,7 @@ on:
         default: "dinullah-omega-ai-runtime-v2026.09.29"
       publish:
         required: true
-        default: "true"
+        default: "false"
 
 # security-justification: release publishes only pinned open-source runtime packages after provenance, checksum and size checks.
 permissions:
