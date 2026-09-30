@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "omega-user-selectable-speech-catalog-2026",
+  "purpose": "Let users choose speech engines, voices, languages, and voice styles without forcing one global winner. This catalog is an Omega system-layer registry and must never modify the canonical scholarly Corpus.",
+  "policy": {
+    "userChoiceIsFirstClass": true,
+    "oneGlobalWinnerRequired": false,
+    "compareBeforeOffering": false,
+    "qualityResultsMustBeMeasured": true,
+    "downloadAllDiscoverableCandidates": true,
+    "downloadPolicy": "Acquire candidate artifacts for private evaluation where access and terms permit; publish or distribute only when model, dataset, voice, and runtime licenses explicitly allow the intended use.",
+    "failClosedOnAmbiguousRights": true,
+    "releaseOnlyBinaryStorage": true,
+    "gitLfsForOmegaWeights": false,
+    "neverSynthesizeQuranRecitation": true,
+    "quranAudioMustBeVerifiedRecitation": true,
+    "corpusMutationAllowed": false
+  },
+  "languageCoverageGoal": {
+    "minimumTarget": 133,
+    "expandBeyondTarget": true,
+    "countingUnit": "distinct BCP-47 or normalized locale identifiers backed by at least one discoverable voice/model candidate",
+    "coverageMustDistinguish": [
+      "discovered",
+      "metadata_checked",
+      "rights_review",
+      "downloadable",
+      "downloaded",
+      "integrity_verified",
+      "runtime_smoke_tested",
+      "user_selectable"
+    ],
+    "doNotClaimCoverageFromLanguageLabelsAlone": true
+  },
+  "userPreferences": {
+    "language": "auto-detect-with-manual-override",
+    "locale": "user-selectable",
+    "engine": "user-selectable",
+    "voice": "user-selectable",
+    "voiceStyle": "where-provider-supports-it",
+    "qualityPreset": ["small-fast", "balanced", "high-quality"],
+    "executionPreference": ["local-offline", "online-service", "automatic"],
+    "networkFallbackRequiresConsent": true,
+    "rememberSelectionLocally": true,
+    "showRightsAndPrivacyBeforeOnlineUse": true,
+    "showModelSizeAndMemoryEstimate": true,
+    "showAvailabilityAndOfflineStatus": true
+  },
+  "candidateProviders": [
+    {
+      "id": "piper",
+      "kind": "open-source-local-tts",
+      "registry": "https://huggingface.co/rhasspy/piper-voices",
+      "discoverAllVoices": true,
+      "languageCoverage": "dynamic-registry-discovery",
+      "acquisitionMode": "enumerate-voice-registry-and-evaluate-each-voice",
+      "artifactTypes": [".onnx", ".onnx.json", "MODEL_CARD"],
+      "perVoiceRightsReviewRequired": true,
+      "publishOnlyAfterRightsGate": true,
+      "activationRequires": ["immutable-source-revision", "sha256", "model-card", "dataset-license-evidence", "runtime-smoke-test"],
+      "status": "candidate"
+    },
+    {
+      "id": "nabra-82m",
+      "kind": "open-source-arabic-neural-tts-candidate",
+      "registry": "https://huggingface.co/oddadmix/Nabra-82M-v0.1",
+      "languageCoverage": ["ar"],
+      "acquisitionMode": "single-model-evaluation",
+      "perModelRightsReviewRequired": true,
+      "activationRequires": ["immutable-source-revision", "sha256", "license-verification", "arabic-pronunciation-benchmark", "runtime-smoke-test"],
+      "status": "candidate"
+    },
+    {
+      "id": "speechgen",
+      "kind": "hosted-tts-service",
+      "registry": "https://speechgen.io/en/tts-arabic-qatar/",
+      "languageCoverage": ["ar-QA"],
+      "acquisitionMode": "no-weight-download; evaluate service only",
+      "requiresNetwork": true,
+      "requiresUserDisclosure": ["service-terms", "pricing", "privacy", "network-use"],
+      "status": "reference-only"
+    },
+    {
+      "id": "verified-quran-recitations",
+      "kind": "original-human-recitation-audio",
+      "languageCoverage": ["ar"],
+      "acquisitionMode": "source-recording-acquisition",
+      "syntheticTtsAllowed": false,
+      "requiredMetadata": ["reciter_identity", "source_url", "surah_or_ayah_mapping_when_available", "riwayah_when_verified", "license", "sha256"],
+      "publishOnlyAfterRightsGate": true,
+      "status": "separate-audio-library"
+    }
+  ],
+  "rightsStates": [
+    "discovered",
+    "metadata_checked",
+    "rights_review",
+    "blocked",
+    "cleared_for_private_evaluation",
+    "cleared_for_public_redistribution"
+  ],
+  "activationStates": [
+    "registered",
+    "downloaded",
+    "integrity_verified",
+    "runtime_verified",
+    "available_to_user",
+    "active"
+  ],
+  "invariants": [
+    "A registered candidate is not necessarily downloaded.",
+    "A downloaded candidate is not necessarily rights-cleared.",
+    "A rights-cleared candidate is not necessarily runtime-compatible.",
+    "A model becomes user-selectable only after its required gates pass.",
+    "Never represent a failed or skipped download as successful.",
+    "Keep all weights and binary voice artifacts out of Git and Git LFS; use dedicated Omega Releases after policy checks.",
+    "Do not silently switch an explicit user voice choice to a different provider.",
+    "Do not use synthetic TTS to replace Quran recitation."
+  ]
+}
