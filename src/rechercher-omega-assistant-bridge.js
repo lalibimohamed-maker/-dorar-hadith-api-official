@@ -57,7 +57,8 @@ export async function runGovernedAssistantTurn({
   runtimeArtifact = null,
   sessionId = null,
   distributedMemory = null,
-  requireDistributedMemory = false
+  requireDistributedMemory = false,
+  executor = executeSelectedBackend
 } = {}) {
   if (!String(query ?? "").trim()) throw new TypeError("assistant query is required");
 
@@ -262,7 +263,8 @@ export async function runGovernedAssistantTurn({
   const history = memory.snapshot();
   const evidenceEnvelope = buildEvidenceEnvelope(evidence);
   const started = Date.now();
-  const result = await executeSelectedBackend(gate, {
+  if (typeof executor !== "function") throw new TypeError("executor must be a function");
+  const result = await executor(gate, {
     messages: [
       {
         role: "system",
