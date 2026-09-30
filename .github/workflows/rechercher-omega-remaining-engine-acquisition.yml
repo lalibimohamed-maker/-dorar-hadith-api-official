@@ -237,7 +237,7 @@ jobs:
         run: python scripts/rechercher-omega-release-stream.py
 
       - name: Attach SANA-Sprint license from immutable HF revision
-        if: matrix.id == 'sana-sprint-1.6b'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'sana-sprint-1.6b'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -258,7 +258,7 @@ jobs:
           gh release upload "$RELEASE_TAG" /tmp/SANA-LICENSE#LICENSE --repo "$REPO" --clobber
 
       - name: Build SANA-Sprint 1.6B runtime metadata
-        if: matrix.id == 'sana-sprint-1.6b'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'sana-sprint-1.6b'
         env:
           MODEL_ID: ${{ matrix.model_id }}
           REVISION: ${{ steps.revision.outputs.sha }}
@@ -307,7 +307,7 @@ jobs:
           test -s "$OUTPUT_DIR/sana-sprint16-runtime-files.tar.gz"
 
       - name: Publish SANA-Sprint runtime metadata
-        if: matrix.id == 'sana-sprint-1.6b'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'sana-sprint-1.6b'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -322,7 +322,7 @@ jobs:
             --repo "$REPO" --clobber
 
       - name: Attach LTX-2 license from the immutable HF model revision
-        if: matrix.id == 'ltx-2'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'ltx-2'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -339,7 +339,7 @@ jobs:
           gh release upload "$RELEASE_TAG" "$license" --repo "$REPO" --clobber
 
       - name: Normalize Hunyuan license assets
-        if: matrix.id == 'hunyuanvideo-1.5'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'hunyuanvideo-1.5'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -356,7 +356,7 @@ jobs:
           done < <(gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name')
 
       - name: Attach Hunyuan license and notice with canonical names
-        if: matrix.id == 'hunyuanvideo-1.5'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'hunyuanvideo-1.5'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -370,7 +370,7 @@ jobs:
           gh release upload "$RELEASE_TAG" "${RUNNER_TEMP}/LICENSE" "${RUNNER_TEMP}/NOTICE" --repo "$REPO" --clobber
 
       - name: Build HunyuanVideo 1.5 runtime bundle
-        if: matrix.id == 'hunyuanvideo-1.5'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'hunyuanvideo-1.5'
         env:
           MODEL_ID: ${{ matrix.model_id }}
           REVISION: ${{ steps.revision.outputs.sha }}
@@ -383,7 +383,7 @@ jobs:
           python scripts/rechercher-omega-hunyuan-runtime.py
 
       - name: Publish HunyuanVideo 1.5 runtime bundle
-        if: matrix.id == 'hunyuanvideo-1.5'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'hunyuanvideo-1.5'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -409,7 +409,7 @@ jobs:
           echo "[OK] Weights manifest exists for $RELEASE_TAG"
 
       - name: Verify Hunyuan runtime completeness
-        if: matrix.id == 'hunyuanvideo-1.5'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'hunyuanvideo-1.5'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -434,7 +434,7 @@ jobs:
           echo "[OK] Runtime completeness gate passed: core packaged, runnable state explicitly blocked by declared external dependencies."
 
       - name: Enforce runtime completeness semantics
-        if: matrix.id == 'hunyuanvideo-1.5'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'hunyuanvideo-1.5'
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
