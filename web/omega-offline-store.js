@@ -33,7 +33,7 @@
   }
 
   async function merkleRoot(records) {
-    let level = ;
+    let level = [];
     for (const record of records) {
       const leafMaterial = "dinullah:omega:evidence:leaf:v1\\u0000" + String(record?.node_id ?? "") + "\\u0000" + String(record?.content_sha256 ?? "").toLowerCase();
       level.push(await sha256Text(leafMaterial));
