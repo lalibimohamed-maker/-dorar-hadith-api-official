@@ -94,3 +94,16 @@ test("delta validation rejects duplicate nodes", () => {
     ]
   }), /OFFLINE_DELTA_DUPLICATE_NODE/);
 });
+
+
+test("delta canonicalization rejects unknown operations instead of coercing them to delete", () => {
+  assert.throws(() => computeOfflineDeltaSha256({
+    schema_version: "1.0.0",
+    format: OMEGA_OFFLINE_DELTA_FORMAT,
+    sequence: 1,
+    generated_at: "2026-09-30T00:00:00Z",
+    base_snapshot_sha256: "a".repeat(64),
+    target_snapshot_sha256: "b".repeat(64),
+    operations: [{ op: "unknown", node_id: "n1", previous_content_sha256: null }]
+  }), /OFFLINE_DELTA_OPERATION_UNSUPPORTED/);
+});
