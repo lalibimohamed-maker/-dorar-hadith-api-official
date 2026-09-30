@@ -83,9 +83,9 @@ These tests complement, rather than replace, the deterministic CI contracts.
 
 ## Browser API compatibility notes
 
-GPUDevice exposes uncapturederror and lost; there is no navigator.gpu.onuncaughterror event used by this runtime. The guard therefore attaches to the actual GPUDevice object. See the cited Web API documentation.
+GPUDevice exposes uncapturederror and lost; there is no navigator.gpu.onuncaughterror event used by this runtime. The guard therefore attaches to the actual GPUDevice object. Reference: https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/uncapturederror_event and https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/lost.
 
-navigator.storage.persist() requests persistent storage and may be denied according to browser heuristics. WebKit documents eviction under storage pressure and persistent-mode exemptions, including on supported iOS/iPadOS Home Screen web apps. See the cited Web API and WebKit documentation.
+navigator.storage.persist() requests persistent storage and may be denied according to browser heuristics. WebKit documents eviction under storage pressure and persistent-mode exemptions, including on supported iOS/iPadOS Home Screen web apps. References: https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist and https://webkit.org/blog/14403/updates-to-storage-policy/.
 
 ## Scope
 No Corpus scholarly text is modified.
