@@ -25,6 +25,8 @@ test("streaming sharder emits contiguous block hashes inside every chunk", async
     });
 
     assert.equal(result.manifest.schema_version, "1.1.0");
+    assert.match(result.manifest.integrity.rolling_root_sha256, /^[a-f0-9]{64}$/);
+    assert.match(result.manifest.integrity.merkle_root_sha256, /^[a-f0-9]{64}$/);
     for (const chunk of result.manifest.chunks) {
       let offset = 0;
       for (const [index, block] of chunk.blocks.entries()) {
@@ -33,9 +35,12 @@ test("streaming sharder emits contiguous block hashes inside every chunk", async
         const bytes = await fs.readFile(path.join(output, chunk.name));
         const slice = bytes.subarray(block.offset, block.offset + block.bytes);
         assert.equal(sha256(slice), block.sha256);
+        assert.match(block.rolling_sha256, /^[a-f0-9]{64}$/);
         offset += block.bytes;
       }
       assert.equal(offset, chunk.bytes);
+      assert.match(chunk.rolling_root_sha256, /^[a-f0-9]{64}$/);
+      assert.match(chunk.merkle_root_sha256, /^[a-f0-9]{64}$/);
     }
   } finally {
     await fs.rm(root, { recursive: true, force: true });
