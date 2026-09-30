@@ -30,5 +30,5 @@ test("Full Corpus production pipeline rejects a missing persistent writer instea
    graphWriter:null,
    vectorWriter:null
  });
- await assert.rejects(()=>p.indexAll(),/NO_VERIFIED_CORPUS_RECORDS/);
+ await assert.rejects(()=>p.indexAll(),/graphWriter is incomplete/);
 });
