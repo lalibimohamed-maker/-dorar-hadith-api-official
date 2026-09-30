@@ -31,6 +31,14 @@ async function registerOfflineAppShell() {
     return null;
   }
 }
+function installLocalProviderBoundary() {
+  if (document.getElementById("omega-local-provider-script")) return;
+  const script = document.createElement("script");
+  script.id = "omega-local-provider-script";
+  script.src = "./omega-local-provider.js";
+  script.defer = true;
+  document.body.appendChild(script);
+}
 function installOfflineOmegaUI() {
   if (document.getElementById("offline-omega-ui-script")) return;
   const script = document.createElement("script");
@@ -107,7 +115,7 @@ async function checkApi(){
 }
 function saveApi(){const value=$("api-base").value.trim().replace(/\/$/,"");localStorage.setItem("deenAllahApiBase",value);location.search=value?`?api=${encodeURIComponent(value)}`:"";}
 function installLearningHubLink(){const header=document.querySelector("header");if(!header||document.getElementById("learning-hub-link"))return;const a=document.createElement("a");a.id="learning-hub-link";a.href="./learning-hub.html";a.textContent="🎓 مركز التعلم التفاعلي — عبادات • قرآن • قبلة • مواقيت • زكاة";a.style.cssText="display:inline-block;margin-top:14px;padding:10px 16px;border-radius:999px;background:#fff;color:#0d4b36;text-decoration:none;font-weight:700";header.appendChild(a);}
-ensureConceptModal();installLearningHubLink();installOfflineOmegaUI();registerOfflineAppShell();$("api-base").value=apiBase;$("search-btn").addEventListener("click",search);$("query").addEventListener("keydown",e=>{if(e.key==="Enter")search();});$("save-api").addEventListener("click",saveApi);$("api-check").addEventListener("click",checkApi);document.querySelectorAll("[data-category]").forEach(el=>el.addEventListener("click",()=>loadSources(el.dataset.category)));checkApi();
+ensureConceptModal();installLearningHubLink();installLocalProviderBoundary();installOfflineOmegaUI();registerOfflineAppShell();$("api-base").value=apiBase;$("search-btn").addEventListener("click",search);$("query").addEventListener("keydown",e=>{if(e.key==="Enter")search();});$("save-api").addEventListener("click",saveApi);$("api-check").addEventListener("click",checkApi);document.querySelectorAll("[data-category]").forEach(el=>el.addEventListener("click",()=>loadSources(el.dataset.category)));checkApi();
 const quranRecitationScript=document.createElement("script");quranRecitationScript.src="./quran-recitation.js";quranRecitationScript.defer=true;document.head.appendChild(quranRecitationScript);
 const voiceScript=document.createElement("script");voiceScript.src="./voice.js";voiceScript.defer=true;document.head.appendChild(voiceScript);
 const bawabatVoiceScript=document.createElement("script");bawabatVoiceScript.src="./ya-bawabat-al-ilm.js";bawabatVoiceScript.defer=true;document.head.appendChild(bawabatVoiceScript);
