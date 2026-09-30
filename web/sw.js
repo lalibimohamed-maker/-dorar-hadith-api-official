@@ -1,3 +1,5 @@
+importScripts("./omega-offline-delta-sync.js");
+
 const CACHE_NAME = "deen-allah-offline-v1";
 const APP_SHELL = [
   "./",
@@ -9,6 +11,7 @@ const APP_SHELL = [
   "./omega-audio-session.js",
   "./omega-visual-pruner.js",
   "./omega-multimodal-context-guard.js",
+  "./omega-offline-delta-sync.js",
   "./omega-offline-evidence-worker.js",
   "./offline-omega-ui.js",
   "./omega-local-provider.js",
@@ -28,6 +31,31 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+});
+
+self.addEventListener("message", event => {
+  const message = event.data || {};
+  if (message.type !== "OMEGA_APPLY_EVIDENCE_DELTA") return;
+  event.waitUntil((async () => {
+    try {
+      const result = message.url
+        ? await self.deenAllahOmegaOfflineSync.fetchAndApply(message.url, {
+            mode: "online_only",
+            trustedPublicKeys: message.trustedPublicKeys || {}
+          })
+        : await self.deenAllahOmegaOfflineSync.applyDelta(message.delta, {
+            requireSignature: true,
+            trustedPublicKeys: message.trustedPublicKeys || {}
+          });
+      event.source?.postMessage?.({ type: "OMEGA_EVIDENCE_DELTA_RESULT", ok: true, result });
+    } catch (error) {
+      event.source?.postMessage?.({
+        type: "OMEGA_EVIDENCE_DELTA_RESULT",
+        ok: false,
+        error: String(error?.message ?? error)
+      });
+    }
+  })());
 });
 
 self.addEventListener("fetch", event => {
