@@ -111,6 +111,23 @@
       "rights_promotion_status": "draft_only_pending_license_review"
     },
     {
+      "id": "sana-sprint-1.6b",
+      "model_id": "Efficient-Large-Model/Sana_Sprint_1.6B_1024px",
+      "revision": "9f6866d6962d5d91d213f113e162cb18bffe741c",
+      "license": "apache-2.0",
+      "release_tag": "rechercher-omega-sana-sprint16-v1.0.0",
+      "release_visibility": "prerelease",
+      "estimated_gb": 6.45,
+      "acquisition": "github_release",
+      "rights_promotion_status": "weights_clear; runtime_dependency_blocked",
+      "runtime_status": "dependency_blocked",
+      "runtime_dependency": {
+        "model_id": "google/gemma-2-2b-it",
+        "status": "external_dependency_not_embedded",
+        "reason": "SANA-Sprint model card identifies Gemma2-2B-IT as its fixed pretrained text encoder; dependency terms/access must be cleared separately."
+      }
+    },
+    {
       "id": "flux",
       "model_id": "black-forest-labs/FLUX.1-schnell",
       "revision": null,
@@ -131,7 +148,8 @@
     "Public Apache-2.0 models may be published as prerelease assets subject to the project rights gate.",
     "HunyuanVideo-1.5 and LTX-2 use community licenses and remain draft_review_only pending applicable redistribution review.",
     "FLUX.1-schnell is gated and requires account acceptance/access; no automated bypass is attempted.",
-    "SGLang is an inference runtime and therefore has no model-weight acquisition target."
+    "SGLang is an inference runtime and therefore has no model-weight acquisition target.",
+    "SANA-Sprint-1.6B weights are public Apache-2.0 at the pinned HF revision; its executable runtime depends on Gemma2-2B-IT, which is tracked separately and is not silently redistributed."
   ],
   "continuationRequestedAt": "2026-09-30",
   "continuationPolicy": "download_verified_free_first_engines_to_release_assets; never_commit_weights"
