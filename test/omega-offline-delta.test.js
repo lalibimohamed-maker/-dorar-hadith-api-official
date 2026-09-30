@@ -45,6 +45,25 @@ test("offline delta signs the base/target snapshot contract", () => {
   assert.equal(verifyOfflineDeltaSignature(delta, { trustedPublicKeys: { "root-1": publicKey } }), true);
 });
 
+test("snapshot root detects metadata changes even when content hash is unchanged", () => {
+  const base = {
+    node_id: "n1",
+    content_sha256: "a".repeat(64),
+    verification_status: "verified",
+    title: "title",
+    text: "text",
+    citation: "citation-1",
+    source_id: "source",
+    language: "ar",
+    updated_at: "2026-09-30T00:00:00Z"
+  };
+  const changed = { ...base, citation: "citation-2" };
+  assert.notEqual(
+    computeEvidenceSnapshotRoot([base]),
+    computeEvidenceSnapshotRoot([changed])
+  );
+});
+
 test("delta signature invalidates when the target root changes", () => {
   const { publicKey, privateKey } = generateKeyPairSync("ed25519");
   const delta = signOfflineDelta({
