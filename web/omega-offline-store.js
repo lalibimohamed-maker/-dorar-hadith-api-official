@@ -147,6 +147,61 @@
     })));
   }
 
+  function canonicalize(value) {
+    if (Array.isArray(value)) return value.map(canonicalize);
+    if (value && typeof value === "object") {
+      return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonicalize(value[key])]));
+    }
+    return value;
+  }
+
+  async function exportEvidenceBundle() {
+    const records = (await getAllEvidence()).sort((a, b) => a.node_id.localeCompare(b.node_id));
+    const payload = {
+      schema_version: "1.0.0",
+      format: "dinullah/omega-offline-evidence-bundle",
+      generated_at: new Date().toISOString(),
+      count: records.length,
+      records
+    };
+    const canonical = JSON.stringify(canonicalize(payload)) + "\n";
+    const bundleSha = await sha256Text(canonical);
+    return Object.freeze({
+      ...payload,
+      bundle_sha256: bundleSha
+    });
+  }
+
+  async function exportEvidenceBundleText() {
+    return JSON.stringify(await exportEvidenceBundle(), null, 2) + "\n";
+  }
+
+  async function importEvidenceBundle(bundle) {
+    if (!bundle || typeof bundle !== "object") throw new Error("OFFLINE_BUNDLE_INVALID");
+    if (bundle.schema_version !== "1.0.0" || bundle.format !== "dinullah/omega-offline-evidence-bundle") {
+      throw new Error("OFFLINE_BUNDLE_SCHEMA_UNSUPPORTED");
+    }
+    if (!Array.isArray(bundle.records)) throw new Error("OFFLINE_BUNDLE_RECORDS_INVALID");
+    const claimed = String(bundle.bundle_sha256 ?? "").toLowerCase();
+    if (!HEX_SHA256.test(claimed)) throw new Error("OFFLINE_BUNDLE_HASH_MISSING");
+
+    const payload = {
+      schema_version: bundle.schema_version,
+      format: bundle.format,
+      generated_at: bundle.generated_at,
+      count: bundle.count,
+      records: [...bundle.records].sort((a, b) => String(a?.node_id ?? "").localeCompare(String(b?.node_id ?? "")))
+    };
+    const canonical = JSON.stringify(canonicalize(payload)) + "\n";
+    const actual = await sha256Text(canonical);
+    if (actual !== claimed) throw new Error("OFFLINE_BUNDLE_HASH_MISMATCH");
+    if (Number(bundle.count) !== bundle.records.length) throw new Error("OFFLINE_BUNDLE_COUNT_MISMATCH");
+
+    const verified = [];
+    for (const record of bundle.records) verified.push(await putEvidence(record));
+    return Object.freeze({ imported: verified.length, bundle_sha256: actual });
+  }
+
   async function clearEvidence() {
     const { objectStore } = await transaction("readwrite");
     await requestToPromise(objectStore.clear());
@@ -161,7 +216,10 @@
     countEvidence,
     clearEvidence,
     normalizeQuery,
-    queryVariants: variants
+    queryVariants: variants,
+    exportEvidenceBundle,
+    exportEvidenceBundleText,
+    importEvidenceBundle
   });
   window.dispatchEvent(new CustomEvent("deenallah:omega-store-ready"));
 })();
