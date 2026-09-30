@@ -58,6 +58,7 @@ export async function runGovernedAssistantTurn({
   sessionId = null,
   distributedMemory = null,
   requireDistributedMemory = false,
+  claimProvenance = [],
   executor = executeSelectedBackend
 } = {}) {
   if (!String(query ?? "").trim()) throw new TypeError("assistant query is required");
@@ -304,7 +305,8 @@ export async function runGovernedAssistantTurn({
         kind: item.kind,
         exact_quote_required: item.exact_quote_required
       })),
-      citations
+      citations,
+      claimProvenance: Array.isArray(claimProvenance) ? claimProvenance : []
     });
 
     if (hasDistributedMemory) {
