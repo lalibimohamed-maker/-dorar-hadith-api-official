@@ -118,7 +118,7 @@ async function handleRpc(req,body) {
       const name=body.params?.name;
       const def=tool(name);
       if(!def) return rpcError(id,-32602,"Unknown tool",{name});
-      try {
+      try{
         const args=body.params?.arguments || {};
         validateArguments(def,args);
         if(name==="deen_verify_answer"){
@@ -132,6 +132,10 @@ async function handleRpc(req,body) {
           const data=verifyAgentAnswer({answer:args.answer,evidence,citations});
           return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:!data.verified});
         }
+        const data=await callApi(name,args);
+        return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:false});
+      }catch(error){
+        return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"UPSTREAM_ERROR",message:error.message,data:error.data||null})}],isError:true});
       }
     }
     default:
