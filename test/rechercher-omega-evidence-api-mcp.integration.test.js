@@ -33,6 +33,20 @@ test("AI gateway exposes the strict evidence verifier",{timeout:8000},async()=>{
     assert.equal(bad.status,422); assert.equal(bad.body.data.verified,false); assert.equal(bad.body.data.error.code,"STRICT_ALIGNMENT_MISMATCH"); assert.equal(bad.body.data.fallback,evidence[0].text);
     const none=await requestJson("http://127.0.0.1:"+port+"/api/v1/agents/verify",{answer:"ذاكرة النموذج",evidence:[],citations:[]});
     assert.equal(none.status,422); assert.equal(none.body.data.error.code,"NO_EVIDENCE_FOUND");
+
+    const forgedClaim=await requestJson("http://127.0.0.1:"+port+"/api/v1/agents/verify",{
+      answer:evidence[0].text+". وهذا الحديث يدل على وجوب النية في العمل.",
+      evidence,
+      citations,
+      claimProvenance:[{
+        claim_text:"وهذا الحديث يدل على وجوب النية في العمل",
+        verification_status:"verified",
+        claim_sha256:"0".repeat(64),
+        citations
+      }]
+    });
+    assert.equal(forgedClaim.status,422);
+    assert.equal(forgedClaim.body.data.error.code,"UNSUPPORTED_CLAIM");
   }finally{await shutdown(server);}
 });
 
