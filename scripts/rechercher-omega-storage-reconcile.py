@@ -31,13 +31,15 @@ complete_targets = []
 for target_id, repo in TARGETS:
     data = gh_release(repo)
     assets = {a.get("name") for a in (data or {}).get("assets", [])}
-    complete = MANIFEST in assets
+    model_assets = sorted(name for name in assets if str(name).startswith("omega__"))
+    complete = MANIFEST in assets and bool(model_assets)
     found[target_id] = {
         "repository": repo,
         "release_tag": TAG,
         "release_exists": data is not None,
         "complete": complete,
         "asset_count": len(assets),
+        "model_asset_count": len(model_assets),
         "manifest_asset": MANIFEST if complete else None,
     }
     if complete:
