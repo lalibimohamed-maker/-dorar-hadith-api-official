@@ -504,11 +504,8 @@ jobs:
           gh release upload "$RELEASE_TAG" "${RUNNER_TEMP}/sana-runtime-dependencies.json" --repo "$REPO" --clobber
 
       # release-manifest.json is a weights-only manifest; it never declares runtime completeness.
-      - name: Skip acquisition when Omega Release is already complete
-        if: steps.existing_release.outputs.complete == 'true'
-        run: echo "Existing verified Release is authoritative; no duplicate weight download."
-
-        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
+      - name: Verify Release manifest after acquisition
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
@@ -517,7 +514,6 @@ jobs:
           set -euo pipefail
           gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name' | grep -Fxq "release-manifest.json"
           echo "[OK] Weights manifest exists for $RELEASE_TAG"
-
       - name: Verify Hunyuan runtime completeness
         if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && matrix.id == 'hunyuanvideo-1.5'
         env:
