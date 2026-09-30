@@ -28,3 +28,15 @@ test("evidence-first runner blocks absent evidence before accepting model output
  });
  assert.equal(r.verification.verified,false); assert.equal(r.verification.error.code,"NO_EVIDENCE_FOUND"); assert.equal(r.result,null); assert.equal(r.fallback,null);
 });
+
+
+test("governed runner can retrieve evidence through a GraphRAG-compatible retriever",async()=>{
+ const r=await runEvidenceFirstResearch({
+  provider:{generate:async({evidence})=>({provider:"fixture",model:"fixture",text:evidence[0].text})},
+  query:"حديث الأعمال بالنيات",
+  retriever:{search:async q=>[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",retrieved_for:q}]},
+  citations:[{sourceId:"bukhari",citation:"vol.1 p.1"}],
+  messages:[]
+ });
+ assert.equal(r.retrievedEvidence.length,1); assert.equal(r.verification.verified,true); assert.equal(r.result.provider,"fixture");
+});
