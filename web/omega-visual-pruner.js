@@ -37,10 +37,10 @@
     const effectiveProfile = contextPlan ? { ...profile, target_visual_tokens: contextPlan.available_visual_tokens } : profile;
     const align = alignment(effectiveProfile);
     const budget = Math.max(1, Math.floor(positive(effectiveProfile.target_visual_tokens, DEFAULTS.target_visual_tokens)));
-    const maxPixels = Math.max(
-      positive(effectiveProfile.min_pixels, DEFAULTS.min_pixels),
-      Math.min(positive(effectiveProfile.max_pixels, DEFAULTS.max_pixels), budget * align * align)
-    );
+    const byTokens = budget * align * align;
+    const minPixels = positive(effectiveProfile.min_pixels, DEFAULTS.min_pixels);
+    if (minPixels > byTokens) throw new RangeError("VISUAL_BUDGET_BELOW_MODEL_MINIMUM");
+    const maxPixels = Math.min(positive(effectiveProfile.max_pixels, DEFAULTS.max_pixels), byTokens);
     const sourceWidth = Math.max(1, Number(width) || 1);
     const sourceHeight = Math.max(1, Number(height) || 1);
     const maxDimension = Math.max(align, Math.floor(positive(
@@ -48,8 +48,8 @@
       runtimeProfile?.target_runtime === "WASM" ? DEFAULTS.max_dimension / 2 : DEFAULTS.max_dimension
     )));
     const scale = Math.min(1, Math.sqrt(maxPixels / (sourceWidth * sourceHeight)));
-    let targetWidth = Math.max(align, Math.round(sourceWidth * scale / align) * align);
-    let targetHeight = Math.max(align, Math.round(sourceHeight * scale / align) * align);
+    let targetWidth = Math.max(align, Math.floor(sourceWidth * scale / align) * align);
+    let targetHeight = Math.max(align, Math.floor(sourceHeight * scale / align) * align);
     while (targetWidth * targetHeight > maxPixels && (targetWidth > align || targetHeight > align)) {
       if (targetWidth / targetHeight >= sourceWidth / sourceHeight && targetWidth > align) targetWidth -= align;
       else if (targetHeight > align) targetHeight -= align;
