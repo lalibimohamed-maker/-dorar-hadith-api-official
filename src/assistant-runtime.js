@@ -47,6 +47,7 @@ export async function runAssistantSearch({
   useOmega = false,
   executeOmega = false,
   omegaOptions = {},
+  graphRagRuntime = null,
 } = {}) {
   const normalizedLanguage = normalizeLanguage(language);
   const session = createMultimodalSession({ language: normalizedLanguage });
@@ -69,10 +70,23 @@ export async function runAssistantSearch({
   };
 
   if (useOmega) {
+    let graphRag = null;
+    if (graphRagRuntime) {
+      graphRag = await graphRagRuntime.search(query, { limit: Number(omegaOptions.graphRagLimit || 8) });
+    }
+    const omegaEvidence = [
+      ...buildOmegaEvidence(result),
+      ...(Array.isArray(graphRag) ? graphRag.map(item => ({
+        source_id: item?.payload?.sourceId ?? item?.sourceId ?? item?.id ?? 'graphrag',
+        text: item?.payload?.text ?? item?.text ?? '',
+        verification: item?.payload?.verification ?? 'source-backed-vector-retrieval',
+        provenance: item?.payload?.provenance ?? null
+      })) : [])
+    ].filter(item => item.text);
     response.omega = await runGovernedAssistantTurn({
       query,
       language: normalizedLanguage,
-      evidence: buildOmegaEvidence(result),
+      evidence: omegaEvidence,
       output_kind: omegaOptions.output_kind ?? 'analysis',
       requested_models: omegaOptions.requested_models ?? [],
       blocked_models: omegaOptions.blocked_models ?? [],
@@ -81,6 +95,7 @@ export async function runAssistantSearch({
       execute: Boolean(executeOmega),
       search_context: { rights_status: omegaOptions.rights_status ?? 'unknown' },
     });
+    response.omega.graphRag = { enabled: Boolean(graphRagRuntime), results: Array.isArray(graphRag) ? graphRag.length : 0 };
   }
 
   return response;
