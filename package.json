@@ -40,7 +40,8 @@
     "test:omega-ai": "node --test test/rechercher-omega-ai-capability-registry.test.js test/rechercher-omega-ai-runtime.test.js test/rechercher-omega-repository-intelligence.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-resilience.test.js test/rechercher-omega-assistant-bridge.test.js test/rechercher-omega-quality-gates.test.js test/rechercher-omega-multimodal-router.test.js",
     "mcp": "node src/rechercher-ai-mcp-server.js",
     "test:mcp": "node --test test/rechercher-ai-mcp-server.test.js",
-    "ai-gateway": "node src/rechercher-ai-gateway.js"
+    "ai-gateway": "node src/rechercher-ai-gateway.js",
+    "test:omega-e2e": "node --test test/rechercher-omega-governed-run.test.js test/rechercher-omega-evidence-api-mcp.integration.test.js test/rechercher-omega-governance-redis-e2e.integration.test.js test/rechercher-omega-assistant-redis.integration.test.js"
   },
   "engines": {
     "node": ">=20"
