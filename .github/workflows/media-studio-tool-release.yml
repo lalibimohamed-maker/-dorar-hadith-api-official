@@ -196,8 +196,8 @@ jobs:
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
           elif [ "$PUBLISH" = "true" ]; then
-            gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Studio Tools $RELEASE_TAG" --notes "Free/open-source media production tool cache with upstream provenance, licensing evidence and SHA-256 verification. Separate from scholarly Corpus and AI model-weight releases."
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Studio Tools $RELEASE_TAG" --notes "Free/open-source media production tool cache with upstream provenance, licensing evidence and SHA-256 verification. Separate from scholarly Corpus and AI model-weight releases."
           else
-            gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Studio Tools $RELEASE_TAG" --notes "Draft free/open-source media tool cache." --draft
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/* --repo "$GITHUB_REPOSITORY" --title "Din Allah Media Studio Tools $RELEASE_TAG" --notes "Draft free/open-source media tool cache." --draft
           fi
           gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json name,tagName,isDraft,assets
