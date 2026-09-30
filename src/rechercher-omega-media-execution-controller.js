@@ -1,16 +1,17 @@
 import { taskToCapability } from "./rechercher-omega-ai-router.js";
 
 export function createMediaExecutionController({execution,mediaAdapters={}}={}) {
-  if(!execution) throw new Error("media controller requires execution service");
+  if(!execution || typeof execution.run!=="function") throw new Error("media controller requires execution service");
   return Object.freeze({
     async submit(mediaJob) {
       const capability=taskToCapability(mediaJob);
-      return execution.execute({
+      return execution.run({
         ...mediaJob,
         capability,
         input:{brief:mediaJob.brief,input:mediaJob.input,media:mediaJob.media},
         preferEngines:mediaJob.preferEngines,
-        resourceRequirements:mediaJob.resourceRequirements
+        resourceRequirements:mediaJob.resourceRequirements,
+        provenance:mediaJob.provenance
       });
     },
     async render(renderJob) {
