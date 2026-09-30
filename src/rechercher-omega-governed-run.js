@@ -9,6 +9,7 @@ export async function runEvidenceFirstResearch({
   evidence = [],
   citations = [],
   claims = [],
+  claimProvenance = [],
   retriever = null,
   messages = []
 } = {}) {
@@ -23,7 +24,7 @@ export async function runEvidenceFirstResearch({
   }
 
   if (!Array.isArray(retrieved) || retrieved.length === 0) {
-    const verification = verifyAgentAnswer({answer:"", evidence:[], citations:[]});
+    const verification = verifyAgentAnswer({answer:"", evidence:[], citations:[], claimProvenance});
     return Object.freeze({
       query: normalized,
       conflicts,
@@ -39,7 +40,7 @@ export async function runEvidenceFirstResearch({
 
   const hardGate = applyEvidenceHardGate(retrieved);
   if (hardGate.accepted.length === 0) {
-    const verification = verifyAgentAnswer({answer:"", evidence:[], citations:[]});
+    const verification = verifyAgentAnswer({answer:"", evidence:[], citations:[], claimProvenance});
     return Object.freeze({
       query: normalized,
       conflicts,
@@ -71,6 +72,7 @@ export async function runEvidenceFirstResearch({
       verification: {
         verified:false,
         verification:null,
+        claimVerification:null,
         fallback:null,
         error:{code:"MODEL_EXECUTION_FAILED",message:error.message}
       },
@@ -82,7 +84,13 @@ export async function runEvidenceFirstResearch({
   }
 
   const answer = generated?.text ?? "";
-  const verification = verifyAgentAnswer({answer,evidence:retrieved,citations});
+  const trustedClaimProvenance = Array.isArray(claimProvenance) ? claimProvenance : [];
+  const verification = verifyAgentAnswer({
+    answer,
+    evidence:retrieved,
+    citations,
+    claimProvenance:trustedClaimProvenance
+  });
 
   return Object.freeze({
     query: normalized,
