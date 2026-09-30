@@ -1,0 +1,87 @@
+name: Rechercher Omega — strict evidence + live Redis E2E
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-e2e-governance-redis-2026-09-30
+    paths:
+      - src/rechercher-omega-evidence-gate.js
+      - src/rechercher-omega-redis-memory.js
+      - src/rechercher-omega-answer-verifier.js
+      - src/rechercher-ai-gateway.js
+      - src/rechercher-ai-mcp-server.js
+      - test/rechercher-omega-governed-run.test.js
+      - test/rechercher-omega-evidence-api-mcp.integration.test.js
+      - test/rechercher-omega-governance-redis-e2e.integration.test.js
+      - runtime/redis/docker-compose.yml
+      - config/rechercher-omega-memory-production-2026.json
+      - .github/workflows/rechercher-omega-strict-governance-redis-e2e.yml
+  pull_request:
+    branches:
+      - main
+      - feat/rechercher-omega-multimodal-intelligence
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-omega-strict-governance-redis-e2e
+  cancel-in-progress: true
+
+jobs:
+  strict-e2e:
+    name: Strict evidence gate + live Redis + concurrency
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Start self-hosted Redis
+        run: docker compose -f runtime/redis/docker-compose.yml up -d
+
+      - name: Wait for Redis
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            if docker compose -f runtime/redis/docker-compose.yml exec -T redis redis-cli ping 2>/dev/null | grep -q '^PONG$'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker compose -f runtime/redis/docker-compose.yml ps
+          exit 1
+
+      - name: Run strict governance matrix
+        env:
+          REQUIRE_REDIS_E2E: "1"
+          REDIS_HOST: "127.0.0.1"
+          REDIS_PORT: "6379"
+          REDIS_SESSION_TTL_SECONDS: "3600"
+          REDIS_MAX_TURNS: "64"
+          AI_GATEWAY_RATE_PER_MINUTE: "10000"
+          AI_GATEWAY_BURST: "1000"
+          MCP_RATE_LIMIT_PER_MINUTE: "10000"
+          MCP_RATE_BURST: "1000"
+        run: |
+          set -euo pipefail
+          node --test \
+            test/rechercher-omega-governed-run.test.js \
+            test/rechercher-omega-evidence-api-mcp.integration.test.js \
+            test/rechercher-omega-governance-redis-e2e.integration.test.js
+
+      - name: Shutdown Redis
+        if: always()
+        run: docker compose -f runtime/redis/docker-compose.yml down -v
