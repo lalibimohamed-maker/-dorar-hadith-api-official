@@ -81,6 +81,16 @@ These conditions require real-device validation because CI cannot reproduce mobi
 
 These tests complement, rather than replace, the deterministic CI contracts.
 
+## Multimodal context and local Vision runtime
+
+The local Transformers.js adapter now accepts an explicit `task: "image-text-to-text"` for local Vision-Language Models. This path remains fail-closed for remote model loading by keeping `env.allowRemoteModels = false`, `local_files_only: true`, and a caller-supplied local model path.
+
+Image preprocessing is model-profile-driven rather than a universal 224px rule. For Qwen2-VL-compatible profiles, Hugging Face documents `patch_size=14`, `temporal_patch_size=2`, and a 28px token accounting unit; its low-memory example uses `256*28*28` to `1024*28*28` pixels for 256–1024 visual tokens. The runtime therefore derives target dimensions from the model profile and preserves page aspect ratio instead of forcing every document to a square. citeturn405164search0turn722142search2
+
+Before multimodal generation, `OmegaMultimodalContextGuard` reserves verified-evidence, text, generation, and safety budgets. Only the remaining context budget is available to visual input; when those reservations cannot fit, the multimodal request is blocked rather than dropping evidence.
+
+The current repository does not claim that every Transformers.js release/model supports every VLM architecture. The task is explicit so an installed/local model must actually expose the requested `image-text-to-text` pipeline before production use. Transformers.js documents `AutoModelForImageTextToText`, and current ONNX model cards demonstrate local Qwen3-VL usage through Transformers.js. citeturn722142search0turn722142search3
+
 ## Browser API compatibility notes
 
 GPUDevice exposes uncapturederror and lost; there is no navigator.gpu.onuncaughterror event used by this runtime. The guard therefore attaches to the actual GPUDevice object. Reference: https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/uncapturederror_event and https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/lost.
