@@ -26,7 +26,6 @@ export async function verifyEvidenceHit(hit, { expectedStatus = "verified" } = {
     node_id: document.node_id,
     content_sha256: document.content_sha256.toLowerCase(),
     citation: document.citation,
-    text: document.text,
-    citation: document.citation
+    text: document.text
   });
 }
