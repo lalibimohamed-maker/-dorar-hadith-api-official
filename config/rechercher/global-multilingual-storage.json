@@ -2,7 +2,7 @@
   "schema": "din-allah-encyclopedia/rechercher-global-multilingual-storage/v1",
   "source_repository": "lalibimohamed-maker/-dorar-hadith-api-official",
   "storage_repository": "lalibimohamed-maker/dinullah-matrix-3192-storage-01",
-  "purpose": "Dedicated storage boundary for the 3,192-cell global multilingual matrix outputs; matrix data and acquisition artifacts are persisted here without mixing them into the main source repository.",
+  "purpose": "Dedicated storage boundary for the 6,384-cell global multilingual matrix outputs (133 languages × 48 Islamic knowledge domains); matrix data and acquisition artifacts are persisted here without mixing them into the main source repository.",
   "scope": {
     "matrix_evidence": "research/evidence/global-multilingual/**",
     "research_outputs": "artifacts/rechercher/global-multilingual-research/**",
@@ -25,7 +25,9 @@
     "matrix_scoped_pdf_acquisition_in_matrix_storage": true,
     "rights_gate_before_public_pdf_persistence": true,
     "research_only_pdf_storage": "private_secondary_storage",
-    "public_matrix_pdf_storage": "only_explicitly_redistributable"
+    "public_matrix_pdf_storage": "only_explicitly_redistributable",
+    "matrix_cell_cardinality": "133 × 48 = 6384",
+    "current_matrix_domain_count": 48
   },
   "restricted_storage": {
     "repository": "lalibimohamed82-coder/rechercher-pdf-storage",
