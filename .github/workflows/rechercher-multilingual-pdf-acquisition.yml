@@ -36,7 +36,7 @@ jobs:
     env:
       ACQUISITION_SHARD_INDEX: ${{ inputs.shard_index }}
       ACQUISITION_SHARD_COUNT: ${{ inputs.shard_count }}
-      # Existing durable matrix Release storage. Its 3192 name is legacy; storage is independent from the current 4921-cell cardinality.
+      # Existing durable matrix Release storage. Its 3192 name is legacy; storage is independent from the current 6384-cell cardinality.
       MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
     steps:
       - name: Checkout
@@ -291,7 +291,7 @@ jobs:
         run: |
           set -euo pipefail
           manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
-          node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));const cells=m.cells||m.languages||{};if(m.cell_count!==4921||Object.keys(cells).length!==4921)process.exit(1);for(const [id,e] of Object.entries(cells)){if(e.cell_id!==id||!e.language||!e.domain)process.exit(1)};console.log(`CELL_INVENTORY_OK cells=${Object.keys(cells).length} files=${m.total_files}`)' "$manifest"
+          node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));const cells=m.cells||m.languages||{};if(m.cell_count!==6384||Object.keys(cells).length!==6384)process.exit(1);for(const [id,e] of Object.entries(cells)){if(e.cell_id!==id||!e.language||!e.domain)process.exit(1)};console.log(`CELL_INVENTORY_OK cells=${Object.keys(cells).length} files=${m.total_files}`)' "$manifest"
 
       - name: Reject encrypted review artifacts and validate source file extensions
         run: |
