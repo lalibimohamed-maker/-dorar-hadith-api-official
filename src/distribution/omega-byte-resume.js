@@ -237,7 +237,7 @@ export class ByteRangeResumeEngine {
       throw new Error("RANGE_RESPONSE_INVALID");
     }
 
-    const handle = await open(absolutePath, "r+").catch(async error => {
+    if (resumeOffset === 0) {\n      await truncate(absolutePath, 0).catch(error => {\n        if (error?.code !== "ENOENT") throw error;\n      });\n    }\n\n    const handle = await open(absolutePath, "r+").catch(async error => {
       if (error?.code !== "ENOENT") throw error;
       return open(absolutePath, "w+");
     });
