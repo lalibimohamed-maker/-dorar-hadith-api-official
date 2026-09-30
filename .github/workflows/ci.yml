@@ -24,7 +24,29 @@ jobs:
       fail-fast: false
       matrix:
         node-version: [24, 22]
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
+      - name: Wait for Redis
+        shell: bash
+        run: |
+          for attempt in {1..30}; do
+            if redis-cli -h 127.0.0.1 -p 6379 ping | grep -q PONG; then
+              echo 'Redis is ready'
+              exit 0
+            fi
+            sleep 1
+          done
+          echo 'Redis did not become ready'
+          exit 1
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
