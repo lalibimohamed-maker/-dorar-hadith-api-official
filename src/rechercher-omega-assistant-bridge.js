@@ -10,6 +10,7 @@ import { loadExecutionBackends, selectExecutionBackend, executeSelectedBackend }
 import { buildTelemetryContext, completeTelemetry } from "./rechercher-omega-observability.js";
 import { buildEvidenceEnvelope, buildScholarlySystemPrompt } from "./rechercher-omega-evidence-envelope.js";
 import { ConversationMemory } from "./rechercher-omega-conversation-memory.js";
+import { sha256 } from "./rechercher-omega-redis-memory.js";
 import { verifyAgentAnswer } from "./rechercher-omega-answer-verifier.js";
 import { evaluateRuntimeArtifactReadiness } from "./rechercher-omega-runtime-readiness.js";
 
@@ -53,7 +54,10 @@ export async function runGovernedAssistantTurn({
   cacheEntry = null,
   cacheWriter = null,
   conversationHistory = [],
-  runtimeArtifact = null
+  runtimeArtifact = null,
+  sessionId = null,
+  distributedMemory = null,
+  requireDistributedMemory = false
 } = {}) {
   if (!String(query ?? "").trim()) throw new TypeError("assistant query is required");
 
@@ -213,6 +217,42 @@ export async function runGovernedAssistantTurn({
     };
   }
 
+  const hasDistributedMemory = Boolean(sessionId && distributedMemory);
+  if (requireDistributedMemory && !sessionId) {
+    throw new TypeError("sessionId is required when distributed memory is mandatory");
+  }
+  let distributedMemoryState = hasDistributedMemory ? "configured" : "volatile_only";
+  const distributedEvidenceIds = evidence
+    .map(item => item?.source_id ?? item?.sourceId ?? item?.id ?? item?.node_id ?? item?.hadith_id)
+    .filter(Boolean)
+    .slice(0, 50);
+
+  if (hasDistributedMemory) {
+    try {
+      if (typeof distributedMemory.ping === "function" && !(await distributedMemory.ping())) {
+        throw new Error("REDIS_PING_FAILED");
+      }
+      await distributedMemory.appendDigest({
+        sessionId,
+        role: "user",
+        content: String(query).trim(),
+        evidenceIds: distributedEvidenceIds,
+        verified: false
+      });
+    } catch (error) {
+      distributedMemoryState = "unavailable";
+      if (requireDistributedMemory) {
+        return {
+          status: "blocked",
+          reason: "distributed_memory_unavailable",
+          error: { code: "REDIS_MEMORY_UNAVAILABLE", message: error.message },
+          corpus_write_allowed: false,
+          generatedMediaIsEvidence: false
+        };
+      }
+    }
+  }
+
   const memory = new ConversationMemory({ maxTurns: 20, maxCharsPerMessage: 12000 });
   for (const turn of Array.isArray(conversationHistory) ? conversationHistory : []) {
     if (turn && typeof turn === "object") {
@@ -264,6 +304,38 @@ export async function runGovernedAssistantTurn({
       })),
       citations
     });
+
+    if (hasDistributedMemory) {
+      try {
+        await distributedMemory.appendDigest({
+          sessionId,
+          role: "assistant",
+          content: generatedText,
+          evidenceIds: distributedEvidenceIds,
+          outputSha256: sha256(generatedText),
+          verified: verification.verified === true
+        });
+        distributedMemoryState = "persisted";
+      } catch (error) {
+        distributedMemoryState = "append_failed";
+        if (requireDistributedMemory) {
+          return {
+            status: "blocked",
+            plan,
+            backend: gate,
+            provenance,
+            runtime_readiness: runtimeReadiness,
+            verification,
+            result: null,
+            fallback: verification.verified ? null : verification.fallback,
+            error: { code: "REDIS_MEMORY_UNAVAILABLE", message: error.message },
+            corpus_write_allowed: false,
+            generatedMediaIsEvidence: false,
+            distributed_memory: { state: distributedMemoryState, session_id: sessionId }
+          };
+        }
+      }
+    }
     if (!verification.verified) {
       return {
         status: "blocked",
@@ -274,6 +346,7 @@ export async function runGovernedAssistantTurn({
         verification,
         result: null,
         fallback: verification.fallback,
+        distributed_memory: { state: distributedMemoryState, session_id: sessionId },
         telemetry: completeTelemetry(telemetryContext, {
           status: "blocked",
           cache_hit: false,
@@ -302,6 +375,7 @@ export async function runGovernedAssistantTurn({
     result,
     provenance,
     runtime_readiness: runtimeReadiness,
+    distributed_memory: { state: distributedMemoryState, session_id: sessionId },
     cache: { hit: false, key: cacheKey, entry: cache },
     telemetry: completeTelemetry(telemetryContext, {
       status: "succeeded",
