@@ -126,6 +126,49 @@ function mcpResult(id,result) {
   return {jsonrpc:"2.0",id,result:{...result,_meta:{"io.modelcontextprotocol/serverInfo":{name:"din-allah-rechercher-mcp",version:"1.0.0",anchoring_version:MCP_STRICT_ANCHORING_VERSION}}}};
 }
 
+async function executeVerifyAnswer(args){
+  let evidence,citations;
+  try{
+    evidence=JSON.parse(args.evidence_json);
+    citations=JSON.parse(args.citations_json);
+  }catch(error){
+    return {__mcp_error:true,value:{code:"INVALID_VERIFICATION_JSON",message:error.message}};
+  }
+
+  const anchoredEvidence=buildStrictEvidenceRecord(evidence);
+  const data=verifyAgentAnswer({
+    answer:args.answer,
+    evidence:evidence.map((item,index)=>({
+      ...item,
+      text_hash:item?.text_hash ?? anchoredEvidence[index]?.text_sha256 ?? undefined
+    })),
+    citations
+  });
+  return data;
+}
+
+async function executeApiTool(name,args){
+  return callApi(name,args);
+}
+
+async function executeSearch(args){
+  const data=await callApi("deen_search",args);
+  return paginateSearch(data,{
+    q:args.q,
+    cursor:args.cursor||null,
+    limit:Number(args.limit||20)
+  });
+}
+
+const TOOL_EXECUTORS=Object.freeze(new Map([
+  ["deen_search",executeSearch],
+  ["deen_concept",args=>executeApiTool("deen_concept",args)],
+  ["deen_quran_ayah",args=>executeApiTool("deen_quran_ayah",args)],
+  ["deen_source",args=>executeApiTool("deen_source",args)],
+  ["deen_verify_answer",executeVerifyAnswer],
+  ["deen_health",args=>executeApiTool("deen_health",args)]
+]));
+
 async function handleRpc(req,body) {
   const id=body.id ?? null;
   const version=protocolVersion(req,body);
@@ -143,28 +186,12 @@ async function handleRpc(req,body) {
       try{
         const args=body.params?.arguments || {};
         validateArguments(def,args);
-        if(name==="deen_verify_answer"){
-          let evidence,citations;
-          try{
-            evidence=JSON.parse(args.evidence_json);
-            citations=JSON.parse(args.citations_json);
-          }catch(error){
-            return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"INVALID_VERIFICATION_JSON",message:error.message})}],isError:true});
-          }
-          const anchoredEvidence=buildStrictEvidenceRecord(evidence);
-          const data=verifyAgentAnswer({
-            answer:args.answer,
-            evidence:evidence.map((item,index)=>({
-              ...item,
-              text_hash:item?.text_hash ?? anchoredEvidence[index]?.text_sha256 ?? undefined
-            })),
-            citations
-          });
-          return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:!data.verified});
-        }
-        let data=await callApi(name,args);
-        if(name==="deen_search"){
-          data=paginateSearch(data,{q:args.q,cursor:args.cursor||null,limit:Number(args.limit||20)});
+        const executor=TOOL_EXECUTORS.get(name);
+        if(!executor) return rpcError(id,-32602,"Unknown tool",{name});
+        const data=await executor(args);
+        const isError=Boolean(data?.__mcp_error);
+        if(isError){
+          return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data.value)}],structuredContent:data.value,isError:true});
         }
         return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:false});
       }catch(error){
