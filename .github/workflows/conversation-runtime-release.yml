@@ -64,7 +64,9 @@ jobs:
       - name: Security gate
         run: |
           set -euo pipefail
-          find release-assets/weights -type f \( -name '*.lock' -o -name '*.metadata' -o -name '.gitignore' \) -delete
+          if [ -d release-assets/weights ]; then
+            find release-assets/weights -type f \( -name '*.lock' -o -name '*.metadata' -o -name '.gitignore' \) -delete
+          fi
           while IFS= read -r -d '' f; do
             file --brief --mime-type "$f"
           done < <(find release-assets -type f -print0)
@@ -78,7 +80,7 @@ jobs:
           elif [ "$PUBLISH" = "true" ]; then
             gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Free/open conversation runtime cache: realtime orchestration, WebRTC transport, ASR, speech enhancement, diarization runtime, Piper and lip-sync source. Model weights are governed separately."
           else
-            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Draft conversation runtime cache." --draft
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Draft conversation runtime cache." --draft
           fi
 
   weights:
