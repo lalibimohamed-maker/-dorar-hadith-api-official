@@ -1,3 +1,5 @@
+import { OmegaMultimodalContextGuard } from "./omega-multimodal-context-guard.js";
+
 const DEFAULTS = Object.freeze({
   patch_size: 14,
   merge_size: 2,
@@ -66,8 +68,23 @@ function dimensionsForPixelBudget(width, height, maxPixels, align, maxDimension)
 export class OmegaVisualPruner {
   static plan(width, height, runtimeProfile = {}, modelProfile = {}) {
     const profile = { ...DEFAULTS, ...modelProfile };
-    const align = alignment(profile);
-    const maxPixels = targetPixelsForBudget(profile);
+    const contextPlan = runtimeProfile?.contextWindowTokens
+      ? OmegaMultimodalContextGuard.plan({
+          contextWindow: runtimeProfile.contextWindowTokens,
+          evidenceTokens: runtimeProfile.evidenceTokens,
+          textTokens: runtimeProfile.textTokens,
+          requestedVisualTokens: profile.target_visual_tokens,
+          reservedGenerationTokens: runtimeProfile.reservedGenerationTokens,
+          safetyMarginTokens: runtimeProfile.safetyMarginTokens,
+          minimumVisualTokens: runtimeProfile.minimumVisualTokens
+        })
+      : null;
+    if (contextPlan) OmegaMultimodalContextGuard.assertEvidencePreserved(contextPlan);
+    const effectiveProfile = contextPlan
+      ? { ...profile, target_visual_tokens: contextPlan.available_visual_tokens }
+      : profile;
+    const align = alignment(effectiveProfile);
+    const maxPixels = targetPixelsForBudget(effectiveProfile);
     const maxDimension = Math.max(align, Math.floor(finitePositive(
       modelProfile.max_dimension,
       runtimeProfile?.target_runtime === "WASM" ? DEFAULTS.max_dimension / 2 : DEFAULTS.max_dimension
@@ -81,7 +98,8 @@ export class OmegaVisualPruner {
       alignment: align,
       max_pixels: maxPixels,
       estimated_visual_tokens: estimatedTokens,
-      target_visual_tokens: Math.max(1, Math.floor(finitePositive(profile.target_visual_tokens, DEFAULTS.target_visual_tokens))),
+      target_visual_tokens: Math.max(1, Math.floor(finitePositive(effectiveProfile.target_visual_tokens, DEFAULTS.target_visual_tokens))),
+      context_plan: contextPlan,
       preserves_aspect_ratio: Math.abs((dimensions.width / dimensions.height) - (Number(width) / Number(height))) < 0.05
     });
   }
