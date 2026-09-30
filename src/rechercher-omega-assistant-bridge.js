@@ -297,8 +297,9 @@ export async function runGovernedAssistantTurn({
       citation: item.citation ?? item.provenance.citation,
       ...(item.text_hash ? { text_hash: item.text_hash } : {})
     }));
+  let verification = null;
   if (SCHOLARLY_TASKS.has(plan.task)) {
-    const verification = verifyAgentAnswer({
+    verification = verifyAgentAnswer({
       answer: generatedText,
       evidence: evidence.map(item => ({
         ...item,
