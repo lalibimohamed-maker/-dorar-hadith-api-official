@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Canonical dual-storage registry for every Rechercher Omega acquisition and verification.",
+  "policy": {
+    "check_all_targets_before_acquisition": true,
+    "complete_manifest_asset": "release-manifest.json",
+    "complete_if_present_in_any_target": true,
+    "never_redownload_verified_release": true,
+    "never_commit_weights_to_git": true,
+    "primary_target_is_read_only_for_omega_acquisition": true
+  },
+  "targets": [
+    {
+      "id": "primary",
+      "repository": "lalibimohamed-maker/-dorar-hadith-api-official",
+      "role": "primary-storage",
+      "release_lookup": true,
+      "acquisition_write": false
+    },
+    {
+      "id": "omega-engine-storage",
+      "repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "role": "dedicated-omega-release-storage",
+      "release_lookup": true,
+      "acquisition_write": true
+    }
+  ]
+}
