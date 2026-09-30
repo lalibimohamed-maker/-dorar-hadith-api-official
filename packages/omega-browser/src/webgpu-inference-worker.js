@@ -1,4 +1,4 @@
-importScripts("./omega-hardware-guardian.js");
+import { OmegaHardwareGuardian } from "./omega-hardware-guardian.js";
 
 let generator = null;
 let runtimeBackend = "webgpu";
