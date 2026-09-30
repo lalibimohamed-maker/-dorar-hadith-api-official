@@ -82,8 +82,10 @@
       ],
       "image": "ghcr.io/k4yt3x/video2x:6.4.0",
       "license": "AGPL-3.0",
-      "provenance": "official Video2X 6.4.0 release/image; immutable release asset SHA-256 is recorded when cached",
-      "releaseAsset": "Video2X-x86_64.AppImage"
+      "provenance": "official Video2X 6.4.0 release/image; tag alone is not an immutable runtime identity",
+      "releaseAsset": "Video2X-x86_64.AppImage",
+      "immutableImageDigest": null,
+      "activationState": "blocked_until_immutable_image_digest"
     },
     {
       "id": "ffmpeg",
