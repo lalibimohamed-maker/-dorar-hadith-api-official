@@ -68,7 +68,7 @@ export function createAiGateway({host="0.0.0.0",port=PORT}={}){
         return send(res,result.verified?200:422,envelope(result));
       }
       return send(res,404,errorBody("NOT_FOUND","Agent endpoint not found."));
-    }catch(e){return send(res,e.status===429?429:502,errorBody("UPSTREAM_ERROR",e.message,e.data||null));}
+    }catch(e){if(String(e.message).startsWith("INVALID_CURSOR"))return send(res,400,errorBody("INVALID_CURSOR",e.message));return send(res,e.status===429?429:502,errorBody("UPSTREAM_ERROR",e.message,e.data||null));}
   }).listen(Number(port),host,()=>console.log(`Din Allah AI gateway listening on ${host}:${port}`));
 }
 if(import.meta.url===`file://${process.argv[1]}`)createAiGateway();
