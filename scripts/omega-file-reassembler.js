@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
-import { mkdir, rm, stat, open, rename } from "node:fs/promises";
+import { mkdir, rm, stat, statfs, rename } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { once } from "node:events";
@@ -15,6 +15,34 @@ function safeChildPath(dir,name){
   const target=path.resolve(dir,name);
   if(!target.startsWith(root)) throw new Error("manifest path traversal rejected: "+name);
   return target;
+}
+
+export async function getFreeDiskBytes(targetPath){
+  if (typeof statfs !== "function") throw new Error("DISK_SPACE_CHECK_UNAVAILABLE: fs.statfs is not available on this runtime");
+  const info = await statfs(targetPath);
+  if (!Number.isSafeInteger(info.bavail) || !Number.isSafeInteger(info.bsize) || info.bavail < 0 || info.bsize < 1) {
+    throw new Error("DISK_SPACE_CHECK_INVALID: filesystem free-space data is invalid");
+  }
+  const freeBytes = info.bavail * info.bsize;
+  if (!Number.isSafeInteger(freeBytes)) throw new Error("DISK_SPACE_CHECK_OVERFLOW: filesystem free-space value is unsafe");
+  return freeBytes;
+}
+
+export function requiredPreflightBytes(totalSize, headroomRatio = 1.2){
+  if (!Number.isSafeInteger(totalSize) || totalSize < 0) throw new Error("invalid total size for disk preflight");
+  if (!Number.isFinite(headroomRatio) || headroomRatio < 1) throw new Error("invalid disk headroom ratio");
+  const required = Math.ceil(totalSize * headroomRatio);
+  if (!Number.isSafeInteger(required)) throw new Error("disk preflight size exceeds safe integer range");
+  return required;
+}
+
+export async function assertDiskPreflight(targetPath, totalSize, {headroomRatio=1.2, getFreeBytes=getFreeDiskBytes}={}){
+  const requiredBytes = requiredPreflightBytes(totalSize, headroomRatio);
+  const freeBytes = await getFreeBytes(targetPath);
+  if (!Number.isSafeInteger(freeBytes) || freeBytes < requiredBytes) {
+    throw new Error("DISK_SPACE_PREFLIGHT_FAILED: required="+requiredBytes+" free="+String(freeBytes));
+  }
+  return Object.freeze({ok:true, free_bytes:freeBytes, required_bytes:requiredBytes, headroom_ratio:headroomRatio});
 }
 
 async function hashAndSize(filePath){
@@ -42,6 +70,7 @@ export async function reassembleAndVerifyModel(
   const targetDir=path.resolve(outputDir);
   await mkdir(targetDir,{recursive:true});
   const finalPath=safeChildPath(targetDir,manifest.model_name);
+  const diskPreflight = await assertDiskPreflight(targetDir, manifest.total_size);
   if(!overwrite){
     try{await stat(finalPath);throw new Error("output already exists: "+finalPath);}catch(error){if(error?.code!=="ENOENT")throw error;}
   }
@@ -94,7 +123,7 @@ export async function reassembleAndVerifyModel(
     }
 
     await rename(tempPath,finalPath);
-    return {modelPath:finalPath,bytes:totalWritten,sha256:totalHash,chunk_count:manifest.chunk_count};
+    return {modelPath:finalPath,bytes:totalWritten,sha256:totalHash,chunk_count:manifest.chunk_count,disk_preflight:diskPreflight};
   }catch(error){
     output.destroy();
     await rm(tempPath,{force:true});
