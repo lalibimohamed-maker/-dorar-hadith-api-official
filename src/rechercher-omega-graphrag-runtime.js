@@ -1,3 +1,4 @@
+import { loadCorpus } from "./corpus_repository.js";
 import { createHash } from "node:crypto";
 
 function hash(value){return createHash("sha256").update(String(value??""),"utf8").digest("hex");}
@@ -51,6 +52,12 @@ export async function indexCorpusToGraphRag(records=[],{embedder,graphWriter,vec
   }
   if(strict && nodes.length!==records.length) throw new Error("GRAPH_RAG_INDEX_COUNT_MISMATCH");
   return Object.freeze({indexedRecords:nodes.length,graphNodes:nodes.length,vectorPoints:vectors.length,vectorDimensions:vectors[0]?.dimensions??0,corpusWrite:false});
+}
+
+export async function indexLoadedCorpus(options={}){
+  const records=loadCorpus();
+  if(!Array.isArray(records)) throw new TypeError("Corpus loader did not return an array");
+  return indexCorpusToGraphRag(records,options);
 }
 
 export function createMemoryGraphWriter(){
