@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
+    if: github.ref == 'refs/heads/main'
       GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ inputs.release_tag || 'dinullah-omega-ai-runtime-v2026.09.29' }}
       PUBLISH: ${{ inputs.publish || 'true' }}
@@ -94,8 +95,8 @@ jobs:
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" release-assets/packages/* release-assets/comfyui/* release-assets/*.txt release-assets/*.json release-assets/*.md --repo "$GITHUB_REPOSITORY" --clobber
           elif [ "$PUBLISH" = "true" ]; then
-            gh release create "$RELEASE_TAG" release-assets/packages/* release-assets/comfyui/* release-assets/*.txt release-assets/*.json release-assets/*.md --repo "$GITHUB_REPOSITORY" --title "Rechercher Omega AI Media Runtime $RELEASE_TAG" --notes "Pinned open-source AI media runtime software cache. Model weights remain separately governed and stored in model-weight releases."
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/packages/* release-assets/comfyui/* release-assets/*.txt release-assets/*.json release-assets/*.md --repo "$GITHUB_REPOSITORY" --title "Rechercher Omega AI Media Runtime $RELEASE_TAG" --notes "Pinned open-source AI media runtime software cache. Model weights remain separately governed and stored in model-weight releases."
           else
-            gh release create "$RELEASE_TAG" release-assets/packages/* release-assets/comfyui/* release-assets/*.txt release-assets/*.json release-assets/*.md --repo "$GITHUB_REPOSITORY" --title "Rechercher Omega AI Media Runtime $RELEASE_TAG" --notes "Draft runtime cache." --draft
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/packages/* release-assets/comfyui/* release-assets/*.txt release-assets/*.json release-assets/*.md --repo "$GITHUB_REPOSITORY" --title "Rechercher Omega AI Media Runtime $RELEASE_TAG" --notes "Draft runtime cache." --draft
           fi
           gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json name,tagName,isDraft,assets
