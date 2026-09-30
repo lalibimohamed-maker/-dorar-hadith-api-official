@@ -18,6 +18,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+
+concurrency:
+  group: rechercher-omega-graphrag-memory-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   integration:
     runs-on: ubuntu-24.04
