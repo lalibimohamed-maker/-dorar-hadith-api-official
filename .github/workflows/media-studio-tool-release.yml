@@ -20,6 +20,7 @@ permissions:
 
 jobs:
   release:
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
     name: Acquire, verify and cache free/open media tools
@@ -28,7 +29,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ inputs.release_tag || 'dinullah-media-studio-v2026.09.29' }}
-      PUBLISH: ${{ inputs.publish || 'true' }}
+      PUBLISH: ${{ inputs.publish || 'false' }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
