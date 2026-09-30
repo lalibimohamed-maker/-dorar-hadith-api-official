@@ -25,8 +25,14 @@ for (const file of files) {
 
 await writeFile(
   path.join(dist, "index.js"),
-  'export * from "./omega-client-core.js";\nexport * from "./omega-local-bridge.js";\nexport * from "./local-bundle-loader.js";\nexport * from "./arabic-query-normalizer.js";\nexport * from "./omega-hardware-guardian.js";
-export * from "./omega-audio-session.js";\n',
+  [
+    'export * from "./omega-client-core.js";',
+    'export * from "./omega-local-bridge.js";',
+    'export * from "./local-bundle-loader.js";',
+    'export * from "./arabic-query-normalizer.js";',
+    'export * from "./omega-hardware-guardian.js";',
+    'export * from "./omega-audio-session.js";'
+  ].join("\n") + "\n",
   "utf8"
 );
 
