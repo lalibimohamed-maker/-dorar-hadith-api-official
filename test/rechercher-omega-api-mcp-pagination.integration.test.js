@@ -42,7 +42,7 @@ test("MCP search cursor paginates sourceMatches",async()=>{
   const server=mod.createMcpServer({host:"127.0.0.1",port:0});
   const port=server.address().port;
   try{
-    const call=arguments=>fetch("http://127.0.0.1:"+port+"/mcp",{method:"POST",headers:{"content-type":"application/json","mcp-protocol-version":"2026-07-28"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"tools/call",params:{name:"deen_search",arguments}})});
+    const call=requestArguments=>fetch("http://127.0.0.1:"+port+"/mcp",{method:"POST",headers:{"content-type":"application/json","mcp-protocol-version":"2026-07-28"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"tools/call",params:{name:"deen_search",arguments:requestArguments}})});
     const first=await call({q:"x",limit:2}); const a=await first.json();
     assert.equal(first.status,200); assert.equal(a.result.structuredContent.sourceMatches.length,2); assert.ok(a.result.structuredContent.pagination.next_cursor);
     const second=await call({q:"x",limit:2,cursor:a.result.structuredContent.pagination.next_cursor}); const b=await second.json();
