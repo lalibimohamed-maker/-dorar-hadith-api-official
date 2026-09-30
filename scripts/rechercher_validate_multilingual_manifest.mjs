@@ -45,7 +45,7 @@ for(const [key,entry] of Object.entries(cells)){
     if(file.promoteToCorpus===true)err('corpus_promotion_forbidden',{key,path:file.path});
   }
 }
-if(Object.keys(cells).length!==4921)err('matrix_cell_count_mismatch',{expected:4921,observed:Object.keys(cells).length});
+if(Object.keys(cells).length!==6384)err('matrix_cell_count_mismatch',{expected:6384,observed:Object.keys(cells).length});
 const fileRecords=Object.values(cells).flatMap(e=>e.files||[]);
 const physicalFiles=fileRecords.filter(file=>!isDeduplicatedReference(file)&&isPhysicalSourceFile(file));
 if(manifest.total_files!==undefined){const n=physicalFiles.length;if(n!==manifest.total_files)err('total_files_mismatch',{declared:manifest.total_files,observed:n});}
