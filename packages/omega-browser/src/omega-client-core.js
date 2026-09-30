@@ -1,6 +1,12 @@
 import { verifyEvidenceHit } from "./omega-local-bridge.js";
+import { resolveLocalRuntime } from "./local-bundle-loader.js";
+import { searchWithArabicQueryPlan } from "../../../src/offline/arabic-query-normalizer.js";
 
 export const OMEGA_CLIENT_MODES = Object.freeze(["auto", "offline_only", "online_only"]);
+
+export async function prepareOmegaLocalRuntime(options = {}) {
+  return resolveLocalRuntime(options);
+}
 
 export function createOmegaClient({
   mode = "auto",
@@ -32,10 +38,10 @@ export function createOmegaClient({
         return onlineGenerate({ query, evidence: [] });
       }
 
-      const hits = await localEvidenceSearch(query);
+      const localSearch = await searchWithArabicQueryPlan(localEvidenceSearch, query);
       const verified = [];
 
-      for (const hit of hits ?? []) {
+      for (const hit of localSearch.hits ?? []) {
         try {
           verified.push(await verifyEvidenceHit(hit));
         } catch {}
@@ -43,13 +49,29 @@ export function createOmegaClient({
 
       if (verified.length === 0) {
         if (mode === "auto" && typeof onlineGenerate === "function") {
-          return onlineGenerate({ query, evidence: [] });
+          return onlineGenerate({
+            query,
+            evidence: [],
+            local_query_variants: localSearch.variants
+          });
         }
-        return Object.freeze({ status: "NO_EVIDENCE_FOUND", evidence: [] });
+        return Object.freeze({
+          status: "NO_EVIDENCE_FOUND",
+          evidence: [],
+          query_variants: localSearch.variants
+        });
       }
 
-      const local = await localGenerate({ query, evidence: verified });
-      return Object.freeze({ ...local, evidence: verified });
+      const local = await localGenerate({
+        query,
+        evidence: verified,
+        query_variants: localSearch.variants
+      });
+      return Object.freeze({
+        ...local,
+        evidence: verified,
+        query_variants: localSearch.variants
+      });
     }
   });
 }
