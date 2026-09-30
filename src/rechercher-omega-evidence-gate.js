@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { canonicalArabicText, classifyArabicMismatch } from "./rechercher-omega-arabic-integrity.js";
 
 const HEX_SHA256=/^[a-f0-9]{64}$/;
 
@@ -84,8 +85,14 @@ export function verifyEvidenceGate({
     }
 
     if(strictQuote){
-      if(!answer.includes(expected)){
-        throw new Error("STRICT_ALIGNMENT_MISMATCH: cited source text is not present byte-for-byte in answer: "+key);
+      const answerContainsExpected =
+        answer.includes(expected) ||
+        canonicalArabicText(answer).includes(canonicalArabicText(expected));
+      if(!answerContainsExpected){
+        throw new Error(
+          "STRICT_ALIGNMENT_MISMATCH: cited source text is not present in canonical Unicode form (" +
+          classifyArabicMismatch(expected, answer) + "): " + key
+        );
       }
       if(citation?.cited_text!==undefined && String(citation.cited_text)!==expected){
         throw new Error("CITED_TEXT_MISMATCH: "+key);
