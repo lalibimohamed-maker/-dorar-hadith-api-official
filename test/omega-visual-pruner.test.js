@@ -5,6 +5,7 @@ import { OmegaVisualPruner } from "../packages/omega-browser/src/omega-visual-pr
 test("visual budget is model-profile driven rather than a universal fixed token count", () => {
   const profile = OmegaVisualPruner.qwen2VisionProfile();
   assert.equal(OmegaVisualPruner.estimateVisualTokens(224, 224, profile), 64);
+  assert.equal(OmegaVisualPruner.estimateVisualTokens(448, 448, profile), 256);
   const plan = OmegaVisualPruner.plan(2048, 3072, { target_runtime: "WASM" }, profile);
   assert.ok(plan.target.width <= 224 || plan.target.height <= 224 || plan.estimated_visual_tokens <= 256);
   assert.ok(plan.target.width % 28 === 0);
