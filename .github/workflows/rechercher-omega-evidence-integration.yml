@@ -16,6 +16,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: rechercher-omega-evidence-integration
+  cancel-in-progress: true
 jobs:
   integration:
     runs-on: ubuntu-24.04
