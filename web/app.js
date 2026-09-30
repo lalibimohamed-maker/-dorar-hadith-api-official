@@ -32,7 +32,7 @@ async function omegaDeltaSync({ url, trustedPublicKeys = {} } = {}) {
   });
 }
 
-function registerOfflineAppShell() {
+async function registerOfflineAppShell() {
   if (!("serviceWorker" in navigator)) return null;
   try {
     return await navigator.serviceWorker.register("./sw.js", { scope: "./" });
