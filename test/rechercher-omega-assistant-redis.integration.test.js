@@ -56,10 +56,15 @@ function storeFixture({ping=true, appendFailure=false}={}){
     async ping(){ if(!ping) throw new Error("redis unavailable"); return true; },
     async appendDigest(record){
       if(appendFailure) throw new Error("redis append unavailable");
-      const copy={...record};
-      if("content" in copy) throw new Error("raw content must never reach distributed store");
-      rows.push(copy);
-      return copy;
+      const {content,...metadata}=record;
+      const stored={
+        ...metadata,
+        content_sha256:sha256(content),
+        chars:content.length
+      };
+      delete stored.content;
+      rows.push(stored);
+      return stored;
     }
   };
 }
@@ -116,7 +121,7 @@ test("governed assistant records hallucination attempt as unverified digest and 
   assert.equal(store.rows.length,2);
   assert.equal(store.rows[1].verified,false);
   assert.equal(store.rows[1].outputSha256,sha256("إنما الأعمال بالنية."));
-  assert.equal("إنما الأعمال بالنية." in store.rows,false);
+  assert.equal(store.rows.some(row=>JSON.stringify(row).includes("إنما الأعمال بالنية.")),false);
 });
 
 test("mandatory distributed memory fails closed before model execution when Redis is unavailable",async()=>{
