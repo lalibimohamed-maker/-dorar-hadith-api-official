@@ -7,6 +7,7 @@
   "required": [
     "schema_version",
     "format",
+    "snapshot_algorithm",
     "sequence",
     "generated_at",
     "base_snapshot_sha256",
@@ -21,6 +22,9 @@
     },
     "format": {
       "const": "dinullah/omega-offline-evidence-delta"
+    },
+    "snapshot_algorithm": {
+      "const": "omega-evidence-snapshot-v2"
     },
     "sequence": {
       "type": "integer",
