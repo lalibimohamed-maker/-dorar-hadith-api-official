@@ -1,0 +1,15 @@
+{
+  "schemaVersion":"1.0.0",
+  "id":"rechercher-omega-universal-job-contract-2026",
+  "purpose":"One execution contract for AI, speech, OCR, image, video and media jobs without changing the scholarly Corpus.",
+  "required":["job_id","capability","input"],
+  "optional":["preferEngines","resourceRequirements","provenance","rights","outputPolicy"],
+  "lifecycle":["queued","preflight","running","cancelling","succeeded","failed","cancelled","blocked"],
+  "engineIdentity":["engine_id","model_id","revision","runtime","artifact","license","rights_state","activation_state"],
+  "resourceKinds":["browser-wasm","browser-webgpu","local-cpu","local-gpu","remote-gpu"],
+  "gates":["artifact_verified","license_verified","runtime_ready","capability_supported"],
+  "outputRules":["generated_artifacts_are_derived","provenance_required","no_direct_corpus_write","no_generated_media_as_scholarly_evidence"],
+  "mediaRules":["release_backed_binaries","sha256_verified","rights_state_separate_from_existence"],
+  "speechRules":["user_selectable_engine_and_voice","verified_human_quran_recordings_are_separate_from_tts"],
+  "offlineRules":["prefer_local_verified_artifact","offline_execution_when_capability_and_artifact_are_available","no_paid_provider_required"]
+}
