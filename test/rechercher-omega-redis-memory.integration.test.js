@@ -5,14 +5,17 @@ import { createRedisConversationMemory } from "../src/rechercher-omega-redis-mem
 test("Redis conversation memory stores digests only and retrieves session turns",async()=>{
  const keyPrefix="test:dinullah:"+Date.now()+":";
  const memory=createRedisConversationMemory({host:"127.0.0.1",port:6379,keyPrefix});
- const a=await memory.appendDigest({sessionId:"s1",role:"user",content:"سر يجب ألا يخزن خاما"});
- const b=await memory.appendDigest({sessionId:"s1",role:"assistant",content:"رد موثق"});
- assert.match(a.content_sha256,/^[0-9a-f]{64}$/); assert.match(b.content_sha256,/^[0-9a-f]{64}$/);
+ const original1="سر يجب ألا يخزن خاما";
+ const original2="رد موثق";
+ await memory.appendDigest({sessionId:"s1",role:"user",content:original1});
+ await memory.appendDigest({sessionId:"s1",role:"assistant",content:original2});
  const rows=await memory.snapshotDigests({sessionId:"s1"});
  assert.equal(rows.length,2);
  const parsed=rows.map(JSON.parse);
- assert.equal(parsed[0].content,"undefined" in parsed[0] ? parsed[0].content : undefined);
- assert.ok(parsed[0].content_sha256); assert.equal("raw" in parsed[0],false);
+ assert.equal(parsed[0].role,"user");
+ assert.equal(parsed[0].content_sha256.length,64);
+ assert.equal("content" in parsed[0],false);
+ assert.notEqual(parsed[0].content_sha256,original1);
  await memory.clear({sessionId:"s1"});
  assert.deepEqual(await memory.snapshotDigests({sessionId:"s1"}),[]);
 });
