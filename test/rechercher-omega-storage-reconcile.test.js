@@ -17,4 +17,6 @@ test("storage verifier checks both targets and uses release-manifest as complete
   assert.match(source, /release-manifest\.json/);
   assert.match(source, /complete_anywhere/);
   assert.match(source, /complete_targets/);
+  assert.match(source, /model_asset_count/);
+  assert.match(source, /model_assets/);
 });
