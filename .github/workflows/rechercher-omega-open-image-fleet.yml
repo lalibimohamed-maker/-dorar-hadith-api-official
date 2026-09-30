@@ -13,7 +13,8 @@ permissions:
 
 concurrency:
   group: rechercher-omega-open-image-fleet
-  cancel-in-progress: true
+  # Keep long-running model acquisitions queued instead of cancelling matrix jobs on a newer push.
+  cancel-in-progress: false
 
 jobs:
   acquire:
