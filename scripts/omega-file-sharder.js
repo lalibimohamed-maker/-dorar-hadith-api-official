@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { mkdir, rm, stat, open } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { once } from "node:events";
 
 export const DEFAULT_CHUNK_BYTES = 1900 * 1024 * 1024;
 export const MAX_GITHUB_RELEASE_ASSET_BYTES = 2147483647;
@@ -69,7 +70,7 @@ export async function shardModelFile(
           const {bytesRead}=await handle.read(buffer,0,want,offset+written);
           if(bytesRead===0) throw new Error("unexpected EOF while sharding "+modelName);
           const bytes=buffer.subarray(0,bytesRead);
-          output.write(bytes);
+          if(!output.write(bytes)) await once(output,"drain");
           chunkHash.update(bytes);
           globalHash.update(bytes);
           written+=bytesRead;
