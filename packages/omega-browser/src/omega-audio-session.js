@@ -33,16 +33,16 @@ async function txRequest(db, mode, action) {
   return await new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, mode);
     const store = tx.objectStore(STORE_NAME);
+    let result;
     let request;
     try { request = action(store); } catch (error) { reject(error); return; }
     if (request) {
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => { result = request.result; };
       request.onerror = () => reject(request.error || new Error("AUDIO_FRAME_REQUEST_FAILED"));
-    } else {
-      tx.oncomplete = () => resolve(undefined);
-      tx.onerror = () => reject(tx.error || new Error("AUDIO_FRAME_TX_FAILED"));
-      tx.onabort = () => reject(tx.error || new Error("AUDIO_FRAME_TX_ABORTED"));
     }
+    tx.oncomplete = () => resolve(result);
+    tx.onerror = () => reject(tx.error || new Error("AUDIO_FRAME_TX_FAILED"));
+    tx.onabort = () => reject(tx.error || new Error("AUDIO_FRAME_TX_ABORTED"));
   });
 }
 
@@ -150,11 +150,22 @@ export class OmegaResilientAudioSession {
     });
   }
 
-  async resume() {
-    return this.resumePending();
+  async restoreCheckpoint(checkpoint) {
+    if (!checkpoint || String(checkpoint.session_id || "") !== this.sessionId) {
+      throw new Error("AUDIO_CHECKPOINT_SESSION_MISMATCH");
+    }
+    this.nextSequence = Math.max(0, Number(checkpoint.sequence) || 0);
+    this.byteOffset = Math.max(0, Number(checkpoint.byte_offset) || 0);
+    this.paused = String(checkpoint.status || "") !== "RUNNING";
+    return this.getCheckpoint();
   }
 
-  getCheckpoint() {
+  async resume() {
+    const replayed = await this.resumePending();
+    return Object.freeze({ replayed, checkpoint: this.getCheckpoint() });
+  }
+
+  getCheckpoint()
     return Object.freeze({
       session_id: this.sessionId,
       byte_offset: this.byteOffset,
