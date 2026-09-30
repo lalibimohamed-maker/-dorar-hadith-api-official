@@ -14,7 +14,7 @@ const base = {
   language: "ar",
   rights_status: "cleared",
   provenance: "verified",
-  sha256: "abc123",
+  sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   verification_status: "verified",
   authenticity_status: "sahih"
 };
