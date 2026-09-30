@@ -163,4 +163,5 @@
     normalizeQuery,
     queryVariants: variants
   });
+  window.dispatchEvent(new CustomEvent("deenallah:omega-store-ready"));
 })();
