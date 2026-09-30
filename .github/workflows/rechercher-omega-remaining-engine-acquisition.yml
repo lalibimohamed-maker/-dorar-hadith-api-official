@@ -242,7 +242,7 @@ jobs:
         run: |
           set -euo pipefail
           json="$(gh api "repos/$REPO/releases/tags/$RELEASE_TAG" 2>/dev/null || true)"
-          if [ -n "$json" ] && python -c 'import json,sys; j=json.load(sys.stdin); a={x["name"] for x in j.get("assets",[])}; sys.exit(0 if "release-manifest.json" in a else 1)' <<<"$json"; then
+          if [ -n "$json" ] && python -c 'import json,sys; j=json.load(sys.stdin); a={x["name"] for x in j.get("assets",[])}; sys.exit(0 if "release-manifest.json" in a and any(n.startswith("omega__") for n in a) else 1)' <<<"$json";
             echo "complete=true" >> "$GITHUB_OUTPUT"
             echo "Existing complete Release detected: $RELEASE_TAG"
           else
