@@ -11,7 +11,7 @@ import { validateLifecycleTransition, prepareEngine } from "../src/rechercher-om
 const identity={engine_id:"test-llm",model_id:"test-model",revision:"r1",runtime:"test-runtime",artifact:{kind:"weights",reference:"release://test",sha256:"a".repeat(64)},license:{code:"MIT",status:"verified_source_license"},rights_state:"public_allowed",activation_state:"active"};
 
 function adapter(){return createRuntimeAdapter({runtime:"test-runtime",load:async()=>{},execute:async(task)=>({ok:true,task})});}
-function registry(){return [{engine_id:"test-llm",capabilities:["reasoning"],enabled:true,identity,artifactVerified:true,licenseVerified:true}];}
+function registry(){return [{engine_id:"test-llm",capabilities:["reasoning","video-generation"],enabled:true,identity,artifactVerified:true,licenseVerified:true}];}
 
 test("lifecycle is fail-closed and incremental",()=>{
   assert.throws(()=>validateLifecycleTransition("registered","active"),/incremental/);
