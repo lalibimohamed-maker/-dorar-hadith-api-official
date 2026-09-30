@@ -25,7 +25,7 @@ test("Corpus GraphRAG pipeline wires the loader to both graph and vector stores"
 
 test("Full Corpus production pipeline rejects a missing persistent writer instead of silently falling back",async()=>{
  const p=createCorpusGraphRagPipeline({
-   corpusLoader:()=>[{node_id:"x",category:"hadith",text_raw:"x",provenance:{sourceId:"s",citation:"p1"}}],
+   corpusLoader:()=>[{node_id:"x",category:"hadith",text_raw:"x",provenance:{sourceId:"s",citation:"p1"},verification_state:"verified"}],
    embedder:{embed:async()=>[1]},
    graphWriter:null,
    vectorWriter:null
