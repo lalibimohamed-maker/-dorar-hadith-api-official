@@ -9,17 +9,16 @@ export function sha256(value){
 
 function encodeCommand(parts){
   const values=parts.map(value=>String(value));
-  const body=values.map(value=>{
-    const bytes=Buffer.from(value,"utf8");
-    return Buffer.concat([
-      Buffer.from("$"+bytes.length+"\r\n","utf8"),
-      bytes,
-      CRLF
-    ]);
-  });
   return Buffer.concat([
     Buffer.from("*"+values.length+"\r\n","utf8"),
-    ...body
+    ...values.map(value=>{
+      const bytes=Buffer.from(value,"utf8");
+      return Buffer.concat([
+        Buffer.from("$"+bytes.length+"\r\n","utf8"),
+        bytes,
+        CRLF
+      ]);
+    })
   ]);
 }
 
@@ -29,16 +28,11 @@ function parseReply(buffer,offset=0){
   const lineEnd=buffer.indexOf(CRLF,offset+1);
   if(lineEnd<0) return null;
 
-  if(type===0x2b){ // +
-    return {value:buffer.subarray(offset+1,lineEnd).toString("utf8"),next:lineEnd+2};
-  }
-  if(type===0x2d){ // -
-    return {error:new Error(buffer.subarray(offset+1,lineEnd).toString("utf8")),next:lineEnd+2};
-  }
-  if(type===0x3a){ // :
-    return {value:Number(buffer.subarray(offset+1,lineEnd).toString("ascii")),next:lineEnd+2};
-  }
-  if(type===0x24){ // $
+  if(type===0x2b) return {value:buffer.subarray(offset+1,lineEnd).toString("utf8"),next:lineEnd+2};
+  if(type===0x2d) return {error:new Error(buffer.subarray(offset+1,lineEnd).toString("utf8")),next:lineEnd+2};
+  if(type===0x3a) return {value:Number(buffer.subarray(offset+1,lineEnd).toString("ascii")),next:lineEnd+2};
+
+  if(type===0x24){
     const length=Number(buffer.subarray(offset+1,lineEnd).toString("ascii"));
     const start=lineEnd+2;
     if(length===-1) return {value:null,next:start};
@@ -47,7 +41,8 @@ function parseReply(buffer,offset=0){
     if(!buffer.subarray(end,end+2).equals(CRLF)) throw new Error("invalid Redis bulk string terminator");
     return {value:buffer.subarray(start,end).toString("utf8"),next:end+2};
   }
-  if(type===0x2a){ // *
+
+  if(type===0x2a){
     const count=Number(buffer.subarray(offset+1,lineEnd).toString("ascii"));
     let next=lineEnd+2;
     if(count===-1) return {value:null,next};
@@ -56,31 +51,34 @@ function parseReply(buffer,offset=0){
       const item=parseReply(buffer,next);
       if(!item) return null;
       next=item.next;
-      if(item.error) values.push(item.error);
-      else values.push(item.value);
+      values.push(item.error ?? item.value);
     }
     return {value:values,next};
   }
+
   throw new Error("unsupported Redis RESP2 reply type: "+String.fromCharCode(type));
 }
 
-function makeClient({host,port,password}){
+function createClient({host,port,password}){
   let socket=null;
   let connecting=null;
   let closed=false;
+  let authenticated=!password;
   let buffer=Buffer.alloc(0);
   const pending=[];
 
   function rejectPending(error){
-    const batches=pending.splice(0,pending.length);
-    const unique=new Set(batches.map(item=>item.batch));
-    for(const batch of unique) batch.reject(error);
+    const batches=[...new Set(pending.splice(0,pending.length).map(item=>item.batch))];
+    for(const batch of batches){
+      if(!batch.done){batch.done=true;batch.reject(error);}
+    }
   }
 
   function resetSocket(error=null){
     const current=socket;
     socket=null;
     buffer=Buffer.alloc(0);
+    authenticated=!password;
     if(error) rejectPending(error);
     if(current && !current.destroyed) current.destroy();
   }
@@ -116,41 +114,46 @@ function makeClient({host,port,password}){
 
       const fail=error=>{
         if(!settled){settled=true;reject(error);}
-        resetSocket(error);
+        if(socket===s) resetSocket(error);
       };
 
       s.on("data",chunk=>{
         buffer=Buffer.concat([buffer,chunk]);
         try{flush();}catch(error){fail(error);}
       });
-      s.once("connect",async()=>{
-        try{
-          if(password){
-            const replies=await sendBatch([["AUTH",password]],{skipAuth:true});
-            if(replies[0]!== "OK") throw new Error("REDIS_AUTH_FAILED");
-          }
-          settled=true;
-          resolve();
-        }catch(error){fail(error);}
+
+      s.once("connect",()=>{
+        settled=true;
+        resolve();
       });
+
       s.once("error",fail);
-      s.once("close",()=>{if(!settled) fail(new Error("REDIS_CONNECTION_CLOSED"));});
+      s.once("close",()=>{
+        if(socket!==s) return;
+        socket=null;
+        buffer=Buffer.alloc(0);
+        authenticated=!password;
+        if(pending.length) rejectPending(new Error("REDIS_CONNECTION_CLOSED"));
+        if(!settled){settled=true;reject(new Error("REDIS_CONNECTION_CLOSED"));}
+      });
+
       s.setTimeout(10000,()=>fail(new Error("REDIS_TIMEOUT")));
     }).finally(()=>{connecting=null;});
+
     return connecting;
   }
 
-  async function sendBatch(commands,{skipAuth=false}={}){
-    await connect();
+  async function sendBatch(commands){
     if(!socket || socket.destroyed) throw new Error("REDIS_NOT_CONNECTED");
+    if(!Array.isArray(commands)||commands.length===0) throw new TypeError("Redis command batch is required");
 
-    const wireCommands=commands;
     return new Promise((resolve,reject)=>{
-      const batch={values:new Array(wireCommands.length),remaining:wireCommands.length,resolve,reject,done:false};
-      wireCommands.forEach((_,index)=>pending.push({batch,index}));
+      const batch={values:new Array(commands.length),remaining:commands.length,resolve,reject,done:false};
+      commands.forEach((_,index)=>pending.push({batch,index}));
       try{
-        socket.write(Buffer.concat(wireCommands.map(encodeCommand)));
+        socket.write(Buffer.concat(commands.map(encodeCommand)));
       }catch(error){
+        for(let i=pending.length-1;i>=0;i--) if(pending[i].batch===batch) pending.splice(i,1);
         batch.done=true;
         reject(error);
       }
@@ -158,29 +161,28 @@ function makeClient({host,port,password}){
   }
 
   async function commandBatch(commands){
-    if(!Array.isArray(commands)||commands.length===0) throw new TypeError("Redis command batch is required");
-
+    if(closed) throw new Error("REDIS_CLIENT_CLOSED");
     await connect();
-    const wrapped=password && !wrappedClient.authenticated
-      ? [["AUTH",password],...commands]
-      : commands;
 
-    const replies=await sendBatch(wrapped,{skipAuth:true});
-    if(password && !wrappedClient.authenticated) wrappedClient.authenticated=true;
-    return password && wrapped.length!==commands.length ? replies.slice(1) : replies;
+    if(password && !authenticated){
+      const authReplies=await sendBatch([["AUTH",password]]);
+      if(authReplies[0]!=="OK") throw new Error("REDIS_AUTH_FAILED");
+      authenticated=true;
+    }
+
+    return sendBatch(commands);
   }
 
-  const wrappedClient={
-    authenticated:!password,
+  return Object.freeze({
     commandBatch,
     async close(){
       closed=true;
       rejectPending(new Error("REDIS_CLIENT_CLOSED"));
       if(socket) socket.end();
       socket=null;
+      buffer=Buffer.alloc(0);
     }
-  };
-  return wrappedClient;
+  });
 }
 
 export function createRedisConversationMemory({
@@ -194,7 +196,7 @@ export function createRedisConversationMemory({
   if(!Number.isInteger(ttlSeconds)||ttlSeconds<60) throw new RangeError("ttlSeconds must be >= 60");
   if(!Number.isInteger(maxTurns)||maxTurns<1||maxTurns>1000) throw new RangeError("maxTurns must be between 1 and 1000");
 
-  const client=makeClient({host,port,password});
+  const client=createClient({host,port,password});
   const sessionKey=sessionId=>keyPrefix+sha256(sessionId).slice(0,32);
 
   return Object.freeze({
@@ -233,7 +235,8 @@ export function createRedisConversationMemory({
         ["EXPIRE",key,String(ttlSeconds)],
         ["EXEC"]
       ]);
-      if(!Array.isArray(replies[4])) throw new Error("REDIS_TRANSACTION_FAILED");
+      const transaction=replies[4];
+      if(!Array.isArray(transaction)) throw new Error("REDIS_TRANSACTION_FAILED");
 
       return {
         sessionId,
@@ -246,17 +249,25 @@ export function createRedisConversationMemory({
 
     async snapshotDigests({sessionId}={}){
       if(!sessionId) throw new TypeError("sessionId is required");
-      return (await client.commandBatch([["LRANGE",sessionKey(sessionId),"0","-1"]]))[0] || [];
+      const replies=await client.commandBatch([["LRANGE",sessionKey(sessionId),"0","-1"]]);
+      return replies[0]||[];
     },
 
     async ttl({sessionId}={}){
       if(!sessionId) throw new TypeError("sessionId is required");
-      return Number((await client.commandBatch([["TTL",sessionKey(sessionId)]]))[0]);
+      const replies=await client.commandBatch([["TTL",sessionKey(sessionId)]]);
+      return Number(replies[0]);
+    },
+
+    async ping(){
+      const replies=await client.commandBatch([["PING"]]);
+      return replies[0]==="PONG";
     },
 
     async clear({sessionId}={}){
       if(!sessionId) throw new TypeError("sessionId is required");
-      return Number((await client.commandBatch([["DEL",sessionKey(sessionId)]]))[0]);
+      const replies=await client.commandBatch([["DEL",sessionKey(sessionId)]]);
+      return Number(replies[0]);
     },
 
     async close(){
