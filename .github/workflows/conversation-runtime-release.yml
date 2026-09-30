@@ -23,6 +23,7 @@ jobs:
     name: Cache conversational software
     permissions:
       contents: write
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -75,9 +76,9 @@ jobs:
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --clobber
           elif [ "$PUBLISH" = "true" ]; then
-            gh release create "$RELEASE_TAG" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Free/open conversation runtime cache: realtime orchestration, WebRTC transport, ASR, speech enhancement, diarization runtime, Piper and lip-sync source. Model weights are governed separately."
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Free/open conversation runtime cache: realtime orchestration, WebRTC transport, ASR, speech enhancement, diarization runtime, Piper and lip-sync source. Model weights are governed separately."
           else
-            gh release create "$RELEASE_TAG" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Draft conversation runtime cache." --draft
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/software/* release-assets/software-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Runtime $RELEASE_TAG" --notes "Draft conversation runtime cache." --draft
           fi
 
   weights:
@@ -176,7 +177,7 @@ jobs:
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" release-assets/weights/* release-assets/conversation-weight-sha256.txt --repo "$GITHUB_REPOSITORY" --clobber
           elif [ "$PUBLISH" = "true" ]; then
-            gh release create "$RELEASE_TAG" release-assets/weights/* release-assets/conversation-weight-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Weights $RELEASE_TAG" --notes "License-cleared multilingual translation and Arabic TTS weights. Restricted/non-commercial/gated models are not included."
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/weights/* release-assets/conversation-weight-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Weights $RELEASE_TAG" --notes "License-cleared multilingual translation and Arabic TTS weights. Restricted/non-commercial/gated models are not included."
           else
-            gh release create "$RELEASE_TAG" release-assets/weights/* release-assets/conversation-weight-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Weights $RELEASE_TAG" --notes "Draft conversation weights release." --draft
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --target "$GITHUB_SHA" release-assets/weights/* release-assets/conversation-weight-sha256.txt --repo "$GITHUB_REPOSITORY" --title "Din Allah Conversation Weights $RELEASE_TAG" --notes "Draft conversation weights release." --draft
           fi
