@@ -46,6 +46,9 @@ jobs:
           fi
           echo "TAG=$TAG" >> "$GITHUB_ENV"
 
+      - name: Verify deterministic sharder exists
+        run: node --check scripts/omega-file-sharder.js && node --check scripts/omega-file-reassembler.js
+
       - name: Publish engines according to distribution policy
         env:
           GH_TOKEN: ${{ github.token }}
@@ -79,14 +82,15 @@ jobs:
             asset_paths=()
 
             if [ "$distribution" = "sharded" ]; then
-              prefix="$WORKDIR/$id-model.safetensors.part-"
-              split -b "$shard_bytes" -d -a 2 "$dir/model.safetensors" "$prefix"
+              node scripts/omega-file-sharder.js "$dir/model.safetensors" "$WORKDIR/$id" "$shard_bytes" "$id-model.safetensors" >/dev/null
               rm "$dir/model.safetensors"
-              for shard in "$prefix"*; do
+              for shard in "$WORKDIR/$id/$id-model.safetensors.part-"*; do
                 test "$(stat -c '%s' "$shard")" -lt 2147483647
                 asset_paths+=( "$shard" )
               done
-              reconstruction_method="cat_sorted_parts"
+              generated_shard_manifest="$WORKDIR/$id/model.safetensors-manifest.json"
+              test -s "$generated_shard_manifest"
+              reconstruction_method="omega_file_sharder"
             else
               model_asset="$WORKDIR/$id-model.safetensors"
               mv "$dir/model.safetensors" "$model_asset"
