@@ -29,12 +29,12 @@ function protocolVersion(req,body) {
 
 function clientAddress(req) { return String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(",")[0].trim(); }
 
-function allowRequest(req) {
+function allowRequest(req,{perMinute=Number(process.env.MCP_RATE_LIMIT_PER_MINUTE||60),burst=Number(process.env.MCP_RATE_BURST||20)} = {}) {
   const now = Date.now();
   const key = clientAddress(req);
-  const bucket = rateBuckets.get(key) || { tokens: RATE_BURST, updated: now };
+  const bucket = rateBuckets.get(key) || { tokens: burst, updated: now };
   const elapsed = Math.max(0, now - bucket.updated);
-  bucket.tokens = Math.min(RATE_BURST, bucket.tokens + (elapsed / 60000) * RATE_LIMIT_PER_MINUTE);
+  bucket.tokens = Math.min(burst, bucket.tokens + (elapsed / 60000) * perMinute);
   bucket.updated = now;
   if (bucket.tokens < 1) { rateBuckets.set(key, bucket); return false; }
   bucket.tokens -= 1;
@@ -163,11 +163,11 @@ async function handleRpc(req,body) {
   }
 }
 
-export function createMcpServer({host="0.0.0.0",port=process.env.MCP_PORT||8787}={}) {
+export function createMcpServer({host="0.0.0.0",port=process.env.MCP_PORT||8787,ratePerMinute=Number(process.env.MCP_RATE_LIMIT_PER_MINUTE||60),rateBurst=Number(process.env.MCP_RATE_BURST||20)}={}) {
   const server=http.createServer(async(req,res)=>{
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"*","access-control-allow-methods":"POST,OPTIONS","access-control-allow-headers":"content-type,mcp-protocol-version,x-api-key"});return res.end();}
     if(req.method!=="POST" || new URL(req.url||"/","http://localhost").pathname!=="/mcp") return json(res,404,{error:"not_found"});
-    if(!allowRequest(req)) return json(res,429,{error:"rate_limit_exceeded",code:"MCP_RATE_LIMIT_EXCEEDED"},{"retry-after":"60"});
+    if(!allowRequest(req,{perMinute:ratePerMinute,burst:rateBurst})) return json(res,429,{error:"rate_limit_exceeded",code:"MCP_RATE_LIMIT_EXCEEDED"},{"retry-after":"60"});
     try {
       const raw=await readBody(req);
       const body=JSON.parse(raw);
