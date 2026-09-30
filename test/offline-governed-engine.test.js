@@ -106,3 +106,18 @@ test("auto mode uses Online as an explicit fallback when local fit is rejected",
   assert.equal(result.mode, "online-fallback");
   assert.equal(result.output, "online:اختبار");
 });
+
+test("online-only mode works without installing any local model runtime", async () => {
+  const engine = new OfflineIslamicAIEngine({
+    mode: "online_only",
+    onlineRunner: async query => ({ output: "online:" + query }),
+    capabilityDetector: async () => ({
+      wasm_available: false,
+      webgpu_available: false
+    })
+  });
+
+  const result = await engine.executeTurn("هاتف ضعيف");
+  assert.equal(result.mode, "online");
+  assert.equal(result.output, "online:هاتف ضعيف");
+});
