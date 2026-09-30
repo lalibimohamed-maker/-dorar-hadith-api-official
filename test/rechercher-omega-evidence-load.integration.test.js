@@ -9,7 +9,6 @@ process.env.MCP_RATE_BURST="1000";
 
 async function start(server){
  await once(server,"listening");
- server.unref();
  return server.address().port;
 }
 async function stop(server){
