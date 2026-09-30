@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
-import { mkdir, rm, stat, open } from "node:fs/promises";
+import { mkdir, rm, open } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { once } from "node:events";
@@ -42,21 +42,22 @@ export async function shardModelFile(
 
   const source=path.resolve(filePath);
   const out=path.resolve(outputDir);
-  const info=await stat(source);
-  if(!info.isFile()) throw new Error("input is not a regular file: "+source);
 
   if(cleanOutput) await rm(out,{recursive:true,force:true});
   await mkdir(out,{recursive:true});
 
-  const totalSize=info.size;
-  const totalChunks=Math.max(1,Math.ceil(totalSize/chunkBytes));
-  const width=Math.max(2,String(totalChunks-1).length);
-  const modelName=path.basename(source);
-  const globalHash=createHash("sha256");
-  const chunks=[];
-
   const handle=await open(source,"r");
   try{
+    const info=await handle.stat();
+    if(!info.isFile()) throw new Error("input is not a regular file: "+source);
+
+    const totalSize=info.size;
+    const totalChunks=Math.max(1,Math.ceil(totalSize/chunkBytes));
+    const width=Math.max(2,String(totalChunks-1).length);
+    const modelName=path.basename(source);
+    const globalHash=createHash("sha256");
+    const chunks=[];
+
     const buffer=Buffer.allocUnsafe(Math.min(1024*1024,chunkBytes));
     let offset=0;
     for(let index=0;index<totalChunks;index++){
@@ -93,11 +94,13 @@ export async function shardModelFile(
       chunks.push({index,name,bytes:written,sha256:sha});
       offset+=written;
     }
-  }finally{
-    await handle.close();
-  }
 
-  const manifest={
+    const finalInfo=await handle.stat();
+    if(finalInfo.size!==totalSize) {
+      throw new Error("input file changed during sharding: "+source);
+    }
+
+    const manifest={
     schema_version:"1.0.0",
     format:"dinullah/omega-sharded-file",
     algorithm:"sha256",
