@@ -10,9 +10,11 @@ on:
       - src/rechercher-omega-answer-verifier.js
       - src/rechercher-ai-gateway.js
       - src/rechercher-ai-mcp-server.js
+      - src/rechercher-omega-assistant-bridge.js
       - test/rechercher-omega-governed-run.test.js
       - test/rechercher-omega-evidence-api-mcp.integration.test.js
       - test/rechercher-omega-governance-redis-e2e.integration.test.js
+      - test/rechercher-omega-assistant-redis.integration.test.js
       - runtime/redis/docker-compose.yml
       - config/rechercher-omega-memory-production-2026.json
       - .github/workflows/rechercher-omega-strict-governance-redis-e2e.yml
@@ -80,7 +82,8 @@ jobs:
           node --test \
             test/rechercher-omega-governed-run.test.js \
             test/rechercher-omega-evidence-api-mcp.integration.test.js \
-            test/rechercher-omega-governance-redis-e2e.integration.test.js
+            test/rechercher-omega-governance-redis-e2e.integration.test.js \
+            test/rechercher-omega-assistant-redis.integration.test.js
 
       - name: Shutdown Redis
         if: always()
