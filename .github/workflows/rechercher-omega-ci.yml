@@ -23,6 +23,13 @@ on:
       - "src/rechercher-omega-scholarly-fleet.js"
       - "config/rechercher-omega-scholarly-fleet.json"
       - "test/rechercher-omega-scholarly-fleet.test.js"
+      - "src/rechercher-ai-mcp-server.js"
+      - "test/rechercher-ai-mcp-server.test.js"
+      - "schemas/islamic-corpus-node.schema.json"
+      - "schemas/hadith-evidence.schema.json"
+      - "schemas/quran-evidence.schema.json"
+      - "config/rechercher-ai-api-mcp-2026.json"
+      - "openapi.yaml"
       - "docs/RECHERCHER-OMEGA-SCHOLARLY-FLEET.md"
       - "test/rechercher-omega-global-deep-search.test.js"
       - "src/rechercher-omega-runtime-gate.js"
@@ -56,4 +63,4 @@ jobs:
       - name: Install
         run: npm ci
       - name: Ω boundary tests
-        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-ai-capability-registry.test.js test/rechercher-omega-ai-runtime.test.js test/rechercher-omega-repository-intelligence.test.js test/rechercher-omega-integration.test.js test/rechercher-omega-global-deep-search.test.js test/rechercher-omega-hunyuan-runtime.test.js test/rechercher-omega-scholarly-fleet.test.js
+        run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-ai-capability-registry.test.js test/rechercher-omega-ai-runtime.test.js test/rechercher-omega-repository-intelligence.test.js test/rechercher-omega-integration.test.js test/rechercher-omega-global-deep-search.test.js test/rechercher-omega-hunyuan-runtime.test.js test/rechercher-omega-scholarly-fleet.test.js test/rechercher-ai-mcp-server.test.js
