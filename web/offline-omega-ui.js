@@ -155,6 +155,12 @@
       const quota = Number(result.quota || 0);
       const mb = value => Math.round(value / 1024 / 1024);
       const base = quota ? "التخزين: " + mb(usage) + "/" + mb(quota) + " MB" : "";
+      let persistenceLabel = "";
+      if (navigator.storage?.persisted) {
+        try {
+          persistenceLabel = " · حماية التخزين: " + (await navigator.storage.persisted() ? "مفعّلة" : "غير مضمونة");
+        } catch {}
+      }
       let evidenceLabel = "";
       if (window.deenAllahOmegaLocalStore?.countEvidence) {
         try {
@@ -162,7 +168,7 @@
           evidenceLabel = " · الأدلة المحلية الموثقة: " + count;
         } catch {}
       }
-      target.textContent = base + evidenceLabel;
+      target.textContent = base + persistenceLabel + evidenceLabel;
     } catch {}
   }
 
