@@ -1,0 +1,193 @@
+name: Rechercher Ω — open image fleet acquisition
+
+on:
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
+  workflow_dispatch:
+
+run-name: Rechercher Omega — open image fleet to Releases
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-omega-open-image-fleet
+  cancel-in-progress: true
+
+jobs:
+  acquire:
+    name: ${{matrix.id }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - id: sana-1600m-2k
+            model_id: Efficient-Large-Model/Sana_1600M_2Kpx_BF16
+            revision: main
+            release_tag: rechercher-omega-sana1600m-2k-v1.0.0
+          - id: sana-1600m-4k
+            model_id: Efficient-Large-Model/Sana_1600M_4Kpx_BF16
+            revision: main
+            release_tag: rechercher-omega-sana1600m-4k-v1.0.0
+          - id: boogu-image-base
+            model_id: Boogu/Boogu-Image-0.1-Base
+            revision: main
+            release_tag: rechercher-omega-boogu-image01-base-v1.0.0
+          - id: boogu-image-edit
+            model_id: Boogu/Boogu-Image-0.1-Edit
+            revision: main
+            release_tag: rechercher-omega-boogu-image01-edit-v1.0.0
+          - id: boogu-image-edit-turbo
+            model_id: Boogu/Boogu-Image-0.1-Edit-Turbo
+            revision: main
+            release_tag: rechercher-omega-boogu-image01-edit-turbo-v1.0.0
+          - id: boogu-image-turbo
+            model_id: Boogu/Boogu-Image-0.1-Turbo
+            revision: main
+            release_tag: rechercher-omega-boogu-image01-turbo-v1.0.0
+          - id: llada-image
+            model_id: inclusionAI/LLaDA-Image
+            revision: main
+            release_tag: rechercher-omega-llada-image-v1.0.0
+          - id: lumina-image-2
+            model_id: Alpha-VLLM/Lumina-Image-2.0
+            revision: main
+            release_tag: rechercher-omega-lumina-image2-v1.0.0
+
+    env:
+      RECHERCHER_OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Validate Omega storage access
+        env:
+          GH_TOKEN: ${{secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          TARGET_REPOSITORY: ${{env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+        run: |
+          set -euo pipefail
+          test -n "$GH_TOKEN"
+          actual="$(gh api "repos/$TARGET_REPOSITORY" --jq '.full_name')"
+          test "$actual" = "$TARGET_REPOSITORY"
+          can_push="$(gh api "repos/$TARGET_REPOSITORY" --jq '.permissions.push // false')"
+          test "$can_push" = "true"
+
+      - name: Setup Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: "3.12"
+
+      - name: Install Hugging Face Hub
+        run: python -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+
+      - name: Check both authoritative storage targets
+        id: storage_reconciliation
+        env:
+          GH_TOKEN: ${{secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          OMEGA_PRIMARY_REPOSITORY: lalibimohamed-maker/-dorar-hadith-api-official
+          OMEGA_STORAGE_REPOSITORY: ${{env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          OMEGA_RELEASE_TAG: ${{matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          python scripts/rechercher-omega-storage-reconcile.py
+
+      - name: Resolve immutable model revision
+        id: revision
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true'
+        env:
+          MODEL_ID: ${{matrix.model_id }}
+          REQUESTED_REVISION: ${{matrix.revision }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          from huggingface_hub import HfApi
+          info = HfApi().model_info(os.environ["MODEL_ID"], revision=os.environ["REQUESTED_REVISION"], files_metadata=False)
+          if not re.fullmatch(r"[0-9a-f]{40}", info.sha):
+              raise SystemExit("Revision did not resolve to a full immutable SHA")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("sha=" + info.sha + "\n")
+          print("Resolved:", info.sha)
+          PY
+
+      - name: Ensure dedicated Release exists
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true'
+        env:
+          GH_TOKEN: ${{secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Release already exists: $RELEASE_TAG"
+          else
+            gh release create "$RELEASE_TAG" --repo "$REPO" --prerelease --title "$RELEASE_TAG" --notes "Rechercher Omega open-source image model. Weights are streamed from an immutable Hugging Face revision; model license and source metadata are recorded separately."
+          fi
+          release_id="$(gh release view "$RELEASE_TAG" --repo "$REPO" --json databaseId --jq '.databaseId')"
+          test -n "$release_id"
+          echo "OMEGA_RELEASE_ID=$release_id" >> "$GITHUB_ENV"
+
+      - name: Stream weights directly into Release
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true'
+        env:
+          GH_TOKEN: ${{secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          OMEGA_STORAGE_REPOSITORY: ${{env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          MODEL_ID: ${{matrix.model_id }}
+          REVISION: ${{steps.revision.outputs.sha }}
+          RELEASE_TAG: ${{matrix.release_tag }}
+          LICENSE_ID: apache-2.0
+          CHUNK_BYTES: 536870912
+        run: python scripts/rechercher-omega-release-stream.py
+
+      - name: Publish canonical Apache-2.0 license
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true'
+        env:
+          GH_TOKEN: ${{secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error https://www.apache.org/licenses/LICENSE-2.0.txt -o "$RUNNER_TEMP/LICENSE-APACHE-2.0"
+          test -s "$RUNNER_TEMP/LICENSE-APACHE-2.0"
+          gh release upload "$RELEASE_TAG" "$RUNNER_TEMP/LICENSE-APACHE-2.0#LICENSE-APACHE-2.0" --repo "$REPO" --clobber
+
+      - name: Record SANA 2K/4K runtime dependency metadata
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && (matrix.id == 'sana-1600m-2k' || matrix.id == 'sana-1600m-4k')
+        env:
+          GH_TOKEN: ${{secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{matrix.release_tag }}
+          MODEL_ID: ${{matrix.model_id }}
+          REVISION: ${{steps.revision.outputs.sha }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/sana-runtime-dependencies.json" <<JSON
+          {
+            "model_id": "$MODEL_ID",
+            "revision": "$REVISION",
+            "license": "Apache-2.0",
+            "runtime_status": "dependency_blocked",
+            "required_external_dependency": "google/gemma-2-2b-it",
+            "embedded": false,
+            "reason": "SANA 2K/4K uses Gemma2-2B-IT as a fixed pretrained text encoder; no dependency redistribution or bypass is attempted."
+          }
+          JSON
+          gh release upload "$RELEASE_TAG" "$RUNNER_TEMP/sana-runtime-dependencies.json" --repo "$REPO" --clobber
+
+      - name: Verify Release manifest
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true'
+        env:
+          GH_TOKEN: ${{secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          RELEASE_TAG: ${{matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name' | grep -Fxq "release-manifest.json"
+          echo "[OK] Verified Release manifest: $RELEASE_TAG"
