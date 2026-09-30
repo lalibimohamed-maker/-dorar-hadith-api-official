@@ -10,7 +10,7 @@ const verifiedSahih = {
   language: "ar",
   rights_status: "cleared",
   provenance: "verified",
-  sha256: "sha-sahih-1",
+  sha256: "a".repeat(64),
   verification_status: "verified",
   authenticity_status: "sahih"
 };
@@ -20,7 +20,7 @@ function adversarialCandidate(authenticity_status) {
     ...verifiedSahih,
     evidence_id: `adversarial:${authenticity_status}`,
     document_id: `adversarial-book:${authenticity_status}`,
-    sha256: `sha-${authenticity_status}`,
+    sha256: "b".repeat(64),
     authenticity_status,
     semanticSimilarity: 1.0,
     text: "نص تجريبي مطابق دلاليًا للسؤال لكنه غير مؤهل كدليل صحيح."
