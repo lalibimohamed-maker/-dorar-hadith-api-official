@@ -7,8 +7,9 @@ export function createExecutionService({router,scheduler,adapters={},clock=()=>D
   const jobs=new Map();
 
   async function run(request) {
-    const job={job_id:request.job_id||`omega-${clock()}`,state:"queued",created_at:new Date(clock()).toISOString(),capability:request.capability};
-    jobs.set(job.job_id,job);
+    const controller=new AbortController();
+    const job={job_id:request.job_id||`omega-${clock()}`,state:"queued",created_at:new Date(clock()).toISOString(),capability:request.capability,provenance:request.provenance||null};
+    jobs.set(job.job_id,{job,controller});
     try {
       job.state="preflight";
       const engine=router.resolve(request.capability,{prefer:request.preferEngines});
@@ -16,23 +17,36 @@ export function createExecutionService({router,scheduler,adapters={},clock=()=>D
       const resource=scheduler.select(request.resourceRequirements||{});
       const adapter=adapters[identity.runtime];
       if(!adapter) throw new Error(`no adapter for runtime: ${identity.runtime}`);
-      await preflightRuntime(adapter,{resource,engine:identity});
-      await adapter.load({resource,engine:identity});
+      await preflightRuntime(adapter,{resource,engine:identity,signal:controller.signal});
+      if(controller.signal.aborted) throw Object.assign(new Error("execution cancelled"),{code:"ABORT_ERR"});
+      await adapter.load({resource,engine:identity,signal:controller.signal});
       job.state="running"; job.engine_id=identity.engine_id; job.resource_id=resource.resource_id;
-      const result=await adapter.execute(request.input,{job,resource,engine:identity,signal:request.signal});
+      const result=await adapter.execute(request.input,{job,resource,engine:identity,signal:controller.signal});
+      if(controller.signal.aborted) throw Object.assign(new Error("execution cancelled"),{code:"ABORT_ERR"});
       job.state="succeeded"; job.completed_at=new Date(clock()).toISOString(); job.result=result;
       return Object.freeze({...job});
     } catch(error) {
-      job.state=error?.code==="ABORT_ERR"?"cancelled":"failed";
+      job.state=error?.code==="ABORT_ERR" || controller.signal.aborted ? "cancelled" : "failed";
       job.error=String(error?.message||error);
       job.completed_at=new Date(clock()).toISOString();
       throw Object.assign(new Error(job.error),{job});
+    } finally {
+      if(terminal.has(job.state)) jobs.delete(job.job_id);
     }
   }
 
   return Object.freeze({
     run,
-    cancel(job_id){const job=jobs.get(job_id);if(!job||terminal.has(job.state))return false;job.state="cancelling";return true;},
-    status(job_id){const job=jobs.get(job_id);return job?Object.freeze({...job}):null;}
+    cancel(job_id){
+      const entry=jobs.get(job_id);
+      if(!entry || terminal.has(entry.job.state)) return false;
+      entry.job.state="cancelling";
+      entry.controller.abort();
+      return true;
+    },
+    status(job_id){
+      const entry=jobs.get(job_id);
+      return entry?Object.freeze({...entry.job}):null;
+    }
   });
 }
