@@ -163,6 +163,7 @@
     metaStore.put({
       id: "evidence",
       snapshot_sha256: null,
+      snapshot_algorithm: "omega-evidence-snapshot-v2",
       dirty: true,
       sequence: 0,
       updated_at: new Date().toISOString()
@@ -273,6 +274,7 @@
       tx.objectStore(META_STORE).put({
         id: "evidence",
         snapshot_sha256: String(snapshotSha256).toLowerCase(),
+        snapshot_algorithm: "omega-evidence-snapshot-v2",
         dirty: false,
         sequence: Math.max(0, Number(sequence) || 0),
         updated_at: new Date().toISOString()
@@ -292,7 +294,9 @@
       request.onerror = () => reject(request.error || new Error("SYNC_STATE_READ_FAILED"));
     });
 
-    if (current?.dirty === false && HEX_SHA256.test(String(current.snapshot_sha256 ?? ""))) {
+    if (current?.dirty === false &&
+        current?.snapshot_algorithm === "omega-evidence-snapshot-v2" &&
+        HEX_SHA256.test(String(current.snapshot_sha256 ?? ""))) {
       return Object.freeze(current);
     }
 
@@ -301,6 +305,7 @@
     return Object.freeze({
       id: "evidence",
       snapshot_sha256: snapshot,
+      snapshot_algorithm: "omega-evidence-snapshot-v2",
       dirty: false,
       sequence: Math.max(0, Number(current?.sequence) || 0)
     });
