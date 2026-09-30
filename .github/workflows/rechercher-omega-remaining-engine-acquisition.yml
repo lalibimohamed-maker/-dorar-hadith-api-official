@@ -148,6 +148,27 @@ jobs:
             license: apache-2.0
             release_mode: prerelease
             chunk_bytes: 536870912
+          - id: nllb-200-600m
+            model_id: facebook/nllb-200-distilled-600M
+            revision: main
+            release_tag: rechercher-omega-nllb200-600m-v1.0.0
+            license: cc-by-nc-4.0
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: seamless-m4t-v2-large
+            model_id: facebook/seamless-m4t-v2-large
+            revision: main
+            release_tag: rechercher-omega-seamless-m4t-v2-large-v1.0.0
+            license: cc-by-nc-4.0
+            release_mode: prerelease
+            chunk_bytes: 536870912
+          - id: pyannote-speaker-diarization-3.1
+            model_id: pyannote/speaker-diarization-3.1
+            revision: main
+            release_tag: rechercher-omega-pyannote-speaker-diarization31-v1.0.0
+            license: mit-gated-upstream-terms
+            release_mode: prerelease
+            chunk_bytes: 536870912
 
     steps:
       - name: Checkout
@@ -581,4 +602,5 @@ jobs:
           path: ${{ runner.temp }}/flux1-schnell-access-state.json
           if-no-files-found: error
 
+# private-fleet-expansion-2026-09-30: NLLB-200, SeamlessM4T-v2 and pyannote diarization are now governed Omega Release targets; private-only retention remains separate from public redistribution.
 # radar-continuation-2026-09-30: explicit weight acquisition continuation trigger; no Corpus/Git weight writes.
