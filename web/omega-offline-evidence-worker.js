@@ -49,6 +49,9 @@ function openDb() {
         store.createIndex("source_id", "source_id", { unique: false });
         store.createIndex("verification_status", "verification_status", { unique: false });
       }
+      if (!db.objectStoreNames.contains("sync_state")) {
+        db.createObjectStore("sync_state", { keyPath: "id" });
+      }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error || new Error("INDEXEDDB_OPEN_FAILED"));
