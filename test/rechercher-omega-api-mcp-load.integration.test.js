@@ -13,7 +13,7 @@ async function stop(server){ server.closeAllConnections?.(); if(server.listening
 test("AI API verifier survives concurrent fail/green requests without leaking rejected text",async()=>{
  const {createAiGateway}=await import("../src/rechercher-ai-gateway.js?loadtest=ai2");
  const server=createAiGateway({host:"127.0.0.1",port:0});
- const evidence=[{sourceId:"b",citation:"p.1",kind:"primary_text",exact_quote_required:true,text:"النص الموثق"}];
+ const evidence=[{sourceId:"b",citation:"p.1",kind:"primary_text",exact_quote_required:true,text:"النص الموثق",sha256:"a42f213000e4d3f815dd57f95f6476c323d9b9db858804f7db2d55d169718d74"}];
  try{
   const port=await start(server);
   const requests=Array.from({length:40},(_,i)=>fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},body:JSON.stringify({answer:i%2===0?"النص الموثق":"نص محرف",evidence,citations:[{sourceId:"b",citation:"p.1"}]}),signal:AbortSignal.timeout(5000)}));
