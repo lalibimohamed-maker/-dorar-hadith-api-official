@@ -2,15 +2,19 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-test("browser package build remains isolated and shell-free", async () => {
+test("browser package build is isolated and network-free", async () => {
   const packageJson = JSON.parse(await readFile("packages/omega-browser/package.json", "utf8"));
   const lock = JSON.parse(await readFile("packages/omega-browser/package-lock.json", "utf8"));
   const build = await readFile("packages/omega-browser/build.js", "utf8");
   const gitignore = await readFile("packages/omega-browser/.gitignore", "utf8");
+  const core = await readFile("packages/omega-browser/src/omega-client-core.js", "utf8");
 
   assert.equal(packageJson.name, "@dinullah/omega-browser");
   assert.equal(lock.name, "@dinullah/omega-browser");
-  assert.equal(build.includes("esbuild@0.28.2"), true);
-  assert.equal(build.includes("shell: false"), true);
+  assert.equal(build.includes("npx"), false);
+  assert.equal(build.includes("esbuild"), false);
+  assert.equal(build.includes("fetch("), false);
+  assert.equal(core.includes("../../../src/offline/arabic-query-normalizer.js"), false);
+  assert.match(core, /\.\/arabic-query-normalizer\.js/);
   assert.equal(gitignore.includes("dist/"), true);
 });
