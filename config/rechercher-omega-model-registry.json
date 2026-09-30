@@ -210,6 +210,30 @@
       "notes": "Multilingual Whisper starter is selected for lightweight local acquisition; larger variants remain runtime/Kaggle candidates."
     },
     {
+      "id": "sana-sprint",
+      "family": "image-generation",
+      "tasks": [
+        "text_to_image",
+        "image_generation",
+        "image_to_image"
+      ],
+      "source": "https://github.com/NVlabs/Sana",
+      "status": "candidate",
+      "license_review": "weights_verified_runtime_dependency_review_required",
+      "license_status": "verified_source_license",
+      "model_id": "Efficient-Large-Model/Sana_Sprint_1.6B_1024px",
+      "revision": "9f6866d6962d5d91d213f113e162cb18bffe741c",
+      "acquisition_class": "github_release",
+      "release_tag": "rechercher-omega-sana-sprint16-v1.0.0",
+      "resolution": "1024px",
+      "inference_steps": "1-4",
+      "approximate_size_gb": 6.45,
+      "resource_class": "medium",
+      "runtime_status": "dependency_blocked_until_gemma_clearance",
+      "dependency_model_id": "google/gemma-2-2b-it",
+      "notes": "Selected as the open, fast FLUX.1-schnell substitute. Weights are Apache-2.0; executable runtime is not declared fully runnable until the Gemma text-encoder dependency is separately cleared."
+    },
+    {
       "id": "flux",
       "family": "image-generation",
       "tasks": [
