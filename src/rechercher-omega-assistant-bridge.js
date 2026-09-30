@@ -10,10 +10,26 @@ import { loadExecutionBackends, selectExecutionBackend, executeSelectedBackend }
 import { buildTelemetryContext, completeTelemetry } from "./rechercher-omega-observability.js";
 import { buildEvidenceEnvelope, buildScholarlySystemPrompt } from "./rechercher-omega-evidence-envelope.js";
 import { ConversationMemory } from "./rechercher-omega-conversation-memory.js";
+import { verifyAgentAnswer } from "./rechercher-omega-answer-verifier.js";
 import { evaluateRuntimeArtifactReadiness } from "./rechercher-omega-runtime-readiness.js";
 
 import { admitExecution } from "./rechercher-omega-resource-admission.js";
 import { buildSemanticCacheKey, createCacheEntry, isCacheReusable, DEFAULT_CACHE_TTLS_MS } from "./rechercher-omega-semantic-cache.js";
+
+
+function extractGeneratedText(result) {
+  if (typeof result?.text === "string") return result.text;
+  if (typeof result?.output_text === "string") return result.output_text;
+  const choice = result?.choices?.[0];
+  if (typeof choice?.message?.content === "string") return choice.message.content;
+  if (Array.isArray(choice?.message?.content)) {
+    return choice.message.content.map(part => part?.text ?? "").filter(Boolean).join("\n");
+  }
+  const candidate = result?.candidates?.[0]?.content?.parts;
+  if (Array.isArray(candidate)) return candidate.map(part => part?.text ?? "").filter(Boolean).join("\n");
+  if (typeof result?.stdout === "string") return result.stdout;
+  return "";
+}
 
 export async function runGovernedAssistantTurn({
   query,
@@ -225,6 +241,48 @@ export async function runGovernedAssistantTurn({
     generated_media_is_evidence: false,
     runtimeArtifact
   });
+
+  const generatedText = extractGeneratedText(result);
+  const citations = evidence
+    .filter(item => item?.source_id && (item?.citation || item?.provenance?.citation))
+    .map(item => ({
+      sourceId: item.source_id,
+      citation: item.citation ?? item.provenance.citation,
+      ...(item.text_hash ? { text_hash: item.text_hash } : {})
+    }));
+  if (SCHOLARLY_TASKS.has("scholarly_answer")) {
+    const verification = verifyAgentAnswer({
+      answer: generatedText,
+      evidence: evidence.map(item => ({
+        ...item,
+        sourceId: item.source_id ?? item.id,
+        citation: item.citation ?? item.provenance?.citation,
+        kind: item.kind,
+        exact_quote_required: item.exact_quote_required
+      })),
+      citations
+    });
+    if (!verification.verified) {
+      return {
+        status: "blocked",
+        plan,
+        backend: gate,
+        provenance,
+        runtime_readiness: runtimeReadiness,
+        verification,
+        result: null,
+        fallback: verification.fallback,
+        telemetry: completeTelemetry(telemetryContext, {
+          status: "blocked",
+          cache_hit: false,
+          error_type: verification.error?.code ?? "EVIDENCE_GATE_REJECTED"
+        }),
+        corpus_write_allowed: false,
+        quality_gate_required: true,
+        quality_gate: "rechercher-omega-quality-gates-2026"
+      };
+    }
+  }
 
   const cache = createCacheEntry({
     key: cacheKey,
