@@ -73,9 +73,13 @@ function decodeCursor(cursor){
   }catch{throw new Error("INVALID_CURSOR: cursor is invalid");}
 }
 function paginateSearch(data,{q,cursor,limit}){
+  const items=Array.isArray(data?.sourceMatches)?data.sourceMatches:[];
+  const upstreamPagination=data?.pagination;
+  if(upstreamPagination && Object.prototype.hasOwnProperty.call(upstreamPagination,"next_cursor")){
+    return {...data,pagination:{...upstreamPagination,limit,cursor:cursor??upstreamPagination.cursor??null,total:upstreamPagination.total??items.length,next_cursor:upstreamPagination.next_cursor??null}};
+  }
   const page=decodeCursor(cursor);
   if(page.q!==null&&page.q!==q)throw new Error("INVALID_CURSOR: cursor does not belong to this query");
-  const items=Array.isArray(data?.sourceMatches)?data.sourceMatches:[];
   const start=page.offset, end=Math.min(items.length,start+limit);
   return {...data,sourceMatches:items.slice(start,end),pagination:{limit,cursor:cursor||null,next_cursor:end<items.length?encodeCursor({q,offset:end}):null,total:items.length}};
 }
@@ -92,7 +96,7 @@ function validateArguments(def,args={}) {
 
 function buildUrl(name,args) {
   const url=new URL(DEFAULT_BASE);
-  if(name==="deen_search"){url.pathname="/api/v1/search";url.search=new URLSearchParams({q:args.q,...(args.lang?{lang:args.lang}:{}),...(args.comparative!==undefined?{comparative:String(args.comparative)}:{})}).toString();}
+  if(name==="deen_search"){url.pathname="/api/v1/search";url.search=new URLSearchParams({q:args.q,...(args.lang?{lang:args.lang}:{}),...(args.comparative!==undefined?{comparative:String(args.comparative)}:{}),...(args.limit?{limit:String(args.limit)}:{}),...(args.cursor?{cursor:String(args.cursor)}:{})}).toString();}
   else if(name==="deen_concept"){url.pathname="/api/v1/concept";url.search=new URLSearchParams({term:args.term,...(args.context?{context:args.context}:{}),...(args.lang?{lang:args.lang}:{})}).toString();}
   else if(name==="deen_quran_ayah"){url.pathname="/api/v1/quran/ayah";url.search=new URLSearchParams({verse:args.verse,...(args.translationIds?{translationIds:args.translationIds}:{}),...(args.tafsirIds?{tafsirIds:args.tafsirIds}:{}),...(args.words!==undefined?{words:String(args.words)}:{})}).toString();}
   else if(name==="deen_source"){url.pathname="/api/v1/encyclopedia/source/"+encodeURIComponent(args.id);}
