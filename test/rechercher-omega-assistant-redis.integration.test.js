@@ -43,7 +43,7 @@ const backends={
 
 function runtimeArtifact(){
   return {
-    state:"ready",
+    state:"verified_installed",
     sha256_verified:true,
     revision_verified:true,
     license_verified:true
