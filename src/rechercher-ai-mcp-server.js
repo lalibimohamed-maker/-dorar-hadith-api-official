@@ -11,12 +11,12 @@ const RATE_BURST = Number(process.env.MCP_RATE_BURST || 20);
 const rateBuckets = new Map();
 
 const TOOLS = Object.freeze([
-  { name:"deen_search", description:strictAnchoringDescription("deen_search")+"\nSearch the verified Din Allah API with cursor pagination. Search is discovery only; returned evidence must still pass provenance/rights/verification gates.", inputSchema:{type:"object",additionalProperties:false,required:["q"],properties:{q:{type:"string",minLength:1,maxLength:300},lang:{type:"string",maxLength:35},comparative:{type:"boolean"},limit:{type:"integer",minimum:1,maximum:100},cursor:{type:"string",maxLength:1024}}}},
-  { name:"deen_concept", description:"Retrieve a source-aware concept card from the encyclopedia.", inputSchema:{type:"object",additionalProperties:false,required:["term"],properties:{term:{type:"string",minLength:1,maxLength:300},context:{type:"string",maxLength:500},lang:{type:"string",maxLength:35}}}},
-  { name:"deen_quran_ayah", description:strictAnchoringDescription("deen_quran_ayah")+"\nRetrieve canonical Quran ayah context. The model is never permitted to generate or rewrite canonical Quran text.", inputSchema:{type:"object",additionalProperties:false,required:["verse"],properties:{verse:{type:"string",minLength:1,maxLength:80},translationIds:{type:"string",maxLength:500},tafsirIds:{type:"string",maxLength:500},words:{type:"boolean"}}}},
-  { name:"deen_source", description:"Retrieve a named encyclopedia source record with provenance metadata.", inputSchema:{type:"object",additionalProperties:false,required:["id"],properties:{id:{type:"string",minLength:1,maxLength:200}}}},
-  { name:"deen_verify_answer", description:strictAnchoringDescription("deen_verify_answer")+"\nStrictly verify generated text against supplied source evidence. A mismatch is rejected and the exact source text is returned as deterministic fallback.", inputSchema:{type:"object",additionalProperties:false,required:["answer","evidence_json","citations_json"],properties:{answer:{type:"string",minLength:1,maxLength:20000},evidence_json:{type:"string",minLength:2,maxLength:500000},citations_json:{type:"string",minLength:2,maxLength:100000}}}},
-  { name:"deen_health", description:"Return API health information.", inputSchema:{type:"object",additionalProperties:false,properties:{}}}
+  { name:"deen_search", annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}, description:strictAnchoringDescription("deen_search")+"\nSearch the verified Din Allah API with cursor pagination. Search is discovery only; returned evidence must still pass provenance/rights/verification gates.", inputSchema:{type:"object",additionalProperties:false,required:["q"],properties:{q:{type:"string",minLength:1,maxLength:300},lang:{type:"string",maxLength:35},comparative:{type:"boolean"},limit:{type:"integer",minimum:1,maximum:100},cursor:{type:"string",maxLength:1024}}}},
+  { name:"deen_concept", annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}, description:strictAnchoringDescription("deen_concept")+"\nRetrieve a source-aware concept card from the encyclopedia.", inputSchema:{type:"object",additionalProperties:false,required:["term"],properties:{term:{type:"string",minLength:1,maxLength:300},context:{type:"string",maxLength:500},lang:{type:"string",maxLength:35}}}},
+  { name:"deen_quran_ayah", annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}, description:strictAnchoringDescription("deen_quran_ayah")+"\nRetrieve canonical Quran ayah context. The model is never permitted to generate or rewrite canonical Quran text.", inputSchema:{type:"object",additionalProperties:false,required:["verse"],properties:{verse:{type:"string",minLength:1,maxLength:80},translationIds:{type:"string",maxLength:500},tafsirIds:{type:"string",maxLength:500},words:{type:"boolean"}}}},
+  { name:"deen_source", annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}, description:strictAnchoringDescription("deen_source")+"\nRetrieve a named encyclopedia source record with provenance metadata.", inputSchema:{type:"object",additionalProperties:false,required:["id"],properties:{id:{type:"string",minLength:1,maxLength:200}}}},
+  { name:"deen_verify_answer", annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}, description:strictAnchoringDescription("deen_verify_answer")+"\nStrictly verify generated text against supplied source evidence. A mismatch is rejected and the exact source text is returned as deterministic fallback.", inputSchema:{type:"object",additionalProperties:false,required:["answer","evidence_json","citations_json"],properties:{answer:{type:"string",minLength:1,maxLength:20000},evidence_json:{type:"string",minLength:2,maxLength:500000},citations_json:{type:"string",minLength:2,maxLength:100000}}}},
+  { name:"deen_health", annotations:{readOnlyHint:true,destructiveHint:false,idempotentHint:true}, description:strictAnchoringDescription("deen_health")+"\nReturn API health information.", inputSchema:{type:"object",additionalProperties:false,properties:{}}}
 ]);
 
 function json(res,status,payload,headers={}) {
@@ -123,7 +123,7 @@ async function callApi(name,args) {
 }
 
 function mcpResult(id,result) {
-  return {jsonrpc:"2.0",id,result:{...result,_meta:{"io.modelcontextprotocol/serverInfo":{name:"din-allah-rechercher-mcp",version:"1.0.0"}}}};
+  return {jsonrpc:"2.0",id,result:{...result,_meta:{"io.modelcontextprotocol/serverInfo":{name:"din-allah-rechercher-mcp",version:"1.0.0",anchoring_version:MCP_STRICT_ANCHORING_VERSION}}}};
 }
 
 async function handleRpc(req,body) {
@@ -133,7 +133,7 @@ async function handleRpc(req,body) {
   if(versionError) return versionError;
   switch(body.method){
     case "server/discover":
-      return mcpResult(id,{protocolVersions:SUPPORTED_MCP_VERSIONS,capabilities:{tools:{listChanged:false}},serverInfo:{name:"din-allah-rechercher-mcp",version:"1.0.0"}});
+      return mcpResult(id,{protocolVersions:SUPPORTED_MCP_VERSIONS,capabilities:{tools:{listChanged:false}},serverInfo:{name:"din-allah-rechercher-mcp",version:"1.0.0",anchoring_version:MCP_STRICT_ANCHORING_VERSION}});
     case "tools/list":
       return mcpResult(id,{tools:TOOLS});
     case "tools/call":{
