@@ -1,9 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { once } from "node:events";
 
 test("AI gateway exposes the strict evidence verifier",async()=>{
  const {createAiGateway}=await import("../src/rechercher-ai-gateway.js");
  const server=createAiGateway({host:"127.0.0.1",port:0});
+ await once(server,"listening");
  const port=server.address().port;
  try{
   const body={answer:"قال رسول الله ﷺ: إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ.",evidence:[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ"}],citations:[{sourceId:"bukhari",citation:"vol.1 p.1"}]};
@@ -20,6 +22,7 @@ test("AI gateway exposes the strict evidence verifier",async()=>{
 test("MCP exposes the same strict verifier as a read-only tool",async()=>{
  const {createMcpServer}=await import("../src/rechercher-ai-mcp-server.js");
  const server=createMcpServer({host:"127.0.0.1",port:0});
+ await once(server,"listening");
  const port=server.address().port;
  try{
   const evidence=[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ"}];
