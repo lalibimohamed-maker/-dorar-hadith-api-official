@@ -10,6 +10,7 @@ on:
       - test/rechercher-omega-answer-verifier.integration.test.js
       - test/rechercher-omega-evidence-api-mcp.integration.test.js
       - test/rechercher-omega-evidence-load.integration.test.js
+      - test/rechercher-omega-api-mcp-pagination.integration.test.js
       - .github/workflows/rechercher-omega-evidence-integration.yml
   pull_request:
     branches: [main]
@@ -33,4 +34,4 @@ jobs:
           node-version: 22
           package-manager-cache: false
       - name: Run deterministic evidence gate tests
-        run: node --test test/rechercher-omega-answer-verifier.integration.test.js test/rechercher-omega-evidence-api-mcp.integration.test.js test/rechercher-omega-evidence-load.integration.test.js test/rechercher-omega-governed-run.test.js test/rechercher-omega-governance-gap-closure.test.js test/rechercher-omega-api-mcp-load.integration.test.js
+        run: node --test test/rechercher-omega-answer-verifier.integration.test.js test/rechercher-omega-evidence-api-mcp.integration.test.js test/rechercher-omega-evidence-load.integration.test.js test/rechercher-omega-governed-run.test.js test/rechercher-omega-governance-gap-closure.test.js test/rechercher-omega-api-mcp-load.integration.test.js test/rechercher-omega-api-mcp-pagination.integration.test.js
