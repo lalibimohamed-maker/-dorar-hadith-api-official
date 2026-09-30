@@ -4,6 +4,7 @@ const APP_SHELL = [
   "./index.html",
   "./self-test.html",
   "./app.js",
+  "./omega-offline-store.js",
   "./offline-omega-ui.js",
   "./omega-local-provider.js",
   "./voice.js",
