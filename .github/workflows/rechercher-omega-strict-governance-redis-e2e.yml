@@ -18,6 +18,7 @@ on:
       - runtime/redis/docker-compose.yml
       - config/rechercher-omega-memory-production-2026.json
       - .github/workflows/rechercher-omega-strict-governance-redis-e2e.yml
+      - package.json
   pull_request:
     branches:
       - main
