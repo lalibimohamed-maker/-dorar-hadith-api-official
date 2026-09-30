@@ -7,4 +7,6 @@ test("offline_only does not use browser Web Speech recognition as a local STT cl
   assert.match(voice, /offline_only/);
   assert.match(voice, /SpeechRecognition/);
   assert.match(voice, /local STT|محلي|دون اتصال/);
+  assert.match(voice, /omegaMode\(\) === "offline_only"/);
+  assert.match(voice, /Web Speech غير مُستخدم/);
 });
