@@ -20,10 +20,13 @@ on:
 
 # security-justification: this workflow publishes only verified release assets from pinned upstream sources after checksum, size and security gates.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   populate:
+    permissions:
+      contents: write
+
     name: Verify and cache approved model weights in GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 45
