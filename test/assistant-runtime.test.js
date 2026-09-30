@@ -63,3 +63,24 @@ test('assistant preserves legacy search-only mode by default', async () => {
   assert.equal(result.capabilities.omega, false);
   assert.equal('omega' in result, false);
 });
+
+
+test('assistant can add provenance-bearing GraphRAG retrieval to Omega evidence', async () => {
+  const graphRagRuntime = {
+    async search() {
+      return [{ id: 'graph-1', payload: { sourceId: 'graph-source', text: 'Graph evidence', verification: 'source_verified', provenance: { citation: 'p.2' } } }];
+    }
+  };
+  const result = await runAssistantSearch({
+    query: 'اختبار GraphRAG',
+    language: 'ar',
+    searchFn: omegaSearchStub,
+    useOmega: true,
+    executeOmega: false,
+    graphRagRuntime,
+    omegaOptions: { availableBackends: ['openai-compatible'] }
+  });
+  assert.equal(result.omega.graphRag.enabled, true);
+  assert.equal(result.omega.graphRag.results, 1);
+  assert.equal(result.omega.plan.status, 'ready');
+});
