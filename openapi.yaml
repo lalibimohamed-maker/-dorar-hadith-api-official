@@ -93,6 +93,25 @@ paths:
         '200': {description: Strict evidence envelope}
         '400': {description: Machine-readable validation error}
         '429': {description: Rate limit exceeded}
+  /api/v1/agents/verify:
+    post:
+      operationId: verifyAgentAnswer
+      summary: Deterministically verify generated answer text against retrieved source evidence
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [answer, evidence, citations]
+              properties:
+                answer: {type: string, maxLength: 20000}
+                evidence: {type: array, items: {$ref: '#/components/schemas/IslamicCorpusNode'}}
+                citations: {type: array, items: {type: object, required: [sourceId, citation]}}
+      responses:
+        '200': {description: Source-backed answer verified}
+        '422': {description: Verification rejected; deterministic source fallback may be returned}
+        '429': {description: Rate limit exceeded}
   /mcp:
     post:
       operationId: mcp
