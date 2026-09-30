@@ -189,11 +189,12 @@ async function handleRpc(req,body) {
         const executor=TOOL_EXECUTORS.get(name);
         if(!executor) return rpcError(id,-32602,"Unknown tool",{name});
         const data=await executor(args);
-        const isError=Boolean(data?.__mcp_error);
-        if(isError){
+        const isExecutorError=Boolean(data?.__mcp_error);
+        if(isExecutorError){
           return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data.value)}],structuredContent:data.value,isError:true});
         }
-        return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:false});
+        const verificationError=Boolean(data && data.verified===false);
+        return mcpResult(id,{content:[{type:"text",text:JSON.stringify(data)}],structuredContent:data,isError:verificationError});
       }catch(error){
         return mcpResult(id,{content:[{type:"text",text:JSON.stringify({code:"UPSTREAM_ERROR",message:error.message,data:error.data||null})}],isError:true});
       }
