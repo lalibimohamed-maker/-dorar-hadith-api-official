@@ -56,7 +56,7 @@ test("WebGPU guard uses GPUDevice uncapturederror and lost, then requests WASM",
     fallbackToWasmCallback: detail => { fallback = detail; }
   });
   listeners.uncapturederror({ error: new Error("boom") });
-  lostResolve({ reason: "destroyed", message: "device lost" });
+  lostResolve({ reason: "unknown", message: "device lost" });
   await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(fallback.backend, "wasm");
   assert.equal(fallback.suggested_chunk_size, 64);
