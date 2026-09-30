@@ -114,6 +114,41 @@
         }
       }
     },
+    "multimodal_profile": {
+      "type": "object",
+      "properties": {
+        "modalities": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["text", "image", "audio", "video"] }
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "processor_family": { "type": "string", "minLength": 1 },
+            "patch_size": { "type": "integer", "minimum": 1 },
+            "merge_size": { "type": "integer", "minimum": 1 },
+            "min_pixels": { "type": "integer", "minimum": 1 },
+            "max_pixels": { "type": "integer", "minimum": 1 },
+            "target_visual_tokens": { "type": "integer", "minimum": 1 },
+            "max_dimension": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "context_guard": {
+          "type": "object",
+          "properties": {
+            "context_window_tokens": { "type": "integer", "minimum": 1 },
+            "evidence_reservation_tokens": { "type": "integer", "minimum": 0 },
+            "text_reservation_tokens": { "type": "integer", "minimum": 0 },
+            "generation_reservation_tokens": { "type": "integer", "minimum": 0 },
+            "safety_margin_tokens": { "type": "integer", "minimum": 0 },
+            "minimum_visual_tokens": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
     "runtime_profile": {
       "type": "object",
       "required": [
