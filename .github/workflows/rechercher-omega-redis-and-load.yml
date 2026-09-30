@@ -1,0 +1,45 @@
+name: Rechercher Omega — Redis and API/MCP load verification
+on:
+  push:
+    branches: [feat/rechercher-omega-multimodal-intelligence]
+    paths:
+      - src/rechercher-omega-redis-memory.js
+      - runtime/redis/docker-compose.yml
+      - test/rechercher-omega-redis-memory.test.js
+      - test/rechercher-omega-api-mcp-load.test.js
+      - .github/workflows/rechercher-omega-redis-and-load.yml
+  pull_request:
+    branches: [main]
+  merge_group:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Syntax and deterministic adapter tests
+        run: node --test test/rechercher-omega-redis-memory.test.js
+      - name: Start self-hosted Redis service
+        run: docker compose -f runtime/redis/docker-compose.yml up -d
+      - name: Redis live smoke
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            if docker exec $(docker ps -qf name=redis-1) redis-cli ping 2>/dev/null | grep -q PONG; then break; fi
+            sleep 1
+          done
+          docker exec $(docker ps -qf name=redis-1) redis-cli ping | grep -Fx PONG
+      - name: API/MCP concurrent verification load
+        run: node --test test/rechercher-omega-api-mcp-load.test.js
+      - name: Shutdown Redis
+        if: always()
+        run: docker compose -f runtime/redis/docker-compose.yml down -v
