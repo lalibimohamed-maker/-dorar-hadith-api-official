@@ -40,15 +40,16 @@ function targetPixelsForBudget(profile) {
   const byTokens = budget * align * align;
   const maxPixels = finitePositive(profile?.max_pixels, DEFAULTS.max_pixels);
   const minPixels = finitePositive(profile?.min_pixels, DEFAULTS.min_pixels);
-  return Math.max(minPixels, Math.min(maxPixels, byTokens));
+  if (minPixels > byTokens) throw new RangeError("VISUAL_BUDGET_BELOW_MODEL_MINIMUM");
+  return Math.min(maxPixels, byTokens);
 }
 
 function dimensionsForPixelBudget(width, height, maxPixels, align, maxDimension) {
   const sourceWidth = Math.max(1, Number(width));
   const sourceHeight = Math.max(1, Number(height));
   const scale = Math.min(1, Math.sqrt(maxPixels / (sourceWidth * sourceHeight)));
-  let targetWidth = Math.max(align, Math.round(sourceWidth * scale / align) * align);
-  let targetHeight = Math.max(align, Math.round(sourceHeight * scale / align) * align);
+  let targetWidth = Math.max(align, Math.floor(sourceWidth * scale / align) * align);
+  let targetHeight = Math.max(align, Math.floor(sourceHeight * scale / align) * align);
 
   while (targetWidth * targetHeight > maxPixels && (targetWidth > align || targetHeight > align)) {
     if (targetWidth / targetHeight >= sourceWidth / sourceHeight && targetWidth > align) targetWidth -= align;
