@@ -19,6 +19,11 @@ on:
       - config/rechercher-omega-memory-production-2026.json
       - .github/workflows/rechercher-omega-strict-governance-redis-e2e.yml
       - package.json
+      - .github/workflows/rechercher-omega-engine-release.yml
+      - test/rechercher-omega-integrity-sharding.test.js
+      - scripts/omega-file-reassembler.js
+      - scripts/omega-file-sharder.js
+      - src/rechercher-omega-arabic-integrity.js
   pull_request:
     branches:
       - main
@@ -84,7 +89,8 @@ jobs:
             test/rechercher-omega-governed-run.test.js \
             test/rechercher-omega-evidence-api-mcp.integration.test.js \
             test/rechercher-omega-governance-redis-e2e.integration.test.js \
-            test/rechercher-omega-assistant-redis.integration.test.js
+            test/rechercher-omega-assistant-redis.integration.test.js \
+            test/rechercher-omega-integrity-sharding.test.js
 
       - name: Shutdown Redis
         if: always()
