@@ -68,7 +68,11 @@ export function createAiGateway({host="0.0.0.0",port=PORT,ratePerMinute=Number(p
       if(url.pathname==="/api/v1/agents/quran"){if(!url.searchParams.get("verse"))return send(res,400,errorBody("INVALID_VERSE","verse is required."));const data=await upstream("/api/v1/quran/ayah",req);return send(res,200,envelope(data));}
       if(url.pathname==="/api/v1/agents/verify" && req.method==="POST"){
         const body=JSON.parse(await readJson(req));
-        const result=verifyAgentAnswer(body);
+        const result=verifyAgentAnswer({
+          answer: body?.answer,
+          evidence: body?.evidence,
+          citations: body?.citations
+        });
         return send(res,result.verified?200:422,envelope(result));
       }
       return send(res,404,errorBody("NOT_FOUND","Agent endpoint not found."));
