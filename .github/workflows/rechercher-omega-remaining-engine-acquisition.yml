@@ -152,7 +152,7 @@ jobs:
 
       - name: Resolve immutable revision
         id: revision
-        if: steps.existing_release.outputs.complete != 'true' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && steps.existing_release.outputs.complete != 'true' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
         env:
           MODEL_ID: ${{ matrix.model_id }}
           REQUESTED_REVISION: ${{ matrix.revision }}
@@ -195,6 +195,17 @@ jobs:
           test -n "$release_id"
           echo "OMEGA_RELEASE_ID=$release_id" >> "$GITHUB_ENV"
           echo "[OK] Release ID: $release_id"
+      - name: Check both authoritative storage targets
+        id: storage_reconciliation
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          OMEGA_PRIMARY_REPOSITORY: lalibimohamed-maker/-dorar-hadith-api-official
+          OMEGA_STORAGE_REPOSITORY: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
+          OMEGA_RELEASE_TAG: ${{ matrix.release_tag }}
+        run: |
+          set -euo pipefail
+          python scripts/rechercher-omega-storage-reconcile.py
+
       - name: Check existing Omega Release assets before streaming
         id: existing_release
         env:
@@ -213,7 +224,7 @@ jobs:
           fi
 
       - name: Stream weights directly into Release
-        if: matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready'
+        if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && (matrix.id != 'flux1-schnell' || steps.gated_access.outputs.state == 'ready')
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           OMEGA_STORAGE_REPOSITORY: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
