@@ -101,21 +101,24 @@ export async function shardModelFile(
     }
 
     const manifest={
-    schema_version:"1.0.0",
-    format:"dinullah/omega-sharded-file",
-    algorithm:"sha256",
-    model_name:modelName,
-    total_size:totalSize,
-    total_sha256:globalHash.digest("hex"),
-    chunk_size_bytes:chunkBytes,
-    chunk_count:chunks.length,
-    chunks
-  };
+      schema_version:"1.0.0",
+      format:"dinullah/omega-sharded-file",
+      algorithm:"sha256",
+      model_name:modelName,
+      total_size:totalSize,
+      total_sha256:globalHash.digest("hex"),
+      chunk_size_bytes:chunkBytes,
+      chunk_count:chunks.length,
+      chunks
+    };
 
-  const manifestPath=path.join(out,modelName+"-manifest.json");
-  await fs.promises.writeFile(manifestPath,JSON.stringify(manifest,null,2)+"\n","utf8");
+    const manifestPath=path.join(out,modelName+"-manifest.json");
+    await fs.promises.writeFile(manifestPath,JSON.stringify(manifest,null,2)+"\n","utf8");
 
-  return {manifest,manifestPath};
+    return {manifest,manifestPath};
+  }finally{
+    await handle.close();
+  }
 }
 
 if(import.meta.url===`file://${process.argv[1]}`){
