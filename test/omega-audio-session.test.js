@@ -14,9 +14,22 @@ test("audio session persists monotonically numbered frames before feeding", asyn
   const frames = [];
   const fed = [];
   const fakeStore = {
-    put(record) { frames.push(record); return new FakeRequest(record); },
-    delete() { return new FakeRequest(); },
-    getAll() { return new FakeRequest(frames.slice()); }
+    put(record) {
+      frames.push(record);
+      const request = new FakeRequest(record);
+      queueMicrotask(() => request.onsuccess?.());
+      return request;
+    },
+    delete() {
+      const request = new FakeRequest();
+      queueMicrotask(() => request.onsuccess?.());
+      return request;
+    },
+    getAll() {
+      const request = new FakeRequest(frames.slice());
+      queueMicrotask(() => request.onsuccess?.());
+      return request;
+    }
   };
   const fakeDb = {
     transaction() {
