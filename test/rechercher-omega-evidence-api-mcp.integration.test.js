@@ -18,11 +18,11 @@ test("AI gateway exposes the strict evidence verifier",async()=>{
  try{
   const port=await start(server);
   const body={answer:"قال رسول الله ﷺ: إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ.",evidence:[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ"}],citations:[{sourceId:"bukhari",citation:"vol.1 p.1"}]};
-  const ok=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},body:JSON.stringify(body)},{signal:AbortSignal.timeout(5000)});
+  const ok=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},body:JSON.stringify(body),signal:AbortSignal.timeout(5000)});
   const good=await ok.json(); assert.equal(ok.status,200); assert.equal(good.data.verified,true);
-  const bad=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},body:JSON.stringify({...body,answer:"قال رسول الله ﷺ: إنما الأعمال بالنية."})},{signal:AbortSignal.timeout(5000)});
+  const bad=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},body:JSON.stringify({...body,answer:"قال رسول الله ﷺ: إنما الأعمال بالنية."}),signal:AbortSignal.timeout(5000)});
   const rejected=await bad.json(); assert.equal(bad.status,422); assert.equal(rejected.data.verified,false); assert.equal(rejected.data.error.code,"STRICT_ALIGNMENT_MISMATCH"); assert.equal(rejected.data.fallback,body.evidence[0].text);
-  const none=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},body:JSON.stringify({answer:"ذاكرة النموذج",evidence:[],citations:[]})},{signal:AbortSignal.timeout(5000)});
+  const none=await fetch("http://127.0.0.1:"+port+"/api/v1/agents/verify",{method:"POST",headers:{"content-type":"application/json","connection":"close"},body:JSON.stringify({answer:"ذاكرة النموذج",evidence:[],citations:[]}),signal:AbortSignal.timeout(5000)});
   const empty=await none.json(); assert.equal(none.status,422); assert.equal(empty.data.error.code,"NO_EVIDENCE_FOUND");
  }finally{await stop(server);}
 });
@@ -34,7 +34,7 @@ test("MCP exposes the same strict verifier as a read-only tool",async()=>{
   const port=await start(server);
   const evidence=[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ"}];
   const payload={jsonrpc:"2.0",id:1,method:"tools/call",params:{name:"deen_verify_answer",arguments:{answer:"إنما الأعمال بالنية.",evidence_json:JSON.stringify(evidence),citations_json:JSON.stringify([{sourceId:"bukhari",citation:"vol.1 p.1"}])}}};
-  const res=await fetch("http://127.0.0.1:"+port+"/mcp",{method:"POST",headers:{"content-type":"application/json","mcp-protocol-version":"2026-07-28","connection":"close"},body:JSON.stringify(payload)},{signal:AbortSignal.timeout(5000)});
+  const res=await fetch("http://127.0.0.1:"+port+"/mcp",{method:"POST",headers:{"content-type":"application/json","mcp-protocol-version":"2026-07-28","connection":"close"},body:JSON.stringify(payload),signal:AbortSignal.timeout(5000)});
   const data=await res.json(); const structured=data.result.structuredContent;
   assert.equal(res.status,200); assert.equal(data.result.isError,true); assert.equal(structured.verified,false); assert.equal(structured.error.code,"STRICT_ALIGNMENT_MISMATCH"); assert.equal(structured.fallback,evidence[0].text);
  }finally{await stop(server);}
