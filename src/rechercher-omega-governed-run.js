@@ -1,6 +1,7 @@
 import { normalizeResearchQuery } from "./rechercher-omega-query-normalizer.js";
 import { verifyAgentAnswer } from "./rechercher-omega-answer-verifier.js";
 import { resolveEvidenceConflicts } from "./rechercher-omega-conflict-resolution.js";
+import { applyEvidenceHardGate } from "./omega-evidence-runtime.js";
 
 export async function runEvidenceFirstResearch({
   provider,
@@ -27,6 +28,7 @@ export async function runEvidenceFirstResearch({
       query: normalized,
       conflicts,
       retrievedEvidence: [],
+      hardGate: {accepted:[],rejected:[]},
       verification,
       result: null,
       fallback: null,
@@ -35,15 +37,43 @@ export async function runEvidenceFirstResearch({
     });
   }
 
+  const hardGate = applyEvidenceHardGate(retrieved);
+  if (hardGate.accepted.length === 0) {
+    const verification = verifyAgentAnswer({answer:"", evidence:[], citations:[]});
+    return Object.freeze({
+      query: normalized,
+      conflicts,
+      retrievedEvidence: [],
+      hardGate,
+      verification,
+      result: null,
+      fallback: null,
+      corpusWrite: false,
+      generatedMediaIsEvidence: false
+    });
+  }
+
+  retrieved = hardGate.accepted;
+
   let generated;
   try {
-    generated = await provider.generate({ messages, query: normalized.normalized, evidence: retrieved });
+    generated = await provider.generate({
+      messages,
+      query: normalized.normalized,
+      evidence: retrieved
+    });
   } catch (error) {
     return Object.freeze({
       query: normalized,
       conflicts,
       retrievedEvidence: retrieved,
-      verification: {verified:false,verification:null,fallback:null,error:{code:"MODEL_EXECUTION_FAILED",message:error.message}},
+      hardGate,
+      verification: {
+        verified:false,
+        verification:null,
+        fallback:null,
+        error:{code:"MODEL_EXECUTION_FAILED",message:error.message}
+      },
       result: null,
       fallback: retrieved.find(item=>item?.text)?.text ?? retrieved.find(item=>item?.text_raw)?.text_raw ?? null,
       corpusWrite: false,
@@ -52,12 +82,13 @@ export async function runEvidenceFirstResearch({
   }
 
   const answer = generated?.text ?? "";
-  const verification = verifyAgentAnswer({answer, evidence:retrieved, citations});
+  const verification = verifyAgentAnswer({answer,evidence:retrieved,citations});
 
   return Object.freeze({
     query: normalized,
     conflicts,
     retrievedEvidence: retrieved,
+    hardGate,
     verification,
     result: verification.verified ? generated : null,
     fallback: verification.verified ? null : verification.fallback,
