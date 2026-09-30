@@ -47,7 +47,7 @@ test("resumable download verifies cumulative rolling state and Merkle root", asy
     expected_sha256: sha256(payload),
     expected_rolling_root_sha256: integrity.rolling_root_sha256,
     expected_merkle_root_sha256: integrity.merkle_root_sha256,
-    validator: { etag: "\"v1\"", last_modified: null }
+    validator: { etag: '"v1"', last_modified: null }
   }));
 
   try {
@@ -59,7 +59,7 @@ test("resumable download verifies cumulative rolling state and Merkle root", asy
           status: 206,
           headers: {
             "Content-Range": "bytes 5-" + (payload.length - 1) + "/" + payload.length,
-            ETag: ""v1""
+                        ETag: '"v1"'
           }
         });
       }
