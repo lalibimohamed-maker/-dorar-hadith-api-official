@@ -1,15 +1,28 @@
-const FIT=(need,have)=>Object.entries(need||{}).every(([k,v])=>have?.[k]===undefined || have[k]>=v);
+const FIT=(need,have)=>Object.entries(need||{}).every(([k,v])=>have?.[k]!==undefined && have[k]>=v);
 
 export function createResourceScheduler(resources=[]) {
-  const snapshot=resources.map(r=>({...r}));
-  return Object.freeze({
-    list(){return snapshot.map(r=>({...r}));},
+  const state=resources.map(r=>({...r,activeJobs:0}));
+  return {
+    list(){return state.map(r=>({...r}));},
     select(requirements={}) {
-      const candidates=snapshot.filter(r=>r.enabled!==false && FIT(requirements,r.capacity||{}));
+      const candidates=state.filter(r=>r.enabled!==false && FIT(requirements,r.capacity||{}));
       if(!candidates.length) throw new Error("no compatible execution resource");
-      return candidates.sort((a,b)=>(a.priority??100)-(b.priority??100))[0];
+      return candidates.slice().sort((a,b)=>
+        (a.activeJobs-b.activeJobs) ||
+        ((a.priority??100)-(b.priority??100))
+      )[0];
+    },
+    acquire(resource_id){
+      const resource=state.find(r=>r.resource_id===resource_id);
+      if(!resource || resource.enabled===false) throw new Error("resource unavailable");
+      resource.activeJobs+=1;
+      return {...resource};
+    },
+    release(resource_id){
+      const resource=state.find(r=>r.resource_id===resource_id);
+      if(resource) resource.activeJobs=Math.max(0,resource.activeJobs-1);
     }
-  });
+  };
 }
 
 export function detectLocalResources({memoryMB=0,webgpu=false,wasm=true,cuda=false}={}) {
