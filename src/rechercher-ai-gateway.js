@@ -8,8 +8,8 @@ const MAX_LIMIT = 100;
 const buckets = new Map();
 
 function bucketKey(req){return String(req.headers["x-forwarded-for"]||req.socket.remoteAddress||"unknown").split(",")[0].trim();}
-function allow(req){
-  const now=Date.now(), key=bucketKey(req), perMinute=Number(process.env.AI_GATEWAY_RATE_PER_MINUTE||60), burst=Number(process.env.AI_GATEWAY_BURST||20);
+function allow(req,{perMinute=Number(process.env.AI_GATEWAY_RATE_PER_MINUTE||60),burst=Number(process.env.AI_GATEWAY_BURST||20)}={}){
+  const now=Date.now(), key=bucketKey(req);
   const b=buckets.get(key)||{tokens:burst,updated:now};
   b.tokens=Math.min(burst,b.tokens+((now-b.updated)/60000)*perMinute); b.updated=now;
   if(b.tokens<1){buckets.set(key,b);return false;} b.tokens-=1;buckets.set(key,b);
@@ -47,11 +47,11 @@ async function upstream(path,req){
   if(!r.ok){const e=new Error("upstream request failed");e.status=r.status;e.data=data;throw e;} return data;
 }
 function envelope(data,{cursor=null,limit=20}={}){return {schema_version:"1.0.0",data,meta:{limit,cursor,next_cursor:null,source_of_truth:"Din Allah API",generated_text_is_evidence:false}};}
-export function createAiGateway({host="0.0.0.0",port=PORT}={}){
+export function createAiGateway({host="0.0.0.0",port=PORT,ratePerMinute=Number(process.env.AI_GATEWAY_RATE_PER_MINUTE||60),rateBurst=Number(process.env.AI_GATEWAY_BURST||20)}={}){
   return http.createServer(async(req,res)=>{
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"*","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"content-type,x-api-key"});return res.end();}
     if(req.method!=="GET"&&req.method!=="POST")return send(res,405,errorBody("METHOD_NOT_ALLOWED","Only GET/POST are supported."));
-    if(!allow(req))return send(res,429,errorBody("RATE_LIMIT_EXCEEDED","AI gateway rate limit exceeded."),{"retry-after":"60"});
+    if(!allow(req,{perMinute:ratePerMinute,burst:rateBurst}))return send(res,429,errorBody("RATE_LIMIT_EXCEEDED","AI gateway rate limit exceeded."),{"retry-after":"60"});
     try{
       const url=new URL(req.url||"/","http://local");
       if(url.pathname==="/api/v1/agents/health"){return send(res,200,envelope({status:"ok",mcp:"/mcp"}));}
