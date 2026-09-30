@@ -1,0 +1,22 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://dinullah.example/schemas/hadith-evidence.schema.json",
+  "title":"Din Allah Hadith Evidence",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["hadith_id","text_raw","book","location","authenticity_status","grading_source","provenance","sha256","rights_status","verification_status"],
+  "properties":{
+    "hadith_id":{"type":"string","minLength":1},
+    "text_raw":{"type":"string","minLength":1},
+    "book":{"type":"string","minLength":1},
+    "location":{"type":"string","minLength":1},
+    "hadith_number":{"type":["string","integer"]},
+    "authenticity_status":{"type":"string","enum":["sahih","hasan","daif","mawdu","batil","very_weak","unknown","multiple_grades"]},
+    "grader":{"type":["string","null"]},
+    "grading_source":{"type":"string","minLength":1},
+    "provenance":{"type":"object","required":["source","document_id"],"additionalProperties":true},
+    "sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "rights_status":{"type":"string","enum":["cleared","restricted","unknown","blocked","review_required"]},
+    "verification_status":{"type":"string","enum":["verified","approved","candidate","unverified","rejected"]}
+  }
+}
