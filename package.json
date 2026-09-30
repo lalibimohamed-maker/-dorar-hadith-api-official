@@ -41,8 +41,9 @@
     "mcp": "node src/rechercher-ai-mcp-server.js",
     "test:mcp": "node --test test/rechercher-ai-mcp-server.test.js",
     "ai-gateway": "node src/rechercher-ai-gateway.js",
-    "test:omega-e2e": "node --test test/rechercher-omega-governed-run.test.js test/rechercher-omega-evidence-api-mcp.integration.test.js test/rechercher-omega-governance-redis-e2e.integration.test.js test/rechercher-omega-assistant-redis.integration.test.js test/rechercher-omega-integrity-sharding.test.js",
-    "test:omega-integrity": "node --test test/rechercher-omega-integrity-sharding.test.js"
+    "test:omega-e2e": "node --test test/rechercher-omega-governed-run.test.js test/rechercher-omega-evidence-api-mcp.integration.test.js test/rechercher-omega-governance-redis-e2e.integration.test.js test/rechercher-omega-assistant-redis.integration.test.js test/rechercher-omega-integrity-sharding.test.js test/rechercher-omega-claim-gate.test.js",
+    "test:omega-integrity": "node --test test/rechercher-omega-integrity-sharding.test.js",
+    "test:omega-claims": "node --test test/rechercher-omega-claim-gate.test.js"
   },
   "engines": {
     "node": ">=20"
