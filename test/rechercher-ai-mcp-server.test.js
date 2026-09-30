@@ -30,6 +30,12 @@ test("MCP strict anchoring exposes explicit governance rules",()=>{
   assert.match(description,/server-side verification/i);
   assert.match(description,/NO_EVIDENCE_FOUND/);
   assert.match(description,/diacritics/);
+  const { TOOLS } = await import("../src/rechercher-ai-mcp-server.js").catch(()=>({TOOLS:[]}));
+  if (Array.isArray(TOOLS) && TOOLS.length) {
+    const verifyTool=TOOLS.find(tool=>tool.name==="deen_verify_answer");
+    assert.equal(verifyTool.annotations.readOnlyHint,true);
+    assert.equal(verifyTool.annotations.destructiveHint,false);
+  }
 });
 
 test("MCP anchoring rejects altered primary text and returns deterministic fallback",()=>{
