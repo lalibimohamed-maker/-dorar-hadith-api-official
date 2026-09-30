@@ -11,8 +11,8 @@ test('multilingual acquisition uses the existing durable matrix storage and loca
   const registry=JSON.parse(await read('research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json'));
   assert.match(caller,/MATRIX_STORAGE_REPO:\s*lalibimohamed-maker\/dinullah-matrix-3192-storage-01/);
   assert.match(acq,/MATRIX_STORAGE_REPO:\s*lalibimohamed-maker\/dinullah-matrix-3192-storage-01/);
-  assert.doesNotMatch(caller,/dinullah-matrix-4921-storage-01/);
-  assert.doesNotMatch(acq,/dinullah-matrix-4921-storage-01/);
+  assert.doesNotMatch(caller,/dinullah-matrix-6384-storage-01/);
+  assert.doesNotMatch(acq,/dinullah-matrix-6384-storage-01/);
   assert.ok(Array.isArray(registry.sources) && registry.sources.length>=500);
   assert.ok(registry.sources.every(s=>s.rights_status==='review_required'));
 });
