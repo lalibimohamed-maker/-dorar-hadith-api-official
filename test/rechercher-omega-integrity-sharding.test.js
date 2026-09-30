@@ -5,7 +5,7 @@ import { mkdir, mkdtemp, readFile, writeFile, rm, stat } from "node:fs/promises"
 import os from "node:os";
 import path from "node:path";
 import { sha256 as digest, shardModelFile } from "../scripts/omega-file-sharder.js";
-import { reassembleAndVerifyModel } from "../scripts/omega-file-reassembler.js";
+import { reassembleAndVerifyModel, requiredPreflightBytes, assertDiskPreflight } from "../scripts/omega-file-reassembler.js";
 import { canonicalArabicText, arabicSkeleton, exactArabicEquivalent, classifyArabicMismatch } from "../src/rechercher-omega-arabic-integrity.js";
 import { verifyEvidenceGate } from "../src/rechercher-omega-evidence-gate.js";
 
@@ -118,4 +118,16 @@ test("Reassembler rejects manifest path traversal",async()=>{
   }finally{
     await rm(root,{recursive:true,force:true});
   }
+});
+
+test("Reassembler disk preflight requires 1.2x logical model size",async()=>{
+  assert.equal(requiredPreflightBytes(1000),1200);
+  assert.throws(
+    ()=>assertDiskPreflight("/tmp",1000,{getFreeBytes:async()=>1199}),
+    /DISK_SPACE_PREFLIGHT_FAILED/
+  );
+  const result=await assertDiskPreflight("/tmp",1000,{getFreeBytes:async()=>1200});
+  assert.equal(result.ok,true);
+  assert.equal(result.required_bytes,1200);
+  assert.equal(result.free_bytes,1200);
 });
