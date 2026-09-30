@@ -10,6 +10,7 @@ const SCHOLARLY_MARKERS = [
   "الفقه","الفقهي","العقيدة","العقدي","الحديث","صحيح","حسن",
   "ضعيف","مرفوع","موقوف","ناسخ","منسوخ","سبب النزول","قاعدة"
 ];
+const QUOTE_FRAMING = /(?:قال|يقول|روي|رواه|أخرج|ذكر|النص|الحديث|الآية|قال تعالى|عن رسول الله|رسول الله|ﷺ)/gu;
 
 function sha256(value) {
   return createHash("sha256")
@@ -30,15 +31,23 @@ function splitSentences(value) {
     .filter(Boolean);
 }
 
-function isQuotedSourceSentence(sentence, evidence) {
-  const normalizedSentence = normalizeClaimText(sentence);
-  if (!normalizedSentence) return false;
-
-  return evidence.some((item) => {
+function residualAfterEvidenceMask(sentence, evidence) {
+  let residual = normalizeClaimText(sentence);
+  for (const item of evidence) {
     const source = normalizeClaimText(item?.text ?? item?.text_raw ?? "");
-    if (!source) return false;
-    return normalizedSentence.includes(source);
-  });
+    if (source) residual = residual.split(source).join(" ");
+  }
+  return normalizeClaimText(residual.replace(/[«»“”"'()[\]{}:؛،,]/gu, " "));
+}
+
+function isQuotedSourceSentence(sentence, evidence) {
+  const residual = residualAfterEvidenceMask(sentence, evidence);
+  if (!residual) return true;
+
+  const residualWithoutFraming = normalizeClaimText(
+    residual.replace(QUOTE_FRAMING, " ")
+  );
+  return residualWithoutFraming.length === 0;
 }
 
 function isScholarlyClaim(sentence) {
@@ -50,10 +59,11 @@ function isScholarlyClaim(sentence) {
   }
 
   // Conservative declarative fallback: do not treat greetings/questions/labels as claims.
-  if (/^(?:هل|ما|ماذا|كيف|أين|متى|من)\\b/u.test(normalized)) return false;
-  if (/^(?:نعم|لا|حسنًا|إليك|إجابة|ملاحظة|تنبيه|السؤال)\\b/u.test(normalized)) return false;
+  if (/^(?:هل|ما|ماذا|كيف|أين|متى|من)\b/u.test(normalized)) return false;
+  if (/^(?:نعم|لا|حسنًا|إليك|إجابة|ملاحظة|تنبيه|السؤال)\b/u.test(normalized)) return false;
 
-  return normalized.length >= 40 && /(?:هو|هي|هذا|هذه|ذلك|تلك|إن|إنّ|أن|لأن|لذلك|فإن|وقد|ويكون|وتكون)/u.test(normalized);
+  return normalized.length >= 40 &&
+    /(?:هو|هي|هذا|هذه|ذلك|تلك|إن|إنّ|أن|لأن|لذلك|فإن|وقد|ويكون|وتكون)/u.test(normalized);
 }
 
 function sourceKey(id, citation) {
