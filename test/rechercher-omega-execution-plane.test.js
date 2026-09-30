@@ -29,6 +29,19 @@ test("resource scheduler refuses unavailable capacity",()=>{
   assert.throws(()=>s.select({memoryMB:1024}),/compatible/);
 });
 
+test("resource scheduler queues a compatible job until capacity is released",async()=>{
+  const s=createResourceScheduler([{resource_id:"cpu",enabled:true,priority:1,maxConcurrent:1,capacity:{memoryMB:4096}}]);
+  const first=await s.acquire({memoryMB:512});
+  let acquired=false;
+  const queued=s.acquire({memoryMB:512}).then(resource=>{acquired=true;return resource;});
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(acquired,false);
+  s.release(first.resource_id);
+  const second=await queued;
+  assert.equal(second.resource_id,"cpu");
+  s.release(second.resource_id);
+});
+
 test("execution service performs preflight, load and execution",async()=>{
   const r=createCapabilityRouter({registry:registry()});
   const s=createResourceScheduler([{resource_id:"cpu",enabled:true,priority:1,capacity:{memoryMB:4096}}]);
