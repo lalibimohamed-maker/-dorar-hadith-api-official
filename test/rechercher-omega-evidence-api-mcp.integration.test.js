@@ -5,7 +5,6 @@ import { once } from "node:events";
 
 async function start(server){
   await once(server,"listening");
-  server.unref();
   return server.address().port;
 }
 async function shutdown(server){
