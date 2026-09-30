@@ -2,8 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { runEvidenceFirstResearch } from "../src/rechercher-omega-governed-run.js";
 
-const evidence=[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ"}];
-const citations=[{sourceId:"bukhari",citation:"vol.1 p.1"}];
+const evidence=[{
+ sourceId:"bukhari",evidence_id:"h:1",citation:"vol.1 p.1",kind:"primary_text",type:"hadith",
+ exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",sha256:"b0282fe41fa1cd9e3224fcf46fbd7180eb6c954396bfcb7b92a858e0220c9c28",
+ source:"sahih-bukhari",document_id:"bukhari:1",rights_status:"cleared",provenance:"verified",
+ verification_status:"verified",authenticity_status:"sahih"
+}];
+const citations=[{sourceId:"bukhari",citation:"vol.1 p.1",text_hash:"b0282fe41fa1cd9e3224fcf46fbd7180eb6c954396bfcb7b92a858e0220c9c28"}];
 
 test("evidence-first runner passes exact source-backed output",async()=>{
  const r=await runEvidenceFirstResearch({
@@ -34,8 +39,13 @@ test("governed runner can retrieve evidence through a GraphRAG-compatible retrie
  const r=await runEvidenceFirstResearch({
   provider:{generate:async({evidence})=>({provider:"fixture",model:"fixture",text:evidence[0].text})},
   query:"حديث الأعمال بالنيات",
-  retriever:{search:async q=>[{sourceId:"bukhari",citation:"vol.1 p.1",kind:"primary_text",exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",retrieved_for:q}]},
-  citations:[{sourceId:"bukhari",citation:"vol.1 p.1"}],
+  retriever:{search:async q=>[{
+   sourceId:"bukhari",evidence_id:"h:1",citation:"vol.1 p.1",kind:"primary_text",type:"hadith",
+   exact_quote_required:true,text:"إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",sha256:"b0282fe41fa1cd9e3224fcf46fbd7180eb6c954396bfcb7b92a858e0220c9c28",
+   source:"sahih-bukhari",document_id:"bukhari:1",rights_status:"cleared",provenance:"verified",
+   verification_status:"verified",authenticity_status:"sahih",retrieved_for:q
+  }]},
+  citations:[{sourceId:"bukhari",citation:"vol.1 p.1",text_hash:"b0282fe41fa1cd9e3224fcf46fbd7180eb6c954396bfcb7b92a858e0220c9c28"}],
   messages:[]
  });
  assert.equal(r.retrievedEvidence.length,1); assert.equal(r.verification.verified,true); assert.equal(r.result.provider,"fixture");
