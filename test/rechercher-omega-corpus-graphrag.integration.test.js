@@ -5,8 +5,8 @@ import { createMemoryGraphWriter, createMemoryVectorWriter } from "../src/recher
 
 test("Corpus GraphRAG pipeline wires the loader to both graph and vector stores",async()=>{
  const records=[
-  {node_id:"q1",category:"quran_verse",text_raw:"الحمد لله",provenance:{sourceId:"quran",citation:"1:2"}},
-  {node_id:"h1",category:"hadith",text_raw:"إنما الأعمال بالنيات",provenance:{sourceId:"bukhari",citation:"v1 p1"}}
+  {node_id:"q1",category:"quran_verse",text_raw:"الحمد لله",provenance:{sourceId:"quran",citation:"1:2"},verification_state:"verified"},
+  {node_id:"h1",category:"hadith",text_raw:"إنما الأعمال بالنيات",provenance:{sourceId:"bukhari",citation:"v1 p1"},verification_state:"source_verified"}
  ];
  const graph=createMemoryGraphWriter(), vector=createMemoryVectorWriter();
  const p=createCorpusGraphRagPipeline({
