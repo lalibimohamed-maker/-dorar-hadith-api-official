@@ -1,0 +1,86 @@
+{
+  "schema": "rechercher-learning-orchestrator-2026",
+  "version": "1.0.0",
+  "status": "p0-foundation",
+  "purpose": "Unified, source-grounded learning orchestration above the verified corpus.",
+  "acquisitionBoundary": {
+    "learningIsDownstream": true,
+    "acquisitionMustNotWaitForLearning": true,
+    "learningFailureIsNonBlocking": true
+  },
+  "schedulers": {
+    "default": "fsrs",
+    "fallback": "leitner",
+    "supported": [
+      "fsrs",
+      "sm2",
+      "leitner",
+      "forgetting-curve",
+      "deadline-aware"
+    ],
+    "perContextState": true,
+    "explainableSchedule": true,
+    "canonicalFsrsImplementationRequiredBeforeClaimingReferenceParity": true
+  },
+  "selectionObjectives": [
+    "due",
+    "retrievability-risk",
+    "recent-error",
+    "mastery-gap",
+    "prerequisite-gap",
+    "confidence-mismatch",
+    "novelty",
+    "interleaving-value",
+    "transfer-value",
+    "source-diversity",
+    "time-budget"
+  ],
+  "confidence": {
+    "correctnessIsSeparateSignal": true,
+    "confidenceIsSeparateSignal": true,
+    "calibrationTracked": true
+  },
+  "provenance": {
+    "sourceIdRequired": true,
+    "sourceAnchorsSupported": true,
+    "lifecycle": [
+      "draft",
+      "machine-generated",
+      "source-verified",
+      "scholar-reviewed",
+      "published",
+      "deprecated"
+    ],
+    "invalidationOnSourceChange": true
+  },
+  "mastery": {
+    "requiresDelayedOrTransferEvidence": true,
+    "gameScoreAloneIsInsufficient": true
+  },
+  "multimodality": [
+    "free-recall",
+    "recognition",
+    "cued-recall",
+    "cloze",
+    "short-answer",
+    "explain",
+    "source-match",
+    "concept-evidence",
+    "compare-contrast",
+    "chronology",
+    "classification",
+    "error-correction",
+    "confidence-prediction",
+    "teach-back",
+    "transfer",
+    "audio-recall",
+    "visual-recall",
+    "game"
+  ],
+  "privacy": {
+    "localFirst": true,
+    "telemetryOptIn": true,
+    "noBiometricInference": true,
+    "dataMinimization": true
+  }
+}

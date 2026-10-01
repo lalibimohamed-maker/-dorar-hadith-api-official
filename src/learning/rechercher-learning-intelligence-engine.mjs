@@ -1,4 +1,5 @@
 import { loadFlashcardConfig } from './flashcard-engine.mjs';
+import { scheduleWith } from './scheduler-registry.mjs';
 
 /**
  * Rechercher Learning Intelligence Engine v1.
@@ -131,18 +132,21 @@ export function selectNextItem(items = [], state = {}) {
 }
 
 /** Transparent scheduler abstraction: FSRS/SM-2/Leitner can plug in behind this contract. */
-export function scheduleReview({ retrievability = 0.5, difficulty = 0.5, correct = false, now = new Date(), minMinutes = 10 } = {}) {
-  const r = clamp(retrievability);
-  const d = clamp(difficulty);
-  const baseMinutes = 10 + 1440 * Math.max(0.05, r) * (1 - 0.55 * d);
-  const multiplier = correct ? 1.35 : 0.22;
-  const minutes = Math.max(minMinutes, Math.round(baseMinutes * multiplier));
+export function scheduleReview({ retrievability = 0.5, difficulty = 0.5, correct = false, now = new Date(), minMinutes = 10, scheduler = 'fsrs' } = {}) {
+  const grade = correct ? 'good' : 'again';
+  const result = scheduleWith(scheduler, {
+    state: { retrievability, difficulty },
+    grade,
+    now
+  });
+  const nextReviewAt = new Date(result.nextReviewAt).getTime();
+  const nowMs = new Date(now).getTime();
   return {
-    scheduler: 'rechercher-adapter-v1',
+    scheduler: result.scheduler,
     compatibleBackends: ['FSRS', 'SM-2', 'Leitner', 'forgetting-curve'],
-    nextReviewAt: new Date(new Date(now).getTime() + minutes * 60000).toISOString(),
-    minutes,
-    reason: correct ? 'successful-retrieval' : 'failed-retrieval'
+    nextReviewAt: result.nextReviewAt,
+    minutes: Math.max(minMinutes, Math.round(Math.max(0, nextReviewAt - nowMs) / 60000)),
+    reason: result.reason
   };
 }
 

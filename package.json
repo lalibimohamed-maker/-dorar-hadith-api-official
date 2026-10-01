@@ -37,7 +37,10 @@
     "test:rechercher-global-completion": "node --test test/rechercher-global-v1-v8-completion-engine.test.js",
     "test:performance": "node --test test/performance-orchestrator.test.js",
     "test:quran-knowledge": "node --test test/quran-knowledge-catalog.test.js",
-    "test:reader-rights": "node --test test/universal-reader-policy.test.js test/book-rights-resolver.test.js"
+    "test:reader-rights": "node --test test/universal-reader-policy.test.js test/book-rights-resolver.test.js",
+    "test:learning-orchestrator": "node --test test/learning-orchestrator.test.js",
+    "test:learning": "npm run test:learning-orchestrator && node --test test/rechercher-learning-intelligence-engine.test.js",
+    "learning:capabilities": "node --input-type=module -e \"import('./src/learning/learning-orchestrator.mjs').then(m=>console.log(JSON.stringify(m.createLearningOrchestrator({}).getContextState(),null,2)))\""
   },
   "engines": {
     "node": ">=20"
