@@ -1,0 +1,89 @@
+name: Rechercher — Legacy branch PDF migration
+
+on:
+  push:
+    branches:
+      - rechercher/encyclopedia-master-unbounded-acquisition
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rechercher-pdf-release-legacy-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PROTECTED_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+      PROTECTED_REPO: lalibimohamed82-coder/rechercher-pdf-storage
+      BATCH_SIZE: '100'
+    steps:
+      - name: Checkout legacy branch without smudging all LFS
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: rechercher/encyclopedia-master-unbounded-acquisition
+          fetch-depth: 0
+          lfs: false
+          persist-credentials: false
+      - name: Install legacy LFS importer and PDF validators
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y git-lfs qpdf poppler-utils
+          git lfs install --local
+          test -n "$PROTECTED_TOKEN"
+          visibility=$(GH_TOKEN="$PROTECTED_TOKEN" gh repo view "$PROTECTED_REPO" --json visibility --jq .visibility)
+          test "$visibility" = PRIVATE || { echo 'ERROR: protected repository is not private'; exit 1; }
+      - name: Migrate a bounded batch of LFS PDFs to Releases
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          mapfile -d '' tracked < <(git ls-files -z '*.pdf' | head -z -n "$BATCH_SIZE")
+          test "${#tracked[@]}" -gt 0 || { echo 'NO_LEGACY_LFS_PDFS_REMAINING=true' > artifacts/governance/legacy-branch-migration.env; exit 0; }
+          printf '%s\0' "${tracked[@]}" > "$RUNNER_TEMP/tracked.zlist"
+          include=$(tr '\0' ',' < "$RUNNER_TEMP/tracked.zlist" | sed 's/,$//')
+          git lfs pull --include="$include" --exclude=''
+          tag="rechercher-migrated-${GITHUB_RUN_ID}"
+          GH_TOKEN="$PROTECTED_TOKEN" gh release create "$tag" --repo "$PROTECTED_REPO" --title "Rechercher migrated PDFs ${GITHUB_RUN_ID}" --notes "Legacy branch PDFs migrated from Git LFS to private plaintext Releases assets. No .pdf.enc is created."
+          : > artifacts/governance/legacy-branch-migration.jsonl
+          for f in "${tracked[@]}"; do
+            test -s "$f"
+            head -c 5 "$f" | grep -qx '%PDF-'
+            qpdf --check "$f" >/dev/null
+            sha=$(sha256sum "$f" | awk '{print $1}')
+            GH_TOKEN="$PROTECTED_TOKEN" gh release upload "$tag" "$f" --repo "$PROTECTED_REPO" --clobber
+            printf '%s\t%s\thttps://github.com/%s/releases/download/%s/%s\n' "$sha" "$f" "$PROTECTED_REPO" "$tag" "$(basename "$f")" >> artifacts/governance/legacy-branch-migration.jsonl
+            git rm -- "$f"
+          done
+          rm -rf artifacts/permanent-pdfs || true
+          git rm --ignore-unmatch .gitattributes || true
+          printf '%s\n' 'NO_LEGACY_LFS_PDFS_REMAINING=false' > artifacts/governance/legacy-branch-migration.env
+      - name: Persist migration evidence and continue until empty
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+import json
+from pathlib import Path
+p=Path('artifacts/governance/legacy-branch-migration.jsonl')
+assets=[]
+if p.exists():
+    for raw in p.read_text(encoding='utf-8').splitlines():
+        if not raw: continue
+        sha,file,url=raw.split('\t',2)
+        assets.append({'sha256':sha,'file':file,'access':'private','download_url':url,'storage_backend':'github-releases-assets'})
+Path('artifacts/governance/legacy-branch-migration.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/legacy-branch-release-migration/v1','git_lfs_final':False,'encrypted_final_format':False,'assets':assets},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+PY
+          git add -A artifacts/governance
+          remaining=$(git ls-files '*.pdf' | wc -l | tr -d ' ')
+          if [ "$remaining" -eq 0 ]; then rm -f artifacts/governance/legacy-branch-migration.jsonl; git rm --ignore-unmatch .github/workflows/rechercher-pdf-release-branch-migration.yml || true; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet && { echo 'Nothing to commit'; exit 0; }
+          git commit -m 'chore(rechercher): migrate legacy branch PDFs from LFS to Releases'
+          git push origin HEAD:refs/heads/rechercher/encyclopedia-master-unbounded-acquisition
