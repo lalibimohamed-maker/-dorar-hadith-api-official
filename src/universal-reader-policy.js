@@ -1,5 +1,7 @@
-const EXPORTABLE = new Set(["redistributable", "licensed", "public-domain"]);
-const READER_ONLY = new Set(["read-only", "link-only"]);
+const FULL_DISTRIBUTION_RIGHTS = new Set(["redistributable", "licensed", "public-domain"]);
+const READER_ALLOWED_RIGHTS = new Set(["redistributable", "licensed", "public-domain", "read-copy", "read-only"]);
+const READER_ONLY = new Set(["read-copy", "read-only", "link-only"]);
+const BLOCKED_RIGHTS = new Set(["restricted", "rights-unclear", "unknown"]);
 
 export const QURAN_POLICY = Object.freeze({
   arabicText: "canonical-arabic-source",
@@ -7,23 +9,70 @@ export const QURAN_POLICY = Object.freeze({
   neverReplaceArabicWithTranslation: true
 });
 
-export function resolveRequestedLanguage({ browserLanguage, requestedLanguage }) {
+export function resolveRequestedLanguage({ browserLanguage, requestedLanguage } = {}) {
   return requestedLanguage || browserLanguage || "ar";
 }
 
-export function buildBookDeliveryPolicy({ rights, sourceAllowsReading = false, sourceAllowsCopy = false, language }) {
+function isRestricted(status) {
+  return BLOCKED_RIGHTS.has(status);
+}
+
+export function buildBookDeliveryPolicy({
+  rights,
+  sourceAllowsReading = false,
+  sourceAllowsCopy = false,
+  language
+} = {}) {
   const status = rights?.status;
-  const exportable = EXPORTABLE.has(status);
-  const readerOnly = READER_ONLY.has(status);
-  const canRead = exportable || (readerOnly && sourceAllowsReading);
-  const canCopyText = exportable || (readerOnly && sourceAllowsCopy);
+  const explicitSourceRead = sourceAllowsReading === true;
+  const explicitSourceCopy = sourceAllowsCopy === true;
+  const fullDistribution = FULL_DISTRIBUTION_RIGHTS.has(status);
+  const rightsPermitReader = READER_ALLOWED_RIGHTS.has(status);
+  const blocked = isRestricted(status);
+
+  const canRead = !blocked && (fullDistribution || rightsPermitReader || explicitSourceRead);
+  const copyNotDeniedBySource = sourceAllowsCopy !== false;
+  const canCopyText = !blocked && copyNotDeniedBySource && (
+    fullDistribution ||
+    status === "read-copy"
+  );
+  const canDownloadDigitalMaster = !blocked && fullDistribution;
 
   return Object.freeze({
     language: resolveRequestedLanguage(language || {}),
     canRead,
     canCopyText,
-    canDownloadDigitalMaster: exportable,
-    canProvideSourceLink: readerOnly || !canRead,
-    mode: exportable ? "digital-master" : canRead ? "reader-only" : "source-link"
+    canDownloadDigitalMaster,
+    canProvideSourceLink: READER_ONLY.has(status) || !canRead,
+    mode: fullDistribution
+      ? "digital-master"
+      : canRead
+        ? "reader-only"
+        : "source-link",
+    permissions: Object.freeze({
+      reading: canRead,
+      copyText: canCopyText,
+      fullRedistribution: canDownloadDigitalMaster
+    })
   });
+}
+
+export function canReadBook({ rights, sourceAllowsReading = false } = {}) {
+  return buildBookDeliveryPolicy({ rights, sourceAllowsReading }).canRead;
+}
+
+export function canCopyBookText({
+  rights,
+  sourceAllowsReading = false,
+  sourceAllowsCopy = false
+} = {}) {
+  return buildBookDeliveryPolicy({
+    rights,
+    sourceAllowsReading,
+    sourceAllowsCopy
+  }).canCopyText;
+}
+
+export function canRedistributeBook({ rights } = {}) {
+  return !isRestricted(rights?.status) && FULL_DISTRIBUTION_RIGHTS.has(rights?.status);
 }
