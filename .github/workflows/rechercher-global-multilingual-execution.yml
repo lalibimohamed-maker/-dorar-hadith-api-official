@@ -25,8 +25,6 @@ concurrency:
 env:
   NODE_VERSION: '24'
   EXPECTED_CELL_COUNT: '6384'
-  # Consume matrix manifests/evidence without materializing legacy LFS PDF pointers.
-  GIT_LFS_SKIP_SMUDGE: '1'
   MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-6384-storage-01
 
 jobs:
@@ -66,8 +64,6 @@ jobs:
           test -n "$(git ls-remote "$storage_url" HEAD)"
           rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
           git clone --depth 1 "$storage_url" "$RUNNER_TEMP/matrix-storage-preflight"
-          git -C "$RUNNER_TEMP/matrix-storage-preflight" lfs install
-          git -C "$RUNNER_TEMP/matrix-storage-preflight" lfs fsck --pointers HEAD
           git -C "$RUNNER_TEMP/matrix-storage-preflight" push --dry-run origin "HEAD:refs/heads/rechercher-preflight-${GITHUB_RUN_ID}-${SHARD_INDEX}"
           rm -rf "$RUNNER_TEMP/matrix-storage-preflight"
           echo "PREFLIGHT_STORAGE_OK repo=$MATRIX_STORAGE_REPO"
