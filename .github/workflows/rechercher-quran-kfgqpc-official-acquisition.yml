@@ -98,5 +98,5 @@ jobs:
           name: quran-kfgqpc-acquisition-${{ github.run_id }}
           path: |
             artifacts/quran-kfgqpc-official-acquisition/manifest.json
-            $(dirname "artifacts/quran-kfgqpc-official-acquisition/manifest.json")/release-persistence.json
+            artifacts/quran-kfgqpc-official-acquisition/release-persistence.json
           if-no-files-found: warn
