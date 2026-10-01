@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "suiteId": "din-allah-media-engine-benchmark-prompt-suite-2026",
+  "purpose": "A fixed, reproducible prompt suite for external GPU video-generation evaluation. Prompts test visual fidelity and cinematic usefulness without treating generated imagery as religious or scientific evidence.",
+  "rules": {
+    "fixedPromptText": true,
+    "samePromptAcrossCandidates": true,
+    "noQuranTextGeneration": true,
+    "noRecitationGeneration": true,
+    "generatedVisualsAreIllustrative": true
+  },
+  "prompts": [
+    {
+      "id": "ant-macro-01",
+      "topic": "ant",
+      "prompt": "Documentary macro shot of real ants moving naturally across soil and small stones, continuous coherent motion, realistic anatomy, natural daylight, shallow depth of field, no text, no labels, no fantasy elements.",
+      "checks": ["anatomy", "motion", "temporal_consistency", "unintended_text"]
+    },
+    {
+      "id": "ant-colony-02",
+      "topic": "ant",
+      "prompt": "Wide documentary view of an ant colony entrance in a natural environment, multiple ants entering and leaving with varied but plausible trajectories, stable camera, realistic shadows and ground contact, no text.",
+      "checks": ["multi_agent_motion", "physics", "camera_stability", "temporal_consistency"]
+    },
+    {
+      "id": "water-flow-03",
+      "topic": "water",
+      "prompt": "Photorealistic close view of clear water flowing around small natural rocks in a stream, coherent ripples, reflections and splashes, physically plausible motion, stable exposure, no text.",
+      "checks": ["physics", "fluid_motion", "temporal_consistency", "appearance"]
+    },
+    {
+      "id": "night-sky-04",
+      "topic": "night_sky",
+      "prompt": "Photorealistic night sky over a quiet natural landscape with stars and subtle atmospheric depth, gradual camera movement, stable geometry, realistic exposure and no invented constellations or text.",
+      "checks": ["appearance", "camera_motion", "temporal_consistency", "unintended_content"]
+    },
+    {
+      "id": "mountain-scale-05",
+      "topic": "mountain",
+      "prompt": "Cinematic documentary view of a vast mountain landscape at sunrise, natural haze, realistic terrain scale, slow controlled camera movement, consistent lighting, no text or artificial structures.",
+      "checks": ["composition", "scale", "camera_motion", "temporal_consistency"]
+    },
+    {
+      "id": "human-lab-06",
+      "topic": "human_science",
+      "prompt": "Documentary laboratory scene showing a researcher carefully observing a scientific specimen through a microscope, natural hand motion, correct human anatomy, realistic equipment and lighting, no readable text on screens or labels.",
+      "checks": ["human_anatomy", "interaction", "identity_stability", "unintended_text"]
+    }
+  ]
+}
