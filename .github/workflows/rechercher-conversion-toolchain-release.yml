@@ -1,0 +1,59 @@
+name: Rechercher — Publish conversion toolchain to Releases
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  RECHERCHER_MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-6384-storage-01
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout governed conversion layer
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+          lfs: false
+
+      - name: Install open-source conversion engines
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}"
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils libreoffice-writer pandoc ocrmypdf tesseract-ocr tesseract-ocr-ara python3-pip img2pdf
+          python3 -m pip install --break-system-packages --no-cache-dir pdf2docx PyMuPDF python-pptx
+          qpdf --version
+          pandoc --version | head -1
+          ocrmypdf --version 2>&1 | head -1
+          pdf2docx --version 2>&1 | head -1
+          python3 -c 'import fitz,pptx; print("PyMuPDF",fitz.VersionBind); print("python-pptx",pptx.__version__)'
+
+      - name: Publish immutable conversion-toolchain release
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="rechercher-conversion-toolchain-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$RECHERCHER_MATRIX_STORAGE_REPO" --target main --title "Rechercher conversion toolchain — $tag" --notes "Open-source conversion engines used by Rechercher. PDF is the canonical master. DOCX/PPTX/EPUB/HTML/Markdown/TXT/ODT/RTF are derived formats. The release contains the governed manifest and conversion engine; runtime dependencies are installed from their official package/release channels." --latest=false
+          mkdir -p /tmp/rechercher-conversion-release
+          cp config/rechercher-conversion-toolchain.json /tmp/rechercher-conversion-release/
+          cp scripts/rechercher_pdf_conversion_engine.py /tmp/rechercher-conversion-release/
+          cat > /tmp/rechercher-conversion-release/install-manifest.json <<'JSON'
+          {
+            "schema": "din-allah-encyclopedia/rechercher-conversion-installation/v1",
+            "pdf_is_canonical": true,
+            "derived_formats": ["docx","pptx","epub","html","md","txt","odt","rtf"],
+            "pdf_fallback_conversion": true,
+            "git_lfs_pdf_storage": false,
+            "source_pdf_is_never_replaced": true
+          }
+          JSON
+          gh release upload "$tag" /tmp/rechercher-conversion-release/rechercher-conversion-toolchain.json#rechercher-conversion-toolchain.json /tmp/rechercher-conversion-release/rechercher_pdf_conversion_engine.py#rechercher_pdf_conversion_engine.py /tmp/rechercher-conversion-release/install-manifest.json#install-manifest.json --repo "$RECHERCHER_MATRIX_STORAGE_REPO" --clobber=false
