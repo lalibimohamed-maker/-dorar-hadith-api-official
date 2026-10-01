@@ -120,26 +120,38 @@ jobs:
           test -s artifacts/registry-document-candidates.json
           df -h "$GITHUB_WORKSPACE"
 
-      - name: Publish governed PDF conversion toolchain manifest to Releases
+      - name: Publish governed PDF conversion toolchain sources and manifest to Releases
         run: |
           set -euo pipefail
           export GH_TOKEN="$MATRIX_STORAGE_TOKEN"
           tag="rechercher-conversion-toolchain-${GITHUB_RUN_ID}"
-          gh release create "$tag" --repo "$RECHERCHER_MATRIX_STORAGE_REPO" --target main --title "Rechercher conversion toolchain — $tag" --notes "Governed open-source conversion layer. Canonical PDFs remain the master; derived formats are generated from validated PDFs. Third-party engines are installed from their official package/release channels at runtime; this release stores the exact project manifest and conversion engine used by the encyclopedia." --latest=false
-          mkdir -p artifacts/governance/conversion-toolchain
-          cp config/rechercher-conversion-toolchain.json artifacts/governance/conversion-toolchain/
-          cp scripts/rechercher_pdf_conversion_engine.py artifacts/governance/conversion-toolchain/
+          mkdir -p /tmp/rechercher-toolchain/{packages,pip,release}
+          python3 -m pip download --no-deps --dest /tmp/rechercher-toolchain/pip pdf2docx PyMuPDF python-pptx ocrmypdf img2pdf
+          for p in qpdf poppler-utils libreoffice-writer pandoc ocrmypdf tesseract-ocr tesseract-ocr-ara img2pdf; do
+            (cd /tmp/rechercher-toolchain/packages && apt-get download "$p") || true
+          done
+          (cd /tmp/rechercher-toolchain && find packages pip -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt)
+          cp config/rechercher-conversion-toolchain.json /tmp/rechercher-toolchain/release/
+          cp scripts/rechercher_pdf_conversion_engine.py /tmp/rechercher-toolchain/release/
           {
-            echo '{"schema":"din-allah-encyclopedia/rechercher-conversion-installation/v1","packages":['
+            echo '{"schema":"din-allah-encyclopedia/rechercher-conversion-source-capture/v1","captured_at":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","packages":['
             printf '{"name":"qpdf","version":"'; qpdf --version | head -1 | sed 's/"/\\"/g'; printf '"},'
             printf '{"name":"pandoc","version":"'; pandoc --version | head -1 | sed 's/"/\\"/g'; printf '"},'
             printf '{"name":"ocrmypdf","version":"'; ocrmypdf --version 2>&1 | head -1 | sed 's/"/\\"/g'; printf '"},'
             printf '{"name":"pdf2docx","version":"'; pdf2docx --version 2>&1 | head -1 | sed 's/"/\\"/g'; printf '"},'
             printf '{"name":"PyMuPDF","version":"'; python3 -c 'import fitz; print(fitz.VersionBind)'; printf '"},'
             printf '{"name":"python-pptx","version":"'; python3 -c 'import pptx; print(pptx.__version__)'; printf '"}'
-            echo '],"pdf_is_canonical":true,"pdf_fallback_conversion":true,"git_lfs_pdf_storage":false}'
-          } > artifacts/governance/conversion-toolchain/install-manifest.json
-          gh release upload "$tag" artifacts/governance/conversion-toolchain/config/rechercher-conversion-toolchain.json#rechercher-conversion-toolchain.json artifacts/governance/conversion-toolchain/rechercher_pdf_conversion_engine.py#rechercher_pdf_conversion_engine.py artifacts/governance/conversion-toolchain/install-manifest.json#install-manifest.json --repo "$RECHERCHER_MATRIX_STORAGE_REPO" --clobber=false
+            echo '],"pdf_is_canonical":true,"pdf_fallback_conversion":true,"git_lfs_pdf_storage":false,"sha256_manifest":"SHA256SUMS.txt"}'
+          } > /tmp/rechercher-toolchain/release/install-manifest.json
+          cat > /tmp/rechercher-toolchain/release/license-manifest.json <<'JSON'
+          {"policy":"Redistribute only artifacts permitted by upstream licenses/terms. All published artifacts retain their upstream licensing; source-reference/install metadata is included for reproducibility.","notices":["PyMuPDF is AGPL-3.0.","Pandoc is GPL-2.0-or-later.","OCRmyPDF core is MPL-2.0 with additional component licenses.","pdf2docx is MIT and upstream states it is no longer actively maintained."]}
+          JSON
+          cp /tmp/rechercher-toolchain/SHA256SUMS.txt /tmp/rechercher-toolchain/release/
+          gh release create "$tag" --repo "$RECHERCHER_MATRIX_STORAGE_REPO" --target main --title "Rechercher conversion toolchain — $tag" --notes "Canonical PDF remains the master. This release contains captured package/source-install artifacts, exact version metadata and SHA-256 checksums. Redistribution remains subject to each upstream license." --latest=false
+          find /tmp/rechercher-toolchain/packages /tmp/rechercher-toolchain/pip -type f -print0 | sort -z | while IFS= read -r -d '' f; do
+            gh release upload "$tag" "$f" --repo "$RECHERCHER_MATRIX_STORAGE_REPO" --clobber=false
+          done
+          gh release upload "$tag" /tmp/rechercher-toolchain/release/rechercher-conversion-toolchain.json /tmp/rechercher-toolchain/release/rechercher_pdf_conversion_engine.py /tmp/rechercher-toolchain/release/install-manifest.json /tmp/rechercher-toolchain/release/license-manifest.json /tmp/rechercher-toolchain/release/SHA256SUMS.txt --repo "$RECHERCHER_MATRIX_STORAGE_REPO" --clobber=false
       - name: Enforce non-destructive PDF quality and completeness gate
         run: |
           set -euo pipefail
