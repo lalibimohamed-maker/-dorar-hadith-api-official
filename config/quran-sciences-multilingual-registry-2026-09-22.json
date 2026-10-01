@@ -1,7 +1,7 @@
 {
   "registry_version": "2026-09-22",
   "scope": "Quran-only service layer for Rechercher",
-  "purpose": "Dedicated registry for the Quran and its sciences, canonical readings, translations, tafsir, tajweed, recitation/audio, morphology and multilingual access. This layer is intentionally isolated from PR #541's 133x24 evidence matrix.",
+  "purpose": "Dedicated registry for the Quran and its sciences, canonical readings, translations, tafsir, tajweed, recitation/audio, morphology and multilingual access. This layer is intentionally isolated from PR #541's 133x48 evidence matrix.",
   "architecture": {
     "source": "Quran Foundation / Quran.com and individually verified institutional sources",
     "service": "quran.ai MCP/service layer",
@@ -12,7 +12,7 @@
     "corpus": "write only through existing governed ingestion; never direct from the service layer"
   },
   "separation": {
-    "pr_541": "isolated multilingual 133x24 evidence/matrix execution; do not modify or merge its corpus of evidence into this registry",
+    "pr_541": "isolated multilingual 133x48 evidence/matrix execution; do not modify or merge its corpus of evidence into this registry",
     "pr_558": "dedicated Quran service/API registry and Quran-sciences integration layer",
     "source_registry": "institutions and human-facing sources remain separate from API/service contracts",
     "corpus": "no direct writes from APIs, quran.ai, or discovery services"
@@ -74,10 +74,10 @@
       "verification_status"
     ]
   },
-  "language_alignment_for_133x24": {
+  "language_alignment_for_133x48": {
     "status": "integration-target-not-claim-of-133-language-coverage",
     "matrix_owner": "PR #541",
-    "role_of_558": "Provide verified Quran editions/services that can populate eligible Quran-related cells in the 133x24 matrix without altering the matrix itself.",
+    "role_of_558": "Provide verified Quran editions/services that can populate eligible Quran-related cells in the 133x48 matrix without altering the matrix itself.",
     "cell_identity": [
       "language",
       "content_class",
@@ -199,7 +199,7 @@
     },
     {
       "id": "quran-multilingual-bridge",
-      "role": "verified language/resource candidates for the 133x24 matrix"
+      "role": "verified language/resource candidates for the 133x48 matrix"
     }
   ],
   "verification_policy": {
@@ -569,6 +569,6 @@
       "ai_retranslation_of_vetted_translation",
       "language_directory_equals_translation_coverage"
     ],
-    "133x24_rule": "For each language/content cell, use an individually identified translation edition and source. If none exists, record the gap; do not synthesize a translation."
+    "133x48_rule": "For each language/content cell, use an individually identified translation edition and source. If none exists, record the gap; do not synthesize a translation."
   }
 }
