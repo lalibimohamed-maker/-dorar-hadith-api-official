@@ -1,0 +1,28 @@
+{
+  "schema": "rechercher/source-capability-bridge/v1",
+  "version": "2026-09-24",
+  "purpose": "Make the distinction between source discovery, PDF acquisition, digital-scan acquisition, API evidence and non-download content explicit before a 3192-cell acquisition run.",
+  "principles": [
+    "Registry presence never implies PDF acquisition capability.",
+    "API/search sources are evidence and discovery unless acquisition is explicitly enabled.",
+    "PDF acquisition requires a concrete real PDF or permitted complete scan plus item-level rights review.",
+    "No .pdf.enc is accepted as an acquired PDF.",
+    "Canonical Arabic Quran remains separate from human and machine translations.",
+    "Unknown or review-required rights remain protected and are never promoted to public redistribution."
+  ],
+  "capability_classes": {
+    "pdf_acquisition": "Concrete PDF download or an adapter explicitly marked acquisition/PDF capable.",
+    "digital_scan_acquisition": "Complete or materially complete digitized manuscript/book surrogate; item-level permission still required.",
+    "discovery_only": "Catalogue, bibliography, manuscript index, search or provenance source without a concrete acquisition route.",
+    "api_evidence": "API/structured content used for search, language enumeration, verification or metadata; not a PDF release route unless acquisition is explicitly enabled.",
+    "content_review": "Islamic educational/dawah/content site useful for discovery/review but not automatically a downloadable-book source."
+  },
+  "decision_order": [
+    "explicit acquisition/pdf capability",
+    "explicit digital-scan role",
+    "catalogue/manuscript/discovery role",
+    "api-only runtime capability",
+    "content/discovery fallback"
+  ],
+  "output": "artifacts/rechercher-source-capability-audit.json"
+}

@@ -13,11 +13,12 @@ The pipeline records two independent facts:
 
 A downloadable/hosted file is not treated as proof of redistribution permission.
 
-## Retention
+## Retention and primary representation
 
-Successful research copies are retained. Restricted or rights-unverified copies are encrypted before persistence using the repository secret `REVIEW_VAULT_KEY`. Plaintext copies are never committed to the repository by this workflow.
-
-The acquisition step does not delete a successful source copy. The only plaintext removal performed by the workflow is removal of the already-encrypted local staging file after encryption, so that the retained encrypted copy is the durable record.
+- The original `.pdf` is the **sole primary representation** for newly acquired books.
+- New acquisition runs must not create a permanent `.pdf.enc` duplicate and must never delete the primary `.pdf` after acquisition.
+- Existing historical `.pdf.enc` material is preserved as legacy recovery evidence. When it is decrypted for review, the recovered `.pdf` uses the same scientific identity/SHA-256 boundary and must not create a duplicate catalog or Corpus record.
+- GitHub Actions artifacts are review/delivery copies, not permanent scientific storage.
 
 ## Verification
 
@@ -29,4 +30,4 @@ Copies whose catalog rights status is `verified-redistributable` remain eligible
 
 ## Security
 
-`REVIEW_VAULT_KEY` must be configured as a GitHub Actions secret. It must never be placed in source files, commits, issue comments, or chat messages.
+`REVIEW_VAULT_KEY` is reserved for legacy `.pdf.enc` recovery workflows only. New PDF acquisition does not require it. The secret must never be placed in source files, commits, issue comments, or chat messages.

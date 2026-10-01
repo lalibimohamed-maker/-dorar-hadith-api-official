@@ -1,0 +1,70 @@
+{
+  "schema": "rechercher/research-infrastructure-registry/v1",
+  "version": "2026-09-21",
+  "purpose": "Additive research/discovery layer for Deen Allah Encyclopedia. No direct Corpus writes.",
+  "discovery_sources": [
+    {
+      "id": "openalex",
+      "url": "https://api.openalex.org/works",
+      "enabled": true,
+      "mode": "discovery-and-enrichment",
+      "acquisition": false,
+      "rights_role": "candidate OA evidence; item-level rights must still be verified"
+    },
+    {
+      "id": "opencitations",
+      "url": "https://api.opencitations.net/",
+      "enabled": true,
+      "mode": "identifier-based citation enrichment",
+      "acquisition": false,
+      "rights_role": "metadata only; never a redistribution grant"
+    }
+  ],
+  "processing_tools": [
+    {
+      "id": "grobid",
+      "url": "https://github.com/grobidOrg/grobid",
+      "enabled": true,
+      "mode": "optional-post-acquisition-derivative",
+      "outputs": [
+        "TEI-XML"
+      ],
+      "canonical_witness": false,
+      "corpus_write": false
+    },
+    {
+      "id": "kraken",
+      "url": "https://kraken.re/",
+      "enabled": true,
+      "mode": "optional-post-acquisition-derivative",
+      "outputs": [
+        "ALTO",
+        "PageXML",
+        "hOCR",
+        "text"
+      ],
+      "canonical_witness": false,
+      "corpus_write": false
+    },
+    {
+      "id": "escriptorium",
+      "url": "https://escriptorium.eu/",
+      "enabled": true,
+      "mode": "research-review",
+      "outputs": [
+        "annotations",
+        "transcriptions",
+        "models"
+      ],
+      "canonical_witness": false,
+      "corpus_write": false
+    }
+  ],
+  "activation_contract": {
+    "discovery": "OpenAlex and OpenCitations are active discovery/enrichment routes in rechercher_deep_worldwide.py.",
+    "derivatives": "GROBID, Kraken and eScriptorium are registered active research tools, but their outputs remain derived review/search evidence only.",
+    "corpus_boundary": "No tool in this registry may write directly to the canonical Corpus.",
+    "religious_text_boundary": "OCR/HTR/TEI output is never treated as the authoritative Qur'an, hadith, tafsir, or other religious witness.",
+    "rights_boundary": "Discoverability or OA metadata never by itself grants redistribution permission."
+  }
+}
