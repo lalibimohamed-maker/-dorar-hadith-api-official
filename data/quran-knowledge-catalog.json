@@ -1,12 +1,38 @@
 {
-  "schemaVersion": "1.0.0",
-  "purpose": "Source-aware catalog for Quran tafsir, tadabbur, visual learning, and related collective scholarly works.",
+  "schemaVersion": "2.0.0",
+  "purpose": "Independent source-aware catalog for Quran tafsir, tadabbur/hidayat, and visual learning aids; Quran Arabic text remains a separate canonical corpus layer.",
+  "nonGoal": "Catalog presence is not a scholarly endorsement and does not imply full-text availability.",
   "policy": {
-    "completenessGoal": "catalog_all_identifiable_works",
-    "ingestionRule": "No full-text ingestion unless source, edition, provenance, and redistribution rights are verified.",
-    "sourcePriority": ["official", "institutional", "licensed", "public-domain", "secondary_reference"],
+    "completenessGoal": "catalog_all_identifiable_works_over_time",
+    "sourcePriority": [
+      "official",
+      "institutional",
+      "licensed",
+      "public-domain",
+      "secondary_reference"
+    ],
     "secondarySourcesAreDiscoveryOnly": true,
-    "catalogEntryDoesNotImplyFullTextPresence": true
+    "catalogEntryDoesNotImplyFullTextPresence": true,
+    "fullTextIngestionRequires": {
+      "source": true,
+      "provenance": true,
+      "rights": true,
+      "validation": true
+    },
+    "protectedQuranTextLayer": "canonical-arabic-quran",
+    "noSilentCrossLayerImport": true
+  },
+  "separation": {
+    "quranText": {
+      "id": "quran-text",
+      "authoritative": true,
+      "description": "Canonical Arabic Quran text; not a tafsir/tadabbur/visual work."
+    },
+    "tracks": [
+      "tafsir",
+      "tadabbur",
+      "visual-learning"
+    ]
   },
   "categories": [
     {
@@ -14,28 +40,666 @@
       "label": "التفاسير",
       "description": "تفاسير القرآن وشروحه وكتب الاختصار والتيسير.",
       "seedWorks": [
-        {"title":"جامع البيان عن تأويل آي القرآن","author":"محمد بن جرير الطبري","status":"reference_seed","sourceTier":"institutional"},
-        {"title":"تفسير القرآن العظيم","author":"إسماعيل بن عمر ابن كثير","status":"reference_seed","sourceTier":"institutional"},
-        {"title":"تيسير الكريم الرحمن في تفسير كلام المنان","author":"عبد الرحمن بن ناصر السعدي","status":"reference_seed","sourceTier":"institutional"},
-        {"title":"تفسير الجلالين","author":"جلال الدين المحلي وجلال الدين السيوطي","status":"reference_seed","sourceTier":"institutional"},
-        {"title":"تفسير البغوي","author":"الحسين بن مسعود البغوي","status":"reference_seed","sourceTier":"institutional"},
-        {"title":"تفسير القرطبي","author":"محمد بن أحمد القرطبي","status":"reference_seed","sourceTier":"institutional"},
-        {"title":"المحرر الوجيز في تفسير الكتاب العزيز","author":"عبد الحق بن غالب ابن عطية","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"مفاتيح الغيب","author":"محمد بن عمر الرازي","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"الكشاف عن حقائق غوامض التنزيل","author":"محمود بن عمر الزمخشري","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"البحر المحيط","author":"محمد بن يوسف أبو حيان الأندلسي","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"الدر المنثور في التفسير بالمأثور","author":"عبد الرحمن بن أبي بكر السيوطي","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"نظم الدرر في تناسب الآيات والسور","author":"إبراهيم بن عمر البقاعي","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"فتح القدير","author":"محمد بن علي الشوكاني","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"التحرير والتنوير","author":"محمد الطاهر بن عاشور","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"أضواء البيان في إيضاح القرآن بالقرآن","author":"محمد الأمين الشنقيطي","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"تفسير النسفي","author":"عبد الله بن أحمد النسفي","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"تفسير أبي السعود","author":"محمد بن محمد أبو السعود","status":"candidate","sourceTier":"secondary_reference"},
-        {"title":"التفسير الميسر","author":"نخبة من العلماء","status":"reference_seed","sourceTier":"official_institutional","publisher":"مجمع الملك فهد لطباعة المصحف الشريف","edition":"الثانية، مزيدة ومنقحة، 1430هـ/2009م"},
-        {"title":"التفسير الوسيط للقرآن الكريم","author":"لجنة من العلماء بإشراف مجمع البحوث الإسلامية بالأزهر","status":"reference_seed","sourceTier":"institutional","publisher":"الهيئة العامة لشئون المطابع الأميرية","edition":"الطبعة الثالثة، 1413هـ/1992م"},
-        {"title":"المختصر في تفسير القرآن الكريم","author":"مجموعة من العلماء","status":"candidate","sourceTier":"official_institutional"},
-        {"title":"المنتخب في تفسير القرآن الكريم","author":"لجنة من العلماء في المجلس الأعلى للشؤون الإسلامية","status":"candidate","sourceTier":"institutional"},
-        {"title":"زبدة التفاسير","author":"فتح الله بن شكر الله الشريف الكاشاني","status":"candidate","sourceTier":"secondary_reference","notes":"Identity verified; provenance and methodological classification must be preserved before ingestion."}
+        {
+          "workId": "tafsir-001",
+          "contentLayer": "tafsir",
+          "title": "جامع البيان عن تأويل آي القرآن",
+          "author": "محمد بن جرير الطبري",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "quranenc",
+          "sourceTier": "institutional",
+          "status": "reference_seed",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-002",
+          "contentLayer": "tafsir",
+          "title": "تفسير القرآن العظيم",
+          "author": "إسماعيل بن عمر ابن كثير",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "quranenc",
+          "sourceTier": "institutional",
+          "status": "reference_seed",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-003",
+          "contentLayer": "tafsir",
+          "title": "تيسير الكريم الرحمن في تفسير كلام المنان",
+          "author": "عبد الرحمن بن ناصر السعدي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "quranenc",
+          "sourceTier": "institutional",
+          "status": "reference_seed",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-004",
+          "contentLayer": "tafsir",
+          "title": "تفسير الجلالين",
+          "author": "جلال الدين المحلي وجلال الدين السيوطي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "quranenc",
+          "sourceTier": "institutional",
+          "status": "reference_seed",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-005",
+          "contentLayer": "tafsir",
+          "title": "تفسير البغوي",
+          "author": "الحسين بن مسعود البغوي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "quranenc",
+          "sourceTier": "institutional",
+          "status": "reference_seed",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-006",
+          "contentLayer": "tafsir",
+          "title": "تفسير القرطبي",
+          "author": "محمد بن أحمد القرطبي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "quranenc",
+          "sourceTier": "institutional",
+          "status": "reference_seed",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-007",
+          "contentLayer": "tafsir",
+          "title": "المحرر الوجيز في تفسير الكتاب العزيز",
+          "author": "عبد الحق بن غالب ابن عطية",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-008",
+          "contentLayer": "tafsir",
+          "title": "مفاتيح الغيب",
+          "author": "محمد بن عمر الرازي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-009",
+          "contentLayer": "tafsir",
+          "title": "الكشاف عن حقائق غوامض التنزيل",
+          "author": "محمود بن عمر الزمخشري",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-010",
+          "contentLayer": "tafsir",
+          "title": "البحر المحيط",
+          "author": "محمد بن يوسف أبو حيان الأندلسي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-011",
+          "contentLayer": "tafsir",
+          "title": "الدر المنثور في التفسير بالمأثور",
+          "author": "عبد الرحمن بن أبي بكر السيوطي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-012",
+          "contentLayer": "tafsir",
+          "title": "نظم الدرر في تناسب الآيات والسور",
+          "author": "إبراهيم بن عمر البقاعي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-013",
+          "contentLayer": "tafsir",
+          "title": "فتح القدير",
+          "author": "محمد بن علي الشوكاني",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-014",
+          "contentLayer": "tafsir",
+          "title": "التحرير والتنوير",
+          "author": "محمد الطاهر بن عاشور",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-015",
+          "contentLayer": "tafsir",
+          "title": "أضواء البيان في إيضاح القرآن بالقرآن",
+          "author": "محمد الأمين الشنقيطي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-016",
+          "contentLayer": "tafsir",
+          "title": "تفسير النسفي",
+          "author": "عبد الله بن أحمد النسفي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-017",
+          "contentLayer": "tafsir",
+          "title": "تفسير أبي السعود",
+          "author": "محمد بن محمد أبو السعود",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-018",
+          "contentLayer": "tafsir",
+          "title": "التفسير الميسر",
+          "author": "نخبة من العلماء",
+          "edition": "الثانية، مزيدة ومنقحة، 1430هـ/2009م",
+          "publisher": "مجمع الملك فهد لطباعة المصحف الشريف",
+          "sourceRef": "king-fahd-complex",
+          "sourceTier": "official_institutional",
+          "status": "reference_seed",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": true,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-019",
+          "contentLayer": "tafsir",
+          "title": "التفسير الوسيط للقرآن الكريم",
+          "author": "لجنة من العلماء بإشراف مجمع البحوث الإسلامية بالأزهر",
+          "edition": "الطبعة الثالثة، 1413هـ/1992م",
+          "publisher": "الهيئة العامة لشئون المطابع الأميرية",
+          "sourceRef": "quranenc",
+          "sourceTier": "institutional",
+          "status": "reference_seed",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": true,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-020",
+          "contentLayer": "tafsir",
+          "title": "المختصر في تفسير القرآن الكريم",
+          "author": "مجموعة من العلماء",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "king-fahd-complex",
+          "sourceTier": "official_institutional",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-021",
+          "contentLayer": "tafsir",
+          "title": "المنتخب في تفسير القرآن الكريم",
+          "author": "لجنة من العلماء في المجلس الأعلى للشؤون الإسلامية",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "quranenc",
+          "sourceTier": "institutional",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": null
+        },
+        {
+          "workId": "tafsir-022",
+          "contentLayer": "tafsir",
+          "title": "زبدة التفاسير",
+          "author": "فتح الله بن شكر الله الشريف الكاشاني",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tafsir-of-quran",
+          "notes": "Identity verified; provenance and methodological classification must be preserved before ingestion."
+        }
       ]
     },
     {
@@ -43,9 +707,96 @@
       "label": "التدبر والهدايات",
       "description": "كتب ومشروعات التدبر والهدايات والوقفات التطبيقية المرتبطة بالآيات.",
       "seedWorks": [
-        {"title":"القرآن تدبر وعمل","author":"مشروع القرآن تدبر وعمل","status":"candidate","sourceTier":"official_project","notes":"Copyright/redistribution status must be verified before full-text ingestion."},
-        {"title":"هدايات القرآن الكريم","author":"فريق من المتخصصين والباحثين - معالم التدبر","status":"candidate","sourceTier":"official_project","notes":"Project reports published hidayat; full-text rights require verification."},
-        {"title":"جعلناه نورا","author":"خالد أبو شادي","status":"candidate","sourceTier":"secondary_reference","notes":"Treat as a copyrighted work unless explicit redistribution permission is obtained."}
+        {
+          "workId": "tadabbur-001",
+          "contentLayer": "tadabbur",
+          "title": "القرآن تدبر وعمل",
+          "author": "مشروع القرآن تدبر وعمل",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "tadabbur-project",
+          "sourceTier": "official_project",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tadabbur-and-hidayat",
+          "notes": "Copyright/redistribution status must be verified before full-text ingestion."
+        },
+        {
+          "workId": "tadabbur-002",
+          "contentLayer": "tadabbur",
+          "title": "هدايات القرآن الكريم",
+          "author": "فريق من المتخصصين والباحثين - معالم التدبر",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "tadabbur-project",
+          "sourceTier": "official_project",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tadabbur-and-hidayat",
+          "notes": "Project reports published hidayat; full-text rights require verification."
+        },
+        {
+          "workId": "tadabbur-003",
+          "contentLayer": "tadabbur",
+          "title": "جعلناه نورا",
+          "author": "خالد أبو شادي",
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "candidate",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "tadabbur-and-hidayat",
+          "notes": "Treat as a copyrighted work unless explicit redistribution permission is obtained."
+        }
       ]
     },
     {
@@ -53,28 +804,155 @@
       "label": "الخرائط والوسائل البصرية",
       "description": "الخرائط الذهنية، خرائط السور، المحاور، الجداول والوسائل التي تبسط فهم المعاني.",
       "seedWorks": [
-        {"title":"خرائط ذهنية للقرآن الكريم","status":"discovery_target","sourceTier":"secondary_reference"},
-        {"title":"خرائط القرآن / تحفيز الأذهان","status":"discovery_target","sourceTier":"secondary_reference"},
-        {"title":"زوايا وخرائط سور القرآن","status":"discovery_target","sourceTier":"secondary_reference"}
-      ]
-    },
-    {
-      "id": "collective-fiqh",
-      "label": "الفقه والعلوم الشرعية - أعمال جماعية",
-      "description": "كتب أعدتها لجان أو نخبة من العلماء، تُفهرس مستقلة عن التفاسير والتدبر.",
-      "seedWorks": [
-        {"title":"الفقه الميسر في ضوء الكتاب والسنة","author":"نخبة من العلماء","status":"reference_seed","sourceTier":"official_institutional","publisher":"مجمع الملك فهد لطباعة المصحف الشريف","edition":"1424هـ","notes":"Collective fiqh work; do not confuse with similarly titled single-author works."}
+        {
+          "workId": "visual-learning-001",
+          "contentLayer": "visual-learning",
+          "title": "خرائط ذهنية للقرآن الكريم",
+          "author": null,
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "discovery_target",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "visual-learning-aid",
+          "notes": null
+        },
+        {
+          "workId": "visual-learning-002",
+          "contentLayer": "visual-learning",
+          "title": "خرائط القرآن / تحفيز الأذهان",
+          "author": null,
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "discovery_target",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "visual-learning-aid",
+          "notes": null
+        },
+        {
+          "workId": "visual-learning-003",
+          "contentLayer": "visual-learning",
+          "title": "زوايا وخرائط سور القرآن",
+          "author": null,
+          "edition": null,
+          "publisher": null,
+          "sourceRef": "waqfeya",
+          "sourceTier": "secondary_reference",
+          "status": "discovery_target",
+          "rights": {
+            "status": "not_verified",
+            "evidence": null,
+            "redistributionAllowed": false
+          },
+          "ingestion": {
+            "method": null,
+            "fullTextAllowed": false,
+            "verifiedAt": null
+          },
+          "provenance": {
+            "authorVerified": false,
+            "titleVerified": true,
+            "editionVerified": false,
+            "sourceVerified": false,
+            "checkedAt": null
+          },
+          "scientificRole": "visual-learning-aid",
+          "notes": null
+        }
       ]
     }
   ],
   "sourceRegistry": [
-    {"id":"ksu-quran-tafsir","name":"جامعة الملك سعود - القرآن الكريم","role":"tafsir_reference","tier":"institutional","url":"https://quran.ksu.edu.sa/"},
-    {"id":"quranenc","name":"موسوعة القرآن الكريم","role":"translations_and_tafsir_reference","tier":"institutional","url":"https://quranenc.com/"},
-    {"id":"tafsir-center-mokhtasr","name":"مركز تفسير للدراسات القرآنية","role":"official_work_source","tier":"official_institutional","url":"https://mtafsir.com/ar"},
-    {"id":"tadabbur-project","name":"القرآن تدبر وعمل","role":"tadabbur_project","tier":"official_project","url":"https://altadabbur.com/"},
-    {"id":"hdaiat-project","name":"هدايات القرآن الكريم","role":"hidayat_project","tier":"official_project","url":"https://hdaiat.com/about_project"},
-    {"id":"king-fahd-complex","name":"مجمع الملك فهد لطباعة المصحف الشريف","role":"official_quran_and_collective_works_source","tier":"official_institutional","url":"https://qurancomplex.gov.sa/"},
-    {"id":"azhar-research-complex","name":"مجمع البحوث الإسلامية بالأزهر","role":"collective_tafsir_source","tier":"institutional","url":"https://www.azhar.eg/"},
-    {"id":"waqfeya","name":"المكتبة الوقفية","role":"discovery_and_scan_reference","tier":"secondary_reference","url":"https://waqfeya.net/"}
+    {
+      "id": "ksu-quran-tafsir",
+      "name": "جامعة الملك سعود - القرآن الكريم",
+      "role": "tafsir_reference",
+      "tier": "institutional",
+      "url": "https://quran.ksu.edu.sa/"
+    },
+    {
+      "id": "quranenc",
+      "name": "موسوعة القرآن الكريم",
+      "role": "translations_and_tafsir_reference",
+      "tier": "institutional",
+      "url": "https://quranenc.com/"
+    },
+    {
+      "id": "tafsir-center-mokhtasr",
+      "name": "مركز تفسير للدراسات القرآنية",
+      "role": "official_work_source",
+      "tier": "official_institutional",
+      "url": "https://mtafsir.com/ar"
+    },
+    {
+      "id": "tadabbur-project",
+      "name": "القرآن تدبر وعمل",
+      "role": "tadabbur_project",
+      "tier": "official_project",
+      "url": "https://altadabbur.com/"
+    },
+    {
+      "id": "hdaiat-project",
+      "name": "هدايات القرآن الكريم",
+      "role": "hidayat_project",
+      "tier": "official_project",
+      "url": "https://hdaiat.com/about_project"
+    },
+    {
+      "id": "king-fahd-complex",
+      "name": "مجمع الملك فهد لطباعة المصحف الشريف",
+      "role": "official_quran_and_collective_works_source",
+      "tier": "official_institutional",
+      "url": "https://qurancomplex.gov.sa/"
+    },
+    {
+      "id": "azhar-research-complex",
+      "name": "مجمع البحوث الإسلامية بالأزهر",
+      "role": "collective_tafsir_source",
+      "tier": "institutional",
+      "url": "https://www.azhar.eg/"
+    },
+    {
+      "id": "waqfeya",
+      "name": "المكتبة الوقفية",
+      "role": "discovery_and_scan_reference",
+      "tier": "secondary_reference",
+      "url": "https://waqfeya.net/"
+    }
   ]
 }
