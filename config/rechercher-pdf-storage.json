@@ -1,24 +1,31 @@
 {
   "schema": "din-allah-encyclopedia/rechercher-pdf-storage/v4",
-  "purpose": "Verified plaintext PDFs are persisted as GitHub Releases assets. The repository tree stores manifests and indexes, never PDF payloads.",
+  "storage_repository": "lalibimohamed-maker/dinullah-matrix-6384-storage-01",
+  "purpose": "Single unified Release-backed PDF storage for the 6,384-cell matrix and whole-encyclopedia acquisition. Git/LFS is not a PDF storage layer.",
   "format": ".pdf",
-  "storage_backend": "github-releases-assets",
   "content_addressing": "sha256-for-integrity-only",
   "storage_contract": {
-    "pdf_storage_path": "GitHub Releases assets only",
-    "repository_tree_pdfs": false,
-    "git_lfs": false,
-    "github_actions_artifacts_as_pdf_storage": false,
-    "encrypted_pdf_final_format": false,
-    "one_asset_per_pdf": true,
+    "model": "github-releases-only",
+    "release_repository": "lalibimohamed-maker/dinullah-matrix-6384-storage-01",
+    "release_asset_format": ".pdf",
+    "one_copy_only": true,
     "verified_pdfs_only": true,
     "real_pdf_signature_required": true,
     "qpdf_validation_required": true,
-    "rights_unclear": "private-release-only",
-    "publication_eligible": "public-release",
-    "release_index_required": true,
-    "source_failover": "immediate next independent catalogued source on restriction/failure"
+    "encrypted_files_forbidden": true,
+    "lfs_pdf_persistence": false,
+    "git_pdf_tracking": false,
+    "rights_unclear": "protected-private-only",
+    "public_release_requires_item_level_rights_and_provenance": true,
+    "source_provider_not_fixed": true,
+    "source_failover": "immediate next independent catalogued source on restriction/failure",
+    "no_source_quota": "the engine does not stop after a provider-specific book count"
   },
-  "protected_release_repository": "lalibimohamed82-coder/rechercher-pdf-storage",
-  "failure_policy": "A PDF is counted as persisted only after a successful Releases upload and recorded SHA-256/download URL. Missing private protected storage fails closed; no encrypted surrogate is retained."
+  "activation": {
+    "repository_must_exist": true,
+    "write_secret_name": "RECHERCHER_MATRIX_STORAGE_TOKEN",
+    "write_scope": "Release asset write access to the unified matrix storage repository",
+    "mandatory": true
+  },
+  "failure_policy": "If a verified PDF cannot be persisted as a governed Release asset, the acquisition cycle fails closed. A second physical PDF copy is never created as a fallback; the book is retried from its catalogued sources."
 }
