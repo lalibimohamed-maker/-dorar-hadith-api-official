@@ -1,0 +1,84 @@
+{
+  "version": "2026-08-29",
+  "title": "Universal Free Distribution and Zero-Cost-First Registry",
+  "policy": {
+    "coreAccessFree": true,
+    "coreReadingFree": true,
+    "coreDownloadFreeWhenRightsPermit": true,
+    "requiredPaidService": false,
+    "requiredPaidApiKey": false,
+    "requiredStoreMembershipForWebAccess": false,
+    "zeroCostFirst": true,
+    "absoluteZeroCostGuarantee": false,
+    "costRiskMustBeExplicit": true
+  },
+  "languages": {
+    "phase1": ["ar","en","zh","es","ru"],
+    "defaultDetection": "BCP47/CLDR-aware client locale detection",
+    "architecture": "one canonical content identity with locale-specific derived layers",
+    "machineTranslationStatus": "draft",
+    "reviewedTranslationStatus": "published"
+  },
+  "delivery": {
+    "primaryWeb": "PWA/static-first",
+    "offline": true,
+    "localSearch": true,
+    "largeAssets": ["external-permissioned-archive","content-addressed-distribution","peer-assisted-distribution"],
+    "githubPages": {
+      "eligibleForPublicRepoOnFree": true,
+      "publishedSiteSizeLimitGiB": 1,
+      "softBandwidthLimitGiBPerMonth": 100,
+      "notForGuaranteedUnlimitedGlobalTraffic": true
+    },
+    "githubReleases": {
+      "assetMaxGiB": 2,
+      "totalReleaseSizeLimit": "no stated total size limit",
+      "bandwidth": "not treated as an unlimited guarantee"
+    },
+    "githubLFS": {
+      "freePlanStorageGiB": 10,
+      "freePlanBandwidthGiBPerMonth": 10,
+      "overageBehavior": "block when budget is zero; never assume unlimited free delivery"
+    },
+    "internetArchive": {
+      "role": "candidate external preservation/distribution host",
+      "rightsGate": true,
+      "retention": "no perpetual-retention promise without current terms verification",
+      "directGitHubAccountLink": false,
+      "integration": "separate Archive account/API credentials with least privilege; never commit credentials"
+    },
+    "p2p": {
+      "role": "optional peer-assisted distribution for legally redistributable bundles",
+      "fallbackRequired": true,
+      "browserSupportMustBeTested": true,
+      "notTheOnlyDeliveryPath": true
+    }
+  },
+  "stores": {
+    "webPwa": "primary universal path",
+    "fdroid": "eligible path for Android FLOSS builds subject to inclusion policy",
+    "appleAppStore": {
+      "status": "secondary",
+      "membership": "paid unless eligible organization fee waiver applies",
+      "requiredForPwaAccess": false
+    },
+    "googlePlay": {
+      "status": "secondary",
+      "developerAccount": "fee-bearing channel; not required for web/PWA access",
+      "requiredForPwaAccess": false
+    }
+  },
+  "rights": {
+    "redistributionOnlyWhenPermitted": true,
+    "unknownLicense": "do-not-rehost",
+    "sourceAttribution": true,
+    "provenanceOnEveryDerivedArtifact": true
+  },
+  "resilience": {
+    "noSingleProviderDependency": true,
+    "atLeastTwoDeliveryPathsForCriticalArtifacts": true,
+    "offlineRecoveryBundles": true,
+    "checksums": true,
+    "reproducibleManifests": true
+  }
+}

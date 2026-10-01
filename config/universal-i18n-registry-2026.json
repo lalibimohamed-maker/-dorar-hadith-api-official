@@ -1,0 +1,38 @@
+{
+  "version": "2026-08-29",
+  "title": "Universal Localization Registry",
+  "principle": "One canonical scholarly content identity; many derived localized presentations.",
+  "phase1": ["ar","en","zh","es","ru"],
+  "runtime": {
+    "detectBrowserLocale": true,
+    "detectOsLocale": true,
+    "honorExplicitUserChoice": true,
+    "persistUserChoice": true,
+    "fallbackChain": ["user-choice","browser-locale","regional-locale","ar"]
+  },
+  "translationTiers": {
+    "canonicalSource": "immutable-source-layer",
+    "machineTranslation": "draft",
+    "bilingualReviewed": "reviewed",
+    "scholarlyReviewed": "published-reviewed"
+  },
+  "religiousTextRules": {
+    "quranCanonicalTextSeparatedFromTranslation": true,
+    "hadithArabicSourceSeparatedFromTranslation": true,
+    "tafsirSourceSeparatedFromTranslation": true,
+    "machineTranslationCannotUpgradeEvidenceStatus": true
+  },
+  "media": {
+    "subtitles": true,
+    "captions": true,
+    "translatedMetadata": true,
+    "translatedCardVariants": true,
+    "languageSpecificAudioWhenLicensed": true
+  },
+  "storeMetadata": {
+    "localizedListings": true,
+    "localizedScreenshots": true,
+    "localizedDescription": true,
+    "oneCanonicalApplicationIdentity": true
+  }
+}
