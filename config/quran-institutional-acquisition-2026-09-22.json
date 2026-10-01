@@ -1,0 +1,52 @@
+{
+  "schema_version": "2026-09-22",
+  "layer": "System",
+  "purpose": "Research-only acquisition manifest for government or national-religious institutional Quran translations.",
+  "policy": {
+    "canonical_arabic_separate": true,
+    "ai_generated_translation_forbidden": true,
+    "public_corpus_ingestion_requires_verified_rights_and_integrity": true,
+    "corpus_write_forbidden": true,
+    "rights_verification_required": true,
+    "text_integrity_verification_required": true
+  },
+  "editions": [
+    {
+      "source_id": "bd-ministry-religious-affairs-quran",
+      "edition_id": "bangla-government-quran-digital",
+      "language_iso_code": "bn",
+      "institution": "Bangladesh Ministry of Religious Affairs",
+      "official_page": "https://quran.gov.bd/home/ebook_download.html",
+      "asset_url": "https://www.quran.gov.bd/quran/pdf/abe/fabe.pdf",
+      "asset_kind": "pdf",
+      "rights_verification": "pending",
+      "text_integrity_status": "pending",
+      "public_publishable": false
+    },
+    {
+      "source_id": "tr-diyanet-quran",
+      "edition_id": "diyanet-turkish-meal",
+      "language_iso_code": "tr",
+      "institution": "Diyanet İşleri Başkanlığı",
+      "official_page": "https://kuran.diyanet.gov.tr/Yayinlar",
+      "asset_url": "https://dijital.diyanet.gov.tr/File/Download?id=430&path=430_1.pdf",
+      "asset_kind": "pdf",
+      "rights_verification": "pending",
+      "text_integrity_status": "pending",
+      "public_publishable": false
+    },
+    {
+      "source_id": "id-kemenag-quran-translation",
+      "edition_id": "kemenag-indonesian-2019",
+      "language_iso_code": "id",
+      "institution": "Lajnah Pentashihan Mushaf Al-Qur'an, Ministry of Religious Affairs of Indonesia",
+      "official_page": "https://lajnah.kemenag.go.id/info-lpmq/unduhan/terjemah-al-quran.html",
+      "asset_url": "https://web.lpmqkemenag.id/unduhan/terjemah-al-quran.html?download=3%3Aterjemah-tahun-2019",
+      "asset_kind": "rar",
+      "expected_md5": "188c72ea69942730998650536e3b874c",
+      "rights_verification": "pending",
+      "text_integrity_status": "pending",
+      "public_publishable": false
+    }
+  ]
+}

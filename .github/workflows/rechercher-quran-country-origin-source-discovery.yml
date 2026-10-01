@@ -1,0 +1,36 @@
+name: Rechercher — country-of-origin Quran source discovery
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "config/quran-country-origin-source-registry-2026-09-22.json"
+      - "scripts/rechercher-discover-quran-country-origin-sources.mjs"
+      - "test/quran-country-origin-source-registry.test.js"
+      - ".github/workflows/rechercher-quran-country-origin-source-discovery.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  discover-country-origin-quran-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+      - name: Probe country-of-origin institutional sources
+        run: node scripts/rechercher-discover-quran-country-origin-sources.mjs
+      - name: Validate discovery manifest
+        run: |
+          node --input-type=module -e 'import fs from "node:fs"; const m=JSON.parse(fs.readFileSync("artifacts/quran-country-origin-source-discovery/manifest.json","utf8")); if(m.source_count!==7) process.exit(1); if(m.corpus_write!==false || m.ai_generated_translation!==false || m.canonical_arabic_separate!==true) process.exit(1); console.log("Country-origin discovery manifest structurally valid",{sources:m.source_count,reachable:m.reachable_source_count});'
+      - name: Upload country-origin discovery evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: quran-country-origin-source-discovery
+          path: artifacts/quran-country-origin-source-discovery
+          retention-days: 90

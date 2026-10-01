@@ -1,0 +1,1223 @@
+{
+  "registry_version": "2026-09-22",
+  "purpose": "Official Quran API and developer-source discovery for Rechercher. This registry records access capabilities without granting Corpus write authority.",
+  "policy": {
+    "canonical_arabic_text_is_separate_from_translations": true,
+    "api_access_does_not_equal_redistribution_rights": true,
+    "source_identity_does_not_certify_each_item": true,
+    "direct_corpus_write": false,
+    "provenance_required": true,
+    "rights_verification_required": true,
+    "ai_generated_religious_text_forbidden_as_source": true,
+    "qiraat_are_distinct_canonical_readings_and_must_not_be_collapsed_into_one_text": true,
+    "tajweed_annotations_are_not_a_replacement_for_canonical_quran_text": true,
+    "tafsir_is_separate_from_canonical_quran_text": true
+  },
+  "verified": [
+    {
+      "id": "quran-foundation-content-api-v4",
+      "provider": "Quran Foundation / Quran.com",
+      "country": "international",
+      "homepage": "https://quran.com/",
+      "documentation": "https://api-docs.quran.com/docs/content_apis_versioned/4.0.0/content-apis/",
+      "access": [
+        "official-api",
+        "official-sdk"
+      ],
+      "api_version": "v4",
+      "authentication": "OAuth2 client_credentials",
+      "scope": "content",
+      "production_required": true,
+      "prelive_limit": "Only Al-Fatihah and Al-Baqarah are available for prelive testing",
+      "capabilities": [
+        "quran",
+        "chapters",
+        "verses",
+        "translations",
+        "tafsir",
+        "audio",
+        "recitations",
+        "pages",
+        "juz",
+        "hizb",
+        "ruku",
+        "manzil",
+        "search",
+        "uthmani_tajweed",
+        "tajweed_colored_mushaf",
+        "mushaf_variants",
+        "content_sync"
+      ],
+      "tafsir_api": {
+        "status": "verified",
+        "endpoint_family": "content-v4-tafsirs",
+        "notes": "Official API documents a tafsir resource catalog and verse-level/paginated tafsir retrieval."
+      },
+      "tajweed_api": {
+        "status": "verified",
+        "endpoint_family": "content-v4-uthmani-tajweed-and-mushaf",
+        "notes": "Official API exposes text_uthmani_tajweed and Tajweed-colored Mushaf variants."
+      },
+      "qiraat_api": {
+        "status": "qirat-metadata-verified; ten-reading-content-completeness-pending",
+        "notes": "Official chapter-reciter resources expose qirat metadata and official recitation/resource families exist. Do not claim complete Ten Canonical Readings production coverage until authorized production resources are enumerated."
+      },
+      "canonical_text_policy": "Arabic Quran text remains distinct from translations, tafsir, tajweed annotations, and qiraat-specific representations",
+      "integration_status": "adapter-present; production credentials/access still require verification",
+      "corpus_write": "forbidden-direct"
+    },
+    {
+      "id": "king-fahd-complex-developer-resources",
+      "provider": "King Fahd Glorious Quran Printing Complex",
+      "country": "SA",
+      "homepage": "https://qurancomplex.gov.sa/",
+      "developer_resources": "https://qurancomplex.gov.sa/en/techquran/dev/",
+      "access": [
+        "official-web",
+        "official-developer-download"
+      ],
+      "api_status": "not-verified-as-public-api",
+      "developer_formats": [
+        "JSON",
+        "XML",
+        "SQL",
+        "CSV",
+        "HTML5",
+        "TXT",
+        "PDF"
+      ],
+      "coverage": [
+        "Quran text",
+        "Uthmani data",
+        "Hafs",
+        "Warsh",
+        "Qalun",
+        "Al-Susi",
+        "Tafsir al-Muyassar",
+        "Quran metadata",
+        "Tajweed educational resources"
+      ],
+      "qiraat_scope": {
+        "status": "partial-official-data-verified",
+        "verified_readings": [
+          "Hafs",
+          "Warsh",
+          "Qalun",
+          "Al-Susi"
+        ],
+        "ten_readings_complete": false,
+        "notes": "This registry must not claim the complete Ten Readings from the developer page until all ten are individually verified."
+      },
+      "integration_status": "developer-data source verified; API endpoint still to be investigated",
+      "corpus_write": "forbidden-direct"
+    },
+    {
+      "id": "quranenc-translation-api",
+      "provider": "QuranEnc.com",
+      "country": "international",
+      "homepage": "https://quranenc.com/",
+      "documentation": "https://quranenc.com/ar/home/api",
+      "access": [
+        "official-api"
+      ],
+      "api_version": "v1",
+      "authentication": "public HTTP API; no credential requirement documented on the API reference",
+      "capabilities": [
+        "translation-catalog",
+        "sura-translation",
+        "aya-translation",
+        "translation-footnotes",
+        "translation-audio"
+      ],
+      "rights_status": "redistribution-permitted-subject-to-source-terms",
+      "rights_note": "The official API page states translations may be downloaded and republished subject to no modification, clear attribution to QuranEnc.com, version identification, preservation of transcript information, source notification of notes, updating to newer versions, and no inappropriate advertising.",
+      "corpus_write": "forbidden-direct",
+      "adapter_status": "registry-ready; endpoint contract documented",
+      "verification_status": "official-api-documentation-verified"
+    },
+    {
+      "id": "tafasir-online-developer-api",
+      "provider": "الجامع التاريخي لتفسير القرآن الكريم",
+      "country": "SA",
+      "homepage": "https://www.tafasir.online/",
+      "documentation": "https://www.tafasir.online/ar/developer",
+      "access": [
+        "official-api"
+      ],
+      "authentication": "API_Key",
+      "capabilities": [
+        "quran-text",
+        "tafsir-books",
+        "book-content",
+        "riwayat"
+      ],
+      "endpoint_status": "official-api-contract-page-verified; concrete endpoint partial",
+      "rights_status": "not-assumed-from-api-access",
+      "integration_status": "registry-ready-as-restricted-official-api",
+      "corpus_write": "forbidden-direct",
+      "provenance_required": true
+    },
+    {
+      "id": "alquran-cloud-api-v1",
+      "provider": "Al Quran Cloud / Islamic Network",
+      "country": "international",
+      "homepage": "https://alquran.cloud/",
+      "documentation": "https://alquran.cloud/api",
+      "api_version": "v1",
+      "base_url": "https://api.alquran.cloud/v1",
+      "access": [
+        "official-api"
+      ],
+      "authentication": "keyless-public",
+      "capabilities": [
+        "quran",
+        "translations",
+        "audio",
+        "recitations",
+        "edition-catalog"
+      ],
+      "source_provenance": "Service terms state Quran text/audio were originally retrieved from GlobalQuran.com; Arabic Quran text is currently described as sourced from various sources including Tanzil.net and Quran Academy.",
+      "rights_status": "source-specific; Arabic text non-commercial reproduction permitted under current terms; translations and recitations retain their own rights/attribution conditions",
+      "rate_limit": "soft per-IP rate limit",
+      "endpoint_example": "GET /surah/1/en.sahih",
+      "corpus_write": "forbidden-direct",
+      "provenance_required": true,
+      "verification_status": "official-api-documentation-and-terms-verified"
+    },
+    {
+      "id": "king-fahd-digital-mushaf-formats",
+      "provider": "King Fahd Glorious Quran Printing Complex",
+      "country": "SA",
+      "homepage": "https://qurancomplex.gov.sa/",
+      "documentation": "https://qurancomplex.gov.sa/en/techquran/dev/",
+      "access": [
+        "official-developer-download"
+      ],
+      "api_status": "not-verified-as-public-api",
+      "formats": [
+        "XML",
+        "JSON",
+        "SQL",
+        "CSV",
+        "HTML5",
+        "TXT",
+        "PDF"
+      ],
+      "coverage": [
+        "Quran text",
+        "Uthmani",
+        "Hafs",
+        "Warsh",
+        "Qalun",
+        "Al-Susi",
+        "Tafsir al-Muyassar",
+        "metadata"
+      ],
+      "verification_status": "official-developer-resources-verified",
+      "corpus_write": "forbidden-direct"
+    },
+    {
+      "id": "ksu-ayat",
+      "provider": "King Saud University - Ayat Electronic Quran Project",
+      "country": "SA",
+      "homepage": "https://quran.ksu.edu.sa/",
+      "access": [
+        "official-web",
+        "institutional-resource"
+      ],
+      "api_status": "not-verified-as-public-api",
+      "coverage": [
+        "Hafs",
+        "Warsh",
+        "Tajweed",
+        "colored Tajweed Mushaf",
+        "tafsir",
+        "recitations",
+        "search"
+      ],
+      "upstream_provenance": [
+        "King Fahd Complex (Quran images)",
+        "Tanzil.net (Quran text and translations)",
+        "mosshaf.com (tafsir)",
+        "Verse by Verse Quran (recitations)"
+      ],
+      "verification_status": "official-institutional-resource-verified",
+      "corpus_write": "forbidden-direct"
+    },
+    {
+      "id": "jakim-smart-quran",
+      "provider": "JAKIM / Smart Quran",
+      "country": "MY",
+      "homepage": "https://www.islam.gov.my/en/quran-hadith/smart-quran",
+      "access": [
+        "official-app"
+      ],
+      "api_status": "not-verified-as-public-api",
+      "coverage": [
+        "Madinah V2 Mushaf",
+        "Malay translation",
+        "English translation",
+        "recitations"
+      ],
+      "verification_status": "official-institutional-app-verified",
+      "corpus_write": "forbidden-direct"
+    }
+  ],
+  "official_specialized_targets": [
+    {
+      "id": "quran-foundation-ten-qiraat",
+      "provider": "Quran Foundation / Quran.com",
+      "country": "international",
+      "homepage": "https://quran.com/",
+      "qiraat_resource": "https://quran.com/ar/explore/a-brief-guide-to-the-ten-readings-qiraat",
+      "access": [
+        "official-web",
+        "official-feature"
+      ],
+      "api_status": "not-yet-verified-for-dedicated-ten-qiraat-endpoint",
+      "role": [
+        "ten-qiraat",
+        "readers",
+        "transmitters",
+        "reading-comparison"
+      ],
+      "integration_rule": "Register as a qiraat evidence source only after the underlying data representation, provenance, and rights are verified."
+    },
+    {
+      "id": "king-fahd-tajweed",
+      "provider": "King Fahd Glorious Quran Printing Complex",
+      "country": "SA",
+      "homepage": "https://qurancomplex.gov.sa/",
+      "developer_resources": "https://qurancomplex.gov.sa/en/techquran/dev/",
+      "access": [
+        "official-developer-download",
+        "official-educational-resource"
+      ],
+      "api_status": "not-verified-as-public-api",
+      "role": [
+        "tajweed",
+        "tajweed-rules",
+        "tajweed-education"
+      ],
+      "integration_rule": "Treat downloadable developer data and educational material separately from any future API adapter."
+    },
+    {
+      "id": "qatar-ministry-quran",
+      "provider": "Qatar Ministry of Awqaf and Islamic Affairs",
+      "country": "QA",
+      "homepage": "https://alquran.islam.gov.qa/",
+      "known_resource": "https://alquran.islam.gov.qa/droos/Sections.html",
+      "access": [
+        "official-web"
+      ],
+      "api_status": "not-yet-verified",
+      "dataset_status": "not-yet-verified",
+      "role": [
+        "quran",
+        "tajweed",
+        "recitation",
+        "education"
+      ]
+    },
+    {
+      "id": "ksu-ayat",
+      "provider": "King Saud University Ayat",
+      "country": "SA",
+      "homepage": "https://quran.ksu.edu.sa/",
+      "access": [
+        "official-web"
+      ],
+      "api_status": "not-yet-verified",
+      "role": [
+        "quran",
+        "mushaf-images",
+        "translations",
+        "tafsir",
+        "recitations",
+        "Warsh"
+      ]
+    },
+    {
+      "id": "diyanet-open-source-quran-api",
+      "provider": "Presidency of Religious Affairs of Türkiye (Diyanet)",
+      "country": "TR",
+      "homepage": "https://acikkaynakkuran.diyanet.gov.tr/",
+      "api_service": "https://acikkaynakkuran-dev.diyanet.gov.tr/",
+      "access": [
+        "official-api",
+        "official-open-source-project"
+      ],
+      "api_status": "verified",
+      "authentication": "GitHub account login to obtain API key",
+      "rights_status": "restricted-for-independent-products",
+      "capabilities": [
+        "quran",
+        "tafsir",
+        "tajweed-learning",
+        "recitation"
+      ],
+      "notes": "Official developer page states API access is provided for contributing to this project and cannot be used for independent applications; bulk transfer/republication/source-file requests are not accepted."
+    },
+    {
+      "id": "diyanet-tafsir-portal",
+      "provider": "Presidency of Religious Affairs of Türkiye (Diyanet)",
+      "country": "TR",
+      "homepage": "https://kuran.diyanet.gov.tr/Tefsir",
+      "access": [
+        "official-web"
+      ],
+      "api_status": "not-verified",
+      "dataset_status": "not-verified",
+      "role": [
+        "tafsir",
+        "quran"
+      ]
+    },
+    {
+      "id": "ksu-ayat-tafsir-qiraat-tajweed",
+      "provider": "King Saud University Ayat",
+      "country": "SA",
+      "homepage": "https://quran.ksu.edu.sa/",
+      "access": [
+        "official-web"
+      ],
+      "api_status": "not-verified-as-public-api",
+      "dataset_status": "not-verified",
+      "role": [
+        "tafsir",
+        "tajweed",
+        "Hafs",
+        "Warsh",
+        "recitations"
+      ],
+      "notes": "Official Ayat interface explicitly exposes Hafs, Warsh, Tajweed and multiple tafsir resources; this does not establish a public API."
+    },
+    {
+      "id": "jakim-smart-quran",
+      "provider": "Department of Islamic Development Malaysia (JAKIM)",
+      "country": "MY",
+      "homepage": "https://www.islam.gov.my/en/quran-hadith/smart-quran",
+      "access": [
+        "official-institutional-app"
+      ],
+      "api_status": "not-verified",
+      "dataset_status": "not-verified",
+      "role": [
+        "quran",
+        "recitation",
+        "translations"
+      ],
+      "notes": "Official JAKIM page documents the approved Smart Quran application and its Quran/audio content; no public API was established by this search."
+    }
+  ],
+  "ten_qiraat_target": {
+    "status": "discovery-and-verification-required",
+    "goal": "Identify authoritative, institutionally hosted machine-readable/API/download sources for all Ten Canonical Readings and their recognized transmitters without collapsing them into Hafs.",
+    "readers": [
+      "Nafi",
+      "Ibn Kathir",
+      "Abu Amr",
+      "Ibn Amir",
+      "Asim",
+      "Hamza",
+      "Al-Kisai",
+      "Abu Jafar",
+      "Yaqub",
+      "Khalaf al-Ashir"
+    ],
+    "required_fields": [
+      "reading_id",
+      "reader",
+      "transmitter",
+      "source_provider",
+      "official_url",
+      "access_type",
+      "api_status",
+      "data_format",
+      "provenance",
+      "rights_status",
+      "text_or_audio_scope",
+      "verification_status"
+    ],
+    "rule": "Do not synthesize missing readings with AI and do not infer a reading from a different riwaya."
+  },
+  "official_institutional_targets": [
+    {
+      "id": "qatar-ministry-quran",
+      "provider": "Qatar Ministry of Awqaf and Islamic Affairs",
+      "country": "QA",
+      "homepage": "https://alquran.islam.gov.qa/",
+      "known_resource": "https://alquran.islam.gov.qa/droos/Sections.html",
+      "access": [
+        "official-web"
+      ],
+      "api_status": "not-yet-verified",
+      "dataset_status": "not-yet-verified",
+      "role": [
+        "quran",
+        "tajweed",
+        "recitation",
+        "education"
+      ]
+    },
+    {
+      "id": "ksu-ayat",
+      "provider": "King Saud University Ayat",
+      "country": "SA",
+      "homepage": "https://quran.ksu.edu.sa/",
+      "access": [
+        "official-web"
+      ],
+      "api_status": "not-yet-verified",
+      "role": [
+        "quran",
+        "mushaf-images",
+        "translations",
+        "tafsir",
+        "recitations",
+        "Warsh"
+      ]
+    }
+  ],
+  "country_search_queue": [
+    {
+      "country": "TR",
+      "priority": "high",
+      "targets": [
+        "Diyanet Open Source Quran API",
+        "Diyanet Quran Portal",
+        "Diyanet tafsir resources"
+      ]
+    },
+    {
+      "country": "MY",
+      "priority": "high",
+      "targets": [
+        "JAKIM Smart Quran",
+        "official Quran datasets/APIs"
+      ]
+    },
+    {
+      "country": "SA",
+      "priority": "high",
+      "targets": [
+        "King Fahd Complex",
+        "Ministry of Islamic Affairs",
+        "King Saud University",
+        "Islamic University of Madinah",
+        "Imam Muhammad ibn Saud Islamic University"
+      ]
+    },
+    {
+      "country": "QA",
+      "priority": "high",
+      "targets": [
+        "Ministry of Awqaf Quran services",
+        "AlQuran",
+        "Quran lessons"
+      ]
+    },
+    {
+      "country": "KW",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Awqaf",
+        "Kuwait National Library",
+        "Islamic manuscripts/library services"
+      ]
+    },
+    {
+      "country": "AE",
+      "priority": "medium",
+      "targets": [
+        "General Authority of Islamic Affairs and Endowments",
+        "UAE Quran services"
+      ]
+    },
+    {
+      "country": "BH",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Justice Islamic Affairs and Waqf Quran services"
+      ]
+    },
+    {
+      "country": "OM",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Endowments and Religious Affairs Quran services"
+      ]
+    },
+    {
+      "country": "JO",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Awqaf Quran services",
+        "Jordanian official Quran resources"
+      ]
+    },
+    {
+      "country": "EG",
+      "priority": "medium",
+      "targets": [
+        "Al-Azhar",
+        "Ministry of Awqaf Quran services",
+        "Egyptian Quran digitization resources"
+      ]
+    },
+    {
+      "country": "MA",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Endowments and Islamic Affairs",
+        "Mohammed VI Institute Quran resources"
+      ]
+    },
+    {
+      "country": "DZ",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Religious Affairs and Wakfs",
+        "Algerian Quran resources"
+      ]
+    },
+    {
+      "country": "TN",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Religious Affairs Quran resources"
+      ]
+    },
+    {
+      "country": "TR",
+      "priority": "medium",
+      "targets": [
+        "Diyanet Quran services"
+      ]
+    },
+    {
+      "country": "MY",
+      "priority": "medium",
+      "targets": [
+        "JAKIM Quran services",
+        "official Quran datasets/APIs"
+      ]
+    },
+    {
+      "country": "ID",
+      "priority": "medium",
+      "targets": [
+        "Ministry of Religious Affairs Quran services",
+        "official Quran datasets/APIs"
+      ]
+    },
+    {
+      "country": "PK",
+      "priority": "medium",
+      "targets": [
+        "Ministry/religious institutions Quran digital resources",
+        "official Quran datasets/APIs"
+      ]
+    }
+  ],
+  "required_record_fields": [
+    "source_id",
+    "country",
+    "provider",
+    "official_url",
+    "access_type",
+    "api_status",
+    "authentication",
+    "rate_limits",
+    "terms_url",
+    "rights_status",
+    "content_scope",
+    "language_or_qiraat_scope",
+    "provenance_policy",
+    "corpus_write_policy",
+    "last_verified_at"
+  ],
+  "discovery_results": {
+    "verified_api_sources": [
+      "diyanet-open-source-quran-api",
+      "quran-foundation-content-api-v4",
+      "quranenc-translation-api"
+    ],
+    "verified_institutional_resources": [
+      "king-fahd-complex-developer-resources",
+      "qatar-ministry-quran",
+      "ksu-ayat",
+      "jakim-smart-quran"
+    ],
+    "important_rights_finding": "Diyanet's official developer page explicitly restricts its API/content to contribution to that project and says it cannot be used for independent products; Rechercher must therefore register it for source research/integration review, not assume redistribution permission."
+  },
+  "api_registry": {
+    "purpose": "Machine-facing registry of official APIs. Website/source registries remain separate and are linked by stable source_id/provider identifiers.",
+    "separation_rule": "API records describe programmable interfaces and access contracts; source records describe institutions, websites, repositories and human-facing resources. Do not collapse either layer.",
+    "records": [
+      {
+        "api_id": "quran-foundation-content-api-v4",
+        "provider_source_id": "source:quran-foundation",
+        "provider": "Quran Foundation / Quran.com",
+        "official_api_base": "https://apis.quran.foundation",
+        "documentation": "https://api-docs.quran.com/docs/api-reference/",
+        "api_version": "v4",
+        "authentication": "OAuth2 client_credentials",
+        "scope": "content",
+        "capabilities": [
+          "quran",
+          "chapters",
+          "verses",
+          "translations",
+          "tafsir",
+          "audio",
+          "recitations",
+          "chapter_reciters",
+          "pages",
+          "juz",
+          "hizb",
+          "ruku",
+          "manzil",
+          "rub_el_hizb",
+          "search"
+        ],
+        "specialized_capabilities": [
+          "uthmani_tajweed",
+          "tajweed_colored_mushaf",
+          "mushaf_variants",
+          "word_level_fields",
+          "qirat_metadata",
+          "content_sync"
+        ],
+        "production_access": "requires approved production permissions/credentials",
+        "rights_status": "terms-required; API access is not treated as redistribution permission",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "registry-ready; existing Quran Foundation sync path present in Rechercher",
+        "verification_status": "official-documentation-verified",
+        "endpoint_contract": "https://apis.quran.foundation/content/api/v4"
+      },
+      {
+        "api_id": "diyanet-open-source-quran-api",
+        "provider_source_id": "source:diyanet-tr",
+        "provider": "Presidency of Religious Affairs of Türkiye (Diyanet)",
+        "official_api_base": "https://acikkaynakkuran-dev.diyanet.gov.tr/",
+        "documentation": "https://acikkaynakkuran.diyanet.gov.tr/developers",
+        "authentication": "GitHub account login to obtain API key",
+        "capabilities": [
+          "quran",
+          "tafsir",
+          "tajweed-learning",
+          "recitation"
+        ],
+        "rights_status": "restricted-for-independent-products",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "registry-only; adapter/access contract requires separate verification",
+        "verification_status": "official-api-service-verified"
+      },
+      {
+        "api_id": "sunnah-com-api",
+        "provider_source_id": "source:sunnah-com",
+        "provider": "Sunnah.com",
+        "official_api_base": "https://sunnah.stoplight.io/docs/api/",
+        "documentation": "https://beta.sunnah.com/developers",
+        "authentication": "API key requested through official GitHub issue process",
+        "capabilities": [
+          "hadith",
+          "collections",
+          "hadith-metadata"
+        ],
+        "access_status": "API exists; key/access must be requested and verified before production use",
+        "rights_status": "access/redistribution terms require verification",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "existing sunnah client path present in Rechercher; credentials not assumed",
+        "verification_status": "official-api-existence-verified"
+      },
+      {
+        "api_id": "hadeethenc-api",
+        "provider_source_id": "source:hadeethenc",
+        "provider": "Encyclopedia of Translated Prophetic Hadiths (HadeethEnc)",
+        "official_api_base": "https://hadeethenc.com/",
+        "documentation": "https://hadeethenc.com/en/",
+        "capabilities": [
+          "hadith",
+          "explanations",
+          "translations",
+          "language-resources"
+        ],
+        "access_status": "official Developers API is exposed; exact endpoint/auth contract requires endpoint-level verification",
+        "rights_status": "translation redistribution is permitted subject to stated source/version/no-modification conditions",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "existing HadeethEnc client/harvester path present in Rechercher",
+        "verification_status": "official-developer-surface-verified; endpoint-contract-pending"
+      },
+      {
+        "api_id": "quran-foundation-search-api-v1",
+        "provider_source_id": "source:quran-foundation",
+        "provider": "Quran Foundation / Quran.com",
+        "official_api_base": "https://apis.quran.foundation",
+        "documentation": "https://api-docs.quran.com/docs/search_apis_versioned/1.0.0/search-controller-search/",
+        "api_version": "v1",
+        "authentication": "app credentials from backend / official SDK",
+        "capabilities": [
+          "quran-search",
+          "verse-search",
+          "chapter-navigation",
+          "juz-navigation",
+          "page-navigation",
+          "quick-search",
+          "advanced-search",
+          "exact-match"
+        ],
+        "production_access": "permission-gated according to Developer Console/API documentation",
+        "rights_status": "terms-required; API access is not treated as redistribution permission",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "registry-ready; endpoint contract verified",
+        "verification_status": "official-api-documentation-verified"
+      },
+      {
+        "api_id": "quranenc-translation-api-v1",
+        "provider_source_id": "source:quranenc",
+        "provider": "QuranEnc.com",
+        "official_api_base": "https://quranenc.com/api/v1",
+        "documentation": "https://quranenc.com/ar/home/api",
+        "api_version": "v1",
+        "authentication": "public HTTP API; no credential requirement documented",
+        "capabilities": [
+          "translations-list",
+          "sura-translation",
+          "aya-translation",
+          "footnotes",
+          "translation-audio"
+        ],
+        "rights_status": "redistribution-permitted-subject-to-source-terms",
+        "corpus_write_policy": "forbidden-direct",
+        "adapter_status": "registry-ready; translation API endpoints documented",
+        "verification_status": "official-api-documentation-verified"
+      }
+    ]
+  },
+  "source_api_links": [
+    {
+      "source_id": "source:quran-foundation",
+      "api_ids": [
+        "quran-foundation-content-api-v4"
+      ]
+    },
+    {
+      "source_id": "source:diyanet-tr",
+      "api_ids": [
+        "diyanet-open-source-quran-api"
+      ]
+    },
+    {
+      "source_id": "source:sunnah-com",
+      "api_ids": [
+        "sunnah-com-api"
+      ]
+    },
+    {
+      "source_id": "source:hadeethenc",
+      "api_ids": [
+        "hadeethenc-api"
+      ]
+    },
+    {
+      "source_id": "source:quranenc",
+      "api_ids": [
+        "quranenc-translation-api-v1"
+      ]
+    }
+  ],
+  "last_updated": "2026-09-22",
+  "radar_scan": {
+    "scan_date": "2026-09-22",
+    "method": "Official-first radial discovery: government/institutional domains, developer/API/open-data terms, then endpoint/rights verification. Non-official aggregators are discovery leads only and are never promoted to official_api.",
+    "findings": [
+      {
+        "id": "uae-awqaf-digital-services",
+        "provider": "General Authority of Islamic Affairs and Endowments",
+        "country": "AE",
+        "official_url": "https://mobileappapi.awqaf.gov.ae/",
+        "access_type": [
+          "official-digital-service"
+        ],
+        "api_status": "official-service-surface-found; Quran-specific API not verified",
+        "role": [
+          "institutional-digital-services"
+        ],
+        "action": "keep-on-radar; do not label as Quran API"
+      },
+      {
+        "id": "kuwait-awqaf-quran",
+        "provider": "Ministry of Awqaf and Islamic Affairs, Kuwait",
+        "country": "KW",
+        "official_url": "https://www.awqaf.gov.kw/quran",
+        "access_type": [
+          "official-web",
+          "official-quran-sector"
+        ],
+        "api_status": "not-verified",
+        "role": [
+          "quran",
+          "tajweed",
+          "tafsir",
+          "hadith-education"
+        ],
+        "action": "search developer/open-data/API surfaces separately"
+      },
+      {
+        "id": "quran-foundation-content-v4-tafsir",
+        "provider": "Quran Foundation / Quran.com",
+        "country": "international",
+        "official_url": "https://api-docs.quran.com/docs/content_apis_versioned/4.0.0/tafsir/",
+        "access_type": [
+          "official-api"
+        ],
+        "api_status": "verified",
+        "role": [
+          "tafsir"
+        ],
+        "capabilities": [
+          "list-tafsirs",
+          "verse-tafsir",
+          "surah",
+          "juz",
+          "mushaf-page",
+          "hizb",
+          "ruku",
+          "manzil",
+          "pagination"
+        ],
+        "verification_note": "Official API exposes structured tafsir records including resource id, author, language, verse key and pagination."
+      },
+      {
+        "id": "quran-foundation-developer-console",
+        "provider": "Quran Foundation / Quran.com",
+        "country": "international",
+        "official_url": "https://api-docs.quran.com/",
+        "access_type": [
+          "official-developer-platform"
+        ],
+        "api_status": "verified",
+        "role": [
+          "api-app-registration",
+          "oauth",
+          "content-api",
+          "search-api"
+        ],
+        "verification_note": "Official docs require creating an app in Developer Console and distinguish content APIs from user/OAuth APIs."
+      },
+      {
+        "id": "quranenc-translation-api",
+        "provider": "QuranEnc.com",
+        "country": "international",
+        "official_url": "https://quranenc.com/ar/home/api",
+        "access_type": [
+          "official-api"
+        ],
+        "api_status": "verified",
+        "role": [
+          "translations",
+          "translation-catalog",
+          "footnotes",
+          "translation-audio"
+        ],
+        "verification_note": "Official API documentation exposes v1 translation list, sura and aya endpoints; official terms permit republication subject to explicit conditions."
+      }
+    ],
+    "negative_findings": [
+      "No public Quran API was verified for Kuwait Ministry of Awqaf during this scan.",
+      "No Quran-specific public API was verified from the UAE digital service endpoint during this scan.",
+      "No official public Quran API was verified for Qatar/Egypt/Morocco/Algeria from the searched official-domain queries; keep them as institutional discovery targets rather than API claims.",
+      "King Fahd developer resource URL timed out during direct fetch in this scan; previous registry evidence remains marked developer-data verified but public API unverified."
+    ],
+    "discovery_leads_not_official": [
+      {
+        "id": "quranbench-api",
+        "url": "https://quranbench.com/api",
+        "classification": "independent-research-api",
+        "status": "discovery-lead-only",
+        "note": "Useful versioned/checksummed research API, but not an institutional/government API."
+      },
+      {
+        "id": "i-muslim-api",
+        "url": "https://i-muslim.com/id/downloads",
+        "classification": "independent-open-data-api",
+        "status": "discovery-lead-only",
+        "note": "Useful API/data lead with per-item licensing, but not an official institutional source; third-party translations remain rights-sensitive."
+      }
+    ],
+    "governance_rules": [
+      "Do not promote a discovery lead to official_api without primary-source verification.",
+      "Do not treat an official website or mobile service as proof of an API.",
+      "Do not treat API access as redistribution permission.",
+      "Keep Quran canonical text, translations, tafsir, tajweed annotations, qiraat and audio as separate content classes.",
+      "Ten Qiraat remain individually sourced and verified; never synthesize missing readings.",
+      "QuranEnc translations remain translation resources, not canonical Arabic Quran text; preserve source/version metadata and the stated no-modification conditions."
+    ],
+    "government_open_data_api_gateways": [
+      {
+        "id": "morocco-national-open-data-api",
+        "provider": "Morocco National Open Data Portal",
+        "country": "MA",
+        "official_url": "https://data.gov.ma/ar/دليل-واجهة-برمجة-التطبيقات",
+        "api_status": "verified",
+        "api_type": "CKAN API",
+        "role": [
+          "dataset-discovery",
+          "metadata",
+          "download"
+        ],
+        "religious_api_status": "no religion-specific API verified in this scan",
+        "rights_note": "Portal states public datasets are made available for free reuse subject to its terms."
+      },
+      {
+        "id": "qatar-open-data-api",
+        "provider": "State of Qatar Open Data",
+        "country": "QA",
+        "official_url": "https://www.data.gov.qa/",
+        "api_status": "verified",
+        "api_type": "Explore API 2.1",
+        "role": [
+          "dataset-discovery",
+          "records",
+          "exports"
+        ],
+        "religious_api_status": "no religion-specific API verified in this scan",
+        "rights_note": "Individual dataset terms must be checked before reuse."
+      },
+      {
+        "id": "bahrain-open-data-api",
+        "provider": "Bahrain Open Data Portal",
+        "country": "BH",
+        "official_url": "https://www.data.gov.bh/api-console/explore/v2.1/",
+        "api_status": "verified",
+        "api_type": "Opendatasoft Explore API v2.1",
+        "role": [
+          "dataset-catalog",
+          "records",
+          "exports",
+          "DCAT"
+        ],
+        "religious_api_status": "no religion-specific API verified in this scan",
+        "rights_note": "Useful institutional discovery gateway; individual dataset licensing still requires verification."
+      },
+      {
+        "id": "oman-data-portal-api",
+        "provider": "Oman National Centre for Statistics and Information",
+        "country": "OM",
+        "official_url": "https://data.gov.om/",
+        "api_status": "verified",
+        "api_type": [
+          "REST",
+          "SDMX"
+        ],
+        "role": [
+          "dataset-discovery",
+          "metadata",
+          "data",
+          "raw-data",
+          "SDMX"
+        ],
+        "religious_api_status": "no religion-specific API verified in this scan",
+        "rights_note": "Official portal states public data are governed by the Open Government License, subject to its terms."
+      },
+      {
+        "id": "kuwait-cait-api-platform",
+        "provider": "Central Agency for Information Technology (Kuwait)",
+        "country": "KW",
+        "official_url": "https://developer.api.cait.gov.kw/get-started?language=ar",
+        "api_status": "verified",
+        "api_type": "government API product platform",
+        "role": [
+          "api-product-discovery",
+          "application-registration",
+          "test-and-production-access"
+        ],
+        "religious_api_status": "Quran-specific product not verified in this scan",
+        "rights_note": "API products require account/approval; credentials must never be stored in the registry."
+      }
+    ],
+    "next_radial_targets": [
+      "Search each government API gateway for Quran, Hadith, Tafsir, Fiqh, Fatwa, Waqf, manuscripts, Islamic libraries, Arabic corpora, recitation and religious education datasets.",
+      "Inspect national university developer portals separately from ministry websites.",
+      "For every discovered API, verify primary documentation, authentication, endpoint contract, rate limits, terms, rights and provenance before marking verified.",
+      "Keep independent APIs and community datasets in a separate discovery-leads class; never relabel them as official.",
+      "Verify QuranEnc translation inventory language-by-language and register edition/version/provenance records separately from the API contract."
+    ]
+  },
+  "quran_foundation_coverage_correction": {
+    "verified_on": "2026-09-22",
+    "correction": "The earlier registry treatment understated the documented Content API surface. Official v4 documentation explicitly covers Quran text, verses, translations, tafsir, audio, recitations, chapter reciters, pages, juz, hizb, ruku, manzil and related resources, and chapter-reciter records expose qirat metadata.",
+    "remaining_verification_boundary": "The documentation establishes the API contract and qirat metadata field, but does not by itself prove that every one of the Ten Canonical Readings is available as a complete production dataset. That requires enumerating the production resource records after authorized access.",
+    "governance": "API access remains separate from redistribution rights and scholarly provenance."
+  },
+  "quran_foundation_primary_service_contract": {
+    "service_id": "quran-foundation-quran-core-v4",
+    "provider_source_id": "source:quran-foundation",
+    "provider": "Quran Foundation / Quran.com",
+    "purpose": "Primary official service contract for Quran Core. This layer records the programmable source surface; it does not write directly to Corpus.",
+    "source_of_truth": "Quran Foundation official Content API v4 documentation",
+    "api_base": "https://apis.quran.foundation/content/api/v4",
+    "authentication": {
+      "flow": "OAuth2 client_credentials",
+      "scope": "content",
+      "required_headers": [
+        "x-auth-token",
+        "x-client-id"
+      ],
+      "production_access": "approved production credentials/permissions required",
+      "prelive_scope": "Al-Fatihah and Al-Baqarah only"
+    },
+    "quran_core_scope": {
+      "canonical_text": "Quran text resources",
+      "chapters": "chapter metadata",
+      "verses": "verse records",
+      "structural_navigation": [
+        "pages",
+        "juz",
+        "hizb",
+        "ruku",
+        "manzil",
+        "rub_el_hizb"
+      ],
+      "tajweed_representation": "text_uthmani_tajweed and related Mushaf/Tajweed representations",
+      "recitation_and_audio": "separate recitation/audio resource families",
+      "translations": "separate translation resources",
+      "tafsir": "separate tafsir resources",
+      "search": "separate Search API family"
+    },
+    "provenance_rule": "Arabic canonical text remains a separate content class. Translations, tafsir, tajweed representations, recitations and qiraat metadata are never silently merged into canonical text.",
+    "acquisition_rule": "Rechercher may acquire or synchronize only after endpoint access, resource identity, provenance and rights are verified.",
+    "corpus_write_policy": "forbidden-direct",
+    "rights_rule": "API access does not itself grant redistribution rights; apply resource/source-specific terms before public storage or publication.",
+    "sync_rule": "Use official Content Sync/resource snapshots where available instead of repeatedly rebuilding a local copy from ad-hoc requests.",
+    "ai_rule": "AI may assist indexing, matching and discovery only; it cannot generate or replace Quran text, translations, tafsir or qiraat as authoritative source content.",
+    "verification_status": "official-documentation-verified"
+  },
+  "translation_expansion_contract": {
+    "goal": "Expand Quran translation acquisition beyond the current Quran Foundation inventory using primary institutional and verified QuranEnc editions; never use AI as a translation source.",
+    "services": [
+      {
+        "service_id": "quranenc-translations-api-v1",
+        "provider": "QuranEnc",
+        "source_url": "https://quranenc.com",
+        "api_base": "https://quranenc.com/api/v1",
+        "endpoint_contract": {
+          "list_all": "/translations/list",
+          "list_by_language": "/translations/list/{language}",
+          "sura": "/translation/sura/{translation_key}/{sura_number}",
+          "ayah": "/translation/aya/{translation_key}/{sura_number}/{aya_number}"
+        },
+        "status": "official-api-documentation-verified",
+        "scope": "translation edition catalog and Quran meaning translations",
+        "coverage_rule": "Catalog enumeration is authoritative for actual available editions; language directories alone are not proof of a translation.",
+        "integrity_rule": "Preserve translation text, footnotes, translation key, version and last_update; no automatic retranslation.",
+        "rights_rule": "Follow QuranEnc terms/policies and retain required publisher/source/version attribution per edition.",
+        "ai_rule": "AI is discovery/matching only and cannot author, replace or retranslate an authoritative Quran translation.",
+        "language_scope_note": "QuranEnc currently advertises 80+ languages; the registry must enumerate actual editions and not convert that headline into an 80+ complete-translation claim."
+      }
+    ],
+    "institutional_translation_priority": {
+      "rule": "Prefer translations issued or formally supervised by ministries, national Quran complexes, official Islamic affairs bodies, universities and recognized scholarly institutions when a primary source can verify the edition.",
+      "priority_countries": [
+        "SA",
+        "TR",
+        "ID",
+        "MY",
+        "PK",
+        "BD",
+        "EG",
+        "JO",
+        "MA",
+        "DZ",
+        "TN",
+        "AE",
+        "QA",
+        "KW",
+        "OM",
+        "BH"
+      ],
+      "example_verified": {
+        "country": "ID",
+        "institution": "Ministry of Religious Affairs of the Republic of Indonesia",
+        "source": "QuranEnc",
+        "status": "verified edition provenance",
+        "translation": "Indonesian Translation - Ministry of Religious Affairs"
+      },
+      "api_constraint": "Institutional website/app presence does not imply an API. API status requires official endpoint documentation."
+    },
+    "translation_admission_states": [
+      "verified_official_institutional_translation",
+      "verified_quranenc_translation",
+      "verified_scholarly_translation",
+      "candidate_requires_primary_source_verification",
+      "language_present_but_translation_not_verified",
+      "no_verified_translation_found"
+    ],
+    "forbidden": "AI-generated Quran translation as authoritative source",
+    "quranenc_catalog_snapshot": {
+      "snapshot_date": "2026-09-22",
+      "catalog_file": "config/quranenc-translation-catalog-2026-09-22.json",
+      "translation_edition_count": 74,
+      "unique_language_count": 55,
+      "language_iso_codes": [
+        "aa",
+        "ak",
+        "am",
+        "as",
+        "az",
+        "bs",
+        "ceb",
+        "de",
+        "en",
+        "es",
+        "fa",
+        "ff",
+        "fr",
+        "gu",
+        "ha",
+        "hi",
+        "hr",
+        "id",
+        "ja",
+        "km",
+        "kn",
+        "ku",
+        "ky",
+        "ln",
+        "lt",
+        "mdh",
+        "mk",
+        "ml",
+        "mos",
+        "nqo",
+        "nl",
+        "om",
+        "pa",
+        "ps",
+        "pt",
+        "rn",
+        "ro",
+        "rw",
+        "si",
+        "so",
+        "sq",
+        "sr",
+        "sw",
+        "ta",
+        "te",
+        "tg",
+        "th",
+        "tl",
+        "tr",
+        "ug",
+        "ur",
+        "uz",
+        "vi",
+        "yo",
+        "zh"
+      ]
+    }
+  }
+}

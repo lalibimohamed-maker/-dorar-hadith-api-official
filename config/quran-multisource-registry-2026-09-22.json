@@ -1,0 +1,117 @@
+{
+  "registry_version": "2026-09-22",
+  "layer": "system",
+  "scope": "quran_translation_source_discovery_and_verification",
+  "corpus_mutation": false,
+  "policy": {
+    "canonical_arabic_separate": true,
+    "ai_generated_translation_forbidden": true,
+    "api_access_is_not_redistribution_rights": true,
+    "aggregator_is_not_primary_provenance": true,
+    "primary_source_verification_required_per_edition": true,
+    "rights_verification_required_per_asset": true,
+    "text_integrity_review_required": true,
+    "public_corpus_ingestion_requires_verified_status": true,
+    "unverified_items_remain_metadata_only": true
+  },
+  "source_records": [
+    {
+      "source_id": "quran-foundation",
+      "display_name": "Quran Foundation / Quran.com",
+      "official_url": "https://quran.com/",
+      "api_documentation_url": "https://api-docs.quran.com/docs/api-reference/",
+      "role": ["official_api", "translation_catalog", "runtime_candidate"],
+      "edition_discovery": "resources_translations_endpoint",
+      "authentication": "credentials_required_for_production_content_api",
+      "verification_status": "source_platform_identified_editions_pending",
+      "rights_status": "per_edition_review_required",
+      "notes": ["Extract the live translation resource catalog instead of hard-coding a language count.", "Do not automatically retranslate vetted translations."]
+    },
+    {
+      "source_id": "quranenc",
+      "display_name": "QuranEnc",
+      "official_url": "https://quranenc.com/",
+      "api_documentation_url": "https://quranenc.com/ar/home/api",
+      "role": ["official_api", "translation_catalog", "download_candidate"],
+      "edition_discovery": "translations_list_endpoint",
+      "verification_status": "catalog_synced_primary_verification_in_progress",
+      "rights_status": "per_edition_review_required",
+      "notes": ["The existing 74-edition catalog remains under provenance and rights review."]
+    },
+    {
+      "source_id": "tanzil",
+      "display_name": "Tanzil",
+      "official_url": "https://tanzil.net/",
+      "translations_url": "https://tanzil.net/trans/",
+      "resources_url": "https://tanzil.net/docs/translations_resources",
+      "role": ["translation_discovery", "source_mapping", "download_candidate"],
+      "verification_status": "source_catalog_pending_import",
+      "rights_status": "terms_and_permission_must_be_checked_per_translation",
+      "notes": ["Use Tanzil to discover and map original publishers; do not infer public redistribution rights from availability."]
+    },
+    {
+      "source_id": "al-quran-cloud",
+      "display_name": "Al Quran Cloud API",
+      "official_url": "https://alquran.cloud/",
+      "role": ["aggregator", "translation_discovery", "runtime_candidate"],
+      "verification_status": "source_platform_pending_review",
+      "rights_status": "original_source_required_per_edition",
+      "notes": ["Track the original translator and publisher behind every edition; aggregator delivery alone is insufficient."]
+    },
+    {
+      "source_id": "global-quran",
+      "display_name": "Global Quran API",
+      "role": ["aggregator", "translation_discovery", "metadata_catalog"],
+      "verification_status": "source_platform_pending_review",
+      "rights_status": "original_source_required_per_edition",
+      "notes": ["No edition enters the public Corpus solely because it is present in an aggregator."]
+    },
+    {
+      "source_id": "islamic-network",
+      "display_name": "Islamic Network API",
+      "role": ["distribution_api", "translation_discovery", "runtime_candidate"],
+      "verification_status": "source_platform_pending_review",
+      "rights_status": "per_asset_review_required",
+      "notes": ["Treat as a distribution layer unless a primary publisher or institution is documented."]
+    },
+    {
+      "source_id": "mp3quran",
+      "display_name": "Mp3Quran",
+      "role": ["audio_source", "recitation_discovery", "translation_audio_candidate"],
+      "verification_status": "audio_scope_pending_review",
+      "rights_status": "per_asset_review_required",
+      "notes": ["Audio and recitation assets are tracked separately from written translation text."]
+    },
+    {
+      "source_id": "fawazahmed0-quran-api",
+      "display_name": "Fawaz Ahmed Quran API",
+      "repository": "https://github.com/fawazahmed0/quran-api",
+      "delivery_endpoint": "https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/",
+      "role": ["discovery", "metadata_catalog", "runtime_candidate"],
+      "verification_status": "repository_registered_editions_pending",
+      "rights_status": "verify_per_edition",
+      "notes": ["The repository license does not automatically grant rights for embedded translations."]
+    }
+  ],
+  "required_per_edition_fields": [
+    "source_id",
+    "edition_identifier",
+    "language_iso_code",
+    "translator_or_author",
+    "publisher_or_institution",
+    "original_source_url",
+    "license_or_permission_evidence",
+    "text_integrity_status",
+    "verification_status",
+    "checked_at"
+  ],
+  "verification_states": [
+    "discovered_pending_primary_source_and_rights_review",
+    "primary_source_pending",
+    "rights_pending",
+    "text_integrity_pending",
+    "verified_for_metadata_only",
+    "verified_for_public_use",
+    "blocked_pending_resolution"
+  ]
+}
