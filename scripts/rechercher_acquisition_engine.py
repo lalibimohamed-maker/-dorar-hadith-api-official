@@ -193,6 +193,20 @@ def quality_score(path):
 
 def source_candidates(book):
     candidates = []
+    registry_index = ROOT / "artifacts/registry-document-candidates.json"
+    if registry_index.is_file():
+        try:
+            data = json.loads(registry_index.read_text(encoding="utf-8"))
+            for item in data.get("candidates", {}).get(str(book.get("id")), []):
+                if item.get("url"):
+                    candidates.append({
+                        "url": item["url"],
+                        "label": f"PR561-registry:{item.get('registry_source_name') or item.get('registry_source_id') or 'source'}",
+                        "discover_pdfs": False,
+                        "rights_status": "review_required",
+                    })
+        except Exception as exc:
+            print(f"REGISTRY_CANDIDATE_INDEX_ERROR={exc}", flush=True)
     for source in book.get("sources", []):
         if isinstance(source, str):
             candidates.append({"url": source, "label": "catalogued-source", "discover_pdfs": True})
