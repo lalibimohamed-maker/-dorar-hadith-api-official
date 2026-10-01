@@ -8,14 +8,17 @@ const matrix = JSON.parse(fs.readFileSync(path.join(root, 'config/rechercher/glo
 const registry = JSON.parse(fs.readFileSync(path.join(root, matrix.language_registry), 'utf8'));
 
 
-test('global matrix is exactly 133 unique languages by 24 domains', () => {
+test('global matrix is exactly 133 unique languages by 48 Islamic knowledge domains', () => {
   const languages = registry.enumerated_islamhouse_languages;
   assert.equal(languages.length, matrix.language_count);
   assert.equal(new Set(languages).size, matrix.language_count);
   assert.equal(matrix.domains.length, matrix.domain_count);
+  assert.deepEqual(matrix.domains, ["quran","quran_sciences","tafsir","tajweed_qiraat","quran_miracles","quran_tadabbur","quran_stories","hadith","hadith_sciences","hadith_terminology","hadith_explanation","sirah_nabawiyyah","shamail_nabawiyyah","aqidah","tawhid","fiqh","usul_al_fiqh","fiqh_schools_branches","fatwa","raqaiq_adab_akhlaq","islamic_history","biographies_tabaqat","comparative_fiqh","dawah_islamic_culture","general_islamic_encyclopedias","scientific_miracles","maqasid_kulliyat","legal_maxims","athar","adhkar_dua","prophets_stories","ghaib","sirah_maghazi","companions_followers","scholars_biographies_rijal_tabaqat","ethics_adab","worship_transactions","family_inheritance_judiciary","siyasah_finance_waqf","contemporary_dawah_education","scientific_encyclopedias_lectures","arabic_language","literature_poetry","manuscripts_editions_bibliography","research_institutions_terms_translation","places_dates","questions_answers","other_islamic_domains"]);
+  assert.equal(matrix.knowledge_domain_count, 48);
+  assert.equal(matrix.support_lane_count, 0);
   assert.equal(new Set(matrix.domains).size, matrix.domain_count);
-  assert.equal(matrix.language_count * matrix.domain_count, 3192);
-  assert.equal(matrix.expected_search_cells, 3192);
+  assert.equal(matrix.language_count * matrix.domain_count, 6384);
+  assert.equal(matrix.expected_search_cells, 6384);
   assert.ok(languages.includes('Bengali'));
   assert.ok(languages.includes('Malagasy'));
 });
