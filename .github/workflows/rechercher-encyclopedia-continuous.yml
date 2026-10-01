@@ -5,27 +5,25 @@ on:
   schedule:
     # Automatic continuation. The persistent queue decides what remains;
     # there is no finite book-count target.
-    # Keep the interval longer than the normal acquisition window so
-    # scheduled requests do not build a superseding concurrency queue.
     - cron: '0 */6 * * *'
 
 # security-justification: trusted default-branch caller only; it invokes the
-# reviewed central reusable acquisition workflow and persists only verified
-# PDF/state outputs to the governed acquisition branch and secondary PDF pool.
+# current central governed acquisition workflow and persists verified PDF bytes
+# only as Release assets in the unified 6,384-matrix storage repository.
 permissions:
   contents: write
 
-# All acquisition callers write to the same secondary LFS repository. A shared
-# group prevents cross-queue non-fast-forward races on secondary/main.
+# All acquisition callers publish to the same Release repository. A shared
+# group prevents concurrent duplicate-release races.
 concurrency:
-  group: rechercher-secondary-lfs-persistence
+  group: rechercher-unified-release-persistence
   cancel-in-progress: false
 
 jobs:
   acquire:
     name: Resume chronological acquisition
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@196d83e6bcd7132bbb4250f7617395bd07591efa
+    uses: ./.github/workflows/rechercher-governed-acquisition.yml
     with:
       target_branch: rechercher/encyclopedia-continuous-acquisition
     secrets:
-      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+      RECHERCHER_MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
