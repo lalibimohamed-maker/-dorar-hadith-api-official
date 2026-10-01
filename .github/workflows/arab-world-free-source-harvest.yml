@@ -1,0 +1,115 @@
+name: Arab World Free Source Harvest
+
+on:
+  push:
+    branches:
+      - feat/portal-knowledge-v3-2026
+  workflow_dispatch:
+    inputs:
+      start:
+        description: 'Starting Waqfeya numeric book ID to scan'
+        required: false
+        default: '1'
+      batch_size:
+        description: 'Maximum candidate books downloaded per run'
+        required: false
+        default: '25'
+      book_id_batch:
+        description: 'Maximum legacy numeric IDs to inspect per run'
+        required: false
+        default: '400'
+      catalog_pages:
+        description: 'Maximum /books catalog offset pages to inspect per run'
+        required: false
+        default: '20'
+  schedule:
+    - cron: '17 2 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  registry-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate Arab-world source registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s config/arab-world-source-registry-2026.json
+          jq -e '.countries | length == 23' config/arab-world-source-registry-2026.json >/dev/null
+          jq -e '([.countries[].country] | length) >= 20' config/arab-world-source-registry-2026.json >/dev/null
+          echo 'Arab-world source registry validated.'
+
+  waqfeya-harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: registry-check
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: ACTUAL DOWNLOAD — fetch book, follow download link, verify PDF, hash SHA-256
+        env:
+          WAQFEYA_START: ${{ github.event.inputs.start || '1' }}
+          WAQFEYA_BATCH_SIZE: ${{ github.event.inputs.batch_size || '25' }}
+          WAQFEYA_BOOK_ID_BATCH: ${{ github.event.inputs.book_id_batch || '400' }}
+          WAQFEYA_CATALOG_PAGES: ${{ github.event.inputs.catalog_pages || '20' }}
+          # Waqfeya currently lists this as a free-distribution/waqf publication.
+          # The workflow downloads it to the runner for technical proof, verifies %PDF-, and hashes it.
+          # It does NOT publish the PDF artifact unless WAQFEYA_KEEP_FILES is explicitly enabled after rights review.
+          WAQFEYA_PROOF_URLS: >-
+            https://waqfeya.net/books/%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86-%D9%88%D9%86%D9%82%D8%B6-%D9%85%D8%B7%D8%A7%D8%B9%D9%86-%D8%A7%D9%84%D8%B1%D9%87%D8%A8%D8%A7%D9%86-%D8%B7-%D8%A7%D9%84%D8%A3%D9%88%D9%82%D8%A7%D9%81-%D8%A7%D9%84%D9%82%D8%B7%D8%B1%D9%8A%D8%A9/9a836d53472d4e97b96f2bc6c0fb8b40
+          WAQFEYA_MAX_DOWNLOAD_MB: '200'
+          WAQFEYA_KEEP_FILES: 'false'
+        run: |
+          set -euo pipefail
+          node scripts/waqfeya-batch-harvest.mjs
+
+      - name: Show HARD DOWNLOAD PROOF (bytes + SHA-256)
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s artifacts/waqfeya-books/manifest.json
+          jq '{downloaded, keepDownloadedFiles, books: [.books[] | {title, bytes, sha256, sourcePage, downloadUrl, proof, fileStoredInArtifact}]}' artifacts/waqfeya-books/manifest.json
+
+      - name: Preserve manifest/provenance (PDFs are not published by default)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: arab-world-waqfeya-download-proof-${{ github.run_id }}
+          path: artifacts/waqfeya-books/manifest.json
+          if-no-files-found: error
+          retention-days: 90
+
+  official-source-register:
+    runs-on: ubuntu-latest
+    needs: registry-check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Generate official-source snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/arab-world-registry
+          cp config/arab-world-source-registry-2026.json artifacts/arab-world-registry/
+          printf '%s\n' 'This snapshot records official Arabic-world discovery sources. It does not equate free reading/downloading with republication permission.' > artifacts/arab-world-registry/RIGHTS.txt
+          jq -r '.countries[] | [.country,.source,.url,.status,.reuse] | @tsv' config/arab-world-source-registry-2026.json > artifacts/arab-world-registry/countries.tsv
+      - name: Preserve registry snapshot
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: arab-world-source-registry-${{ github.run_id }}
+          path: artifacts/arab-world-registry
+          retention-days: 90

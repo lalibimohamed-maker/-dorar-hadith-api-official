@@ -1,0 +1,29 @@
+name: Waqfeya Store Proof
+
+on:
+  push:
+    branches:
+      - feat/portal-knowledge-v3-2026
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download one real Waqfeya store item
+        run: node scripts/waqfeya-store-proof.mjs
+      - name: Preserve store test item and manifest
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: waqfeya-store-proof-${{ github.run_id }}
+          path: artifacts/store-proof
+          if-no-files-found: error
+          retention-days: 90

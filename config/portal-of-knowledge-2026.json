@@ -1,0 +1,71 @@
+{
+  "version": "2026.09.02",
+  "name": "بوابة العلم",
+  "nameEn": "Portal of Knowledge",
+  "purpose": "Unified entry point connecting Quran, Sunnah, Tafsir, Sirah, Fiqh and the encyclopedia's educational and research tools without conflating source identity, authenticity, or rights.",
+  "principles": [
+    "Every displayed claim carries source identity and verification state.",
+    "Quran text remains separate from translations, tafsir, reflections and commentary.",
+    "Hadith existence in a book is separate from hadith grading.",
+    "Copyrighted editions are linked or API-served only under compatible terms; public-domain and explicitly free/waqf material may be acquired with provenance.",
+    "No silent inference when a source, legal status or scholarly judgment is unresolved."
+  ],
+  "capabilities": {
+    "quran": {
+      "reader": "/quran/ayah",
+      "studyMode": true,
+      "wordByWord": true,
+      "translations": "/quran/translations",
+      "tafsir": "Quran Foundation Content API / local licensed corpus when available",
+      "reflections": "Quran Foundation Quran Reflect resources when configured",
+      "relatedVerses": "study layer; source-linked, never presented as canonical text",
+      "recitations": "Quran Foundation Content API",
+      "mushafMetadata": "Quran Foundation Content API",
+      "offlineSync": "Quran Foundation resource sync when credentials are configured"
+    },
+    "sunnah": {
+      "hadithCorpus": "data/corpus/hadith/collections",
+      "search": "/search",
+      "methodology": "/hadith/methodology",
+      "narratorResearch": "/hadith/narrator/profile",
+      "rijal": "/hadith/rijal-books"
+    },
+    "research": {
+      "domains": "/research/domains",
+      "scholars": "/research/scholars",
+      "books": "/books",
+      "authors": "/authors",
+      "fiqh": "/fiqh",
+      "fiqhResearch": "/fiqh/research",
+      "inheritance": "/inheritance"
+    },
+    "education": {
+      "tajweed": "/tajweed",
+      "learningCards": "FlashCard engine integration point",
+      "lessonProgress": "Portal user-state integration point"
+    },
+    "lifeTools": {
+      "prayerTimes": "Provider integration point; location/timezone required",
+      "qibla": "Provider integration point; device/location required",
+      "hijriCalendar": "Provider integration point",
+      "nearbyMosques": "Provider integration point; location required"
+    },
+    "media": {
+      "quranManuscripts": "Public-domain acquisition pipeline",
+      "audio": "Rights-aware provider/local artifact",
+      "video": "Rights-aware external media link or licensed artifact",
+      "ocr": "Processing pipeline for openly licensed/public-domain scans"
+    },
+    "provenance": {
+      "requiredFields": ["source", "sourceUrl", "sourceType", "author", "rights", "verification", "retrievedAt", "sha256"],
+      "statusValues": ["verified", "provisional", "needs-review", "rights-restricted", "public-domain", "waqf-explicit", "external-link-only"]
+    }
+  },
+  "externalResearchBasis": {
+    "quranComStudyMode": "https://quran.com/en/product-updates/new-study-mode-on-quran-com",
+    "quranFoundationApi": "https://api-docs.quran.com/docs/api-reference/",
+    "quranFoundationSync": "https://api-docs.quran.com/docs/tutorials/content-sync/getting-started/",
+    "tanzilLicense": "https://tanzil.net/docs/Text_License",
+    "metOpenAccess": "https://www.metmuseum.org/art/collection/search/456964"
+  }
+}
