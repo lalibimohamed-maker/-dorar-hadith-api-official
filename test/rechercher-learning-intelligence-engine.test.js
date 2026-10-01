@@ -69,4 +69,6 @@ test('capabilities explicitly state learning cannot block acquisition', () => {
   assert.equal(capabilities.acquisitionBlocking, false);
   assert.equal(capabilities.sourceGroundingRequiredForReligiousAnswers, true);
   assert.ok(capabilities.renderers.includes('game'));
+  assert.equal(capabilities.schedulerBackends.includes('deadline-aware'), true);
+  assert.equal(capabilities.v3.acquisitionIndependent, true);
 });

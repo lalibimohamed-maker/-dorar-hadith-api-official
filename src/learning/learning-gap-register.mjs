@@ -6,6 +6,7 @@ const CONFIG_PATH = path.resolve('config/rechercher-learning-gap-register-2026.j
 export const PRIORITIES = Object.freeze(['P0','P1','P2','P3','P4']);
 export const STATUSES = Object.freeze([
   'implemented-in-p0',
+  'implemented-in-v3',
   'partial-contract',
   'partial-existing',
   'planned'

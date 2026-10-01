@@ -1,6 +1,7 @@
 import { loadFlashcardConfig } from './flashcard-engine.mjs';
 import { scheduleWith } from './scheduler-registry.mjs';
 import { loadGlobalLearningStrategy, validateGlobalLearningStrategy } from './global-learning-strategy.mjs';
+import { getV3Capabilities } from './rechercher-learning-intelligence-v3.mjs';
 
 /**
  * Rechercher Learning Intelligence Engine v1.
@@ -223,7 +224,7 @@ export function getLearningEngineCapabilities() {
     version: ENGINE_VERSION,
     loop: [...LEARNING_LOOP],
     practiceModes: [...PRACTICE_MODES],
-    schedulerBackends: ['FSRS', 'SM-2', 'Leitner', 'forgetting-curve'],
+    schedulerBackends: ['FSRS', 'SM-2', 'Leitner', 'forgetting-curve', 'deadline-aware'],
     renderers: ['card', 'reading', 'audio', 'visual', 'game'],
     flashcardQuestionModes: flashcards.questionModes ?? [],
     acquisitionBlocking: false,
@@ -235,6 +236,7 @@ export function getLearningEngineCapabilities() {
       frozen: strategy.status === 'frozen-strategic-requirements',
       valid: strategyValidation.ok,
       acquisitionIndependent: strategy.governance?.acquisitionIndependent === true
-    }
+    },
+    v3: getV3Capabilities()
   };
 }
