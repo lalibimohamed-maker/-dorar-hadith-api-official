@@ -1,8 +1,8 @@
-# Rechercher — Global 133 × 24 Search Matrix
+# Rechercher — Global 133 × 48 Search Matrix
 
 ## Objective
 
-Rechercher now treats the current first-party IslamHouse snapshot of **133 enumerated languages** as a concrete research universe across 24 Islamic knowledge/resource domains: **3,192 deterministic search cells**.
+Rechercher now treats the current first-party IslamHouse snapshot of **133 enumerated languages** as a concrete research universe across 48 Islamic knowledge domains: **6,384 deterministic search cells**.
 
 The previous 132-language snapshot had one missing enumerated language. The current official IslamHouse catalogue reports 133 languages and explicitly includes **Bengali** in the language selector. Bengali is therefore promoted from the discrepancy state into the evidence-backed language registry; no language was invented or inferred.
 
@@ -31,7 +31,7 @@ The canonical Arabic Quran is an isolated corpus layer. Human translations are s
 
 ## Resource domains
 
-Quran, tafsir, hadith, hadith explanation, Sunnah, sirah, aqidah, fiqh, usul al-fiqh, fatwa, Islamic terms, Islamic history, Islamic ethics, dua/adhkar, education, books, articles, audio, video, PDF, structured metadata, provenance, rights, verification.
+The matrix uses exactly 48 Islamic knowledge domains. Domains 1–47 cover the explicit scholarly subjects, and domain 48 is the automatic catch-all for additional Islamic knowledge subjects with automatic subject classification. Supporting resource/governance lanes are not separate matrix dimensions.
 
 ## Expansion rule
 
