@@ -1,40 +1,76 @@
 {
+  "engine": "Rechercher Learning Intelligence Engine v4",
   "version": "4.0.0",
+  "status": "implemented-core",
   "memory": {
     "session": {
-      "purpose": "ephemeral current-session context",
-      "retention": "session-scoped",
-      "raw_micro_events_allowed": true
+      "ephemeral": true,
+      "rawMicroEventsAllowed": true,
+      "maxRecentSignals": 50
     },
-    "long_term": {
-      "purpose": "multi-week and multi-month learner trajectory",
-      "stores": ["mastery", "calibration", "misconceptions", "modality_profile", "transfer_history"],
-      "raw_event_log_default": false
+    "longTerm": {
+      "summaryOnly": true,
+      "rawEventLogDefault": false,
+      "stores": [
+        "mastery",
+        "calibration",
+        "misconceptions",
+        "modality_profile",
+        "transfer_history"
+      ]
     }
   },
-  "feedback_loop_buffer": {
-    "signals": ["pause", "hesitation", "revision", "hint_request", "answer_attempt", "confidence_change", "navigation", "completion"],
-    "max_session_events": 50,
-    "feeds": ["calibration", "diagnosis", "method_selection"]
+  "feedbackLoopBuffer": {
+    "signals": [
+      "pause",
+      "hesitation",
+      "revision",
+      "hint_request",
+      "answer_attempt",
+      "confidence_change",
+      "navigation",
+      "completion"
+    ],
+    "maxSessionEvents": 50,
+    "rawDiaryPersisted": false,
+    "feeds": [
+      "diagnosis",
+      "calibration",
+      "method_selection"
+    ]
   },
-  "cross_domain_transfer": {
+  "crossDomainTransfer": {
     "enabled": true,
-    "requires_evidence": true,
-    "route_by": ["skill", "domain", "relation", "confidence", "evidence"],
-    "evaluation": ["immediate", "delayed", "transfer"]
+    "requiredFields": [
+      "sourceSkillId",
+      "targetSkillId",
+      "relation",
+      "evidence",
+      "confidence",
+      "provenance"
+    ],
+    "evaluationSeparateFromSourceMastery": true
   },
-  "pedagogical_safety": {
-    "scaffold_before_answer": true,
-    "preserve_struggle": true,
-    "no_answer_dump": true,
-    "progressive_disclosure": true,
-    "learner_agency": true,
-    "source_grounded": true,
-    "rights_aware": true,
-    "biometric_inference_default": false
+  "pedagogicalSafety": {
+    "scaffoldBeforeAnswer": true,
+    "preserveStruggle": true,
+    "noAnswerDump": true,
+    "progressiveDisclosure": true,
+    "learnerAgency": true,
+    "sourceGrounded": true,
+    "rightsAware": true,
+    "noBiometricInferenceByDefault": true,
+    "religiousDirectAnswerRequires": {
+      "sourceId": true,
+      "sourceAnchorOrPageOrLocation": true,
+      "sourceGroundedExplicit": true
+    }
   },
-  "architecture": {
-    "learning_downstream_of_acquisition": true,
-    "acquisition_must_not_wait_for_learning": true
+  "acquisitionBoundary": {
+    "learningDownstream": true,
+    "learningFailureNonBlocking": true,
+    "graphFailureNonBlocking": true,
+    "evaluationFailureNonBlocking": true,
+    "multimodalFailureNonBlocking": true
   }
 }
