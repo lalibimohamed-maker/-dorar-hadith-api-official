@@ -114,6 +114,7 @@ jobs:
           protected_count=$(python3 -c "import json; d=json.load(open('artifacts/governance/release-input.json')); print(sum(x['route']=='protected' for x in d['assets']))")
           public_tag="rechercher-pdf-${GITHUB_RUN_ID}"
           protected_tag="rechercher-protected-pdf-${GITHUB_RUN_ID}"
+          export PUBLIC_TAG="$public_tag" PROTECTED_TAG="$protected_tag"
           if [ "$public_count" -gt 0 ]; then
             gh release create "$public_tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher plaintext PDFs ${GITHUB_RUN_ID}" --notes "Verified plaintext PDF assets. PDF storage is GitHub Releases only; Git LFS and Actions artifacts are not storage backends."
           fi
