@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const dir = process.argv[2] || 'artifacts/rechercher/global-multilingual-research';
-const expected = Number(process.env.EXPECTED_CELL_COUNT || 3192);
+const expected = Number(process.env.EXPECTED_CELL_COUNT || 6384);
 const registry = JSON.parse(await fs.readFile('config/rechercher/global-multilingual-resource-discovery-2026.json', 'utf8'));
 const languages = registry.enumerated_islamhouse_languages;
 const domains = registry.resource_lanes;
