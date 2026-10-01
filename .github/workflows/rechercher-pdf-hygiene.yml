@@ -87,9 +87,10 @@ PY
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add artifacts/governance/release-storage-hygiene.json
           git diff --cached --quiet || git commit -m 'data(rechercher): persist Releases storage hygiene report'
+          STATE_COMMIT=$(git rev-parse HEAD)
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
-          git checkout HEAD@{1} -- artifacts/governance/release-storage-hygiene.json 2>/dev/null || true
+          git checkout "$STATE_COMMIT" -- artifacts/governance/release-storage-hygiene.json
           git add artifacts/governance/release-storage-hygiene.json
           git diff --cached --quiet || git commit -m 'data(rechercher): reconcile Releases storage hygiene state'
           git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
