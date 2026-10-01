@@ -128,10 +128,10 @@ jobs:
               side="${rel%.pdf}.manifest.json"
               route=protected
               if [ -f "$dir/$side" ] && python3 - "$dir/$side" <<'PY'
-import json,sys
-d=json.load(open(sys.argv[1],encoding='utf-8'))
-raise SystemExit(0 if d.get('storage_visibility')=='publication-eligible' and d.get('public_browser') is True else 1)
-PY
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding='utf-8'))
+          raise SystemExit(0 if d.get('storage_visibility')=='publication-eligible' and d.get('public_browser') is True else 1)
+          PY
               then route=public; fi
               if [ "$route" = public ]; then
                 if [ "$public_ready" -eq 0 ]; then
@@ -182,14 +182,14 @@ PY
           set -euo pipefail
           mkdir -p artifacts/governance
           python3 - <<'PY'
-import json, pathlib
-out={'schema':'din-allah-encyclopedia/rechercher-pdf-release-migration/v2','storage_backend':'github-releases-assets','git_lfs_final':False,'encrypted_final_format':False,'github_actions_artifacts_as_pdf_storage':False,'encrypted_release_assets_migrated':0,'legacy_branch_pdf_paths_migrated':0}
-p=pathlib.Path('encrypted-release-migration.tsv')
-if p.exists(): out['encrypted_release_assets_migrated']=len([x for x in p.read_text(encoding='utf-8').splitlines() if x])
-p2=pathlib.Path('legacy-branch-migration.tsv')
-if p2.exists(): out['legacy_branch_pdf_paths_migrated']=len([x for x in p2.read_text(encoding='utf-8').splitlines() if x])
-(pathlib.Path('artifacts/governance')/'pdf-release-migration.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-PY
+          import json, pathlib
+          out={'schema':'din-allah-encyclopedia/rechercher-pdf-release-migration/v2','storage_backend':'github-releases-assets','git_lfs_final':False,'encrypted_final_format':False,'github_actions_artifacts_as_pdf_storage':False,'encrypted_release_assets_migrated':0,'legacy_branch_pdf_paths_migrated':0}
+          p=pathlib.Path('encrypted-release-migration.tsv')
+          if p.exists(): out['encrypted_release_assets_migrated']=len([x for x in p.read_text(encoding='utf-8').splitlines() if x])
+          p2=pathlib.Path('legacy-branch-migration.tsv')
+          if p2.exists(): out['legacy_branch_pdf_paths_migrated']=len([x for x in p2.read_text(encoding='utf-8').splitlines() if x])
+          (pathlib.Path('artifacts/governance')/'pdf-release-migration.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add artifacts/governance/pdf-release-migration.json
