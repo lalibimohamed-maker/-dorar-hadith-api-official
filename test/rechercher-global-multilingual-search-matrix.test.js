@@ -19,47 +19,47 @@ test('global matrix is exactly 133 unique languages by 48 Islamic knowledge doma
     'quran',
     'quran_sciences',
     'tafsir',
-    'tajweed_qiraat'
+    'tajweed_qiraat',
     'quran_miracles',
     'quran_tadabbur',
     'quran_stories',
-    'hadith'
+    'hadith',
     'hadith_sciences',
     'hadith_terminology',
     'hadith_explanation',
-    'sirah_nabawiyyah'
+    'sirah_nabawiyyah',
     'shamail_nabawiyyah',
     'aqidah',
     'tawhid',
-    'fiqh'
+    'fiqh',
     'usul_al_fiqh',
     'fiqh_schools_branches',
     'fatwa',
-    'raqaiq_adab_akhlaq'
+    'raqaiq_adab_akhlaq',
     'islamic_history',
     'biographies_tabaqat',
     'comparative_fiqh',
-    'dawah_islamic_culture'
+    'dawah_islamic_culture',
     'general_islamic_encyclopedias',
     'scientific_miracles',
     'maqasid_kulliyat',
-    'legal_maxims'
+    'legal_maxims',
     'athar',
     'adhkar_dua',
     'prophets_stories',
-    'ghaib'
+    'ghaib',
     'sirah_maghazi',
     'companions_followers',
     'scholars_biographies_rijal_tabaqat',
-    'ethics_adab'
+    'ethics_adab',
     'worship_transactions',
     'family_inheritance_judiciary',
     'siyasah_finance_waqf',
-    'contemporary_dawah_education'
+    'contemporary_dawah_education',
     'scientific_encyclopedias_lectures',
     'arabic_language',
     'literature_poetry',
-    'manuscripts_editions_bibliography'
+    'manuscripts_editions_bibliography',
     'research_institutions_terms_translation',
     'places_dates',
     'questions_answers',
