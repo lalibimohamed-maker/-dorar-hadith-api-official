@@ -15,8 +15,6 @@ on:
     secrets:
       RECHERCHER_MATRIX_STORAGE_TOKEN:
         required: true
-      RECHERCHER_SECONDARY_STORAGE_TOKEN:
-        required: false
   # PR/schedule/push triggers are owned by the parent orchestration workflow.
   # Keeping this reusable workflow callable prevents duplicate multilingual matrix acquisition runs.
   workflow_dispatch:
@@ -186,118 +184,13 @@ jobs:
           done < <(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("artifacts/rechercher/multilingual-pdf-acquisition/manifest.json","utf8"));for(const e of Object.values(m.cells || m.languages || {}))if(e.acquisition==="research-only")for(const f of e.files||[])if(/\.(pdf|docx)$/i.test(String(f.path||"")))console.log(f.path)')
           echo "RESEARCH_ONLY_STORAGE=PRIVATE_DURABLE_STORAGE_REQUIRED"
 
-      - name: Persist research-only source files to protected GitHub Releases
-        env:
-          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
-          SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
-        run: |
-          set -euo pipefail
-          if ! find artifacts/rechercher/multilingual-research-vault -type f \( -name "*.pdf" -o -name "*.docx" \) -print -quit | grep -q .; then
-            echo "No research-only source files to persist."
-            exit 0
-          fi
-          test -n "${SECONDARY_STORAGE_TOKEN:-}" || {
-            echo "ERROR: RECHERCHER_SECONDARY_STORAGE_TOKEN is required for durable research-only PDF retention."
-            exit 1
-          }
-          export GH_TOKEN="$SECONDARY_STORAGE_TOKEN"
-          release_root="$RUNNER_TEMP/research-release"
-          rm -rf "$release_root"
-          mkdir -p "$release_root"
-          find artifacts/rechercher/multilingual-research-vault -type f \( -name '*.pdf' -o -name '*.docx' \) -print0 > "$release_root/files.nul"
-          count=0
-          while IFS= read -r -d '' file; do
-            case "$file" in
-              *.pdf) test "$(head -c 5 "$file")" = "%PDF-" ;;
-              *.docx) python3 - "$file" <<'PY'
-          import sys, zipfile
-          p=sys.argv[1]
-          assert zipfile.is_zipfile(p), p
-          with zipfile.ZipFile(p) as z:
-              names=set(z.namelist())
-              assert "[Content_Types].xml" in names and "word/document.xml" in names, p
-          PY
-                ;;
-            esac
-            count=$((count+1))
-          done < "$release_root/files.nul"
-          if [ "$count" -eq 0 ]; then
-            echo "No research-only source files to persist."
-            exit 0
-          fi
-          tag="rechercher-multilingual-protected-${GITHUB_RUN_ID}"
-          notes="$release_root/notes.md"
-          {
-            echo "# Rechercher protected multilingual source files"
-            echo
-            echo "Research-only original DOCX and/or verified PDFs retained for developer/research review."
-            echo "No Corpus write. No public publication."
-            echo "Original DOCX and canonical plaintext PDF source files only; encrypted extensions are forbidden."
-          } > "$notes"
-
-          declare -A existing_sha=()
-          while IFS=$'\t' read -r digest release_tag asset_name; do
-            [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
-          done < <(
-            gh api --paginate -H "Accept: application/vnd.github+json" \
-              "/repos/$SECONDARY_STORAGE_REPO/releases?per_page=100" \
-              --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
-          )
-          echo "SECONDARY_EXISTING_SHA_COUNT=${#existing_sha[@]}"
-
-          new_count=0
-          duplicate_count=0
-          declare -A batch_sha=()
-          while IFS= read -r -d '' file; do
-            sha="$(sha256sum "$file" | awk '{print $1}')"
-            digest="sha256:$sha"
-            if [ -n "${existing_sha[$digest]+x}" ] || [ -n "${batch_sha[$digest]+x}" ]; then
-              echo "SECONDARY_DEDUP_SKIP sha256=$sha file=$(basename "$file")"
-              duplicate_count=$((duplicate_count+1))
-              continue
-            fi
-            batch_sha["$digest"]=1
-            new_count=$((new_count+1))
-          done < "$release_root/files.nul"
-          echo "SECONDARY_RELEASE_INPUTS total=$count new=$new_count duplicates_skipped=$duplicate_count"
-          if [ "$new_count" -eq 0 ]; then
-            echo "SECONDARY_RELEASE_NOOP all_research_only_source_files_already_persisted=true"
-            rm -rf "$release_root"
-            exit 0
-          fi
-
-          gh release create "$tag" --repo "$SECONDARY_STORAGE_REPO" --title "Rechercher protected multilingual source files — $tag" --notes-file "$notes" --latest=false
-          while IFS= read -r -d '' file; do
-            sha="$(sha256sum "$file" | awk '{print $1}')"
-            digest="sha256:$sha"
-            if [ -n "${existing_sha[$digest]+x}" ]; then
-              echo "SECONDARY_DEDUP_SKIP sha256=$sha existing=${existing_sha[$digest]} file=$(basename "$file")"
-              continue
-            fi
-            base="$(basename "$file")"
-            asset="${sha}_${base}"
-            cp -f "$file" "$release_root/$asset"
-            gh release upload "$tag" "$release_root/$asset" --repo "$SECONDARY_STORAGE_REPO"
-            rm -f "$release_root/$asset"
-            existing_sha["$digest"]="$tag/$asset"
-          done < "$release_root/files.nul"
-          gh release view "$tag" --repo "$SECONDARY_STORAGE_REPO" --json tagName,isDraft,assets,url
-          rm -rf "$release_root"
-          echo "SECONDARY_MULTILINGUAL_SOURCE_RELEASE_OK assets=$new_count tag=$tag"
-
-      - name: Verify cell download inventory
-        run: |
-          set -euo pipefail
-          manifest="artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
-          node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));const cells=m.cells||m.languages||{};if(m.cell_count!==6384||Object.keys(cells).length!==6384)process.exit(1);for(const [id,e] of Object.entries(cells)){if(e.cell_id!==id||!e.language||!e.domain)process.exit(1)};console.log(`CELL_INVENTORY_OK cells=${Object.keys(cells).length} files=${m.total_files}`)' "$manifest"
-
-      - name: Reject encrypted review artifacts and validate source file extensions
-        run: |
-          set -euo pipefail
-          if find artifacts/rechercher -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
-            echo "ERROR: encrypted review artifacts are not retained."
-            exit 1
-          fi
+      - name: Upload research-only files as ephemeral review evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rechercher-multilingual-research-only-${{ github.run_id }}
+          path: artifacts/rechercher/multilingual-research-vault/
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Persist public multilingual source files to matrix GitHub Releases
         env:
