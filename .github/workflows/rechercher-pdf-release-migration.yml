@@ -8,6 +8,7 @@ on:
     - cron: '15 2 * * *'
   workflow_dispatch:
 
+ # security-justification: write permission is used only for verified PDF release migration and migration evidence.
 permissions:
   contents: write
 
