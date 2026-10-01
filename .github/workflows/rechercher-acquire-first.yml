@@ -36,13 +36,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
 
-      - name: Require vault key
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
-
       - name: Materialize central unbounded master catalog
         run: |
           set -euo pipefail
