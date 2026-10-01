@@ -3,6 +3,7 @@ name: Rechercher — Legacy PDF migration to Releases
 on:
   workflow_dispatch:
 
+# security-justification: contents: write is required only to migrate legacy encrypted Release assets: the workflow validates/decrypts them, uploads verified plaintext PDFs to the protected private Releases destination, and deletes the legacy encrypted Release assets. It does not commit PDF payloads to the repository tree or use Git LFS.
 permissions:
   contents: write
 
