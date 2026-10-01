@@ -66,7 +66,10 @@ jobs:
       - name: Remove forbidden encrypted working outputs
         run: |
           set -euo pipefail
-          find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -delete
+          if find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo 'ERROR: encrypted PDF found in active acquisition path. Recover/convert it before deletion; migration workflow owns legacy conversion.'
+            exit 1
+          fi
 
       - name: Acquire real PDFs
         run: |
