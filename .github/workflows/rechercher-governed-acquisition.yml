@@ -13,6 +13,13 @@ env:
   RECHERCHER_MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-6384-storage-01
 
 on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Branch holding the persistent acquisition state.'
+        required: true
+        default: 'main'
+        type: string
   workflow_call:
     inputs:
       target_branch:
@@ -58,7 +65,7 @@ jobs:
           test -s .governance-source/config/rechercher-central-sequential-scope.json
           mkdir -p books-batches scripts
           cp -a .governance-source/books-batches/. books-batches/
-          for script in rechercher_sequential_acquisition.py rechercher_acquisition_engine.py rechercher_pdf_storage_hygiene.py rechercher_pdf_quality_gate.py; do
+          for script in rechercher_sequential_acquisition.py rechercher_acquisition_engine.py rechercher_registry_document_discovery.py rechercher_pdf_storage_hygiene.py rechercher_pdf_quality_gate.py; do
             test -s ".governance-source/scripts/$script"
             cp -f ".governance-source/scripts/$script" "scripts/$script"
           done
@@ -95,13 +102,19 @@ jobs:
           set -euo pipefail
           python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
 
+      - name: Discover real PDF/DOCX candidates from PR #561 registry
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher_registry_document_discovery.py
+
       - name: Acquire PDFs through the single unbounded Hijri chronological queue
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y qpdf poppler-utils
+          sudo apt-get install -y qpdf poppler-utils libreoffice-writer
           sudo apt-get clean
           python3 scripts/rechercher_sequential_acquisition.py --root "$GITHUB_WORKSPACE"
+          test -s artifacts/registry-document-candidates.json
           df -h "$GITHUB_WORKSPACE"
 
       - name: Enforce non-destructive PDF quality and completeness gate
