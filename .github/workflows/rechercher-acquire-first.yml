@@ -120,35 +120,61 @@ jobs:
             sha256sum "$f"
           done
 
-      - name: Persist each acquired PDF exactly once as plaintext
+      - name: Persist each acquired PDF exactly once as the correct Releases asset
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROTECTED_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
         run: |
           set -euo pipefail
           shopt -s nullglob
           files=(artifacts/developer-review-vault/*.pdf)
           test "${#files[@]}" -gt 0
+          test -n "$PROTECTED_TOKEN"
+          PROTECTED_REPO='lalibimohamed82-coder/rechercher-pdf-storage'
+          visibility=$(GH_TOKEN="$PROTECTED_TOKEN" gh repo view "$PROTECTED_REPO" --json visibility --jq .visibility)
+          test "$visibility" = PRIVATE || { echo 'ERROR: protected Releases repository must be private.'; exit 1; }
+          public_tag="rechercher-public-${GITHUB_RUN_ID}"
+          protected_tag="rechercher-protected-${GITHUB_RUN_ID}"
           mkdir -p artifacts/governance
-          VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
-          gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher acquired storage ${GITHUB_RUN_ID}" --notes "Acquire-first persistence boundary. Each verified PDF is persisted exactly once as a plaintext PDF. No PDF is encrypted into .pdf.enc and no duplicate PDF copy is created."
-          : > artifacts/governance/vault-release.jsonl
-          for f in "${files[@]}"; do
-            gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
-            printf '%s  %s  pdf\\n' "$(sha256sum "$f" | awk '{print $1}')" "$f" >> artifacts/governance/vault-release.jsonl
-            rm -f -- "$f"
-          done
-          python3 - "$VAULT_TAG" <<'PY'
-          import json,os,subprocess,sys
+          python3 - <<'PY'
+          import json,hashlib
           from pathlib import Path
-          tag=sys.argv[1]; assets=[]
-          for raw in Path('artifacts/governance/vault-release.jsonl').read_text(encoding='utf-8').splitlines():
-              digest,path,kind=raw.split(None,2)
-              assets.append({'sha256':digest,'file':path,'format':'pdf','access':'developer-and-release'})
-          release=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo',os.environ['GITHUB_REPOSITORY'],'--json','url,tagName'],text=True))
-          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v4-single-plaintext-pdf','persistence_boundary':'acquire-first','storage_model':'single-canonical-plaintext-pdf','encrypted_pdf_format':False,'release':release,'assets':assets,'counts':{'pdf':len(assets),'pdf_enc':0}},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          out=[]
+          for f in sorted(Path('artifacts/developer-review-vault').glob('*.pdf')):
+              side=Path('artifacts')/(f.stem+'.manifest.json')
+              rights='private-protected'; public=False
+              if side.exists():
+                  try:
+                      d=json.loads(side.read_text(encoding='utf-8')); rights=d.get('storage_visibility') or rights; public=d.get('public_browser') is True
+                  except Exception: pass
+              route='public' if rights=='publication-eligible' and public else 'protected'
+              out.append({'file':str(f),'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'bytes':f.stat().st_size,'route':route})
+          Path('artifacts/governance/release-input.json').write_text(json.dumps({'assets':out},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
-          rm -f artifacts/governance/vault-release.jsonl
-
+          pub_count=$(python3 -c "import json; d=json.load(open('artifacts/governance/release-input.json')); print(sum(x['route']=='public' for x in d['assets']))")
+          pro_count=$(python3 -c "import json; d=json.load(open('artifacts/governance/release-input.json')); print(sum(x['route']=='protected' for x in d['assets']))")
+          [ "$pub_count" -eq 0 ] || gh release create "$public_tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher public plaintext PDFs ${GITHUB_RUN_ID}" --notes "Verified redistributable PDFs only. PDF storage is Releases assets; no Git LFS."
+          [ "$pro_count" -eq 0 ] || GH_TOKEN="$PROTECTED_TOKEN" gh release create "$protected_tag" --repo "$PROTECTED_REPO" --title "Rechercher protected plaintext PDFs ${GITHUB_RUN_ID}" --notes "Verified PDFs retained privately. No .pdf.enc and no Git LFS."
+          while IFS= read -r -d '' f; do
+            route=$(python3 - "$f" <<'PY2'
+          import json,sys
+          d=json.load(open('artifacts/governance/release-input.json'))
+          print(next(x['route'] for x in d['assets'] if x['file']==sys.argv[1]))
+          PY2
+            )
+            if [ "$route" = public ]; then gh release upload "$public_tag" "$f" --repo "$GITHUB_REPOSITORY" --clobber; else GH_TOKEN="$PROTECTED_TOKEN" gh release upload "$protected_tag" "$f" --repo "$PROTECTED_REPO" --clobber; fi
+            rm -f -- "$f"
+          done < <(find artifacts/developer-review-vault -maxdepth 1 -type f -name '*.pdf' -print0)
+          python3 - "$public_tag" "$protected_tag" <<'PY3'
+          import json,sys
+          from pathlib import Path
+          p=Path('artifacts/governance/release-input.json'); d=json.loads(p.read_text(encoding='utf-8'))
+          for x in d['assets']:
+              tag=sys.argv[1] if x['route']=='public' else sys.argv[2]
+              repo='${{ github.repository }}' if x['route']=='public' else 'lalibimohamed82-coder/rechercher-pdf-storage'
+              x.update({'release_tag':tag,'release_repository':repo,'access':'public' if x['route']=='public' else 'private','download_url':f'https://github.com/{repo}/releases/download/{tag}/{Path(x["file"]).name}'})
+          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v5','storage_model':'github-releases-assets','git_lfs':False,'encrypted_pdf_final_format':False,'assets':d['assets'],'counts':{'pdf':len(d['assets']),'pdf_enc':0}},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY3
       - name: Persist manifest, discovery memory and release evidence to review branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
