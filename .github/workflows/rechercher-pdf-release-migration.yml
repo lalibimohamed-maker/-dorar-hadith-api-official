@@ -162,7 +162,26 @@ PY
           PY
           rm -f artifacts-migrated-encrypted.jsonl
           git add -A artifacts/governance
-          git rm --ignore-unmatch .github/workflows/rechercher-pdf-release-migration.yml || true
+          remaining=$(git ls-files '*.pdf' | wc -l | tr -d ' ')
+          encrypted_remaining=0
+          mapfile -t _legacy_releases < <(gh release list --repo "$GITHUB_REPOSITORY" --limit 1000 --json tagName --jq '.[].tagName' | grep -E '^rechercher-(vault|review).*' || true)
+          for _tag in "${_legacy_releases[@]}"; do
+            if gh release view "$_tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -E '\.(pdf\.enc|enc|encrypted)
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git diff --cached --quiet; then
+            echo 'ERROR: migration produced no repository state change.'; exit 1
+          fi
+          git commit -m 'chore(rechercher): migrate legacy PDFs to Releases and remove LFS tree storage'
+          git push origin HEAD:refs/heads/rechercher/pdf-release-storage-v1
+ -q; then encrypted_remaining=1; break; fi
+          done
+          echo "MIGRATION_REMAINING_LFS=$remaining ENCRYPTED_ASSETS_REMAIN=$encrypted_remaining"
+          if [ "$remaining" -eq 0 ] && [ "$encrypted_remaining" -eq 0 ]; then
+            git rm --ignore-unmatch .github/workflows/rechercher-pdf-release-migration.yml || true
+            echo 'MIGRATION_COMPLETE=true'
+          else
+            echo 'MIGRATION_COMPLETE=false'
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           if git diff --cached --quiet; then
