@@ -328,8 +328,8 @@ The main encyclopedia interface should expose a small set of strong entry points
 
 These additions are a learning/intelligence layer above Rechercher acquisition. They must not weaken:
 
-- PDF acquisition persistence;
-- secondary LFS serialization;
+- PDF acquisition persistence via Releases assets;
+- secondary protected Releases serialization;
 - source reachability quarantine;
 - rights controls;
 - provenance;
