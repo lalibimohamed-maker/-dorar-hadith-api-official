@@ -51,8 +51,75 @@ The web UI exposes:
 
 The page can register local providers through `window.deenAllahRegisterLocalOmegaProviders({ search, concept })`. This is an integration boundary; absence of a provider is shown as unavailable local evidence.
 
-## Scope
+## Mobile field resilience
 
+The browser runtime now includes OmegaHardwareGuardian and a resumable local audio frame journal.
+
+### Storage persistence
+
+The runtime requests navigator.storage.persist() and re-checks persisted(); a positive result changes the origin to persistent storage mode where supported. This is a request governed by browser policy, not an unconditional OS whitelist. When persistence is denied or unavailable, the UI must continue to surface the condition rather than claim protection.
+
+### Audio interruption
+
+OmegaHardwareGuardian.monitorAudioContextResilience() observes AudioContext.state and page visibility. On suspension/interruption it records a session checkpoint in IndexedDB. OmegaResilientAudioSession journals each PCM frame before feeding it into the STT adapter, assigning a monotonically increasing sequence and byte offset; pending frames are replayed in order after resume.
+
+This makes the byte-offset boundary explicit. It does not claim that an arbitrary third-party STT implementation is lossless unless that adapter feeds the journal before consuming each frame.
+
+### WebGPU device loss
+
+The inference worker observes the GPUDevice.uncapturederror event and GPUDevice.lost. On non-intentional loss, the worker switches to a smaller WASM chunk size and, when the generator does not expose a backend-switch method, recreates the local generator with backend: wasm. The worker never interprets an error event as a successful generation.
+
+### Manual device matrix
+
+These conditions require real-device validation because CI cannot reproduce mobile OS resource arbitration reliably:
+
+- iOS/iPadOS Safari or Home Screen Web App: start microphone capture, background the app, trigger an interruption, return, and verify the same session ID resumes from the stored sequence/byte offset.
+- Android Chrome: repeat background/foreground and an audio-focus interruption; verify pending PCM frames replay in order.
+- Storage pressure: fill device storage sufficiently to create pressure, verify the UI reports persistence status and that import failures are explicit rather than silently deleting or replacing the local index.
+- WebGPU: start local generation, provoke a device-loss condition where reproducible, and verify the worker emits runtime-fallback with backend: wasm and reduced chunk_size.
+- Low-memory import: import a large evidence bundle and verify the UI remains responsive while worker progress events continue.
+
+These tests complement, rather than replace, the deterministic CI contracts.
+
+## Multimodal context and local Vision runtime
+
+The local Transformers.js adapter now accepts an explicit `task: "image-text-to-text"` for local Vision-Language Models. This path remains fail-closed for remote model loading by keeping `env.allowRemoteModels = false`, `local_files_only: true`, and a caller-supplied local model path.
+
+Image preprocessing is model-profile-driven rather than a universal 224px rule. For Qwen2-VL-compatible profiles, Hugging Face documents `patch_size=14`, `temporal_patch_size=2`, and a 28px token accounting unit; its low-memory example uses `256*28*28` to `1024*28*28` pixels for 256–1024 visual tokens. The runtime therefore derives target dimensions from the model profile and preserves page aspect ratio instead of forcing every document to a square. citeturn405164search0turn722142search2
+
+Before multimodal generation, `OmegaMultimodalContextGuard` reserves verified-evidence, text, generation, and safety budgets. Only the remaining context budget is available to visual input; when those reservations cannot fit, the multimodal request is blocked rather than dropping evidence.
+
+The current repository does not claim that every Transformers.js release/model supports every VLM architecture. The task is explicit so an installed/local model must actually expose the requested `image-text-to-text` pipeline before production use. Transformers.js documents `AutoModelForImageTextToText`, and current ONNX model cards demonstrate local Qwen3-VL usage through Transformers.js. citeturn722142search0turn722142search3
+
+## Browser API compatibility notes
+
+GPUDevice exposes uncapturederror and lost; there is no navigator.gpu.onuncaughterror event used by this runtime. The guard therefore attaches to the actual GPUDevice object. Reference: https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/uncapturederror_event and https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/lost.
+
+navigator.storage.persist() requests persistent storage and may be denied according to browser heuristics. WebKit documents eviction under storage pressure and persistent-mode exemptions, including on supported iOS/iPadOS Home Screen web apps. References: https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist and https://webkit.org/blog/14403/updates-to-storage-policy/.
+
+
+## Offline Corpus synchronization
+
+Future server-to-device Corpus corrections use a signed atomic delta rather than an uncoordinated IndexedDB merge.
+
+The delta format is \`dinullah/omega-offline-evidence-delta\` v1.0.0. It carries:
+
+- \`base_snapshot_sha256\`
+- \`target_snapshot_sha256\`
+- \`snapshot_algorithm: omega-evidence-snapshot-v2\`
+- monotonic \`sequence\`
+- ordered upsert/delete operations with \`previous_content_sha256\` preconditions
+- an Ed25519 signature covering the canonical delta envelope
+
+The sync snapshot root covers the complete verified evidence record, not only \`content_sha256\`. Therefore metadata changes such as citation/source/language/update timestamp also alter the sync root.
+
+The device rejects a delta when the local state is marked dirty, the stored snapshot root conflicts with a recomputed root, the base root does not match, a per-record precondition fails, the target root does not recompute, the sequence is stale, or signature verification fails.
+
+After all checks pass, the Service Worker executes one IndexedDB \`readwrite\` transaction spanning the evidence and sync-state stores. Either all requested changes and the target snapshot metadata commit, or the transaction aborts and the previous state remains. IndexedDB transactions are atomic and abort rolls back the transaction's writes. citeturn101516search0turn101516search1
+
+This is an update mechanism for the local evidence snapshot; it does not rewrite the canonical server Corpus. A device without a matching base snapshot must receive a full verified bundle instead of applying an incompatible delta.
+
+## Scope
 No Corpus scholarly text is modified.
 No model weights are committed.
 No Git LFS is introduced.

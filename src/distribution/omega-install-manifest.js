@@ -41,6 +41,34 @@ export function validateOfflineInstallManifest(manifest, {
     assertVerifiedEd25519ManifestSignature(manifest, { trustedPublicKeys: trustedPublicKeys ?? {} });
   }
 
+  if (manifest.multimodal_profile) {
+    const image = manifest.multimodal_profile.image;
+    if (image) {
+      requiredString(image.processor_family, "multimodal_profile.image.processor_family");
+      for (const field of ["patch_size", "merge_size", "min_pixels", "max_pixels", "target_visual_tokens", "max_dimension"]) {
+        positiveSafeInteger(image[field], "multimodal_profile.image." + field);
+      }
+      if (image.min_pixels > image.max_pixels) {
+        throw new Error("multimodal image pixel range is invalid");
+      }
+    }
+    const context = manifest.multimodal_profile.context_guard;
+    if (context) {
+      positiveSafeInteger(context.context_window_tokens, "multimodal_profile.context_guard.context_window_tokens");
+      for (const field of ["evidence_reservation_tokens", "text_reservation_tokens", "generation_reservation_tokens", "safety_margin_tokens", "minimum_visual_tokens"]) {
+        const value = context[field];
+        if (!Number.isSafeInteger(value) || value < 0) {
+          throw new Error("multimodal_profile.context_guard." + field + " must be a non-negative safe integer");
+        }
+      }
+      const reserved = context.evidence_reservation_tokens + context.text_reservation_tokens +
+        context.generation_reservation_tokens + context.safety_margin_tokens;
+      if (reserved > context.context_window_tokens) {
+        throw new Error("multimodal context reservations exceed context window");
+      }
+    }
+  }
+
   if (!Array.isArray(manifest.tokenizer?.files) || manifest.tokenizer.files.length === 0) {
     throw new Error("tokenizer.files must not be empty");
   }

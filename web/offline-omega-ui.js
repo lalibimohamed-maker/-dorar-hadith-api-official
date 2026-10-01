@@ -22,7 +22,7 @@
       ".omega-runtime{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;background:#fff;border:1px solid #dbe8e0;border-radius:16px;box-shadow:0 8px 24px #17352a14;font:600 15px/1.35 system-ui,sans-serif}",
       ".omega-runtime [data-omega-state]{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:#e9f4ee;color:#0d4b36}",
       ".omega-runtime .omega-spacer{flex:1}",
-      ".omega-runtime button{border:1px solid #dbe8e0;border-radius:999px;background:#fff;color:#17352a;padding:6px 10px;cursor:pointer}",
+      ".omega-runtime button{border:1px solid #dbe8e0;border-radius:999px;background:#fff;color:#17352a;padding:6px 10px;cursor:pointer}.omega-bundle-button{font-size:13px}",
       ".omega-runtime button[aria-pressed=true]{background:#176b4b;color:#fff;border-color:#176b4b}",
       ".omega-runtime button:focus-visible,#omega-quick-search:focus-visible{outline:3px solid #a87918;outline-offset:2px}",
       ".omega-progress{height:3px;margin-top:7px;overflow:hidden;border-radius:999px;background:#e9f4ee}",
@@ -68,7 +68,7 @@
       '<button type="button" data-omega-mode="online_only" aria-pressed="false">متصل</button>',
       '<span data-omega-storage class="muted"></span>',
       "</div>",
-      '<div class="omega-progress" data-omega-progress hidden><span></span></div>'
+      '<div class="omega-progress" data-omega-progress hidden><span></span></div><span data-omega-integrity-progress class="muted" aria-live="polite"></span>'
     ].join("");
 
     host.querySelectorAll("[data-omega-mode]").forEach(button => {
@@ -78,6 +78,53 @@
         render();
         toast("تم تغيير وضع Ω إلى: " + MODE_LABELS[next]);
       });
+    });
+  }
+
+  function installEvidenceBundleControls() {
+    const exportButton = document.querySelector("[data-omega-export]");
+    const importButton = document.querySelector("[data-omega-import]");
+    const input = document.querySelector("[data-omega-import-file]");
+    if (!exportButton || !importButton || !input) return;
+
+    exportButton.addEventListener("click", async () => {
+      try {
+        const store = window.deenAllahOmegaLocalStore;
+        if (!store?.exportEvidenceBundleText) {
+          toast("مخزن الأدلة المحلي غير جاهز.");
+          return;
+        }
+        const text = await store.exportEvidenceBundleText();
+        const blob = new Blob([text], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "deen-allah-omega-offline-evidence.json";
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        toast("تم تصدير حزمة الأدلة المحلية الموثقة.");
+      } catch (error) {
+        toast("تعذر تصدير الأدلة: " + String(error?.message ?? error));
+      }
+    });
+
+    importButton.addEventListener("click", () => input.click());
+    input.addEventListener("change", async () => {
+      const file = input.files?.[0];
+      input.value = "";
+      if (!file) return;
+      try {
+        const store = window.deenAllahOmegaLocalStore;
+        if (!store?.importEvidenceBundle) {
+          toast("مخزن الأدلة المحلي غير جاهز.");
+          return;
+        }
+        const result = await store.importEvidenceBundleFile(file);
+        toast("تم استيراد " + result.imported + " دليلًا موثقًا بعد التحقق.");
+        await renderStorage();
+      } catch (error) {
+        toast("رُفضت الحزمة: " + String(error?.message ?? error));
+      }
     });
   }
 
@@ -108,6 +155,12 @@
       const quota = Number(result.quota || 0);
       const mb = value => Math.round(value / 1024 / 1024);
       const base = quota ? "التخزين: " + mb(usage) + "/" + mb(quota) + " MB" : "";
+      let persistenceLabel = "";
+      if (navigator.storage?.persisted) {
+        try {
+          persistenceLabel = " · حماية التخزين: " + (await navigator.storage.persisted() ? "مفعّلة" : "غير مضمونة");
+        } catch {}
+      }
       let evidenceLabel = "";
       if (window.deenAllahOmegaLocalStore?.countEvidence) {
         try {
@@ -115,7 +168,7 @@
           evidenceLabel = " · الأدلة المحلية الموثقة: " + count;
         } catch {}
       }
-      target.textContent = base + evidenceLabel;
+      target.textContent = base + persistenceLabel + evidenceLabel;
     } catch {}
   }
 
@@ -151,6 +204,18 @@
     });
   }
 
+
+  window.addEventListener("deenallah:omega-integrity-progress", event => {
+    const label = document.querySelector("[data-omega-integrity-progress]");
+    const detail = event.detail || {};
+    if (!label) return;
+    const stage = String(detail.stage || "");
+    const completed = Number(detail.completed || 0);
+    const total = Number(detail.total || 0);
+    const names = { reading: "قراءة الحزمة", "bundle-hash": "تحقق SHA-256 للحزمة", records: "تحقق الأدلة", merkle: "تحقق Merkle", writing: "حفظ الأدلة الموثقة" };
+    label.textContent = stage ? " · " + (names[stage] || stage) + (total ? " " + completed + "/" + total : "") : "";
+  });
+
   window.addEventListener("online", () => {
     render();
     toast("عاد الاتصال بالإنترنت؛ وضع Ω لا يغيّر وحده اختيارك.");
@@ -170,6 +235,7 @@
   ensureBar();
   installQuickSearch();
   installKeyboardShortcut();
+  installEvidenceBundleControls();
   render();
   renderStorage();
 

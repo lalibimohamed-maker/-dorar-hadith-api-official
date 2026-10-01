@@ -67,11 +67,21 @@
   function escapeHtml(v) { return String(v ?? "").replace(/[&<>\"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
   function escapeAttr(v) { return escapeHtml(v).replace(/`/g, "&#96;"); }
 
+  function omegaMode() {
+    try { return localStorage.getItem("deenAllahOmegaMode") || "auto"; } catch { return "auto"; }
+  }
+
   function setupMicrophone() {
     const input = $("query"), searchButton = $("search-btn"); if (!input || !searchButton || $("voice-mic")) return;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const wrap = searchButton.parentElement; const mic = document.createElement("button"); mic.id="voice-mic"; mic.className="btn secondary"; mic.type="button"; mic.textContent="🎙️ تحدث"; mic.title="التحدث بلغتك إلى الموسوعة"; wrap.appendChild(mic);
     if (!SpeechRecognition) { mic.disabled = true; mic.title = "التعرف على الكلام غير متاح في هذا المتصفح"; return; }
+    if (omegaMode() === "offline_only") {
+      mic.disabled = true;
+      mic.title = "وضع دون اتصال: يلزم محرك STT محلي؛ Web Speech غير مُستخدم.";
+      announce("وضع دون اتصال: لم يتم تشغيل التعرف الصوتي الشبكي. يلزم محرك STT محلي.");
+      return;
+    }
     let recognition; let listening = false;
     mic.addEventListener("click", () => {
       if (listening) { recognition?.stop(); return; }

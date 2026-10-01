@@ -23,6 +23,26 @@
     ],
     "unicode_test_profile": "quran-canonical-roundtrip-v1"
   },
+  "multimodal_profile": {
+    "modalities": ["text", "image", "audio"],
+    "image": {
+      "processor_family": "qwen2-vl-compatible",
+      "patch_size": 14,
+      "merge_size": 2,
+      "min_pixels": 50176,
+      "max_pixels": 802816,
+      "target_visual_tokens": 256,
+      "max_dimension": 448
+    },
+    "context_guard": {
+      "context_window_tokens": 32768,
+      "evidence_reservation_tokens": 4096,
+      "text_reservation_tokens": 1024,
+      "generation_reservation_tokens": 2048,
+      "safety_margin_tokens": 256,
+      "minimum_visual_tokens": 64
+    }
+  },
   "runtime_profile": {
     "estimated_peak_ram_bytes": 1,
     "runtime_overhead_bytes": 1,

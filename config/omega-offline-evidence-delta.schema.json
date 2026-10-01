@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dinullah.example/schemas/omega-offline-evidence-delta-1.0.0.json",
+  "title": "Dinullah Omega Offline Evidence Delta",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "format",
+    "snapshot_algorithm",
+    "sequence",
+    "generated_at",
+    "base_snapshot_sha256",
+    "target_snapshot_sha256",
+    "delta_sha256",
+    "operations",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "format": {
+      "const": "dinullah/omega-offline-evidence-delta"
+    },
+    "snapshot_algorithm": {
+      "const": "omega-evidence-snapshot-v2"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_snapshot_sha256": {
+      "type": "string",
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "target_snapshot_sha256": {
+      "type": "string",
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "delta_sha256": {
+      "type": "string",
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "op",
+          "node_id",
+          "previous_content_sha256"
+        ],
+        "properties": {
+          "op": {
+            "enum": [
+              "upsert",
+              "delete"
+            ]
+          },
+          "node_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "previous_content_sha256": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "pattern": "^[A-Fa-f0-9]{64}$"
+              }
+            ]
+          },
+          "record": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "node_id",
+              "content_sha256",
+              "verification_status",
+              "text"
+            ],
+            "properties": {
+              "node_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "content_sha256": {
+                "type": "string",
+                "pattern": "^[A-Fa-f0-9]{64}$"
+              },
+              "verification_status": {
+                "const": "verified"
+              },
+              "title": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "citation": {
+                "type": "string"
+              },
+              "source_id": {
+                "type": "string"
+              },
+              "language": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "public_key_id",
+        "signature_base64"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "ed25519"
+        },
+        "public_key_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signature_base64": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

@@ -14,7 +14,11 @@ const files = [
   "omega-local-bridge.js",
   "local-bundle-loader.js",
   "arabic-query-normalizer.js",
-  "webgpu-inference-worker.js"
+  "webgpu-inference-worker.js",
+  "omega-hardware-guardian.js",
+  "omega-audio-session.js",
+  "omega-visual-pruner.js",
+  "omega-multimodal-context-guard.js"
 ];
 
 for (const file of files) {
@@ -23,7 +27,16 @@ for (const file of files) {
 
 await writeFile(
   path.join(dist, "index.js"),
-  'export * from "./omega-client-core.js";\nexport * from "./omega-local-bridge.js";\nexport * from "./local-bundle-loader.js";\nexport * from "./arabic-query-normalizer.js";\n',
+  [
+    'export * from "./omega-client-core.js";',
+    'export * from "./omega-local-bridge.js";',
+    'export * from "./local-bundle-loader.js";',
+    'export * from "./arabic-query-normalizer.js";',
+    'export * from "./omega-hardware-guardian.js";',
+    'export * from "./omega-audio-session.js";',
+    'export * from "./omega-visual-pruner.js";',
+    'export * from "./omega-multimodal-context-guard.js";'
+  ].join("\n") + "\n",
   "utf8"
 );
 
