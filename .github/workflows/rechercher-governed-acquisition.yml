@@ -4,6 +4,7 @@ name: Rechercher — Central governed PDF acquisition
 # Order is unbounded: Prophetic era -> Hijri chronology -> present -> future additions.
 # PDF bytes are never persisted in Git/LFS. Publication-eligible PDFs go to the unified
 # 6,384-matrix Release repository; unresolved/non-public items remain blocked from public release.
+# security-justification: reviewed — contents: write is required only to persist governed acquisition state (catalogs, scripts, governance manifests) back to the explicitly selected TARGET_BRANCH; PDF bytes are never committed, and release publication uses the separate matrix-storage token.
 permissions:
   contents: write
 
