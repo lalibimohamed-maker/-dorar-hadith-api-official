@@ -24,8 +24,6 @@ permissions:
   contents: none
 
 env:
-  # PDF bytes are persisted as GitHub Release assets; do not smudge legacy LFS pointers.
-  GIT_LFS_SKIP_SMUDGE: '1'
 concurrency:
   group: rechercher-multilingual-pdf-${{ github.ref }}-${{ inputs.shard_index }}
   cancel-in-progress: false
