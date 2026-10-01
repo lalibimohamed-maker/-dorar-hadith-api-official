@@ -1,6 +1,6 @@
 import { verifyEvidenceHit } from "./omega-local-bridge.js";
 import { resolveLocalRuntime } from "./local-bundle-loader.js";
-import { searchWithArabicQueryPlan } from "../../../src/offline/arabic-query-normalizer.js";
+import { searchWithArabicQueryPlan } from "./arabic-query-normalizer.js";
 
 export const OMEGA_CLIENT_MODES = Object.freeze(["auto", "offline_only", "online_only"]);
 

@@ -1,26 +1,30 @@
-import { spawn } from "node:child_process";
+import { cp, mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
-const args = [
-  "--yes",
-  "esbuild@0.28.2",
-  path.join(root, "src/omega-client-core.js"),
-  path.join(root, "src/webgpu-inference-worker.js"),
-  "--bundle",
-  "--minify",
-  "--format=esm",
-  "--platform=browser",
-  "--outdir=" + path.join(root, "dist")
+const src = path.join(root, "src");
+const dist = path.join(root, "dist");
+
+await rm(dist, { recursive: true, force: true });
+await mkdir(dist, { recursive: true });
+
+const files = [
+  "omega-client-core.js",
+  "omega-local-bridge.js",
+  "local-bundle-loader.js",
+  "arabic-query-normalizer.js",
+  "webgpu-inference-worker.js"
 ];
 
-const child = spawn(process.platform === "win32" ? "npx.cmd" : "npx", args, {
-  stdio: "inherit",
-  shell: false
-});
-child.on("exit", code => process.exit(code ?? 1));
-child.on("error", error => {
-  console.error(error);
-  process.exit(1);
-});
+for (const file of files) {
+  await cp(path.join(src, file), path.join(dist, file));
+}
+
+await writeFile(
+  path.join(dist, "index.js"),
+  'export * from "./omega-client-core.js";\nexport * from "./omega-local-bridge.js";\nexport * from "./local-bundle-loader.js";\nexport * from "./arabic-query-normalizer.js";\n',
+  "utf8"
+);
+
+console.log("Omega browser package built locally without network or package installation:", dist);
