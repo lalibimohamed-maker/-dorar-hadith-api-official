@@ -30,42 +30,39 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
 
-      - name: Require vault key
+      - name: Normalize encrypted review inputs into ordinary PDFs
         env:
           REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
         run: |
           set -euo pipefail
-          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required.'; exit 1; }
-
-      - name: Recover latest encrypted vault
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/recovered-vault artifacts/developer-review-vault artifacts/governance
-          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt --jq '[.[] | select(.tagName | startswith("rechercher-vault-"))] | sort_by(.createdAt) | last | .tagName')
-          if [ -z "${tag:-}" ] || [ "$tag" = "null" ]; then
-            echo 'No vault release exists; continuing with authoritative acquisition manifest.'
-            exit 0
-          fi
-
-          enc_count=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '[.assets[] | select(.name | endswith(".enc"))] | length')
-          if [ "${enc_count:-0}" -eq 0 ]; then
-            echo "Vault release $tag has no .enc assets; continuing without encrypted-vault recovery."
-            exit 0
-          fi
-
-          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern '*.enc' --dir artifacts/recovered-vault
-          shopt -s nullglob
-          enc_files=(artifacts/recovered-vault/*.enc)
-          test "${#enc_files[@]}" -gt 0
-          for f in "${enc_files[@]}"; do
-            out="artifacts/developer-review-vault/$(basename "${f%.enc}")"
-            openssl enc -d -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
-            test "$(head -c 5 "$out")" = '%PDF-'
+          found=0
+          mkdir -p artifacts/developer-review-vault artifacts/governance
+          while IFS= read -r -d '' f; do
+            found=1
+            case "$f" in
+              *.pdf.enc) base="$(basename "${f%.pdf.enc}")" ;;
+              *.enc) base="$(basename "${f%.enc}")" ;;
+              *.encrypted) base="$(basename "${f%.encrypted}")" ;;
+            esac
+            out="artifacts/developer-review-vault/${base}.pdf"
+            python3 scripts/rechercher_decrypt_review_copy.py "$f" "$out"
             qpdf --check "$out"
-          done
+            rm -f -- "$f"
+          done < <(find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print0)
+          if [ "$found" -eq 1 ]; then
+            echo 'Encrypted review input normalized to ordinary .pdf.'
+          else
+            echo 'No encrypted review input encountered.'
+          fi
+          echo 'PDF_REVIEW_STORAGE=PRIVATE_PLAINTEXT_PDF'
+      
+      - name: Reject encrypted PDF artifacts after normalization
+        run: |
+          set -euo pipefail
+          if find artifacts -type f \( -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' \) -print -quit | grep -q .; then
+            echo 'ERROR: encrypted PDF artifacts remain after normalization.'
+            exit 1
+          fi
 
       - name: Recover authoritative acquisition manifest
         run: |

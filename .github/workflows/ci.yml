@@ -18,12 +18,12 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        node-version: [24, 22]
+        node-version: [22, 24]
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -45,6 +45,14 @@ jobs:
             echo 'No npm lockfile in repository; using npm install without lockfile.'
             npm install --ignore-scripts --no-package-lock --no-audit --no-fund
           fi
+      - name: Setup Python 3.12 for PDF→DOCX tests
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Pin workflow Python executable for PDF→DOCX engine
+        run: sudo ln -sf "$(command -v python3)" /usr/local/bin/rechercher-python3
+      - name: Install PDF→DOCX test dependencies
+        run: python3 -m pip install --disable-pip-version-check --no-cache-dir pymupdf==1.28.2 python-docx==1.2.0 python-bidi==0.6.7 arabic-reshaper==3.0.0
       - name: Syntax check
         run: |
           npm run health

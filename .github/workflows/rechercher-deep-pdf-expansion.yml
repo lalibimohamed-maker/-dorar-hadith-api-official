@@ -1,0 +1,230 @@
+name: Rechercher — deep PDF expansion for missing multilingual cells
+# security-justification: contents: write is required only to persist verified/public or research-only PDF expansion outputs and its audit manifest into the dedicated storage repositories; no Corpus paths are modified.
+on:
+  push:
+    branches:
+      - feat/rechercher-global-multilingual-resource-discovery-v9
+    paths:
+      - 'scripts/rechercher_deep_pdf_expansion.mjs'
+      - 'config/rechercher/**'
+      - 'research/evidence/global-multilingual/**'
+      - '.github/workflows/rechercher-deep-pdf-expansion.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 4 * * *'
+permissions:
+  contents: read
+env:
+  # Deep expansion reads matrix manifests; PDF binaries are persisted as Release assets, not LFS blobs.
+  GIT_LFS_SKIP_SMUDGE: '1'
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
+  SECONDARY_STORAGE_REPO: lalibimohamed82-coder/rechercher-pdf-storage
+jobs:
+  expand:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Install PDF validator
+        run: sudo apt-get update && sudo apt-get install -y qpdf
+      - name: Prepare previous manifest
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$MATRIX_STORAGE_TOKEN"
+          cat > "$RUNNER_TEMP/askpass" <<'SH'
+          #!/bin/sh
+          case "$1" in *Username*) echo x-access-token;; *Password*) echo "$MATRIX_STORAGE_TOKEN";; *) echo "$MATRIX_STORAGE_TOKEN";; esac
+          SH
+          chmod 700 "$RUNNER_TEMP/askpass"
+          export GIT_ASKPASS="$RUNNER_TEMP/askpass" GIT_TERMINAL_PROMPT=0
+          git clone --depth 1 "https://github.com/$MATRIX_STORAGE_REPO.git" "$RUNNER_TEMP/matrix"
+          test -s "$RUNNER_TEMP/matrix/artifacts/rechercher/multilingual-pdf-acquisition/manifest.json"
+      - name: Deep search missing cells
+        env:
+          PREVIOUS_MANIFEST: ${{ runner.temp }}/matrix/artifacts/rechercher/multilingual-pdf-acquisition/manifest.json
+          ISLAMHOUSE_API_KEY: ${{ secrets.ISLAMHOUSE_API_KEY }}
+        run: node scripts/rechercher_deep_pdf_expansion.mjs
+      - name: Install PDF to DOCX structural engine and Arabic OCR/font support
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements-rechercher-pdf-docx.txt
+          sudo apt-get update
+          sudo apt-get install -y libreoffice fonts-hosny-amiri tesseract-ocr tesseract-ocr-ara
+          fc-cache -f -v
+          tesseract --list-langs
+          TESSDATA_PREFIX="$(dirname "$(find /usr/share/tesseract-ocr -type f -name ara.traineddata -print -quit)")"
+          test -f "$TESSDATA_PREFIX/ara.traineddata"
+          echo "TESSDATA_PREFIX=$TESSDATA_PREFIX" >> "$GITHUB_ENV"
+      - name: Derive DOCX from validated PDFs
+        run: node scripts/rechercher_pdf_to_docx.mjs --input artifacts/rechercher/multilingual-deep-pdf-expansion --output artifacts/rechercher/multilingual-docx-expansion --strict
+      - name: Upload PDF to DOCX derivations
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-deep-pdf-docx-expansion
+          path: artifacts/rechercher/multilingual-docx-expansion
+          if-no-files-found: error
+      - name: Validate PDFs
+        run: |
+          set -euo pipefail
+          find artifacts/rechercher/multilingual-deep-pdf-expansion -type f -name '*.pdf' -print0 | while IFS= read -r -d '' f; do test "$(head -c 4 "$f")" = "%PDF"; qpdf --check "$f"; done
+      - name: Persist expansion to matrix GitHub Release assets
+        env:
+          MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MATRIX_STORAGE_TOKEN:-}"
+          export GH_TOKEN="$MATRIX_STORAGE_TOKEN"
+          manifest="artifacts/rechercher/multilingual-deep-pdf-expansion/manifest.json"
+          test -s "$manifest"
+          release_root="$RUNNER_TEMP/matrix-deep-release"
+          rm -rf "$release_root"
+          mkdir -p "$release_root/assets"
+          python3 - "$release_root" <<'PY'
+          import hashlib, json, os, pathlib, shutil, sys
+          m=json.loads(pathlib.Path("artifacts/rechercher/multilingual-deep-pdf-expansion/manifest.json").read_text(encoding="utf-8"))
+          root=pathlib.Path("artifacts/rechercher/multilingual-deep-pdf-expansion").resolve()
+          out=pathlib.Path(sys.argv[1]).resolve()/"assets"
+          for cell_id,e in (m.get("cells") or {}).items():
+              if e.get("acquisition") != "public":
+                  continue
+              for item in e.get("files",[]) or []:
+                  src=pathlib.Path(str(item.get("path") or "")).resolve()
+                  if not str(src).startswith(str(root)+os.sep) or not src.is_file() or src.suffix.lower()!=".pdf":
+                      raise SystemExit(f"unsafe or missing public expansion PDF: {src}")
+                  with src.open("rb") as fh:
+                      if fh.read(5) != b"%PDF-":
+                          raise SystemExit(f"invalid public expansion PDF: {src}")
+                  sha=item.get("sha256") or hashlib.sha256(src.read_bytes()).hexdigest()
+                  shutil.copy2(src,out/f"{cell_id}__{sha[:16]}__{src.name}")
+          mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f -name '*.pdf' -print | sort)
+          declare -A existing_sha=()
+          while IFS=$'\t' read -r digest release_tag asset_name; do
+            [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
+          done < <(
+            gh api --paginate -H "Accept: application/vnd.github+json"               "/repos/$MATRIX_STORAGE_REPO/releases?per_page=100"               --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
+          )
+          new_assets=()
+          skipped=0
+          for file in "${assets[@]}"; do
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            if [ -n "${existing_sha[sha256:$sha]+x}" ]; then
+              skipped=$((skipped+1))
+            else
+              new_assets+=( "$file" )
+            fi
+          done
+          if [ "${#new_assets[@]}" -eq 0 ]; then
+            echo "DEEP_PUBLIC_RELEASE_NOOP no new public expansion PDFs."
+            rm -rf "$release_root"
+            exit 0
+          fi
+          max_assets=900
+          total_new="${#new_assets[@]}"
+          part=0
+          for ((i=0;i<total_new;i+=max_assets)); do
+            part=$((part+1))
+            end_i=$((i+max_assets))
+            [ "$end_i" -gt "$total_new" ] && end_i="$total_new"
+            tag="rechercher-multilingual-deep-public-${GITHUB_RUN_ID}-$(printf '%03d' "$part")"
+            gh release create "$tag" --repo "$MATRIX_STORAGE_REPO"               --title "Rechercher deep multilingual public PDFs — part $part"               --notes "Release-only deep expansion. Public-eligible plaintext PDFs only; no LFS and no encrypted artifacts. SHA-256 deduplication is enforced."               --latest=false
+            for ((j=i;j<end_i;j++)); do
+              file="${new_assets[$j]}"
+              sha="$(sha256sum "$file" | awk '{print $1}')"
+              digest="sha256:$sha"
+              if gh api --paginate -H "Accept: application/vnd.github+json"                   "/repos/$MATRIX_STORAGE_REPO/releases?per_page=100"                   --jq '.[] | .assets[]? | .digest // empty' | grep -Fxq "$digest"; then
+                continue
+              fi
+              gh release upload "$tag" "$file" --repo "$MATRIX_STORAGE_REPO"
+            done
+            gh release view "$tag" --repo "$MATRIX_STORAGE_REPO" --json tagName,isDraft,assets,url
+          done
+          rm -rf "$release_root"
+          echo "DEEP_PUBLIC_RELEASE_ONLY_OK uploaded=$total_new dedup_skipped=$skipped releases=$part"
+
+      - name: Persist research-only expansion to protected GitHub Release assets
+        env:
+          SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          SECONDARY_STORAGE_REPO: ${{ env.SECONDARY_STORAGE_REPO }}
+        run: |
+          set -euo pipefail
+          test -n "${SECONDARY_STORAGE_TOKEN:-}"
+          export GH_TOKEN="$SECONDARY_STORAGE_TOKEN"
+          manifest="artifacts/rechercher/multilingual-deep-pdf-expansion/manifest.json"
+          test -s "$manifest"
+          release_root="$RUNNER_TEMP/secondary-deep-release"
+          rm -rf "$release_root"
+          mkdir -p "$release_root/assets"
+          python3 - "$release_root" <<'PY'
+          import hashlib, json, os, pathlib, shutil, sys
+          m=json.loads(pathlib.Path("artifacts/rechercher/multilingual-deep-pdf-expansion/manifest.json").read_text(encoding="utf-8"))
+          root=pathlib.Path("artifacts/rechercher/multilingual-deep-pdf-expansion").resolve()
+          out=pathlib.Path(sys.argv[1]).resolve()/"assets"
+          for cell_id,e in (m.get("cells") or {}).items():
+              if e.get("acquisition") != "research-only":
+                  continue
+              for item in e.get("files",[]) or []:
+                  src=pathlib.Path(str(item.get("path") or "")).resolve()
+                  if not str(src).startswith(str(root)+os.sep) or not src.is_file() or src.suffix.lower()!=".pdf":
+                      raise SystemExit(f"unsafe or missing research-only expansion PDF: {src}")
+                  with src.open("rb") as fh:
+                      if fh.read(5) != b"%PDF-":
+                          raise SystemExit(f"invalid research-only expansion PDF: {src}")
+                  sha=item.get("sha256") or hashlib.sha256(src.read_bytes()).hexdigest()
+                  shutil.copy2(src,out/f"{cell_id}__{sha[:16]}__{src.name}")
+          mapfile -t assets < <(find "$release_root/assets" -maxdepth 1 -type f -name '*.pdf' -print | sort)
+          if [ "${#assets[@]}" -eq 0 ]; then
+            echo "DEEP_PROTECTED_RELEASE_NOOP no research-only expansion PDFs."
+            rm -rf "$release_root"
+            exit 0
+          fi
+          declare -A existing_sha=()
+          while IFS=$'\t' read -r digest release_tag asset_name; do
+            [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
+          done < <(
+            gh api --paginate -H "Accept: application/vnd.github+json"               "/repos/$SECONDARY_STORAGE_REPO/releases?per_page=100"               --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [.digest,$tag,.name] | @tsv'
+          )
+          new_assets=()
+          skipped=0
+          for file in "${assets[@]}"; do
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            if [ -n "${existing_sha[sha256:$sha]+x}" ]; then
+              skipped=$((skipped+1))
+            else
+              new_assets+=( "$file" )
+            fi
+          done
+          if [ "${#new_assets[@]}" -eq 0 ]; then
+            echo "DEEP_PROTECTED_RELEASE_NOOP all research-only expansion PDFs already persisted."
+            rm -rf "$release_root"
+            exit 0
+          fi
+          tag="rechercher-multilingual-deep-protected-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$SECONDARY_STORAGE_REPO"             --title "Rechercher deep multilingual protected PDFs"             --notes "Protected research-only deep expansion. Plaintext PDFs only; no public publication, no LFS and no encrypted artifacts. SHA-256 deduplication is enforced."             --latest=false
+          for file in "${new_assets[@]}"; do
+            sha="$(sha256sum "$file" | awk '{print $1}')"
+            digest="sha256:$sha"
+            if gh api --paginate -H "Accept: application/vnd.github+json"                 "/repos/$SECONDARY_STORAGE_REPO/releases?per_page=100"                 --jq '.[] | .assets[]? | .digest // empty' | grep -Fxq "$digest"; then
+              continue
+            fi
+            gh release upload "$tag" "$file" --repo "$SECONDARY_STORAGE_REPO"
+          done
+          gh release view "$tag" --repo "$SECONDARY_STORAGE_REPO" --json tagName,isDraft,assets,url
+          rm -rf "$release_root"
+          echo "DEEP_PROTECTED_RELEASE_ONLY_OK uploaded=${#new_assets[@]} dedup_skipped=$skipped tag=$tag"
+
+      - name: Upload deep expansion manifest
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-deep-pdf-expansion-manifest
+          path: artifacts/rechercher/multilingual-deep-pdf-expansion/manifest.json
+          if-no-files-found: error
