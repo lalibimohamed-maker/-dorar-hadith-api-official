@@ -112,12 +112,34 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y qpdf poppler-utils libreoffice-writer img2pdf
+          sudo apt-get install -y qpdf poppler-utils libreoffice-writer img2pdf pandoc ocrmypdf tesseract-ocr tesseract-ocr-ara python3-pip
+          python3 -m pip install --break-system-packages --no-cache-dir pdf2docx PyMuPDF python-pptx
           sudo apt-get clean
           python3 scripts/rechercher_sequential_acquisition.py --root "$GITHUB_WORKSPACE"
+          python3 -m py_compile scripts/rechercher_pdf_conversion_engine.py
           test -s artifacts/registry-document-candidates.json
           df -h "$GITHUB_WORKSPACE"
 
+      - name: Publish governed PDF conversion toolchain manifest to Releases
+        run: |
+          set -euo pipefail
+          export GH_TOKEN="$MATRIX_STORAGE_TOKEN"
+          tag="rechercher-conversion-toolchain-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$RECHERCHER_MATRIX_STORAGE_REPO" --target main --title "Rechercher conversion toolchain — $tag" --notes "Governed open-source conversion layer. Canonical PDFs remain the master; derived formats are generated from validated PDFs. Third-party engines are installed from their official package/release channels at runtime; this release stores the exact project manifest and conversion engine used by the encyclopedia." --latest=false
+          mkdir -p artifacts/governance/conversion-toolchain
+          cp config/rechercher-conversion-toolchain.json artifacts/governance/conversion-toolchain/
+          cp scripts/rechercher_pdf_conversion_engine.py artifacts/governance/conversion-toolchain/
+          {
+            echo '{"schema":"din-allah-encyclopedia/rechercher-conversion-installation/v1","packages":['
+            printf '{"name":"qpdf","version":"'; qpdf --version | head -1 | sed 's/"/\\"/g'; printf '"},'
+            printf '{"name":"pandoc","version":"'; pandoc --version | head -1 | sed 's/"/\\"/g'; printf '"},'
+            printf '{"name":"ocrmypdf","version":"'; ocrmypdf --version 2>&1 | head -1 | sed 's/"/\\"/g'; printf '"},'
+            printf '{"name":"pdf2docx","version":"'; pdf2docx --version 2>&1 | head -1 | sed 's/"/\\"/g'; printf '"},'
+            printf '{"name":"PyMuPDF","version":"'; python3 -c 'import fitz; print(fitz.VersionBind)'; printf '"},'
+            printf '{"name":"python-pptx","version":"'; python3 -c 'import pptx; print(pptx.__version__)'; printf '"}'
+            echo '],"pdf_is_canonical":true,"pdf_fallback_conversion":true,"git_lfs_pdf_storage":false}'
+          } > artifacts/governance/conversion-toolchain/install-manifest.json
+          gh release upload "$tag" artifacts/governance/conversion-toolchain/config/rechercher-conversion-toolchain.json#rechercher-conversion-toolchain.json artifacts/governance/conversion-toolchain/rechercher_pdf_conversion_engine.py#rechercher_pdf_conversion_engine.py artifacts/governance/conversion-toolchain/install-manifest.json#install-manifest.json --repo "$RECHERCHER_MATRIX_STORAGE_REPO" --clobber=false
       - name: Enforce non-destructive PDF quality and completeness gate
         run: |
           set -euo pipefail
