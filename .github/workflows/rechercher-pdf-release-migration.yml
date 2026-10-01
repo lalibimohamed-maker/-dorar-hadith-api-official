@@ -50,6 +50,7 @@ jobs:
 
       - name: Convert legacy encrypted Releases assets to plaintext PDFs
         env:
+          GH_TOKEN: ${{ github.token }}
           REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
           PROTECTED_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
         run: |
@@ -83,7 +84,7 @@ jobs:
               qpdf --check "$out" >/dev/null
               sha=$(sha256sum "$out" | awk '{print $1}')
               GH_TOKEN="$PROTECTED_TOKEN" gh release upload "$private_tag" "$out" --repo "$PROTECTED_REPO" --clobber
-              GH_TOKEN="$GH_TOKEN" gh release delete-asset "$tag" "$name" --repo "$GITHUB_REPOSITORY" --yes
+              gh release delete-asset "$tag" "$name" --repo "$GITHUB_REPOSITORY" --yes
               printf '%s\t%s\t%s\n' "$tag" "$name" "$sha" >> "$GITHUB_WORKSPACE/encrypted-release-migration.tsv"
               migrated=$((migrated+1))
               echo "[ENC->PDF] $tag/$name sha256=$sha"
@@ -93,6 +94,7 @@ jobs:
 
       - name: Remove PDF LFS payloads from legacy acquisition branches after successful upload
         env:
+          GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
           PROTECTED_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
         run: |
