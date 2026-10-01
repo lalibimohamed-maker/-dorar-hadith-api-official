@@ -2,7 +2,7 @@
 
 This registry consolidates the worldwide discovery links surfaced by Rechercher PR #541 and the Quran-specific/API layer in PR #558.
 
-- **PR #541:** owner of the 133×24 multilingual evidence matrix.
+- **PR #541:** owner of the 133×48 multilingual evidence matrix.
 - **PR #558:** Quran-only API/institutional source layer; it can supply eligible evidence to #541 after provenance and rights verification.
 - **Important:** a URL in this registry is a discovery/source link, **not** a grant of redistribution rights.
 - Every item remains subject to item-level provenance, license/terms, and public-release verification.
