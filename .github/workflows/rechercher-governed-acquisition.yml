@@ -13,6 +13,7 @@ on:
         required: true
 
 # security-justification: contents: write is required only to persist acquisition/release indexes and verified PDF release evidence; no PDF payload is committed to the repository tree.
+ # security-justification: write permission is used only for acquisition indexes and verified release evidence; PDF payloads are not committed.
 permissions:
   contents: write
 
