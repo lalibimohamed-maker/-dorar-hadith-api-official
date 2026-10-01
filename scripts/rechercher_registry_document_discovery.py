@@ -2,7 +2,7 @@
 """Build a real-document candidate index from PR #561's live source registry.
 
 The registry is a discovery pool, not a rights grant. This pass crawls each
-registered page once, extracts direct PDF/DOCX links, and matches document
+registered page once, extracts direct PDF and fallback-document/image links, and matches document
 names/URLs to the master book catalog. It never treats a registry entry as
 redistributable by itself.
 """
@@ -41,7 +41,7 @@ def links(page: str, base: str):
         href = html.unescape(m.group(1)).strip()
         label = re.sub(r"<[^>]+>", " ", m.group(2))
         u = urljoin(base, href)
-        if re.search(r"\.(pdf|docx)(?:[?#]|$)", u, re.I) and not re.search(r"\.pdf\.enc(?:[?#]|$)", u, re.I):
+        if re.search(r"\.(pdf|docx|doc|odt|rtf|txt|jpg|jpeg|png|tif|tiff)(?:[?#]|$)", u, re.I) and not re.search(r"\.pdf\.enc(?:[?#]|$)", u, re.I):
             out.append({"url": u, "label": re.sub(r"\s+", " ", label).strip()})
     return out
 
@@ -100,6 +100,7 @@ def main():
         "candidates": mapped,
         "errors": errors,
         "rights_rule": "registry discovery never grants redistribution permission",
+        "fallback_policy": "pdf-first; when no PDF exists, acquire supported source document/image and convert to canonical PDF",
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"REGISTRY_561_SOURCES={len(registry.get('sources', []))}", flush=True)
     print(f"REGISTRY_DOCUMENTS_DISCOVERED={len(discovered)}", flush=True)
