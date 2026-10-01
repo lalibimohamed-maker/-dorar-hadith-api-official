@@ -1,0 +1,54 @@
+name: Rechercher — Research infrastructure gate
+
+on:
+  pull_request:
+    paths:
+      - 'config/rechercher/research-infrastructure-registry-2026.json'
+      - 'books-batches/salaf-01-400h/master-global-source-registry-seed-2026-09.json'
+      - 'scripts/rechercher_deep_worldwide.py'
+      - 'test/rechercher-research-infrastructure.test.js'
+      - '.github/workflows/rechercher-research-infrastructure-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research-infrastructure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Validate Python discovery layer
+        run: python3 -m py_compile scripts/rechercher_deep_worldwide.py
+
+      - name: Validate research registry
+        run: node --test test/rechercher-research-infrastructure.test.js
+
+      - name: Verify new discovery routes are wired
+        run: |
+          set -euo pipefail
+          grep -q '"openalex"' scripts/rechercher_deep_worldwide.py
+          grep -q '"opencitations"' scripts/rechercher_deep_worldwide.py
+          grep -q '"grobid"' scripts/rechercher_deep_worldwide.py
+          grep -q '"kraken"' scripts/rechercher_deep_worldwide.py
+          grep -q '"escriptorium"' scripts/rechercher_deep_worldwide.py
+          echo "RESEARCH_INFRASTRUCTURE_WIRING_OK"
+
+      - name: Verify Corpus boundary
+        run: |
+          set -euo pipefail
+          grep -q '"corpus_write": false' config/rechercher/research-infrastructure-registry-2026.json
+          grep -q 'No tool in this registry may write directly to the canonical Corpus.' config/rechercher/research-infrastructure-registry-2026.json
+          echo "CORPUS_BOUNDARY_OK"

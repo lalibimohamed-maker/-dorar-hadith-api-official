@@ -188,18 +188,13 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Create encrypted retention copies without deleting PDFs
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+      - name: Enforce PDF-only primary representation
         run: |
           set -euo pipefail
-          mkdir -p artifacts/developer-review-encrypted
-          shopt -s nullglob
-          for f in artifacts/developer-review-pdfs/*.pdf; do
-            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
-              -pass env:REVIEW_VAULT_KEY -in "$f" -out "artifacts/developer-review-encrypted/$(basename "$f").enc"
-          done
-          test -n "$(find artifacts/developer-review-encrypted -name '*.enc' -type f -print -quit)"
+          if find artifacts/developer-review-pdfs -type f -name '*.pdf.enc' -o -name '*.enc' -o -name '*.encrypted' | grep -q .; then
+            echo 'ERROR: new encrypted output detected in the primary PDF workspace.'
+            exit 1
+          fi
 
       - name: Publish only verified-redistributable PDFs
         env:
