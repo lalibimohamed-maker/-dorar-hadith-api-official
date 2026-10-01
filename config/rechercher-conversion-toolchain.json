@@ -1,21 +1,19 @@
 {
-  "schema": "din-allah-encyclopedia/rechercher-conversion-toolchain/v1",
-  "policy": "PDF remains the canonical master; derived formats are generated only from a validated PDF and never replace it.",
-  "release_storage": "lalibimohamed-maker/dinullah-matrix-6384-storage-01",
-  "engines": [
-    {"id":"pdf2docx","direction":"pdf->docx","role":"text/layout-preserving DOCX conversion","license":"MIT","source":"https://github.com/ArtifexSoftware/pdf2docx","status":"enabled-with-fallback"},
-    {"id":"libreoffice","direction":"pdf->docx|pdf->odt|pdf->rtf","role":"office-format conversion fallback","license":"MPL-2.0","source":"https://www.libreoffice.org/","status":"enabled"},
-    {"id":"pandoc","direction":"pdf->epub|pdf->html|pdf->markdown|pdf->txt","role":"document conversion through extracted text/HTML intermediates","license":"GPL-2.0-or-later","source":"https://github.com/jgm/pandoc","status":"enabled"},
-    {"id":"pymupdf","direction":"pdf->images|pdf->text|pdf->html","role":"PDF rendering and extraction","license":"AGPL-3.0","source":"https://github.com/pymupdf/PyMuPDF","status":"enabled"},
-    {"id":"python-pptx","direction":"pdf->pptx","role":"generate presentation with one rendered PDF page per slide when editable layout extraction is not reliable","license":"MIT","source":"https://github.com/scanny/python-pptx","status":"enabled"},
-    {"id":"ocrmypdf","direction":"scanned-pdf->searchable-pdf","role":"OCR prerequisite before derived-format conversion","license":"MPL-2.0","source":"https://github.com/ocrmypdf/OCRmyPDF","status":"enabled"},
-    {"id":"tesseract","direction":"image->text","role":"OCR engine used by OCRmyPDF","license":"Apache-2.0","source":"https://github.com/tesseract-ocr/tesseract","status":"enabled"}
+  "schema":"din-allah-encyclopedia/rechercher-conversion-toolchain/v2",
+  "policy":{"canonical_master":"pdf","fallback_acquisition":"if_no_pdf_download_supported_document_or_manuscript_images_then_convert_to_validated_pdf","derived_formats":["docx","pptx","epub","html","md","txt","odt","rtf"],"derived_generation":"on-demand-or-cache","canonical_pdf_never_replaced":true,"rights_and_provenance_inherit_from_canonical_pdf":true},
+  "release_storage":"lalibimohamed-maker/dinullah-matrix-6384-storage-01",
+  "source_policy":{"capture_official_source_or_package":true,"record_version":true,"record_sha256":true,"record_license":true,"record_source_url":true,"redistribution":"only_when_upstream_license_or_terms_permit; otherwise publish manifest/source-reference and install from official channel"},
+  "engines":[
+    {"id":"pdf2docx","direction":"pdf->docx","license":"MIT","source":"https://github.com/ArtifexSoftware/pdf2docx","status":"fallback-only","note":"upstream states project is no longer actively maintained"},
+    {"id":"libreoffice","direction":"pdf->docx|pdf->odt|pdf->rtf","license":"MPL-2.0","source":"https://www.libreoffice.org/","status":"enabled"},
+    {"id":"pandoc","direction":"text->epub|text->html|text->markdown","license":"GPL-2.0-or-later","source":"https://github.com/jgm/pandoc","status":"enabled"},
+    {"id":"pymupdf","direction":"pdf->images|pdf->text|pdf->pptx","license":"AGPL-3.0","source":"https://github.com/pymupdf/PyMuPDF","status":"enabled","redistribution":"license-reviewed"},
+    {"id":"python-pptx","direction":"rendered-pages->pptx","license":"MIT","source":"https://github.com/scanny/python-pptx","status":"enabled"},
+    {"id":"ocrmypdf","direction":"scanned-pdf->searchable-pdf","license":"MPL-2.0","source":"https://github.com/ocrmypdf/OCRmyPDF","status":"enabled"},
+    {"id":"tesseract","direction":"image->text","license":"Apache-2.0","source":"https://github.com/tesseract-ocr/tesseract","status":"enabled"},
+    {"id":"qpdf","direction":"pdf-validation|pdf-repair","license":"Apache-2.0","source":"https://github.com/qpdf/qpdf","status":"enabled"},
+    {"id":"poppler","direction":"pdf-text|pdf-html|pdf-rendering","source":"https://gitlab.freedesktop.org/poppler/poppler","status":"enabled"},
+    {"id":"img2pdf","direction":"images->pdf","license":"LGPL-3.0-or-later","source":"https://gitlab.mister-muffin.de/josch/img2pdf","status":"enabled"}
   ],
-  "quality_rules": [
-    "validate source PDF before conversion",
-    "OCR scanned/image-only PDFs before text-derived formats when needed",
-    "never modify the canonical PDF",
-    "validate generated output and record source SHA-256",
-    "derived formats are disposable/cacheable and rights-inherited from the source PDF"
-  ]
+  "quality_rules":["validate canonical PDF signature and qpdf integrity before conversion","detect low-text scanned PDFs and OCR only into a temporary derivative","never overwrite canonical PDF","validate generated output is non-empty","record source PDF SHA-256 and derived SHA-256","derived artifacts inherit rights/provenance and remain disposable/cacheable"]
 }
