@@ -63,5 +63,5 @@ jobs:
           name: quran-institutional-acquisition-${{ github.run_id }}
           path: |
             artifacts/quran-institutional-acquisition/manifest.json
-            $(dirname "artifacts/quran-institutional-acquisition/manifest.json")/release-persistence.json
+            artifacts/quran-institutional-acquisition/release-persistence.json
           if-no-files-found: warn
