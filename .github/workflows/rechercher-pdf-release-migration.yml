@@ -106,6 +106,7 @@ jobs:
             git clone --no-checkout --filter=blob:none "https://github.com/$GITHUB_REPOSITORY.git" "$dir"
             git -C "$dir" fetch --no-tags origin "refs/heads/$branch:refs/remotes/origin/$branch"
             git -C "$dir" checkout -B "$branch" "origin/$branch"
+            git -C "$dir" lfs install --local
             git -C "$dir" lfs pull --include='*.pdf' --exclude='' || true
             mapfile -t pdfs < <(git -C "$dir" ls-files '*.pdf')
             if [ "${#pdfs[@]}" -eq 0 ]; then
@@ -157,9 +158,13 @@ PY
               if [ ! -s "$dir/.gitattributes" ]; then git -C "$dir" rm -- .gitattributes; fi
             fi
             # Repoint known acquisition callers to the current Releases-only central workflow.
-            for wf in .github/workflows/rechercher-decrypt-vault-pdfs.yml .github/workflows/rechercher-encyclopedia-continuous.yml .github/workflows/rechercher-salaf-01-400h-automatic.yml; do
-              if git -C "$dir" cat-file -e "origin/main:$wf" 2>/dev/null; then git -C "$dir" checkout origin/main -- "$wf" || true; fi
-            done
+            git -C "$dir" fetch --no-tags origin main:refs/remotes/origin/main
+            while IFS= read -r wf; do
+              rel="${wf#origin/main:}"
+              if [ -f "$dir/$rel" ] && grep -Eq 'git[[:space:]]+lfs|rechercher-governed-acquisition\.yml@|REVIEW_VAULT_KEY|\.pdf\.enc' "$dir/$rel"; then
+                git -C "$dir" checkout origin/main -- "$rel"
+              fi
+            done < <(git -C "$dir" ls-tree -r --name-only origin/main -- .github/workflows/rechercher*.yml .github/workflows/rechercher*.yaml | sed 's#^#origin/main:#')
             git -C "$dir" add -A
             git -C "$dir" config user.name 'github-actions[bot]'
             git -C "$dir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
