@@ -12,6 +12,7 @@ on:
         description: 'Token for the private protected Releases repository; never used for Git LFS.'
         required: true
 
+# security-justification: contents: write is required only to persist acquisition/release indexes and verified PDF release evidence; no PDF payload is committed to the repository tree.
 permissions:
   contents: write
 
