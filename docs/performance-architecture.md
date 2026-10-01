@@ -26,3 +26,36 @@
 - حتى 8 workers/adapters في التنفيذ المتوازي للمهمة الواحدة.
 - إلغاء النتائج البطيئة عند توفر نتيجة مقبولة، حيث يسمح المسار.
 - cache وstreaming هما جزء من الأداء، وليس زيادة عدد اللغات فقط.
+
+
+## التنفيذ البرمجي
+
+المكوّن `src/performance-orchestrator.js` يقدّم عقدًا موحدًا للمهام الست: `search`, `reader`, `download`, `voice`, `video`, و`ocr`. قبل التنفيذ يمر الطلب عبر `src/orchestration-kernel.js`، ولذلك لا يستطيع مسار الأداء منح نفسه صلاحية الكتابة إلى Corpus أو تجاوز provenance/rights/validation.
+
+### اختيار الـruntime
+
+لا يتم اختيار Node.js أو Go أو Rust أو Python بالاسم. الـadapter يجب أن يعلن حالة صحة وقياسات benchmark فعلية: throughput وp95 latency وmemory، مع cost اختياري. الـadapters غير المقاسة تُستبعد من الاختيار التنفيذي.
+
+### البحث
+
+`runSearchFastPath()` يشغّل adapters المقاسة بالتوازي ضمن حد أقصى 8، ويعيد أول نتيجة مقبولة ويصدر إلغاءً لبقية المسارات. الميزانية الافتراضية 1800ms؛ تجاوزها ينهي المسار بـ`PERFORMANCE_BUDGET_EXCEEDED`.
+
+### القارئ والتنزيل
+
+`readerRequest()` يبني طلبات cache-aware مع HTTP Range عند الحاجة، بينما `downloadRangeRequest()` و`nextDownloadRange()` يوفّران أساس الاستئناف وتقسيم التنزيل بدل افتراض تنزيل ملف كامل في كل مرة. هذا هو عقد النقل؛ طبقة المتصفح/الخادم هي التي تنفذ stream الفعلي وتتعامل مع Cache/Range حسب قدراتها.
+
+### الصوت
+
+`createVoiceQueue()` توفر طابورًا غير متزامنًا بحد تزامن مستقل، مع cache للنتائج وdeduplication للطلبات المتطابقة الموجودة قيد التنفيذ.
+
+### الفيديو
+
+`buildVideoPipeline()` يصف pipeline غير متزامن وadaptive streaming ومتعدد الدقات. دقة 2160p تُدرج فقط عندما تسمح قدرات المصدر، ولا توجد أي وعود بأن 4K سيعمل بزمن معين.
+
+### OCR
+
+`runWorkerPool()` يشغّل OCR كعمال مستقلين بحد تزامن قابل للضبط، مع سقف عام يبلغ 8 مسارات متوازية لكل مهمة.
+
+### القياس
+
+`summarizeBenchmarks()` يحسب p95 من مجموعة قياسات فعلية بدل تسمية زمن تنفيذ واحد بأنه p95. ويمكن استخدام الناتج لتحديث سجل الـruntime adapters بعد اختبارات benchmark حقيقية.

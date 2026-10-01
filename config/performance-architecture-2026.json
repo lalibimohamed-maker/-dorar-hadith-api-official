@@ -1,0 +1,38 @@
+{
+  "version": "2026-09-28",
+  "purpose": "Keep interactive and media performance independent of one JavaScript runtime while preserving governance boundaries.",
+  "interactive": {
+    "defaultBudgetMs": 1800,
+    "maxParallelAdapters": 8,
+    "search": {
+      "parallelRace": true,
+      "cancelSlowOnAcceptedResult": true,
+      "budgetExceededBehavior": "fail-fast"
+    }
+  },
+  "tasks": {
+    "search": { "mode": "parallel-race", "cache": "optional" },
+    "reader": { "mode": "cache-stream-range", "preferRangeDelivery": true },
+    "download": { "mode": "resumable-range", "chunkBytes": 8388608, "resumeWhenSupported": true },
+    "voice": { "mode": "async-queue", "queueConcurrency": 2, "cacheRepeatedResults": true, "deduplicateInflight": true },
+    "video": { "mode": "async-pipeline", "adaptiveStreaming": true, "multiResolution": true, "fourKIsConditional": true },
+    "ocr": { "mode": "worker-pool", "workerConcurrency": 4, "maxParallelAdapters": 8 }
+  },
+  "runtimeSelection": {
+    "requiredEvidence": ["health", "throughput", "p95LatencyMs", "memoryMb"],
+    "optionalEvidence": ["cost"],
+    "selectionRule": "Use measured benchmark data; runtime language/name is never a performance proxy.",
+    "unbenchmarkedAdapters": "excluded"
+  },
+  "governance": {
+    "executionOnly": true,
+    "corpusWrite": false,
+    "requiredBoundary": "existing Governance Kernel",
+    "separateFrom": ["provenance", "rights", "validation"]
+  },
+  "resourcePolicy": {
+    "workerUpperBoundPerTask": 8,
+    "avoidAutomaticLargeDownloads": true,
+    "fourKSpeedPromise": false
+  }
+}
