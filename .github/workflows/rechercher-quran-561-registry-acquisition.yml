@@ -72,5 +72,5 @@ jobs:
           name: quran-561-registry-acquisition-${{ github.run_id }}
           path: |
             artifacts/quran-561-registry-acquisition/manifest.json
-            $(dirname "artifacts/quran-561-registry-acquisition/manifest.json")/release-persistence.json
+            artifacts/quran-561-registry-acquisition/release-persistence.json
           if-no-files-found: warn
