@@ -6,17 +6,17 @@ on:
     - cron: "17 */4 * * *"
 
 permissions:
-  # security-justification: contents: write is required to persist governed acquisition progress and protected PDF release evidence; no Corpus write or public redistribution is performed.
+  # security-justification: contents: write is required only for governed acquisition progress; publication-eligible PDF bytes are persisted as Release assets in the unified 6,384-matrix repository.
   contents: write
 
 concurrency:
-  group: rechercher-global-book-acquisition-${{ github.ref }}
+  group: rechercher-unified-release-persistence-${{ github.ref }}
   cancel-in-progress: false
 
 env:
   SOURCE_REGISTRY_URL: https://raw.githubusercontent.com/lalibimohamed-maker/-dorar-hadith-api-official/feat/rechercher-worldwide-source-link-registry-2026-09-24/research/evidence/global-multilingual/worldwide-source-link-registry-2026-09-24.json
   SOURCE_REGISTRY_PR: "561"
-  PROTECTED_STORAGE_REPO: lalibimohamed-maker/dinullah-pdf-storage-01
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-6384-storage-01
 
 jobs:
   acquire:
@@ -145,10 +145,9 @@ jobs:
             GIT_ASKPASS="$RUNNER_TEMP/askpass.sh" GIT_TERMINAL_PROMPT=0 git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
-      - name: Persist acquired PDFs to protected Releases
+      - name: Persist publication-eligible PDFs to unified matrix Releases
         env:
-          GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
-          SECONDARY_STORAGE_TOKEN: ${{ secrets.DINULLAH_PDF_STORAGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
         run: |
           set -euo pipefail
           shopt -s nullglob
@@ -157,28 +156,38 @@ jobs:
             echo "NO_PDFS_THIS_RUN"
             exit 0
           fi
-          test -n "${SECONDARY_STORAGE_TOKEN:-}" || {
-            echo "DINULLAH_PDF_STORAGE_TOKEN missing; durable Release PDF persistence cannot proceed."
-            exit 1
-          }
-
-          release_root="$RUNNER_TEMP/global-book-release"
-          rm -rf "$release_root"
-          mkdir -p "$release_root"
-
+          test -n "${MATRIX_STORAGE_REPO:-}"
+          tag="rechercher-books-${GITHUB_RUN_ID}"
+          gh release create "$tag" --repo "$MATRIX_STORAGE_REPO" --target main --title "Rechercher books — $tag" --notes "Publication-eligible real PDFs acquired from live PR #561 sources. Item-level rights and integrity gates are mandatory; no Corpus write." --latest=false
           declare -A existing_sha=()
           while IFS=$'\t' read -r digest release_tag asset_name; do
             [ -n "$digest" ] && existing_sha["$digest"]="$release_tag/$asset_name"
           done < <(
-            gh api --paginate               -H "Accept: application/vnd.github+json"               "/repos/$PROTECTED_STORAGE_REPO/releases?per_page=100"               --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [ .digest,$tag,.name] | @tsv'
+            gh api --paginate -H "Accept: application/vnd.github+json" "/repos/$MATRIX_STORAGE_REPO/releases?per_page=100"               --jq '.[] | .tag_name as $tag | .assets[]? | select(.state == "uploaded" and (.digest // "" | startswith("sha256:"))) | [ .digest,$tag,.name] | @tsv'
           )
-
-          tag="rechercher-global-books-${GITHUB_RUN_ID}"
-          gh release create "$tag" --repo "$PROTECTED_STORAGE_REPO"             --title "Rechercher global books protected — $tag"             --notes "Protected acquisition driven by live PR #561 source registry. No public redistribution grant."             --latest=false
-
           uploaded=0
           skipped=0
+          blocked=0
           for f in "${files[@]}"; do
+            stem="${f%.pdf}"
+            stem="${stem#artifacts/}"
+            manifest="artifacts/${stem}.manifest.json"
+            if [ ! -s "$manifest" ]; then
+              echo "BLOCKED_NO_MANIFEST file=$(basename "$f")"
+              blocked=$((blocked+1))
+              continue
+            fi
+            eligible="$(python3 - "$manifest" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("yes" if d.get("storage_visibility") == "publication-eligible" and d.get("public_browser") is True else "no")
+          PY
+          )"
+            if [ "$eligible" != "yes" ]; then
+              echo "BLOCKED_RIGHTS file=$(basename "$f")"
+              blocked=$((blocked+1))
+              continue
+            fi
             sha=$(sha256sum "$f" | awk '{print $1}')
             digest="sha256:$sha"
             if [ -n "${existing_sha[$digest]+x}" ]; then
@@ -187,47 +196,32 @@ jobs:
               continue
             fi
             asset="${sha}_$(basename "$f")"
-            cp -f "$f" "$release_root/$asset"
-            gh release upload "$tag" "$release_root/$asset" --repo "$PROTECTED_STORAGE_REPO"
-            existing_sha["$digest"]="$tag/$asset"
+            gh release upload "$tag" "$f#${asset}" --repo "$MATRIX_STORAGE_REPO" --clobber=false
+            existing_sha["$digest"]="$tag/${asset}"
             uploaded=$((uploaded+1))
+            python3 - "$manifest" "$MATRIX_STORAGE_REPO" "$tag" "${asset}" "$sha" <<'PY'
+          import json,sys
+          from pathlib import Path
+          p=Path(sys.argv[1])
+          d=json.loads(p.read_text(encoding="utf-8"))
+          d.update({
+            "storage_state":"persisted",
+            "storage_model":"github-releases-only",
+            "storage_repository":sys.argv[2],
+            "storage_release":sys.argv[3],
+            "storage_asset":sys.argv[4],
+            "storage_sha256":sys.argv[5]
+          })
+          d.pop("unified_file",None)
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          PY
           done
-
-          gh release view "$tag" --repo "$PROTECTED_STORAGE_REPO" --json tagName,assets,url
-          echo "PROTECTED_PDF_RELEASE_OK uploaded=$uploaded skipped_duplicates=$skipped"
-          rm -rf "$release_root"
-
-      - name: Remove superseded .pdf.enc assets after successful PDF persistence
-        env:
-          GH_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          echo "MATRIX_RELEASE_PUBLISH_OK uploaded=$uploaded skipped=$skipped blocked=$blocked"
+      - name: Remove local PDF bytes after Release persistence
         run: |
           set -euo pipefail
-          shopt -s nullglob
-          files=(artifacts/*.pdf)
-          [ "${#files[@]}" -gt 0 ] || { echo "NO_NEW_PDFS_FOR_ENC_CLEANUP"; exit 0; }
-
-          python3 - <<'PY'
-          import json, os, re, subprocess
-          from pathlib import Path
-          repo=os.environ["PROTECTED_STORAGE_REPO"]
-          new_names=[p.name for p in Path("artifacts").glob("*.pdf")]
-          releases=json.loads(subprocess.check_output(["gh","api","--paginate",f"/repos/{repo}/releases?per_page=100"],text=True))
-          deleted=0
-          for rel in releases:
-              tag=rel["tag_name"]
-              for asset in rel.get("assets",[]):
-                  name=asset["name"]
-                  normalized=re.sub(r"^[0-9a-f]{64}_","",name,re.I)
-                  if not normalized.lower().endswith(".pdf.enc"):
-                      continue
-                  pdf_name=normalized[:-4]
-                  if pdf_name not in new_names:
-                      continue
-                  subprocess.run(["gh","release","delete-asset",tag,name,"--repo",repo,"--yes"],check=True)
-                  print(f"REMOVED_SUPERSEDED_PDF_ENC release={tag} asset={name} replacement={pdf_name}")
-                  deleted += 1
-          print(f"SUPERSEDED_PDF_ENC_REMOVED={deleted}")
-          PY
+          rm -f artifacts/*.pdf 2>/dev/null || true
+          echo "LOCAL_PDF_BYTES_REMOVED_AFTER_RELEASE=OK"
 
       - name: Upload run evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
