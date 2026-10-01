@@ -30,6 +30,7 @@ jobs:
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 0
+          lfs: false
           persist-credentials: false
 
       - name: Checkout governed engine and catalogs
