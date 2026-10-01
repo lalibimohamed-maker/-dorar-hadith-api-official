@@ -39,6 +39,8 @@ jobs:
     uses: {central}
     permissions:
       contents: write
+    secrets:
+      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{{{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}}}
 """.format(central=CENTRAL_REUSABLE)
 
 
