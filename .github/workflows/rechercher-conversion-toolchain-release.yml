@@ -1,6 +1,7 @@
 name: Rechercher — Publish conversion toolchain to Releases
 on:
   workflow_dispatch:
+# security-justification: reviewed — cross-repository release publication uses the dedicated RECHERCHER_MATRIX_STORAGE_TOKEN; repository contents remain read-only and no PDF bytes are committed.
 permissions:
   contents: read
 env:
