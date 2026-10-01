@@ -6,20 +6,20 @@ on:
     - cron: '0 */6 * * *'
 
 permissions:
-  # security-justification: This workflow requires contents: write solely to invoke the reviewed central acquisition engine and persist verified PDF acquisition results; it does not bypass protected branches.
+  # security-justification: this caller only invokes the current governed acquisition
+  # workflow; publication-eligible PDF bytes are persisted as Release assets in the
+  # unified 6,384-matrix storage repository.
   contents: write
 
-# All acquisition callers write to the same secondary LFS repository. A shared
-# group prevents cross-queue non-fast-forward races on secondary/main.
 concurrency:
-  group: rechercher-secondary-lfs-persistence
+  group: rechercher-unified-release-persistence
   cancel-in-progress: false
 
 jobs:
   acquire:
     name: Whole-encyclopedia continuous real-PDF acquisition and permanent retention
-    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@196d83e6bcd7132bbb4250f7617395bd07591efa # pinned reviewed commit
+    uses: ./.github/workflows/rechercher-governed-acquisition.yml
     with:
       target_branch: rechercher/encyclopedia-continuous-acquisition
     secrets:
-      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+      RECHERCHER_MATRIX_STORAGE_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
