@@ -17,7 +17,7 @@ CALLER_NAMES = {
 }
 CENTRAL = "lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main"
 MARKERS = ("[skip ci]", "[ci skip]", "[no ci]", "[skip actions]", "[actions skip]")
-CALLER = f"""name: Rechercher — governed multi-volume acquisition
+CALLER = """name: Rechercher — governed multi-volume acquisition
 
 on:
   push:
@@ -30,9 +30,11 @@ permissions:
 
 jobs:
   acquire:
-    uses: {CENTRAL}
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main
     permissions:
       contents: write
+    secrets:
+      RECHERCHER_SECONDARY_STORAGE_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
 """
 
 changed: list[str] = []
