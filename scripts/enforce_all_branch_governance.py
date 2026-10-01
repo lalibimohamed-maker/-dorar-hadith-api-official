@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   acquire:
-    uses: CENTRAL
+    uses: lalibimohamed-maker/-dorar-hadith-api-official/.github/workflows/rechercher-governed-acquisition.yml@main
     permissions:
       contents: write
     secrets:
