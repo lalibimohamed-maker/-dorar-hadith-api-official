@@ -35,18 +35,17 @@ test('machine translation remains explicitly separated from verified resources',
   assert.equal(registry.policy.machine_translation_verification_state, 'unverified');
 });
 
-test('resource lanes include core Islamic knowledge domains', () => {
-  for (const lane of ['quran', 'tafsir', 'hadith', 'sunnah', 'sirah', 'aqidah', 'fiqh', 'fatwa', 'books', 'provenance', 'rights', 'verification']) {
-    assert.ok(registry.resource_lanes.includes(lane), `missing lane: ${lane}`);
-  }
+test('resource lanes include all 48 Islamic knowledge domains', () => {
+  assert.equal(registry.resource_lanes.length, 48);
+  assert.deepEqual(registry.resource_lanes, ["quran","quran_sciences","tafsir","tajweed_qiraat","quran_miracles","quran_tadabbur","quran_stories","hadith","hadith_sciences","hadith_terminology","hadith_explanation","sirah_nabawiyyah","shamail_nabawiyyah","aqidah","tawhid","fiqh","usul_al_fiqh","fiqh_schools_branches","fatwa","raqaiq_adab_akhlaq","islamic_history","biographies_tabaqat","comparative_fiqh","dawah_islamic_culture","general_islamic_encyclopedias","scientific_miracles","maqasid_kulliyat","legal_maxims","athar","adhkar_dua","prophets_stories","ghaib","sirah_maghazi","companions_followers","scholars_biographies_rijal_tabaqat","ethics_adab","worship_transactions","family_inheritance_judiciary","siyasah_finance_waqf","contemporary_dawah_education","scientific_encyclopedias_lectures","arabic_language","literature_poetry","manuscripts_editions_bibliography","research_institutions_terms_translation","places_dates","questions_answers","other_islamic_domains"] );
 });
 
 
-test('3192 matrix outputs use a dedicated storage repository', () => {
+test('6384 matrix outputs use a dedicated storage repository', () => {
   const storage = JSON.parse(fs.readFileSync(
     path.join(process.cwd(), 'config/rechercher/global-multilingual-storage.json'), 'utf8'
   ));
-  assert.equal(storage.storage_repository, 'lalibimohamed-maker/dinullah-matrix-3192-storage-01');
+  assert.equal(storage.storage_repository, 'lalibimohamed-maker/dinullah-matrix-6384-storage-01');
   assert.equal(storage.authentication.secret_name, 'RECHERCHER_MATRIX_STORAGE_TOKEN');
   assert.equal(storage.contract.matrix_content_isolated_from_main_repository, true);
   assert.equal(storage.contract.general_pdf_storage_is_separate_from_matrix_storage, true);
