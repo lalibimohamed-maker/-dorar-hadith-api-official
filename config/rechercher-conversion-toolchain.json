@@ -1,7 +1,7 @@
 {
   "schema":"din-allah-encyclopedia/rechercher-conversion-toolchain/v2",
   "policy":{"canonical_master":"pdf","fallback_acquisition":"if_no_pdf_download_supported_document_or_manuscript_images_then_convert_to_validated_pdf","derived_formats":["docx","pptx","epub","html","md","txt","odt","rtf"],"derived_generation":"on-demand-or-cache","canonical_pdf_never_replaced":true,"rights_and_provenance_inherit_from_canonical_pdf":true},
-  "release_storage":"lalibimohamed-maker/dinullah-matrix-6384-storage-01",
+  "release_storage":"lalibimohamed-maker/dinullah-conversion-toolchain",
   "source_policy":{"capture_official_source_or_package":true,"record_version":true,"record_sha256":true,"record_license":true,"record_source_url":true,"redistribution":"only_when_upstream_license_or_terms_permit; otherwise publish manifest/source-reference and install from official channel"},
   "engines":[
     {"id":"pdf2docx","direction":"pdf->docx","license":"MIT","source":"https://github.com/ArtifexSoftware/pdf2docx","status":"fallback-only","note":"upstream states project is no longer actively maintained"},
