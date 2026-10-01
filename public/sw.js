@@ -28,7 +28,7 @@ self.addEventListener("fetch", (event) => {
     // Unknown PDFs are never cached here. Only downloadPdfForOffline(),
     // after governance + byte-size + SHA-256 verification, may populate
     // the PDF cache.
-    if (self.navigator?.onLine) return fetch(request);
+    if (self.navigator?.onLine !== false) return fetch(request);
 
     return new Response("Offline PDF is not downloaded on this device.", {
       status: 504,

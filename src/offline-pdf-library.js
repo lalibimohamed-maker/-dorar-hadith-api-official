@@ -98,20 +98,31 @@ export async function verifySha256(blob, expectedSha256) {
 }
 
 export async function requestPersistentStorage() {
-  if (!navigator.storage?.persist) return false;
-  return navigator.storage.persist();
+  const storage = globalThis.navigator?.storage;
+  if (typeof storage?.persist !== "function") return false;
+  try {
+    return Boolean(await storage.persist());
+  } catch {
+    return false;
+  }
 }
 
 export async function storageEstimate() {
-  if (!navigator.storage?.estimate) return { usage: 0, quota: 0 };
-  const estimate = await navigator.storage.estimate();
-  return { usage: estimate.usage || 0, quota: estimate.quota || 0 };
+  const storage = globalThis.navigator?.storage;
+  if (typeof storage?.estimate !== "function") return { usage: 0, quota: 0 };
+  try {
+    const estimate = await storage.estimate();
+    return { usage: estimate.usage || 0, quota: estimate.quota || 0 };
+  } catch {
+    return { usage: 0, quota: 0 };
+  }
 }
 
-export async function downloadPdfForOffline(book, { onProgress } = {}) {
+export async function downloadPdfForOffline(book, { onProgress, requestPersistent = true } = {}) {
   requireBook(book);
   if (!globalThis.fetch || !globalThis.caches) throw new Error("This browser does not support offline PDF storage");
 
+  const persistentRequested = requestPersistent ? await requestPersistentStorage() : false;
   const response = await fetch(book.url, { credentials: "omit" });
   if (!response.ok) throw new Error(`PDF download failed: HTTP ${response.status}`);
 
@@ -149,14 +160,27 @@ export async function downloadPdfForOffline(book, { onProgress } = {}) {
     headers: { "Content-Type": "application/pdf", "Content-Length": String(blob.size), "X-Offline-SHA256": book.sha256 }
   }));
 
-  await putMetadata({
+  try {
+    await putMetadata({
+      ...book,
+      sizeBytes: blob.size,
+      cachedAt: new Date().toISOString(),
+      state: "cached",
+      version: book.version || 1,
+      persistentStorageRequested: requestPersistent === true,
+      persistentStorageGranted: persistentRequested,
+    });
+  } catch (error) {
+    await cache.delete(book.url);
+    throw error;
+  }
+  return {
     ...book,
     sizeBytes: blob.size,
-    cachedAt: new Date().toISOString(),
     state: "cached",
-    version: book.version || 1,
-  });
-  return { ...book, sizeBytes: blob.size, state: "cached" };
+    persistentStorageRequested: requestPersistent === true,
+    persistentStorageGranted: persistentRequested,
+  };
 }
 
 export async function openOfflinePdf(id) {
