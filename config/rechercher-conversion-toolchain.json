@@ -1,0 +1,21 @@
+{
+  "schema": "din-allah-encyclopedia/rechercher-conversion-toolchain/v1",
+  "policy": "PDF remains the canonical master; derived formats are generated only from a validated PDF and never replace it.",
+  "release_storage": "lalibimohamed-maker/dinullah-matrix-6384-storage-01",
+  "engines": [
+    {"id":"pdf2docx","direction":"pdf->docx","role":"text/layout-preserving DOCX conversion","license":"MIT","source":"https://github.com/ArtifexSoftware/pdf2docx","status":"enabled-with-fallback"},
+    {"id":"libreoffice","direction":"pdf->docx|pdf->odt|pdf->rtf","role":"office-format conversion fallback","license":"MPL-2.0","source":"https://www.libreoffice.org/","status":"enabled"},
+    {"id":"pandoc","direction":"pdf->epub|pdf->html|pdf->markdown|pdf->txt","role":"document conversion through extracted text/HTML intermediates","license":"GPL-2.0-or-later","source":"https://github.com/jgm/pandoc","status":"enabled"},
+    {"id":"pymupdf","direction":"pdf->images|pdf->text|pdf->html","role":"PDF rendering and extraction","license":"AGPL-3.0","source":"https://github.com/pymupdf/PyMuPDF","status":"enabled"},
+    {"id":"python-pptx","direction":"pdf->pptx","role":"generate presentation with one rendered PDF page per slide when editable layout extraction is not reliable","license":"MIT","source":"https://github.com/scanny/python-pptx","status":"enabled"},
+    {"id":"ocrmypdf","direction":"scanned-pdf->searchable-pdf","role":"OCR prerequisite before derived-format conversion","license":"MPL-2.0","source":"https://github.com/ocrmypdf/OCRmyPDF","status":"enabled"},
+    {"id":"tesseract","direction":"image->text","role":"OCR engine used by OCRmyPDF","license":"Apache-2.0","source":"https://github.com/tesseract-ocr/tesseract","status":"enabled"}
+  ],
+  "quality_rules": [
+    "validate source PDF before conversion",
+    "OCR scanned/image-only PDFs before text-derived formats when needed",
+    "never modify the canonical PDF",
+    "validate generated output and record source SHA-256",
+    "derived formats are disposable/cacheable and rights-inherited from the source PDF"
+  ]
+}
