@@ -24,8 +24,8 @@ concurrency:
 
 env:
   NODE_VERSION: '24'
-  EXPECTED_CELL_COUNT: '3192'
-  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-3192-storage-01
+  EXPECTED_CELL_COUNT: '6384'
+  MATRIX_STORAGE_REPO: lalibimohamed-maker/dinullah-matrix-6384-storage-01
 
 jobs:
   matrix:
@@ -137,7 +137,7 @@ jobs:
 
 
   acquire-multilingual-pdfs:
-    name: Acquire and persist PDFs from the verified 3,192-cell ledger
+    name: Acquire and persist PDFs from the verified 6,384-cell ledger
     needs: matrix
     uses: ./.github/workflows/rechercher-multilingual-pdf-acquisition.yml
     secrets:
