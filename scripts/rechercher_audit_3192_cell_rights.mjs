@@ -33,8 +33,8 @@ const languages = Array.isArray(discovery.enumerated_islamhouse_languages)
   ? discovery.enumerated_islamhouse_languages.map((name,i)=>({name,iso:null,index:i}))
   : [];
 const domains = matrix.domains || [];
-if (languages.length * domains.length !== 3192) {
-  throw new Error(`Expected 3192 cells, got ${languages.length * domains.length}`);
+if (languages.length * domains.length !== 6384) {
+  throw new Error(`Expected 6384 cells, got ${languages.length * domains.length}`);
 }
 
 async function fetchUrl(url) {
@@ -126,9 +126,9 @@ await fs.writeFile('research/evidence/global-multilingual/rights-audit/source-ri
 await fs.writeFile('research/evidence/global-multilingual/rights-audit/cell-rights-audit.jsonl',cells.map(x=>JSON.stringify(x)).join('\n')+'\n');
 
 const summary={
-  schema:'rechercher/3192-cell-rights-audit-summary/v1',
+  schema:'rechercher/6384-cell-rights-audit-summary/v1',
   generated_at:new Date().toISOString(),
-  expected_cells:3192,
+  expected_cells:6384,
   audited_cells:cells.length,
   source_count:sources.length,
   accessible_sources:sourceAudit.filter(x=>x.result.ok).length,
