@@ -81,9 +81,22 @@ jobs:
 
           console.log('KFGQPC acquisition manifest OK', m.languages.join(','));
           NODE
-      - name: Upload research-only KFGQPC acquisition
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - name: Publish explicitly eligible Quran PDFs to unified 6384 Releases
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_MATRIX_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          node scripts/rechercher-publish-eligible-quran-release.mjs \
+            --root "${{ github.workspace }}" \
+            --manifest "artifacts/quran-kfgqpc-official-acquisition/manifest.json" \
+            --repository "lalibimohamed-maker/dinullah-matrix-6384-storage-01" \
+            --release-prefix "quran-kfgqpc"
+
+      - name: Upload Quran acquisition checkpoint evidence (ephemeral)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: quran-kfgqpc-official-acquisition
-          path: artifacts/quran-kfgqpc-official-acquisition
-          retention-days: 90
+          name: quran-kfgqpc-acquisition-${{ github.run_id }}
+          path: |
+            artifacts/quran-kfgqpc-official-acquisition/manifest.json
+            $(dirname "artifacts/quran-kfgqpc-official-acquisition/manifest.json")/release-persistence.json
+          if-no-files-found: warn
