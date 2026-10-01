@@ -1,33 +1,35 @@
 {
   "schema": "din-allah-encyclopedia/permanent-storage-pool/v2",
-  "policy": "GitHub Releases asset storage; real .pdf only; SHA-256 identity; repository tree contains indexes only.",
-  "backend": "github-releases-assets",
-  "git_lfs": false,
-  "github_actions_artifacts_as_pdf_storage": false,
-  "encrypted_final_artifacts": false,
-  "primary": {
-    "id": "release-public",
-    "repository": "lalibimohamed-maker/-dorar-hadith-api-official",
-    "status": "active",
-    "role": "public-publication-eligible-pdf-releases"
-  },
-  "protected": {
-    "id": "release-protected",
-    "repository": "lalibimohamed82-coder/rechercher-pdf-storage",
-    "status": "active-when-private",
-    "role": "rights-unclear-or-restricted-pdf-releases"
-  },
+  "policy": "append-only; real .pdf Release assets only; SHA-256 identity; never delete, overwrite, replace, or rename an existing published asset",
+  "storage_model": "github-releases-only",
+  "repository": "lalibimohamed-maker/dinullah-matrix-6384-storage-01",
+  "role": "unified-6,384-matrix-release-storage",
   "routing": {
     "identity": "sha256",
     "same_sha": "keep-existing",
-    "different_sha": "keep as independently identified edition only when metadata distinguishes it",
-    "rights_unclear": "protected-private-release-only",
-    "public_eligible": "public-release-only",
-    "repository_tree_pdf": false,
-    "one_release_asset_per_pdf": true
+    "different_sha": "append-new-independent-pdf",
+    "rights_unclear": "protected-private-only",
+    "release_target": "main",
+    "public_release_requires_item_level_rights_and_provenance": true,
+    "never_route_before_rights_verification": true,
+    "fail_closed_if_release_storage_is_not_accessible": true,
+    "never_delete_or_move_existing_assets": true
   },
   "central_index": {
     "required": true,
-    "fields": ["sha256", "release_tag", "release_repository", "download_url", "bytes", "validation", "acquisition_date", "acquisition_run", "book_id", "work_id", "edition_id", "rights_status", "access"]
+    "record_fields": [
+      "sha256",
+      "storage_repository",
+      "release",
+      "asset",
+      "bytes",
+      "validation",
+      "acquisition_date",
+      "acquisition_run",
+      "book_id",
+      "work_id",
+      "edition_id",
+      "rights_status"
+    ]
   }
 }

@@ -1,34 +1,60 @@
 #!/usr/bin/env python3
-"""Resolve Rechercher PDF persistence to GitHub Releases, never Git LFS."""
+"""Resolve the unified Release-backed PDF storage target for Rechercher."""
 from __future__ import annotations
-import argparse, json
+
+import argparse
+import json
+import os
 from pathlib import Path
 
-def main():
-    ap=argparse.ArgumentParser()
-    ap.add_argument('--root',default='.')
-    ap.add_argument('--config',default='config/rechercher-permanent-storage-pool.json')
-    ap.add_argument('--output',default='artifacts/governance/storage-pool-route.json')
-    args=ap.parse_args()
-    root=Path(args.root).resolve()
-    cfg=json.loads((root/args.config).read_text(encoding='utf-8'))
-    if cfg.get('backend')!='github-releases-assets': raise SystemExit('ERROR: PDF storage backend is not GitHub Releases')
-    if cfg.get('git_lfs') is not False: raise SystemExit('ERROR: Git LFS must be disabled for PDF storage')
-    if cfg.get('github_actions_artifacts_as_pdf_storage') is not False: raise SystemExit('ERROR: Actions artifacts cannot be PDF storage')
-    if cfg.get('encrypted_final_artifacts') is not False: raise SystemExit('ERROR: encrypted final PDFs are forbidden')
-    out={
-      'schema':'din-allah-encyclopedia/permanent-storage-pool-route/v2',
-      'storage_backend':'github-releases-assets',
-      'public_repository':cfg['primary']['repository'],
-      'protected_repository':cfg['protected']['repository'],
-      'git_lfs':False,
-      'release_assets':True,
-      'repository_tree_pdfs':False,
-      'policy':'real .pdf Releases assets only; indexes/manifests in repository tree'
-    }
-    p=root/args.output
-    p.parent.mkdir(parents=True,exist_ok=True)
-    p.write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    print(json.dumps(out,ensure_ascii=False))
 
-if __name__=='__main__': raise SystemExit(main())
+EXPECTED_REPOSITORY = "lalibimohamed-maker/dinullah-matrix-6384-storage-01"
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--root", default=".")
+    ap.add_argument("--config", default="config/rechercher-permanent-storage-pool.json")
+    ap.add_argument("--output", default="artifacts/governance/storage-pool-route.json")
+    ap.add_argument("--token-env", default="RECHERCHER_MATRIX_STORAGE_TOKEN")
+    args = ap.parse_args()
+
+    root = Path(args.root).resolve()
+    cfg = json.loads((root / args.config).read_text(encoding="utf-8"))
+
+    if cfg.get("schema") != "din-allah-encyclopedia/permanent-storage-pool/v2":
+        raise SystemExit("ERROR: unsupported unified Release storage schema")
+
+    if cfg.get("storage_model") != "github-releases-only":
+        raise SystemExit("ERROR: PDF storage must use GitHub Releases only")
+
+    repo = cfg.get("repository")
+    if repo != EXPECTED_REPOSITORY:
+        raise SystemExit(f"ERROR: unexpected unified storage repository: {repo!r}")
+
+    token = os.environ.get(args.token_env, "")
+    if not token:
+        raise SystemExit(f"ERROR: {args.token_env} is required for Release persistence")
+
+    out = {
+        "schema": "din-allah-encyclopedia/permanent-storage-pool-route/v2",
+        "storage_model": "github-releases-only",
+        "repository": repo,
+        "release_target": "main",
+        "reason": "unified-matrix-release-storage",
+        "rights_unclear": "protected-private-only",
+        "policy": "append-only; real .pdf Release assets only; SHA-256 identity; no Git/LFS PDF persistence",
+        "lfs_pdf_persistence": False,
+    }
+
+    out_path = root / args.output
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(out, ensure_ascii=False))
+    print(f"RECHERCHER_STORAGE_MODEL={out['storage_model']}")
+    print(f"RECHERCHER_STORAGE_REPO={out['repository']}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
