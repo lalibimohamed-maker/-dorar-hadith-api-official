@@ -1,3 +1,11 @@
+import {
+  computeChunkIntegrity,
+  computeDistributionIntegrity,
+  computeRollingStep,
+  ROLLING_SHA256_INITIAL
+} from "./omega-integrity-chain.js";
+import { assertVerifiedEd25519ManifestSignature } from "./omega-manifest-signature.js";
+
 const HEX_SHA256 = /^[a-f0-9]{64}$/i;
 
 function requiredString(value, field) {
@@ -12,7 +20,10 @@ function sha256(value, field) {
   if (!HEX_SHA256.test(String(value ?? ""))) throw new Error(field + " must be a SHA-256 hex digest");
 }
 
-export function validateOfflineInstallManifest(manifest) {
+export function validateOfflineInstallManifest(manifest, {
+  trustedPublicKeys = null,
+  requireAuthenticatedSignature = false
+} = {}) {
   if (!manifest || typeof manifest !== "object") throw new TypeError("offline install manifest must be an object");
   if (manifest.schema_version !== "1.0.0") throw new Error("unsupported offline install manifest version");
 
@@ -25,6 +36,10 @@ export function validateOfflineInstallManifest(manifest) {
   requiredString(manifest.artifact?.signature?.algorithm, "artifact.signature.algorithm");
   requiredString(manifest.artifact?.signature?.public_key_id, "artifact.signature.public_key_id");
   requiredString(manifest.artifact?.signature?.signature_base64, "artifact.signature.signature_base64");
+
+  if (requireAuthenticatedSignature) {
+    assertVerifiedEd25519ManifestSignature(manifest, { trustedPublicKeys: trustedPublicKeys ?? {} });
+  }
 
   if (!Array.isArray(manifest.tokenizer?.files) || manifest.tokenizer.files.length === 0) {
     throw new Error("tokenizer.files must not be empty");
@@ -81,9 +96,46 @@ export function validateOfflineInstallManifest(manifest) {
       if (block.offset !== offset) throw new Error("block offset mismatch at chunk " + index + ", block " + blockIndex);
       positiveSafeInteger(block.bytes, "distribution.chunks[" + index + "].blocks[" + blockIndex + "].bytes");
       sha256(block.sha256, "distribution.chunks[" + index + "].blocks[" + blockIndex + "].sha256");
+      if (manifest.distribution?.integrity) {
+        sha256(block.rolling_sha256, "distribution.chunks[" + index + "].blocks[" + blockIndex + "].rolling_sha256");
+      }
       offset += block.bytes;
     }
     if (offset !== chunk.bytes) throw new Error("block coverage mismatch for chunk " + index);
+
+    if (manifest.distribution?.integrity) {
+      sha256(chunk.rolling_root_sha256, "distribution.chunks[" + index + "].rolling_root_sha256");
+      sha256(chunk.merkle_root_sha256, "distribution.chunks[" + index + "].merkle_root_sha256");
+      const computed = computeChunkIntegrity(chunk.blocks);
+      let rollingState = ROLLING_SHA256_INITIAL;
+      for (const block of chunk.blocks) {
+        rollingState = computeRollingStep(rollingState, block);
+        if (block.rolling_sha256 !== rollingState) {
+          throw new Error("block rolling state mismatch at chunk " + index + ", block " + block.index);
+        }
+      }
+      if (computed.rolling_root_sha256 !== String(chunk.rolling_root_sha256).toLowerCase()) {
+        throw new Error("chunk rolling root mismatch at " + index);
+      }
+      if (computed.merkle_root_sha256 !== String(chunk.merkle_root_sha256).toLowerCase()) {
+        throw new Error("chunk Merkle root mismatch at " + index);
+      }
+    }
+  }
+
+  if (manifest.distribution?.integrity) {
+    requiredString(manifest.distribution.integrity.algorithm, "distribution.integrity.algorithm");
+    requiredString(manifest.distribution.integrity.rolling_algorithm, "distribution.integrity.rolling_algorithm");
+    requiredString(manifest.distribution.integrity.merkle_algorithm, "distribution.integrity.merkle_algorithm");
+    sha256(manifest.distribution.integrity.rolling_root_sha256, "distribution.integrity.rolling_root_sha256");
+    sha256(manifest.distribution.integrity.merkle_root_sha256, "distribution.integrity.merkle_root_sha256");
+    const computed = computeDistributionIntegrity(manifest.distribution.chunks);
+    if (computed.rolling_root_sha256 !== String(manifest.distribution.integrity.rolling_root_sha256).toLowerCase()) {
+      throw new Error("distribution rolling root mismatch");
+    }
+    if (computed.merkle_root_sha256 !== String(manifest.distribution.integrity.merkle_root_sha256).toLowerCase()) {
+      throw new Error("distribution Merkle root mismatch");
+    }
   }
 
   if (manifest.distribution?.resume?.supports_http_range !== true ||
@@ -101,6 +153,8 @@ export function validateOfflineInstallManifest(manifest) {
 
   return Object.freeze({
     valid: true,
+    authenticated_signature: Boolean(requireAuthenticatedSignature),
+    cumulative_integrity: Boolean(manifest.distribution?.integrity),
     model_id: manifest.artifact.model_id,
     version: manifest.artifact.version
   });

@@ -4,6 +4,12 @@ import { mkdir, rm, open } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { once } from "node:events";
+import {
+  computeChunkIntegrity,
+  computeDistributionIntegrity,
+  computeRollingStep,
+  ROLLING_SHA256_INITIAL
+} from "../src/distribution/omega-integrity-chain.js";
 
 export const DEFAULT_CHUNK_BYTES = 1900 * 1024 * 1024;
 export const DEFAULT_BLOCK_BYTES = 16 * 1024 * 1024;
@@ -44,6 +50,7 @@ export async function shardModelFile(
   try{
     const info=await handle.stat();
     if(!info.isFile()) throw new Error("input is not a regular file: "+source);
+    if(info.size < 1) throw new Error("input file must not be empty: "+source);
 
     const totalSize=info.size;
     const totalChunks=Math.max(1,Math.ceil(totalSize/chunkBytes));
@@ -108,6 +115,12 @@ export async function shardModelFile(
         throw error;
       }
 
+      let rolling = ROLLING_SHA256_INITIAL;
+      for (const block of blockHashes) {
+        rolling = computeRollingStep(rolling, block);
+        block.rolling_sha256 = rolling;
+      }
+      const chunkIntegrity = computeChunkIntegrity(blockHashes);
       const sha=chunkHash.digest("hex");
       chunks.push({
         index,
@@ -115,7 +128,8 @@ export async function shardModelFile(
         bytes:written,
         sha256:sha,
         block_size_bytes:blockBytes,
-        blocks:blockHashes
+        blocks:blockHashes,
+        ...chunkIntegrity
       });
       offset+=written;
     }
@@ -135,6 +149,7 @@ export async function shardModelFile(
       chunk_size_bytes:chunkBytes,
       block_size_bytes:blockBytes,
       chunk_count:chunks.length,
+      integrity: computeDistributionIntegrity(chunks),
       chunks
     };
 
