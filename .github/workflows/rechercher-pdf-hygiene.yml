@@ -54,22 +54,22 @@ jobs:
             fi
           done
           python3 - "$encrypted" "$lfs_refs" "$tree_pdfs" "$branch_pdfs" <<'PY'
-import json,sys
-from pathlib import Path
-encrypted,lfs_refs,tree_pdfs,branch_pdfs=map(int,sys.argv[1:])
-out={
- 'schema':'din-allah-encyclopedia/rechercher-release-storage-hygiene/v1',
- 'pdf_backend':'github-releases-assets',
- 'git_lfs':False,
- 'github_actions_artifacts_as_pdf_storage':False,
- 'encrypted_pdf_final_format':False,
- 'checks':{'legacy_encrypted_release_assets':encrypted==0,'gitattributes_lfs_pdf_rules':lfs_refs==0,'default_tree_pdf_payloads':tree_pdfs==0,'acquisition_branch_pdf_payloads':branch_pdfs==0},
- 'report_artifact_only':True
-}
-Path('artifacts/governance/release-storage-hygiene.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-print(json.dumps(out,ensure_ascii=False,sort_keys=True))
-if not all(out['checks'].values()): raise SystemExit('ERROR: PDF release storage boundary is not clean.')
-PY
+          import json,sys
+          from pathlib import Path
+          encrypted,lfs_refs,tree_pdfs,branch_pdfs=map(int,sys.argv[1:])
+          out={
+           'schema':'din-allah-encyclopedia/rechercher-release-storage-hygiene/v1',
+           'pdf_backend':'github-releases-assets',
+           'git_lfs':False,
+           'github_actions_artifacts_as_pdf_storage':False,
+           'encrypted_pdf_final_format':False,
+           'checks':{'legacy_encrypted_release_assets':encrypted==0,'gitattributes_lfs_pdf_rules':lfs_refs==0,'default_tree_pdf_payloads':tree_pdfs==0,'acquisition_branch_pdf_payloads':branch_pdfs==0},
+           'report_artifact_only':True
+          }
+          Path('artifacts/governance/release-storage-hygiene.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(out,ensure_ascii=False,sort_keys=True))
+          if not all(out['checks'].values()): raise SystemExit('ERROR: PDF release storage boundary is not clean.')
+          PY
 
       - name: Recover authoritative acquisition manifest
         run: |
