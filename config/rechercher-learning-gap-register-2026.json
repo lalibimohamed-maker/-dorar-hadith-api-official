@@ -1,0 +1,185 @@
+{
+  "schema": "rechercher-learning-gap-register-2026",
+  "version": "1.0.0",
+  "status": "implementation-register",
+  "nonNegotiable": {
+    "acquisitionBlockerAllowed": false,
+    "learningMayNotBlockPdfAcquisition": true,
+    "acquisitionStagesRemainIndependent": [
+      "discover",
+      "download",
+      "preserve",
+      "validate"
+    ]
+  },
+  "gaps": [
+    {
+      "id": "LG-P0-01",
+      "priority": "P0",
+      "gap": "Unified scheduler",
+      "capability": "FSRS-compatible interface + SM-2/Leitner fallbacks",
+      "status": "implemented-in-p0",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "src/learning/scheduler-registry.mjs"
+      ]
+    },
+    {
+      "id": "LG-P0-02",
+      "priority": "P0",
+      "gap": "Central selector",
+      "capability": "Choose item/mode/source/difficulty and explain why",
+      "status": "implemented-in-p0",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "src/learning/learning-orchestrator.mjs"
+      ]
+    },
+    {
+      "id": "LG-P0-03",
+      "priority": "P0",
+      "gap": "Confidence calibration",
+      "capability": "Store confidence separately from correctness",
+      "status": "implemented-in-p0",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "src/learning/learning-orchestrator.mjs"
+      ]
+    },
+    {
+      "id": "LG-P0-04",
+      "priority": "P0",
+      "gap": "Provenance lifecycle",
+      "capability": "Source/page anchor + card lifecycle + invalidation",
+      "status": "implemented-in-p0",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "src/learning/learning-orchestrator.mjs"
+      ]
+    },
+    {
+      "id": "LG-P1-01",
+      "priority": "P1",
+      "gap": "Prerequisites",
+      "capability": "Route failures to prerequisite concepts",
+      "status": "planned",
+      "acquisitionBlocker": false
+    },
+    {
+      "id": "LG-P1-02",
+      "priority": "P1",
+      "gap": "Interleaving",
+      "capability": "Mix discriminable concepts intentionally",
+      "status": "planned",
+      "acquisitionBlocker": false
+    },
+    {
+      "id": "LG-P1-03",
+      "priority": "P1",
+      "gap": "Transfer",
+      "capability": "Generate verified-evidence application tasks",
+      "status": "planned",
+      "acquisitionBlocker": false
+    },
+    {
+      "id": "LG-P1-04",
+      "priority": "P1",
+      "gap": "Misconceptions",
+      "capability": "Detect repeated error patterns and remediate",
+      "status": "planned",
+      "acquisitionBlocker": false
+    },
+    {
+      "id": "LG-P1-05",
+      "priority": "P1",
+      "gap": "Progressive explanation",
+      "capability": "Control answer depth without losing evidence",
+      "status": "planned",
+      "acquisitionBlocker": false
+    },
+    {
+      "id": "LG-P1-06",
+      "priority": "P1",
+      "gap": "Delayed mastery",
+      "capability": "Require delayed/transfer evidence before mastery",
+      "status": "implemented-in-p0",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "src/learning/learning-orchestrator.mjs"
+      ]
+    },
+    {
+      "id": "LG-P2-01",
+      "priority": "P2",
+      "gap": "Game adapters",
+      "capability": "Memory, matching, ordering, hotspots, timelines, branching",
+      "status": "planned",
+      "acquisitionBlocker": false
+    },
+    {
+      "id": "LG-P2-02",
+      "priority": "P2",
+      "gap": "Game telemetry",
+      "capability": "Map game events to skills and retrieval evidence",
+      "status": "partial-contract",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "src/learning/learning-orchestrator.mjs"
+      ]
+    },
+    {
+      "id": "LG-P2-03",
+      "priority": "P2",
+      "gap": "Cooperative learning",
+      "capability": "Teach-back, source hunts, peer/team challenges",
+      "status": "partial-contract",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "src/learning/learning-orchestrator.mjs"
+      ]
+    },
+    {
+      "id": "LG-P3-01",
+      "priority": "P3",
+      "gap": "Multimodal",
+      "capability": "Audio, spoken answer, video, diagram and manuscript interaction",
+      "status": "partial-existing",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "src/learning/flashcard-engine.mjs",
+        "src/multimodal-runtime.js"
+      ]
+    },
+    {
+      "id": "LG-P3-02",
+      "priority": "P3",
+      "gap": "Offline queue",
+      "capability": "Local review packs and safe synchronization",
+      "status": "partial-existing",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "src/offline-pdf-library.js"
+      ]
+    },
+    {
+      "id": "LG-P4-01",
+      "priority": "P4",
+      "gap": "Method evaluation",
+      "capability": "Compare algorithms using retention/transfer outcomes",
+      "status": "planned",
+      "acquisitionBlocker": false
+    },
+    {
+      "id": "LG-P4-02",
+      "priority": "P4",
+      "gap": "Research registry",
+      "capability": "Continuously update learning-method evidence",
+      "status": "partial-contract",
+      "acquisitionBlocker": false,
+      "implementation": [
+        "config/rechercher-learning-algorithm-catalog-2026.json",
+        "config/rechercher-global-learning-strategy-2026.json"
+      ]
+    }
+  ]
+}
