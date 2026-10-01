@@ -35,18 +35,18 @@ test('machine translation remains explicitly separated from verified resources',
   assert.equal(registry.policy.machine_translation_verification_state, 'unverified');
 });
 
-test('resource lanes include core Islamic knowledge domains', () => {
+test('resource lanes include all 48 Islamic knowledge domains', () => {
   for (const lane of ['quran', 'tafsir', 'hadith', 'sunnah', 'sirah', 'aqidah', 'fiqh', 'fatwa', 'books', 'provenance', 'rights', 'verification']) {
     assert.ok(registry.resource_lanes.includes(lane), `missing lane: ${lane}`);
   }
 });
 
 
-test('3192 matrix outputs use a dedicated storage repository', () => {
+test('6384 matrix outputs use a dedicated storage repository', () => {
   const storage = JSON.parse(fs.readFileSync(
     path.join(process.cwd(), 'config/rechercher/global-multilingual-storage.json'), 'utf8'
   ));
-  assert.equal(storage.storage_repository, 'lalibimohamed-maker/dinullah-matrix-3192-storage-01');
+  assert.equal(storage.storage_repository, 'lalibimohamed-maker/dinullah-matrix-6384-storage-01');
   assert.equal(storage.authentication.secret_name, 'RECHERCHER_MATRIX_STORAGE_TOKEN');
   assert.equal(storage.contract.matrix_content_isolated_from_main_repository, true);
   assert.equal(storage.contract.general_pdf_storage_is_separate_from_matrix_storage, true);
