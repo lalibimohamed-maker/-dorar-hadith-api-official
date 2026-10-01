@@ -5,7 +5,7 @@ on:
   schedule:
     - cron: '0 3 * * *'
 
-# security-justification: the workflow downloads catalogued research copies for developer review, encrypts retained copies with a GitHub secret, and never publishes plaintext restricted copies.
+# security-justification: the workflow downloads catalogued research copies, validates them, and stores plaintext copies only in a private GitHub Releases repository.
 permissions:
   contents: write
 
@@ -30,13 +30,6 @@ jobs:
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
-
-      - name: Require vault key
-        env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required; refusing to acquire or persist copies.'; exit 1; }
 
       - name: Materialize central unbounded master catalog
         run: |
@@ -189,48 +182,38 @@ jobs:
             --reason 'multi-engine resolution, deep worldwide federation, acquisition validation, governance and fail-closed global control' \
             --commit "$(git rev-parse HEAD)"
 
-      - name: Encrypt retained copies
+      - name: Persist verified plaintext PDFs to private Releases
         env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+          PROTECTED_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+          PROTECTED_REPO: lalibimohamed82-coder/rechercher-pdf-storage
         run: |
           set -euo pipefail
           shopt -s nullglob
-          for f in artifacts/developer-review-vault/*.pdf; do
-            openssl enc -aes-256-cbc -pbkdf2 -salt -md sha256 \
-              -pass env:REVIEW_VAULT_KEY -in "$f" -out "$f.enc"
-            rm -f -- "$f"
-          done
-
-      - name: Persist encrypted vault as release assets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          files=(artifacts/developer-review-vault/*.enc)
-          test "${#files[@]}" -gt 0 || { echo 'ERROR: no encrypted vault files were produced.'; exit 1; }
-          VAULT_TAG="rechercher-vault-${GITHUB_RUN_ID}"
-          gh release create "$VAULT_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "Rechercher encrypted vault ${GITHUB_RUN_ID}" \
-            --notes "Encrypted developer-review acquisition vault for workflow run ${GITHUB_RUN_ID}. Files are AES-256-CBC encrypted with the repository REVIEW_VAULT_KEY secret."
+          files=(artifacts/developer-review-vault/*.pdf)
+          test "${#files[@]}" -gt 0 || { echo 'ERROR: no verified PDFs were acquired.'; exit 1; }
+          test -n "$PROTECTED_TOKEN"
+          visibility=$(GH_TOKEN="$PROTECTED_TOKEN" gh repo view "$PROTECTED_REPO" --json visibility --jq .visibility)
+          test "$visibility" = PRIVATE || { echo 'ERROR: protected review storage must be private.'; exit 1; }
+          TAG="rechercher-review-pdf-${GITHUB_RUN_ID}"
+          GH_TOKEN="$PROTECTED_TOKEN" gh release create "$TAG" --repo "$PROTECTED_REPO" --title "Rechercher developer-review plaintext PDFs ${GITHUB_RUN_ID}" --notes "Verified plaintext PDFs for developer review. No encryption surrogate, no .pdf.enc, and no Git LFS."
           : > artifacts/governance/vault-release.jsonl
           for f in "${files[@]}"; do
-            gh release upload "$VAULT_TAG" "$f" --repo "$GITHUB_REPOSITORY" --clobber
-            sha256sum "$f" >> artifacts/governance/vault-release.jsonl
+            head -c 5 "$f" | grep -qx '%PDF-'
+            qpdf --check "$f" >/dev/null
+            sha=$(sha256sum "$f" | awk '{print $1}')
+            GH_TOKEN="$PROTECTED_TOKEN" gh release upload "$TAG" "$f" --repo "$PROTECTED_REPO" --clobber
+            printf '%s\t%s\t%s\n' "$sha" "$(basename "$f")" "https://github.com/$PROTECTED_REPO/releases/download/$TAG/$(basename "$f")" >> artifacts/governance/vault-release.jsonl
+            rm -f -- "$f"
           done
-          python3 - "$VAULT_TAG" <<'PY'
-          import json, os, subprocess, sys
+          python3 - "$TAG" <<'PY'
+          import json,sys
           from pathlib import Path
-          tag=sys.argv[1]
-          lines=[]
+          tag=sys.argv[1]; assets=[]
           for raw in Path('artifacts/governance/vault-release.jsonl').read_text(encoding='utf-8').splitlines():
-              digest, path=raw.split(None, 1)
-              lines.append({'sha256':digest,'file':path})
-          release=json.loads(subprocess.check_output(['gh','release','view',tag,'--repo',os.environ['GITHUB_REPOSITORY'],'--json','url,tagName'], text=True))
-          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v1','release':release,'assets':lines}, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+              sha,name,url=raw.split('\t',2); assets.append({'sha256':sha,'file':name,'format':'pdf','access':'private','download_url':url})
+          Path('artifacts/governance/vault-release.json').write_text(json.dumps({'schema':'din-allah-encyclopedia/rechercher-vault-release/v5-plaintext-private','storage_model':'github-releases-assets','git_lfs':False,'encrypted_pdf_final_format':False,'release':{'tag_name':tag,'repository':'lalibimohamed82-coder/rechercher-pdf-storage'},'assets':assets,'counts':{'pdf':len(assets),'pdf_enc':0}},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
           rm -f artifacts/governance/vault-release.jsonl
-
       - name: Persist manifests and governance evidence
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -246,7 +229,7 @@ jobs:
             echo 'ERROR: acquisition/governance produced no persistable change; nothing was persisted.'
             exit 1
           fi
-          git commit -m 'data(rechercher): retain encrypted vault release and governance evidence'
+          git commit -m 'data(rechercher): retain plaintext private release and governance evidence'
           ACQ_COMMIT=$(git rev-parse HEAD)
           # The central catalog is materialized for this run only. Restore the tracked
           # catalog before switching branches so generated catalog state never blocks checkout

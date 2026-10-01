@@ -30,42 +30,51 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qpdf poppler-utils
 
-      - name: Require vault key
+      - name: Audit repository and release PDF storage boundary
         env:
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          test -n "$REVIEW_VAULT_KEY" || { echo 'REVIEW_VAULT_KEY is required.'; exit 1; }
-
-      - name: Recover latest encrypted vault
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/recovered-vault artifacts/developer-review-vault artifacts/governance
-          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,createdAt --jq '[.[] | select(.tagName | startswith("rechercher-vault-"))] | sort_by(.createdAt) | last | .tagName')
-          if [ -z "${tag:-}" ] || [ "$tag" = "null" ]; then
-            echo 'No vault release exists; continuing with authoritative acquisition manifest.'
-            exit 0
-          fi
-
-          enc_count=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '[.assets[] | select(.name | endswith(".enc"))] | length')
-          if [ "${enc_count:-0}" -eq 0 ]; then
-            echo "Vault release $tag has no .enc assets; continuing without encrypted-vault recovery."
-            exit 0
-          fi
-
-          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern '*.enc' --dir artifacts/recovered-vault
-          shopt -s nullglob
-          enc_files=(artifacts/recovered-vault/*.enc)
-          test "${#enc_files[@]}" -gt 0
-          for f in "${enc_files[@]}"; do
-            out="artifacts/developer-review-vault/$(basename "${f%.enc}")"
-            openssl enc -d -aes-256-cbc -pbkdf2 -salt -md sha256 -pass env:REVIEW_VAULT_KEY -in "$f" -out "$out"
-            test "$(head -c 5 "$out")" = '%PDF-'
-            qpdf --check "$out"
+          mkdir -p artifacts/governance
+          report=artifacts/governance/release-storage-hygiene.json
+          encrypted=0
+          lfs_refs=0
+          tree_pdfs=0
+          mapfile -t tags < <(gh release list --repo "$GITHUB_REPOSITORY" --limit 1000 --json tagName --jq '.[].tagName' | grep -E '^rechercher-' || true)
+          for tag in "${tags[@]}"; do
+            if gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -E '\.(pdf\.enc|enc|encrypted)$' -q; then encrypted=1; fi
           done
+          if [ -f .gitattributes ] && grep -E 'filter=lfs.*artifacts/.*\.pdf|artifacts/.*\.pdf.*filter=lfs' .gitattributes -q; then lfs_refs=1; fi
+          if git ls-tree -r --name-only HEAD -- '*.pdf' | grep -q .; then tree_pdfs=1; fi
+          branches='rechercher/encyclopedia-continuous-acquisition rechercher/encyclopedia-master-unbounded-acquisition rechercher/salaf-01-400h-developer-review-acquisition'
+          branch_pdfs=0
+          for branch in $branches; do
+            if git fetch --no-tags origin "refs/heads/$branch:refs/remotes/origin/$branch" >/dev/null 2>&1; then
+              if git ls-tree -r --name-only "refs/remotes/origin/$branch" -- '*.pdf' | grep -q .; then branch_pdfs=1; fi
+            fi
+          done
+          python3 - "$encrypted" "$lfs_refs" "$tree_pdfs" "$branch_pdfs" <<'PY'
+          import json,sys
+          from pathlib import Path
+          encrypted,lfs_refs,tree_pdfs,branch_pdfs=map(int,sys.argv[1:])
+          out={
+            'schema':'din-allah-encyclopedia/rechercher-release-storage-hygiene/v1',
+            'pdf_backend':'github-releases-assets',
+            'git_lfs':False,
+            'github_actions_artifacts_as_pdf_storage':False,
+            'encrypted_pdf_final_format':False,
+            'checks':{
+              'legacy_encrypted_release_assets':encrypted==0,
+              'gitattributes_lfs_pdf_rules':lfs_refs==0,
+              'default_tree_pdf_payloads':tree_pdfs==0,
+              'acquisition_branch_pdf_payloads':branch_pdfs==0
+            },
+            'report_artifact_only':True
+          }
+          Path('artifacts/governance/release-storage-hygiene.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
+          print(json.dumps(out,ensure_ascii=False,sort_keys=True))
+          if not all(out['checks'].values()): raise SystemExit('ERROR: PDF release storage boundary is not clean.')
+          PY
 
       - name: Recover authoritative acquisition manifest
         run: |
@@ -75,56 +84,21 @@ jobs:
           git show "origin/$REVIEW_BRANCH:books-batches/salaf-01-400h/developer-review-manifest.json" > books-batches/salaf-01-400h/developer-review-manifest.json
           test -s books-batches/salaf-01-400h/developer-review-manifest.json
 
-      - name: Audit the whole recovered encyclopedia PDF vault
+      - name: Persist hygiene report without storing PDF payloads
         run: |
           set -euo pipefail
-          python3 scripts/rechercher_pdf_hygiene.py \
-            --root "$GITHUB_WORKSPACE" \
-            --pdf-root artifacts/developer-review-vault \
-            --manifest books-batches/salaf-01-400h/developer-review-manifest.json \
-            --out artifacts/governance/pdf-hygiene-report.json \
-            --quarantine artifacts/developer-review-quarantine
-          cat artifacts/governance/pdf-hygiene-report.json
-
-      - name: Validate every remaining PDF recursively
-        run: |
-          set -euo pipefail
-          while IFS= read -r -d '' f; do
-            test "$(head -c 5 "$f")" = '%PDF-'
-            qpdf --check "$f"
-          done < <(find artifacts/developer-review-vault -type f -name '*.pdf' -print0)
-
-      - name: Persist hygiene report and reconciled state
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          gh auth setup-git
+          rm -f -- books-batches/salaf-01-400h/developer-review-manifest.json
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-
-          # The authoritative manifest was materialized from REVIEW_BRANCH above.
-          # It is intentionally untracked while this job is still on main. A direct
-          # checkout of REVIEW_BRANCH would therefore abort because that branch tracks
-          # the same path. Remove only this exact generated copy; REVIEW_BRANCH will
-          # restore its tracked copy immediately after checkout.
-          REVIEW_MANIFEST='books-batches/salaf-01-400h/developer-review-manifest.json'
-          test -s "$REVIEW_MANIFEST"
-          rm -f -- "$REVIEW_MANIFEST"
-
-          git add artifacts/governance/pdf-hygiene-report.json
-          git diff --cached --quiet || git commit -m 'data(rechercher): persist whole-encyclopedia PDF hygiene report'
+          git add artifacts/governance/release-storage-hygiene.json
+          git diff --cached --quiet || git commit -m 'data(rechercher): persist Releases storage hygiene report'
           STATE_COMMIT=$(git rev-parse HEAD)
-
           git fetch origin "$REVIEW_BRANCH"
           git checkout -B "$REVIEW_BRANCH" "origin/$REVIEW_BRANCH"
-          test -s "$REVIEW_MANIFEST"
-
-          git checkout "$STATE_COMMIT" -- artifacts/governance/pdf-hygiene-report.json
-          git add artifacts/governance/pdf-hygiene-report.json
-          git diff --cached --quiet || git commit -m 'data(rechercher): reconcile whole-encyclopedia PDF hygiene state'
+          git checkout "$STATE_COMMIT" -- artifacts/governance/release-storage-hygiene.json
+          git add artifacts/governance/release-storage-hygiene.json
+          git diff --cached --quiet || git commit -m 'data(rechercher): reconcile Releases storage hygiene state'
           git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
-
       - name: Upload compact hygiene report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

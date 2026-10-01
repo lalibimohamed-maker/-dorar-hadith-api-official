@@ -1,0 +1,12 @@
+# Gitleaks false-positive allowlist for a public evidence URL token.
+#
+# The Rwanda Ministry of Justice evidence URL below contains a public download
+# token in its query string. It is a locator for a government-published document,
+# not an application credential. Keep this allowlist exact and narrow; do not
+# broaden it to the whole evidence URL/domain or to either provenance file.
+[allowlist]
+description = "Known public Rwanda Ministry of Justice evidence URL token"
+regexTarget = "match"
+regexes = [
+  '''0a72c9f36e0694e727af1c50eeb47f730ca327e3'''
+]

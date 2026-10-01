@@ -1,0 +1,197 @@
+name: Rechercher — PDF storage migration to Releases
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '15 2 * * *'
+  workflow_dispatch:
+
+# security-justification: write permission is used only for verified PDF release migration and migration evidence.
+permissions:
+  contents: write
+
+concurrency:
+  group: rechercher-pdf-release-migration
+  cancel-in-progress: false
+
+env:
+  PROTECTED_REPO: lalibimohamed82-coder/rechercher-pdf-storage
+  LEGACY_BRANCHES: 'rechercher/encyclopedia-continuous-acquisition rechercher/encyclopedia-master-unbounded-acquisition rechercher/salaf-01-400h-developer-review-acquisition'
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          lfs: false
+          persist-credentials: false
+
+      - name: Install migration tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y git-lfs qpdf poppler-utils
+          git lfs install --local
+
+      - name: Verify private protected Releases destination
+        env:
+          PROTECTED_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$PROTECTED_TOKEN"
+          visibility=$(GH_TOKEN="$PROTECTED_TOKEN" gh repo view "$PROTECTED_REPO" --json visibility --jq .visibility)
+          test "$visibility" = PRIVATE || { echo 'ERROR: protected PDF destination must be private.'; exit 1; }
+
+      - name: Convert legacy encrypted Releases assets to plaintext PDFs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEW_VAULT_KEY: ${{ secrets.REVIEW_VAULT_KEY }}
+          PROTECTED_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_VAULT_KEY"
+          test -n "$PROTECTED_TOKEN"
+          work="$RUNNER_TEMP/encrypted-release-migration"
+          mkdir -p "$work"
+          migrated=0
+          mapfile -t tags < <(gh release list --repo "$GITHUB_REPOSITORY" --limit 1000 --json tagName --jq '.[].tagName' | grep -E '^rechercher-vault-.*$' || true)
+          for tag in "${tags[@]}"; do
+            mapfile -t assets < <(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -E '\.(pdf\.enc|enc|encrypted)$' || true)
+            [ "${#assets[@]}" -eq 0 ] && continue
+            private_tag="rechercher-migrated-${tag#rechercher-vault-}"
+            if ! GH_TOKEN="$PROTECTED_TOKEN" gh release view "$private_tag" --repo "$PROTECTED_REPO" >/dev/null 2>&1; then
+              GH_TOKEN="$PROTECTED_TOKEN" gh release create "$private_tag" --repo "$PROTECTED_REPO" --title "Rechercher migrated plaintext PDFs ${tag#rechercher-vault-}" --notes "Plaintext PDFs converted from legacy encrypted assets. Private repository; no .pdf.enc retained."
+            fi
+            for name in "${assets[@]}"; do
+              rm -f "$work"/* || true
+              gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern "$name" --dir "$work"
+              enc="$work/$name"
+              case "$name" in
+                *.pdf.enc) out="$work/${name%.enc}" ;;
+                *.enc) out="$work/${name%.enc}.pdf" ;;
+                *.encrypted) out="$work/${name%.encrypted}.pdf" ;;
+                *) continue ;;
+              esac
+              openssl enc -d -aes-256-cbc -pbkdf2 -md sha256 -pass env:REVIEW_VAULT_KEY -in "$enc" -out "$out"
+              test -s "$out"
+              head -c 5 "$out" | grep -qx '%PDF-'
+              qpdf --check "$out" >/dev/null
+              sha=$(sha256sum "$out" | awk '{print $1}')
+              GH_TOKEN="$PROTECTED_TOKEN" gh release upload "$private_tag" "$out" --repo "$PROTECTED_REPO" --clobber
+              gh release delete-asset "$tag" "$name" --repo "$GITHUB_REPOSITORY" --yes
+              printf '%s\t%s\t%s\n' "$tag" "$name" "$sha" >> "$GITHUB_WORKSPACE/encrypted-release-migration.tsv"
+              migrated=$((migrated+1))
+              echo "[ENC->PDF] $tag/$name sha256=$sha"
+            done
+          done
+          echo "ENCRYPTED_RELEASE_ASSETS_MIGRATED=$migrated"
+
+      - name: Remove PDF LFS payloads from legacy acquisition branches after successful upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PROTECTED_TOKEN: ${{ secrets.RECHERCHER_SECONDARY_STORAGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/legacy-branch-migration"
+          rm -rf "$work"; mkdir -p "$work"
+          : > legacy-branch-migration.tsv
+          for branch in $LEGACY_BRANCHES; do
+            safe=$(printf '%s' "$branch" | tr '/ ' '__')
+            dir="$work/$safe"
+            rm -rf "$dir"
+            git clone --no-checkout --filter=blob:none "https://github.com/$GITHUB_REPOSITORY.git" "$dir"
+            git -C "$dir" fetch --no-tags origin "refs/heads/$branch:refs/remotes/origin/$branch"
+            git -C "$dir" checkout -B "$branch" "origin/$branch"
+            git -C "$dir" lfs install --local
+            git -C "$dir" lfs pull --include='*.pdf' --exclude='' || true
+            mapfile -t pdfs < <(git -C "$dir" ls-files '*.pdf')
+            if [ "${#pdfs[@]}" -eq 0 ]; then
+              echo "[BRANCH CLEAN] $branch"
+              continue
+            fi
+            public_tag="rechercher-legacy-public-${safe}-${GITHUB_RUN_ID}"
+            protected_tag="rechercher-legacy-protected-${safe}-${GITHUB_RUN_ID}"
+            public_ready=0; protected_ready=0
+            for rel in "${pdfs[@]}"; do
+              f="$dir/$rel"
+              test -s "$f"
+              head -c 5 "$f" | grep -qx '%PDF-'
+              qpdf --check "$f" >/dev/null
+              sha=$(sha256sum "$f" | awk '{print $1}')
+              side="${rel%.pdf}.manifest.json"
+              route=protected
+              if [ -f "$dir/$side" ] && python3 - "$dir/$side" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding='utf-8'))
+          raise SystemExit(0 if d.get('storage_visibility')=='publication-eligible' and d.get('public_browser') is True else 1)
+          PY
+              then route=public; fi
+              if [ "$route" = public ]; then
+                if [ "$public_ready" -eq 0 ]; then
+                  gh release create "$public_tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Rechercher migrated public PDFs ${branch}" --notes "Migrated from legacy acquisition branch after PDF validation. Repository tree no longer stores PDF payloads."
+                  public_ready=1
+                fi
+                gh release upload "$public_tag" "$f" --repo "$GITHUB_REPOSITORY" --clobber
+                url="https://github.com/$GITHUB_REPOSITORY/releases/download/$public_tag/$(basename "$f")"
+                access=public
+              else
+                if [ "$protected_ready" -eq 0 ]; then
+                  GH_TOKEN="$PROTECTED_TOKEN" gh release create "$protected_tag" --repo "$PROTECTED_REPO" --title "Rechercher migrated protected PDFs ${branch}" --notes "Migrated from legacy acquisition branch after PDF validation. Private destination; no Git LFS."
+                  protected_ready=1
+                fi
+                GH_TOKEN="$PROTECTED_TOKEN" gh release upload "$protected_tag" "$f" --repo "$PROTECTED_REPO" --clobber
+                url="https://github.com/$PROTECTED_REPO/releases/download/$protected_tag/$(basename "$f")"
+                access=private
+              fi
+              printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$branch" "$rel" "$sha" "$route" "$access" "$url" >> legacy-branch-migration.tsv
+              git -C "$dir" rm -- "$rel"
+              echo "[LFS/PDF -> RELEASE] branch=$branch path=$rel route=$route sha256=$sha"
+            done
+            # Remove only PDF-specific LFS attributes; preserve unrelated attributes.
+            if [ -f "$dir/.gitattributes" ]; then
+              sed -i -E '/artifacts\/.*\.pdf.*filter=lfs/d;/\.pdf$.*filter=lfs/d' "$dir/.gitattributes"
+              git -C "$dir" add .gitattributes
+              if [ ! -s "$dir/.gitattributes" ]; then git -C "$dir" rm -- .gitattributes; fi
+            fi
+            # Repoint known acquisition callers to the current Releases-only central workflow.
+            git -C "$dir" fetch --no-tags origin main:refs/remotes/origin/main
+            while IFS= read -r wf; do
+              rel="${wf#origin/main:}"
+              if [ -f "$dir/$rel" ] && grep -Eq 'git[[:space:]]+lfs|rechercher-governed-acquisition\.yml@|REVIEW_VAULT_KEY|\.pdf\.enc' "$dir/$rel"; then
+                git -C "$dir" checkout origin/main -- "$rel"
+              fi
+            done < <(git -C "$dir" ls-tree -r --name-only origin/main -- .github/workflows/rechercher*.yml .github/workflows/rechercher*.yaml | sed 's#^#origin/main:#')
+            git -C "$dir" add -A
+            git -C "$dir" config user.name 'github-actions[bot]'
+            git -C "$dir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            if ! git -C "$dir" diff --cached --quiet; then
+              git -C "$dir" commit -m 'chore(rechercher): migrate legacy PDF storage from LFS to Releases'
+              git -C "$dir" -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)" push origin "HEAD:refs/heads/$branch"
+            fi
+          done
+
+      - name: Publish migration evidence on main
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          python3 - <<'PY'
+          import json, pathlib
+          out={'schema':'din-allah-encyclopedia/rechercher-pdf-release-migration/v2','storage_backend':'github-releases-assets','git_lfs_final':False,'encrypted_final_format':False,'github_actions_artifacts_as_pdf_storage':False,'encrypted_release_assets_migrated':0,'legacy_branch_pdf_paths_migrated':0}
+          p=pathlib.Path('encrypted-release-migration.tsv')
+          if p.exists(): out['encrypted_release_assets_migrated']=len([x for x in p.read_text(encoding='utf-8').splitlines() if x])
+          p2=pathlib.Path('legacy-branch-migration.tsv')
+          if p2.exists(): out['legacy_branch_pdf_paths_migrated']=len([x for x in p2.read_text(encoding='utf-8').splitlines() if x])
+          (pathlib.Path('artifacts/governance')/'pdf-release-migration.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add artifacts/governance/pdf-release-migration.json
+          git diff --cached --quiet || git commit -m 'data(rechercher): record Releases-only PDF migration evidence'
+          git status --short

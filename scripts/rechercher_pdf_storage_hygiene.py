@@ -32,7 +32,9 @@ def clean(root: Path, pattern: str) -> int:
     for path in root.glob(pattern):
         if not path.is_file():
             continue
-        if path.name.endswith(FORBIDDEN_SUFFIXES) or (path.suffix.lower()==".pdf" and not is_real_pdf(path)):
+        if path.name.endswith(FORBIDDEN_SUFFIXES):
+            raise SystemExit(f"ENCRYPTED_PDF_REQUIRES_RECOVERY: {path}")
+        if path.suffix.lower()==".pdf" and not is_real_pdf(path):
             path.unlink()
             removed += 1
     return removed

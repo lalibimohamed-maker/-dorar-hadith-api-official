@@ -9,15 +9,15 @@ The 01–400H master catalog is the authoritative inventory of discovered works 
 The pipeline records two independent facts:
 
 - `availability`: whether a usable copy was actually acquired from a catalogued source.
-- `rights_action`: whether the catalog currently supports public redistribution or the copy must remain in the developer review vault.
+- `rights_action`: whether the catalog currently supports public redistribution or the copy must remain in the private protected Releases repository.
 
 A downloadable/hosted file is not treated as proof of redistribution permission.
 
 ## Retention
 
-Successful research copies are retained. Restricted or rights-unverified copies are encrypted before persistence using the repository secret `REVIEW_VAULT_KEY`. Plaintext copies are never committed to the repository by this workflow.
+Successful research copies are retained as plaintext `.pdf` Releases assets. Restricted or rights-unverified copies are stored only in the private protected Releases repository. `.pdf.enc`, `.enc`, and `.encrypted` are migration-only inputs and are never a final storage format.
 
-The acquisition step does not delete a successful source copy. The only plaintext removal performed by the workflow is removal of the already-encrypted local staging file after encryption, so that the retained encrypted copy is the durable record.
+The acquisition step never commits PDF payloads to the repository tree. After a verified Releases upload, the local PDF staging copy is removed and the release URL, SHA-256, bytes, rights state, and access class are recorded in the acquisition evidence.
 
 ## Verification
 
@@ -29,4 +29,4 @@ Copies whose catalog rights status is `verified-redistributable` remain eligible
 
 ## Security
 
-`REVIEW_VAULT_KEY` must be configured as a GitHub Actions secret. It must never be placed in source files, commits, issue comments, or chat messages.
+The protected Releases destination must remain private and its write token is supplied only through the GitHub Actions secret `RECHERCHER_SECONDARY_STORAGE_TOKEN`. PDF payloads and credentials are never placed in source files, commits, issue comments, or chat messages.
