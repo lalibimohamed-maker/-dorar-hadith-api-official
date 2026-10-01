@@ -81,5 +81,5 @@ jobs:
           name: quran-translation-acquisition-${{ github.run_id }}
           path: |
             artifacts/quran-translation-acquisition/manifest.json
-            $(dirname "artifacts/quran-translation-acquisition/manifest.json")/release-persistence.json
+            artifacts/quran-translation-acquisition/release-persistence.json
           if-no-files-found: warn
