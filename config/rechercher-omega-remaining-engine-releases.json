@@ -128,6 +128,21 @@
       }
     },
     {
+      "id": "spark-x2.5-4b",
+      "model_id": "XHToken/Spark-X2.5-4B",
+      "revision": "main",
+      "license": "apache-2.0",
+      "release_tag": "rechercher-omega-spark-x25-4b-v1.0.0",
+      "release_visibility": "prerelease",
+      "estimated_gb": 8.2,
+      "acquisition": "github_release",
+      "rights_promotion_status": "weights_clear_pending_manifest_verification",
+      "role": "local_reasoning_candidate",
+      "al_huda_stage": "reasoning",
+      "upstream": "https://github.com/XHToken/Spark-X2.5",
+      "ollama_model": "SparkLLM/Spark-X2.5-4B"
+    },
+    {
       "id": "flux",
       "model_id": "black-forest-labs/FLUX.1-schnell",
       "revision": null,
@@ -149,6 +164,7 @@
     "HunyuanVideo-1.5 and LTX-2 use community licenses and remain draft_review_only pending applicable redistribution review.",
     "FLUX.1-schnell is gated and requires account acceptance/access; no automated bypass is attempted.",
     "SGLang is an inference runtime and therefore has no model-weight acquisition target.",
+    "Spark-X2.5-4B is tracked as an Apache-2.0 local reasoning candidate for Al-Huda; acquisition resolves main to an immutable HF commit before streaming and never commits weights to Git."
     "SANA-Sprint-1.6B weights are public Apache-2.0 at the pinned HF revision; its executable runtime depends on Gemma2-2B-IT, which is tracked separately and is not silently redistributed."
   ],
   "continuationRequestedAt": "2026-09-30",
