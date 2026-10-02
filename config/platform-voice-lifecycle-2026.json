@@ -1,0 +1,10 @@
+{
+  "schema":"dinullah.platform-voice-lifecycle.v1",
+  "assistant":"Al-Huda",
+  "wakeWord":"الهُدَى",
+  "permissions":{"microphone":true,"notifications":false,"backgroundAudio":false},
+  "batteryThermal":{"adaptiveModelSelection":true,"cpuBudgetRequired":true,"thermalDowngradeRequired":true,"backgroundListeningRequiresPlatformSupport":true},
+  "ios":{"appIntents":true,"appShortcuts":true,"vocalShortcuts":true,"nativeEvidenceRequired":true},
+  "android":{"voiceInteractionService":true,"sessionService":true,"selectedAssistant":true,"hotwording":true,"nativeEvidenceRequired":true},
+  "webAssembly":{"required":true,"browserEvidenceRequired":true}
+}
