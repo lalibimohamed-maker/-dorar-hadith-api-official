@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Training pipeline: regenerate deterministic Al-Huda KWS evidence on demand.
 import argparse, json, math, random, subprocess, tempfile
 from pathlib import Path
 
