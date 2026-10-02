@@ -45,7 +45,9 @@
     "test:omega-integrity": "node --test test/rechercher-omega-integrity-sharding.test.js",
     "test:omega-claims": "node --test test/rechercher-omega-claim-gate.test.js",
     "test:offline": "node --test test/offline-governed-engine.test.js test/offline-runtime-profile.test.js",
-    "test:omega-engine-identity": "node --test test/rechercher-omega-engine-identity.test.js"
+    "test:omega-engine-identity": "node --test test/rechercher-omega-engine-identity.test.js",
+    "test:omega-execution-plane": "node --test test/rechercher-omega-execution-plane.test.js",
+    "omega:execution:doctor": "node --input-type=module -e \"import('./src/rechercher-omega-capability-router.js').then(()=>console.log('Omega execution plane: ready'))\""
   },
   "engines": {
     "node": ">=20"

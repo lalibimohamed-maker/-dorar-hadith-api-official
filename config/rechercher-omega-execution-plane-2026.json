@@ -1,0 +1,10 @@
+{
+  "version":"2026.09",
+  "service":"rechercher-omega-execution-plane",
+  "layers":["model-lifecycle","runtime-adapters","capability-router","resource-scheduler","execution-service","media-controller"],
+  "activation":{"failClosed":true,"requiresVerifiedArtifact":true,"requiresVerifiedLicense":true},
+  "resultPolicy":{"generatedArtifactsDerived":true,"corpusMutation":false,"provenanceRequired":true},
+  "jobStates":["queued","preflight","running","cancelling","succeeded","failed","cancelled","blocked"],
+  "resourceKinds":["browser-wasm","browser-webgpu","local-cpu","local-gpu","remote-gpu"],
+  "capabilities":["reasoning","vision","ocr","embedding","reranking","asr","translation","tts","image-generation","video-generation","media-render","document-analysis"]
+}
