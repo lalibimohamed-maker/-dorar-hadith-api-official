@@ -5,7 +5,7 @@
   "targets":[
     {"id":"sherpa-onnx-vad-silero","role":"vad","source":"https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx","status":"acquire"},
     {"id":"sherpa-onnx-whisper-tiny-lid","role":"spoken-language-identification-and-light-asr","source":"https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-tiny.tar.bz2","status":"acquire"},
-    {"id":"sherpa-onnx-kws-zipformer-zh-en-3m","role":"open-vocabulary-kws-base-runtime","source":"https://github.com/k2-fsa/sherpa-onnx/releases/tag/kws-models","status":"acquire-and-evaluate","note":"Base KWS only; Arabic يا بوابة العلم still requires a trained and verified model."},
+    {"id":"sherpa-onnx-kws-zipformer-zh-en-3m","role":"open-vocabulary-kws-base-runtime","source":"https://github.com/k2-fsa/sherpa-onnx/releases/tag/kws-models","status":"acquire-and-evaluate","note":"Base KWS only; Arabic Al-Huda wake-word still requires a trained and verified model."},
     {"id":"sherpa-onnx-punctuation","role":"punctuation","source":"https://github.com/k2-fsa/sherpa-onnx/releases/tag/punctuation-models","status":"acquire-and-evaluate"},
     {"id":"sherpa-onnx-speaker-recognition","role":"speaker-identification-and-enrollment","source":"https://github.com/k2-fsa/sherpa-onnx/releases/tag/speaker-recongition-models","status":"acquire-and-evaluate"},
     {"id":"sherpa-onnx-audio-tagging","role":"audio-event-tagging","source":"https://github.com/k2-fsa/sherpa-onnx/releases/tag/audio-tagging-models","status":"acquire-and-evaluate"},
@@ -13,6 +13,7 @@
     {"id":"piper-ar-jordan","role":"arabic-local-tts-fallback","source":"https://github.com/OHF-Voice/piper1-gpl","status":"acquire-after-model-card-license-verification","locale":"ar_JO"},
     {"id":"whisper-cpp-multilingual","role":"high-quality-local-asr-fallback","source":"https://github.com/ggml-org/whisper.cpp","status":"acquire-and-runtime-verify","modelFamily":"multilingual"},
     {"id":"harmony-speech-engine","role":"unified-speech-serving-and-routing","source":"https://github.com/harmony-ai-solutions/harmony-speech-engine","status":"acquire-runtime-code-and-register-third-party-models-separately","note":"Third-party weights require individual redistribution review."},
-    {"id":"ya-bawabat-al-ilm-arabic-kws","role":"custom-arabic-wake-word","source":null,"status":"BUILD_REQUIRED","phrase":"يا بوابة العلم","note":"No release is declared until real inference evidence exists."}
+    {"id":"al-huda-arabic-kws","role":"custom-arabic-wake-word","source":null,"status":"BUILD_REQUIRED","phrase":"Al-Huda","arabicSpokenForm":"الهُدَى","note":"No release is declared until real training and inference evidence exists."},
+    {"id":"quran-ten-qiraat-recitation-registry","role":"quran-recitation-qiraah-riwayah-reciter-mapping","source":"config/quran-recitation-qiraat-2026.json","status":"registry-and-runtime-verify","note":"The registry defines the ten qiraat and their twenty riwayat; individual reciters remain playable only after verified source mapping and rights/provenance checks."}
   ]
 }
