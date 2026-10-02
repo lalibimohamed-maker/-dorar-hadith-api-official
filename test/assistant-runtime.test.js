@@ -57,7 +57,7 @@ await assert.rejects(
     initialMessage: 'ابدأ',
     domain: 'general-chat',
   }),
-  /supported Din Allah religious/scholarly domain/
+  /supported Din Allah religious\/scholarly domain/
 );
 
 const stopped = await runEngineDialogue({
