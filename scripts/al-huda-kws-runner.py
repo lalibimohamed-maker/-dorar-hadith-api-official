@@ -20,8 +20,10 @@ def fb():
 FB=fb()
 def features(audio):
     if audio.ndim>1: audio=audio.mean(axis=1)
-    if len(audio) and SR!=16000: audio=resample_poly(audio,SR,16000).astype(np.float32)
-    if len(audio)>=SR: x=audio[:SR]
+    if len(audio) and src_sr != SR: audio=resample_poly(audio,SR,int(src_sr)).astype(np.float32)
+    if len(audio)>=SR:
+        start=(len(audio)-SR)//2
+        x=audio[start:start+SR]
     else:
         x=np.zeros(SR,np.float32); start=(SR-len(audio))//2; x[start:start+len(audio)]=audio
     _,_,z=stft(x,fs=SR,nperseg=N_FFT,noverlap=N_FFT-HOP,nfft=N_FFT,window='hann',boundary=None)
@@ -32,7 +34,7 @@ def main():
     for line in sys.stdin:
         if not line.strip(): continue
         try:
-            req=json.loads(line); audio,_=sf.read(req["audio"],dtype="float32")
+            req=json.loads(line); audio,src_sr=sf.read(req["audio"],dtype="float32")
             sess=ort.InferenceSession(req["model"],providers=["CPUExecutionProvider"])
             inp=sess.get_inputs()[0].name
             outputs=sess.run(None,{inp:features(audio)})
