@@ -37,7 +37,872 @@ jobs:
           fi
           jq -r '.assets[].name' /tmp/runtime-release.json | sort > /tmp/runtime-assets.txt
           grep -Fxq 'Qwen3-ASR-0.6B.tar.bz2' /tmp/runtime-assets.txt && echo 'qwen06=true' >> "$GITHUB_OUTPUT" || echo 'qwen06=false' >> "$GITHUB_OUTPUT"
-          grep -Fxq 'Qwen3-ASR-1.7B.tar.bz2.part-00' /tmp/runtime-assets.txt && echo 'qwen17=true' >> "$GITHUB_OUTPUT" || echo 'qwen17=false' >> "$GITHUB_OUTPUT"
+          grep -Eq '^Qwen3-ASR-1.7B\.tar\.bz2\.part-[[:alnum:]]+
+          grep -Fxq 'silero_vad.onnx' /tmp/runtime-assets.txt && echo 'silero=true' >> "$GITHUB_OUTPUT" || echo 'silero=false' >> "$GITHUB_OUTPUT"
+          if grep -Fq 'Qwen3-ASR-0.6B.tar.bz2' /tmp/runtime-assets.txt && grep -Eq '^Qwen3-ASR-1.7B\.tar\.bz2\.part-[[:alnum:]]+ && grep -Fq 'silero_vad.onnx' /tmp/runtime-assets.txt; then
+            echo "any_missing=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any_missing=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install acquisition and inference tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl jq python3 python3-pip tar bzip2 espeak-ng
+          python3 -m pip install --disable-pip-version-check --no-cache-dir qwen-asr onnxruntime numpy scipy soundfile scikit-learn skl2onnx onnx
+      - name: Prepare
+        run: |
+          set -euo pipefail
+          rm -rf voice-release-assets
+          mkdir -p voice-release-assets
+          cp config/voice-model-acquisition-manifest-2026.json voice-release-assets/manifest.json
+      - name: Acquire fixed runtime targets
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-release-assets/silero_vad.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
+          test -s voice-release-assets/silero_vad.onnx
+      - name: Acquire Qwen3-ASR 0.6B
+        if: ${{ steps.runtime_release.outputs.qwen06 != 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download Qwen/Qwen3-ASR-0.6B --local-dir voice-release-assets/Qwen3-ASR-0.6B
+          test -s voice-release-assets/Qwen3-ASR-0.6B/config.json
+          test -s voice-release-assets/Qwen3-ASR-0.6B/model.safetensors
+          test -s voice-release-assets/Qwen3-ASR-0.6B/preprocessor_config.json
+      - name: Acquire Qwen3-ASR 1.7B
+        if: ${{ steps.runtime_release.outputs.qwen17 != 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download Qwen/Qwen3-ASR-1.7B --local-dir voice-release-assets/Qwen3-ASR-1.7B
+          test -s voice-release-assets/Qwen3-ASR-1.7B/config.json
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model-00001-of-00002.safetensors
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model-00002-of-00002.safetensors
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model.safetensors.index.json
+      - name: Skip unlicensed optional voice weights
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          echo "Optional generic KWS/punctuation/speaker/audio-tagging weights remain in the dedicated gap workflow until model-specific redistribution evidence is available."
+      - name: Validate real payloads and provenance
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.load(open("voice-release-assets/manifest.json"))
+          assert p["policy"]["noGitLFS"] is True
+          assert p["policy"]["checksumRequired"] is True
+          assert p["policy"]["runtimeVerificationAfterDownload"] is True
+          selected="both"
+          roots=[]
+          if selected in ("0.6b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-0.6B"))
+          if selected in ("1.7b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-1.7B"))
+          for root in roots: assert root.is_dir(), root
+          assert Path("voice-release-assets/silero_vad.onnx").stat().st_size > 0
+          print("manifest targets:", len(p["targets"]))
+          PY
+      - name: Runtime inference verification — Qwen3-ASR
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import torch
+          from qwen_asr import Qwen3ASRModel
+          selected="both"
+          targets=[]
+          if selected in ("0.6b","both"): targets.append(("qwen3-asr-0.6b","voice-release-assets/Qwen3-ASR-0.6B"))
+          if selected in ("1.7b","both"): targets.append(("qwen3-asr-1.7b","voice-release-assets/Qwen3-ASR-1.7B"))
+          sample="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-ASR-Repo/asr_en.wav"
+          evidence=[]
+          for target_id, model_path in targets:
+              model=Qwen3ASRModel.from_pretrained(model_path,dtype=torch.float32,device_map="cpu",max_inference_batch_size=1,max_new_tokens=128,local_files_only=True)
+              result=model.transcribe(audio=sample,language=None,return_time_stamps=False)[0]
+              if not result.language or not result.text.strip(): raise SystemExit(f"{target_id}: empty inference result")
+              evidence.append({"id":target_id,"runtime":"verified","language":result.language,"text_nonempty":True})
+              del model
+          json.dump(evidence,open("voice-release-assets/runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          print(json.dumps(evidence,ensure_ascii=False))
+          PY
+      - name: Runtime inference verification — Silero VAD
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import numpy as np
+          import onnxruntime as ort
+          path="voice-release-assets/silero_vad.onnx"
+          session=ort.InferenceSession(path, providers=["CPUExecutionProvider"])
+          metas={x.name:x for x in session.get_inputs()}
+          assert {"input","state","sr"} <= set(metas), [x.name for x in session.get_inputs()]
+          print("silero inputs:",[(x.name,x.shape,x.type) for x in session.get_inputs()])
+          def zeros_for(meta, fallback):
+              shape=[]
+              for d in meta.shape:
+                  shape.append(fallback if not isinstance(d,int) or d < 1 else d)
+              if not shape: return np.array(fallback)
+              return np.zeros(tuple(shape),dtype=np.float32)
+          state=zeros_for(metas["state"],128)
+          sr_meta=metas["sr"]
+          if len(sr_meta.shape)==0:
+              sr_value=np.array(16000,dtype=np.int64)
+          else:
+              sr_shape=tuple(1 if (not isinstance(d,int) or d<1) else d for d in sr_meta.shape)
+              sr_value=np.full(sr_shape,16000,dtype=np.int64)
+          errors=[]
+          verified=False
+          for chunk in (512,576,1024,256):
+              try:
+                  audio=zeros_for(metas["input"],chunk)
+                  out=session.run(None,{"input":audio,"state":state,"sr":sr_value})
+                  assert len(out)>=2
+                  probability=np.asarray(out[0]); next_state=np.asarray(out[1])
+                  assert probability.size>=1 and next_state.size>=1
+                  print("silero_vad runtime verified; chunk=",chunk,"speech_probability=",float(probability.reshape(-1)[0]),"state_shape=",tuple(next_state.shape))
+                  verified=True
+                  break
+              except Exception as exc:
+                  errors.append(f"chunk={chunk}: {exc!r}")
+          if not verified:
+              raise RuntimeError("Silero VAD inference failed for all chunk sizes: " + " | ".join(errors))
+          PY
+
+      - name: Verify Silero VAD payload
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("voice-release-assets/silero_vad.onnx")
+          if p.stat().st_size < 100000: raise SystemExit(f"silero_vad.onnx unexpectedly small: {p.stat().st_size}")
+          print("silero_vad.onnx verified:",p.stat().st_size)
+          PY
+      - name: Runtime verification — Quran recitation source and mapping
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, urllib.request
+          cfg=json.load(open("config/quran-recitation-qiraat-2026.json"))
+          mapping=cfg["reciterMappings"]["ar.alafasy"]
+          assert mapping["qiraah"] == "asim"
+          assert mapping["riwayah"] == "hafs"
+          with urllib.request.urlopen("https://api.alquran.cloud/v1/ayah/1/ar.alafasy", timeout=30) as r:
+              payload=json.load(r)
+          data=payload["data"]
+          audio=data["audio"]
+          assert audio.startswith("https://")
+          req=urllib.request.Request(audio, headers={"Range":"bytes=0-15"})
+          with urllib.request.urlopen(req, timeout=30) as r:
+              assert r.status in (200,206)
+              content_type=(r.headers.get("content-type") or "").lower()
+              assert "audio" in content_type or audio.endswith(".mp3")
+          evidence={
+              "edition":"ar.alafasy",
+              "reciter":mapping["reciter"],
+              "qiraah":mapping["qiraah"],
+              "riwayah":mapping["riwayah"],
+              "audioUrlReachable":True,
+              "providerEditionReachable":True
+          }
+          json.dump(evidence,open("voice-release-assets/quran-recitation-runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          print(json.dumps(evidence,ensure_ascii=False))
+          PY
+
+      - name: Package Release assets without repository binary storage
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          cd voice-release-assets
+          rm -f SHA256SUMS.txt *.tar.bz2 *.part-* *.parts.SHA256SUMS.txt
+          if [ "both" = "0.6b" ] || [ "both" = "both" ]; then tar -cjf Qwen3-ASR-0.6B.tar.bz2 Qwen3-ASR-0.6B; fi
+          if [ "both" = "1.7b" ] || [ "both" = "both" ]; then tar -cjf - Qwen3-ASR-1.7B | split -b 1900m - Qwen3-ASR-1.7B.tar.bz2.part-; sha256sum Qwen3-ASR-1.7B.tar.bz2.part-* > Qwen3-ASR-1.7B.parts.SHA256SUMS.txt; fi
+          rm -rf Qwen3-ASR-0.6B Qwen3-ASR-1.7B
+          find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+      - name: Publish verified assets automatically to Release
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-runtime-2026-10
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice runtime acquisition. Payloads are checksum-recorded and runtime-verified before publication; no repository binary storage."
+          gh release upload "$TAG" voice-release-assets/SHA256SUMS.txt voice-release-assets/manifest.json voice-release-assets/runtime-verification.json voice-release-assets/quran-recitation-runtime-verification.json voice-release-assets/silero_vad.onnx voice-release-assets/al-huda-kws/al-huda-kws.onnx voice-release-assets/al-huda-kws/al-huda-kws-metadata.json voice-release-assets/al-huda-kws/runtime-verification.json --repo "$GITHUB_REPOSITORY"
+          for asset in voice-release-assets/*.tar.bz2 voice-release-assets/*.part-* voice-release-assets/*parts.SHA256SUMS.txt; do
+            [ -f "$asset" ] || continue
+            gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+          done
+
+  build-al-huda-kws:
+    if: ${{ true }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    concurrency:
+      group: rechercher-al-huda-kws
+      cancel-in-progress: true
+    steps:
+      - name: Inspect existing Al-Huda KWS Release
+        id: kws_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: al-huda-kws-2026-10
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install KWS training runtime
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y espeak-ng python3 python3-pip libsndfile1
+          python3 -m pip install --disable-pip-version-check --no-cache-dir numpy scipy soundfile scikit-learn skl2onnx onnx onnxruntime
+
+      - name: Train Al-Huda KWS
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          rm -rf al-huda-kws-release
+          mkdir -p al-huda-kws-release
+          python3 scripts/train-al-huda-kws.py --out-dir al-huda-kws-release --samples 720
+          test -s al-huda-kws-release/al-huda-kws.onnx
+          test -s al-huda-kws-release/al-huda-kws-metadata.json
+
+      - name: Real ONNX inference positive and negative
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          espeak-ng -v ar -s 165 -p 50 -a 140 -w al-huda-positive.wav 'الهُدَى'
+          espeak-ng -v ar -s 165 -p 50 -a 140 -w al-huda-negative.wav 'الحمد لله'
+          positive="$(printf '%s\\n' '{"model":"al-huda-kws-release/al-huda-kws.onnx","audio":"al-huda-positive.wav","threshold":0.80}' | python3 scripts/al-huda-kws-runner.py)"
+          negative="$(printf '%s\\n' '{"model":"al-huda-kws-release/al-huda-kws.onnx","audio":"al-huda-negative.wav","threshold":0.80}' | python3 scripts/al-huda-kws-runner.py)"
+          python3 - "$positive" "$negative" <<'PY'
+          import json,sys
+          pos=json.loads(sys.argv[1]); neg=json.loads(sys.argv[2])
+          assert pos["ok"] and neg["ok"], (pos,neg)
+          assert pos["detected"], pos
+          assert not neg["detected"], neg
+          json.dump({"assistant":"Al-Huda","wakeWord":"الهُدَى","runtime":"onnxruntime-cpu","positive":pos,"negative":neg,"deviceRuntimeStillRequired":True},open("al-huda-kws-release/runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          PY
+          rm -f al-huda-positive.wav al-huda-negative.wav
+
+      - name: Package KWS Release
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          cd al-huda-kws-release
+          sha256sum al-huda-kws.onnx al-huda-kws-metadata.json runtime-verification.json > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+
+      - name: Publish Al-Huda KWS Release
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: al-huda-kws-2026-10
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Al-Huda KWS — الهُدَى" --notes "Custom Arabic wake-word model. Trained from deterministic synthetic Arabic speech and verified with positive/negative ONNX Runtime CPU inference. Device-microphone verification remains a separate gate."
+          gh release upload "$TAG" al-huda-kws-release/al-huda-kws.onnx al-huda-kws-release/al-huda-kws-metadata.json al-huda-kws-release/runtime-verification.json al-huda-kws-release/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
+ /tmp/runtime-assets.txt && echo 'qwen17=true' >> "$GITHUB_OUTPUT" || echo 'qwen17=false' >> "$GITHUB_OUTPUT"
+          grep -Fxq 'silero_vad.onnx' /tmp/runtime-assets.txt && echo 'silero=true' >> "$GITHUB_OUTPUT" || echo 'silero=false' >> "$GITHUB_OUTPUT"
+          if grep -Fq 'Qwen3-ASR-0.6B.tar.bz2' /tmp/runtime-assets.txt && grep -Fq 'Qwen3-ASR-1.7B.tar.bz2.part-00' /tmp/runtime-assets.txt && grep -Fq 'silero_vad.onnx' /tmp/runtime-assets.txt; then
+            echo "any_missing=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any_missing=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install acquisition and inference tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl jq python3 python3-pip tar bzip2 espeak-ng
+          python3 -m pip install --disable-pip-version-check --no-cache-dir qwen-asr onnxruntime numpy scipy soundfile scikit-learn skl2onnx onnx
+      - name: Prepare
+        run: |
+          set -euo pipefail
+          rm -rf voice-release-assets
+          mkdir -p voice-release-assets
+          cp config/voice-model-acquisition-manifest-2026.json voice-release-assets/manifest.json
+      - name: Acquire fixed runtime targets
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-release-assets/silero_vad.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
+          test -s voice-release-assets/silero_vad.onnx
+      - name: Acquire Qwen3-ASR 0.6B
+        if: ${{ steps.runtime_release.outputs.qwen06 != 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download Qwen/Qwen3-ASR-0.6B --local-dir voice-release-assets/Qwen3-ASR-0.6B
+          test -s voice-release-assets/Qwen3-ASR-0.6B/config.json
+          test -s voice-release-assets/Qwen3-ASR-0.6B/model.safetensors
+          test -s voice-release-assets/Qwen3-ASR-0.6B/preprocessor_config.json
+      - name: Acquire Qwen3-ASR 1.7B
+        if: ${{ steps.runtime_release.outputs.qwen17 != 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download Qwen/Qwen3-ASR-1.7B --local-dir voice-release-assets/Qwen3-ASR-1.7B
+          test -s voice-release-assets/Qwen3-ASR-1.7B/config.json
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model-00001-of-00002.safetensors
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model-00002-of-00002.safetensors
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model.safetensors.index.json
+      - name: Skip unlicensed optional voice weights
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          echo "Optional generic KWS/punctuation/speaker/audio-tagging weights remain in the dedicated gap workflow until model-specific redistribution evidence is available."
+      - name: Validate real payloads and provenance
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.load(open("voice-release-assets/manifest.json"))
+          assert p["policy"]["noGitLFS"] is True
+          assert p["policy"]["checksumRequired"] is True
+          assert p["policy"]["runtimeVerificationAfterDownload"] is True
+          selected="both"
+          roots=[]
+          if selected in ("0.6b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-0.6B"))
+          if selected in ("1.7b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-1.7B"))
+          for root in roots: assert root.is_dir(), root
+          assert Path("voice-release-assets/silero_vad.onnx").stat().st_size > 0
+          print("manifest targets:", len(p["targets"]))
+          PY
+      - name: Runtime inference verification — Qwen3-ASR
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import torch
+          from qwen_asr import Qwen3ASRModel
+          selected="both"
+          targets=[]
+          if selected in ("0.6b","both"): targets.append(("qwen3-asr-0.6b","voice-release-assets/Qwen3-ASR-0.6B"))
+          if selected in ("1.7b","both"): targets.append(("qwen3-asr-1.7b","voice-release-assets/Qwen3-ASR-1.7B"))
+          sample="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-ASR-Repo/asr_en.wav"
+          evidence=[]
+          for target_id, model_path in targets:
+              model=Qwen3ASRModel.from_pretrained(model_path,dtype=torch.float32,device_map="cpu",max_inference_batch_size=1,max_new_tokens=128,local_files_only=True)
+              result=model.transcribe(audio=sample,language=None,return_time_stamps=False)[0]
+              if not result.language or not result.text.strip(): raise SystemExit(f"{target_id}: empty inference result")
+              evidence.append({"id":target_id,"runtime":"verified","language":result.language,"text_nonempty":True})
+              del model
+          json.dump(evidence,open("voice-release-assets/runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          print(json.dumps(evidence,ensure_ascii=False))
+          PY
+      - name: Runtime inference verification — Silero VAD
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import numpy as np
+          import onnxruntime as ort
+          path="voice-release-assets/silero_vad.onnx"
+          session=ort.InferenceSession(path, providers=["CPUExecutionProvider"])
+          metas={x.name:x for x in session.get_inputs()}
+          assert {"input","state","sr"} <= set(metas), [x.name for x in session.get_inputs()]
+          print("silero inputs:",[(x.name,x.shape,x.type) for x in session.get_inputs()])
+          def zeros_for(meta, fallback):
+              shape=[]
+              for d in meta.shape:
+                  shape.append(fallback if not isinstance(d,int) or d < 1 else d)
+              if not shape: return np.array(fallback)
+              return np.zeros(tuple(shape),dtype=np.float32)
+          state=zeros_for(metas["state"],128)
+          sr_meta=metas["sr"]
+          if len(sr_meta.shape)==0:
+              sr_value=np.array(16000,dtype=np.int64)
+          else:
+              sr_shape=tuple(1 if (not isinstance(d,int) or d<1) else d for d in sr_meta.shape)
+              sr_value=np.full(sr_shape,16000,dtype=np.int64)
+          errors=[]
+          verified=False
+          for chunk in (512,576,1024,256):
+              try:
+                  audio=zeros_for(metas["input"],chunk)
+                  out=session.run(None,{"input":audio,"state":state,"sr":sr_value})
+                  assert len(out)>=2
+                  probability=np.asarray(out[0]); next_state=np.asarray(out[1])
+                  assert probability.size>=1 and next_state.size>=1
+                  print("silero_vad runtime verified; chunk=",chunk,"speech_probability=",float(probability.reshape(-1)[0]),"state_shape=",tuple(next_state.shape))
+                  verified=True
+                  break
+              except Exception as exc:
+                  errors.append(f"chunk={chunk}: {exc!r}")
+          if not verified:
+              raise RuntimeError("Silero VAD inference failed for all chunk sizes: " + " | ".join(errors))
+          PY
+
+      - name: Verify Silero VAD payload
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("voice-release-assets/silero_vad.onnx")
+          if p.stat().st_size < 100000: raise SystemExit(f"silero_vad.onnx unexpectedly small: {p.stat().st_size}")
+          print("silero_vad.onnx verified:",p.stat().st_size)
+          PY
+      - name: Runtime verification — Quran recitation source and mapping
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, urllib.request
+          cfg=json.load(open("config/quran-recitation-qiraat-2026.json"))
+          mapping=cfg["reciterMappings"]["ar.alafasy"]
+          assert mapping["qiraah"] == "asim"
+          assert mapping["riwayah"] == "hafs"
+          with urllib.request.urlopen("https://api.alquran.cloud/v1/ayah/1/ar.alafasy", timeout=30) as r:
+              payload=json.load(r)
+          data=payload["data"]
+          audio=data["audio"]
+          assert audio.startswith("https://")
+          req=urllib.request.Request(audio, headers={"Range":"bytes=0-15"})
+          with urllib.request.urlopen(req, timeout=30) as r:
+              assert r.status in (200,206)
+              content_type=(r.headers.get("content-type") or "").lower()
+              assert "audio" in content_type or audio.endswith(".mp3")
+          evidence={
+              "edition":"ar.alafasy",
+              "reciter":mapping["reciter"],
+              "qiraah":mapping["qiraah"],
+              "riwayah":mapping["riwayah"],
+              "audioUrlReachable":True,
+              "providerEditionReachable":True
+          }
+          json.dump(evidence,open("voice-release-assets/quran-recitation-runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          print(json.dumps(evidence,ensure_ascii=False))
+          PY
+
+      - name: Package Release assets without repository binary storage
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          cd voice-release-assets
+          rm -f SHA256SUMS.txt *.tar.bz2 *.part-* *.parts.SHA256SUMS.txt
+          if [ "both" = "0.6b" ] || [ "both" = "both" ]; then tar -cjf Qwen3-ASR-0.6B.tar.bz2 Qwen3-ASR-0.6B; fi
+          if [ "both" = "1.7b" ] || [ "both" = "both" ]; then tar -cjf - Qwen3-ASR-1.7B | split -b 1900m - Qwen3-ASR-1.7B.tar.bz2.part-; sha256sum Qwen3-ASR-1.7B.tar.bz2.part-* > Qwen3-ASR-1.7B.parts.SHA256SUMS.txt; fi
+          rm -rf Qwen3-ASR-0.6B Qwen3-ASR-1.7B
+          find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+      - name: Publish verified assets automatically to Release
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-runtime-2026-10
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice runtime acquisition. Payloads are checksum-recorded and runtime-verified before publication; no repository binary storage."
+          gh release upload "$TAG" voice-release-assets/SHA256SUMS.txt voice-release-assets/manifest.json voice-release-assets/runtime-verification.json voice-release-assets/quran-recitation-runtime-verification.json voice-release-assets/silero_vad.onnx voice-release-assets/al-huda-kws/al-huda-kws.onnx voice-release-assets/al-huda-kws/al-huda-kws-metadata.json voice-release-assets/al-huda-kws/runtime-verification.json --repo "$GITHUB_REPOSITORY"
+          for asset in voice-release-assets/*.tar.bz2 voice-release-assets/*.part-* voice-release-assets/*parts.SHA256SUMS.txt; do
+            [ -f "$asset" ] || continue
+            gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+          done
+
+  build-al-huda-kws:
+    if: ${{ true }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    concurrency:
+      group: rechercher-al-huda-kws
+      cancel-in-progress: true
+    steps:
+      - name: Inspect existing Al-Huda KWS Release
+        id: kws_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: al-huda-kws-2026-10
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install KWS training runtime
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y espeak-ng python3 python3-pip libsndfile1
+          python3 -m pip install --disable-pip-version-check --no-cache-dir numpy scipy soundfile scikit-learn skl2onnx onnx onnxruntime
+
+      - name: Train Al-Huda KWS
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          rm -rf al-huda-kws-release
+          mkdir -p al-huda-kws-release
+          python3 scripts/train-al-huda-kws.py --out-dir al-huda-kws-release --samples 720
+          test -s al-huda-kws-release/al-huda-kws.onnx
+          test -s al-huda-kws-release/al-huda-kws-metadata.json
+
+      - name: Real ONNX inference positive and negative
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          espeak-ng -v ar -s 165 -p 50 -a 140 -w al-huda-positive.wav 'الهُدَى'
+          espeak-ng -v ar -s 165 -p 50 -a 140 -w al-huda-negative.wav 'الحمد لله'
+          positive="$(printf '%s\\n' '{"model":"al-huda-kws-release/al-huda-kws.onnx","audio":"al-huda-positive.wav","threshold":0.80}' | python3 scripts/al-huda-kws-runner.py)"
+          negative="$(printf '%s\\n' '{"model":"al-huda-kws-release/al-huda-kws.onnx","audio":"al-huda-negative.wav","threshold":0.80}' | python3 scripts/al-huda-kws-runner.py)"
+          python3 - "$positive" "$negative" <<'PY'
+          import json,sys
+          pos=json.loads(sys.argv[1]); neg=json.loads(sys.argv[2])
+          assert pos["ok"] and neg["ok"], (pos,neg)
+          assert pos["detected"], pos
+          assert not neg["detected"], neg
+          json.dump({"assistant":"Al-Huda","wakeWord":"الهُدَى","runtime":"onnxruntime-cpu","positive":pos,"negative":neg,"deviceRuntimeStillRequired":True},open("al-huda-kws-release/runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          PY
+          rm -f al-huda-positive.wav al-huda-negative.wav
+
+      - name: Package KWS Release
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          cd al-huda-kws-release
+          sha256sum al-huda-kws.onnx al-huda-kws-metadata.json runtime-verification.json > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+
+      - name: Publish Al-Huda KWS Release
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: al-huda-kws-2026-10
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Al-Huda KWS — الهُدَى" --notes "Custom Arabic wake-word model. Trained from deterministic synthetic Arabic speech and verified with positive/negative ONNX Runtime CPU inference. Device-microphone verification remains a separate gate."
+          gh release upload "$TAG" al-huda-kws-release/al-huda-kws.onnx al-huda-kws-release/al-huda-kws-metadata.json al-huda-kws-release/runtime-verification.json al-huda-kws-release/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
+ /tmp/runtime-assets.txt && grep -Fq 'silero_vad.onnx' /tmp/runtime-assets.txt; then
+            echo "any_missing=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any_missing=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install acquisition and inference tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl jq python3 python3-pip tar bzip2 espeak-ng
+          python3 -m pip install --disable-pip-version-check --no-cache-dir qwen-asr onnxruntime numpy scipy soundfile scikit-learn skl2onnx onnx
+      - name: Prepare
+        run: |
+          set -euo pipefail
+          rm -rf voice-release-assets
+          mkdir -p voice-release-assets
+          cp config/voice-model-acquisition-manifest-2026.json voice-release-assets/manifest.json
+      - name: Acquire fixed runtime targets
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-release-assets/silero_vad.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
+          test -s voice-release-assets/silero_vad.onnx
+      - name: Acquire Qwen3-ASR 0.6B
+        if: ${{ steps.runtime_release.outputs.qwen06 != 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download Qwen/Qwen3-ASR-0.6B --local-dir voice-release-assets/Qwen3-ASR-0.6B
+          test -s voice-release-assets/Qwen3-ASR-0.6B/config.json
+          test -s voice-release-assets/Qwen3-ASR-0.6B/model.safetensors
+          test -s voice-release-assets/Qwen3-ASR-0.6B/preprocessor_config.json
+      - name: Acquire Qwen3-ASR 1.7B
+        if: ${{ steps.runtime_release.outputs.qwen17 != 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download Qwen/Qwen3-ASR-1.7B --local-dir voice-release-assets/Qwen3-ASR-1.7B
+          test -s voice-release-assets/Qwen3-ASR-1.7B/config.json
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model-00001-of-00002.safetensors
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model-00002-of-00002.safetensors
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model.safetensors.index.json
+      - name: Skip unlicensed optional voice weights
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          echo "Optional generic KWS/punctuation/speaker/audio-tagging weights remain in the dedicated gap workflow until model-specific redistribution evidence is available."
+      - name: Validate real payloads and provenance
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.load(open("voice-release-assets/manifest.json"))
+          assert p["policy"]["noGitLFS"] is True
+          assert p["policy"]["checksumRequired"] is True
+          assert p["policy"]["runtimeVerificationAfterDownload"] is True
+          selected="both"
+          roots=[]
+          if selected in ("0.6b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-0.6B"))
+          if selected in ("1.7b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-1.7B"))
+          for root in roots: assert root.is_dir(), root
+          assert Path("voice-release-assets/silero_vad.onnx").stat().st_size > 0
+          print("manifest targets:", len(p["targets"]))
+          PY
+      - name: Runtime inference verification — Qwen3-ASR
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import torch
+          from qwen_asr import Qwen3ASRModel
+          selected="both"
+          targets=[]
+          if selected in ("0.6b","both"): targets.append(("qwen3-asr-0.6b","voice-release-assets/Qwen3-ASR-0.6B"))
+          if selected in ("1.7b","both"): targets.append(("qwen3-asr-1.7b","voice-release-assets/Qwen3-ASR-1.7B"))
+          sample="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-ASR-Repo/asr_en.wav"
+          evidence=[]
+          for target_id, model_path in targets:
+              model=Qwen3ASRModel.from_pretrained(model_path,dtype=torch.float32,device_map="cpu",max_inference_batch_size=1,max_new_tokens=128,local_files_only=True)
+              result=model.transcribe(audio=sample,language=None,return_time_stamps=False)[0]
+              if not result.language or not result.text.strip(): raise SystemExit(f"{target_id}: empty inference result")
+              evidence.append({"id":target_id,"runtime":"verified","language":result.language,"text_nonempty":True})
+              del model
+          json.dump(evidence,open("voice-release-assets/runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          print(json.dumps(evidence,ensure_ascii=False))
+          PY
+      - name: Runtime inference verification — Silero VAD
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import numpy as np
+          import onnxruntime as ort
+          path="voice-release-assets/silero_vad.onnx"
+          session=ort.InferenceSession(path, providers=["CPUExecutionProvider"])
+          metas={x.name:x for x in session.get_inputs()}
+          assert {"input","state","sr"} <= set(metas), [x.name for x in session.get_inputs()]
+          print("silero inputs:",[(x.name,x.shape,x.type) for x in session.get_inputs()])
+          def zeros_for(meta, fallback):
+              shape=[]
+              for d in meta.shape:
+                  shape.append(fallback if not isinstance(d,int) or d < 1 else d)
+              if not shape: return np.array(fallback)
+              return np.zeros(tuple(shape),dtype=np.float32)
+          state=zeros_for(metas["state"],128)
+          sr_meta=metas["sr"]
+          if len(sr_meta.shape)==0:
+              sr_value=np.array(16000,dtype=np.int64)
+          else:
+              sr_shape=tuple(1 if (not isinstance(d,int) or d<1) else d for d in sr_meta.shape)
+              sr_value=np.full(sr_shape,16000,dtype=np.int64)
+          errors=[]
+          verified=False
+          for chunk in (512,576,1024,256):
+              try:
+                  audio=zeros_for(metas["input"],chunk)
+                  out=session.run(None,{"input":audio,"state":state,"sr":sr_value})
+                  assert len(out)>=2
+                  probability=np.asarray(out[0]); next_state=np.asarray(out[1])
+                  assert probability.size>=1 and next_state.size>=1
+                  print("silero_vad runtime verified; chunk=",chunk,"speech_probability=",float(probability.reshape(-1)[0]),"state_shape=",tuple(next_state.shape))
+                  verified=True
+                  break
+              except Exception as exc:
+                  errors.append(f"chunk={chunk}: {exc!r}")
+          if not verified:
+              raise RuntimeError("Silero VAD inference failed for all chunk sizes: " + " | ".join(errors))
+          PY
+
+      - name: Verify Silero VAD payload
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("voice-release-assets/silero_vad.onnx")
+          if p.stat().st_size < 100000: raise SystemExit(f"silero_vad.onnx unexpectedly small: {p.stat().st_size}")
+          print("silero_vad.onnx verified:",p.stat().st_size)
+          PY
+      - name: Runtime verification — Quran recitation source and mapping
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, urllib.request
+          cfg=json.load(open("config/quran-recitation-qiraat-2026.json"))
+          mapping=cfg["reciterMappings"]["ar.alafasy"]
+          assert mapping["qiraah"] == "asim"
+          assert mapping["riwayah"] == "hafs"
+          with urllib.request.urlopen("https://api.alquran.cloud/v1/ayah/1/ar.alafasy", timeout=30) as r:
+              payload=json.load(r)
+          data=payload["data"]
+          audio=data["audio"]
+          assert audio.startswith("https://")
+          req=urllib.request.Request(audio, headers={"Range":"bytes=0-15"})
+          with urllib.request.urlopen(req, timeout=30) as r:
+              assert r.status in (200,206)
+              content_type=(r.headers.get("content-type") or "").lower()
+              assert "audio" in content_type or audio.endswith(".mp3")
+          evidence={
+              "edition":"ar.alafasy",
+              "reciter":mapping["reciter"],
+              "qiraah":mapping["qiraah"],
+              "riwayah":mapping["riwayah"],
+              "audioUrlReachable":True,
+              "providerEditionReachable":True
+          }
+          json.dump(evidence,open("voice-release-assets/quran-recitation-runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          print(json.dumps(evidence,ensure_ascii=False))
+          PY
+
+      - name: Package Release assets without repository binary storage
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          cd voice-release-assets
+          rm -f SHA256SUMS.txt *.tar.bz2 *.part-* *.parts.SHA256SUMS.txt
+          if [ "both" = "0.6b" ] || [ "both" = "both" ]; then tar -cjf Qwen3-ASR-0.6B.tar.bz2 Qwen3-ASR-0.6B; fi
+          if [ "both" = "1.7b" ] || [ "both" = "both" ]; then tar -cjf - Qwen3-ASR-1.7B | split -b 1900m - Qwen3-ASR-1.7B.tar.bz2.part-; sha256sum Qwen3-ASR-1.7B.tar.bz2.part-* > Qwen3-ASR-1.7B.parts.SHA256SUMS.txt; fi
+          rm -rf Qwen3-ASR-0.6B Qwen3-ASR-1.7B
+          find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+      - name: Publish verified assets automatically to Release
+        if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-runtime-2026-10
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice runtime acquisition. Payloads are checksum-recorded and runtime-verified before publication; no repository binary storage."
+          gh release upload "$TAG" voice-release-assets/SHA256SUMS.txt voice-release-assets/manifest.json voice-release-assets/runtime-verification.json voice-release-assets/quran-recitation-runtime-verification.json voice-release-assets/silero_vad.onnx voice-release-assets/al-huda-kws/al-huda-kws.onnx voice-release-assets/al-huda-kws/al-huda-kws-metadata.json voice-release-assets/al-huda-kws/runtime-verification.json --repo "$GITHUB_REPOSITORY"
+          for asset in voice-release-assets/*.tar.bz2 voice-release-assets/*.part-* voice-release-assets/*parts.SHA256SUMS.txt; do
+            [ -f "$asset" ] || continue
+            gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+          done
+
+  build-al-huda-kws:
+    if: ${{ true }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    concurrency:
+      group: rechercher-al-huda-kws
+      cancel-in-progress: true
+    steps:
+      - name: Inspect existing Al-Huda KWS Release
+        id: kws_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: al-huda-kws-2026-10
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install KWS training runtime
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y espeak-ng python3 python3-pip libsndfile1
+          python3 -m pip install --disable-pip-version-check --no-cache-dir numpy scipy soundfile scikit-learn skl2onnx onnx onnxruntime
+
+      - name: Train Al-Huda KWS
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          rm -rf al-huda-kws-release
+          mkdir -p al-huda-kws-release
+          python3 scripts/train-al-huda-kws.py --out-dir al-huda-kws-release --samples 720
+          test -s al-huda-kws-release/al-huda-kws.onnx
+          test -s al-huda-kws-release/al-huda-kws-metadata.json
+
+      - name: Real ONNX inference positive and negative
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          espeak-ng -v ar -s 165 -p 50 -a 140 -w al-huda-positive.wav 'الهُدَى'
+          espeak-ng -v ar -s 165 -p 50 -a 140 -w al-huda-negative.wav 'الحمد لله'
+          positive="$(printf '%s\\n' '{"model":"al-huda-kws-release/al-huda-kws.onnx","audio":"al-huda-positive.wav","threshold":0.80}' | python3 scripts/al-huda-kws-runner.py)"
+          negative="$(printf '%s\\n' '{"model":"al-huda-kws-release/al-huda-kws.onnx","audio":"al-huda-negative.wav","threshold":0.80}' | python3 scripts/al-huda-kws-runner.py)"
+          python3 - "$positive" "$negative" <<'PY'
+          import json,sys
+          pos=json.loads(sys.argv[1]); neg=json.loads(sys.argv[2])
+          assert pos["ok"] and neg["ok"], (pos,neg)
+          assert pos["detected"], pos
+          assert not neg["detected"], neg
+          json.dump({"assistant":"Al-Huda","wakeWord":"الهُدَى","runtime":"onnxruntime-cpu","positive":pos,"negative":neg,"deviceRuntimeStillRequired":True},open("al-huda-kws-release/runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          PY
+          rm -f al-huda-positive.wav al-huda-negative.wav
+
+      - name: Package KWS Release
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        run: |
+          set -euo pipefail
+          cd al-huda-kws-release
+          sha256sum al-huda-kws.onnx al-huda-kws-metadata.json runtime-verification.json > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+
+      - name: Publish Al-Huda KWS Release
+        if: ${{ steps.kws_release.outputs.exists != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: al-huda-kws-2026-10
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Al-Huda KWS — الهُدَى" --notes "Custom Arabic wake-word model. Trained from deterministic synthetic Arabic speech and verified with positive/negative ONNX Runtime CPU inference. Device-microphone verification remains a separate gate."
+          gh release upload "$TAG" al-huda-kws-release/al-huda-kws.onnx al-huda-kws-release/al-huda-kws-metadata.json al-huda-kws-release/runtime-verification.json al-huda-kws-release/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
+ /tmp/runtime-assets.txt && echo 'qwen17=true' >> "$GITHUB_OUTPUT" || echo 'qwen17=false' >> "$GITHUB_OUTPUT"
           grep -Fxq 'silero_vad.onnx' /tmp/runtime-assets.txt && echo 'silero=true' >> "$GITHUB_OUTPUT" || echo 'silero=false' >> "$GITHUB_OUTPUT"
           if grep -Fq 'Qwen3-ASR-0.6B.tar.bz2' /tmp/runtime-assets.txt && grep -Fq 'Qwen3-ASR-1.7B.tar.bz2.part-00' /tmp/runtime-assets.txt && grep -Fq 'silero_vad.onnx' /tmp/runtime-assets.txt; then
             echo "any_missing=false" >> "$GITHUB_OUTPUT"
