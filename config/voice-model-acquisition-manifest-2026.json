@@ -125,7 +125,7 @@
       "role": "custom-arabic-wake-word",
       "source": null,
       "status": "BUILD_REQUIRED",
-      "phrase": "Al-Huda",
+      "phrase": "الهُدَى",
       "arabicSpokenForm": "الهُدَى",
       "releaseEligible": false,
       "notes": "No binary is declared until a trained model exists and real inference evidence is recorded."
@@ -168,6 +168,44 @@
       "releaseEligible": false,
       "accessRequirement": "Hugging Face user conditions and token",
       "notes": "Gated upstream model; binary cannot be acquired by anonymous CI."
+    },
+    {
+      "id": "nabra-82m-arabic-int8",
+      "role": "arabic-local-tts",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/nabra-82m-arabic-int8.tar.bz2",
+      "status": "license-gated-acquire-to-project-release",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10",
+      "notes": "Upstream sherpa-onnx publishes this model asset and documents its model layout; do not publish until model-specific redistribution terms are recorded."
+    },
+    {
+      "id": "piper-ar-jo-kareem-medium",
+      "role": "arabic-local-tts-fallback",
+      "source": "https://huggingface.co/rhasspy/piper-voices/resolve/main/ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx",
+      "companion": "https://huggingface.co/rhasspy/piper-voices/resolve/main/ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx.json",
+      "status": "license-gated-acquire-to-project-release",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10",
+      "notes": "Piper documents ar_JO availability and requires reviewing each voice MODEL_CARD because some voices may have restrictive licenses."
+    },
+    {
+      "id": "whisper-cpp-ggml-base-multilingual",
+      "role": "local-asr-fallback",
+      "source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin",
+      "status": "acquire-and-runtime-verify",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10",
+      "license": "MIT",
+      "notes": "Multilingual ggml-base; do not use .en assets for multilingual Arabic path."
+    },
+    {
+      "id": "sherpa-onnx-gtcrn-noise-suppression",
+      "role": "neural-noise-suppression",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx",
+      "status": "acquire-and-runtime-verify",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10"
     }
-  ]
+  ],
+  "acquisitionStatus": {
+    "implementedInRepo": true,
+    "publishedReleaseAssets": false,
+    "reason": "GitHub Actions workflow is configured for manual dispatch; this connector exposes no workflow-dispatch or release-upload mutation, so no binary is claimed published from this session."
+  }
 }
