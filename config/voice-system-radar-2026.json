@@ -1,6 +1,6 @@
 {
   "schema": "dinullah.voice-system-radar.v2",
-  "purpose": "Unified local-first voice assistant inventory for يا بوابة العلم.",
+  "purpose": "Unified local-first voice assistant inventory for Al-Huda.",
   "systemInvocation": {
     "apple": {
       "appIntents": true,
@@ -69,11 +69,15 @@
     ]
   },
   "wakePhrase": {
-    "defaultDisplayName": "يا بوابة العلم",
+    "defaultDisplayName": "Al-Huda",
     "userCanChooseCustomShortPhrase": true,
     "perLanguageAliases": true,
     "customArabicModelRequired": true,
-    "modelStatus": "BUILD_AND_RUNTIME_VERIFY_REQUIRED"
+    "modelStatus": "BUILD_AND_RUNTIME_VERIFY_REQUIRED",
+    "arabicSpokenForm": "الهُدَى",
+    "arabicTtsText": "الهُدَى",
+    "previousName": "يا بوابة العلم",
+    "renameStatus": "MIGRATED_TO_AL_HUDA"
   },
   "speakerProfiles": {
     "mode": "optional",
@@ -103,7 +107,14 @@
     "humanSupervisedMode": true,
     "autonomousModeOptional": true,
     "speakerProfilesIndependent": true,
-    "simultaneousMultiSpeakerRequiresDiarization": true
+    "simultaneousMultiSpeakerRequiresDiarization": true,
+    "engineA": "Al-Huda",
+    "engineB": "Al-Taqwa",
+    "arabicEngineA": "الهُدَى",
+    "arabicEngineB": "الْتَقْوَى",
+    "defaultDomain": "dinullah-religious-scholarly",
+    "sourcesWrittenByDefault": true,
+    "fullDialogueCopy": true
   },
   "quran": {
     "syntheticTtsForbiddenForRecitation": true,
