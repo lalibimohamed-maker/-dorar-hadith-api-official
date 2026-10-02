@@ -47,8 +47,9 @@ export async function runVoiceQuestion({ provider, audio, language, searchOption
 }
 
 /**
- * Runs a bounded internal dialogue between two engines using structured messages.
- * Engine output is never routed through the physical microphone.
+ * Runs a bounded internal dialogue between Al-Huda and Al-Taqwa using
+ * structured messages. Engine output is never routed through the physical
+ * microphone. The default scope is Din Allah religious/scholarly dialogue.
  */
 export async function runEngineDialogue({
   engineA,
@@ -57,6 +58,8 @@ export async function runEngineDialogue({
   language = 'ar',
   maxTurns = 6,
   timeoutMs = 15_000,
+  domain = 'dinullah-religious-scholarly',
+  sourcesResolver,
   onTurn,
   shouldStop,
 } = {}) {
@@ -66,6 +69,19 @@ export async function runEngineDialogue({
   if (!initialMessage) throw new Error('initialMessage is required');
   if (!Number.isInteger(maxTurns) || maxTurns < 1 || maxTurns > 8) {
     throw new Error('maxTurns must be an integer between 1 and 8');
+  }
+  const allowedDomains = new Set([
+    'quran-and-tafsir',
+    'hadith',
+    'aqidah',
+    'fiqh',
+    'sirah',
+    'islamic-history',
+    'arabic-and-linguistics',
+    'islamic-scholarly-studies',
+  ]);
+  if (domain !== 'dinullah-religious-scholarly' && !allowedDomains.has(domain)) {
+    throw new Error('Engine-to-engine dialogue requires a supported Din Allah religious/scholarly domain');
   }
 
   const conversationId = `engine-dialogue-${Date.now()}`;
@@ -78,6 +94,8 @@ export async function runEngineDialogue({
     content: String(initialMessage),
     language: normalizeLanguage(language),
     provenance: 'user',
+    sources: [],
+    domain,
   };
   let lastContent = null;
 
@@ -97,6 +115,10 @@ export async function runEngineDialogue({
     if (!content) throw new Error(`${engineId} returned no dialogue content`);
     if (content === lastContent) return { conversationId, status: 'loop-detected', turns: transcript };
 
+    const resolvedSources = typeof sourcesResolver === 'function'
+      ? await sourcesResolver({ response, message: current, engineId, domain })
+      : (Array.isArray(response?.sources) ? response.sources : []);
+
     const message = {
       conversationId,
       turnId: turn,
@@ -107,6 +129,8 @@ export async function runEngineDialogue({
       confidence: response?.confidence ?? null,
       timestamp: new Date().toISOString(),
       provenance: response?.provenance || engineId,
+      sources: Array.isArray(resolvedSources) ? resolvedSources : [],
+      domain,
       latencyMs: Date.now() - started,
     };
     transcript.push(message);
@@ -123,9 +147,23 @@ export async function renderAnswerVoice({ provider, answer, language } = {}) {
   return synthesize({ provider, text: answer, language: normalizeLanguage(language) });
 }
 
-export async function renderQuranAudio({ provider, surah, ayah, reciter } = {}) {
+export async function renderQuranAudio({
+  provider,
+  surah,
+  ayah,
+  reciter,
+  qiraah,
+  riwayah,
+} = {}) {
   const verifiedProvider = provider || createAlQuranCloudRecitationProvider();
-  return quranRecitation({ provider: verifiedProvider, surah, ayah, reciter });
+  return quranRecitation({
+    provider: verifiedProvider,
+    surah,
+    ayah,
+    reciter,
+    qiraah,
+    riwayah,
+  });
 }
 
 export async function exportAssistantSession({ provider, format, sessionId, includeVoice = false, includeVideo = false } = {}) {
