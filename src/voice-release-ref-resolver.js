@@ -19,6 +19,26 @@ const RELEASES = Object.freeze({
       digests:["sha256:9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"],
       runtimeVerified:true,
     }),
+
+  }),
+  "rechercher-voice-gap-2026-10": Object.freeze({
+    "qwen3-forced-aligner-0.6b": Object.freeze({
+      assets:["Qwen3-ForcedAligner-0.6B.tar.bz2"],
+      digests:["sha256:0f5986ecad5a7cac422413cfc5ca0a7ccfa7bb89958bed54ab4b21f86a27828d"],
+      runtimeVerified:true,
+    }),
+  }),
+  "rechercher-voice-optional-2026-10": Object.freeze({
+    "piper-en-us-libritts-high": Object.freeze({
+      assets:["piper-en-us-libritts-high.tar.bz2"],
+      digests:["sha256:e89235985e08ddab4bd027c2e0173e88a00e88521bc860b3931c4d5d8657ec22"],
+      runtimeVerified:true,
+    }),
+    "f5-tts-v1-base": Object.freeze({
+      assets:["F5TTS_v1_Base.tar.bz2"],
+      digests:["sha256:ed17deb61f560d389185042bd9e633243e5a8253adffab281046c1cd9a2e6e3c"],
+      runtimeVerified:false,
+    }),
   }),
 });
 
