@@ -6,6 +6,7 @@ const CATALOG = Object.freeze({
   "sherpa-onnx-speaker-recognition": { capability: "speaker-id", profile: "speaker", localFirst: true, status: "acquired-runtime-evidence-pending" },
   "sherpa-onnx-audio-tagging": { capability: "audio-tagging", profile: "audio", localFirst: true, status: "acquired-review-evidence-pending" },
   "sherpa-onnx-pyannote-segmentation-3": { capability: "speaker-segmentation", profile: "segmentation", localFirst: true, status: "acquired-review-evidence-pending" },
+  "sherpa-onnx-gtcrn-noise-suppression": { capability: "speech-enhancement", profile: "neural-denoising", localFirst: true, status: "runnable-release-verified" },
   "al-huda-kws": { capability: "wake-word", profile: "al-huda", localFirst: true, status: "runnable-release-verified" },
   "qwen3-forced-aligner-0.6b": { capability: "forced-alignment", profile: "timestamps", localFirst: true, status: "runnable-supported-languages-only", supportedLanguages: ["zh", "yue", "en", "de", "es", "fr", "it", "pt", "ru", "ko", "ja"] },
   "piper-en-us-libritts-high": { capability: "tts", profile: "english-fallback", localFirst: true, locale: "en-US", status: "runnable-release-verified", attributionRequired: true },

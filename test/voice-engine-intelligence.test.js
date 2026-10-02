@@ -36,4 +36,5 @@ test('engine catalogue exposes operational states for auxiliary engines', () => 
   assert.equal(byId.get('piper-ar-jo-kareem-medium').status, 'quarantine-license-review');
   assert.equal(byId.get('whisper-cpp-ggml-base-multilingual').status, 'runnable-release-verified');
   assert.equal(byId.get('sherpa-onnx-speaker-recognition').status, 'acquired-runtime-evidence-pending');
+  assert.equal(byId.get('sherpa-onnx-gtcrn-noise-suppression').status, 'runnable-release-verified');
 });

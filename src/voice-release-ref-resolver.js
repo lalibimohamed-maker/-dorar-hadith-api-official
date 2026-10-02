@@ -34,6 +34,14 @@ const RELEASES = Object.freeze({
       digests:["sha256:0f5986ecad5a7cac422413cfc5ca0a7ccfa7bb89958bed54ab4b21f86a27828d"],
       runtimeVerified:true,
     }),
+    "sherpa-onnx-gtcrn-noise-suppression": Object.freeze({
+      assets:["gtcrn_simple.onnx","gtcrn-runtime-verification.json"],
+      digests:[
+        "sha256:e77603ac0c23dac3227dd2d7135b3a585cbee2679048aecfa886657d3ae1b534",
+        "sha256:055644d80f656742c3ffe79e4ed3cb8ab4e15116f25eb75650cf1f99d0b9dffb",
+      ],
+      runtimeVerified:true,
+    }),
   }),
   "rechercher-voice-fallback-2026-10": Object.freeze({
     "whisper-cpp-ggml-base-multilingual": Object.freeze({
