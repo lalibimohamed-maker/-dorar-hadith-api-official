@@ -13,7 +13,7 @@ test('creates a localized multimodal session', () => {
   assert.equal(session.input.voice, true);
   assert.equal(session.input.keyboard, true);
   assert.equal(session.output.quranRecitation.language, 'ar');
-  assert.equal(session.output.quranRecitation.reciter, 'Saad Al-Ghamdi');
+  assert.equal(session.output.quranRecitation.reciter, 'Mishary Rashid Alafasy');
 });
 
 test('keeps Quran recitation Arabic and identifies the configured reciter', () => {
@@ -21,9 +21,12 @@ test('keeps Quran recitation Arabic and identifies the configured reciter', () =
   assert.deepEqual(policy, {
     mode: 'arabic-recitation-only',
     language: 'ar',
-    reciter: 'Saad Al-Ghamdi',
+    reciter: 'Mishary Rashid Alafasy',
+    qiraatCatalog: policy.qiraatCatalog,
     translateRecitation: false,
   });
+  assert.ok(Array.isArray(policy.qiraatCatalog));
+  assert.ok(policy.qiraatCatalog.length > 0);
 });
 
 test('localizes non-Quran speech output to the user language', () => {
