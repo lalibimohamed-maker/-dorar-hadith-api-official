@@ -208,6 +208,10 @@
     "automaticReleaseAcquisition": true,
     "binaryRepositoryStorage": false,
     "publishedReleaseAssets": "release-state-is-evidence-only",
-    "reason": "Rechercher automatically acquires approved missing targets, verifies payloads/runtime/provenance, and publishes only eligible binaries to GitHub Releases. No binary weights are stored in the repository."
+    "reason": "Rechercher automatically acquires approved missing targets, verifies payloads/runtime/provenance, and publishes only eligible binaries to GitHub Releases. No binary weights are stored in the repository.",
+    "voiceStudioExploitationRevision": "2026-10-02-v2",
+    "contract": "config/voice-platform-contract-2026.json",
+    "runtimeContractTest": "test/voice-platform-contract.test.js",
+    "weightsPolicy": "approved targets are acquired by CI and published only after checksum, provenance, license and runtime gates"
   }
 }
