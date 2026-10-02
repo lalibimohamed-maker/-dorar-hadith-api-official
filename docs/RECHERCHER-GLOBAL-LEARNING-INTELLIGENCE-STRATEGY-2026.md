@@ -17,7 +17,7 @@ A successful acquisition remains useful even if later indexing or educational en
 ## Frozen product pillars
 
 1. **Global Search** — multilingual semantic and lexical search across the permitted corpus.
-2. **يا بوابة العلم** — knowledge navigator that turns a question into a source-grounded investigation path.
+2. **Al-Huda** — knowledge navigator that turns a question into a source-grounded investigation path.
 3. **🧠 اختبر نفسك** — assessment engine with domain-appropriate tasks, not only multiple choice.
 4. **🎓 علّمني** — adaptive learning paths based on prerequisite knowledge, demonstrated mastery, and learner goals.
 5. **📖 اقرأ وتعلّم** — turns a book/source into an interactive learning environment while preserving access to the original source.
@@ -316,7 +316,7 @@ No layer may silently overwrite another.
 The main encyclopedia interface should expose a small set of strong entry points rather than dozens of disconnected tools:
 
 - 🔎 **ابحث** — Global Search
-- 🕌 **يا بوابة العلم** — Knowledge Navigator
+- 🕌 **Al-Huda** — Knowledge Navigator
 - 🧠 **اختبر نفسك** — Assessment & Retrieval
 - 🎓 **علّمني** — Adaptive Learning
 - 📖 **اقرأ وتعلّم** — Source Learning
