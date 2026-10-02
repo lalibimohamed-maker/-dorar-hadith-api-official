@@ -25,12 +25,10 @@ NEGATIVE_TEXTS=[
 
 def synth(text, out):
     subprocess.run(["espeak-ng","-v","ar","-s","165","-p","50","-a","140","-w",str(out),text],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-    audio,_=sf.read(out,dtype="float32")
+    audio,src_sr=sf.read(out,dtype="float32")
     if audio.ndim>1: audio=audio.mean(axis=1)
-    # Normalize source to 16 kHz if espeak changes it.
-    src_sr=22050
     if len(audio) and src_sr != SR:
-        audio=resample_poly(audio,SR,src_sr).astype(np.float32)
+        audio=resample_poly(audio,SR,int(src_sr)).astype(np.float32)
     return audio
 
 def augment(audio, rng):
