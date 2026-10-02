@@ -42,3 +42,11 @@ test('voice platform exposes verified models, translation and JSON-RPC routes', 
   assert.match(buildTranslationRequest({audioFile:'/tmp/q.webm'}).url,/\/v1\/audio\/translations$/);
   assert.equal(buildJsonRpcEndpoint(),'http://127.0.0.1:3902/rpc');
 });
+
+test('remote WebSocket access uses a scoped ticket endpoint', async () => {
+  const { buildWsTicketRequest } = await import('../src/voice-local-platform.js');
+  const req=buildWsTicketRequest({baseUrl:'https://voice.example',scope:'/v1/audio/transcriptions/stream',allowRemote:true});
+  assert.equal(req.method,'POST');
+  assert.equal(req.json.scope,'/v1/audio/transcriptions/stream');
+  assert.throws(()=>buildWsTicketRequest({scope:'/admin',allowRemote:true}),/unsupported WebSocket ticket scope/);
+});
