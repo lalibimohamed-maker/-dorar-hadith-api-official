@@ -63,7 +63,7 @@ jobs:
           curl -fL --retry 5 --retry-all-errors -o voice-release-assets/silero_vad.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
           test -s voice-release-assets/silero_vad.onnx
       - name: Acquire Qwen3-ASR 0.6B
-        if: ${{ inputs.model == '0.6b' || inputs.model == 'both' }}
+        if: ${{ github.event_name == 'push' || inputs.model == '0.6b' || inputs.model == 'both' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -73,7 +73,7 @@ jobs:
           test -s voice-release-assets/Qwen3-ASR-0.6B/model.safetensors
           test -s voice-release-assets/Qwen3-ASR-0.6B/preprocessor_config.json
       - name: Acquire Qwen3-ASR 1.7B
-        if: ${{ inputs.model == '1.7b' || inputs.model == 'both' }}
+        if: ${{ github.event_name == 'push' || inputs.model == '1.7b' || inputs.model == 'both' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -104,7 +104,7 @@ jobs:
           assert p["policy"]["noGitLFS"] is True
           assert p["policy"]["checksumRequired"] is True
           assert p["policy"]["runtimeVerificationAfterDownload"] is True
-          selected="${{ inputs.model }}"
+          selected="${{ inputs.model || 'both' }}"
           roots=[]
           if selected in ("0.6b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-0.6B"))
           if selected in ("1.7b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-1.7B"))
