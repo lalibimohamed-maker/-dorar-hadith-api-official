@@ -62,7 +62,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y curl jq python3 python3-pip tar bzip2
+          sudo apt-get install -y curl jq python3 python3-pip tar bzip2 espeak-ng
           python3 -m pip install --disable-pip-version-check --no-cache-dir qwen-asr onnxruntime numpy scipy soundfile
 
       - name: Validate approved runtime targets
@@ -140,7 +140,21 @@ jobs:
           )[0]
           assert result.language
           assert result.text.strip()
-          print("qwen3-asr-0.6b runtime verified:", result.language)
+
+          import subprocess
+          subprocess.run([
+              "espeak-ng","-v","ar","-s","160","-a","140","-w",
+              "/tmp/al-huda-arabic.wav",
+              "السلام عليكم ورحمة الله وبركاته"
+          ], check=True)
+          arabic=model.transcribe(
+              audio="/tmp/al-huda-arabic.wav",
+              language="Arabic",
+              return_time_stamps=False
+          )[0]
+          assert arabic.language
+          assert arabic.text.strip()
+          print("qwen3-asr-0.6b runtime verified:", result.language, "Arabic sample:", arabic.text)
           PY
 
       - name: Runtime verify Qwen3-ASR 1.7B
@@ -165,7 +179,21 @@ jobs:
           )[0]
           assert result.language
           assert result.text.strip()
-          print("qwen3-asr-1.7b runtime verified:", result.language)
+
+          import subprocess
+          subprocess.run([
+              "espeak-ng","-v","ar","-s","160","-a","140","-w",
+              "/tmp/al-huda-arabic-17b.wav",
+              "السلام عليكم ورحمة الله وبركاته"
+          ], check=True)
+          arabic=model.transcribe(
+              audio="/tmp/al-huda-arabic-17b.wav",
+              language="Arabic",
+              return_time_stamps=False
+          )[0]
+          assert arabic.language
+          assert arabic.text.strip()
+          print("qwen3-asr-1.7b runtime verified:", result.language, "Arabic sample:", arabic.text)
           PY
 
       - name: Runtime verify Silero VAD
