@@ -44,15 +44,6 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.release_tag || 'rechercher-voice-runtime-2026-10' }}
-        run: |
-          set -euo pipefail
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $TAG already exists; no duplicate acquisition."
-            exit 0
-          fi
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -70,6 +61,7 @@ jobs:
           mkdir -p voice-release-assets
           cp config/voice-model-acquisition-manifest-2026.json voice-release-assets/manifest.json
       - name: Acquire fixed runtime targets
+        if: ${{ steps.runtime_release.outputs.exists != 'true' }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-release-assets/silero_vad.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
@@ -96,6 +88,7 @@ jobs:
           test -s voice-release-assets/Qwen3-ASR-1.7B/model-00002-of-00002.safetensors
           test -s voice-release-assets/Qwen3-ASR-1.7B/model.safetensors.index.json
       - name: Acquire remaining voice runtime weights
+        if: ${{ steps.runtime_release.outputs.exists != 'true' }}
         run: |
           set -euo pipefail
           mkdir -p voice-release-assets/remaining
@@ -107,6 +100,7 @@ jobs:
           sha256sum voice-release-assets/remaining/* > voice-release-assets/remaining/SHA256SUMS.txt
 
       - name: Validate real payloads and provenance
+        if: ${{ steps.runtime_release.outputs.exists != 'true' }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -125,6 +119,7 @@ jobs:
           print("manifest targets:", len(p["targets"]))
           PY
       - name: Runtime inference verification — Qwen3-ASR
+        if: ${{ steps.runtime_release.outputs.exists != 'true' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -149,6 +144,7 @@ jobs:
           print(json.dumps(evidence,ensure_ascii=False))
           PY
       - name: Runtime inference verification — Silero VAD
+        if: ${{ steps.runtime_release.outputs.exists != 'true' }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -191,6 +187,7 @@ jobs:
           print("silero_vad.onnx verified:",p.stat().st_size)
           PY
       - name: Runtime verification — Quran recitation source and mapping
+        if: ${{ steps.runtime_release.outputs.exists != 'true' }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -252,6 +249,7 @@ jobs:
           rm -f voice-release-assets/al-huda-positive.wav voice-release-assets/al-huda-negative.wav
 
       - name: Package Release assets without Git LFS
+        if: ${{ steps.runtime_release.outputs.exists != 'true' }}
         run: |
           set -euo pipefail
           cd voice-release-assets
