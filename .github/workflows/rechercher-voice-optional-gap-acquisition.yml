@@ -40,15 +40,23 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     steps:
-      - name: Guard existing release
+      - name: Inspect existing Release and missing assets
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.release_tag || 'rechercher-voice-runtime-2026-10' }}
+          TAG: ${{ inputs.release_tag || 'rechercher-voice-optional-2026-10' }}
         run: |
           set -euo pipefail
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $TAG already exists; no duplicate acquisition."
-            exit 0
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets > /tmp/release.json 2>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            f5_missing=$(jq -r '[.assets[].name] | index("F5TTS_v1_Base.tar.bz2") | not' /tmp/release.json)
+            piper_missing=$(jq -r '[.assets[].name] | index("piper-en-us-libritts-high.tar.bz2") | not' /tmp/release.json)
+            echo "f5_missing=$f5_missing" >> "$GITHUB_OUTPUT"
+            echo "piper_missing=$piper_missing" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "f5_missing=true" >> "$GITHUB_OUTPUT"
+            echo "piper_missing=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -73,7 +81,7 @@ jobs:
           cp config/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json
 
       - name: Acquire F5-TTS v1 base
-        if: ${{ github.event_name == 'push' || inputs.include_f5tts == 'true' }}
+        if: ${{ (github.event_name == 'push' || inputs.include_f5tts == 'true') && steps.release.outputs.f5_missing == 'true' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -83,7 +91,7 @@ jobs:
           test -s optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/vocab.txt
 
       - name: Verify F5-TTS payload
-        if: ${{ inputs.include_f5tts == 'true' }}
+        if: ${{ (github.event_name == 'push' || inputs.include_f5tts == 'true') && steps.release.outputs.f5_missing == 'true' }}
         run: |
           set -euo pipefail
           test "$(stat -c%s optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/model_1250000.safetensors)" -gt 1000000000
@@ -92,7 +100,7 @@ jobs:
           rm -rf optional-voice-release-assets/F5TTS_v1_Base
 
       - name: Acquire Piper en_US LibriTTS High
-        if: ${{ github.event_name == 'push' || inputs.include_piper_en == 'true' }}
+        if: ${{ (github.event_name == 'push' || inputs.include_piper_en == 'true') && steps.release.outputs.piper_missing == 'true' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -159,9 +167,19 @@ jobs:
         if: ${{ inputs.dry_run != 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.release_tag }}
+          TAG: ${{ inputs.release_tag || 'rechercher-voice-optional-2026-10' }}
         run: |
           set -euo pipefail
           test ! -d optional-voice-release-assets/pyannote-speaker-diarization-3.1
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Optional voice weights. Payloads are checksum-recorded and runtime-verified where implemented. Model-specific licenses are preserved."
-          gh release upload "$TAG" optional-voice-release-assets/*.tar.bz2 optional-voice-release-assets/acquisition-record.json optional-voice-release-assets/piper-runtime-verification.json optional-voice-release-assets/manifest.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/model-license-evidence-f5-tts-v1-base.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            for asset in optional-voice-release-assets/*.tar.bz2 optional-voice-release-assets/acquisition-record.json optional-voice-release-assets/piper-runtime-verification.json optional-voice-release-assets/manifest.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/model-license-evidence-f5-tts-v1-base.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/SHA256SUMS.txt; do
+              [ -f "$asset" ] || continue
+              name=$(basename "$asset")
+              if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets | jq -e --arg n "$name" '.assets[] | select(.name==$n)' >/dev/null; then
+                gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+              fi
+            done
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Optional voice weights. Payloads are checksum-recorded; runtime status is recorded separately. Model-specific licenses are preserved."
+            gh release upload "$TAG" optional-voice-release-assets/*.tar.bz2 optional-voice-release-assets/acquisition-record.json optional-voice-release-assets/piper-runtime-verification.json optional-voice-release-assets/manifest.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/model-license-evidence-f5-tts-v1-base.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
+          fi
