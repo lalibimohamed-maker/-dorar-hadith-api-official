@@ -75,7 +75,7 @@ export function createAlQuranCloudRecitationProvider({
         .map(normalizeEdition);
     },
 
-    async execute({ ayah, reciter, verifiedOnly = true } = {}) {
+    async execute({ ayah, reciter, qiraah, riwayah, verifiedOnly = true } = {}) {
       if (!verifiedOnly) throw new Error('Quran recitation requires verifiedOnly=true');
       const number = assertAyah(ayah);
       const payload = await request(`${apiBase}/ayah/${number}/${encodeURIComponent(edition)}`);
@@ -84,7 +84,6 @@ export function createAlQuranCloudRecitationProvider({
       const providerReciter = reciterFromEdition(data.edition);
       if (!audioUrl || !providerReciter) throw new Error('Provider returned incomplete Quran recitation provenance');
       if (reciter && reciter !== providerReciter) throw new Error('Requested reciter does not match the selected verified edition');
-
       return {
         domain: 'quran-recitation',
         ayah: data.numberInSurah || data.number || number,
@@ -94,6 +93,8 @@ export function createAlQuranCloudRecitationProvider({
         sourceUrl: SOURCE_URL,
         termsUrl: TERMS_URL,
         reciter: providerReciter,
+        qiraah: qiraah || null,
+        riwayah: riwayah || null,
         edition,
         verified: true,
         provenance: {
@@ -101,6 +102,8 @@ export function createAlQuranCloudRecitationProvider({
           providerUrl: SOURCE_URL,
           termsUrl: TERMS_URL,
           edition,
+          qiraah: qiraah || null,
+          riwayah: riwayah || null,
         },
       };
     },
