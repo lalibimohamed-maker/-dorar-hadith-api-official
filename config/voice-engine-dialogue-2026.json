@@ -1,0 +1,81 @@
+{
+  "schema": "dinullah.engine-to-engine-dialogue.v1",
+  "displayName": "حوار المحركات",
+  "englishName": "Engine-to-Engine Dialogue",
+  "purpose": "Controlled internal dialogue between two or more speech/AI engines without routing their generated audio back through the physical microphone.",
+  "defaultMode": "human-supervised",
+  "modes": [
+    {
+      "id": "human-supervised",
+      "description": "The user starts/stops the exchange and can inspect the conversation.",
+      "autonomousTurnLimit": 8
+    },
+    {
+      "id": "autonomous",
+      "description": "Optional bounded engine-to-engine exchange.",
+      "autonomousTurnLimit": 6,
+      "requiresExplicitUserEnable": true
+    }
+  ],
+  "transport": {
+    "preferred": "structured-message",
+    "formats": ["json-message", "text"],
+    "audioLoopback": false,
+    "physicalMicrophoneInjection": false,
+    "ttsPlaybackToPeerAsInput": false
+  },
+  "turnProtocol": {
+    "messageFields": [
+      "conversationId",
+      "turnId",
+      "engineId",
+      "role",
+      "content",
+      "language",
+      "confidence",
+      "timestamp",
+      "provenance"
+    ],
+    "roles": ["user-proxy", "engine-a", "engine-b", "system"],
+    "terminationSignals": ["user-stop", "max-turns", "loop-detected", "timeout", "error"]
+  },
+  "safety": {
+    "loopDetectionRequired": true,
+    "duplicateResponseSuppression": true,
+    "maxTurnLimitRequired": true,
+    "perTurnTimeoutRequired": true,
+    "userStopMustInterruptImmediately": true,
+    "microphoneIsolationDuringInternalDialogue": true,
+    "noPrivilegeEscalationBetweenEngines": true,
+    "sensitiveActionsRequireHumanConfirmation": true
+  },
+  "examples": [
+    {
+      "engineA": "whisper.cpp",
+      "engineB": "sherpa-onnx",
+      "note": "ASR engines may exchange structured hypotheses; this is not a peer-to-peer voice call."
+    },
+    {
+      "engineA": "harmony-speech-engine",
+      "engineB": "dinullah-local-voice-runtime",
+      "note": "Harmony is an optional serving/orchestration participant, not the voice core."
+    }
+  ],
+  "speakerHandling": {
+    "oneProfile": true,
+    "twoProfiles": true,
+    "threeProfiles": true,
+    "groupProfiles": true,
+    "openMicWithoutIdentification": true,
+    "simultaneousSpeechRequiresRuntimeVerifiedDiarization": true
+  },
+  "quranPolicy": {
+    "syntheticTtsAsRecitation": false,
+    "recitationAssetsRemainSeparate": true
+  },
+  "completionPolicy": {
+    "configuredIsNotRuntimeVerified": true,
+    "releasePresenceIsNotRuntimeProof": true,
+    "dialogueFeatureRequiresEndToEndTest": true
+  }
+}
