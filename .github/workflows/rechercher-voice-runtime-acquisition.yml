@@ -152,13 +152,13 @@ jobs:
           session=ort.InferenceSession(path, providers=["CPUExecutionProvider"])
           metas={x.name:x for x in session.get_inputs()}
           assert {"input","state","sr"} <= set(metas), [x.name for x in session.get_inputs()]
+          print("silero inputs:",[(x.name,x.shape,x.type) for x in session.get_inputs()])
           def zeros_for(meta, fallback):
               shape=[]
               for d in meta.shape:
                   shape.append(fallback if not isinstance(d,int) or d < 1 else d)
               if not shape: return np.array(fallback)
               return np.zeros(tuple(shape),dtype=np.float32)
-          audio=zeros_for(metas["input"],576)
           state=zeros_for(metas["state"],128)
           sr_meta=metas["sr"]
           if len(sr_meta.shape)==0:
@@ -166,13 +166,22 @@ jobs:
           else:
               sr_shape=tuple(1 if (not isinstance(d,int) or d<1) else d for d in sr_meta.shape)
               sr_value=np.full(sr_shape,16000,dtype=np.int64)
-          out=session.run(None,{"input":audio,"state":state,"sr":sr_value})
-          assert len(out) >= 2
-          probability=np.asarray(out[0])
-          next_state=np.asarray(out[1])
-          assert probability.size >= 1
-          assert next_state.size >= 1
-          print("silero_vad runtime verified; speech_probability=",float(probability.reshape(-1)[0]),"state_shape=",tuple(next_state.shape))
+          errors=[]
+          verified=False
+          for chunk in (512,576,1024,256):
+              try:
+                  audio=zeros_for(metas["input"],chunk)
+                  out=session.run(None,{"input":audio,"state":state,"sr":sr_value})
+                  assert len(out)>=2
+                  probability=np.asarray(out[0]); next_state=np.asarray(out[1])
+                  assert probability.size>=1 and next_state.size>=1
+                  print("silero_vad runtime verified; chunk=",chunk,"speech_probability=",float(probability.reshape(-1)[0]),"state_shape=",tuple(next_state.shape))
+                  verified=True
+                  break
+              except Exception as exc:
+                  errors.append(f"chunk={chunk}: {exc!r}")
+          if not verified:
+              raise RuntimeError("Silero VAD inference failed for all chunk sizes: " + " | ".join(errors))
           PY
 
       - name: Verify Silero VAD payload
