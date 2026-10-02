@@ -2,7 +2,7 @@ import { QURAN_QIRAAT_CATALOG } from './quran-qiraat-catalog.js';
 
 const DEFAULTS = Object.freeze({
   fallbackLanguage: 'ar',
-  quranReciter: 'Saad Al-Ghamdi',
+  quranReciter: 'Mishary Rashid Alafasy',
   quranVoiceMode: 'arabic-recitation-only',
   supportedDirections: ['ltr', 'rtl'],
   exportFormats: ['mp3', 'mp4-4k', 'pdf', 'docx'],
@@ -15,6 +15,27 @@ export function createMultimodalSession(options = {}) {
   return {
     language,
     direction,
+    assistant: {
+      name: 'Al-Huda',
+      arabicName: 'الهُدَى',
+      wakeWord: 'الهُدَى',
+      wakeWordProvider: options.wakeWordProvider ?? null,
+      wakeWordRuntimeVerificationRequired: true,
+    },
+    voiceRuntime: {
+      questionInputEngine: 'qwen3-asr',
+      vad: options.vad ?? null,
+      endpointing: options.endpointing ?? null,
+      audioFrontEnd: options.audioFrontEnd ?? null,
+      bargeIn: options.bargeIn ?? null,
+      punctuation: options.punctuation ?? null,
+      speakerIdentification: options.speakerIdentification ?? null,
+      diarization: options.diarization ?? null,
+      audioEventDetection: options.audioEventDetection ?? null,
+      resourceGovernor: options.resourceGovernor ?? null,
+      permissionLifecycle: options.permissionLifecycle ?? null,
+      modelLifecycle: options.modelLifecycle ?? null,
+    },
     input: {
       text: true,
       voice: true,
