@@ -33,3 +33,22 @@ test('unconfigured operations fail closed', async () => {
   const tools=createAlHudaAgentTools({providers:{}});
   await assert.rejects(()=>tools.execute('health'),/provider is not configured/);
 });
+
+test('Al-Huda agent synthesis resolves a consented per-agent voice profile', async () => {
+  const calls=[];
+  const tools = createAlHudaAgentTools({
+    voiceBindings: {
+      resolve(clientId, profileId) {
+        calls.push([clientId, profileId]);
+        return profileId || 'bound-profile';
+      },
+    },
+    providers: {
+      synthesize: async input => input,
+    },
+  });
+  const out=await tools.execute('synthesize',{clientId:'codex-cli',text:'السلام عليكم'});
+  assert.equal(out.result.resolvedProfileId,'bound-profile');
+  assert.deepEqual(calls,[['codex-cli',undefined]]);
+  assert.equal(out.audit.voiceProfileId,'bound-profile');
+});
