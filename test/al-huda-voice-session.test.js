@@ -24,7 +24,7 @@ test('Al-Huda voice session wires wake detection to ASR, reasoning and TTS', asy
   await session.start();
   await session.pushFrame(new Float32Array([.1]));
   await session.pushFrame(new Float32Array([.1]));
-  const result=const result=await session.pushFrame(new Float32Array([0]));
+  const result=await session.pushFrame(new Float32Array([0]));
   assert.equal(result.transcript.language,'Arabic');
   assert.match(result.answer,/طلب العلم/);
   assert.ok(events.some(e=>e.type==='wake-detected'));
