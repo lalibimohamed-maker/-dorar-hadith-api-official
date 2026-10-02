@@ -21,8 +21,10 @@ export function buildTranscriptionRequest({ baseUrl = "http://127.0.0.1:3900", a
   return Object.freeze({ method: "POST", url: new URL("/v1/audio/transcriptions", base).toString(), form });
 }
 
-export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, model, voice, language, speed = 1, streamFormat = "audio", allowRemote = false } = {}) {
+export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, model, voice, language, speed = 1, responseFormat = "wav", streamFormat = "audio", instructions, allowRemote = false } = {}) {
   if (!text) throw new TypeError("text is required");
+  const allowedResponseFormats = new Set(["mp3","opus","aac","flac","wav","pcm"]);
+  if (!allowedResponseFormats.has(responseFormat)) throw new Error("invalid speech response format");
   if (!["audio","sse"].includes(streamFormat)) throw new Error("invalid speech stream format");
   const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
   return Object.freeze({
@@ -34,7 +36,9 @@ export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, mo
       voice: voice || "default",
       ...(language ? { language: String(language) } : {}),
       speed: Number(speed),
+      response_format: responseFormat,
       stream_format: streamFormat,
+      ...(instructions ? { instructions: String(instructions) } : {}),
     }),
   });
 }
