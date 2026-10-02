@@ -34,7 +34,9 @@
       "source": "https://huggingface.co/Qwen/Qwen3-ForcedAligner-0.6B",
       "status": "optional-acquire-and-runtime-verify",
       "license": "Apache-2.0",
-      "notes": "Optional companion for timestamp alignment; not required for the first question/answer path."
+      "notes": "Optional companion for timestamp alignment; not required for the first question/answer path.",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10",
+      "note": "Apache-2.0 upstream. Current model card/config does not list Arabic among supported languages; acquire as optional alignment utility, not as Arabic-language proof."
     },
     {
       "id": "sherpa-onnx-vad-silero",
@@ -130,8 +132,52 @@
       "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2",
       "status": "acquire-to-project-release",
       "note": "Base runtime only; it does not close the Arabic الهُدَى wake-word gap."
+    },
+    {
+      "id": "sherpa-onnx-speaker-segmentation-pyannote-3",
+      "role": "speaker-segmentation-for-diarization",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2",
+      "status": "acquire-and-runtime-verify",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10"
+    },
+    {
+      "id": "sherpa-onnx-kws-zipformer-zh-en-3m-2025-12-20",
+      "role": "generic-kws-base-not-arabic-wake-word",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2",
+      "status": "acquire-and-evaluate",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10",
+      "note": "Generic base runtime only; not evidence for الهُدَى."
+    },
+    {
+      "id": "sherpa-onnx-punctuation-ct-transformer-zh-en-int8",
+      "role": "punctuation-runtime-base",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2",
+      "status": "acquire-and-evaluate",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10"
+    },
+    {
+      "id": "sherpa-onnx-speaker-id-3dspeaker-eres2net-base",
+      "role": "speaker-identification-and-enrollment",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx",
+      "status": "acquire-and-runtime-verify",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10",
+      "note": "Speaker embeddings are language-independent in intended use; Arabic device enrollment still requires runtime evidence."
+    },
+    {
+      "id": "sherpa-onnx-audio-tagging-zipformer",
+      "role": "audio-event-tagging",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/audio-tagging-models/sherpa-onnx-zipformer-audio-tagging-2024-04-09.tar.bz2",
+      "status": "acquire-and-runtime-verify",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10"
     }
   ],
   "assistant": "Al-Huda",
-  "wakeWord": "الهُدَى"
+  "wakeWord": "الهُدَى",
+  "releaseAssetPolicy": {
+    "releaseTag": "rechercher-voice-gap-2026-10",
+    "noGitLFS": true,
+    "maxAssetBytes": 2147483648,
+    "checksumFile": "SHA256SUMS.txt",
+    "publicationRequiresSuccessfulVerification": true
+  }
 }
