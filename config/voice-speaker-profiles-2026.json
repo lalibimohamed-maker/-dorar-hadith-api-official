@@ -1,0 +1,14 @@
+{
+  "schema":"dinullah.voice-speaker-profiles.v1",
+  "displayName":"Voice & Speaker Profiles",
+  "activation":{"settingsPath":"Voice > Microphone & Speaker","platformSettingsIntegration":{"ios":"Accessibility/Vocal Shortcuts compatible action plus in-app voice settings","android":"Assistant settings plus in-app voice settings","web":"browser microphone permission plus in-app voice settings"}},
+  "modes":[
+    {"id":"single-user","label":"صوتي فقط","speakerCount":1},
+    {"id":"family-2","label":"شخصان","speakerCount":2},
+    {"id":"family-3","label":"ثلاثة أشخاص","speakerCount":3},
+    {"id":"group","label":"أكثر من ثلاثة","speakerCount":null},
+    {"id":"open-mic","label":"الميكروفون مفتوح بدون تمييز صوت","speakerIdentification":false}
+  ],
+  "enrollment":{"consentRequired":true,"localFirst":true,"minimumUtterances":3,"rawAudioDefaultRetention":false,"storeEmbeddingOnlyPreferred":true,"deleteProfileMustDeleteDerivedEmbedding":true},
+  "security":{"speakerIdentificationIsNotAuthentication":true,"sensitiveActionsRequireDeviceAuthentication":true,"unexpectedSpeakerMustNotGrantPrivileges":true}
+}
