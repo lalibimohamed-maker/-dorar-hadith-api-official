@@ -294,6 +294,48 @@
       "gated_access": true,
       "hf_token_required": true,
       "notes": "Official FLUX.1 Schnell weights; access is gated on Hugging Face. Acquisition workflow authenticates with HF_TOKEN and preserves the immutable revision and per-asset SHA-256 manifest."
+    },
+    {
+      "model_id": "spark-x2.5-4b",
+      "source_repo": "https://github.com/XHToken/Spark-X2.5",
+      "revision": "448e61eb392c00f2c403185c5b56d5e0665bfaab",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "revision_type": "immutable_hf_commit",
+      "source_model_id": "XHToken/Spark-X2.5-4B",
+      "release_tag": "rechercher-omega-spark-x25-4b-v1.0.0",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "rights_promotion_status": "blocked_until_clearance",
+      "role": "auxiliary_reasoning_model",
+      "primary_model": false,
+      "replaces_omega": false
+    },
+    {
+      "model_id": "spark-x2.5-1.7b",
+      "source_repo": "https://github.com/XHToken/Spark-X2.5",
+      "revision": "448e61eb392c00f2c403185c5b56d5e0665bfaab",
+      "weight_license_status": "verified_source_license",
+      "acquisition": "github_release",
+      "revision_type": "immutable_hf_commit",
+      "source_model_id": "XHToken/Spark-X2.5-1.7B",
+      "release_tag": "rechercher-omega-spark-x25-1.7b-v1.0.0",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "verification": {
+        "mode": "release_manifest",
+        "manifest_asset": "release-manifest.json",
+        "required_before_runtime": true,
+        "required_before_promotion": true
+      },
+      "rights_promotion_status": "blocked_until_clearance",
+      "role": "auxiliary_reasoning_model",
+      "primary_model": false,
+      "replaces_omega": false
     }
   ]
 }
