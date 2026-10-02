@@ -1,0 +1,88 @@
+{
+  "schema": "dinullah.voice-release-inventory.v1",
+  "checkedAt": "2026-10-02",
+  "releases": [
+    {
+      "tag": "rechercher-voice-gap-2026-10",
+      "publishedAt": "2026-10-02T09:49:54Z",
+      "assets": [
+        {
+          "name": "audio-tagging.tar.bz2",
+          "size": 300823660,
+          "digest": "sha256:af81580b4fcda8c633893730a2b07a2265b74d7af385698d5b8b113fe18d269e"
+        },
+        {
+          "name": "forced-aligner-runtime-verification.json",
+          "size": 114,
+          "digest": "sha256:501c570455c89348075fbd47b05c2273991a15348c867cf18347d993b478eed0"
+        },
+        {
+          "name": "kws-base.tar.bz2",
+          "size": 32885699,
+          "digest": "sha256:68447f4fbc67e70eee3a93961f36e81e98f47aef73ce7e7ca00885c6cd3616a"
+        },
+        {
+          "name": "manifest.json",
+          "size": 9428,
+          "digest": "sha256:1e4b402c0a7b69a195cccd1eb79956810b8f95031258ae6b1b52e9084514e83b"
+        },
+        {
+          "name": "punctuation.tar.bz2",
+          "size": 64717756,
+          "digest": "sha256:c0d5aa5f8eeb686032345e180bedf39319dc2e0556781c6264bcadba8328a6e1"
+        },
+        {
+          "name": "pyannote-segmentation.tar.bz2",
+          "size": 6958444,
+          "digest": "sha256:24615ee884c897d9d2ba09bb4d30da6bb1b15e685065962db5b02e76e4996488"
+        },
+        {
+          "name": "Qwen3-ForcedAligner-0.6B.tar.bz2",
+          "size": 1272892863,
+          "digest": "sha256:0f5986ecad5a7cac422413cfc5ca0a7ccfa7bb89958bed54ab4b21f86a27828d"
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "size": 721,
+          "digest": "sha256:c1d73e6092823b14e13aa9bbf0216f74c899f307d9d9433873f9cac92c54d8bc"
+        },
+        {
+          "name": "speaker-id.onnx",
+          "size": 39593761,
+          "digest": "sha256:1a331345f04805badbb495c775a6ddffcdd1a732567d5ec8b3d5749e3c7a5e4b"
+        }
+      ]
+    },
+    {
+      "tag": "rechercher-voice-optional-2026-10",
+      "publishedAt": "2026-10-02T06:05:11Z",
+      "assets": [
+        {
+          "name": "F5TTS_v1_Base.tar.bz2",
+          "size": 1282749516,
+          "digest": "sha256:ed17deb61f560d389185042bd9e633243e5a8253adffab281046c1cd9a2e6e3c"
+        },
+        {
+          "name": "piper-en-us-libritts-high.tar.bz2",
+          "size": 123701665,
+          "digest": "sha256:e89235985e08ddab4bd027c2e0173e88a00e88521bc860b3931c4d5d8657ec22"
+        },
+        {
+          "name": "piper-runtime-verification.json",
+          "size": 112,
+          "digest": "sha256:f1aca4a2e77f681bd48cc7cca84063032ab292e4989357817e6a116dc9d57688"
+        },
+        {
+          "name": "model-license-evidence-piper-en-us-libritts-high.json",
+          "size": 437,
+          "digest": "sha256:fc701b3fa850f5ec20233814db278294f4889c79a5d87ddab4bd027c2e0173e88a00e88521bc860b3931c4d5d8657ec22"
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "releasePresenceIsNotRuntimeProof": true,
+    "acquiredIsNotLoaded": true,
+    "noGitLFS": true
+  }
+}
