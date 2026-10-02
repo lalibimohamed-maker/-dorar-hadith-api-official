@@ -205,7 +205,9 @@
   ],
   "acquisitionStatus": {
     "implementedInRepo": true,
-    "publishedReleaseAssets": false,
-    "reason": "GitHub Actions workflow is configured for manual dispatch; this connector exposes no workflow-dispatch or release-upload mutation, so no binary is claimed published from this session."
+    "automaticReleaseAcquisition": true,
+    "binaryRepositoryStorage": false,
+    "publishedReleaseAssets": "release-state-is-evidence-only",
+    "reason": "Rechercher automatically acquires approved missing targets, verifies payloads/runtime/provenance, and publishes only eligible binaries to GitHub Releases. No binary weights are stored in the repository."
   }
 }
