@@ -11,7 +11,7 @@ on:
       - scripts/train-al-huda-kws.py
       - scripts/al-huda-kws-runner.py
 permissions:
-  # SECURITY-JUSTIFICATION: contents: write is required only when workflow_dispatch sets dry_run=false; gh release create/upload publishes verified acquisition payloads and checksums as Release assets. Checkout uses persist-credentials:false.
+  # SECURITY-JUSTIFICATION: contents: write is required to automatically publish verified binary assets to GitHub Releases. Repository checkout is code-only; binary assets are never persisted in the repository.
   contents: write
 concurrency:
   group: rechercher-voice-runtime-acquisition
@@ -220,7 +220,7 @@ jobs:
           print(json.dumps(evidence,ensure_ascii=False))
           PY
 
-      - name: Package Release assets without Git LFS
+      - name: Package Release assets without repository binary storage
         if: ${{ steps.runtime_release.outputs.any_missing == 'true' }}
         run: |
           set -euo pipefail
@@ -238,7 +238,7 @@ jobs:
           TAG: rechercher-voice-runtime-2026-10
         run: |
           set -euo pipefail
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice runtime acquisition. Payloads are checksum-recorded and runtime-verified before publication; no Git LFS."
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice runtime acquisition. Payloads are checksum-recorded and runtime-verified before publication; no repository binary storage."
           gh release upload "$TAG" voice-release-assets/SHA256SUMS.txt voice-release-assets/manifest.json voice-release-assets/runtime-verification.json voice-release-assets/quran-recitation-runtime-verification.json voice-release-assets/silero_vad.onnx voice-release-assets/al-huda-kws/al-huda-kws.onnx voice-release-assets/al-huda-kws/al-huda-kws-metadata.json voice-release-assets/al-huda-kws/runtime-verification.json --repo "$GITHUB_REPOSITORY"
           for asset in voice-release-assets/*.tar.bz2 voice-release-assets/*.part-* voice-release-assets/*parts.SHA256SUMS.txt; do
             [ -f "$asset" ] || continue
