@@ -12,6 +12,7 @@ export function createAlHudaVoiceSession({
   }
   if (!audioPipeline || typeof audioPipeline.process !== 'function') throw new TypeError('audioPipeline is required');
   let active=false;
+  let armed=false;
   let questionFrames=[];
   let answerController=null;
 
@@ -21,19 +22,22 @@ export function createAlHudaVoiceSession({
       const status=typeof permission?.refresh === 'function' ? await permission.refresh() : 'granted';
       if (status !== 'granted') throw new Error('microphone permission is not granted');
       active=true;
-      onEvent({type:'listening'});
+      armed=false;
+      questionFrames=[];
+      onEvent({type:'listening',wakeWord:'الهُدَى'});
       return {active:true};
     },
     async pushFrame(samples) {
       if (!active) throw new Error('voice session is not active');
       const processed=audioPipeline.process(samples);
       if (!active) return {state:'stopped'};
-      if (!questionFrames.length && wakeDetector(processed.samples)) {
+      if (!armed && wakeDetector(processed.samples)) {
+        armed=true;
         questionFrames=[];
         onEvent({type:'wake-detected',wakeWord:'الهُدَى'});
         return {state:'wake-detected'};
       }
-      if (questionFrames.length || processed.turn.active) {
+      if (armed && (questionFrames.length || processed.turn.active)) {
         questionFrames.push(processed.samples);
       }
       if (questionFrames.length && processed.turn.speechEnded) {
@@ -41,7 +45,7 @@ export function createAlHudaVoiceSession({
         questionFrames=[];
         onEvent({type:'transcribing'});
         const transcript=await asr(audio);
-        if (!transcript?.text?.trim()) throw new Error('empty transcript');
+        if (!transcript?.text?.trim()) { armed=false; throw new Error('empty transcript'); }
         onEvent({type:'transcript-ready',text:transcript.text,language:transcript.language ?? null});
         onEvent({type:'reasoning'});
         const answer=await reasoning(transcript.text);
@@ -52,6 +56,7 @@ export function createAlHudaVoiceSession({
         } finally {
           answerController=null;
         }
+        armed=false;
         onEvent({type:'answer-complete'});
         return {state:'answer-complete',transcript,answer};
       }
@@ -65,9 +70,11 @@ export function createAlHudaVoiceSession({
     stop() {
       active=false;
       questionFrames=[];
+      armed=false;
       if (answerController && !answerController.signal.aborted) answerController.abort('session-stopped');
       answerController=null;
       onEvent({type:'stopped'});
-    }
+    },
+    get armed() { return armed; }
   });
 }
