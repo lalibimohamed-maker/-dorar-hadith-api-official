@@ -1,28 +1,137 @@
 {
-  "schema":"dinullah.voice-model-acquisition-manifest.v2",
-  "releasePrefix":"rechercher-voice-runtime",
-  "policy":{
-    "downloadWeightsOnlyForExplicitTargets":true,
-    "noGitLFS":true,
-    "storeLargeBinaryInReleaseAssets":true,
-    "checksumRequired":true,
-    "provenanceRequired":true,
-    "licenseReviewRequired":true,
-    "runtimeVerificationAfterDownload":true
+  "schema": "dinullah.voice-model-acquisition-manifest.v2",
+  "releasePrefix": "rechercher-voice-runtime",
+  "policy": {
+    "downloadWeightsOnlyForExplicitTargets": true,
+    "noGitLFS": true,
+    "storeLargeBinaryInReleaseAssets": true,
+    "checksumRequired": true,
+    "provenanceRequired": true,
+    "licenseReviewRequired": true,
+    "runtimeVerificationAfterDownload": true,
+    "projectReleaseAssetRule": "All acquired binary weights are published only as checksum-recorded GitHub Release assets; never Git LFS."
   },
-  "targets":[
-    {"id":"qwen3-asr-0.6b","role":"primary-lightweight-multilingual-asr-and-language-identification","source":"https://huggingface.co/Qwen/Qwen3-ASR-0.6B","status":"acquire-and-runtime-verify","license":"Apache-2.0","notes":"Offline and streaming ASR; Arabic supported. Use as the low-resource/low-latency path."},
-    {"id":"qwen3-asr-1.7b","role":"primary-high-quality-multilingual-asr-and-language-identification","source":"https://huggingface.co/Qwen/Qwen3-ASR-1.7B","status":"acquire-and-runtime-verify","license":"Apache-2.0","notes":"Offline and streaming ASR; Arabic supported. Use when higher recognition quality is worth the additional runtime cost."},
-    {"id":"qwen3-forced-aligner-0.6b","role":"optional-speech-text-timestamp-alignment","source":"https://huggingface.co/Qwen/Qwen3-ForcedAligner-0.6B","status":"optional-acquire-and-runtime-verify","license":"Apache-2.0","notes":"Optional companion for timestamp alignment; not required for the first question/answer path."},
-    {"id":"sherpa-onnx-vad-silero","role":"vad","source":"https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx","status":"acquire"},
-    {"id":"sherpa-onnx-kws-zipformer-zh-en-3m","role":"open-vocabulary-kws-base-runtime","source":"https://github.com/k2-fsa/sherpa-onnx/releases/tag/kws-models","status":"acquire-and-evaluate","note":"Base KWS only; Arabic Al-Huda wake-word still requires a trained and verified model."},
-    {"id":"sherpa-onnx-punctuation","role":"punctuation","source":"https://github.com/k2-fsa/sherpa-onnx/releases/tag/punctuation-models","status":"acquire-and-evaluate"},
-    {"id":"sherpa-onnx-speaker-recognition","role":"speaker-identification-and-enrollment","source":"https://github.com/k2-fsa/sherpa-onnx/releases/tag/speaker-recongition-models","status":"acquire-and-evaluate"},
-    {"id":"sherpa-onnx-audio-tagging","role":"audio-event-tagging","source":"https://github.com/k2-fsa/sherpa-onnx/releases/tag/audio-tagging-models","status":"acquire-and-evaluate"},
-    {"id":"sherpa-onnx-arabic-tts-nabra-int8","role":"arabic-local-tts","source":"https://huggingface.co/csukuangfj/nabra-82m-arabic-int8","status":"acquire-after-license-verification"},
-    {"id":"piper-ar-jordan","role":"arabic-local-tts-fallback","source":"https://github.com/OHF-Voice/piper1-gpl","status":"acquire-after-model-card-license-verification","locale":"ar_JO"},
-    {"id":"whisper-cpp-multilingual","role":"high-quality-local-asr-fallback","source":"https://github.com/ggml-org/whisper.cpp","status":"acquire-and-runtime-verify","modelFamily":"multilingual"},
-    {"id":"al-huda-arabic-kws","role":"custom-arabic-wake-word","source":null,"status":"BUILD_REQUIRED","phrase":"Al-Huda","arabicSpokenForm":"الهُدَى","note":"No release is declared until real training and inference evidence exists."},
-    {"id":"quran-ten-qiraat-recitation-registry","role":"quran-recitation-qiraah-riwayah-reciter-mapping","source":"config/quran-recitation-qiraat-2026.json","status":"registry-and-runtime-verify","note":"The registry defines the ten qiraat and their twenty riwayat; individual reciters remain playable only after verified source mapping and rights/provenance checks."}
-  ]
+  "targets": [
+    {
+      "id": "qwen3-asr-0.6b",
+      "role": "primary-lightweight-multilingual-asr-and-language-identification",
+      "source": "https://huggingface.co/Qwen/Qwen3-ASR-0.6B",
+      "status": "acquire-and-runtime-verify",
+      "license": "Apache-2.0",
+      "notes": "Offline and streaming ASR; Arabic supported. Use as the low-resource/low-latency path."
+    },
+    {
+      "id": "qwen3-asr-1.7b",
+      "role": "primary-high-quality-multilingual-asr-and-language-identification",
+      "source": "https://huggingface.co/Qwen/Qwen3-ASR-1.7B",
+      "status": "acquire-and-runtime-verify",
+      "license": "Apache-2.0",
+      "notes": "Offline and streaming ASR; Arabic supported. Use when higher recognition quality is worth the additional runtime cost."
+    },
+    {
+      "id": "qwen3-forced-aligner-0.6b",
+      "role": "optional-speech-text-timestamp-alignment",
+      "source": "https://huggingface.co/Qwen/Qwen3-ForcedAligner-0.6B",
+      "status": "optional-acquire-and-runtime-verify",
+      "license": "Apache-2.0",
+      "notes": "Optional companion for timestamp alignment; not required for the first question/answer path."
+    },
+    {
+      "id": "sherpa-onnx-vad-silero",
+      "role": "vad",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx",
+      "status": "acquire"
+    },
+    {
+      "id": "sherpa-onnx-kws-zipformer-zh-en-3m",
+      "role": "open-vocabulary-kws-base-runtime",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/tag/kws-models",
+      "status": "acquire-and-evaluate",
+      "note": "Base KWS only; Arabic Al-Huda wake-word still requires a trained and verified model."
+    },
+    {
+      "id": "sherpa-onnx-punctuation",
+      "role": "punctuation",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/tag/punctuation-models",
+      "status": "acquire-and-evaluate"
+    },
+    {
+      "id": "sherpa-onnx-speaker-recognition",
+      "role": "speaker-identification-and-enrollment",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/tag/speaker-recongition-models",
+      "status": "acquire-and-evaluate"
+    },
+    {
+      "id": "sherpa-onnx-audio-tagging",
+      "role": "audio-event-tagging",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/tag/audio-tagging-models",
+      "status": "acquire-and-evaluate"
+    },
+    {
+      "id": "sherpa-onnx-arabic-tts-nabra-int8",
+      "role": "arabic-local-tts",
+      "source": "https://huggingface.co/csukuangfj/nabra-82m-arabic-int8",
+      "status": "acquire-after-license-verification"
+    },
+    {
+      "id": "piper-ar-jordan",
+      "role": "arabic-local-tts-fallback",
+      "source": "https://github.com/OHF-Voice/piper1-gpl",
+      "status": "acquire-after-model-card-license-verification",
+      "locale": "ar_JO"
+    },
+    {
+      "id": "whisper-cpp-multilingual",
+      "role": "high-quality-local-asr-fallback",
+      "source": "https://github.com/ggml-org/whisper.cpp",
+      "status": "acquire-and-runtime-verify",
+      "modelFamily": "multilingual"
+    },
+    {
+      "id": "al-huda-arabic-kws",
+      "role": "custom-arabic-wake-word",
+      "source": null,
+      "status": "BUILD_REQUIRED",
+      "phrase": "Al-Huda",
+      "arabicSpokenForm": "الهُدَى",
+      "note": "No release is declared until real training and inference evidence exists."
+    },
+    {
+      "id": "quran-ten-qiraat-recitation-registry",
+      "role": "quran-recitation-qiraah-riwayah-reciter-mapping",
+      "source": "config/quran-recitation-qiraat-2026.json",
+      "status": "registry-and-runtime-verify",
+      "note": "The registry defines the ten qiraat and their twenty riwayat; individual reciters remain playable only after verified source mapping and rights/provenance checks."
+    },
+    {
+      "id": "sherpa-onnx-punctuation-ct-transformer-zh-en-int8",
+      "role": "punctuation-runtime",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2",
+      "status": "acquire-to-project-release",
+      "checksumSource": "sherpa-onnx-punctuation-models"
+    },
+    {
+      "id": "sherpa-onnx-speaker-campplus-en",
+      "role": "speaker-identification-and-enrollment",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_campplus_sv_en_voxceleb_16k.onnx",
+      "status": "acquire-to-project-release",
+      "checksumRequired": true
+    },
+    {
+      "id": "sherpa-onnx-audio-tagging-zipformer-small",
+      "role": "audio-event-tagging",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/audio-tagging-models/sherpa-onnx-zipformer-small-audio-tagging-2024-04-15.tar.bz2",
+      "status": "acquire-to-project-release",
+      "checksumRequired": true
+    },
+    {
+      "id": "sherpa-onnx-kws-zh-en-base",
+      "role": "open-vocabulary-kws-base-runtime",
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2",
+      "status": "acquire-to-project-release",
+      "note": "Base runtime only; it does not close the Arabic الهُدَى wake-word gap."
+    }
+  ],
+  "assistant": "Al-Huda",
+  "wakeWord": "الهُدَى"
 }
