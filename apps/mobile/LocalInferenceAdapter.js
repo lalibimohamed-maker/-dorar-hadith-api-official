@@ -3,6 +3,7 @@ import { createLocalConsumerInferenceRuntime } from '../../src/local-consumer-in
 export function createMobileLocalInferenceAdapter({
   mode = 'auto',
   capabilities = {},
+  verifiedBackends = [],
   webgpuLoader,
   wasmLoader,
   nativeLoader,
@@ -17,6 +18,7 @@ export function createMobileLocalInferenceAdapter({
   const runtime = createLocalConsumerInferenceRuntime({
     mode,
     capabilities,
+    verifiedBackends,
     preferredBackends: ['webgpu', 'native', 'wasm'],
     backendLoaders,
     onEvent
@@ -26,8 +28,22 @@ export function createMobileLocalInferenceAdapter({
     runtime,
     async initialize() {
       const result = await runtime.initialize();
-      if (!result.ready) return { ready: false, mode, reason: result.reason, backend: null };
-      return { ready: true, mode, backend: result.backend, runtime: result.runtime };
+      if (!result.ready) {
+        return {
+          ready: false,
+          mode,
+          reason: result.reason,
+          backend: null,
+          failures: result.failures || []
+        };
+      }
+      return {
+        ready: true,
+        mode,
+        backend: result.backend,
+        runtime: result.runtime,
+        failures: result.failures || []
+      };
     }
   });
 }
