@@ -13,8 +13,7 @@ name: Rechercher Al-Huda KWS Release
       - scripts/al-huda-kws-runner.py
 
 permissions:
-  # SECURITY-JUSTIFICATION: contents: write is required only to publish the runtime-verified Al-Huda KWS binary to GitHub Releases. The binary is not stored in the repository.
-  contents: write
+  contents: read
 
 concurrency:
   group: rechercher-al-huda-kws-release
@@ -22,6 +21,10 @@ concurrency:
 
 jobs:
   build:
+    # SECURITY-JUSTIFICATION: this job publishes only the runtime-verified Al-Huda KWS
+    # binary to GitHub Releases; write access is scoped to this job.
+    permissions:
+      contents: write
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
