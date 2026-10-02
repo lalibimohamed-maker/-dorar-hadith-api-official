@@ -209,11 +209,21 @@
     "binaryRepositoryStorage": false,
     "publishedReleaseAssets": "release-state-is-evidence-only",
     "reason": "Rechercher automatically acquires approved missing targets, verifies payloads/runtime/provenance, and publishes only eligible binaries to GitHub Releases. No binary weights are stored in the repository.",
-    "voiceStudioExploitationRevision": "2026-10-02-v3",
+    "voiceStudioExploitationRevision": "2026-10-02-v5",
     "contract": "config/voice-platform-contract-2026.json",
     "runtimeContractTest": "test/voice-platform-contract.test.js",
     "weightsPolicy": "approved targets are acquired by CI and published only after checksum, provenance, license and runtime gates",
     "continuationTriggerCommit": "16edca2f8ec5fab002f24718af261d3f72ca65c0",
-    "continuationTriggerPurpose": "re-run approved voice acquisition workflows after platform-contract ESM fix"
+    "continuationTriggerPurpose": "re-run approved voice acquisition workflows after platform-contract ESM fix",
+    "runtimeCapabilities": [
+      "streaming-asr-tts-events",
+      "checkpointed-long-form-audio",
+      "crash-isolated-worker-supervision",
+      "idempotent-voice-jobs",
+      "local-openai-compatible-speech",
+      "local-mcp-boundary",
+      "native-dictation-output-session"
+    ],
+    "noImplicitRemote": true
   }
 }
