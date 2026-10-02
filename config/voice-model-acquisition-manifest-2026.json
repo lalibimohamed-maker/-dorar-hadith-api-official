@@ -141,10 +141,12 @@
       "id": "f5-tts-v1-base",
       "role": "optional-tts-research-fallback",
       "source": "https://huggingface.co/SWivid/F5-TTS",
-      "status": "optional-acquire-and-runtime-verify",
+      "status": "optional-acquire-payload-verify-runtime-pending",
       "license": "CC-BY-NC-4.0",
       "releaseEligible": true,
-      "notes": "Non-commercial license; not part of the primary Al-Huda TTS path unless separately enabled."
+      "notes": "Non-commercial license; not part of the primary Al-Huda TTS path unless separately enabled.",
+      "licenseEvidence": "config/model-license-evidence-f5-tts-v1-base.json",
+      "usageRestriction": "non-commercial-only"
     },
     {
       "id": "piper-en-us-libritts-high",
@@ -153,7 +155,9 @@
       "status": "acquire-and-runtime-verify",
       "license": "CC-BY-4.0",
       "releaseEligible": true,
-      "notes": "Model card identifies LibriTTS dataset under CC BY 4.0; retain attribution."
+      "notes": "Model card identifies LibriTTS dataset under CC BY 4.0; retain attribution.",
+      "licenseEvidence": "config/model-license-evidence-piper-en-us-libritts-high.json",
+      "attributionRequired": true
     },
     {
       "id": "pyannote-speaker-diarization-3.1",
