@@ -169,7 +169,7 @@ jobs:
           test -s SHA256SUMS.txt
 
       - name: Publish verified assets automatically to Release
-        if: ${{ steps.gap_release.outputs.any_missing == 'true' }}
+        if: ${{ steps.gap_release.outputs.forced != 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: rechercher-voice-gap-2026-10
