@@ -1,0 +1,16 @@
+{
+  "schema":"dinullah.audio-runtime-stack.v1",
+  "assistant":"Al-Huda",
+  "wakeWord":"الهُدَى",
+  "frontEnd":["aec","noise-suppression","automatic-gain-control","resampling","clipping-detection"],
+  "speechControl":["vad","speech-start","speech-end","endpointing","turn-detection"],
+  "interaction":["barge-in","tts-ducking","interruption-cancellation"],
+  "models":["sherpa-onnx-vad-silero","sherpa-onnx-punctuation"],
+  "verificationPolicy":{
+    "audioFixtureTestsAllowed":true,
+    "deviceMicrophoneProofRequired":true,
+    "bargeInDeviceProofRequired":true,
+    "aecDeviceProofRequired":true,
+    "endpointingDeviceProofRequired":true
+  }
+}
