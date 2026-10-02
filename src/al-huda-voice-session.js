@@ -18,6 +18,7 @@ export function createAlHudaVoiceSession({
 
   return Object.freeze({
     get active() { return active; },
+    get armed() { return armed; },
     async start() {
       const status=typeof permission?.refresh === 'function' ? await permission.refresh() : 'granted';
       if (status !== 'granted') throw new Error('microphone permission is not granted');
@@ -34,6 +35,7 @@ export function createAlHudaVoiceSession({
       if (!armed && wakeDetector(processed.samples)) {
         armed=true;
         questionFrames=[];
+        armed=true;
         onEvent({type:'wake-detected',wakeWord:'الهُدَى'});
         return {state:'wake-detected'};
       }
@@ -43,6 +45,7 @@ export function createAlHudaVoiceSession({
       if (questionFrames.length && processed.turn.speechEnded) {
         const audio=Float32Array.from(questionFrames.flatMap(frame=>Array.from(frame)));
         questionFrames=[];
+        armed=false;
         onEvent({type:'transcribing'});
         const transcript=await asr(audio);
         if (!transcript?.text?.trim()) { armed=false; throw new Error('empty transcript'); }
