@@ -1,4 +1,4 @@
-const STATES = Object.freeze([
+export const STATES = Object.freeze([
   "declared","acquiring","acquired","checksum-verified",
   "license-reviewed","loadable","loaded","inference-verified","ready"
 ]);
