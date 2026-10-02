@@ -1,10 +1,36 @@
 {
-  "schema":"dinullah.voice-gap-inventory.v1",
-  "assistant":{"name":"Al-Huda","arabicName":"الهُدَى","wakeWord":"الهُدَى"},
-  "softwareImplemented":["mobile-runtime-bridge","model-lifecycle-manager","permission-lifecycle","battery-thermal-governor-contract","audio-front-end-processing","endpointing","turn-detection","barge-in","punctuation-runtime","speaker-identification-contract","diarization-contract","audio-event-detection-contract","wasm-runtime-gate","ios-app-intent-and-app-shortcuts-contract","android-voice-interaction-service-contract","android-session-service-contract","al-huda-voice-session"],
-  "acquisitionWorkflows":["rechercher-voice-runtime-acquisition","rechercher-voice-gap-acquisition","rechercher-voice-optional-gap-acquisition"],
-  "releaseStorage":"GitHub Releases; Git LFS forbidden",
-  "runtimeProofStillRequired":[
+  "schema": "dinullah.voice-gap-inventory.v1",
+  "assistant": {
+    "name": "Al-Huda",
+    "arabicName": "الهُدَى",
+    "wakeWord": "الهُدَى"
+  },
+  "softwareImplemented": [
+    "mobile-runtime-bridge",
+    "model-lifecycle-manager",
+    "permission-lifecycle",
+    "battery-thermal-governor-contract",
+    "audio-front-end-processing",
+    "endpointing",
+    "turn-detection",
+    "barge-in",
+    "punctuation-runtime",
+    "speaker-identification-contract",
+    "diarization-contract",
+    "audio-event-detection-contract",
+    "wasm-runtime-gate",
+    "ios-app-intent-and-app-shortcuts-contract",
+    "android-voice-interaction-service-contract",
+    "android-session-service-contract",
+    "al-huda-voice-session"
+  ],
+  "acquisitionWorkflows": [
+    "rechercher-voice-runtime-acquisition",
+    "rechercher-voice-gap-acquisition",
+    "rechercher-voice-optional-gap-acquisition"
+  ],
+  "releaseStorage": "GitHub Releases; Git LFS forbidden",
+  "runtimeProofStillRequired": [
     "al-huda-arabic-wake-word-trained-inference",
     "qwen3-asr-0.6b-real-run-evidence",
     "qwen3-asr-1.7b-real-run-evidence",
@@ -31,6 +57,34 @@
     "real-engine-to-engine-dialogue-e2e",
     "dialogue-copy-export-e2e"
   ],
-  "blockedFromPublicReleaseUntilEvidence":["generic-sherpa-kws-model-license","generic-sherpa-punctuation-model-license","generic-sherpa-speaker-model-license","generic-sherpa-audio-tagging-model-license","pyannote-gated-model-access-and-redistribution"],
-  "gapOnlyRule":"Do not reacquire a target whose payload is already present and checksum/provenance state is recorded unless the target version changes or verification invalidates it."
+  "blockedFromPublicReleaseUntilEvidence": [
+    "generic-sherpa-kws-model-license",
+    "generic-sherpa-punctuation-model-license",
+    "generic-sherpa-speaker-model-license",
+    "generic-sherpa-audio-tagging-model-license",
+    "pyannote-gated-model-access-and-redistribution"
+  ],
+  "gapOnlyRule": "Do not reacquire a target whose payload is already present and checksum/provenance state is recorded unless the target version changes or verification invalidates it.",
+  "acquiredReleaseAssets": {
+    "rechercher-voice-optional-2026-10": {
+      "releaseVerified": true,
+      "assets": {
+        "F5TTS_v1_Base.tar.bz2": {
+          "present": true,
+          "payloadVerified": true,
+          "runtimeInferenceVerified": false
+        },
+        "piper-en-us-libritts-high.tar.bz2": {
+          "present": true,
+          "payloadVerified": true,
+          "runtimeEvidenceAssetPresent": true
+        },
+        "SHA256SUMS.txt": {
+          "present": true,
+          "checksumRecorded": true
+        }
+      },
+      "note": "Release asset presence was verified via GitHub release metadata; content of JSON evidence assets is not directly readable through the GitHub connector."
+    }
+  }
 }
