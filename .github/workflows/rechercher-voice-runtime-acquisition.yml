@@ -88,8 +88,10 @@ jobs:
         if: "${{ steps.release.outputs.qwen06 != 'true' }}"
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
+          RECHERCHER_VOICE_ACQUISITION_REVISION: "2026-10-02"
         run: |
           set -euo pipefail
+          echo "Rechercher voice acquisition revision: $RECHERCHER_VOICE_ACQUISITION_REVISION"
           hf download Qwen/Qwen3-ASR-0.6B --local-dir voice-release-assets/Qwen3-ASR-0.6B
           test -s voice-release-assets/Qwen3-ASR-0.6B/config.json
           test -s voice-release-assets/Qwen3-ASR-0.6B/model.safetensors
