@@ -227,7 +227,7 @@ jobs:
             [ -f "$asset" ] || continue
             name=$(basename "$asset")
             if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets | jq -e --arg n "$name" '.assets[] | select(.name==$n)' >/dev/null; then
-              gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+              gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY" --clobber
             fi
           done
 
