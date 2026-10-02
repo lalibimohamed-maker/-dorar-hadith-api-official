@@ -175,30 +175,76 @@ jobs:
           python3 - <<'PY'
           import numpy as np
           import onnxruntime as ort
+
           path="voice-release-assets/silero_vad.onnx"
           session=ort.InferenceSession(path, providers=["CPUExecutionProvider"])
-          names={x.name for x in session.get_inputs()}
-          assert {"input","state","sr"} <= names, names
-          meta={x.name:x for x in session.get_inputs()}
-          def zeros(meta, fallback):
+          inputs={x.name:x for x in session.get_inputs()}
+          names=set(inputs)
+          print("Silero VAD ONNX inputs:", {k: str(v.shape) for k,v in inputs.items()})
+
+          def concrete_shape(meta, sample_size=512, hidden_size=64):
               shape=[]
-              for d in meta.shape:
-                  shape.append(fallback if not isinstance(d,int) or d < 1 else d)
-              return np.zeros(tuple(shape),dtype=np.float32) if shape else np.array(fallback,dtype=np.float32)
-          state=zeros(meta["state"],128)
-          sr=np.array(16000,dtype=np.int64) if len(meta["sr"].shape)==0 else np.full(tuple(1 if not isinstance(d,int) or d<1 else d for d in meta["sr"].shape),16000,dtype=np.int64)
+              for i,d in enumerate(meta.shape):
+                  if isinstance(d, int) and d > 0:
+                      shape.append(d)
+                      continue
+                  if len(meta.shape) == 2:
+                      shape.append(sample_size if i == len(meta.shape)-1 else 1)
+                  elif len(meta.shape) == 3:
+                      if i == 0:
+                          shape.append(2)
+                      elif i == 1:
+                          shape.append(1)
+                      else:
+                          shape.append(hidden_size)
+                  else:
+                      shape.append(1)
+              return tuple(shape)
+
+          def zeros(meta, sample_size=512, hidden_size=64, dtype=np.float32):
+              shape=concrete_shape(meta, sample_size, hidden_size)
+              return np.zeros(shape, dtype=dtype)
+
           ok=False
-          for size in (512,576,1024,256):
-              try:
-                  audio=zeros(meta["input"],size)
-                  out=session.run(None,{"input":audio,"state":state,"sr":sr})
-                  assert len(out)>=2 and np.asarray(out[0]).size and np.asarray(out[1]).size
-                  ok=True
-                  break
-              except Exception:
-                  pass
-          assert ok, "Silero VAD runtime verification failed"
-          print("silero_vad runtime verified")
+          if {"x","h","c"} <= names:
+              for sample_size in (512,576,1024):
+                  for hidden_size in (64,128):
+                      try:
+                          feeds={
+                              "x": zeros(inputs["x"], sample_size, hidden_size),
+                              "h": zeros(inputs["h"], sample_size, hidden_size),
+                              "c": zeros(inputs["c"], sample_size, hidden_size),
+                          }
+                          out=session.run(None, feeds)
+                          assert out and np.asarray(out[0]).size
+                          ok=True
+                          print("silero_vad runtime verified using x/h/c contract",
+                                "sample_size=", sample_size,
+                                "hidden_size=", hidden_size)
+                          break
+                      except Exception as exc:
+                          print("x/h/c probe failed:", type(exc).__name__, str(exc))
+                  if ok:
+                      break
+          elif {"input","state","sr"} <= names:
+              for sample_size in (512,576,1024,256):
+                  try:
+                      audio=zeros(inputs["input"], sample_size, 64)
+                      state=zeros(inputs["state"], sample_size, 128)
+                      sr_shape=concrete_shape(inputs["sr"], sample_size, 64)
+                      sr=np.full(sr_shape,16000,dtype=np.int64)
+                      out=session.run(None, {"input":audio,"state":state,"sr":sr})
+                      assert len(out)>=2 and np.asarray(out[0]).size and np.asarray(out[1]).size
+                      ok=True
+                      print("silero_vad runtime verified using input/state/sr contract",
+                            "sample_size=", sample_size)
+                      break
+                  except Exception as exc:
+                      print("input/state/sr probe failed:", type(exc).__name__, str(exc))
+          else:
+              raise AssertionError(f"unsupported Silero VAD ONNX input contract: {sorted(names)}")
+
+          assert ok, "Silero VAD runtime verification failed for all supported input contracts"
           PY
 
       - name: Package verified Release assets
