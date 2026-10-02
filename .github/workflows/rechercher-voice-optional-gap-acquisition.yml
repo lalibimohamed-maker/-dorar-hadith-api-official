@@ -112,7 +112,7 @@ jobs:
           rm -rf optional-voice-release-assets/piper-voices
 
       - name: Verify Piper runtime
-        if: ${{ inputs.include_piper_en == 'true' }}
+        if: ${{ (github.event_name == 'push' || inputs.include_piper_en == 'true') && steps.release.outputs.piper_missing == 'true' }}
         run: |
           set -euo pipefail
           python3 -m pip install --disable-pip-version-check --no-cache-dir piper-tts
