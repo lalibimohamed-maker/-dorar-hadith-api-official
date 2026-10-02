@@ -27,3 +27,15 @@ test('voice stream runtime rejects empty ASR payloads', () => {
   stream.startASR();
   assert.throws(()=>stream.partialASR('   '),/must not be empty/);
 });
+
+
+test('voice stream runtime opens successive turns without resetting sequence', () => {
+  const stream=createVoiceStreamRuntime();
+  stream.startASR();
+  stream.finalASR('الأول');
+  stream.completeASR();
+  stream.startASR();
+  stream.finalASR('الثاني');
+  assert.equal(stream.sequence,5);
+  assert.equal(stream.state.asr,'final');
+});
