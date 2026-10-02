@@ -15,6 +15,18 @@ const SOURCE_NAME = 'Al Quran Cloud';
 const SOURCE_URL = 'https://alquran.cloud/';
 const TERMS_URL = 'https://alquran.cloud/terms-and-conditions';
 const DEFAULT_EDITION = 'ar.alafasy';
+const VERIFIED_RECITER_MAPPINGS = Object.freeze({
+  'ar.alafasy': Object.freeze({
+    reciter: 'Mishary Rashid Alafasy',
+    qiraah: 'asim',
+    riwayah: 'hafs',
+    evidence: Object.freeze({
+      source: 'Quran-Uni',
+      url: 'https://quran-uni.com/reciter/%D9%85%D8%B4%D8%A7%D8%B1%D9%8A-%D8%A7%D9%84%D8%B9%D9%81%D8%A7%D8%B3%D9%8A/',
+      checkedAt: '2026-10-02',
+    }),
+  }),
+});
 const MIN_AYAH = 1;
 const MAX_AYAH = 6236;
 
@@ -36,6 +48,7 @@ function reciterFromEdition(edition = {}) {
 }
 
 function normalizeEdition(edition) {
+  const mapping = VERIFIED_RECITER_MAPPINGS[edition?.identifier] || null;
   return {
     identifier: edition?.identifier || null,
     name: edition?.name || null,
@@ -46,6 +59,9 @@ function normalizeEdition(edition) {
     source: SOURCE_NAME,
     sourceUrl: SOURCE_URL,
     termsUrl: TERMS_URL,
+    qiraah: mapping?.qiraah || null,
+    riwayah: mapping?.riwayah || null,
+    mappingEvidence: mapping?.evidence || null,
   };
 }
 
@@ -83,6 +99,12 @@ export function createAlQuranCloudRecitationProvider({
       const audioUrl = pickAudio(data);
       const providerReciter = reciterFromEdition(data.edition);
       if (!audioUrl || !providerReciter) throw new Error('Provider returned incomplete Quran recitation provenance');
+      const mapping = VERIFIED_RECITER_MAPPINGS[edition];
+      if (!mapping) throw new Error('No evidence-backed qiraah/riwayah mapping exists for the selected reciter edition');
+      if (providerReciter !== mapping.reciter) throw new Error('Provider reciter does not match the evidence-backed reciter mapping');
+      if (qiraah !== mapping.qiraah || riwayah !== mapping.riwayah) {
+        throw new Error('Requested qiraah/riwayah does not match the evidence-backed reciter mapping');
+      }
       if (reciter && reciter !== providerReciter) throw new Error('Requested reciter does not match the selected verified edition');
       return {
         domain: 'quran-recitation',
@@ -104,6 +126,7 @@ export function createAlQuranCloudRecitationProvider({
           edition,
           qiraah: qiraah || null,
           riwayah: riwayah || null,
+          mappingEvidence: mapping.evidence,
         },
       };
     },
