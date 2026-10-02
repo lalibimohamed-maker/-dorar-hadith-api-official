@@ -64,10 +64,9 @@ export function selectRunnableVoiceEngine({
     throw new Error('explicit language required');
   }
 
-  const orderedIds = [
-    ...preferredIds,
-    ...(DEFAULT_ENGINE_IDS[capability] || []),
-  ];
+  const orderedIds = preferredIds.length > 0
+    ? preferredIds
+    : (DEFAULT_ENGINE_IDS[capability] || []);
 
   const candidates = [];
   for (const id of orderedIds) {

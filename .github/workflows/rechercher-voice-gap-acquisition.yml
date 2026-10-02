@@ -263,6 +263,9 @@ jobs:
   # They are never uploaded to the public gap release until redistribution/access gates pass.
   quarantine:
     name: Acquire gated voice weights to draft quarantine
+    # security-justification: contents: write is required only to maintain draft quarantine Release assets; they are never public until separate license/access gates pass.
+    env:
+      HAS_HF_TOKEN: ${{ secrets.HF_TOKEN != '' }}
     permissions:
       contents: write
     runs-on: ubuntu-24.04
@@ -346,7 +349,7 @@ jobs:
           fi
 
       - name: Acquire gated pyannote diarization when HF_TOKEN exists
-        if: ${{ (github.event_name != 'workflow_dispatch' || inputs.include_pyannote_gated) && secrets.HF_TOKEN != '' }}
+        if: ${{ (github.event_name != 'workflow_dispatch' || inputs.include_pyannote_gated) && env.HAS_HF_TOKEN == 'true' }}
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_HUB_DISABLE_TELEMETRY: "1"
