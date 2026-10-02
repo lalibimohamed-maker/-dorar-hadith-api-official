@@ -159,14 +159,13 @@ jobs:
 
           model = Path('voice-gap-release-assets/gtcrn_simple.onnx')
           wav = Path('voice-gap-release-assets/inp_16k.wav')
-          config = sherpa_onnx.OfflineSpeechDenoiserConfig(
-              model=sherpa_onnx.OfflineSpeechDenoiserModelConfig(
-                  gtcrn=sherpa_onnx.OfflineSpeechDenoiserGtcrnModelConfig(model=str(model))
-              ),
+          model_config = sherpa_onnx.OfflineSpeechDenoiserModelConfig(
+              gtcrn=sherpa_onnx.OfflineSpeechDenoiserGtcrnModelConfig(model=str(model)),
               debug=False,
               num_threads=1,
               provider='cpu',
           )
+          config = sherpa_onnx.OfflineSpeechDenoiserConfig(model=model_config)
           assert config.validate(), config
           denoiser = sherpa_onnx.OfflineSpeechDenoiser(config)
           samples, sample_rate = sf.read(str(wav), always_2d=True, dtype='float32')
