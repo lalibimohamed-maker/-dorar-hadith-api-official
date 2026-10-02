@@ -8,26 +8,32 @@ function assertMode(mode) {
 function normalizeCapabilities(capabilities = {}) {
   return Object.freeze({
     webgpu: capabilities.webgpu === true,
-    wasm: capabilities.wasm !== false,
+    wasm: capabilities.wasm === true,
     native: capabilities.native === true
   });
 }
 
 /**
- * Platform-neutral local inference admission/runtime selector.
+ * Local inference admission boundary.
  *
- * No downloads, remote inference, paid fallback, or Corpus writes happen here.
- * The caller supplies already-provisioned local backends.
+ * A backend is admitted only when:
+ * 1. the platform capability is explicitly true;
+ * 2. a loader is supplied; and
+ * 3. the caller explicitly marks the local backend as verified.
+ *
+ * This module never downloads models, performs remote inference, or writes Corpus data.
  */
 export function createLocalConsumerInferenceRuntime({
   mode = 'auto',
   capabilities = {},
   preferredBackends = ['webgpu', 'wasm', 'native'],
   backendLoaders = {},
+  verifiedBackends = [],
   onEvent = () => {}
 } = {}) {
   assertMode(mode);
   const caps = normalizeCapabilities(capabilities);
+  const verified = new Set(verifiedBackends);
   const ordered = [...preferredBackends].filter((backend, index, list) =>
     BACKENDS.has(backend) && list.indexOf(backend) === index
   );
@@ -37,7 +43,11 @@ export function createLocalConsumerInferenceRuntime({
   }
 
   function admissibleBackends() {
-    return ordered.filter(backend => caps[backend] && typeof backendLoaders[backend] === 'function');
+    return ordered.filter(backend =>
+      caps[backend] === true &&
+      verified.has(backend) &&
+      typeof backendLoaders[backend] === 'function'
+    );
   }
 
   function selectBackend() {
@@ -58,28 +68,49 @@ export function createLocalConsumerInferenceRuntime({
       return Object.freeze({ ready: false, mode, ...selection });
     }
 
-    const backend = selection.backend;
-    emit('loading', { backend, candidates: selection.candidates });
-    const runtime = await backendLoaders[backend]();
-    if (!runtime || typeof runtime.run !== 'function') {
-      emit('error', { backend, reason: 'backend-loader-returned-invalid-runtime' });
-      throw new TypeError('invalid local inference runtime for backend: ' + backend);
+    const failures = [];
+    for (const backend of selection.candidates) {
+      emit('loading', { backend, candidates: selection.candidates });
+      try {
+        const runtime = await backendLoaders[backend]();
+        if (!runtime || typeof runtime.run !== 'function') {
+          throw new TypeError('backend-loader-returned-invalid-runtime');
+        }
+        emit('ready', { backend });
+        return Object.freeze({
+          ready: true,
+          mode,
+          backend,
+          candidates: selection.candidates,
+          failures,
+          runtime
+        });
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        failures.push({ backend, reason });
+        emit('backend_failed', { backend, reason });
+      }
     }
-    emit('ready', { backend });
-    return Object.freeze({ ready: true, mode, backend, candidates: selection.candidates, runtime });
+
+    emit('error', { reason: 'all-verified-local-backends-failed', failures });
+    return Object.freeze({
+      ready: false,
+      mode,
+      reason: 'all-verified-local-backends-failed',
+      candidates: selection.candidates,
+      failures
+    });
   }
 
-  return Object.freeze({ mode, capabilities: caps, selectBackend, initialize });
+  return Object.freeze({ mode, capabilities: caps, verifiedBackends: [...verified], selectBackend, initialize });
 }
 
 export function createLocalSessionPolicy({ mode = 'auto', networkAvailable = true } = {}) {
   assertMode(mode);
-  const localAllowed = mode !== 'online_only';
-  const remoteAllowed = mode !== 'offline_only' && networkAvailable === true;
   return Object.freeze({
     mode,
-    localAllowed,
-    remoteAllowed,
+    localAllowed: mode !== 'online_only',
+    remoteAllowed: mode !== 'offline_only' && networkAvailable === true,
     silentRemoteFallback: false
   });
 }
