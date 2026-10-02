@@ -836,6 +836,26 @@
       "auto_download": false
     },
     {
+      "id": "spark-x2.5-4b",
+      "kind": "auxiliary_reasoning_model",
+      "source_repo": "https://github.com/XHToken/Spark-X2.5",
+      "source_model_id": "XHToken/Spark-X2.5-4B",
+      "code_license": "Apache-2.0",
+      "model_license_status": "verified_source_license",
+      "tasks": [
+        "reasoning",
+        "long_context",
+        "tool_use",
+        "multilingual_reasoning"
+      ],
+      "integration": "openai_compatible",
+      "auto_download": false,
+      "primary_model": false,
+      "replaces_omega": false,
+      "role": "auxiliary_reasoning_model",
+      "notes": "Optional support engine for Ω AI. It can assist the existing intelligence stack when selected by the router; it never replaces the project's core AI weights."
+    },
+    {
       "id": "qwen3",
       "kind": "language_reasoning_model",
       "source_repo": "https://github.com/QwenLM/Qwen3",
