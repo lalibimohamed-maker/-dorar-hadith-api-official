@@ -82,3 +82,28 @@ export function buildJsonRpcEndpoint({ baseUrl = "http://127.0.0.1:3900", allowR
   rpcBase.search = "";
   return rpcBase.toString();
 }
+
+export function buildOutputSessionCreateRequest({ baseUrl = "http://127.0.0.1:3902", allowRemote = false } = {}) {
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return Object.freeze({ method: "POST", url: new URL("/v1/output/sessions", base).toString() });
+}
+
+export function buildOutputSessionInsertRequest({ baseUrl = "http://127.0.0.1:3902", sessionId, text, allowRemote = false } = {}) {
+  if (!sessionId) throw new TypeError("sessionId is required");
+  if (!text) throw new TypeError("text is required");
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return Object.freeze({
+    method: "POST",
+    url: new URL(`/v1/output/sessions/${encodeURIComponent(String(sessionId))}/insert`, base).toString(),
+    json: Object.freeze({ text: String(text) }),
+  });
+}
+
+export function buildOutputSessionCancelRequest({ baseUrl = "http://127.0.0.1:3902", sessionId, allowRemote = false } = {}) {
+  if (!sessionId) throw new TypeError("sessionId is required");
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return Object.freeze({
+    method: "DELETE",
+    url: new URL(`/v1/output/sessions/${encodeURIComponent(String(sessionId))}`, base).toString(),
+  });
+}
