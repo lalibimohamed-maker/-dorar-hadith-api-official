@@ -5,7 +5,7 @@ const APP_SHELL = [
   "./self-test.html",
   "./app.js",
   "./voice.js",
-  "./ya-bawabat-al-ilm.js",
+  "./al-huda-voice.js",
   "./self-test-engine.js",
   "./self-test-question-bank.json",
   "./self-test-question-schema.json",
