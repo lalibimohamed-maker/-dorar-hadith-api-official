@@ -58,3 +58,27 @@ test('Al-Huda voice session interrupts active TTS', async () => {
   release();
   await assert.rejects(p);
 });
+
+test('Al-Huda does not capture speech before wake detection', async () => {
+  let asrCalls=0;
+  let wake=false;
+  const session=createAlHudaVoiceSession({
+    permission:{refresh:async()=> 'granted'},
+    wakeDetector:()=>wake,
+    audioPipeline:createAudioFramePipeline({
+      frontEnd:createAudioFrontEnd(),
+      vad:()=>true,
+      endpointing:createEndpointing({startSpeechFrames:1,endSilenceFrames:1})
+    }),
+    asr:async()=>{asrCalls++; return {text:'unexpected',language:'Arabic'};},
+    reasoning:async()=> 'unexpected',
+    tts:async()=>{}
+  });
+  await session.start();
+  await session.pushFrame(new Float32Array([.1]));
+  await session.pushFrame(new Float32Array([0]));
+  assert.equal(asrCalls,0);
+  wake=true;
+  assert.equal((await session.pushFrame(new Float32Array([.1]))).state,'wake-detected');
+  assert.equal(session.armed,true);
+});
