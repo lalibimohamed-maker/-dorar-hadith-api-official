@@ -28,22 +28,8 @@ export function createMobileLocalInferenceAdapter({
     runtime,
     async initialize() {
       const result = await runtime.initialize();
-      if (!result.ready) {
-        return {
-          ready: false,
-          mode,
-          reason: result.reason,
-          backend: null,
-          failures: result.failures || []
-        };
-      }
-      return {
-        ready: true,
-        mode,
-        backend: result.backend,
-        runtime: result.runtime,
-        failures: result.failures || []
-      };
+      if (!result.ready) return { ready: false, mode, reason: result.reason, backend: null, failures: result.failures || [] };
+      return { ready: true, mode, backend: result.backend, runtime: result.runtime };
     }
   });
 }
