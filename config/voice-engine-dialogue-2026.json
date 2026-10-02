@@ -1,13 +1,62 @@
 {
-  "schema": "dinullah.engine-to-engine-dialogue.v1",
+  "schema": "dinullah.engine-to-engine-dialogue.v2",
   "displayName": "حوار المحركات",
   "englishName": "Engine-to-Engine Dialogue",
-  "purpose": "Controlled internal dialogue between two or more speech/AI engines without routing their generated audio back through the physical microphone.",
+  "defaultDomain": "dinullah-religious-scholarly",
+  "domainPolicy": {
+    "sourceOfTruth": "dinullah-corpus-and-verified-search",
+    "requiresProvenanceForSubstantiveClaims": true,
+    "requiresSourceBackedRetrieval": true,
+    "allowedDomains": [
+      "quran-and-tafsir",
+      "hadith",
+      "aqidah",
+      "fiqh",
+      "sirah",
+      "islamic-history",
+      "arabic-and-linguistics",
+      "islamic-scholarly-studies"
+    ],
+    "outOfDomainRouting": "reject-unless-explicitly-switched-to-general-assistant-mode"
+  },
+  "engines": [
+    {
+      "id": "al-huda",
+      "displayName": "Al-Huda",
+      "arabicDisplayName": "الهُدَى",
+      "arabicTtsText": "الهُدَى"
+    },
+    {
+      "id": "al-taqwa",
+      "displayName": "Al-Taqwa",
+      "arabicDisplayName": "الْتَقْوَى",
+      "arabicTtsText": "الْتَقْوَى"
+    }
+  ],
+  "speechAndText": {
+    "userInput": [
+      "voice",
+      "text"
+    ],
+    "engineDialogueTranscript": "text",
+    "engineSpeechOutput": "optional-user-controlled",
+    "sources": "text-only",
+    "sourceAttributionSpeechDefault": false,
+    "sourceAttributionAlwaysVisibleInTranscript": true
+  },
+  "export": {
+    "userCanCopyFullDialogue": true,
+    "includeAllEngineTurns": true,
+    "includeUserTurns": true,
+    "includeSourcesAndProvenance": true,
+    "includeTimestamps": true
+  },
+  "purpose": "Controlled internal dialogue between two named engines without routing generated audio back through the physical microphone.",
   "defaultMode": "human-supervised",
   "modes": [
     {
       "id": "human-supervised",
-      "description": "The user starts/stops the exchange and can inspect the conversation.",
+      "description": "The user starts/stops the exchange and can inspect and copy the complete written dialogue.",
       "autonomousTurnLimit": 8
     },
     {
@@ -19,7 +68,10 @@
   ],
   "transport": {
     "preferred": "structured-message",
-    "formats": ["json-message", "text"],
+    "formats": [
+      "json-message",
+      "text"
+    ],
     "audioLoopback": false,
     "physicalMicrophoneInjection": false,
     "ttsPlaybackToPeerAsInput": false
@@ -34,10 +86,23 @@
       "language",
       "confidence",
       "timestamp",
-      "provenance"
+      "provenance",
+      "sources",
+      "domain"
     ],
-    "roles": ["user-proxy", "engine-a", "engine-b", "system"],
-    "terminationSignals": ["user-stop", "max-turns", "loop-detected", "timeout", "error"]
+    "roles": [
+      "user-proxy",
+      "engine-a",
+      "engine-b",
+      "system"
+    ],
+    "terminationSignals": [
+      "user-stop",
+      "max-turns",
+      "loop-detected",
+      "timeout",
+      "error"
+    ]
   },
   "safety": {
     "loopDetectionRequired": true,
@@ -49,18 +114,6 @@
     "noPrivilegeEscalationBetweenEngines": true,
     "sensitiveActionsRequireHumanConfirmation": true
   },
-  "examples": [
-    {
-      "engineA": "whisper.cpp",
-      "engineB": "sherpa-onnx",
-      "note": "ASR engines may exchange structured hypotheses; this is not a peer-to-peer voice call."
-    },
-    {
-      "engineA": "harmony-speech-engine",
-      "engineB": "dinullah-local-voice-runtime",
-      "note": "Harmony is an optional serving/orchestration participant, not the voice core."
-    }
-  ],
   "speakerHandling": {
     "oneProfile": true,
     "twoProfiles": true,
