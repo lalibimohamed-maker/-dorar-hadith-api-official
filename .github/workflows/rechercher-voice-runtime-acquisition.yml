@@ -154,9 +154,9 @@ jobs:
           data=payload["data"]
           audio=data["audio"]
           assert audio.startswith("https://")
-          req=urllib.request.Request(audio, method="HEAD")
+          req=urllib.request.Request(audio, headers={"Range":"bytes=0-15"})
           with urllib.request.urlopen(req, timeout=30) as r:
-              assert r.status == 200
+              assert r.status in (200,206)
               content_type=(r.headers.get("content-type") or "").lower()
               assert "audio" in content_type or audio.endswith(".mp3")
           evidence={
