@@ -70,6 +70,17 @@ jobs:
           test -s voice-release-assets/Qwen3-ASR-1.7B/model-00001-of-00002.safetensors
           test -s voice-release-assets/Qwen3-ASR-1.7B/model-00002-of-00002.safetensors
           test -s voice-release-assets/Qwen3-ASR-1.7B/model.safetensors.index.json
+      - name: Acquire remaining voice runtime weights
+        run: |
+          set -euo pipefail
+          mkdir -p voice-release-assets/remaining
+          curl -fL --retry 5 --retry-all-errors -o voice-release-assets/remaining/punctuation.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2
+          curl -fL --retry 5 --retry-all-errors -o voice-release-assets/remaining/speaker.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_campplus_sv_en_voxceleb_16k.onnx
+          curl -fL --retry 5 --retry-all-errors -o voice-release-assets/remaining/audio-tagging.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/audio-tagging-models/sherpa-onnx-zipformer-small-audio-tagging-2024-04-15.tar.bz2
+          curl -fL --retry 5 --retry-all-errors -o voice-release-assets/remaining/kws-base.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2
+          for f in voice-release-assets/remaining/*; do test -s "$f"; done
+          sha256sum voice-release-assets/remaining/* > voice-release-assets/remaining/SHA256SUMS.txt
+
       - name: Validate real payloads and provenance
         run: |
           set -euo pipefail
