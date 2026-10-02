@@ -15,10 +15,15 @@ export function createVoiceStreamRuntime({ onEvent = () => {} } = {}) {
     const stateKey = stream === "asr" ? "asrState" : "ttsState";
     const current = stream === "asr" ? asrState : ttsState;
     const terminal = new Set(["completed", "failed"]);
-    if (current === "completed" || current === "failed") {
+    if (kind === "started" && (current === "completed" || current === "failed")) {
+      if (stream === "asr") asrState = "idle";
+      else ttsState = "idle";
+    }
+    const activeCurrent = stream === "asr" ? asrState : ttsState;
+    if (activeCurrent === "completed" || activeCurrent === "failed") {
       throw new Error(`${stream} stream already terminated`);
     }
-    if (kind === "started" && current !== "idle") {
+    if (kind === "started" && activeCurrent !== "idle") {
       throw new Error(`${stream} stream already started`);
     }
     if (kind === "partial" && stream === "asr" && current !== "started" && current !== "partial") {
