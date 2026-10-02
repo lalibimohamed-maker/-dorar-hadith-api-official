@@ -122,10 +122,12 @@
     "openAiCompatibleLocalSpeech",
     "jsonRpcLocalSpeech",
     "versionedSpeechDiscovery",
-    "voiceStudioStreamInterop"
+    "voiceStudioStreamInterop",
+    "releaseBoundLocalQwenASR",
+    "voiceStudioToAlHudaLocalAudio"
   ],
   "exploitation": {
-    "revision": "2026-10-02-v5",
+    "revision": "2026-10-02-v6",
     "localPlatform": "src/voice-local-platform.js",
     "streamRuntime": "src/voice-stream-runtime.js",
     "longFormRunner": "src/voice-longform-runner.js",
@@ -137,6 +139,9 @@
     "runnableSelectionRule": "engine must resolve to an observed runtime-verified Release asset",
     "discovery": "src/voice-local-platform.js",
     "voiceStudioStreamAdapter": "src/voice-studio-stream-adapter.js",
-    "protocolEnvelope": "voicestudio.speech.v1"
+    "protocolEnvelope": "voicestudio.speech.v1",
+    "localASRRuntime": "src/al-huda-local-asr-runtime.js",
+    "voiceStudioLocalAudioBridge": "src/voice-studio-stream-adapter.js",
+    "qwenRunner": "scripts/qwen3-asr-runner.py"
   }
 }
