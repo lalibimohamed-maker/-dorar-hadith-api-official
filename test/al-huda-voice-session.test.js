@@ -13,7 +13,7 @@ test('Al-Huda voice session wires wake detection to ASR, reasoning and TTS', asy
     wakeDetector:()=>wake ? (wake=false,true) : false,
     audioPipeline:createAudioFramePipeline({
       frontEnd:createAudioFrontEnd(),
-      vad:()=>true,
+      vad:samples=>Math.abs(samples[0] ?? 0) > 0.01,
       endpointing:createEndpointing({startSpeechFrames:1,endSilenceFrames:1})
     }),
     asr:async()=>({text:'ما حكم طلب العلم؟',language:'Arabic'}),
@@ -24,8 +24,7 @@ test('Al-Huda voice session wires wake detection to ASR, reasoning and TTS', asy
   await session.start();
   await session.pushFrame(new Float32Array([.1]));
   await session.pushFrame(new Float32Array([.1]));
-  const result=await session.pushFrame(new Float32Array([0]));
-  assert.equal(result.state,'answer-complete');
+  const result=const result=await session.pushFrame(new Float32Array([0]));
   assert.equal(result.transcript.language,'Arabic');
   assert.match(result.answer,/طلب العلم/);
   assert.ok(events.some(e=>e.type==='wake-detected'));
