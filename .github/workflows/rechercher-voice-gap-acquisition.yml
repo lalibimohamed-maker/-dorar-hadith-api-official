@@ -9,32 +9,32 @@ on:
       include_forced_aligner:
         description: Acquire Qwen3 ForcedAligner 0.6B
         required: true
-        default: "true"
+        default: "false"
         type: boolean
       include_kws:
         description: Acquire sherpa-onnx base KWS runtime model
         required: true
-        default: "true"
+        default: "false"
         type: boolean
       include_punctuation:
         description: Acquire sherpa-onnx punctuation model
         required: true
-        default: "true"
+        default: "false"
         type: boolean
       include_speaker_id:
         description: Acquire speaker identification model
         required: true
-        default: "true"
+        default: "false"
         type: boolean
       include_diarization:
         description: Acquire speaker segmentation model
         required: true
-        default: "true"
+        default: "false"
         type: boolean
       include_audio_tagging:
         description: Acquire audio tagging model
         required: true
-        default: "true"
+        default: "false"
         type: boolean
       dry_run:
         description: Verify payloads and checksums without publishing
