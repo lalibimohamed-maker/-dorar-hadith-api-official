@@ -1,0 +1,76 @@
+{
+  "schema": "dinullah.platform-voice-engine-bundles.v1",
+  "assistant": {
+    "name": "Al-Huda",
+    "arabicName": "الهُدَى"
+  },
+  "sharedCore": {
+    "wake": "al-huda-kws",
+    "vad": "silero-vad",
+    "asr": ["qwen3-asr-0.6b", "qwen3-asr-1.7b"],
+    "fallbackAsr": ["whisper.cpp", "faster-whisper"],
+    "reasoning": ["Al-Huda", "Al-Taqwa"],
+    "tts": ["sherpa-onnx", "piper1-gpl"],
+    "recitation": "verified-source-only-separate-pipeline"
+  },
+  "platforms": {
+    "ios": {
+      "runtime": "native-audio-bridge",
+      "input": "qwen3-asr",
+      "systemSurface": "App Intents/App Shortcuts/Siri"
+    },
+    "android": {
+      "runtime": "VoiceInteractionService + native-audio-bridge",
+      "input": "qwen3-asr",
+      "systemSurface": "assistant-role"
+    },
+    "harmonyOS": {
+      "runtime": "ArkTS + native-audio-bridge",
+      "input": "qwen3-asr",
+      "systemSurface": "Xiaoyi Skill/Agent + Intents Kit where supported",
+      "approval": "Huawei-review-required"
+    },
+    "androidTV": {
+      "runtime": "android-native-adapter",
+      "profile": "tv",
+      "input": "qwen3-asr"
+    },
+    "wearOS": {
+      "runtime": "android-native-adapter",
+      "profile": "wearable",
+      "input": "qwen3-asr-0.6b"
+    },
+    "harmonyTV": {
+      "runtime": "harmony-native-adapter",
+      "profile": "tv",
+      "input": "qwen3-asr"
+    },
+    "harmonyWearable": {
+      "runtime": "harmony-native-adapter",
+      "profile": "wearable",
+      "input": "qwen3-asr-0.6b"
+    },
+    "automotive": {
+      "runtime": "platform-native-adapter",
+      "profile": "hands-free",
+      "input": "qwen3-asr-0.6b"
+    },
+    "smartHome": {
+      "runtime": "local-gateway-adapter",
+      "profile": "low-power-endpoint",
+      "input": "qwen3-asr-0.6b"
+    },
+    "web": {
+      "runtime": "Web Speech/WebAssembly local-first",
+      "input": "browser-or-local-qwen3-asr",
+      "systemSurface": "browser/PWA"
+    }
+  },
+  "policy": {
+    "sameReasoningCoreAcrossPlatforms": true,
+    "platformNativeAudioBoundaryRequired": true,
+    "noCorpusModification": true,
+    "noAutomaticAssistantReplacement": true,
+    "continuousBackgroundListeningOnlyWhenPlatformAllows": true
+  }
+}
