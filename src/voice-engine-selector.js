@@ -9,6 +9,7 @@ const RELEASE_MODEL_BY_ENGINE = Object.freeze({
   'qwen3-forced-aligner-0.6b': ['rechercher-voice-gap-2026-10', 'qwen3-forced-aligner-0.6b'],
   'piper-en-us-libritts-high': ['rechercher-voice-optional-2026-10', 'piper-en-us-libritts-high'],
   'f5-tts-v1-base': ['rechercher-voice-optional-2026-10', 'f5-tts-v1-base'],
+  'sherpa-onnx-gtcrn-noise-suppression': ['rechercher-voice-gap-2026-10', 'sherpa-onnx-gtcrn-noise-suppression'],
 });
 
 const DEFAULT_ENGINE_IDS = Object.freeze({
@@ -16,6 +17,7 @@ const DEFAULT_ENGINE_IDS = Object.freeze({
   vad: ['silero-vad'],
   'wake-word': ['al-huda-kws'],
   'forced-alignment': ['qwen3-forced-aligner-0.6b'],
+  'speech-enhancement': ['sherpa-onnx-gtcrn-noise-suppression'],
   tts: ['piper-en-us-libritts-high', 'f5-tts-v1-base'],
 });
 

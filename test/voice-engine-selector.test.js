@@ -82,3 +82,13 @@ test('runnable selector keeps license/runtime-pending F5-TTS out of runnable exe
   assert.equal(f5.release.runtimeVerified, false);
   assert.equal(f5.runnable, false);
 });
+
+
+test('runnable selector resolves the runtime-verified GTCRN speech enhancement release', () => {
+  const denoiser = selectRunnableVoiceEngine({
+    capability: 'speech-enhancement',
+  });
+  assert.equal(denoiser.engine.id, 'sherpa-onnx-gtcrn-noise-suppression');
+  assert.equal(denoiser.release.releaseTag, 'rechercher-voice-gap-2026-10');
+  assert.equal(denoiser.runnable, true);
+});
