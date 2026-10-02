@@ -11,21 +11,20 @@ export function assertVoicePlatformUrl(url, { allowRemote = false } = {}) {
   return parsed;
 }
 
-export function buildTranscriptionRequest({ baseUrl = "http://127.0.0.1:3900", audioFile, model, language, prompt, temperature, stream = false } = {}) {
+export function buildTranscriptionRequest({ baseUrl = "http://127.0.0.1:3900", audioFile, model, language, prompt, temperature, allowRemote = false } = {}) {
   if (!audioFile) throw new TypeError("audioFile is required");
-  const base = assertVoicePlatformUrl(baseUrl);
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
   const form = { model: model || "active", file: String(audioFile) };
   if (language) form.language = String(language);
   if (prompt) form.prompt = String(prompt);
   if (temperature != null) form.temperature = Number(temperature);
-  if (stream) form.stream = true;
   return Object.freeze({ method: "POST", url: new URL("/v1/audio/transcriptions", base).toString(), form });
 }
 
-export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, model, voice, language, speed = 1, streamFormat = "audio" } = {}) {
+export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, model, voice, language, speed = 1, streamFormat = "audio", allowRemote = false } = {}) {
   if (!text) throw new TypeError("text is required");
   if (!["audio","sse"].includes(streamFormat)) throw new Error("invalid speech stream format");
-  const base = assertVoicePlatformUrl(baseUrl);
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
   return Object.freeze({
     method: "POST",
     url: new URL("/v1/audio/speech", base).toString(),
@@ -40,7 +39,13 @@ export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, mo
   });
 }
 
-export function buildMcpEndpoint({ baseUrl = "http://127.0.0.1:3900" } = {}) {
-  const base = assertVoicePlatformUrl(baseUrl);
+export function buildStreamingTranscriptionEndpoint({ baseUrl = "http://127.0.0.1:3900", allowRemote = false } = {}) {
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  const scheme = base.protocol === "https:" ? "wss:" : "ws:";
+  return new URL("/v1/audio/transcriptions/stream", `${scheme}//${base.host}`).toString();
+}
+
+export function buildMcpEndpoint({ baseUrl = "http://127.0.0.1:3900", allowRemote = false } = {}) {
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
   return new URL("/mcp/", base).toString();
 }
