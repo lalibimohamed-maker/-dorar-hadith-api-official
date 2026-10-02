@@ -39,7 +39,7 @@ const RELEASES = Object.freeze({
     "whisper-cpp-ggml-base-multilingual": Object.freeze({
       assets:["whisper-cpp-ggml-base.bin"],
       digests:["sha256:60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe"],
-      runtimeVerified:false,
+      runtimeVerified:true,
     }),
   }),
   "rechercher-voice-optional-2026-10": Object.freeze({

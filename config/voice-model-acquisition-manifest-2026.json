@@ -206,7 +206,7 @@
       "id": "whisper-cpp-ggml-base-multilingual",
       "role": "local-asr-fallback",
       "source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin",
-      "status": "acquire-runtime-verify",
+      "status": "acquired-published-runtime-verified",
       "releaseAssetPlan": "rechercher-voice-gap-2026-10",
       "license": "MIT",
       "notes": "Multilingual ggml-base; do not use .en assets for multilingual Arabic path.",
@@ -260,6 +260,9 @@
     "publishedRuntimeReleaseObserved": true,
     "publishedRuntimeRelease": "rechercher-voice-runtime-2026-10",
     "publishedRuntimeReleaseObservedAt": "2026-10-02T16:15:02Z",
+    "publishedFallbackReleaseObserved": true,
+    "publishedFallbackRelease": "rechercher-voice-fallback-2026-10",
+    "publishedFallbackReleaseObservedAt": "2026-10-02T16:59:34Z",
     "weightsCompletionRevision": "2026-10-02-v3",
     "weightsCompletionGoal": "complete explicit voice weight acquisition without weakening license or runtime gates",
     "expectedReleaseLayers": {

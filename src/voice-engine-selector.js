@@ -4,10 +4,19 @@ import { resolveVoiceReleaseRef } from './voice-release-ref-resolver.js';
 const RELEASE_MODEL_BY_ENGINE = Object.freeze({
   'qwen3-asr-0.6b': ['rechercher-voice-runtime-2026-10', 'qwen3-asr-0.6b'],
   'qwen3-asr-1.7b': ['rechercher-voice-runtime-2026-10', 'qwen3-asr-1.7b'],
+  'whisper-cpp-ggml-base-multilingual': ['rechercher-voice-fallback-2026-10', 'whisper-cpp-ggml-base-multilingual'],
   'silero-vad': ['rechercher-voice-runtime-2026-10', 'sherpa-onnx-vad-silero'],
   'qwen3-forced-aligner-0.6b': ['rechercher-voice-gap-2026-10', 'qwen3-forced-aligner-0.6b'],
   'piper-en-us-libritts-high': ['rechercher-voice-optional-2026-10', 'piper-en-us-libritts-high'],
   'f5-tts-v1-base': ['rechercher-voice-optional-2026-10', 'f5-tts-v1-base'],
+});
+
+const DEFAULT_ENGINE_IDS = Object.freeze({
+  asr: ['qwen3-asr-1.7b', 'qwen3-asr-0.6b', 'whisper-cpp-ggml-base-multilingual'],
+  vad: ['silero-vad'],
+  'wake-word': ['al-huda-kws'],
+  'forced-alignment': ['qwen3-forced-aligner-0.6b'],
+  tts: ['piper-en-us-libritts-high', 'f5-tts-v1-base'],
 });
 
 function resolveEngineRelease(engineId, releaseTag = null) {
@@ -30,10 +39,16 @@ function resolveEngineRelease(engineId, releaseTag = null) {
 function languageEligible(engine, language) {
   if (!language) return true;
   const tag = String(language).toLowerCase();
-  if (engine.id === 'qwen3-forced-aligner-0.6b' && (
-    tag === 'ar' || tag.startsWith('ar-') || tag.includes('arabic')
-  )) return false;
-  if (engine.id === 'piper-en-us-libritts-high') return tag === 'en' || tag.startsWith('en-') || tag.includes('english');
+  const base = tag.split('-')[0];
+
+  if (Array.isArray(engine.supportedLanguages) && engine.supportedLanguages.length > 0) {
+    if (!engine.supportedLanguages.some((item) => String(item).toLowerCase() === base)) return false;
+  }
+
+  if (engine.id === 'piper-en-us-libritts-high') {
+    return base === 'en' || tag.includes('english');
+  }
+
   return true;
 }
 
@@ -45,29 +60,28 @@ export function selectRunnableVoiceEngine({
   releaseTag = null,
 } = {}) {
   const preferredIds = Array.isArray(preferred) ? preferred : [];
-  if ((capability === "tts" || capability === "forced-alignment") && !language) throw new Error("explicit language required");
-  const candidates = [];
+  if ((capability === 'tts' || capability === 'forced-alignment') && !language) {
+    throw new Error('explicit language required');
+  }
 
-  for (const id of preferredIds) {
+  const orderedIds = [
+    ...preferredIds,
+    ...(DEFAULT_ENGINE_IDS[capability] || []),
+  ];
+
+  const candidates = [];
+  for (const id of orderedIds) {
+    if (candidates.some((x) => x.id === id)) continue;
     try {
       const engine = getVoiceEngine(id);
-      if (engine.capability === capability && languageEligible(engine, language) && !candidates.some(x => x.id === id)) {
+      if (engine.capability === capability && languageEligible(engine, language)) {
         candidates.push(engine);
       }
     } catch {}
   }
 
-  for (const engine of [
-    ...preferredIds.map(id => { try { return getVoiceEngine(id); } catch { return null; } }),
-    ...[...new Set(['qwen3-asr-0.6b','qwen3-asr-1.7b','silero-vad','al-huda-kws','qwen3-forced-aligner-0.6b','piper-en-us-libritts-high','f5-tts-v1-base'])]
-      .map(id => { try { return getVoiceEngine(id); } catch { return null; } }),
-  ]) {
-    if (!engine || engine.capability !== capability || !languageEligible(engine, language)) continue;
-    if (!candidates.some(x => x.id === engine.id)) candidates.push(engine);
-  }
-
   if (lowPower && capability === 'asr') {
-    const lightweight = candidates.find(item => item.id === 'qwen3-asr-0.6b');
+    const lightweight = candidates.find((item) => item.id === 'qwen3-asr-0.6b');
     if (lightweight) candidates.splice(0, candidates.length, lightweight);
   }
 

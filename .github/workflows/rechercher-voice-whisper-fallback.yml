@@ -21,6 +21,7 @@ concurrency:
 
 jobs:
   acquire-verify-publish:
+    # security-justification: contents: write is required only to publish the checksum/provenance/runtime-verified Whisper fallback Release asset; it does not write source files or Corpus content.
     permissions:
       contents: write
     runs-on: ubuntu-24.04

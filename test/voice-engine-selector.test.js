@@ -11,6 +11,13 @@ test('runnable selector binds core Al-Huda engines to observed runtime releases'
   assert.equal(quality.engine.id,'qwen3-asr-1.7b');
   assert.equal(quality.runnable,true);
 
+  const fallback=selectRunnableVoiceEngine({
+    capability:'asr',
+    preferred:['whisper-cpp-ggml-base-multilingual'],
+  });
+  assert.equal(fallback.engine.id,'whisper-cpp-ggml-base-multilingual');
+  assert.equal(fallback.runnable,true);
+
   const vad=selectRunnableVoiceEngine({capability:'vad'});
   assert.equal(vad.engine.id,'silero-vad');
   assert.equal(vad.runnable,true);
