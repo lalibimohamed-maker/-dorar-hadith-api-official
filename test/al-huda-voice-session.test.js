@@ -40,7 +40,7 @@ test('Al-Huda voice session interrupts active TTS', async () => {
     wakeDetector:()=>true,
     audioPipeline:createAudioFramePipeline({
       frontEnd:createAudioFrontEnd(),
-      vad:()=>true,
+      vad:samples=>Math.abs(samples[0] ?? 0) > 0.01,
       endpointing:createEndpointing({startSpeechFrames:1,endSilenceFrames:1})
     }),
     asr:async()=>({text:'سؤال',language:'Arabic'}),
