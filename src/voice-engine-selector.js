@@ -45,6 +45,7 @@ export function selectRunnableVoiceEngine({
   releaseTag = null,
 } = {}) {
   const preferredIds = Array.isArray(preferred) ? preferred : [];
+  if ((capability === "tts" || capability === "forced-alignment") && !language) throw new Error("explicit language required");
   const candidates = [];
 
   for (const id of preferredIds) {
