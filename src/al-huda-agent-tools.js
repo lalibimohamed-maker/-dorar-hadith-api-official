@@ -1,3 +1,22 @@
+const OPERATIONS = Object.freeze([
+  "health",
+  "list-engines",
+  "list-voices",
+  "list-languages",
+  "transcribe",
+  "synthesize",
+]);
+
+const BLOCKED = Object.freeze([
+  "modify-corpus",
+  "publish-source-content",
+  "bypass-rights-gates",
+  "clone-quran-recitation-voice",
+]);
+
+export function createAlHudaAgentTools({ providers = {}, voiceBindings = null, onAudit = () => {} } = {}) {
+  function assertOperation(operation) {
+    if (!OPERATIONS.includes(operation)) {
       if (BLOCKED.includes(operation)) throw new Error(`blocked Al-Huda operation: ${operation}`);
       throw new Error(`unknown Al-Huda operation: ${operation}`);
     }
@@ -24,7 +43,9 @@
       operation,
       corpusMutation: false,
       rightsBypass: false,
-      ...(operation === 'synthesize' && voiceBindings ? { voiceProfileId: effectiveInput.resolvedProfileId ?? null } : {}),
+      ...(operation === "synthesize" && voiceBindings
+        ? { voiceProfileId: effectiveInput.resolvedProfileId ?? null }
+        : {}),
       timestamp: new Date().toISOString(),
     });
     onAudit(audit);
