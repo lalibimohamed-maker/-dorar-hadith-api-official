@@ -120,10 +120,12 @@
     "checkpointedLongForm",
     "crashIsolatedWorkerSupervision",
     "openAiCompatibleLocalSpeech",
-    "jsonRpcLocalSpeech"
+    "jsonRpcLocalSpeech",
+    "versionedSpeechDiscovery",
+    "voiceStudioStreamInterop"
   ],
   "exploitation": {
-    "revision": "2026-10-02-v4",
+    "revision": "2026-10-02-v5",
     "localPlatform": "src/voice-local-platform.js",
     "streamRuntime": "src/voice-stream-runtime.js",
     "longFormRunner": "src/voice-longform-runner.js",
@@ -132,6 +134,9 @@
     "note": "Capabilities are implemented as Din Allah-native adapters/contracts; VoiceStudio remains a reference and never a runtime dependency.",
     "engineSelection": "src/voice-engine-selector.js",
     "releaseResolver": "src/voice-release-ref-resolver.js",
-    "runnableSelectionRule": "engine must resolve to an observed runtime-verified Release asset"
+    "runnableSelectionRule": "engine must resolve to an observed runtime-verified Release asset",
+    "discovery": "src/voice-local-platform.js",
+    "voiceStudioStreamAdapter": "src/voice-studio-stream-adapter.js",
+    "protocolEnvelope": "voicestudio.speech.v1"
   }
 }
