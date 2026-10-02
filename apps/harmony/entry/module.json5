@@ -1,0 +1,36 @@
+{
+  "module": {
+    "name": "entry",
+    "type": "entry",
+    "description": "Al-Huda native HarmonyOS voice assistant integration",
+    "mainElement": "EntryAbility",
+    "deviceTypes": ["phone", "tablet", "2in1", "tv", "wearable"],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.MICROPHONE",
+        "reason": "Al-Huda needs microphone access only when the user starts voice interaction."
+      },
+      {
+        "name": "ohos.permission.INTERNET"
+      }
+    ],
+    "abilities": [
+      {
+        "name": "EntryAbility",
+        "srcEntry": "./ets/entryability/EntryAbility.ets",
+        "description": "Al-Huda — الهُدَى",
+        "label": "Al-Huda",
+        "exported": true,
+        "skills": [
+          {
+            "entities": ["entity.system.home"],
+            "actions": ["ohos.want.action.home"]
+          }
+        ]
+      }
+    ]
+  }
+}
