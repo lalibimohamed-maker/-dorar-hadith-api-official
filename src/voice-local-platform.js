@@ -50,3 +50,18 @@ export function buildMcpEndpoint({ baseUrl = "http://127.0.0.1:3900", allowRemot
   const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
   return new URL("/mcp/", base).toString();
 }
+
+export function buildSpeechDiscoveryEndpoint({ baseUrl = "http://127.0.0.1:3900", allowRemote = false } = {}) {
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return new URL("/.well-known/voicestudio-speech", base).toString();
+}
+
+export function buildVoicesEndpoint({ baseUrl = "http://127.0.0.1:3900", allowRemote = false } = {}) {
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return new URL("/v1/audio/voices", base).toString();
+}
+
+export function buildVoiceAuthHeaders({ bearerToken } = {}) {
+  if (!bearerToken) throw new TypeError("bearerToken is required");
+  return Object.freeze({ Authorization: `Bearer ${String(bearerToken)}` });
+}
