@@ -56,7 +56,20 @@
       "completed",
       "failed"
     ],
-    "monotonicSequence": true
+    "monotonicSequence": true,
+    "externalProtocol": "voicestudio.speech.v1",
+    "inputAudioEndMessage": {
+      "type": "input_audio.end"
+    },
+    "sessionEnvelope": [
+      "protocol",
+      "session_id",
+      "type"
+    ],
+    "finalKind": [
+      "utterance",
+      "summary"
+    ]
   },
   "longForm": {
     "chunking": true,
@@ -96,5 +109,15 @@
     "apiCompatibility": "OpenAI-compatible audio endpoints",
     "localMcp": "/mcp/",
     "note": "Only documented transports are mirrored as Din Allah contracts; VoiceStudio is not a runtime dependency."
+  },
+  "discovery": {
+    "protocol": "voicestudio.speech.v1",
+    "backend": "GET :3900/.well-known/voicestudio-speech",
+    "control": "GET :3902/.well-known/voicestudio-speech",
+    "documentedOnly": true
+  },
+  "agentIdentity": {
+    "mcpClientHeader": "X-OmniVoice-Client-Id",
+    "explicitProfilePrecedence": true
   }
 }
