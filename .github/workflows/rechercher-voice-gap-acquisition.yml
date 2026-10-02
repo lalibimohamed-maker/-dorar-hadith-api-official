@@ -1,48 +1,15 @@
 name: Rechercher — Voice gap acquisition to Releases
 on:
-  workflow_dispatch:
-    inputs:
-      release_tag:
-        description: Release tag
-        required: true
-        default: rechercher-voice-gap-2026-10
-      include_forced_aligner:
-        description: Acquire Qwen3 ForcedAligner 0.6B
-        required: true
-        default: "true"
-        type: boolean
-      include_kws:
-        description: Acquire sherpa-onnx base KWS runtime model
-        required: true
-        default: "false"
-        type: boolean
-      include_punctuation:
-        description: Acquire sherpa-onnx punctuation model
-        required: true
-        default: "false"
-        type: boolean
-      include_speaker_id:
-        description: Acquire speaker identification model
-        required: true
-        default: "false"
-        type: boolean
-      include_diarization:
-        description: Acquire speaker segmentation model
-        required: true
-        default: "false"
-        type: boolean
-      include_audio_tagging:
-        description: Acquire audio tagging model
-        required: true
-        default: "false"
-        type: boolean
-      dry_run:
-        description: Verify payloads and checksums without publishing
-        required: true
-        default: "false"
-        type: boolean
+  schedule:
+    - cron: "47 * * * *"
+  push:
+    branches:
+      - feat/rechercher-voice-harmony-acquisition-v2
+    paths:
+      - .github/workflows/rechercher-voice-gap-acquisition.yml
+      - config/voice-model-acquisition-manifest-2026.json
 permissions:
-  # SECURITY-JUSTIFICATION: contents: write is required only for dry_run=false to publish verified binary model assets as GitHub Release assets. No model binaries are committed to git and no Git LFS is used.
+  # SECURITY-JUSTIFICATION: contents: write is required to automatically publish verified binary assets to GitHub Releases. Repository checkout is code-only; binary assets are not persisted in the repository.
   contents: write
 concurrency:
   group: rechercher-voice-gap-acquisition
@@ -52,6 +19,32 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     steps:
+      - name: Inspect existing gap Release
+        id: gap_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-gap-2026-10
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets > /tmp/gap-release.json 2>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            printf '%s\n' '{"assets":[]}' > /tmp/gap-release.json
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          jq -r '.assets[].name' /tmp/gap-release.json | sort > /tmp/gap-assets.txt
+          grep -Fxq 'Qwen3-ForcedAligner-0.6B.tar.bz2' /tmp/gap-assets.txt && echo 'forced=true' >> "$GITHUB_OUTPUT" || echo 'forced=false' >> "$GITHUB_OUTPUT"
+          grep -Fxq 'kws-base.tar.bz2' /tmp/gap-assets.txt && echo 'kws=true' >> "$GITHUB_OUTPUT" || echo 'kws=false' >> "$GITHUB_OUTPUT"
+          grep -Fxq 'punctuation.tar.bz2' /tmp/gap-assets.txt && echo 'punct=true' >> "$GITHUB_OUTPUT" || echo 'punct=false' >> "$GITHUB_OUTPUT"
+          grep -Fxq 'speaker-id.onnx' /tmp/gap-assets.txt && echo 'speaker=true' >> "$GITHUB_OUTPUT" || echo 'speaker=false' >> "$GITHUB_OUTPUT"
+          grep -Fxq 'pyannote-segmentation.tar.bz2' /tmp/gap-assets.txt && echo 'diarization=true' >> "$GITHUB_OUTPUT" || echo 'diarization=false' >> "$GITHUB_OUTPUT"
+          grep -Fxq 'audio-tagging.tar.bz2' /tmp/gap-assets.txt && echo 'audio=true' >> "$GITHUB_OUTPUT" || echo 'audio=false' >> "$GITHUB_OUTPUT"
+          if grep -Fq 'Qwen3-ForcedAligner-0.6B.tar.bz2' /tmp/gap-assets.txt && grep -Fq 'kws-base.tar.bz2' /tmp/gap-assets.txt && grep -Fq 'punctuation.tar.bz2' /tmp/gap-assets.txt && grep -Fq 'speaker-id.onnx' /tmp/gap-assets.txt && grep -Fq 'pyannote-segmentation.tar.bz2' /tmp/gap-assets.txt && grep -Fq 'audio-tagging.tar.bz2' /tmp/gap-assets.txt; then
+            echo "any_missing=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any_missing=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -71,7 +64,7 @@ jobs:
           cp config/voice-model-acquisition-manifest-2026.json voice-gap-release-assets/manifest.json
 
       - name: Acquire Qwen3 ForcedAligner 0.6B
-        if: ${{ inputs.include_forced_aligner == 'true' }}
+        if: ${{ steps.gap_release.outputs.forced != 'true' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -82,7 +75,7 @@ jobs:
           test -s voice-gap-release-assets/Qwen3-ForcedAligner-0.6B/config.json
 
       - name: Runtime inference verification — Qwen3 ForcedAligner
-        if: ${{ inputs.include_forced_aligner == 'true' }}
+        if: ${{ steps.gap_release.outputs.forced != 'true' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -113,35 +106,35 @@ jobs:
           PY
 
       - name: Acquire KWS base model
-        if: ${{ inputs.include_kws == 'true' }}
+        if: ${{ steps.gap_release.outputs.kws != 'true' }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/kws-base.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2
           test -s voice-gap-release-assets/kws-base.tar.bz2
 
       - name: Acquire punctuation model
-        if: ${{ inputs.include_punctuation == 'true' }}
+        if: ${{ steps.gap_release.outputs.punct != 'true' }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/punctuation.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2
           test -s voice-gap-release-assets/punctuation.tar.bz2
 
       - name: Acquire speaker identification model
-        if: ${{ inputs.include_speaker_id == 'true' }}
+        if: ${{ steps.gap_release.outputs.speaker != 'true' }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/speaker-id.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx
           test -s voice-gap-release-assets/speaker-id.onnx
 
       - name: Acquire speaker segmentation model
-        if: ${{ inputs.include_diarization == 'true' }}
+        if: ${{ steps.gap_release.outputs.diarization != 'true' }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/pyannote-segmentation.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2
           test -s voice-gap-release-assets/pyannote-segmentation.tar.bz2
 
       - name: Acquire audio tagging model
-        if: ${{ inputs.include_audio_tagging == 'true' }}
+        if: ${{ steps.gap_release.outputs.audio != 'true' }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/audio-tagging.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/audio-tagging-models/sherpa-onnx-zipformer-audio-tagging-2024-04-09.tar.bz2
@@ -174,12 +167,20 @@ jobs:
           sha256sum * > SHA256SUMS.txt
           test -s SHA256SUMS.txt
 
-      - name: Publish Release
-        if: ${{ inputs.dry_run != 'true' }}
+      - name: Publish verified assets automatically to Release
+        if: ${{ steps.gap_release.outputs.any_missing == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.release_tag }}
+          TAG: rechercher-voice-gap-2026-10
         run: |
           set -euo pipefail
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice gap acquisition. Payloads are source-recorded and checksum-verified. Large binaries are stored as Release assets; Git LFS is not used."
-          gh release upload "$TAG" voice-gap-release-assets/* --repo "$GITHUB_REPOSITORY"
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Automatic Rechercher gap acquisition. Payloads are verified before publication."
+          fi
+          for asset in voice-gap-release-assets/*; do
+            [ -f "$asset" ] || continue
+            name=$(basename "$asset")
+            if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets | jq -e --arg n "$name" '.assets[] | select(.name==$n)' >/dev/null; then
+              gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+            fi
+          done
