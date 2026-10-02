@@ -88,7 +88,7 @@ def main():
     ap.add_argument("--samples",type=int,default=720)
     args=ap.parse_args()
     out=Path(args.out_dir); out.mkdir(parents=True,exist_ok=True)
-    rng=random.Random(20261002)
+    rng=np.random.default_rng(20261002)
     X=[]; y=[]
     with tempfile.TemporaryDirectory() as td:
         td=Path(td)
