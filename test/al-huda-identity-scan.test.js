@@ -4,11 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const roots=['config','src','apps','web'];
-const forbidden=['يا بوابة العلم','Bawabat Al-Ilm'];
-const approvedCompatibilitySurfaces=new Set([
-  path.resolve('config/din-allah-master-contract-2026.json'),
-  path.resolve('web/ya-bawabat-al-ilm.js')
-]);
+const forbidden=['يا بوابة العلم','Bawabat Al-Ilm','Harmony Speech Engine'];
+const approvedCompatibilitySurfaces=new Set();
 
 function filesUnder(root){
   const out=[];
@@ -27,8 +24,8 @@ test('voice implementation surfaces keep Al-Huda as canonical identity while all
   for(const root of roots){
     for(const file of filesUnder(root)){
       const text=fs.readFileSync(file,'utf8');
-      if(!file.includes(path.join('docs', ''))) {
-        const isApprovedCompatibilitySurface=approvedCompatibilitySurfaces.has(path.resolve(file));
+      if(!approvedCompatibilitySurfaces.has(path.resolve(file))) {
+        const isApprovedCompatibilitySurface=false;
         for(const term of forbidden) {
           if(text.includes(term) && !isApprovedCompatibilitySurface) hits.push({file,term});
         }
