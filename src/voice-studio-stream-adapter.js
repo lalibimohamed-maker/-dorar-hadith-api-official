@@ -20,7 +20,7 @@ function assertEnvelope(event) {
   if (!event.type) throw new Error("VoiceStudio stream type is required");
 }
 
-export function createVoiceStudioStreamAdapter({ runtime, sessionId = null } = {}) {
+export function createVoiceStudioStreamAdapter({ runtime, sessionId = null, localASR = null } = {}) {
   if (!runtime || typeof runtime.startASR !== "function") {
     throw new TypeError("runtime with ASR stream methods is required");
   }
@@ -76,9 +76,54 @@ export function createVoiceStudioStreamAdapter({ runtime, sessionId = null } = {
     });
   }
 
+  async function transcribeAudio({ audioPath, language = null, sessionId: requestedSessionId = null } = {}) {
+    if (!localASR || typeof localASR.transcribe !== "function") {
+      throw new Error("local Al-Huda ASR runtime is not configured");
+    }
+    if (!audioPath) throw new TypeError("audioPath is required");
+    if (requestedSessionId) {
+      if (activeSessionId && activeSessionId !== String(requestedSessionId)) {
+        throw new Error("VoiceStudio stream session mismatch");
+      }
+      activeSessionId ||= String(requestedSessionId);
+    }
+    activeSessionId ||= `local-${Date.now().toString(36)}`;
+    runtime.startASR({
+      sessionId: activeSessionId,
+      protocol: PROTOCOL,
+      backend: "al-huda-local-qwen3",
+    });
+    try {
+      const result = await localASR.transcribe({ audioPath, language });
+      const text = String(result?.text ?? "").trim();
+      if (!text) throw new Error("local Al-Huda ASR returned an empty transcript");
+      runtime.finalASR(text, {
+        sessionId: activeSessionId,
+        protocol: PROTOCOL,
+        language: result.language ?? language ?? null,
+        engine: localASR.engine?.id ?? null,
+        finalKind: "summary",
+      });
+      runtime.completeASR();
+      return Object.freeze({
+        text,
+        language: result.language ?? language ?? null,
+        sessionId: activeSessionId,
+        engine: localASR.engine?.id ?? null,
+      });
+    } catch (error) {
+      runtime.failASR(error, {
+        sessionId: activeSessionId,
+        protocol: PROTOCOL,
+      });
+      throw error;
+    }
+  }
+
   return Object.freeze({
     protocol: PROTOCOL,
     get sessionId() { return activeSessionId; },
     consume,
+    transcribeAudio,
   });
 }
