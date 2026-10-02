@@ -9,6 +9,9 @@ import {
   buildModelsEndpoint,
   buildTranslationRequest,
   buildJsonRpcEndpoint,
+  buildOutputSessionCreateRequest,
+  buildOutputSessionInsertRequest,
+  buildOutputSessionCancelRequest,
 } from '../src/voice-local-platform.js';
 
 test('voice platform defaults to loopback and OpenAI-compatible routes', () => {
