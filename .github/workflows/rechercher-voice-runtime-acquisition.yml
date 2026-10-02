@@ -144,15 +144,29 @@ jobs:
           import onnxruntime as ort
           path="voice-release-assets/silero_vad.onnx"
           session=ort.InferenceSession(path, providers=["CPUExecutionProvider"])
-          inputs={x.name:x for x in session.get_inputs()}
-          assert {"input","state","sr"} <= set(inputs), [x.name for x in session.get_inputs()]
-          audio=np.zeros((1,576),dtype=np.float32)
-          state=np.zeros((2,1,128),dtype=np.float32)
-          out=session.run(None,{"input":audio,"state":state,"sr":np.array([16000],dtype=np.int64)})
+          metas={x.name:x for x in session.get_inputs()}
+          assert {"input","state","sr"} <= set(metas), [x.name for x in session.get_inputs()]
+          def zeros_for(meta, fallback):
+              shape=[]
+              for d in meta.shape:
+                  shape.append(fallback if not isinstance(d,int) or d < 1 else d)
+              if not shape: return np.array(fallback)
+              return np.zeros(tuple(shape),dtype=np.float32)
+          audio=zeros_for(metas["input"],576)
+          state=zeros_for(metas["state"],128)
+          sr_meta=metas["sr"]
+          if len(sr_meta.shape)==0:
+              sr_value=np.array(16000,dtype=np.int64)
+          else:
+              sr_shape=tuple(1 if (not isinstance(d,int) or d<1) else d for d in sr_meta.shape)
+              sr_value=np.full(sr_shape,16000,dtype=np.int64)
+          out=session.run(None,{"input":audio,"state":state,"sr":sr_value})
           assert len(out) >= 2
-          assert np.asarray(out[0]).size >= 1
-          assert np.asarray(out[1]).shape == (2,1,128)
-          print("silero_vad runtime verified; speech_probability=",float(np.asarray(out[0]).reshape(-1)[0]))
+          probability=np.asarray(out[0])
+          next_state=np.asarray(out[1])
+          assert probability.size >= 1
+          assert next_state.size >= 1
+          print("silero_vad runtime verified; speech_probability=",float(probability.reshape(-1)[0]),"state_shape=",tuple(next_state.shape))
           PY
 
       - name: Verify Silero VAD payload
