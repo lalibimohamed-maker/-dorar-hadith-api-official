@@ -1,3 +1,5 @@
+import { QURAN_QIRAAT_CATALOG } from './quran-qiraat-catalog.js';
+
 const DEFAULTS = Object.freeze({
   fallbackLanguage: 'ar',
   quranReciter: 'Saad Al-Ghamdi',
@@ -6,12 +8,6 @@ const DEFAULTS = Object.freeze({
   exportFormats: ['mp3', 'mp4-4k', 'pdf', 'docx'],
 });
 
-/**
- * Multimodal policy/runtime helpers shared by a web or mobile client.
- * This module deliberately does not invent speech/audio sources. A client
- * must provide a verified provider for transcription, synthesis and media
- * export before claiming that a capability is available.
- */
 export function createMultimodalSession(options = {}) {
   const language = normalizeLanguage(options.language ?? DEFAULTS.fallbackLanguage);
   const direction = options.direction === 'rtl' ? 'rtl' : 'ltr';
@@ -31,6 +27,14 @@ export function createMultimodalSession(options = {}) {
         language: 'ar',
         reciter: DEFAULTS.quranReciter,
         policy: DEFAULTS.quranVoiceMode,
+        qiraatCatalog: QURAN_QIRAAT_CATALOG,
+        selection: {
+          qiraah: true,
+          riwayah: true,
+          reciter: true,
+          order: ['qiraah', 'riwayah', 'reciter'],
+          availabilityRequiresVerifiedMapping: true,
+        },
       },
     },
     exports: DEFAULTS.exportFormats.map(format => ({
@@ -72,6 +76,7 @@ export function speechPolicy({ language, isQuran = false } = {}) {
       mode: DEFAULTS.quranVoiceMode,
       language: 'ar',
       reciter: DEFAULTS.quranReciter,
+      qiraatCatalog: QURAN_QIRAAT_CATALOG,
       translateRecitation: false,
     };
   }
