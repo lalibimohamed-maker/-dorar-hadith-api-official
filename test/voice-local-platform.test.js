@@ -6,9 +6,6 @@ import {
   buildSpeechRequest,
   buildMcpEndpoint,
   buildStreamingTranscriptionEndpoint,
-  buildSpeechDiscoveryEndpoint,
-  buildVoicesEndpoint,
-  buildVoiceAuthHeaders,
   buildModelsEndpoint,
   buildTranslationRequest,
   buildJsonRpcEndpoint,
@@ -34,7 +31,7 @@ test('speech request validates stream format', () => {
 });
 
 test('voice platform exposes verified models, translation and JSON-RPC routes', () => {
-  assert.match(buildModelsEndpoint(),/\\/v1\\/models$/);
-  assert.match(buildTranslationRequest({audioFile:'/tmp/q.webm'}).url,/\\/v1\\/audio\\/translations$/);
+  assert.match(buildModelsEndpoint(),/\/v1\/models$/);
+  assert.match(buildTranslationRequest({audioFile:'/tmp/q.webm'}).url,/\/v1\/audio\/translations$/);
   assert.equal(buildJsonRpcEndpoint(),'http://127.0.0.1:3902/rpc');
 });
