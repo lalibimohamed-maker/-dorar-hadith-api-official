@@ -25,13 +25,25 @@ permissions:
   contents: write
 concurrency:
   group: rechercher-voice-runtime-acquisition
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   acquire:
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     steps:
-      - name: Guard existing release
+      - name: Inspect existing runtime Release
+        id: runtime_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag || 'rechercher-voice-runtime-2026-10' }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.release_tag || 'rechercher-voice-runtime-2026-10' }}
@@ -63,7 +75,7 @@ jobs:
           curl -fL --retry 5 --retry-all-errors -o voice-release-assets/silero_vad.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
           test -s voice-release-assets/silero_vad.onnx
       - name: Acquire Qwen3-ASR 0.6B
-        if: ${{ github.event_name == 'push' || inputs.model == '0.6b' || inputs.model == 'both' }}
+        if: ${{ (github.event_name == 'push' || inputs.model == '0.6b' || inputs.model == 'both') && steps.runtime_release.outputs.exists != 'true' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -73,7 +85,7 @@ jobs:
           test -s voice-release-assets/Qwen3-ASR-0.6B/model.safetensors
           test -s voice-release-assets/Qwen3-ASR-0.6B/preprocessor_config.json
       - name: Acquire Qwen3-ASR 1.7B
-        if: ${{ github.event_name == 'push' || inputs.model == '1.7b' || inputs.model == 'both' }}
+        if: ${{ (github.event_name == 'push' || inputs.model == '1.7b' || inputs.model == 'both') && steps.runtime_release.outputs.exists != 'true' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -210,7 +222,7 @@ jobs:
           PY
 
       - name: Train Al-Huda KWS on deterministic synthetic Arabic corpus
-        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, 'trigger Al-Huda KWS training') }}
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, 'trigger Al-Huda KWS training') && steps.runtime_release.outputs.exists != 'true' }}
         run: |
           set -euo pipefail
           rm -rf voice-release-assets/al-huda-kws
@@ -250,7 +262,7 @@ jobs:
           find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
           test -s SHA256SUMS.txt
       - name: Publish Release
-        if: ${{ inputs.dry_run != 'true' }}
+        if: ${{ inputs.dry_run != 'true' && steps.runtime_release.outputs.exists != 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.release_tag }}
