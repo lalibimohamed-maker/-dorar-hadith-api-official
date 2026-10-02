@@ -124,3 +124,31 @@ export function buildWsTicketRequest({ baseUrl = "http://127.0.0.1:3900", scope 
     json: Object.freeze({ scope: String(scope) }),
   });
 }
+
+
+export function buildSpeechDiscoveryEndpoint({
+  baseUrl = "http://127.0.0.1:3900",
+  role = "backend",
+  allowRemote = false,
+} = {}) {
+  if (!["backend", "control"].includes(role)) throw new Error("invalid speech discovery role");
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  const discoveryBase = new URL(base.toString());
+  if (role === "control") discoveryBase.port = "3902";
+  discoveryBase.pathname = "/.well-known/voicestudio-speech";
+  discoveryBase.search = "";
+  return discoveryBase.toString();
+}
+
+export function buildVoiceStudioInputAudioEndMessage() {
+  return Object.freeze({
+    type: "input_audio.end",
+  });
+}
+
+export function buildVoiceStudioMcpHeaders({ clientId } = {}) {
+  if (!clientId) throw new TypeError("clientId is required");
+  return Object.freeze({
+    "X-OmniVoice-Client-Id": String(clientId),
+  });
+}
