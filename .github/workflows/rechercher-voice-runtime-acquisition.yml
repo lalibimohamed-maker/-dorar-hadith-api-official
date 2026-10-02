@@ -12,8 +12,7 @@ name: Rechercher voice runtime acquisition
       - config/voice-model-acquisition-manifest-2026.json
 
 permissions:
-  # SECURITY-JUSTIFICATION: contents: write is required only to publish verified binary model assets to GitHub Releases. Binary assets are not stored in the repository.
-  contents: write
+  contents: read
 
 concurrency:
   group: rechercher-voice-runtime-acquisition
@@ -21,6 +20,10 @@ concurrency:
 
 jobs:
   acquire:
+    # SECURITY-JUSTIFICATION: this job must publish verified model assets to GitHub Releases;
+    # the permission is scoped to this job rather than the whole workflow.
+    permissions:
+      contents: write
     runs-on: ubuntu-24.04
     timeout-minutes: 240
 
