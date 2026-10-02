@@ -76,10 +76,41 @@ jobs:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
           set -euo pipefail
-          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
+          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub qwen-asr
           hf download Qwen/Qwen3-ForcedAligner-0.6B --local-dir voice-gap-release-assets/Qwen3-ForcedAligner-0.6B
           test -s voice-gap-release-assets/Qwen3-ForcedAligner-0.6B/model.safetensors
           test -s voice-gap-release-assets/Qwen3-ForcedAligner-0.6B/config.json
+
+      - name: Runtime inference verification — Qwen3 ForcedAligner
+        if: ${{ inputs.include_forced_aligner == 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, torch
+          from qwen_asr import Qwen3ForcedAligner
+          model=Qwen3ForcedAligner.from_pretrained(
+              "voice-gap-release-assets/Qwen3-ForcedAligner-0.6B",
+              dtype=torch.float32,
+              device_map="cpu"
+          )
+          results=model.align(
+              audio="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-ASR-Repo/asr_zh.wav",
+              text="甚至出现交易几乎停滞的情况。",
+              language="Chinese",
+          )
+          assert results and results[0], "forced aligner returned no alignment"
+          first=results[0][0]
+          assert first.text and first.end_time >= first.start_time
+          json.dump({
+              "id":"qwen3-forced-aligner-0.6b",
+              "runtime":"verified",
+              "segments":len(results[0]),
+              "firstSegmentNonEmpty":True
+          },open("voice-gap-release-assets/forced-aligner-runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          print("Qwen3 ForcedAligner runtime verified; segments=",len(results[0]))
+          PY
 
       - name: Acquire KWS base model
         if: ${{ inputs.include_kws == 'true' }}
@@ -139,6 +170,7 @@ jobs:
         run: |
           set -euo pipefail
           cd voice-gap-release-assets
+          if [ -d Qwen3-ForcedAligner-0.6B ]; then tar -cjf Qwen3-ForcedAligner-0.6B.tar.bz2 Qwen3-ForcedAligner-0.6B; rm -rf Qwen3-ForcedAligner-0.6B; fi
           sha256sum * > SHA256SUMS.txt
           test -s SHA256SUMS.txt
 
