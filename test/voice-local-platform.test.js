@@ -6,6 +6,9 @@ import {
   buildSpeechRequest,
   buildMcpEndpoint,
   buildStreamingTranscriptionEndpoint,
+  buildSpeechDiscoveryEndpoint,
+  buildVoicesEndpoint,
+  buildVoiceAuthHeaders,
 } from '../src/voice-local-platform.js';
 
 test('voice platform defaults to loopback and OpenAI-compatible routes', () => {
