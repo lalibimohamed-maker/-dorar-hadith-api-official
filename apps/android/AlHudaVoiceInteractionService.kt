@@ -15,12 +15,11 @@ class AlHudaVoiceInteractionService : VoiceInteractionService() {
     }
     override fun onReady() {
         super.onReady()
-        check(isSelectedAssistant()) { "Al-Huda service is not the active selected assistant" }
-        // Install the local hotword detector and keep this path lightweight.
+        // Android may instantiate the service during discovery before selection is finalized.\n        // Only enable system invocation when this service is actually selected.\n        if (isSelectedAssistant()) {\n            // Start only lightweight local wake detection; heavy inference stays off this callback.\n        }
     }
 
     override fun onShutdown() {
-        // Stop hotwording and release lightweight native handles.
+        // Stop hotwording and release lightweight native handles when selected.
         super.onShutdown()
     }
 }
