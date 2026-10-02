@@ -1,28 +1,126 @@
 {
-  "schema":"dinullah.voice-system-radar.v1",
-  "purpose":"Unified local-first voice assistant inventory for يا بوابة العلم.",
-  "systemInvocation":{
-    "apple":{"appIntents":true,"appShortcuts":true,"vocalShortcuts":true,"userDefinedWakePhrase":true},
-    "android":{"voiceInteractionService":true,"voiceInteractionSessionService":true,"userSelectedAssistant":true,"hotwording":true},
-    "web":{"browserLocaleSeed":true,"spokenLanguageDetection":true,"webAssemblyRuntime":true}
+  "schema": "dinullah.voice-system-radar.v2",
+  "purpose": "Unified local-first voice assistant inventory for يا بوابة العلم.",
+  "systemInvocation": {
+    "apple": {
+      "appIntents": true,
+      "appShortcuts": true,
+      "vocalShortcuts": true,
+      "userDefinedWakePhrase": true
+    },
+    "android": {
+      "voiceInteractionService": true,
+      "voiceInteractionSessionService": true,
+      "userSelectedAssistant": true,
+      "hotwording": true
+    },
+    "web": {
+      "browserLocaleSeed": true,
+      "spokenLanguageDetection": true,
+      "webAssemblyRuntime": true
+    }
   },
-  "voiceCore":{
-    "primaryUnifiedRuntime":"sherpa-onnx",
-    "asr":["sherpa-onnx","whisper.cpp","faster-whisper"],
-    "tts":["sherpa-onnx","piper1-gpl"],
-    "vad":["sherpa-onnx","silero-vad"],
-    "keywordSpotting":["sherpa-onnx-open-vocabulary-kws","openWakeWord"],
-    "languageId":["sherpa-onnx-whisper-multilingual"],
-    "punctuation":["sherpa-onnx-punctuation"],
-    "speakerIdentification":["sherpa-onnx"],
-    "diarization":["sherpa-onnx"],
-    "audioTagging":["sherpa-onnx"],
-    "audioFrontEnd":["aec","noise-suppression","automatic-gain-control","resampling","clipping-detection"],
-    "turnTaking":["endpointing","barge-in","tts-ducking","interruption-cancellation"]
+  "voiceCore": {
+    "primaryUnifiedRuntime": "sherpa-onnx",
+    "asr": [
+      "sherpa-onnx",
+      "whisper.cpp",
+      "faster-whisper"
+    ],
+    "tts": [
+      "sherpa-onnx",
+      "piper1-gpl"
+    ],
+    "vad": [
+      "sherpa-onnx",
+      "silero-vad"
+    ],
+    "keywordSpotting": [
+      "sherpa-onnx-open-vocabulary-kws",
+      "openWakeWord"
+    ],
+    "languageId": [
+      "sherpa-onnx-whisper-multilingual"
+    ],
+    "punctuation": [
+      "sherpa-onnx-punctuation"
+    ],
+    "speakerIdentification": [
+      "sherpa-onnx"
+    ],
+    "diarization": [
+      "sherpa-onnx"
+    ],
+    "audioTagging": [
+      "sherpa-onnx"
+    ],
+    "audioFrontEnd": [
+      "aec",
+      "noise-suppression",
+      "automatic-gain-control",
+      "resampling",
+      "clipping-detection"
+    ],
+    "turnTaking": [
+      "endpointing",
+      "barge-in",
+      "tts-ducking",
+      "interruption-cancellation"
+    ]
   },
-  "wakePhrase":{"defaultDisplayName":"يا بوابة العلم","userCanChooseCustomShortPhrase":true,"perLanguageAliases":true,"customArabicModelRequired":true,"modelStatus":"BUILD_AND_RUNTIME_VERIFY_REQUIRED"},
-  "speakerProfiles":{"mode":"optional","profiles":[1,2,3],"unlimitedGroupMode":true,"speakerEnrollment":true,"localOnlyPreferred":true,"rawVoiceRetentionDefault":false,"speakerEmbeddingsOnlyPreferred":true,"explicitConsentRequired":true,"fallback":"open-microphone-without-speaker-identification"},
-  "quran":{"syntheticTtsForbiddenForRecitation":true,"recitationIsSeparateAssetPipeline":true},
-  "harmony":{"enabledAsOrchestrationLayer":true,"role":"speech-model-router-and-local-serving-layer","doesNotReplaceVoiceCore":true,"runtimeProofRequired":true,"modelRightsRequiredPerAsset":true},
-  "completionPolicy":{"releasePresenceIsNotRuntimeProof":true,"acquiredIsNotLoaded":true,"loadedIsNotInferenceVerified":true,"inferenceVerifiedIsNotEndToEndVerified":true,"noGapClosureWithoutEvidence":true}
+  "wakePhrase": {
+    "defaultDisplayName": "يا بوابة العلم",
+    "userCanChooseCustomShortPhrase": true,
+    "perLanguageAliases": true,
+    "customArabicModelRequired": true,
+    "modelStatus": "BUILD_AND_RUNTIME_VERIFY_REQUIRED"
+  },
+  "speakerProfiles": {
+    "mode": "optional",
+    "profiles": [
+      1,
+      2,
+      3
+    ],
+    "unlimitedGroupMode": true,
+    "speakerEnrollment": true,
+    "localOnlyPreferred": true,
+    "rawVoiceRetentionDefault": false,
+    "speakerEmbeddingsOnlyPreferred": true,
+    "explicitConsentRequired": true,
+    "fallback": "open-microphone-without-speaker-identification"
+  },
+  "engineToEngineDialogue": {
+    "enabled": true,
+    "displayName": "حوار المحركات",
+    "englishName": "Engine-to-Engine Dialogue",
+    "protocol": "structured-message",
+    "audioLoopbackForbiddenByDefault": true,
+    "maxTurnsRequired": true,
+    "loopDetectionRequired": true,
+    "userStopRequired": true,
+    "microphoneIsolationDuringInternalDialogue": true,
+    "humanSupervisedMode": true,
+    "autonomousModeOptional": true,
+    "speakerProfilesIndependent": true,
+    "simultaneousMultiSpeakerRequiresDiarization": true
+  },
+  "quran": {
+    "syntheticTtsForbiddenForRecitation": true,
+    "recitationIsSeparateAssetPipeline": true
+  },
+  "harmony": {
+    "enabledAsOrchestrationLayer": true,
+    "role": "speech-model-router-and-local-serving-layer",
+    "doesNotReplaceVoiceCore": true,
+    "runtimeProofRequired": true,
+    "modelRightsRequiredPerAsset": true
+  },
+  "completionPolicy": {
+    "releasePresenceIsNotRuntimeProof": true,
+    "acquiredIsNotLoaded": true,
+    "loadedIsNotInferenceVerified": true,
+    "inferenceVerifiedIsNotEndToEndVerified": true,
+    "noGapClosureWithoutEvidence": true
+  }
 }
