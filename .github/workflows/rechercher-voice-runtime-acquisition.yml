@@ -12,6 +12,7 @@ name: Rechercher voice runtime acquisition
       - config/voice-model-acquisition-manifest-2026.json
 
 permissions:
+  # SECURITY-JUSTIFICATION: contents: write is required only to publish verified binary model assets to GitHub Releases. Binary assets are not stored in the repository.
   contents: write
 
 concurrency:
