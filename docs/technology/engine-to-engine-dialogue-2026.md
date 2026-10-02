@@ -1,70 +1,31 @@
 # Engine-to-Engine Dialogue — 2026
 
-## Purpose
+## Identity
 
-«حوار المحركات» is a separate capability inside the **يا بوابة العلم** voice system. It allows two or more internal engines to exchange bounded structured messages.
+The two named internal engines are **Al-Huda — الهُدَى** and **Al-Taqwa — الْتَقْوَى**.
 
-This is intentionally **not** implemented as a microphone feedback loop.
+## Religious and scholarly scope
+
+The dialogue defaults to the Din Allah religious/scholarly domain. Substantive claims must be grounded in the Din Allah Corpus and/or verified search, with provenance and source records attached to turns. Allowed domains include Quran and tafsir, hadith, aqidah, fiqh, sirah, Islamic history, Arabic/linguistics, and Islamic scholarly studies.
+
+## Speech + writing
+
+The user may start the dialogue by voice or text. The engine exchange is retained as a complete written transcript. Speech output is optional and user-controlled. Sources and citations remain written by default and do not need to be spoken aloud.
+
+## Copy/export
+
+The user can copy the complete engine-to-engine dialogue, including user turns, every engine turn, source/provenance records, and timestamps. No turn is silently omitted.
 
 ## Architecture
 
-`User → يا بوابة العلم → Engine A → structured message → Engine B → structured message → response`
+User → Al-Huda → structured message → Al-Taqwa → structured message → Al-Huda ...
 
-When speech output is needed, the selected TTS engine renders the final response for the user. Engine B's audio is not fed back into the physical microphone.
+Generated engine audio is never fed back through the physical microphone.
 
-## Why structured messages
+## Completion
 
-Using text/JSON between engines avoids acoustic feedback, wake-word reactivation, room noise, echo, and uncontrolled self-conversation. It also gives every turn a stable provenance record.
+Hard turn limits, loop detection, per-turn timeouts, immediate user stop, microphone isolation, and provenance are required. Configuration alone does not prove completion; end-to-end runtime tests remain mandatory.
 
-Required fields include:
+## Quran and Harmony
 
-- conversation ID
-- turn ID
-- engine ID
-- role
-- content
-- language
-- confidence
-- timestamp
-- provenance
-
-## Modes
-
-### Human-supervised
-
-The user explicitly starts the exchange, can stop it immediately, and can inspect the dialogue.
-
-### Autonomous
-
-Optional bounded engine-to-engine discussion. It requires explicit user enablement and a hard turn limit.
-
-## Safety controls
-
-Every implementation must include:
-
-- hard maximum turns;
-- loop/repetition detection;
-- duplicate-response suppression;
-- per-turn timeout;
-- immediate user stop;
-- microphone isolation during internal dialogue;
-- no privilege escalation from one engine to another;
-- human confirmation for sensitive actions.
-
-## Multi-speaker behavior
-
-One, two, three, group, and open-microphone profiles remain separate from engine-to-engine dialogue.
-
-Two or three **speaker profiles do not by themselves mean simultaneous multi-speaker recognition**. Concurrent speech requires a runtime-verified diarization and turn-taking path.
-
-## Harmony
-
-Harmony Speech Engine may participate as an optional serving/orchestration engine. It is not HarmonyOS and it does not replace the Din Allah voice core.
-
-## Quran
-
-Quran recitation remains a separate original/rights-cleared audio path. Synthetic TTS is never treated as Quran recitation.
-
-## Completion gate
-
-Configuration alone does not close the feature gap. The feature is complete only after end-to-end runtime tests demonstrate bounded two-engine exchange, interruption, loop prevention, microphone isolation, provenance, and correct termination.
+Quran recitation remains a separate original/rights-cleared audio path. Synthetic TTS is never treated as Quran recitation. Harmony Speech Engine remains an optional serving/orchestration component and is distinct from Huawei HarmonyOS.
