@@ -61,13 +61,15 @@ jobs:
           jq -r '.assets[].name' /tmp/gap-release.json | sort > /tmp/gap-assets.txt
           grep -Fxq 'Qwen3-ForcedAligner-0.6B.tar.bz2' /tmp/gap-assets.txt && echo 'forced=true' >> "$GITHUB_OUTPUT" || echo 'forced=false' >> "$GITHUB_OUTPUT"
           grep -Fxq 'gtcrn_simple.onnx' /tmp/gap-assets.txt && echo 'gtcrn=true' >> "$GITHUB_OUTPUT" || echo 'gtcrn=false' >> "$GITHUB_OUTPUT"
+          grep -Fxq 'gtcrn-runtime-verification.json' /tmp/gap-assets.txt && echo 'gtcrn_verified=true' >> "$GITHUB_OUTPUT" || echo 'gtcrn_verified=false' >> "$GITHUB_OUTPUT"
           echo 'kws=review-required' >> "$GITHUB_OUTPUT"
           echo 'punct=review-required' >> "$GITHUB_OUTPUT"
           echo 'speaker=review-required' >> "$GITHUB_OUTPUT"
           echo 'diarization=review-required' >> "$GITHUB_OUTPUT"
           echo 'audio=review-required' >> "$GITHUB_OUTPUT"
           if grep -Fq 'Qwen3-ForcedAligner-0.6B.tar.bz2' /tmp/gap-assets.txt &&
-             grep -Fq 'gtcrn_simple.onnx' /tmp/gap-assets.txt; then
+             grep -Fq 'gtcrn_simple.onnx' /tmp/gap-assets.txt &&
+             grep -Fq 'gtcrn-runtime-verification.json' /tmp/gap-assets.txt; then
             echo "any_missing=false" >> "$GITHUB_OUTPUT"
           else
             echo "any_missing=true" >> "$GITHUB_OUTPUT"
@@ -144,9 +146,14 @@ jobs:
           test -s voice-gap-release-assets/gtcrn_simple.onnx
 
       - name: Runtime verify GTCRN speech enhancement
-        if: ${{ steps.gap_release.outputs.gtcrn != 'true' }}
+        if: ${{ steps.gap_release.outputs.gtcrn_verified != 'true' }}
         run: |
           set -euo pipefail
+          if [ ! -s voice-gap-release-assets/gtcrn_simple.onnx ]; then
+            curl -fL --retry 5 --retry-all-errors \
+              -o voice-gap-release-assets/gtcrn_simple.onnx \
+              https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx
+          fi
           curl -fL --retry 5 --retry-all-errors \
             -o voice-gap-release-assets/inp_16k.wav \
             https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/inp_16k.wav
@@ -175,6 +182,15 @@ jobs:
           sf.write('/tmp/gtcrn-enhanced.wav', result.samples, result.sample_rate)
           assert Path('/tmp/gtcrn-enhanced.wav').stat().st_size > 0
           print('GTCRN runtime verified:', result.sample_rate, len(result.samples))
+          json.dump({
+              'id': 'sherpa-onnx-gtcrn-noise-suppression',
+              'runtime': 'sherpa-onnx OfflineSpeechDenoiser',
+              'verified': True,
+              'model': str(model),
+              'testAudio': str(wav),
+              'sampleRate': result.sample_rate,
+              'outputSamples': len(result.samples),
+          }, open('voice-gap-release-assets/gtcrn-runtime-verification.json', 'w'), indent=2)
           PY
       - name: Acquire KWS base model
         if: ${{ false }}
