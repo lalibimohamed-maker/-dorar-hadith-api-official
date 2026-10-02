@@ -11,7 +11,7 @@ struct AskAlHudaIntent: AppIntent {
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         let normalized = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalized.isEmpty else {
-            throw $question.needsValueError("A question is required.")
+            throw NSError(domain: "AlHudaAppIntent", code: 2, userInfo: [NSLocalizedDescriptionKey: "A question is required."])
         }
         let answer = try await AlHudaIntentRuntime.shared.ask(normalized)
         return .result(value: answer)
