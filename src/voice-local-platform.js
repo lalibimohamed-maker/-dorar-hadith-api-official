@@ -21,10 +21,9 @@ export function buildTranscriptionRequest({ baseUrl = "http://127.0.0.1:3900", a
   return Object.freeze({ method: "POST", url: new URL("/v1/audio/transcriptions", base).toString(), form });
 }
 
-export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, model, voice, language, speed = 1, responseFormat = "wav", allowRemote = false } = {}) {
+export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, model, voice, language, speed = 1, streamFormat = "audio", allowRemote = false } = {}) {
   if (!text) throw new TypeError("text is required");
-  const allowedFormats = new Set(["mp3","opus","aac","flac","wav","pcm"]);
-  if (!allowedFormats.has(responseFormat)) throw new Error("invalid speech response format");
+  if (!["audio","sse"].includes(streamFormat)) throw new Error("invalid speech stream format");
   const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
   return Object.freeze({
     method: "POST",
@@ -35,7 +34,7 @@ export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, mo
       voice: voice || "default",
       ...(language ? { language: String(language) } : {}),
       speed: Number(speed),
-      response_format: responseFormat,
+      stream_format: streamFormat,
     }),
   });
 }
@@ -64,4 +63,32 @@ export function buildVoicesEndpoint({ baseUrl = "http://127.0.0.1:3900", allowRe
 export function buildVoiceAuthHeaders({ bearerToken } = {}) {
   if (!bearerToken) throw new TypeError("bearerToken is required");
   return Object.freeze({ Authorization: `Bearer ${String(bearerToken)}` });
+}
+
+export function buildModelsEndpoint({ baseUrl = "http://127.0.0.1:3900", allowRemote = false } = {}) {
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return new URL("/v1/models", base).toString();
+}
+
+export function buildTranslationRequest({ baseUrl = "http://127.0.0.1:3900", audioFile, model, language, allowRemote = false } = {}) {
+  if (!audioFile) throw new TypeError("audioFile is required");
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return Object.freeze({
+    method: "POST",
+    url: new URL("/v1/audio/translations", base).toString(),
+    form: Object.freeze({
+      model: model || "active",
+      file: String(audioFile),
+      ...(language ? { language: String(language) } : {}),
+    }),
+  });
+}
+
+export function buildJsonRpcEndpoint({ baseUrl = "http://127.0.0.1:3900", allowRemote = false } = {}) {
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  const rpcBase = new URL(base.toString());
+  rpcBase.port = "3902";
+  rpcBase.pathname = "/rpc";
+  rpcBase.search = "";
+  return rpcBase.toString();
 }
