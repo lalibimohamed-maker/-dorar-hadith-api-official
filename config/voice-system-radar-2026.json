@@ -1,72 +1,33 @@
 {
-  "schema": "dinullah.voice-system-radar.v2",
+  "schema": "dinullah.voice-system-radar.v3",
   "purpose": "Unified local-first voice assistant inventory for Al-Huda.",
   "systemInvocation": {
-    "apple": {
-      "appIntents": true,
-      "appShortcuts": true,
-      "vocalShortcuts": true,
-      "userDefinedWakePhrase": true
-    },
-    "android": {
-      "voiceInteractionService": true,
-      "voiceInteractionSessionService": true,
-      "userSelectedAssistant": true,
-      "hotwording": true
-    },
-    "web": {
-      "browserLocaleSeed": true,
-      "spokenLanguageDetection": true,
-      "webAssemblyRuntime": true
-    }
+    "apple": {"appIntents": true, "appShortcuts": true, "vocalShortcuts": true, "userDefinedWakePhrase": true},
+    "android": {"voiceInteractionService": true, "voiceInteractionSessionService": true, "userSelectedAssistant": true, "hotwording": true},
+    "web": {"browserLocaleSeed": true, "spokenLanguageDetection": true, "webAssemblyRuntime": true}
   },
   "voiceCore": {
     "primaryUnifiedRuntime": "sherpa-onnx",
-    "asr": [
-      "sherpa-onnx",
-      "whisper.cpp",
-      "faster-whisper"
-    ],
-    "tts": [
-      "sherpa-onnx",
-      "piper1-gpl"
-    ],
-    "vad": [
-      "sherpa-onnx",
-      "silero-vad"
-    ],
-    "keywordSpotting": [
-      "sherpa-onnx-open-vocabulary-kws",
-      "openWakeWord"
-    ],
-    "languageId": [
-      "sherpa-onnx-whisper-multilingual"
-    ],
-    "punctuation": [
-      "sherpa-onnx-punctuation"
-    ],
-    "speakerIdentification": [
-      "sherpa-onnx"
-    ],
-    "diarization": [
-      "sherpa-onnx"
-    ],
-    "audioTagging": [
-      "sherpa-onnx"
-    ],
-    "audioFrontEnd": [
-      "aec",
-      "noise-suppression",
-      "automatic-gain-control",
-      "resampling",
-      "clipping-detection"
-    ],
-    "turnTaking": [
-      "endpointing",
-      "barge-in",
-      "tts-ducking",
-      "interruption-cancellation"
-    ]
+    "questionInputEngine": "qwen3-asr",
+    "asr": ["qwen3-asr-0.6b", "qwen3-asr-1.7b", "whisper.cpp", "faster-whisper"],
+    "tts": ["sherpa-onnx", "piper1-gpl"],
+    "vad": ["sherpa-onnx", "silero-vad"],
+    "keywordSpotting": ["sherpa-onnx-open-vocabulary-kws", "openWakeWord"],
+    "languageId": ["qwen3-asr", "sherpa-onnx-whisper-multilingual"],
+    "punctuation": ["sherpa-onnx-punctuation"],
+    "speakerIdentification": ["sherpa-onnx"],
+    "diarization": ["sherpa-onnx"],
+    "audioTagging": ["sherpa-onnx"],
+    "audioFrontEnd": ["aec", "noise-suppression", "automatic-gain-control", "resampling", "clipping-detection"],
+    "turnTaking": ["endpointing", "barge-in", "tts-ducking", "interruption-cancellation"]
+  },
+  "questionAnswerPath": {
+    "input": "voice-or-text",
+    "voicePath": "microphone -> VAD -> Qwen3-ASR -> normalized-question",
+    "reasoningEngines": ["Al-Huda", "Al-Taqwa"],
+    "outputPath": "reasoned-answer -> optional-TTS",
+    "audioLoopbackForbidden": true,
+    "fallback": "text-input-or-whisper-cpp"
   },
   "wakePhrase": {
     "defaultDisplayName": "Al-Huda",
@@ -81,11 +42,7 @@
   },
   "speakerProfiles": {
     "mode": "optional",
-    "profiles": [
-      1,
-      2,
-      3
-    ],
+    "profiles": [1, 2, 3],
     "unlimitedGroupMode": true,
     "speakerEnrollment": true,
     "localOnlyPreferred": true,
@@ -119,13 +76,6 @@
   "quran": {
     "syntheticTtsForbiddenForRecitation": true,
     "recitationIsSeparateAssetPipeline": true
-  },
-  "harmony": {
-    "enabledAsOrchestrationLayer": true,
-    "role": "speech-model-router-and-local-serving-layer",
-    "doesNotReplaceVoiceCore": true,
-    "runtimeProofRequired": true,
-    "modelRightsRequiredPerAsset": true
   },
   "completionPolicy": {
     "releasePresenceIsNotRuntimeProof": true,
