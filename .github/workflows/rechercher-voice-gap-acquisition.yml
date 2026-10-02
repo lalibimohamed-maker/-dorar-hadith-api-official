@@ -9,7 +9,7 @@ on:
       include_forced_aligner:
         description: Acquire Qwen3 ForcedAligner 0.6B
         required: true
-        default: "false"
+        default: "true"
         type: boolean
       include_kws:
         description: Acquire sherpa-onnx base KWS runtime model
@@ -39,7 +39,7 @@ on:
       dry_run:
         description: Verify payloads and checksums without publishing
         required: true
-        default: "true"
+        default: "false"
         type: boolean
 permissions:
   # SECURITY-JUSTIFICATION: contents: write is required only for dry_run=false to publish verified binary model assets as GitHub Release assets. No model binaries are committed to git and no Git LFS is used.
