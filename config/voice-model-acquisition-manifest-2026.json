@@ -206,10 +206,18 @@
       "id": "whisper-cpp-ggml-base-multilingual",
       "role": "local-asr-fallback",
       "source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin",
-      "status": "acquire-and-runtime-verify",
+      "status": "acquire-runtime-verify",
       "releaseAssetPlan": "rechercher-voice-gap-2026-10",
       "license": "MIT",
-      "notes": "Multilingual ggml-base; do not use .en assets for multilingual Arabic path."
+      "notes": "Multilingual ggml-base; do not use .en assets for multilingual Arabic path.",
+      "releaseEligible": true,
+      "releaseTag": "rechercher-voice-fallback-2026-10",
+      "releaseAssets": [
+        "whisper-cpp-ggml-base.bin",
+        "whisper-runtime-verification.json"
+      ],
+      "weightSha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+      "runtimeEvidence": "pending-ci"
     },
     {
       "id": "sherpa-onnx-gtcrn-noise-suppression",
@@ -244,13 +252,14 @@
     "publishedRuntimeReleaseObserved": true,
     "publishedRuntimeRelease": "rechercher-voice-runtime-2026-10",
     "publishedRuntimeReleaseObservedAt": "2026-10-02T16:15:02Z",
-    "weightsCompletionRevision": "2026-10-02-v1",
+    "weightsCompletionRevision": "2026-10-02-v2",
     "weightsCompletionGoal": "complete explicit voice weight acquisition without weakening license or runtime gates",
     "expectedReleaseLayers": {
       "runtimeVerified": "rechercher-voice-runtime-2026-10",
       "gapAssets": "rechercher-voice-gap-2026-10",
       "optional": "rechercher-voice-optional-2026-10",
       "gatedQuarantine": "rechercher-voice-quarantine-2026-10"
-    }
+    },
+    "whisperFallback": "rechercher-voice-fallback-2026-10"
   }
 }
