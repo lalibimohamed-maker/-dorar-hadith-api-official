@@ -223,8 +223,16 @@
       "id": "sherpa-onnx-gtcrn-noise-suppression",
       "role": "neural-noise-suppression",
       "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx",
-      "status": "acquire-and-runtime-verify",
-      "releaseAssetPlan": "rechercher-voice-gap-2026-10"
+      "status": "acquire-runtime-verify",
+      "releaseAssetPlan": "rechercher-voice-gap-2026-10",
+      "license": "MIT",
+      "releaseEligible": true,
+      "releaseTag": "rechercher-voice-gap-2026-10",
+      "releaseAssets": [
+        "gtcrn_simple.onnx"
+      ],
+      "runtimeEvidence": "pending-ci",
+      "sourceLicenseEvidence": "https://github.com/Xiaobin-Rong/gtcrn"
     }
   ],
   "acquisitionStatus": {
@@ -252,7 +260,7 @@
     "publishedRuntimeReleaseObserved": true,
     "publishedRuntimeRelease": "rechercher-voice-runtime-2026-10",
     "publishedRuntimeReleaseObservedAt": "2026-10-02T16:15:02Z",
-    "weightsCompletionRevision": "2026-10-02-v2",
+    "weightsCompletionRevision": "2026-10-02-v3",
     "weightsCompletionGoal": "complete explicit voice weight acquisition without weakening license or runtime gates",
     "expectedReleaseLayers": {
       "runtimeVerified": "rechercher-voice-runtime-2026-10",
