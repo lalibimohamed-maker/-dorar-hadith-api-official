@@ -35,6 +35,13 @@ const RELEASES = Object.freeze({
       runtimeVerified:true,
     }),
   }),
+  "rechercher-voice-fallback-2026-10": Object.freeze({
+    "whisper-cpp-ggml-base-multilingual": Object.freeze({
+      assets:["whisper-cpp-ggml-base.bin"],
+      digests:["sha256:60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe"],
+      runtimeVerified:false,
+    }),
+  }),
   "rechercher-voice-optional-2026-10": Object.freeze({
     "piper-en-us-libritts-high": Object.freeze({
       assets:["piper-en-us-libritts-high.tar.bz2"],
