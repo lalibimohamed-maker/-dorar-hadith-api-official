@@ -10,13 +10,16 @@ on:
       - .github/workflows/rechercher-voice-gap-acquisition.yml
       - config/voice-model-acquisition-manifest-2026.json
 permissions:
-  # SECURITY-JUSTIFICATION: contents: write is required to automatically publish verified binary assets to GitHub Releases. Repository checkout is code-only; binary assets are not persisted in the repository.
-  contents: write
+  contents: read
 concurrency:
   group: rechercher-voice-gap-acquisition
   cancel-in-progress: false
 jobs:
   acquire:
+    # SECURITY-JUSTIFICATION: this job publishes only payloads that passed the acquisition
+    # and verification gates; write access is scoped to this job.
+    permissions:
+      contents: write
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     steps:
