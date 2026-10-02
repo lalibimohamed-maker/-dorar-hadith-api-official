@@ -169,6 +169,15 @@ jobs:
             license: mit-gated-upstream-terms
             release_mode: prerelease
             chunk_bytes: 536870912
+          - id: spark-x2.5-4b
+            model_id: XHToken/Spark-X2.5-4B
+            revision: main
+            release_tag: rechercher-omega-spark-x25-4b-v1.0.0
+            license: apache-2.0
+            license_asset: LICENSE-APACHE-2.0
+            license_url: https://www.apache.org/licenses/LICENSE-2.0.txt
+            release_mode: prerelease
+            chunk_bytes: 536870912
 
     steps:
       - name: Checkout
