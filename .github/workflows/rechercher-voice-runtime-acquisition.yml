@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - feat/rechercher-voice-harmony-acquisition-v2
+      - main
     paths:
       - .github/workflows/rechercher-voice-runtime-acquisition.yml
       - config/voice-model-acquisition-manifest-2026.json
@@ -121,7 +122,7 @@ jobs:
           import json
           import torch
           from qwen_asr import Qwen3ASRModel
-          selected="${{ inputs.model || '0.6b' }}"
+          selected="both"
           targets=[]
           if selected in ("0.6b","both"): targets.append(("qwen3-asr-0.6b","voice-release-assets/Qwen3-ASR-0.6B"))
           if selected in ("1.7b","both"): targets.append(("qwen3-asr-1.7b","voice-release-assets/Qwen3-ASR-1.7B"))
@@ -226,8 +227,8 @@ jobs:
           set -euo pipefail
           cd voice-release-assets
           rm -f SHA256SUMS.txt *.tar.bz2 *.part-* *.parts.SHA256SUMS.txt
-          if [ "${{ inputs.model || '0.6b' }}" = "0.6b" ] || [ "${{ inputs.model || '0.6b' }}" = "both" ]; then tar -cjf Qwen3-ASR-0.6B.tar.bz2 Qwen3-ASR-0.6B; fi
-          if [ "${{ inputs.model || '0.6b' }}" = "1.7b" ] || [ "${{ inputs.model || '0.6b' }}" = "both" ]; then tar -cjf - Qwen3-ASR-1.7B | split -b 1900m - Qwen3-ASR-1.7B.tar.bz2.part-; sha256sum Qwen3-ASR-1.7B.tar.bz2.part-* > Qwen3-ASR-1.7B.parts.SHA256SUMS.txt; fi
+          if [ "both" = "0.6b" ] || [ "both" = "both" ]; then tar -cjf Qwen3-ASR-0.6B.tar.bz2 Qwen3-ASR-0.6B; fi
+          if [ "both" = "1.7b" ] || [ "both" = "both" ]; then tar -cjf - Qwen3-ASR-1.7B | split -b 1900m - Qwen3-ASR-1.7B.tar.bz2.part-; sha256sum Qwen3-ASR-1.7B.tar.bz2.part-* > Qwen3-ASR-1.7B.parts.SHA256SUMS.txt; fi
           rm -rf Qwen3-ASR-0.6B Qwen3-ASR-1.7B
           find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
           test -s SHA256SUMS.txt
@@ -246,7 +247,7 @@ jobs:
           done
 
   build-al-huda-kws:
-    if: ${{ inputs.build_kws == true }}
+    if: ${{ true }}
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     concurrency:
