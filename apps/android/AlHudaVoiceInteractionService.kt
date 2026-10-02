@@ -10,8 +10,12 @@ import android.service.voice.VoiceInteractionService
  * lifecycle model.
  */
 class AlHudaVoiceInteractionService : VoiceInteractionService() {
+    fun isSelectedAssistant(): Boolean {
+        return VoiceInteractionService.isActiveService(this, componentName)
+    }
     override fun onReady() {
         super.onReady()
+        check(isSelectedAssistant()) { "Al-Huda service is not the active selected assistant" }
         // Install the local hotword detector and keep this path lightweight.
     }
 
