@@ -37,7 +37,7 @@ jobs:
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y curl jq python3 python3-pip tar bzip2
-          python3 -m pip install --disable-pip-version-check --no-cache-dir qwen-asr
+          python3 -m pip install --disable-pip-version-check --no-cache-dir qwen-asr onnxruntime
       - name: Prepare
         run: |
           set -euo pipefail
@@ -112,6 +112,25 @@ jobs:
           json.dump(evidence,open("voice-release-assets/runtime-verification.json","w"),ensure_ascii=False,indent=2)
           print(json.dumps(evidence,ensure_ascii=False))
           PY
+      - name: Runtime inference verification — Silero VAD
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import numpy as np
+          import onnxruntime as ort
+          path="voice-release-assets/silero_vad.onnx"
+          session=ort.InferenceSession(path, providers=["CPUExecutionProvider"])
+          inputs={x.name:x for x in session.get_inputs()}
+          assert {"input","state","sr"} <= set(inputs), [x.name for x in session.get_inputs()]
+          audio=np.zeros((1,576),dtype=np.float32)
+          state=np.zeros((2,1,128),dtype=np.float32)
+          out=session.run(None,{"input":audio,"state":state,"sr":np.array([16000],dtype=np.int64)})
+          assert len(out) >= 2
+          assert np.asarray(out[0]).size >= 1
+          assert np.asarray(out[1]).shape == (2,1,128)
+          print("silero_vad runtime verified; speech_probability=",float(np.asarray(out[0]).reshape(-1)[0]))
+          PY
+
       - name: Verify Silero VAD payload
         run: |
           set -euo pipefail
