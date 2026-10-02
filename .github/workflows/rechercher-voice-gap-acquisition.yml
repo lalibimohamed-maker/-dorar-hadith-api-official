@@ -1,0 +1,153 @@
+name: Rechercher — Voice gap acquisition to Releases
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag
+        required: true
+        default: rechercher-voice-gap-2026-10
+      include_forced_aligner:
+        description: Acquire Qwen3 ForcedAligner 0.6B
+        required: true
+        default: "true"
+        type: boolean
+      include_kws:
+        description: Acquire sherpa-onnx base KWS runtime model
+        required: true
+        default: "true"
+        type: boolean
+      include_punctuation:
+        description: Acquire sherpa-onnx punctuation model
+        required: true
+        default: "true"
+        type: boolean
+      include_speaker_id:
+        description: Acquire speaker identification model
+        required: true
+        default: "true"
+        type: boolean
+      include_diarization:
+        description: Acquire speaker segmentation model
+        required: true
+        default: "true"
+        type: boolean
+      include_audio_tagging:
+        description: Acquire audio tagging model
+        required: true
+        default: "true"
+        type: boolean
+      dry_run:
+        description: Verify payloads and checksums without publishing
+        required: true
+        default: "true"
+        type: boolean
+permissions:
+  # SECURITY-JUSTIFICATION: contents: write is required only for dry_run=false to publish verified binary model assets as GitHub Release assets. No model binaries are committed to git and no Git LFS is used.
+  contents: write
+concurrency:
+  group: rechercher-voice-gap-acquisition
+  cancel-in-progress: false
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl jq python3 tar bzip2
+
+      - name: Prepare manifest
+        run: |
+          set -euo pipefail
+          rm -rf voice-gap-release-assets
+          mkdir -p voice-gap-release-assets
+          cp config/voice-model-acquisition-manifest-2026.json voice-gap-release-assets/manifest.json
+
+      - name: Acquire Qwen3 ForcedAligner 0.6B
+        if: ${{ inputs.include_forced_aligner == 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
+          hf download Qwen/Qwen3-ForcedAligner-0.6B --local-dir voice-gap-release-assets/Qwen3-ForcedAligner-0.6B
+          test -s voice-gap-release-assets/Qwen3-ForcedAligner-0.6B/model.safetensors
+          test -s voice-gap-release-assets/Qwen3-ForcedAligner-0.6B/config.json
+
+      - name: Acquire KWS base model
+        if: ${{ inputs.include_kws == 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/kws-base.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2
+          test -s voice-gap-release-assets/kws-base.tar.bz2
+
+      - name: Acquire punctuation model
+        if: ${{ inputs.include_punctuation == 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/punctuation.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2
+          test -s voice-gap-release-assets/punctuation.tar.bz2
+
+      - name: Acquire speaker identification model
+        if: ${{ inputs.include_speaker_id == 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/speaker-id.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx
+          test -s voice-gap-release-assets/speaker-id.onnx
+
+      - name: Acquire speaker segmentation model
+        if: ${{ inputs.include_diarization == 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/pyannote-segmentation.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2
+          test -s voice-gap-release-assets/pyannote-segmentation.tar.bz2
+
+      - name: Acquire audio tagging model
+        if: ${{ inputs.include_audio_tagging == 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/audio-tagging.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/audio-tagging-models/sherpa-onnx-zipformer-audio-tagging-2024-04-09.tar.bz2
+          test -s voice-gap-release-assets/audio-tagging.tar.bz2
+
+      - name: Validate payloads, provenance and size
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path("voice-gap-release-assets/manifest.json").read_text())
+          assert manifest["policy"]["noGitLFS"] is True
+          assert manifest["policy"]["checksumRequired"] is True
+          assets=list(Path("voice-gap-release-assets").glob("*"))
+          assets=[p for p in assets if p.name != "manifest.json" and p.is_file()]
+          assert assets, "no assets acquired"
+          for p in assets:
+              size=p.stat().st_size
+              assert size > 0, p
+              assert size < 2*1024*1024*1024, f"{p} exceeds GitHub release asset limit"
+          print("validated assets:", [(p.name,p.stat().st_size) for p in assets])
+          PY
+
+      - name: Create checksums
+        run: |
+          set -euo pipefail
+          cd voice-gap-release-assets
+          sha256sum * > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+
+      - name: Publish Release
+        if: ${{ inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice gap acquisition. Payloads are source-recorded and checksum-verified. Large binaries are stored as Release assets; Git LFS is not used."
+          gh release upload "$TAG" voice-gap-release-assets/* --repo "$GITHUB_REPOSITORY"
