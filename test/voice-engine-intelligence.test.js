@@ -27,3 +27,13 @@ test('low-power selection prefers the lightweight ASR engine', () => {
 test('unknown engines fail closed', () => {
   assert.throws(() => getVoiceEngine('not-an-al-huda-engine'), /Unknown Al-Huda voice engine/);
 });
+
+test('engine catalogue exposes operational states for auxiliary engines', () => {
+  const byId = new Map(listVoiceEngines().map(engine => [engine.id, engine]));
+  assert.equal(byId.get('qwen3-forced-aligner-0.6b').status, 'runnable-supported-languages-only');
+  assert.equal(byId.get('piper-en-us-libritts-high').status, 'runnable-release-verified');
+  assert.equal(byId.get('f5-tts-v1-base').status, 'release-present-license-constrained-runtime-pending');
+  assert.equal(byId.get('piper-ar-jo-kareem-medium').status, 'quarantine-license-review');
+  assert.equal(byId.get('whisper-cpp-ggml-base-multilingual').status, 'quarantine-runtime-license-review');
+  assert.equal(byId.get('sherpa-onnx-speaker-recognition').status, 'acquired-runtime-evidence-pending');
+});
