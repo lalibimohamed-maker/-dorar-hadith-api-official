@@ -22,7 +22,7 @@ on:
       include_pyannote_gated:
         description: "Attempt gated pyannote acquisition when HF_TOKEN is configured; quarantine only."
         required: false
-        default: true
+        default: false
         type: boolean
   push:
     branches:
@@ -348,7 +348,7 @@ jobs:
           fi
 
       - name: Acquire gated pyannote diarization when HF_TOKEN exists
-        if: ${{ (github.event_name != 'workflow_dispatch' || inputs.include_pyannote_gated) && env.HAS_HF_TOKEN == 'true' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_pyannote_gated && env.HAS_HF_TOKEN == 'true' }}
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_HUB_DISABLE_TELEMETRY: "1"
@@ -356,6 +356,7 @@ jobs:
           set -euo pipefail
           if ! grep -Fxq 'pyannote-speaker-diarization-3.1.tar.bz2' /tmp/quarantine-assets.txt; then
             rm -rf voice-quarantine-assets/pyannote-speaker-diarization-3.1
+            hf auth login --token "$HF_TOKEN" --add-to-git-credential false
             hf download pyannote/speaker-diarization-3.1 --local-dir voice-quarantine-assets/pyannote-speaker-diarization-3.1 --token "$HF_TOKEN"
             tar -cjf voice-quarantine-assets/pyannote-speaker-diarization-3.1.tar.bz2 -C voice-quarantine-assets pyannote-speaker-diarization-3.1
             rm -rf voice-quarantine-assets/pyannote-speaker-diarization-3.1

@@ -34,6 +34,6 @@ test('engine catalogue exposes operational states for auxiliary engines', () => 
   assert.equal(byId.get('piper-en-us-libritts-high').status, 'runnable-release-verified');
   assert.equal(byId.get('f5-tts-v1-base').status, 'release-present-license-constrained-runtime-pending');
   assert.equal(byId.get('piper-ar-jo-kareem-medium').status, 'quarantine-license-review');
-  assert.equal(byId.get('whisper-cpp-ggml-base-multilingual').status, 'quarantine-runtime-license-review');
+  assert.equal(byId.get('whisper-cpp-ggml-base-multilingual').status, 'runnable-release-verified');
   assert.equal(byId.get('sherpa-onnx-speaker-recognition').status, 'acquired-runtime-evidence-pending');
 });
