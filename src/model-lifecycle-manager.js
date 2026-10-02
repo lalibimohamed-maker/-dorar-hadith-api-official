@@ -27,7 +27,7 @@ export function createModelLifecycleManager({ load, unload } = {}) {
       const record = records.get(id);
       if (!record) throw new Error(`unknown model: ${id}`);
       if (record.state === 'warm' || record.state === 'loaded' || record.state === 'inference-verified') return record;
-      if (!['loadable','checksum-verified','license-reviewed','acquired'].includes(record.state)) {
+      if (record.state !== 'loadable') {
         throw new Error(`model ${id} is not loadable from state ${record.state}`);
       }
       await load(id);
