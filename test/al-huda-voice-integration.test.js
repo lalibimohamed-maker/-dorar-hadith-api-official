@@ -28,7 +28,7 @@ test('Al-Huda integrated local-first voice surface stays bounded end to end', as
       vad:samples=>Math.abs(samples[0] ?? 0)>0.01,
       endpointing:createEndpointing({startSpeechFrames:1,endSilenceFrames:1}),
     }),
-    asr:async()=>agent.execute('transcribe',{audio:'frame-buffer'}),
+    asr:async()=> (await agent.execute('transcribe',{audio:'frame-buffer'})).result,
     reasoning:async q=>`جواب موثق عن: ${q}`,
     tts:async answer=>{ await agent.execute('synthesize',{text:answer}); },
     stream,
