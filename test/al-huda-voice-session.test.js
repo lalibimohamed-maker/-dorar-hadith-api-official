@@ -78,6 +78,7 @@ test('Al-Huda does not capture speech before wake detection', async () => {
   await session.pushFrame(new Float32Array([0]));
   assert.equal(asrCalls,0);
   wake=true;
-  assert.equal((await session.pushFrame(new Float32Array([.1]))).state,'wake-detected');
+  const wakeResult=await session.pushFrame(new Float32Array([.1]));
+  assert.equal(wakeResult.state,'wake-detected');
   assert.equal(session.armed,true);
 });
