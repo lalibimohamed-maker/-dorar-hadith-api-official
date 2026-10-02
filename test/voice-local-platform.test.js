@@ -12,6 +12,9 @@ import {
   buildOutputSessionCreateRequest,
   buildOutputSessionInsertRequest,
   buildOutputSessionCancelRequest,
+  buildSpeechDiscoveryEndpoint,
+  buildVoiceStudioInputAudioEndMessage,
+  buildVoiceStudioMcpHeaders,
 } from '../src/voice-local-platform.js';
 
 test('voice platform defaults to loopback and OpenAI-compatible routes', () => {
@@ -49,4 +52,28 @@ test('remote WebSocket access uses a scoped ticket endpoint', async () => {
   assert.equal(req.method,'POST');
   assert.equal(req.json.scope,'/v1/audio/transcriptions/stream');
   assert.throws(()=>buildWsTicketRequest({scope:'/admin',allowRemote:true}),/unsupported WebSocket ticket scope/);
+});
+
+test('voice platform exposes documented VoiceStudio discovery endpoints', () => {
+  assert.equal(
+    buildSpeechDiscoveryEndpoint(),
+    'http://127.0.0.1:3900/.well-known/voicestudio-speech'
+  );
+  assert.equal(
+    buildSpeechDiscoveryEndpoint({ role: 'control' }),
+    'http://127.0.0.1:3902/.well-known/voicestudio-speech'
+  );
+  assert.throws(
+    () => buildSpeechDiscoveryEndpoint({ role: 'sidecar' }),
+    /invalid speech discovery role/
+  );
+});
+
+test('VoiceStudio stream and MCP helpers keep explicit session/client identity', () => {
+  assert.deepEqual(buildVoiceStudioInputAudioEndMessage(), { type: 'input_audio.end' });
+  assert.deepEqual(
+    buildVoiceStudioMcpHeaders({ clientId: 'codex-cli' }),
+    { 'X-OmniVoice-Client-Id': 'codex-cli' }
+  );
+  assert.throws(() => buildVoiceStudioMcpHeaders(), /clientId is required/);
 });
