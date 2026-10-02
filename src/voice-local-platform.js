@@ -11,14 +11,35 @@ export function assertVoicePlatformUrl(url, { allowRemote = false } = {}) {
   return parsed;
 }
 
-export function buildTranscriptionRequest({ baseUrl = "http://127.0.0.1:3900", audioFile, model, language, prompt, temperature, allowRemote = false } = {}) {
+export function buildTranscriptionRequest({
+  baseUrl = "http://127.0.0.1:3900",
+  audioFile,
+  model,
+  language,
+  prompt,
+  temperature,
+  responseFormat = "json",
+  wordTimestamps = false,
+  allowRemote = false,
+} = {}) {
   if (!audioFile) throw new TypeError("audioFile is required");
+  const allowedResponseFormats = new Set(["json", "text", "verbose_json", "srt", "vtt"]);
+  if (!allowedResponseFormats.has(responseFormat)) throw new Error("invalid transcription response format");
   const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
-  const form = { model: model || "active", file: String(audioFile) };
+  const form = {
+    model: model || "active",
+    file: String(audioFile),
+    response_format: responseFormat,
+  };
   if (language) form.language = String(language);
   if (prompt) form.prompt = String(prompt);
   if (temperature != null) form.temperature = Number(temperature);
-  return Object.freeze({ method: "POST", url: new URL("/v1/audio/transcriptions", base).toString(), form });
+  if (wordTimestamps) form.timestamp_granularities = "word";
+  return Object.freeze({
+    method: "POST",
+    url: new URL("/v1/audio/transcriptions", base).toString(),
+    form: Object.freeze(form),
+  });
 }
 
 export function buildSpeechRequest({ baseUrl = "http://127.0.0.1:3900", text, model, voice, language, speed = 1, responseFormat = "wav", streamFormat = "audio", instructions, allowRemote = false } = {}) {
