@@ -37,9 +37,9 @@ jobs:
           fi
           jq -r '.assets[].name' /tmp/runtime-release.json | sort > /tmp/runtime-assets.txt
           grep -Fxq 'Qwen3-ASR-0.6B.tar.bz2' /tmp/runtime-assets.txt && echo 'qwen06=true' >> "$GITHUB_OUTPUT" || echo 'qwen06=false' >> "$GITHUB_OUTPUT"
-          grep -Eq '^Qwen3-ASR-1.7B\.tar\.bz2\.part-[[:alnum:]]+
+          grep -Eq '^Qwen3-ASR-1.7B\.tar\.bz2\.part-[[:alnum:]]+$' /tmp/runtime-assets.txt && echo 'qwen17=true' >> "$GITHUB_OUTPUT" || echo 'qwen17=false' >> "$GITHUB_OUTPUT"
           grep -Fxq 'silero_vad.onnx' /tmp/runtime-assets.txt && echo 'silero=true' >> "$GITHUB_OUTPUT" || echo 'silero=false' >> "$GITHUB_OUTPUT"
-          if grep -Fq 'Qwen3-ASR-0.6B.tar.bz2' /tmp/runtime-assets.txt && grep -Eq '^Qwen3-ASR-1.7B\.tar\.bz2\.part-[[:alnum:]]+ && grep -Fq 'silero_vad.onnx' /tmp/runtime-assets.txt; then
+          if grep -Fq 'Qwen3-ASR-0.6B.tar.bz2' /tmp/runtime-assets.txt && grep -Eq '^Qwen3-ASR-1.7B\.tar\.bz2\.part-[[:alnum:]]+$' /tmp/runtime-assets.txt && grep -Fq 'silero_vad.onnx' /tmp/runtime-assets.txt; then
             echo "any_missing=false" >> "$GITHUB_OUTPUT"
           else
             echo "any_missing=true" >> "$GITHUB_OUTPUT"
