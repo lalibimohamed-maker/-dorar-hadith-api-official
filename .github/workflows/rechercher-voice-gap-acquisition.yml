@@ -159,6 +159,7 @@ jobs:
             https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/inp_16k.wav
           test -s voice-gap-release-assets/inp_16k.wav
           python3 - <<'PY'
+          import json
           import numpy as np
           import sherpa_onnx
           import soundfile as sf
