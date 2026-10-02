@@ -4,6 +4,7 @@ import { createAlHudaVoiceSession } from '../src/al-huda-voice-session.js';
 import { createAudioFrontEnd } from '../src/audio-front-end.js';
 import { createEndpointing } from '../src/endpointing.js';
 import { createAudioFramePipeline } from '../src/audio-frame-pipeline.js';
+import { createVoiceStreamRuntime } from '../src/voice-stream-runtime.js';
 
 test('Al-Huda voice session wires wake detection to ASR, reasoning and TTS', async () => {
   const events=[];
@@ -81,4 +82,33 @@ test('Al-Huda does not capture speech before wake detection', async () => {
   const wakeResult=await session.pushFrame(new Float32Array([.1]));
   assert.equal(wakeResult.state,'wake-detected');
   assert.equal(session.armed,true);
+});
+
+
+test('Al-Huda voice session emits stream lifecycle around one-shot providers', async () => {
+  const events=[];
+  const stream=createVoiceStreamRuntime({onEvent:e=>events.push(e)});
+  let wake=true;
+  const session=createAlHudaVoiceSession({
+    permission:{refresh:async()=> 'granted'},
+    wakeDetector:()=>wake ? (wake=false,true) : false,
+    audioPipeline:createAudioFramePipeline({
+      frontEnd:createAudioFrontEnd(),
+      vad:samples=>Math.abs(samples[0] ?? 0) > 0.01,
+      endpointing:createEndpointing({startSpeechFrames:1,endSilenceFrames:1})
+    }),
+    asr:async()=>({text:'سؤال البث',language:'Arabic'}),
+    reasoning:async()=> 'إجابة',
+    tts:async()=>{},
+    stream,
+  });
+  await session.start();
+  await session.pushFrame(new Float32Array([.1]));
+  await session.pushFrame(new Float32Array([.1]));
+  const result=await session.pushFrame(new Float32Array([0]));
+  assert.equal(result.state,'answer-complete');
+  assert.deepEqual(
+    events.map(e=>[e.stream,e.type]),
+    [['asr','started'],['asr','final'],['asr','completed'],['tts','started'],['tts','completed']]
+  );
 });
