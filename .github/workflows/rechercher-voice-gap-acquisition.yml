@@ -35,12 +35,12 @@ jobs:
           fi
           jq -r '.assets[].name' /tmp/gap-release.json | sort > /tmp/gap-assets.txt
           grep -Fxq 'Qwen3-ForcedAligner-0.6B.tar.bz2' /tmp/gap-assets.txt && echo 'forced=true' >> "$GITHUB_OUTPUT" || echo 'forced=false' >> "$GITHUB_OUTPUT"
-          grep -Fxq 'kws-base.tar.bz2' /tmp/gap-assets.txt && echo 'kws=true' >> "$GITHUB_OUTPUT" || echo 'kws=false' >> "$GITHUB_OUTPUT"
-          grep -Fxq 'punctuation.tar.bz2' /tmp/gap-assets.txt && echo 'punct=true' >> "$GITHUB_OUTPUT" || echo 'punct=false' >> "$GITHUB_OUTPUT"
-          grep -Fxq 'speaker-id.onnx' /tmp/gap-assets.txt && echo 'speaker=true' >> "$GITHUB_OUTPUT" || echo 'speaker=false' >> "$GITHUB_OUTPUT"
-          grep -Fxq 'pyannote-segmentation.tar.bz2' /tmp/gap-assets.txt && echo 'diarization=true' >> "$GITHUB_OUTPUT" || echo 'diarization=false' >> "$GITHUB_OUTPUT"
-          grep -Fxq 'audio-tagging.tar.bz2' /tmp/gap-assets.txt && echo 'audio=true' >> "$GITHUB_OUTPUT" || echo 'audio=false' >> "$GITHUB_OUTPUT"
-          if grep -Fq 'Qwen3-ForcedAligner-0.6B.tar.bz2' /tmp/gap-assets.txt && grep -Fq 'kws-base.tar.bz2' /tmp/gap-assets.txt && grep -Fq 'punctuation.tar.bz2' /tmp/gap-assets.txt && grep -Fq 'speaker-id.onnx' /tmp/gap-assets.txt && grep -Fq 'pyannote-segmentation.tar.bz2' /tmp/gap-assets.txt && grep -Fq 'audio-tagging.tar.bz2' /tmp/gap-assets.txt; then
+          echo 'kws=review-required' >> "$GITHUB_OUTPUT"
+          echo 'punct=review-required' >> "$GITHUB_OUTPUT"
+          echo 'speaker=review-required' >> "$GITHUB_OUTPUT"
+          echo 'diarization=review-required' >> "$GITHUB_OUTPUT"
+          echo 'audio=review-required' >> "$GITHUB_OUTPUT"
+          if grep -Fq 'Qwen3-ForcedAligner-0.6B.tar.bz2' /tmp/gap-assets.txt; then
             echo "any_missing=false" >> "$GITHUB_OUTPUT"
           else
             echo "any_missing=true" >> "$GITHUB_OUTPUT"
@@ -107,35 +107,35 @@ jobs:
           PY
 
       - name: Acquire KWS base model
-        if: ${{ steps.gap_release.outputs.kws != 'true' }}
+        if: ${{ false }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/kws-base.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2
           test -s voice-gap-release-assets/kws-base.tar.bz2
 
       - name: Acquire punctuation model
-        if: ${{ steps.gap_release.outputs.punct != 'true' }}
+        if: ${{ false }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/punctuation.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2
           test -s voice-gap-release-assets/punctuation.tar.bz2
 
       - name: Acquire speaker identification model
-        if: ${{ steps.gap_release.outputs.speaker != 'true' }}
+        if: ${{ false }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/speaker-id.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx
           test -s voice-gap-release-assets/speaker-id.onnx
 
       - name: Acquire speaker segmentation model
-        if: ${{ steps.gap_release.outputs.diarization != 'true' }}
+        if: ${{ false }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/pyannote-segmentation.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2
           test -s voice-gap-release-assets/pyannote-segmentation.tar.bz2
 
       - name: Acquire audio tagging model
-        if: ${{ steps.gap_release.outputs.audio != 'true' }}
+        if: ${{ false }}
         run: |
           set -euo pipefail
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/audio-tagging.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/audio-tagging-models/sherpa-onnx-zipformer-audio-tagging-2024-04-09.tar.bz2
