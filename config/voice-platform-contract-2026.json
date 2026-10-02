@@ -101,7 +101,20 @@
     "cancelSession": "DELETE :3902/v1/output/sessions/{id}",
     "focusedDestinationExclusive": true,
     "staleSessionMustFail": true,
-    "noCorpusMutation": true
+    "noCorpusMutation": true,
+    "controlActions": [
+      "start",
+      "stop",
+      "toggle"
+    ],
+    "controlHttp": "POST :3902/v1/dictation/{action}",
+    "controlJsonRpc": "POST :3902/rpc",
+    "jsonRpcMethods": [
+      "dictation.start",
+      "dictation.stop",
+      "dictation.toggle"
+    ],
+    "allowlistOnly": true
   },
   "referenceAlignment": {
     "voiceStudio": "0.5.6",
