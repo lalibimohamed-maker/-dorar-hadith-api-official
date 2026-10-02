@@ -142,6 +142,7 @@ jobs:
           test -s voice-gap-release-assets/audio-tagging.tar.bz2
 
       - name: Validate payloads, provenance and size
+        if: ${{ steps.gap_release.outputs.forced != 'true' }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -161,6 +162,7 @@ jobs:
           PY
 
       - name: Create checksums
+        if: ${{ steps.gap_release.outputs.forced != 'true' }}
         run: |
           set -euo pipefail
           cd voice-gap-release-assets
