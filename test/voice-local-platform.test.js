@@ -20,6 +20,7 @@ import {
 test('voice platform defaults to loopback and OpenAI-compatible routes', () => {
   assert.equal(assertVoicePlatformUrl('http://127.0.0.1:3900').hostname,'127.0.0.1');
   assert.match(buildTranscriptionRequest({audioFile:'/tmp/q.webm'}).url,/\/v1\/audio\/transcriptions$/);
+  assert.equal(buildTranscriptionRequest({audioFile:'/tmp/q.webm'}).form.response_format,'json');
   assert.equal(buildSpeechRequest({text:'السلام عليكم'}).json.response_format,'wav');
   assert.equal(buildSpeechRequest({text:'السلام عليكم'}).json.stream_format,'audio');
   assert.match(buildMcpEndpoint(),/\/mcp\/$/);
@@ -76,4 +77,24 @@ test('VoiceStudio stream and MCP helpers keep explicit session/client identity',
     { 'X-OmniVoice-Client-Id': 'codex-cli' }
   );
   assert.throws(() => buildVoiceStudioMcpHeaders(), /clientId is required/);
+});
+
+test('transcription request preserves documented response and word timestamp options', () => {
+  const req = buildTranscriptionRequest({
+    audioFile: '/tmp/q.webm',
+    language: 'ar',
+    prompt: 'بسم الله',
+    temperature: 0.2,
+    responseFormat: 'verbose_json',
+    wordTimestamps: true,
+  });
+  assert.equal(req.form.response_format, 'verbose_json');
+  assert.equal(req.form.timestamp_granularities, 'word');
+  assert.equal(req.form.language, 'ar');
+  assert.equal(req.form.prompt, 'بسم الله');
+  assert.equal(req.form.temperature, 0.2);
+  assert.throws(
+    () => buildTranscriptionRequest({ audioFile: '/tmp/q.webm', responseFormat: 'mp3' }),
+    /invalid transcription response format/
+  );
 });
