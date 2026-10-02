@@ -1,18 +1,16 @@
+import { evaluateVoiceEvidence } from './voice-evidence-ledger.js';
 const FAILURE_CODES = new Set([
   "permission-denied","model-missing","checksum-mismatch","license-unreviewed",
   "backend-unavailable","out-of-memory","thermal-pressure","inference-invalid","cancelled"
 ]);
 export function validateVoiceRuntimeContract(report = {}) {
-  const missing = [];
-  for (const key of ["modelId","modelVersion","licenseEvidence","sha256","backend","deviceProfile","selfTest","inferenceTest"]) {
-    if (report[key] === undefined || report[key] === null || report[key] === "") missing.push(key);
-  }
-  const valid = missing.length === 0 &&
-    report.selfTest === "passed" &&
-    report.inferenceTest === "passed" &&
-    report.licenseReviewed === true &&
-    report.checksumVerified === true;
-  return Object.freeze({ valid, missing, status: valid ? "inference-verified" : "not-ready" });
+  const evaluation = evaluateVoiceEvidence(report);
+  return Object.freeze({
+    valid: evaluation.valid,
+    missing: evaluation.missing,
+    status: evaluation.status,
+    gates: evaluation.gates,
+  });
 }
 export function normalizeVoiceFailure(code) {
   const value = String(code || "");
