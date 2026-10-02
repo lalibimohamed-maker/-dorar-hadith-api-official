@@ -5,6 +5,7 @@ export function createAlHudaVoiceSession({
   asr,
   reasoning,
   tts,
+  stream = null,
   onEvent = () => {}
 } = {}) {
   for (const [name,fn] of Object.entries({wakeDetector, asr, reasoning, tts})) {
@@ -35,7 +36,6 @@ export function createAlHudaVoiceSession({
       if (!armed && wakeDetector(processed.samples)) {
         armed=true;
         questionFrames=[];
-        armed=true;
         onEvent({type:'wake-detected',wakeWord:'الهُدَى'});
         return {state:'wake-detected'};
       }
@@ -47,15 +47,29 @@ export function createAlHudaVoiceSession({
         questionFrames=[];
         armed=false;
         onEvent({type:'transcribing'});
-        const transcript=await asr(audio);
+        stream?.startASR?.({wakeWord:'الهُدَى'});
+        let transcript;
+        try {
+          transcript=await asr(audio);
+          if (transcript?.text?.trim()) stream?.finalASR?.(transcript.text,{language:transcript.language ?? null});
+          stream?.completeASR?.();
+        } catch (error) {
+          stream?.failASR?.(error);
+          throw error;
+        }
         if (!transcript?.text?.trim()) { armed=false; throw new Error('empty transcript'); }
         onEvent({type:'transcript-ready',text:transcript.text,language:transcript.language ?? null});
         onEvent({type:'reasoning'});
         const answer=await reasoning(transcript.text);
         answerController=new AbortController();
         onEvent({type:'speaking'});
+        stream?.startTTS?.({language:transcript.language ?? null});
         try {
           await tts(answer, answerController.signal);
+          stream?.completeTTS?.();
+        } catch (error) {
+          stream?.failTTS?.(error);
+          throw error;
         } finally {
           answerController=null;
         }
