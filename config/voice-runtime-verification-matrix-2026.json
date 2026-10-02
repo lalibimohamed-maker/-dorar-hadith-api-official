@@ -1,0 +1,42 @@
+{
+  "schema": "dinullah.voice-runtime-verification-matrix.v1",
+  "policy": {
+    "releasePresenceIsNotRuntimeProof": true,
+    "acquiredIsNotLoaded": true,
+    "loadedIsNotInferenceVerified": true,
+    "inferenceVerifiedIsNotEndToEndVerified": true,
+    "gapOnlyAcquisition": true
+  },
+  "implementedRuntimeGates": [
+    "qwen3-asr-0.6b-payload-and-local-inference",
+    "qwen3-asr-1.7b-sharded-payload-and-local-inference",
+    "silero-vad-onnx-load-and-inference",
+    "qwen3-asr-local-node-provider-contract",
+    "quran-reciter-qiraah-riwayah-evidence-gate"
+  ],
+  "requiresWorkflowExecution": [
+    "qwen3-asr-0.6b-real-run-evidence",
+    "qwen3-asr-1.7b-real-run-evidence",
+    "silero-vad-real-run-evidence",
+    "qwen3-asr-vad-question-path-e2e",
+    "qwen3-arabic-multilingual-benchmark",
+    "quran-recitation-live-audio-playback"
+  ],
+  "remainingBuildOrPlatformGaps": [
+    "al-huda-arabic-wake-word-training-and-inference",
+    "speaker-recognition-enrollment-e2e",
+    "speaker-diarization-multi-speaker-e2e",
+    "language-id-microphone-benchmark",
+    "tts-final-runtime-verification",
+    "al-huda-real-engine-inference",
+    "al-taqwa-real-engine-inference",
+    "real-engine-to-engine-dialogue-e2e",
+    "dialogue-copy-export-e2e",
+    "ios-native-vocal-shortcut-runtime",
+    "android-user-selected-assistant-runtime"
+  ],
+  "notes": {
+    "harmonySpeechEngine": "removed from voice serving architecture; Huawei HarmonyOS remains a separate platform target under apps/harmony",
+    "quran": "reciter labels alone never close a qiraah/riwayah gap; playback requires evidence-backed mapping plus live audio verification"
+  }
+}
