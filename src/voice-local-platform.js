@@ -173,3 +173,49 @@ export function buildVoiceStudioMcpHeaders({ clientId } = {}) {
     "X-OmniVoice-Client-Id": String(clientId),
   });
 }
+
+
+const NATIVE_DICTATION_ACTIONS = new Set(["start", "stop", "toggle"]);
+
+export function buildNativeDictationControlRequest({
+  baseUrl = "http://127.0.0.1:3902",
+  action = "toggle",
+  allowRemote = false,
+} = {}) {
+  if (!NATIVE_DICTATION_ACTIONS.has(String(action))) {
+    throw new Error("unsupported native dictation action");
+  }
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return Object.freeze({
+    method: "POST",
+    url: new URL(`/v1/dictation/${String(action)}`, base).toString(),
+  });
+}
+
+export function buildJsonRpcRequest({
+  baseUrl = "http://127.0.0.1:3902",
+  id = 1,
+  method = "dictation.toggle",
+  params = {},
+  allowRemote = false,
+} = {}) {
+  const allowedMethods = new Set([
+    "dictation.start",
+    "dictation.stop",
+    "dictation.toggle",
+  ]);
+  if (!allowedMethods.has(String(method))) {
+    throw new Error("unsupported local JSON-RPC method");
+  }
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return Object.freeze({
+    method: "POST",
+    url: new URL("/rpc", base).toString(),
+    json: Object.freeze({
+      jsonrpc: "2.0",
+      id,
+      method: String(method),
+      params: Object.freeze({ ...params }),
+    }),
+  });
+}
