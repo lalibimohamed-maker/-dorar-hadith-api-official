@@ -56,6 +56,8 @@ jobs:
           mkdir -p optional-voice-release-assets
           cp config/voice-model-acquisition-manifest-2026.json optional-voice-release-assets/manifest.json
           cp config/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json
+          cp config/model-license-evidence-f5-tts-v1-base.json optional-voice-release-assets/model-license-evidence-f5-tts-v1-base.json
+          cp config/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json
 
       - name: Acquire F5-TTS v1 base
         if: ${{ inputs.include_f5tts == 'true' }}
@@ -128,7 +130,7 @@ jobs:
           manifest=json.loads(Path("optional-voice-release-assets/manifest.json").read_text())
           records=[]
           if Path("optional-voice-release-assets/F5TTS_v1_Base.tar.bz2").exists():
-              records.append({"id":"f5-tts-v1-base","status":"payload-acquired","license":"CC-BY-NC-4.0"})
+              records.append({"id":"f5-tts-v1-base","status":"payload-acquired-runtime-pending","license":"CC-BY-NC-4.0","usageRestriction":"non-commercial-only"})
           if Path("optional-voice-release-assets/piper-en-us-libritts-high.tar.bz2").exists():
               records.append({"id":"piper-en-us-libritts-high","status":"payload-acquired","license":"CC-BY-4.0","attribution":"LibriTTS"})
           if Path("optional-voice-release-assets/pyannote-speaker-diarization-3.1").exists():
@@ -137,7 +139,7 @@ jobs:
           Path("optional-voice-release-assets/acquisition-record.json").write_text(json.dumps(records,ensure_ascii=False,indent=2)+"\n")
           PY
           cd optional-voice-release-assets
-          sha256sum *.tar.bz2 acquisition-record.json manifest.json model-license-evidence-qwen3-forced-aligner-0.6b.json piper-runtime-verification.json 2>/dev/null | sort > SHA256SUMS.txt
+          sha256sum *.tar.bz2 acquisition-record.json manifest.json model-license-evidence-qwen3-forced-aligner-0.6b.json model-license-evidence-f5-tts-v1-base.json model-license-evidence-piper-en-us-libritts-high.json piper-runtime-verification.json 2>/dev/null | sort > SHA256SUMS.txt
           test -s SHA256SUMS.txt
 
       - name: Publish Release
@@ -149,4 +151,4 @@ jobs:
           set -euo pipefail
           test ! -d optional-voice-release-assets/pyannote-speaker-diarization-3.1
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Optional voice weights. Payloads are checksum-recorded and runtime-verified where implemented. Model-specific licenses are preserved."
-          gh release upload "$TAG" optional-voice-release-assets/*.tar.bz2 optional-voice-release-assets/acquisition-record.json optional-voice-release-assets/piper-runtime-verification.json optional-voice-release-assets/manifest.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
+          gh release upload "$TAG" optional-voice-release-assets/*.tar.bz2 optional-voice-release-assets/acquisition-record.json optional-voice-release-assets/piper-runtime-verification.json optional-voice-release-assets/manifest.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/model-license-evidence-f5-tts-v1-base.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
