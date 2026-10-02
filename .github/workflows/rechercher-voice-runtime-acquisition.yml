@@ -1,0 +1,74 @@
+name: Rechercher — Voice Runtime acquisition
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag to create
+        required: true
+        default: rechercher-voice-runtime-2026-10
+      dry_run:
+        description: Verify sources and manifests without publishing binaries
+        required: true
+        default: "true"
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rechercher-voice-runtime-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install acquisition tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl jq python3 tar bzip2
+
+      - name: Prepare
+        run: |
+          set -euo pipefail
+          mkdir -p voice-release-assets
+          cp config/voice-model-acquisition-manifest-2026.json voice-release-assets/manifest.json
+
+      - name: Acquire fixed verified targets
+        run: |
+          set -euo pipefail
+          cd voice-release-assets
+          curl -fL --retry 5 --retry-all-errors -o silero_vad.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
+          curl -fL --retry 5 --retry-all-errors -o sherpa-whisper-tiny.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-tiny.tar.bz2
+          sha256sum * > SHA256SUMS.txt
+
+      - name: Validate real payloads
+        run: |
+          set -euo pipefail
+          test -s voice-release-assets/silero_vad.onnx
+          test -s voice-release-assets/sherpa-whisper-tiny.tar.bz2
+          test -s voice-release-assets/SHA256SUMS.txt
+          python3 - <<'PY'
+          import json
+          p=json.load(open("voice-release-assets/manifest.json"))
+          assert p["policy"]["noGitLFS"] is True
+          assert p["policy"]["checksumRequired"] is True
+          assert p["policy"]["runtimeVerificationAfterDownload"] is True
+          print("targets:", len(p["targets"]))
+          PY
+
+      - name: Publish Release
+        if: ${{ inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" voice-release-assets/* --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice runtime acquisition. Payloads include SHA-256 evidence; model rights remain per-asset."
