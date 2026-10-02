@@ -1,0 +1,14 @@
+{
+  "schema":"dinullah.mobile-runtime-bridge.v1",
+  "purpose":"Platform-neutral contract between native microphone/audio lifecycle and the local Al-Huda voice runtime.",
+  "assistant":"Al-Huda",
+  "wakeWord":"الهُدَى",
+  "platforms":{
+    "ios":{"appIntents":true,"appShortcuts":true,"vocalShortcuts":true,"nativeRuntimeProofRequired":true},
+    "android":{"voiceInteractionService":true,"voiceInteractionSessionService":true,"userSelectedAssistant":true,"hotwording":true,"nativeRuntimeProofRequired":true},
+    "web":{"wasmRuntime":true,"browserMicrophone":true,"runtimeProofRequired":true}
+  },
+  "bridgeStates":["idle","permission-request","ready","listening","wake-detected","transcribing","reasoning","speaking","interrupted","stopped","error"],
+  "events":["permissionChanged","audioStarted","audioFrame","wakeDetected","speechStarted","speechEnded","transcriptReady","answerReady","ttsStarted","bargeIn","stopped","error"],
+  "privacy":{"rawAudioRetentionDefault":false,"localFirst":true,"serverRecognitionOptIn":true}
+}
