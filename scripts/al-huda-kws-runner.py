@@ -34,9 +34,16 @@ def main():
         try:
             req=json.loads(line); audio,_=sf.read(req["audio"],dtype="float32")
             sess=ort.InferenceSession(req["model"],providers=["CPUExecutionProvider"])
-            inp=sess.get_inputs()[0].name; out=sess.run(None,{inp:features(audio)})[1]
-            prob=float(out[0][1] if out.ndim==2 else out.reshape(-1)[-1])
-            print(json.dumps({"ok":True,"wakeWord":"الهُدَى","detected":prob>=req.get("threshold",.8),"probability":prob},ensure_ascii=False),flush=True)
+            inp=sess.get_inputs()[0].name
+            outputs=sess.run(None,{inp:features(audio)})
+            label=int(np.asarray(outputs[0]).reshape(-1)[0])
+            raw=outputs[1]
+            if isinstance(raw,list) and raw and isinstance(raw[0],dict):
+                prob=float(raw[0].get(1, raw[0].get("1", 0.0)))
+            else:
+                arr=np.asarray(raw)
+                prob=float(arr.reshape(-1)[1] if arr.size>1 else arr.reshape(-1)[0])
+            print(json.dumps({"ok":True,"wakeWord":"الهُدَى","label":label,"detected":prob>=req.get("threshold",.8),"probability":prob},ensure_ascii=False),flush=True)
         except Exception as exc:
             print(json.dumps({"ok":False,"error":str(exc)},ensure_ascii=False),flush=True)
 if __name__=="__main__": main()
