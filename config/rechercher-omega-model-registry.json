@@ -161,6 +161,71 @@
       "release_tag": "rechercher-omega-cosyvoice2-0.5b-v1.0.0"
     },
     {
+      "id": "spark-x2.5-4b",
+      "family": "auxiliary-reasoning",
+      "tasks": [
+        "reasoning",
+        "long_context",
+        "tool_use",
+        "multilingual_reasoning"
+      ],
+      "source": "https://github.com/XHToken/Spark-X2.5",
+      "source_model_id": "XHToken/Spark-X2.5-4B",
+      "source_revision": "448e61eb392c00f2c403185c5b56d5e0665bfaab",
+      "status": "auxiliary_candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "acquisition_class": "github_release",
+      "release_tag": "rechercher-omega-spark-x25-4b-v1.0.0",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "role": "auxiliary_reasoning_model",
+      "omega_stage": "reasoning",
+      "primary_model": false,
+      "replaces_omega": false,
+      "omega_supports": true,
+      "runtime_options": [
+        "ollama",
+        "llama.cpp",
+        "vllm",
+        "sglang",
+        "mlx"
+      ],
+      "notes": "Optional support engine for Ω AI; never replaces the project's core AI weights."
+    },
+    {
+      "id": "spark-x2.5-1.7b",
+      "family": "auxiliary-reasoning",
+      "tasks": [
+        "reasoning",
+        "long_context",
+        "tool_use",
+        "multilingual_reasoning",
+        "on_device_reasoning"
+      ],
+      "source": "https://github.com/XHToken/Spark-X2.5",
+      "source_model_id": "XHToken/Spark-X2.5-1.7B",
+      "source_revision": "448e61eb392c00f2c403185c5b56d5e0665bfaab",
+      "status": "auxiliary_candidate",
+      "license_review": "verified",
+      "license_status": "verified_source_license",
+      "acquisition_class": "github_release",
+      "release_tag": "rechercher-omega-spark-x25-1.7b-v1.0.0",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "role": "auxiliary_reasoning_model",
+      "omega_stage": "reasoning",
+      "primary_model": false,
+      "replaces_omega": false,
+      "omega_supports": true,
+      "runtime_options": [
+        "ollama",
+        "llama.cpp",
+        "vllm",
+        "sglang",
+        "mlx"
+      ],
+      "notes": "Optional lightweight support engine for Ω AI; never replaces the project's core AI weights."
+    },
+    {
       "id": "sglang",
       "family": "inference-runtime",
       "tasks": [
