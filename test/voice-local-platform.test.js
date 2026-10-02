@@ -15,6 +15,8 @@ import {
   buildSpeechDiscoveryEndpoint,
   buildVoiceStudioInputAudioEndMessage,
   buildVoiceStudioMcpHeaders,
+  buildNativeDictationControlRequest,
+  buildJsonRpcRequest,
 } from '../src/voice-local-platform.js';
 
 test('voice platform defaults to loopback and OpenAI-compatible routes', () => {
@@ -96,5 +98,37 @@ test('transcription request preserves documented response and word timestamp opt
   assert.throws(
     () => buildTranscriptionRequest({ audioFile: '/tmp/q.webm', responseFormat: 'mp3' }),
     /invalid transcription response format/
+  );
+});
+
+test('native dictation HTTP and JSON-RPC controls are strictly allow-listed', () => {
+  assert.equal(
+    buildNativeDictationControlRequest({ action: 'toggle' }).url,
+    'http://127.0.0.1:3902/v1/dictation/toggle'
+  );
+  assert.equal(
+    buildNativeDictationControlRequest({ action: 'start' }).url,
+    'http://127.0.0.1:3902/v1/dictation/start'
+  );
+  assert.throws(
+    () => buildNativeDictationControlRequest({ action: 'reset-mic' }),
+    /unsupported native dictation action/
+  );
+
+  const rpc = buildJsonRpcRequest({
+    id: 7,
+    method: 'dictation.toggle',
+    params: { source: 'al-huda' },
+  });
+  assert.equal(rpc.url, 'http://127.0.0.1:3902/rpc');
+  assert.deepEqual(rpc.json, {
+    jsonrpc: '2.0',
+    id: 7,
+    method: 'dictation.toggle',
+    params: { source: 'al-huda' },
+  });
+  assert.throws(
+    () => buildJsonRpcRequest({ method: 'system.exec' }),
+    /unsupported local JSON-RPC method/
   );
 });
