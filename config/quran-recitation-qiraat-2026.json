@@ -1,0 +1,51 @@
+{
+  "schema": "dinullah.quran-recitation-qiraat.v1",
+  "policy": {
+    "recitationIsSeparateFromTts": true,
+    "tenQiraatAreCanonicalSelectionSet": true,
+    "reciterMustBeMappedToVerifiedRiwayah": true,
+    "doNotClaimAvailabilityFromLabels": true,
+    "availabilityStates": [
+      "catalogued",
+      "source-verified",
+      "acquired",
+      "runtime-verified",
+      "mapped-to-riwayah",
+      "playable"
+    ]
+  },
+  "qiraat": [
+    {"id":"nafi","nameAr":"نافع المدني","nameEn":"Nafi' al-Madani","riwayat":["qalun","warsh"]},
+    {"id":"ibn-kathir","nameAr":"ابن كثير المكي","nameEn":"Ibn Kathir al-Makki","riwayat":["al-bazzi","qunbul"]},
+    {"id":"abu-amr","nameAr":"أبو عمرو البصري","nameEn":"Abu Amr al-Basri","riwayat":["al-duri-abu-amr","al-susi"]},
+    {"id":"ibn-amir","nameAr":"ابن عامر الشامي","nameEn":"Ibn Amir al-Shami","riwayat":["hisham","ibn-dhakwan"]},
+    {"id":"asim","nameAr":"عاصم الكوفي","nameEn":"Asim al-Kufi","riwayat":["hafs","shuba"]},
+    {"id":"hamza","nameAr":"حمزة الكوفي","nameEn":"Hamza al-Kufi","riwayat":["khalaf-hamza","khallad"]},
+    {"id":"al-kisai","nameAr":"الكسائي الكوفي","nameEn":"Al-Kisa'i al-Kufi","riwayat":["abu-al-harith","al-duri-kisai"]},
+    {"id":"abu-jafar","nameAr":"أبو جعفر المدني","nameEn":"Abu Ja'far al-Madani","riwayat":["ibn-wardan","ibn-jammaz"]},
+    {"id":"yaqub","nameAr":"يعقوب الحضرمي","nameEn":"Ya'qub al-Hadrami","riwayat":["ruways","rawh"]},
+    {"id":"khalaf","nameAr":"خلف العاشر","nameEn":"Khalaf al-'Ashir","riwayat":["ishaq","idris"]}
+  ],
+  "riwayat": {
+    "qalun":{"nameAr":"قالون","qiraah":"nafi"},
+    "warsh":{"nameAr":"ورش","qiraah":"nafi"},
+    "al-bazzi":{"nameAr":"البزي","qiraah":"ibn-kathir"},
+    "qunbul":{"nameAr":"قنبل","qiraah":"ibn-kathir"},
+    "al-duri-abu-amr":{"nameAr":"الدوري عن أبي عمرو","qiraah":"abu-amr"},
+    "al-susi":{"nameAr":"السوسي","qiraah":"abu-amr"},
+    "hisham":{"nameAr":"هشام","qiraah":"ibn-amir"},
+    "ibn-dhakwan":{"nameAr":"ابن ذكوان","qiraah":"ibn-amir"},
+    "hafs":{"nameAr":"حفص","qiraah":"asim"},
+    "shuba":{"nameAr":"شعبة","qiraah":"asim"},
+    "khalaf-hamza":{"nameAr":"خلف عن حمزة","qiraah":"hamza"},
+    "khallad":{"nameAr":"خلاد","qiraah":"hamza"},
+    "abu-al-harith":{"nameAr":"أبو الحارث","qiraah":"al-kisai"},
+    "al-duri-kisai":{"nameAr":"الدوري عن الكسائي","qiraah":"al-kisai"},
+    "ibn-wardan":{"nameAr":"ابن وردان","qiraah":"abu-jafar"},
+    "ibn-jammaz":{"nameAr":"ابن جماز","qiraah":"abu-jafar"},
+    "ruways":{"nameAr":"رويس","qiraah":"yaqub"},
+    "rawh":{"nameAr":"روح","qiraah":"yaqub"},
+    "ishaq":{"nameAr":"إسحاق","qiraah":"khalaf"},
+    "idris":{"nameAr":"إدريس","qiraah":"khalaf"}
+  }
+}
