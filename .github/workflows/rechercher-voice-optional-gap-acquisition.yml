@@ -1,4 +1,5 @@
-name: Rechercher — optional voice weights gap acquisition
+name: Rechercher — optional voice license audit
+
 on:
   schedule:
     - cron: "57 * * * *"
@@ -8,177 +9,41 @@ on:
       - main
     paths:
       - .github/workflows/rechercher-voice-optional-gap-acquisition.yml
+      - config/model-license-evidence-f5-tts-v1-base.json
+      - config/model-license-evidence-piper-en-us-libritts-high.json
       - config/voice-model-acquisition-manifest-2026.json
+
 permissions:
-  # SECURITY-JUSTIFICATION: contents: write is required to automatically publish verified optional binary assets to GitHub Releases. Repository checkout is code-only; binary assets are not persisted in the repository.
-  contents: write
+  contents: read
+
 concurrency:
-  group: rechercher-optional-voice-acquisition
-  cancel-in-progress: true
+  group: rechercher-optional-voice-license-audit
+  cancel-in-progress: false
+
 jobs:
-  acquire:
+  audit:
     runs-on: ubuntu-24.04
-    timeout-minutes: 240
+    timeout-minutes: 20
     steps:
-      - name: Inspect existing Release and missing assets
-        id: release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: rechercher-voice-optional-2026-10
-        run: |
-          set -euo pipefail
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets > /tmp/release.json 2>/dev/null; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            f5_missing=$(jq -r '[.assets[].name] | index("F5TTS_v1_Base.tar.bz2") | not' /tmp/release.json)
-            piper_missing=$(jq -r '[.assets[].name] | index("piper-en-us-libritts-high.tar.bz2") | not' /tmp/release.json)
-            echo "f5_missing=$f5_missing" >> "$GITHUB_OUTPUT"
-            echo "piper_missing=$piper_missing" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "f5_missing=true" >> "$GITHUB_OUTPUT"
-            echo "piper_missing=true" >> "$GITHUB_OUTPUT"
-          fi
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
 
-      - name: Install tools
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y curl jq python3 python3-pip tar bzip2
-          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
-
-      - name: Prepare
-        run: |
-          set -euo pipefail
-          rm -rf optional-voice-release-assets
-          mkdir -p optional-voice-release-assets
-          cp config/voice-model-acquisition-manifest-2026.json optional-voice-release-assets/manifest.json
-          cp config/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json
-          cp config/model-license-evidence-f5-tts-v1-base.json optional-voice-release-assets/model-license-evidence-f5-tts-v1-base.json
-          cp config/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json
-
-      - name: Acquire F5-TTS v1 base
-        if: ${{ steps.release.outputs.f5_missing == 'true' }}
-        env:
-          HF_HUB_DISABLE_TELEMETRY: "1"
-        run: |
-          set -euo pipefail
-          hf download SWivid/F5-TTS --include 'F5TTS_v1_Base/model_1250000.safetensors' --include 'F5TTS_v1_Base/vocab.txt' --local-dir optional-voice-release-assets/F5TTS_v1_Base
-          test -s optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/model_1250000.safetensors
-          test -s optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/vocab.txt
-
-      - name: Verify F5-TTS payload and local inference
-        if: ${{ steps.release.outputs.f5_missing == 'true' }}
-        env:
-          HF_HUB_DISABLE_TELEMETRY: "1"
-        run: |
-          set -euo pipefail
-          test "$(stat -c%s optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/model_1250000.safetensors)" -gt 1000000000
-          python3 -m pip install --disable-pip-version-check --no-cache-dir f5-tts
-          python3 - <<'PY'
-          import importlib.util, pathlib
-          root=pathlib.Path("optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base")
-          assert (root/"model_1250000.safetensors").stat().st_size > 1_000_000_000
-          assert (root/"vocab.txt").stat().st_size > 0
-          assert importlib.util.find_spec("f5_tts") is not None
-          PY
-          rm -rf optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/.cache
-          tar -cjf optional-voice-release-assets/F5TTS_v1_Base.tar.bz2 -C optional-voice-release-assets/F5TTS_v1_Base F5TTS_v1_Base
-          rm -rf optional-voice-release-assets/F5TTS_v1_Base
-          python3 - <<'PY'
-          import json
-          json.dump({"id":"f5-tts-v1-base","runtime":"package-load-ready","checkpoint":"model_1250000.safetensors","vocab":"vocab.txt","inference":"not-run-on-branch-run","reason":"requires reference audio fixture and full synthesis runtime"},open("optional-voice-release-assets/f5-runtime-verification.json","w"),indent=2)
-          PY
-
-      - name: Acquire Piper en_US LibriTTS High
-        if: ${{ steps.release.outputs.piper_missing == 'true' }}
-        env:
-          HF_HUB_DISABLE_TELEMETRY: "1"
-        run: |
-          set -euo pipefail
-          hf download rhasspy/piper-voices --repo-type model --include 'en/en_US/libritts/high/en_US-libritts-high.onnx' --include 'en/en_US/libritts/high/en_US-libritts-high.onnx.json' --include 'en/en_US/libritts/high/MODEL_CARD' --local-dir optional-voice-release-assets/piper-voices
-          test -s optional-voice-release-assets/piper-voices/en/en_US/libritts/high/en_US-libritts-high.onnx
-          test -s optional-voice-release-assets/piper-voices/en/en_US/libritts/high/en_US-libritts-high.onnx.json
-          tar -cjf optional-voice-release-assets/piper-en-us-libritts-high.tar.bz2 -C optional-voice-release-assets/piper-voices en/en_US/libritts/high
-          rm -rf optional-voice-release-assets/piper-voices
-
-      - name: Verify Piper runtime
-        if: ${{ steps.release.outputs.piper_missing == 'true' }}
-        run: |
-          set -euo pipefail
-          python3 -m pip install --disable-pip-version-check --no-cache-dir piper-tts
-          mkdir -p optional-voice-release-assets/piper-runtime
-          tar -xjf optional-voice-release-assets/piper-en-us-libritts-high.tar.bz2 -C optional-voice-release-assets/piper-runtime
-          python3 -m piper -m optional-voice-release-assets/piper-runtime/en/en_US/libritts/high/en_US-libritts-high.onnx -f optional-voice-release-assets/piper-smoke.wav -- 'This is an Al-Huda voice runtime smoke test.'
-          test -s optional-voice-release-assets/piper-smoke.wav
-          python3 - <<'PY'
-          import wave, json
-          p="optional-voice-release-assets/piper-smoke.wav"
-          with wave.open(p,"rb") as w:
-              assert w.getnframes()>0 and w.getframerate()==22050
-          json.dump({"id":"piper-en-us-libritts-high","runtime":"verified","sampleRate":22050,"nonEmptyAudio":True},open("optional-voice-release-assets/piper-runtime-verification.json","w"),indent=2)
-          PY
-          rm -rf optional-voice-release-assets/piper-runtime
-          rm -f optional-voice-release-assets/piper-smoke.wav
-
-      - name: Acquire gated pyannote diarization 3.1
-        if: ${{ false }}
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HF_HUB_DISABLE_TELEMETRY: "1"
-        run: |
-          set -euo pipefail
-          test -n "${HF_TOKEN}" || { echo "HF_TOKEN is required for gated pyannote acquisition"; exit 2; }
-          hf download pyannote/speaker-diarization-3.1 --token "${HF_TOKEN}" --local-dir optional-voice-release-assets/pyannote-speaker-diarization-3.1
-          test -s optional-voice-release-assets/pyannote-speaker-diarization-3.1/config.yaml
-          echo "Gated pyannote payload acquired; publication remains blocked pending model-specific redistribution review."
-
-      - name: Create metadata and checksums
+      - name: Audit optional voice licensing
         run: |
           set -euo pipefail
           python3 - <<'PY'
           import json
           from pathlib import Path
-          manifest=json.loads(Path("optional-voice-release-assets/manifest.json").read_text())
-          records=[]
-          if Path("optional-voice-release-assets/F5TTS_v1_Base.tar.bz2").exists():
-              records.append({"id":"f5-tts-v1-base","status":"payload-acquired-runtime-pending","license":"CC-BY-NC-4.0","usageRestriction":"non-commercial-only"})
-          if Path("optional-voice-release-assets/piper-en-us-libritts-high.tar.bz2").exists():
-              records.append({"id":"piper-en-us-libritts-high","status":"payload-acquired","license":"CC-BY-4.0","attribution":"LibriTTS"})
-          if Path("optional-voice-release-assets/pyannote-speaker-diarization-3.1").exists():
-              records.append({"id":"pyannote-speaker-diarization-3.1","status":"gated-payload-acquired","publication":"blocked"})
-          if not records and Path("/tmp/release.json").exists():
-              records=[{"status":"no-new-assets","reason":"requested optional assets already exist in Release"}]
-          elif not records:
-              raise SystemExit("no optional voice payload was acquired")
-          Path("optional-voice-release-assets/acquisition-record.json").write_text(json.dumps(records,ensure_ascii=False,indent=2)+"\n")
+          for p in [
+              Path("config/model-license-evidence-f5-tts-v1-base.json"),
+              Path("config/model-license-evidence-piper-en-us-libritts-high.json"),
+          ]:
+              data=json.loads(p.read_text())
+              text=json.dumps(data,ensure_ascii=False).lower()
+              assert data, p
+              print(p, "license evidence loaded")
+              print("  automatic_release=false")
+          print("Optional F5-TTS/Piper weights remain audit-only until model/voice redistribution evidence is separately cleared.")
           PY
-          cd optional-voice-release-assets
-          files=(acquisition-record.json manifest.json model-license-evidence-qwen3-forced-aligner-0.6b.json model-license-evidence-f5-tts-v1-base.json model-license-evidence-piper-en-us-libritts-high.json)
-          for f in *.tar.bz2 f5-runtime-verification.json piper-runtime-verification.json; do [ -f "$f" ] && files+=("$f"); done
-          sha256sum "${files[@]}" | sort > SHA256SUMS.txt
-          test -s SHA256SUMS.txt
-
-      - name: Publish Release
-        if: ${{ true }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: rechercher-voice-optional-2026-10
-        run: |
-          set -euo pipefail
-          test ! -d optional-voice-release-assets/pyannote-speaker-diarization-3.1
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            for asset in optional-voice-release-assets/*.tar.bz2 optional-voice-release-assets/acquisition-record.json optional-voice-release-assets/f5-runtime-verification.json optional-voice-release-assets/piper-runtime-verification.json optional-voice-release-assets/manifest.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/model-license-evidence-f5-tts-v1-base.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/SHA256SUMS.txt; do
-              [ -f "$asset" ] || continue
-              name=$(basename "$asset")
-              if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets | jq -e --arg n "$name" '.assets[] | select(.name==$n)' >/dev/null; then
-                gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
-              fi
-            done
-          else
-            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Optional voice weights. Payloads are checksum-recorded; runtime status is recorded separately. Model-specific licenses are preserved."
-            gh release upload "$TAG" optional-voice-release-assets/*.tar.bz2 optional-voice-release-assets/acquisition-record.json optional-voice-release-assets/piper-runtime-verification.json optional-voice-release-assets/manifest.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/model-license-evidence-f5-tts-v1-base.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
-          fi
