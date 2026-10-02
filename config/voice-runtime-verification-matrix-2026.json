@@ -12,7 +12,11 @@
     "qwen3-asr-1.7b-sharded-payload-and-local-inference",
     "silero-vad-onnx-load-and-inference",
     "qwen3-asr-local-node-provider-contract",
-    "quran-reciter-qiraah-riwayah-evidence-gate"
+    "quran-reciter-qiraah-riwayah-evidence-gate",
+    "mobile-runtime-bridge-state-contract",
+    "model-lifecycle-manager-state-contract",
+    "audio-runtime-endpointing-barge-in-contract",
+    "platform-voice-lifecycle-contract"
   ],
   "requiresWorkflowExecution": [
     "qwen3-asr-0.6b-real-run-evidence",
@@ -20,7 +24,15 @@
     "silero-vad-real-run-evidence",
     "qwen3-asr-vad-question-path-e2e",
     "qwen3-arabic-multilingual-benchmark",
-    "quran-recitation-live-audio-playback"
+    "quran-recitation-live-audio-playback",
+    "mobile-native-ios-runtime-evidence",
+    "mobile-native-android-runtime-evidence",
+    "audio-front-end-device-evidence",
+    "endpointing-device-evidence",
+    "barge-in-device-evidence",
+    "speaker-recognition-enrollment-e2e",
+    "speaker-diarization-multi-speaker-e2e",
+    "audio-event-detection-runtime-e2e"
   ],
   "remainingBuildOrPlatformGaps": [
     "al-huda-arabic-wake-word-training-and-inference",
@@ -33,7 +45,12 @@
     "real-engine-to-engine-dialogue-e2e",
     "dialogue-copy-export-e2e",
     "ios-native-vocal-shortcut-runtime",
-    "android-user-selected-assistant-runtime"
+    "android-user-selected-assistant-runtime",
+    "audio-front-end-device-evidence",
+    "endpointing-device-evidence",
+    "barge-in-device-evidence",
+    "battery-thermal-device-governor-evidence",
+    "webassembly-runtime-browser-evidence"
   ],
   "notes": {
     "harmonySpeechEngine": "removed from voice serving architecture; Huawei HarmonyOS remains a separate platform target under apps/harmony",
