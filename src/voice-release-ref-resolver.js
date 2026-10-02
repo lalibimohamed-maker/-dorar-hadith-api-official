@@ -21,6 +21,13 @@ const RELEASES = Object.freeze({
     }),
 
   }),
+  "al-huda-kws-2026-10": Object.freeze({
+    "al-huda-kws": Object.freeze({
+      assets:["al-huda-kws.onnx"],
+      digests:["sha256:878850ba14f929ce0030bf8dfebf60d85e77be24d8066a1f67df7b00836a1062"],
+      runtimeVerified:true,
+    }),
+  }),
   "rechercher-voice-gap-2026-10": Object.freeze({
     "qwen3-forced-aligner-0.6b": Object.freeze({
       assets:["Qwen3-ForcedAligner-0.6B.tar.bz2"],
