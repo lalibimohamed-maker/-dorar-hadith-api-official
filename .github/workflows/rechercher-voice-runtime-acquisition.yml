@@ -7,6 +7,15 @@ on:
         description: Release tag to create
         required: true
         default: rechercher-voice-runtime-2026-10
+      model:
+        description: Qwen3-ASR model to acquire
+        required: true
+        default: both
+        type: choice
+        options:
+          - 0.6b
+          - 1.7b
+          - both
       dry_run:
         description: Verify sources and manifests without publishing binaries
         required: true
@@ -14,7 +23,7 @@ on:
         type: boolean
 
 permissions:
-  # SECURITY-JUSTIFICATION: contents: write is required only when workflow_dispatch sets dry_run=false; gh release create publishes the verified, checksum-recorded acquisition payloads as GitHub Release assets. Checkout uses persist-credentials:false and the token is exposed only to the publish step.
+  # SECURITY-JUSTIFICATION: contents: write is required only when workflow_dispatch sets dry_run=false; gh release create publishes verified checksum-recorded acquisition payloads as Release assets. Checkout uses persist-credentials:false.
   contents: write
 
 concurrency:
@@ -24,7 +33,7 @@ concurrency:
 jobs:
   acquire:
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 240
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -34,7 +43,8 @@ jobs:
       - name: Install acquisition tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl jq python3 tar bzip2
+          sudo apt-get install -y curl jq python3 python3-pip tar bzip2
+          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
 
       - name: Prepare
         run: |
@@ -42,27 +52,67 @@ jobs:
           mkdir -p voice-release-assets
           cp config/voice-model-acquisition-manifest-2026.json voice-release-assets/manifest.json
 
-      - name: Acquire fixed verified targets
+      - name: Acquire fixed runtime targets
         run: |
           set -euo pipefail
           cd voice-release-assets
           curl -fL --retry 5 --retry-all-errors -o silero_vad.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
-          curl -fL --retry 5 --retry-all-errors -o sherpa-whisper-tiny.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-tiny.tar.bz2
-          sha256sum * > SHA256SUMS.txt
 
-      - name: Validate real payloads
+      - name: Acquire Qwen3-ASR 0.6B
+        if: ${{ inputs.model == '0.6b' || inputs.model == 'both' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download Qwen/Qwen3-ASR-0.6B --local-dir voice-release-assets/Qwen3-ASR-0.6B
+          test -s voice-release-assets/Qwen3-ASR-0.6B/config.json
+          test -s voice-release-assets/Qwen3-ASR-0.6B/model.safetensors
+
+      - name: Acquire Qwen3-ASR 1.7B
+        if: ${{ inputs.model == '1.7b' || inputs.model == 'both' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download Qwen/Qwen3-ASR-1.7B --local-dir voice-release-assets/Qwen3-ASR-1.7B
+          test -s voice-release-assets/Qwen3-ASR-1.7B/config.json
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model.safetensors
+
+      - name: Validate real payloads and provenance
         run: |
           set -euo pipefail
           test -s voice-release-assets/silero_vad.onnx
-          test -s voice-release-assets/sherpa-whisper-tiny.tar.bz2
-          test -s voice-release-assets/SHA256SUMS.txt
           python3 - <<'PY'
           import json
           p=json.load(open("voice-release-assets/manifest.json"))
           assert p["policy"]["noGitLFS"] is True
           assert p["policy"]["checksumRequired"] is True
           assert p["policy"]["runtimeVerificationAfterDownload"] is True
-          print("targets:", len(p["targets"]))
+          ids={x["id"] for x in p["targets"]}
+          for target in ("qwen3-asr-0.6b","qwen3-asr-1.7b"):
+              assert target in ids
+          print("manifest targets:", len(p["targets"]))
+          PY
+          find voice-release-assets -type f -not -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > voice-release-assets/SHA256SUMS.txt
+          test -s voice-release-assets/SHA256SUMS.txt
+
+      - name: Runtime smoke verification
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          selected="${{ inputs.model }}"
+          roots=[]
+          if selected in ("0.6b","both"):
+              roots.append(Path("voice-release-assets/Qwen3-ASR-0.6B"))
+          if selected in ("1.7b","both"):
+              roots.append(Path("voice-release-assets/Qwen3-ASR-1.7B"))
+          for root in roots:
+              for name in ("config.json","model.safetensors"):
+                  path=root/name
+                  if not path.is_file() or path.stat().st_size == 0:
+                      raise SystemExit(f"missing payload file: {path}")
+          print("Qwen3-ASR payload structure verified; full inference remains a separate runtime gate.")
           PY
 
       - name: Publish Release
@@ -72,4 +122,13 @@ jobs:
           TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
-          gh release create "$TAG" voice-release-assets/* --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice runtime acquisition. Payloads include SHA-256 evidence; model rights remain per-asset."
+          if [ "${{ inputs.model }}" = "0.6b" ] || [ "${{ inputs.model }}" = "both" ]; then
+            tar -cjf voice-release-assets/Qwen3-ASR-0.6B.tar.bz2 -C voice-release-assets Qwen3-ASR-0.6B
+          fi
+          if [ "${{ inputs.model }}" = "1.7b" ] || [ "${{ inputs.model }}" = "both" ]; then
+            tar -cjf voice-release-assets/Qwen3-ASR-1.7B.tar.bz2 -C voice-release-assets Qwen3-ASR-1.7B
+          fi
+          find voice-release-assets -maxdepth 1 -type f -print0 | xargs -0 gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Rechercher voice runtime acquisition. Qwen3-ASR payloads are acquired without Git LFS; SHA-256 evidence is included. Full inference verification remains gated."
+          for asset in voice-release-assets/*.tar.bz2; do
+            gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+          done
