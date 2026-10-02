@@ -1,0 +1,144 @@
+name: Rechercher — optional voice weights gap acquisition
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag
+        required: true
+        default: rechercher-voice-optional-2026-10
+      include_f5tts:
+        description: Acquire F5-TTS v1 base weights
+        required: true
+        default: "true"
+        type: boolean
+      include_piper_en:
+        description: Acquire Piper en_US LibriTTS High voice
+        required: true
+        default: "true"
+        type: boolean
+      include_pyannote:
+        description: Acquire gated pyannote speaker diarization 3.1
+        required: true
+        default: "false"
+        type: boolean
+      dry_run:
+        description: Verify and package without publishing
+        required: true
+        default: "false"
+        type: boolean
+permissions:
+  # SECURITY-JUSTIFICATION: contents: write is needed only when dry_run=false to publish verified optional voice weights as Release assets. No binary model weights are committed to git.
+  contents: write
+concurrency:
+  group: rechercher-optional-voice-acquisition
+  cancel-in-progress: false
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl jq python3 python3-pip tar bzip2
+          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
+
+      - name: Prepare
+        run: |
+          set -euo pipefail
+          rm -rf optional-voice-release-assets
+          mkdir -p optional-voice-release-assets
+          cp config/voice-model-acquisition-manifest-2026.json optional-voice-release-assets/manifest.json
+          cp config/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json
+
+      - name: Acquire F5-TTS v1 base
+        if: ${{ inputs.include_f5tts == 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download SWivid/F5-TTS --include 'F5TTS_v1_Base/model_1250000.safetensors' --include 'F5TTS_v1_Base/vocab.txt' --local-dir optional-voice-release-assets/F5TTS_v1_Base
+          test -s optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/model_1250000.safetensors
+          test -s optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/vocab.txt
+
+      - name: Verify F5-TTS payload
+        if: ${{ inputs.include_f5tts == 'true' }}
+        run: |
+          set -euo pipefail
+          test "$(stat -c%s optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/model_1250000.safetensors)" -gt 1000000000
+          rm -rf optional-voice-release-assets/F5TTS_v1_Base/F5TTS_v1_Base/.cache
+          tar -cjf optional-voice-release-assets/F5TTS_v1_Base.tar.bz2 -C optional-voice-release-assets/F5TTS_v1_Base F5TTS_v1_Base
+          rm -rf optional-voice-release-assets/F5TTS_v1_Base
+
+      - name: Acquire Piper en_US LibriTTS High
+        if: ${{ inputs.include_piper_en == 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download rhasspy/piper-voices --repo-type model --include 'en/en_US/libritts/high/en_US-libritts-high.onnx' --include 'en/en_US/libritts/high/en_US-libritts-high.onnx.json' --include 'en/en_US/libritts/high/MODEL_CARD' --local-dir optional-voice-release-assets/piper-voices
+          test -s optional-voice-release-assets/piper-voices/en/en_US/libritts/high/en_US-libritts-high.onnx
+          test -s optional-voice-release-assets/piper-voices/en/en_US/libritts/high/en_US-libritts-high.onnx.json
+          tar -cjf optional-voice-release-assets/piper-en-us-libritts-high.tar.bz2 -C optional-voice-release-assets/piper-voices en/en_US/libritts/high
+          rm -rf optional-voice-release-assets/piper-voices
+
+      - name: Verify Piper runtime
+        if: ${{ inputs.include_piper_en == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --no-cache-dir piper-tts
+          mkdir -p optional-voice-release-assets/piper-runtime
+          tar -xjf optional-voice-release-assets/piper-en-us-libritts-high.tar.bz2 -C optional-voice-release-assets/piper-runtime
+          python3 -m piper -m optional-voice-release-assets/piper-runtime/en/en_US/libritts/high/en_US-libritts-high.onnx -f optional-voice-release-assets/piper-smoke.wav -- 'This is an Al-Huda voice runtime smoke test.'
+          test -s optional-voice-release-assets/piper-smoke.wav
+          rm -rf optional-voice-release-assets/piper-runtime
+
+      - name: Acquire gated pyannote diarization 3.1
+        if: ${{ inputs.include_pyannote == 'true' }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          test -n "${HF_TOKEN}" || { echo "HF_TOKEN is required for gated pyannote acquisition"; exit 2; }
+          hf download pyannote/speaker-diarization-3.1 --token "${HF_TOKEN}" --local-dir optional-voice-release-assets/pyannote-speaker-diarization-3.1
+          test -s optional-voice-release-assets/pyannote-speaker-diarization-3.1/config.yaml
+          echo "Gated pyannote payload acquired; publication remains blocked pending model-specific redistribution review."
+
+      - name: Create metadata and checksums
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path("optional-voice-release-assets/manifest.json").read_text())
+          records=[]
+          if Path("optional-voice-release-assets/F5TTS_v1_Base.tar.bz2").exists():
+              records.append({"id":"f5-tts-v1-base","status":"payload-acquired","license":"CC-BY-NC-4.0"})
+          if Path("optional-voice-release-assets/piper-en-us-libritts-high.tar.bz2").exists():
+              records.append({"id":"piper-en-us-libritts-high","status":"payload-acquired","license":"CC-BY-4.0","attribution":"LibriTTS"})
+          if Path("optional-voice-release-assets/pyannote-speaker-diarization-3.1").exists():
+              records.append({"id":"pyannote-speaker-diarization-3.1","status":"gated-payload-acquired","publication":"blocked"})
+          assert records, "no optional voice payload was acquired"
+          Path("optional-voice-release-assets/acquisition-record.json").write_text(json.dumps(records,ensure_ascii=False,indent=2)+"\n")
+          PY
+          cd optional-voice-release-assets
+          sha256sum *.tar.bz2 *.wav acquisition-record.json manifest.json model-license-evidence-qwen3-forced-aligner-0.6b.json 2>/dev/null | sort > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+
+      - name: Publish Release
+        if: ${{ inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          test ! -d optional-voice-release-assets/pyannote-speaker-diarization-3.1
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Optional voice weights. Payloads are checksum-recorded and runtime-verified where implemented. Model-specific licenses are preserved."
+          gh release upload "$TAG" optional-voice-release-assets/*.tar.bz2 optional-voice-release-assets/acquisition-record.json optional-voice-release-assets/manifest.json optional-voice-release-assets/model-license-evidence-qwen3-forced-aligner-0.6b.json optional-voice-release-assets/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
