@@ -14,6 +14,7 @@ on:
         type: boolean
 
 permissions:
+  # SECURITY-JUSTIFICATION: contents: write is required only when workflow_dispatch sets dry_run=false; gh release create publishes the verified, checksum-recorded acquisition payloads as GitHub Release assets. Checkout uses persist-credentials:false and the token is exposed only to the publish step.
   contents: write
 
 concurrency:
