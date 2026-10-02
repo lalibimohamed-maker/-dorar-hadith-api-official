@@ -6,8 +6,12 @@ const CATALOG = Object.freeze({
   "sherpa-onnx-speaker-recognition": { capability: "speaker-id", profile: "speaker", localFirst: true },
   "sherpa-onnx-audio-tagging": { capability: "audio-tagging", profile: "audio", localFirst: true },
   "al-huda-kws": { capability: "wake-word", profile: "al-huda", localFirst: true },
-  "sherpa-onnx": { capability: "tts", profile: "local", localFirst: true },
-  "piper1-gpl": { capability: "tts", profile: "local", localFirst: true }
+  "qwen3-forced-aligner-0.6b": { capability: "forced-alignment", profile: "timestamps", localFirst: true },
+  "piper-en-us-libritts-high": { capability: "tts", profile: "english-fallback", localFirst: true, locale: "en-US" },
+  "piper-ar-jo-kareem-medium": { capability: "tts", profile: "arabic-fallback", localFirst: true, locale: "ar-JO" },
+  "f5-tts-v1-base": { capability: "tts", profile: "research", localFirst: true, usageRestriction: "non-commercial-only" },
+  "sherpa-onnx": { capability: "tts-runtime", profile: "runtime-library", localFirst: true },
+  "piper1-gpl": { capability: "tts-runtime", profile: "runtime-library", localFirst: true }
 });
 
 export function listVoiceEngines() {
