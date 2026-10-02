@@ -1,0 +1,65 @@
+{
+  "schema": "dinullah.voice-evidence-ledger.v1",
+  "checkedAt": "2026-10-02",
+  "identity": {
+    "assistant": "Al-Huda",
+    "arabic": "الهُدَى",
+    "wakeWord": "الهُدَى"
+  },
+  "executionEvidence": [
+    {
+      "capability": "qwen3-asr-0.6b-local-inference",
+      "runId": 36971779956,
+      "workflowRun": 9,
+      "status": "success",
+      "scope": "CPU local model inference",
+      "note": "Qwen inference step passed; overall run later failed at Silero VAD."
+    },
+    {
+      "capability": "qwen3-asr-1.7b-local-inference",
+      "runId": 36971779956,
+      "workflowRun": 9,
+      "status": "success",
+      "scope": "CPU local model inference",
+      "note": "Qwen inference step passed; overall run later failed at Silero VAD."
+    },
+    {
+      "capability": "silero-vad-local-inference",
+      "runId": 36971779956,
+      "workflowRun": 9,
+      "status": "failed",
+      "scope": "CPU ONNX smoke test",
+      "note": "Old test used fixed input shapes; repaired to read model input metadata dynamically."
+    },
+    {
+      "capability": "optional-voice-release-noop",
+      "runId": 36972406771,
+      "workflowRun": 26,
+      "status": "success",
+      "scope": "Existing Release gap-only repair",
+      "note": "No duplicate F5/Piper download was performed."
+    }
+  ],
+  "releases": [
+    {
+      "tag": "rechercher-voice-optional-2026-10",
+      "status": "published",
+      "assets": [
+        "F5TTS_v1_Base.tar.bz2",
+        "piper-en-us-libritts-high.tar.bz2",
+        "piper-runtime-verification.json",
+        "SHA256SUMS.txt"
+      ],
+      "f5RuntimeInferenceVerified": false,
+      "piperRuntimeEvidenceAssetPresent": true
+    }
+  ],
+  "currentGates": {
+    "qwen3-asr-0.6b": "inference-evidence-existing",
+    "qwen3-asr-1.7b": "inference-evidence-existing",
+    "silero-vad": "repair-and-rerun-pending",
+    "al-huda-kws": "training-and-inference-pending",
+    "native-ios": "device-proof-pending",
+    "native-android": "device-proof-pending"
+  }
+}
