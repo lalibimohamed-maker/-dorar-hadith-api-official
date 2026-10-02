@@ -168,40 +168,6 @@ jobs:
           curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/audio-tagging.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/audio-tagging-models/sherpa-onnx-zipformer-audio-tagging-2024-04-09.tar.bz2
           test -s voice-gap-release-assets/audio-tagging.tar.bz2
 
-      - name: Acquire Piper ar_JO Kareem medium
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_piper_ar_jo || github.event_name != 'workflow_dispatch' }}
-        run: |
-          set -euo pipefail
-          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
-          hf download rhasspy/piper-voices ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx.json ar/ar_JO/kareem/medium/MODEL_CARD --local-dir voice-gap-release-assets/piper-ar_JO-kareem-medium
-          test -s voice-gap-release-assets/piper-ar_JO-kareem-medium/ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx
-          test -s voice-gap-release-assets/piper-ar_JO-kareem-medium/ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx.json
-          test -s voice-gap-release-assets/piper-ar_JO-kareem-medium/ar/ar_JO/kareem/medium/MODEL_CARD
-
-      - name: Acquire GTCRN noise suppression
-        if: ${{ steps.gap_release.outputs.gtcrn != 'true' }}
-        run: |
-          set -euo pipefail
-          curl -fL --retry 5 --retry-all-errors \
-            -o voice-gap-release-assets/gtcrn_simple.onnx \
-            https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx
-          test -s voice-gap-release-assets/gtcrn_simple.onnx
-
-      - name: Acquire Nabra Arabic int8
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_nabra || github.event_name != 'workflow_dispatch' }}
-        run: |
-          set -euo pipefail
-          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/nabra-82m-arabic-int8.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/nabra-82m-arabic-int8.tar.bz2
-          test -s voice-gap-release-assets/nabra-82m-arabic-int8.tar.bz2
-
-      - name: Acquire whisper.cpp multilingual ggml-base
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_whisper_multilingual || github.event_name != 'workflow_dispatch' }}
-        run: |
-          set -euo pipefail
-          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
-          hf download ggerganov/whisper.cpp ggml-base.bin --local-dir voice-gap-release-assets/whisper-cpp-multilingual
-          test -s voice-gap-release-assets/whisper-cpp-multilingual/ggml-base.bin
-
       - name: Validate payloads, provenance and size
         if: ${{ steps.gap_release.outputs.forced != 'true' }}
         run: |
