@@ -26,17 +26,28 @@
       "id": "qwen3-asr-0.6b",
       "role": "question-input-asr-and-language-identification",
       "source": "https://huggingface.co/Qwen/Qwen3-ASR-0.6B",
-      "status": "acquire-and-runtime-verify",
+      "status": "acquired-published-runtime-verified",
       "license": "Apache-2.0",
-      "releaseEligible": true
+      "releaseEligible": true,
+      "releaseTag": "rechercher-voice-runtime-2026-10",
+      "releaseAssets": [
+        "Qwen3-ASR-0.6B.tar.bz2"
+      ],
+      "runtimeEvidence": "release-gated"
     },
     {
       "id": "qwen3-asr-1.7b",
       "role": "question-input-asr-and-language-identification-high-quality",
       "source": "https://huggingface.co/Qwen/Qwen3-ASR-1.7B",
-      "status": "acquire-and-runtime-verify",
+      "status": "acquired-published-runtime-verified",
       "license": "Apache-2.0",
-      "releaseEligible": true
+      "releaseEligible": true,
+      "releaseTag": "rechercher-voice-runtime-2026-10",
+      "releaseAssets": [
+        "Qwen3-ASR-1.7B.tar.bz2.part-aa",
+        "Qwen3-ASR-1.7B.tar.bz2.part-ab"
+      ],
+      "runtimeEvidence": "release-gated"
     },
     {
       "id": "qwen3-forced-aligner-0.6b",
@@ -51,8 +62,13 @@
       "id": "sherpa-onnx-vad-silero",
       "role": "voice-activity-detection",
       "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx",
-      "status": "acquire-and-runtime-verify",
-      "releaseEligible": true
+      "status": "acquired-published-runtime-verified",
+      "releaseEligible": true,
+      "releaseTag": "rechercher-voice-runtime-2026-10",
+      "releaseAssets": [
+        "silero_vad.onnx"
+      ],
+      "runtimeEvidence": "release-gated"
     },
     {
       "id": "sherpa-onnx-kws-zipformer-zh-en-3m",
@@ -224,6 +240,9 @@
       "local-mcp-boundary",
       "native-dictation-output-session"
     ],
-    "noImplicitRemote": true
+    "noImplicitRemote": true,
+    "publishedRuntimeReleaseObserved": true,
+    "publishedRuntimeRelease": "rechercher-voice-runtime-2026-10",
+    "publishedRuntimeReleaseObservedAt": "2026-10-02T16:15:02Z"
   }
 }
