@@ -129,6 +129,9 @@
     "longFormRunner": "src/voice-longform-runner.js",
     "workerSupervisor": "src/voice-worker-supervisor.js",
     "lifecycleGate": "src/model-lifecycle-manager.js",
-    "note": "Capabilities are implemented as Din Allah-native adapters/contracts; VoiceStudio remains a reference and never a runtime dependency."
+    "note": "Capabilities are implemented as Din Allah-native adapters/contracts; VoiceStudio remains a reference and never a runtime dependency.",
+    "engineSelection": "src/voice-engine-selector.js",
+    "releaseResolver": "src/voice-release-ref-resolver.js",
+    "runnableSelectionRule": "engine must resolve to an observed runtime-verified Release asset"
   }
 }
