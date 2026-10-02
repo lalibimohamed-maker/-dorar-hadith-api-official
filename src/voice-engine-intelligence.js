@@ -12,7 +12,7 @@ const CATALOG = Object.freeze({
   "piper-ar-jo-kareem-medium": { capability: "tts", profile: "arabic-fallback", localFirst: true, locale: "ar-JO", status: "quarantine-license-review" },
   "nabra-82m-arabic-int8": { capability: "tts", profile: "arabic", localFirst: true, locale: "ar", status: "quarantine-license-review" },
   "f5-tts-v1-base": { capability: "tts", profile: "research", localFirst: true, status: "release-present-license-constrained-runtime-pending", usageRestriction: "non-commercial-only" },
-  "whisper-cpp-ggml-base-multilingual": { capability: "asr", profile: "fallback", localFirst: true, status: "quarantine-runtime-license-review", multilingual: true },
+  "whisper-cpp-ggml-base-multilingual": { capability: "asr", profile: "fallback", localFirst: true, status: "release-runtime-verification-pending", multilingual: true },
   "pyannote-speaker-diarization-3.1": { capability: "diarization", profile: "multi-speaker", localFirst: true, status: "gated-quarantine" },
   "sherpa-onnx": { capability: "tts-runtime", profile: "runtime-library", localFirst: true, status: "runtime-framework-not-model" },
   "piper1-gpl": { capability: "tts-runtime", profile: "runtime-library", localFirst: true, status: "runtime-framework-not-model" }
