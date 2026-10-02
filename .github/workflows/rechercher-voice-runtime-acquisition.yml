@@ -238,15 +238,6 @@ jobs:
           rm -rf Qwen3-ASR-0.6B Qwen3-ASR-1.7B
           find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
           test -s SHA256SUMS.txt
-      - name: Upload runtime verification evidence
-        if: ${{ always() }}
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
-        with:
-          name: rechercher-voice-runtime-verification
-          path: voice-release-assets
-          if-no-files-found: error
-          retention-days: 30
-
       - name: Publish Release
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run != 'true' && steps.runtime_release.outputs.exists != 'true' }}
         env:
