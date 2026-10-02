@@ -137,7 +137,10 @@
       "estimated_gb": 3.2,
       "acquisition": "github_release",
       "rights_promotion_status": "blocked_until_clearance",
-      "role": "local_reasoning_on_device",
+      "role": "auxiliary_reasoning_model",
+      "primary_model": false,
+      "replaces_omega": false,
+      "omega_supports": true,
       "official_source": "https://github.com/XHToken/Spark-X2.5",
       "runtime_support": ["llama.cpp", "MLX", "Ollama", "SGLang", "vLLM"],
       "source_model_license": "apache-2.0"
@@ -152,7 +155,10 @@
       "estimated_gb": 8.2,
       "acquisition": "github_release",
       "rights_promotion_status": "weights_clear_pending_manifest_verification",
-      "role": "local_reasoning_candidate",
+      "role": "auxiliary_reasoning_model",
+      "primary_model": false,
+      "replaces_omega": false,
+      "omega_supports": true,
     "runtime_options": ["ollama", "llama.cpp", "vllm", "sglang", "mlx"],
       "omega_stage": "reasoning",
       "upstream": "https://github.com/XHToken/Spark-X2.5",
@@ -180,7 +186,7 @@
     "HunyuanVideo-1.5 and LTX-2 use community licenses and remain draft_review_only pending applicable redistribution review.",
     "FLUX.1-schnell is gated and requires account acceptance/access; no automated bypass is attempted.",
     "SGLang is an inference runtime and therefore has no model-weight acquisition target.",
-    "Spark-X2.5-4B is tracked as an Apache-2.0 local reasoning candidate for Al-Huda; acquisition resolves main to an immutable HF commit before streaming and never commits weights to Git."
+    "Spark-X2.5-4B is an auxiliary Apache-2.0 reasoning candidate for Ω AI; it never replaces the project core AI weights. Acquisition resolves main to an immutable HF commit before streaming and never commits weights to Git.",
     "SANA-Sprint-1.6B weights are public Apache-2.0 at the pinned HF revision; its executable runtime depends on Gemma2-2B-IT, which is tracked separately and is not silently redistributed."
   ],
   "continuationRequestedAt": "2026-09-30",
