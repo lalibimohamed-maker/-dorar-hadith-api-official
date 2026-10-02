@@ -110,7 +110,7 @@ jobs:
           assert p["policy"]["noGitLFS"] is True
           assert p["policy"]["checksumRequired"] is True
           assert p["policy"]["runtimeVerificationAfterDownload"] is True
-          selected="${{ inputs.model || 'both' }}"
+          selected="${{ inputs.model || '0.6b' }}"
           roots=[]
           if selected in ("0.6b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-0.6B"))
           if selected in ("1.7b","both"): roots.append(Path("voice-release-assets/Qwen3-ASR-1.7B"))
@@ -238,8 +238,17 @@ jobs:
           rm -rf Qwen3-ASR-0.6B Qwen3-ASR-1.7B
           find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
           test -s SHA256SUMS.txt
+      - name: Upload runtime verification evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: rechercher-voice-runtime-verification
+          path: voice-release-assets
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Publish Release
-        if: ${{ inputs.dry_run != 'true' && steps.runtime_release.outputs.exists != 'true' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run != 'true' && steps.runtime_release.outputs.exists != 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.release_tag }}
