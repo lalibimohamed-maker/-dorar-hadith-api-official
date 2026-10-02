@@ -26,6 +26,6 @@ Generated engine audio is never fed back through the physical microphone.
 
 Hard turn limits, loop detection, per-turn timeouts, immediate user stop, microphone isolation, and provenance are required. Configuration alone does not prove completion; end-to-end runtime tests remain mandatory.
 
-## Quran and Harmony
+## Quran and speech orchestration
 
-Quran recitation remains a separate original/rights-cleared audio path. Synthetic TTS is never treated as Quran recitation. Harmony Speech Engine remains an optional serving/orchestration component and is distinct from Huawei HarmonyOS.
+Quran recitation remains a separate original/rights-cleared audio path. Synthetic TTS is never treated as Quran recitation. Speech orchestration remains separate from reasoning and does not alter the Quran recitation path.
