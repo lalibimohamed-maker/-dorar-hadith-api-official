@@ -115,7 +115,7 @@ Each relationship must retain provenance and confidence. A graph relation is an 
 
 Knowledge graphs are particularly relevant because educational research identifies applications in personalized learning, curriculum design, concept mapping, recommendation, semantic search, and question answering.
 
-## Ya Bawabat al-Ilm
+## Al-Huda
 
 The navigator should convert a question into a research path:
 
