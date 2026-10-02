@@ -107,3 +107,20 @@ export function buildOutputSessionCancelRequest({ baseUrl = "http://127.0.0.1:39
     url: new URL(`/v1/output/sessions/${encodeURIComponent(String(sessionId))}`, base).toString(),
   });
 }
+
+export function buildWsTicketRequest({ baseUrl = "http://127.0.0.1:3900", scope = "/v1/audio/transcriptions/stream", allowRemote = false } = {}) {
+  if (!String(scope).startsWith("/")) throw new TypeError("scope must be an absolute path");
+  const allowedScopes = new Set([
+    "/v1/audio/transcriptions/stream",
+    "/ws/transcribe",
+    "/ws/events",
+    "/ws/tts",
+  ]);
+  if (!allowedScopes.has(String(scope))) throw new Error("unsupported WebSocket ticket scope");
+  const base = assertVoicePlatformUrl(baseUrl, { allowRemote });
+  return Object.freeze({
+    method: "POST",
+    url: new URL("/api/auth/ws-ticket", base).toString(),
+    json: Object.freeze({ scope: String(scope) }),
+  });
+}
