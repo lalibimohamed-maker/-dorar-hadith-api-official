@@ -14,7 +14,7 @@ const BLOCKED = Object.freeze([
   "clone-quran-recitation-voice",
 ]);
 
-export function createAlHudaAgentTools({ providers = {}, onAudit = () => {} } = {}) {
+export function createAlHudaAgentTools({ providers = {}, voiceBindings = null, onAudit = () => {} } = {}) {
   function assertOperation(operation) {
     if (!OPERATIONS.includes(operation)) {
       if (BLOCKED.includes(operation)) throw new Error(`blocked Al-Huda operation: ${operation}`);
@@ -40,6 +40,7 @@ export function createAlHudaAgentTools({ providers = {}, onAudit = () => {} } = 
       operation,
       corpusMutation: false,
       rightsBypass: false,
+      ...(operation === 'synthesize' && voiceBindings ? { voiceProfileId: effectiveInput.resolvedProfileId ?? null } : {}),
       timestamp: new Date().toISOString(),
     });
     onAudit(audit);
