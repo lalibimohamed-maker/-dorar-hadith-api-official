@@ -73,7 +73,7 @@ jobs:
           cp config/model-license-evidence-piper-en-us-libritts-high.json optional-voice-release-assets/model-license-evidence-piper-en-us-libritts-high.json
 
       - name: Acquire F5-TTS v1 base
-        if: ${{ inputs.include_f5tts == 'true' }}
+        if: ${{ github.event_name == 'push' || inputs.include_f5tts == 'true' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -92,7 +92,7 @@ jobs:
           rm -rf optional-voice-release-assets/F5TTS_v1_Base
 
       - name: Acquire Piper en_US LibriTTS High
-        if: ${{ inputs.include_piper_en == 'true' }}
+        if: ${{ github.event_name == 'push' || inputs.include_piper_en == 'true' }}
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
