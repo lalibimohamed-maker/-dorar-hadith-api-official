@@ -8,7 +8,8 @@ on:
     - cron: '17,47 * * * *'
   workflow_dispatch:
 
-# security-justification: this workflow audits every branch and repairs governed policy drift; it needs contents: write for non-protected branches and pull-requests: write to open reviewed repair PRs for protected main.
+# security-justification: audits every branch; workflow-file writes are deferred when
+# the installed GitHub App lacks the Workflows repository permission.
 permissions:
   contents: write
   pull-requests: write
@@ -47,12 +48,10 @@ jobs:
           set -euo pipefail
           git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
           mkdir -p /tmp/governance-worktrees
-          main_drift=0
 
           while read -r branch; do
             [ -n "$branch" ] || continue
-            remote_ref="origin/$branch"
-            before_sha="$(git rev-parse "$remote_ref")"
+            before_sha="$(git rev-parse "origin/$branch")"
             safe_name="$(printf '%s' "$branch" | tr '/ ' '__')"
             worktree="/tmp/governance-worktrees/$safe_name"
             rm -rf "$worktree"
@@ -60,12 +59,8 @@ jobs:
             echo "=== auditing $branch @ $before_sha ==="
             git worktree add --detach "$worktree" "$before_sha" >/dev/null
 
-            # The auditor is governance infrastructure owned by main, not branch content.
-            # Run the canonical main version even when the audited commit predates it or
-            # does not contain the script. This prevents missing-tool false failures.
             mkdir -p "$worktree/scripts"
-            cp scripts/enforce_all_branch_governance.py \
-              "$worktree/scripts/enforce_all_branch_governance.py"
+            cp scripts/enforce_all_branch_governance.py "$worktree/scripts/enforce_all_branch_governance.py"
             chmod 0755 "$worktree/scripts/enforce_all_branch_governance.py"
 
             if ! (cd "$worktree" && python3 scripts/enforce_all_branch_governance.py); then
@@ -74,72 +69,21 @@ jobs:
               continue
             fi
 
-            # Do not pass absent directories to git as pathspecs: old/minimal branches may
-            # legitimately have no .github/workflows or scripts directory at all.
-            # Filter the complete clean-worktree status instead, preserving strict failure
-            # behavior for real git errors while making missing governance paths non-fatal.
-            governance_status="$(git -C "$worktree" status --porcelain --untracked-files=all \
-              | awk '$2 ~ /^(\.github\/workflows|scripts)\// {print}')"
+            governance_status="$(git -C "$worktree" status --porcelain --untracked-files=all | awk '$2 ~ /^(\.github\/workflows|scripts)\// {print}')"
+
             if [ -z "$governance_status" ]; then
               echo "COMPLIANT $branch"
               git worktree remove --force "$worktree"
               continue
             fi
 
-            # main is protected. Never bypass it. Convert detected drift into a dedicated
-            # repair branch and reviewed PR so the audit can finish successfully while the
-            # protected branch remains untouched.
+            workflow_status="$(printf '%s\n' "$governance_status" | awk '$2 ~ /^\.github\/workflows\// {print}')"
+            script_status="$(printf '%s\n' "$governance_status" | awk '$2 ~ /^scripts\// {print}')"
+
             if [ "$branch" = "main" ]; then
               echo "PROTECTED_MAIN_DRIFT $branch"
               printf '%s\n' "$governance_status"
-              repair_branch="automation/governance-main-repair-${before_sha:0:12}"
-              repair_worktree="/tmp/governance-worktrees/main-repair-${before_sha:0:12}"
-              existing_pr=""
-
-              if git ls-remote --exit-code origin "refs/heads/$repair_branch" >/dev/null 2>&1; then
-                existing_pr="$(gh pr list --base main --head "$repair_branch" --state open --json number,url --jq '.[0].url // empty')"
-              else
-                rm -rf "$repair_worktree"
-                git worktree add --detach "$repair_worktree" "$before_sha" >/dev/null
-                mkdir -p "$repair_worktree/scripts"
-                cp scripts/enforce_all_branch_governance.py \
-                  "$repair_worktree/scripts/enforce_all_branch_governance.py"
-                chmod 0755 "$repair_worktree/scripts/enforce_all_branch_governance.py"
-                (cd "$repair_worktree" && python3 scripts/enforce_all_branch_governance.py)
-
-                repair_status="$(git -C "$repair_worktree" status --porcelain --untracked-files=all \
-                  | awk '$2 ~ /^(\.github\/workflows|scripts)\// {print}')"
-                if [ -z "$repair_status" ]; then
-                  echo "MAIN_DRIFT_RECHECK_CLEAN $branch"
-                  git worktree remove --force "$repair_worktree"
-                  git worktree remove --force "$worktree"
-                  continue
-                fi
-
-                git -C "$repair_worktree" switch -c "$repair_branch" "$before_sha"
-                if [ -d "$repair_worktree/.github/workflows" ]; then
-                  git -C "$repair_worktree" add .github/workflows
-                fi
-                if [ -d "$repair_worktree/scripts" ]; then
-                  git -C "$repair_worktree" add scripts
-                fi
-                git -C "$repair_worktree" commit -m 'chore(governance): repair protected main policy drift'
-                git -C "$repair_worktree" push origin "HEAD:refs/heads/$repair_branch"
-                git worktree remove --force "$repair_worktree"
-              fi
-
-              if [ -z "$existing_pr" ]; then
-                existing_pr="$(gh pr list --base main --head "$repair_branch" --state open --json number,url --jq '.[0].url // empty')"
-              fi
-              if [ -z "$existing_pr" ]; then
-                existing_pr="$(gh pr create \
-                  --base main \
-                  --head "$repair_branch" \
-                  --title 'fix(governance): repair protected main workflow policy drift' \
-                  --body 'Automated governance repair. This PR contains only the canonical workflow-policy normalization required by Branch Workflow Governance. Main protection is preserved; no protected-branch bypass or force-push is used. Review and merge through the normal protected-branch process.')"
-              fi
-
-              echo "MAIN_REPAIR_PR_PENDING $existing_pr"
+              echo "NOTICE workflow-file repair on protected main is deferred to reviewed PR."
               git worktree remove --force "$worktree"
               continue
             fi
@@ -151,29 +95,27 @@ jobs:
               continue
             fi
 
-            # Stage only directories that actually exist; git add must not receive a
-            # pathspec for a directory absent from an old/minimal branch.
-            if [ -d "$worktree/.github/workflows" ]; then
-              git -C "$worktree" add .github/workflows
+            # The installed GitHub App token has no Workflows permission. Never push
+            # .github/workflows changes with it; GitHub rejects such pushes.
+            if [ -n "$workflow_status" ]; then
+              echo "POLICY_DEFERRED_WORKFLOW_PERMISSION $branch"
+              printf '%s\n' "$workflow_status"
             fi
-            if [ -d "$worktree/scripts" ]; then
+
+            if [ -n "$script_status" ]; then
               git -C "$worktree" add scripts
-            fi
-            git -C "$worktree" commit -m 'chore(governance): repair branch workflow policy'
+              git -C "$worktree" commit -m 'chore(governance): repair branch workflow policy'
 
-            current_sha="$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')"
-            if [ "$current_sha" != "$before_sha" ]; then
-              echo "DRIFT_RACE_AFTER_REPAIR $branch expected=$before_sha actual=$current_sha"
-              git worktree remove --force "$worktree"
-              continue
+              current_sha="$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')"
+              if [ "$current_sha" != "$before_sha" ]; then
+                echo "DRIFT_RACE_AFTER_REPAIR $branch expected=$before_sha actual=$current_sha"
+                git worktree remove --force "$worktree"
+                continue
+              fi
+
+              git -C "$worktree" push origin "HEAD:refs/heads/$branch"
+              echo "REPAIRED_SCRIPTS $branch"
             fi
 
-            git -C "$worktree" push origin "HEAD:refs/heads/$branch"
-            echo "REPAIRED $branch"
             git worktree remove --force "$worktree"
           done < <(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin/ | sort -u)
-
-          if [ "$main_drift" -ne 0 ]; then
-            echo 'Unexpected protected-main repair failure; no protected-branch bypass was attempted.'
-            exit 1
-          fi

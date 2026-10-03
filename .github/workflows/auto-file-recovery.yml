@@ -54,6 +54,7 @@ jobs:
             done < <(printf '%s\n' "${workflow_paths[@]}")
           )
           if [ "${#recovery_paths[@]}" -eq 0 ]; then echo 'No changed workflow file has a trusted main counterpart; manual review required.'; exit 0; fi
+
           head_commit_json="$(gh api "/repos/${REPOSITORY}/git/commits/${pr_head_sha}")"
           base_tree_sha="$(jq -r '.tree.sha' <<<"$head_commit_json")"
           tree_entries='[]'; changed_count=0
@@ -64,9 +65,16 @@ jobs:
             tree_entries="$(jq -c --arg path "$path" --arg sha "$blob_sha" '. + [{path:$path,mode:"100644",type:"blob",sha:$sha}]' <<<"$tree_entries")"
             changed_count=$((changed_count + 1))
           done
-          new_tree_sha="$(gh api --method POST -H 'Accept: application/vnd.github+json' "/repos/${REPOSITORY}/git/trees" -f "base_tree=$base_tree_sha" -F "tree=$tree_entries" --jq '.sha')"
-          new_commit_sha="$(gh api --method POST -H 'Accept: application/vnd.github+json' "/repos/${REPOSITORY}/git/commits" -f message='security: auto-recover trusted workflow files' -f "tree=$new_tree_sha" -f "parents[]=$pr_head_sha" --jq '.sha')"
-          gh api --method PATCH -H 'Accept: application/vnd.github+json' "/repos/${REPOSITORY}/git/refs/heads/${PR_BRANCH}" -f "sha=$new_commit_sha" -F force=false >/dev/null
+
+          tree_payload="$(jq -cn --arg base_tree "$base_tree_sha" --argjson tree "$tree_entries" '{base_tree:$base_tree,tree:$tree}')"
+          new_tree_sha="$(printf '%s' "$tree_payload" | gh api --method POST -H 'Accept: application/vnd.github+json' "/repos/${REPOSITORY}/git/trees" --input - --jq '.sha')"
+
+          commit_payload="$(jq -cn --arg message 'security: auto-recover trusted workflow files' --arg tree "$new_tree_sha" --arg parent "$pr_head_sha" '{message:$message,tree:$tree,parents:[$parent]}')"
+          new_commit_sha="$(printf '%s' "$commit_payload" | gh api --method POST -H 'Accept: application/vnd.github+json' "/repos/${REPOSITORY}/git/commits" --input - --jq '.sha')"
+
+          ref_payload="$(jq -cn --arg sha "$new_commit_sha" '{sha:$sha,force:false}')"
+          printf '%s' "$ref_payload" | gh api --method PATCH -H 'Accept: application/vnd.github+json' "/repos/${REPOSITORY}/git/refs/heads/${PR_BRANCH}" --input - >/dev/null
+
           echo "Recovery commit created from trusted main for ${changed_count} workflow file(s): ${new_commit_sha}"
           echo 'No PR code was checked out or executed.'
           echo 'The PR branch was advanced only through the GitHub API; fresh CI and independent review are required.'
