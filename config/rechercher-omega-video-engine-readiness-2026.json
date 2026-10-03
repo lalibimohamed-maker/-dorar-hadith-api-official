@@ -65,7 +65,10 @@
           "e2e_smoke_test"
         ],
         "otherwise": "queue_without_execution"
-      }
+      },
+      "runtime_environment_id": "hunyuanvideo15-pytorch",
+      "runtime_environment_verified_required": true,
+      "execution_environment_isolated": true
     },
     {
       "id": "ltx-2",
@@ -115,7 +118,10 @@
       "revision_type": "immutable_hf_commit",
       "embedded_text_encoder": true,
       "matching_text_encoder_external_dependency": false,
-      "checkpoint_layout_verified_against_upstream": true
+      "checkpoint_layout_verified_against_upstream": true,
+      "runtime_environment_id": "ltx2-pinned-python",
+      "runtime_environment_verified_required": true,
+      "execution_environment_isolated": true
     }
   ],
   "execution_contract": {
