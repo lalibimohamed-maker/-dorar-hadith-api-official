@@ -187,7 +187,9 @@ export function orchestrateVideoPlan({
 }
 
 function buildRuntimeJob(runtime, scene, selection = {}) {
-  if (runtime === "managed-local-video") return buildLocalVideoEngineJob({
+  if (["hunyuanvideo-1.5", "ltx-2"].includes(selection.model_id) && ["local", "kaggle-gpu"].includes(runtime)) {
+    return buildLocalVideoEngineJob({
+
     engineId: selection.model_id,
     modelRevision: selection.model_revision ?? scene.model_revision,
     runtimeEnvironmentId: selection.runtime_environment_id,
