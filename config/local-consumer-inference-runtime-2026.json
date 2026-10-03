@@ -1,0 +1,33 @@
+{
+  "schema": "dinullah.local-consumer-inference-runtime.v1",
+  "purpose": "Local-first consumer inference admission for browser/PWA and Capacitor mobile shells.",
+  "integration": {
+    "assistant": "Al-Huda",
+    "stage": "reasoning",
+    "upstreamVoiceChain": ["wake-word", "vad", "asr", "normalization"],
+    "downstreamVoiceChain": ["tts-or-verified-recitation"],
+    "corpusLayerUntouched": true
+  },
+  "modes": ["offline_only", "auto", "online_only"],
+  "backends": {
+    "webgpu": { "runtime": "onnx-runtime-web", "role": "preferred-browser-accelerated-local" },
+    "wasm": { "runtime": "onnx-runtime-web", "role": "portable-browser-local-fallback" },
+    "native": { "runtime": "onnx-runtime-mobile-or-platform-native", "role": "mobile-native-local-adapter" }
+  },
+  "selection": {
+    "browserPreference": ["webgpu", "wasm"],
+    "mobilePreference": ["webgpu", "native", "wasm"],
+    "remotePromotion": "explicit-only"
+  },
+  "integrity": {
+    "backendVerificationRequired": true,
+    "modelMustBeLocallyProvisioned": true,
+    "modelVerificationRequired": true,
+    "corpusWriteAllowed": false,
+    "silentRemoteFallback": false
+  },
+  "privacy": {
+    "rawAudioRetentionDefault": false,
+    "localInferencePreferred": true
+  }
+}
