@@ -3,7 +3,7 @@
  * Plans runtime execution without network calls or Corpus writes.
  */
 import { selectMultimodalModel } from "./rechercher-omega-multimodal-router.js";
-import { buildComfyUIJob, buildKaggleMediaJob, buildFFmpegComposition } from "./rechercher-omega-media-runtimes.js";
+import { buildComfyUIJob, buildKaggleMediaJob, buildFFmpegComposition, buildLocalVideoEngineJob } from "./rechercher-omega-media-runtimes.js";
 import { createJob, assertJobBoundary } from "./rechercher-omega-job-control.js";
 import { buildTelemetryContext } from "./rechercher-omega-observability.js";
 import { admitExecution } from "./rechercher-omega-resource-admission.js";
@@ -111,7 +111,7 @@ export function orchestrateVideoPlan({
       }
     }
 
-    result.execution = buildRuntimeJob(selection.runtime, scene);
+    result.execution = buildRuntimeJob(selection.runtime, scene, selection);
     const job = createJob({
       kind: "media:generation",
       payload: {
@@ -186,7 +186,15 @@ export function orchestrateVideoPlan({
   };
 }
 
-function buildRuntimeJob(runtime, scene) {
+function buildRuntimeJob(runtime, scene, selection = {}) {
+  if (runtime === "managed-local-video") return buildLocalVideoEngineJob({
+    engineId: selection.model_id,
+    modelRevision: selection.model_revision ?? scene.model_revision,
+    runtimeEnvironmentId: selection.runtime_environment_id,
+    task: scene.generation_task,
+    prompt: scene.prompt,
+    sourceAssets: scene.source_assets ?? []
+  });
   if (runtime === "local-comfyui") return buildComfyUIJob({
     workflow: scene.comfyui_workflow ?? "REQUIRED_RUNTIME_WORKFLOW",
     prompt: scene.prompt
