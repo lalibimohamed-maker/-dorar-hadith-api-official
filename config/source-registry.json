@@ -6,74 +6,1040 @@
     "hadith": "Presence in a musnad or sunan is not itself a declaration of authenticity. Preserve grading and attribution separately."
   },
   "categories": [
-    { "id": "quran", "nameAr": "القرآن وعلومه" },
-    { "id": "tafsir", "nameAr": "التفسير" },
-    { "id": "tadabbur", "nameAr": "التدبر والهدايات" },
-    { "id": "hadith", "nameAr": "الحديث وعلومه" },
-    { "id": "musnads-sunan", "nameAr": "المسانيد والسنن" },
-    { "id": "sirah", "nameAr": "السيرة والمغازي والشمائل" },
-    { "id": "fiqh", "nameAr": "الفقه والمعاملات" },
-    { "id": "usul-fiqh", "nameAr": "أصول الفقه والقواعد" },
-    { "id": "maqasid", "nameAr": "مقاصد الشريعة" },
-    { "id": "aqidah", "nameAr": "العقيدة" },
-    { "id": "biographies", "nameAr": "التراجم والرواة والعلماء" },
-    { "id": "library", "nameAr": "المكتبة الإسلامية" },
-    { "id": "official", "nameAr": "المصادر الرسمية والمؤسسات العلمية" },
-    { "id": "manuscripts", "nameAr": "المخطوطات والفهارس" },
-    { "id": "genealogy", "nameAr": "الأنساب والتاريخ" }
+    {
+      "id": "quran",
+      "nameAr": "القرآن وعلومه"
+    },
+    {
+      "id": "tafsir",
+      "nameAr": "التفسير"
+    },
+    {
+      "id": "tadabbur",
+      "nameAr": "التدبر والهدايات"
+    },
+    {
+      "id": "hadith",
+      "nameAr": "الحديث وعلومه"
+    },
+    {
+      "id": "musnads-sunan",
+      "nameAr": "المسانيد والسنن"
+    },
+    {
+      "id": "sirah",
+      "nameAr": "السيرة والمغازي والشمائل"
+    },
+    {
+      "id": "fiqh",
+      "nameAr": "الفقه والمعاملات"
+    },
+    {
+      "id": "usul-fiqh",
+      "nameAr": "أصول الفقه والقواعد"
+    },
+    {
+      "id": "maqasid",
+      "nameAr": "مقاصد الشريعة"
+    },
+    {
+      "id": "aqidah",
+      "nameAr": "العقيدة"
+    },
+    {
+      "id": "biographies",
+      "nameAr": "التراجم والرواة والعلماء"
+    },
+    {
+      "id": "library",
+      "nameAr": "المكتبة الإسلامية"
+    },
+    {
+      "id": "official",
+      "nameAr": "المصادر الرسمية والمؤسسات العلمية"
+    },
+    {
+      "id": "manuscripts",
+      "nameAr": "المخطوطات والفهارس"
+    },
+    {
+      "id": "genealogy",
+      "nameAr": "الأنساب والتاريخ"
+    }
   ],
   "sources": [
-    { "id": "dorar", "nameAr": "الدرر السنية", "category": "hadith", "url": "https://dorar.net", "role": "primary" },
-    { "id": "shamela", "nameAr": "المكتبة الشاملة", "category": "library", "url": "https://shamela.ws", "role": "supporting" },
-    { "id": "qurancomplex", "nameAr": "مجمع الملك فهد لطباعة المصحف الشريف", "country": "السعودية", "category": "official", "url": "https://qurancomplex.gov.sa/", "role": "official-primary", "coverage": ["quran", "qiraat", "translations", "tafsir", "quran-sciences", "digital-quran"] },
-    { "id": "moia-sa", "nameAr": "وزارة الشؤون الإسلامية والدعوة والإرشاد", "country": "السعودية", "category": "official", "url": "https://moia.gov.sa/", "role": "official-primary", "coverage": ["dawah", "quran", "books", "research", "fatwa-related-guidance"] },
-    { "id": "moia-ebook", "nameAr": "المكتبة الإلكترونية الإسلامية - وزارة الشؤون الإسلامية", "country": "السعودية", "category": "official", "url": "https://ebook.moia.gov.sa/", "role": "official-primary", "coverage": ["islamic-books", "lessons", "hadith", "aqidah", "fiqh"] },
-    { "id": "saudi-libraries", "nameAr": "منصة المكتبات الرقمية السعودية - هيئة المكتبات", "country": "السعودية", "category": "official", "url": "https://libraries.moc.gov.sa/", "role": "official-research", "coverage": ["books", "manuscripts", "research"] },
-    { "id": "king-abdulaziz-public-library", "nameAr": "مكتبة الملك عبدالعزيز العامة", "country": "السعودية", "category": "official", "url": "https://www.kapl.org.sa/", "role": "official-research", "coverage": ["books", "heritage", "arabic-culture", "islamic-studies"] },
-    { "id": "king-fahd-national-library", "nameAr": "مكتبة الملك فهد الوطنية", "country": "السعودية", "category": "official", "url": "https://kfnl.gov.sa/", "role": "official-research", "coverage": ["bibliography", "books", "manuscripts", "national-heritage"] },
-    { "id": "imam-muhammad-university", "nameAr": "جامعة الإمام محمد بن سعود الإسلامية", "country": "السعودية", "category": "official", "url": "https://imamu.edu.sa/", "role": "official-academic", "coverage": ["sharia", "hadith", "fiqh", "aqidah", "quran"] },
-    { "id": "islamic-university-madinah", "nameAr": "الجامعة الإسلامية بالمدينة المنورة", "country": "السعودية", "category": "official", "url": "https://iu.edu.sa/", "role": "official-academic", "coverage": ["sharia", "hadith", "aqidah", "fiqh", "quran"] },
-    { "id": "umm-al-qura", "nameAr": "جامعة أم القرى", "country": "السعودية", "category": "official", "url": "https://uqu.edu.sa/", "role": "official-academic", "coverage": ["quran", "hadith", "fiqh", "sharia", "history"] },
-    { "id": "ksu", "nameAr": "جامعة الملك سعود", "country": "السعودية", "category": "official", "url": "https://ksu.edu.sa/", "role": "official-academic", "coverage": ["research", "arabic", "history", "humanities"] },
-    { "id": "kfcris", "nameAr": "مركز الملك فيصل للبحوث والدراسات الإسلامية", "country": "السعودية", "category": "official", "url": "https://www.kfcris.com/", "role": "official-research", "coverage": ["manuscripts", "history", "islamic-studies", "research"] },
-    { "id": "kuwait-national-library", "nameAr": "مكتبة الكويت الوطنية", "country": "الكويت", "category": "official", "url": "https://www.nlk.gov.kw/", "role": "official-national-library", "coverage": ["bibliography", "books", "manuscripts", "islamic-heritage", "theses"] },
-    { "id": "kuwait-national-library-digital", "nameAr": "المكتبة الرقمية - مكتبة الكويت الوطنية", "country": "الكويت", "category": "official", "url": "https://www.nlk.gov.kw/", "role": "official-digital-library", "coverage": ["catalog", "databases", "national-bibliography"] },
-    { "id": "kuwait-awqaf-manuscripts", "nameAr": "إدارة المخطوطات والمكتبات الإسلامية - وزارة الأوقاف الكويتية", "country": "الكويت", "category": "official", "url": "https://mild.awqaf.gov.kw/", "role": "official-research", "coverage": ["manuscripts", "islamic-libraries", "research-guides"] },
-    { "id": "kuwait-awqaf", "nameAr": "وزارة الأوقاف والشؤون الإسلامية الكويتية", "country": "الكويت", "category": "official", "url": "https://www.awqaf.gov.kw/", "role": "official-primary", "coverage": ["awqaf", "dawah", "islamic-studies"] },
-    { "id": "qatar-ministry-islam", "nameAr": "وزارة الأوقاف والشؤون الإسلامية - دولة قطر", "country": "قطر", "category": "official", "url": "https://www.islam.gov.qa/", "role": "official-primary", "coverage": ["quran", "dawah", "lessons", "islamic-studies"] },
-    { "id": "qatar-quran-lessons", "nameAr": "دروس القرآن الكريم - وزارة الأوقاف القطرية", "category": "quran", "url": "https://alquran.islam.gov.qa/droos/Sections.html", "role": "official-educational", "coverage": ["tajweed", "quran-recitation", "quran-lessons"] },
-    { "id": "qatar-university", "nameAr": "جامعة قطر", "country": "قطر", "category": "official", "url": "https://www.qu.edu.qa/", "role": "official-academic", "coverage": ["sharia", "arabic", "islamic-studies"] },
-    { "id": "quranflash", "nameAr": "QuranFlash", "category": "quran", "url": "https://www.quranflash.com/v2/", "role": "supporting" },
-    { "id": "tafsir-app", "nameAr": "Tafsir.app", "category": "tafsir", "url": "https://tafsir.app", "role": "supporting" },
-    { "id": "altadabbur", "nameAr": "التدبر", "category": "tadabbur", "url": "https://altadabbur.com", "role": "supporting" },
-    { "id": "tadabur-app", "nameAr": "Tadabur.app", "category": "tadabbur", "url": "https://www.tadabur.app", "role": "supporting" },
-    { "id": "muslim-library", "nameAr": "المكتبة الإسلامية - هدايات القرآن", "category": "tadabbur", "url": "https://www.muslim-library.com/arabic/هدايات-القرآن-الكريم/", "role": "supporting" },
-    { "id": "bukhari", "nameAr": "صحيح البخاري", "category": "hadith", "role": "primary-book" },
-    { "id": "muslim", "nameAr": "صحيح مسلم", "category": "hadith", "role": "primary-book" },
-    { "id": "ahmad", "nameAr": "مسند الإمام أحمد", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "abu-yala", "nameAr": "مسند أبي يعلى الموصلي", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "ibn-rahwayh", "nameAr": "مسند إسحاق بن راهويه", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "abu-dawud", "nameAr": "سنن أبي داود", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "tirmidhi", "nameAr": "سنن الترمذي", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "nasai", "nameAr": "سنن النسائي", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "ibn-majah", "nameAr": "سنن ابن ماجه", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "darimi", "nameAr": "سنن الدارمي", "category": "musnads-sunan", "role": "primary-book" },
-    { "id": "bayhaqi", "nameAr": "السنن الكبرى ودلائل النبوة للبيهقي", "category": "hadith", "role": "primary-book" },
-    { "id": "ibn-hisham", "nameAr": "السيرة النبوية لابن هشام", "category": "sirah", "role": "primary-book" },
-    { "id": "ibn-sad", "nameAr": "الطبقات الكبرى", "category": "biographies", "role": "primary-book" },
-    { "id": "zad-al-maad", "nameAr": "زاد المعاد", "category": "sirah", "role": "supporting" },
-    { "id": "shamail", "nameAr": "الشمائل المحمدية", "category": "sirah", "role": "primary-book" },
-    { "id": "madhhab-hanafi", "nameAr": "المذهب الحنفي", "category": "fiqh", "role": "school" },
-    { "id": "madhhab-maliki", "nameAr": "المذهب المالكي", "category": "fiqh", "role": "school" },
-    { "id": "madhhab-shafii", "nameAr": "المذهب الشافعي", "category": "fiqh", "role": "school" },
-    { "id": "madhhab-hanbali", "nameAr": "المذهب الحنبلي", "category": "fiqh", "role": "school" },
-    { "id": "usul-thalatha", "nameAr": "الأصول الثلاثة", "category": "aqidah", "role": "text" },
-    { "id": "usul-sitta", "nameAr": "الأصول الستة", "category": "aqidah", "role": "text" },
-    { "id": "qawaid-arbaa", "nameAr": "القواعد الأربع", "category": "aqidah", "role": "text" }
+    {
+      "id": "dorar",
+      "nameAr": "الدرر السنية",
+      "category": "hadith",
+      "url": "https://dorar.net",
+      "role": "primary"
+    },
+    {
+      "id": "shamela",
+      "nameAr": "المكتبة الشاملة",
+      "category": "library",
+      "url": "https://shamela.ws",
+      "role": "supporting"
+    },
+    {
+      "id": "qurancomplex",
+      "nameAr": "مجمع الملك فهد لطباعة المصحف الشريف",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://qurancomplex.gov.sa/",
+      "role": "official-primary",
+      "coverage": [
+        "quran",
+        "qiraat",
+        "translations",
+        "tafsir",
+        "quran-sciences",
+        "digital-quran"
+      ]
+    },
+    {
+      "id": "moia-sa",
+      "nameAr": "وزارة الشؤون الإسلامية والدعوة والإرشاد",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://moia.gov.sa/",
+      "role": "official-primary",
+      "coverage": [
+        "dawah",
+        "quran",
+        "books",
+        "research",
+        "fatwa-related-guidance"
+      ]
+    },
+    {
+      "id": "moia-ebook",
+      "nameAr": "المكتبة الإلكترونية الإسلامية - وزارة الشؤون الإسلامية",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://ebook.moia.gov.sa/",
+      "role": "official-primary",
+      "coverage": [
+        "islamic-books",
+        "lessons",
+        "hadith",
+        "aqidah",
+        "fiqh"
+      ]
+    },
+    {
+      "id": "saudi-libraries",
+      "nameAr": "منصة المكتبات الرقمية السعودية - هيئة المكتبات",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://libraries.moc.gov.sa/",
+      "role": "official-research",
+      "coverage": [
+        "books",
+        "manuscripts",
+        "research"
+      ]
+    },
+    {
+      "id": "king-abdulaziz-public-library",
+      "nameAr": "مكتبة الملك عبدالعزيز العامة",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://www.kapl.org.sa/",
+      "role": "official-research",
+      "coverage": [
+        "books",
+        "heritage",
+        "arabic-culture",
+        "islamic-studies"
+      ]
+    },
+    {
+      "id": "king-fahd-national-library",
+      "nameAr": "مكتبة الملك فهد الوطنية",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://kfnl.gov.sa/",
+      "role": "official-research",
+      "coverage": [
+        "bibliography",
+        "books",
+        "manuscripts",
+        "national-heritage"
+      ]
+    },
+    {
+      "id": "imam-muhammad-university",
+      "nameAr": "جامعة الإمام محمد بن سعود الإسلامية",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://imamu.edu.sa/",
+      "role": "official-academic",
+      "coverage": [
+        "sharia",
+        "hadith",
+        "fiqh",
+        "aqidah",
+        "quran"
+      ]
+    },
+    {
+      "id": "islamic-university-madinah",
+      "nameAr": "الجامعة الإسلامية بالمدينة المنورة",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://iu.edu.sa/",
+      "role": "official-academic",
+      "coverage": [
+        "sharia",
+        "hadith",
+        "aqidah",
+        "fiqh",
+        "quran"
+      ]
+    },
+    {
+      "id": "umm-al-qura",
+      "nameAr": "جامعة أم القرى",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://uqu.edu.sa/",
+      "role": "official-academic",
+      "coverage": [
+        "quran",
+        "hadith",
+        "fiqh",
+        "sharia",
+        "history"
+      ]
+    },
+    {
+      "id": "ksu",
+      "nameAr": "جامعة الملك سعود",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://ksu.edu.sa/",
+      "role": "official-academic",
+      "coverage": [
+        "research",
+        "arabic",
+        "history",
+        "humanities"
+      ]
+    },
+    {
+      "id": "kfcris",
+      "nameAr": "مركز الملك فيصل للبحوث والدراسات الإسلامية",
+      "country": "السعودية",
+      "category": "official",
+      "url": "https://www.kfcris.com/",
+      "role": "official-research",
+      "coverage": [
+        "manuscripts",
+        "history",
+        "islamic-studies",
+        "research"
+      ]
+    },
+    {
+      "id": "kuwait-national-library",
+      "nameAr": "مكتبة الكويت الوطنية",
+      "country": "الكويت",
+      "category": "official",
+      "url": "https://www.nlk.gov.kw/",
+      "role": "official-national-library",
+      "coverage": [
+        "bibliography",
+        "books",
+        "manuscripts",
+        "islamic-heritage",
+        "theses"
+      ]
+    },
+    {
+      "id": "kuwait-national-library-digital",
+      "nameAr": "المكتبة الرقمية - مكتبة الكويت الوطنية",
+      "country": "الكويت",
+      "category": "official",
+      "url": "https://www.nlk.gov.kw/",
+      "role": "official-digital-library",
+      "coverage": [
+        "catalog",
+        "databases",
+        "national-bibliography"
+      ]
+    },
+    {
+      "id": "kuwait-awqaf-manuscripts",
+      "nameAr": "إدارة المخطوطات والمكتبات الإسلامية - وزارة الأوقاف الكويتية",
+      "country": "الكويت",
+      "category": "official",
+      "url": "https://mild.awqaf.gov.kw/",
+      "role": "official-research",
+      "coverage": [
+        "manuscripts",
+        "islamic-libraries",
+        "research-guides"
+      ]
+    },
+    {
+      "id": "kuwait-awqaf",
+      "nameAr": "وزارة الأوقاف والشؤون الإسلامية الكويتية",
+      "country": "الكويت",
+      "category": "official",
+      "url": "https://www.awqaf.gov.kw/",
+      "role": "official-primary",
+      "coverage": [
+        "awqaf",
+        "dawah",
+        "islamic-studies"
+      ]
+    },
+    {
+      "id": "qatar-ministry-islam",
+      "nameAr": "وزارة الأوقاف والشؤون الإسلامية - دولة قطر",
+      "country": "قطر",
+      "category": "official",
+      "url": "https://www.islam.gov.qa/",
+      "role": "official-primary",
+      "coverage": [
+        "quran",
+        "dawah",
+        "lessons",
+        "islamic-studies"
+      ]
+    },
+    {
+      "id": "qatar-quran-lessons",
+      "nameAr": "دروس القرآن الكريم - وزارة الأوقاف القطرية",
+      "category": "quran",
+      "url": "https://alquran.islam.gov.qa/droos/Sections.html",
+      "role": "official-educational",
+      "coverage": [
+        "tajweed",
+        "quran-recitation",
+        "quran-lessons"
+      ]
+    },
+    {
+      "id": "qatar-university",
+      "nameAr": "جامعة قطر",
+      "country": "قطر",
+      "category": "official",
+      "url": "https://www.qu.edu.qa/",
+      "role": "official-academic",
+      "coverage": [
+        "sharia",
+        "arabic",
+        "islamic-studies"
+      ]
+    },
+    {
+      "id": "quranflash",
+      "nameAr": "QuranFlash",
+      "category": "quran",
+      "url": "https://www.quranflash.com/v2/",
+      "role": "supporting"
+    },
+    {
+      "id": "tafsir-app",
+      "nameAr": "Tafsir.app",
+      "category": "tafsir",
+      "url": "https://tafsir.app",
+      "role": "supporting"
+    },
+    {
+      "id": "altadabbur",
+      "nameAr": "التدبر",
+      "category": "tadabbur",
+      "url": "https://altadabbur.com",
+      "role": "supporting"
+    },
+    {
+      "id": "tadabur-app",
+      "nameAr": "Tadabur.app",
+      "category": "tadabbur",
+      "url": "https://www.tadabur.app",
+      "role": "supporting"
+    },
+    {
+      "id": "muslim-library",
+      "nameAr": "المكتبة الإسلامية - هدايات القرآن",
+      "category": "tadabbur",
+      "url": "https://www.muslim-library.com/arabic/هدايات-القرآن-الكريم/",
+      "role": "supporting"
+    },
+    {
+      "id": "bukhari",
+      "nameAr": "صحيح البخاري",
+      "category": "hadith",
+      "role": "primary-book"
+    },
+    {
+      "id": "muslim",
+      "nameAr": "صحيح مسلم",
+      "category": "hadith",
+      "role": "primary-book"
+    },
+    {
+      "id": "ahmad",
+      "nameAr": "مسند الإمام أحمد",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "abu-yala",
+      "nameAr": "مسند أبي يعلى الموصلي",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "ibn-rahwayh",
+      "nameAr": "مسند إسحاق بن راهويه",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "abu-dawud",
+      "nameAr": "سنن أبي داود",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "tirmidhi",
+      "nameAr": "سنن الترمذي",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "nasai",
+      "nameAr": "سنن النسائي",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "ibn-majah",
+      "nameAr": "سنن ابن ماجه",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "darimi",
+      "nameAr": "سنن الدارمي",
+      "category": "musnads-sunan",
+      "role": "primary-book"
+    },
+    {
+      "id": "bayhaqi",
+      "nameAr": "السنن الكبرى ودلائل النبوة للبيهقي",
+      "category": "hadith",
+      "role": "primary-book"
+    },
+    {
+      "id": "ibn-hisham",
+      "nameAr": "السيرة النبوية لابن هشام",
+      "category": "sirah",
+      "role": "primary-book"
+    },
+    {
+      "id": "ibn-sad",
+      "nameAr": "الطبقات الكبرى",
+      "category": "biographies",
+      "role": "primary-book"
+    },
+    {
+      "id": "zad-al-maad",
+      "nameAr": "زاد المعاد",
+      "category": "sirah",
+      "role": "supporting"
+    },
+    {
+      "id": "shamail",
+      "nameAr": "الشمائل المحمدية",
+      "category": "sirah",
+      "role": "primary-book"
+    },
+    {
+      "id": "madhhab-hanafi",
+      "nameAr": "المذهب الحنفي",
+      "category": "fiqh",
+      "role": "school"
+    },
+    {
+      "id": "madhhab-maliki",
+      "nameAr": "المذهب المالكي",
+      "category": "fiqh",
+      "role": "school"
+    },
+    {
+      "id": "madhhab-shafii",
+      "nameAr": "المذهب الشافعي",
+      "category": "fiqh",
+      "role": "school"
+    },
+    {
+      "id": "madhhab-hanbali",
+      "nameAr": "المذهب الحنبلي",
+      "category": "fiqh",
+      "role": "school"
+    },
+    {
+      "id": "usul-thalatha",
+      "nameAr": "الأصول الثلاثة",
+      "category": "aqidah",
+      "role": "text"
+    },
+    {
+      "id": "usul-sitta",
+      "nameAr": "الأصول الستة",
+      "category": "aqidah",
+      "role": "text"
+    },
+    {
+      "id": "qawaid-arbaa",
+      "nameAr": "القواعد الأربع",
+      "category": "aqidah",
+      "role": "text"
+    },
+    {
+      "id": "islamreligion-videos",
+      "nameAr": "IslamReligion.com — المنظومة الإسلامية للمقالات والفيديوهات والكتب والبحث",
+      "nameFr": "IslamReligion.com — contenu islamique, vidéos, articles, e-books et recherche",
+      "country": "global",
+      "category": "islamic-content",
+      "url": "https://www.islamreligion.com/videos",
+      "canonicalUrl": "https://www.islamreligion.com/videos",
+      "role": "dawah-editorial-and-reference-source-family",
+      "sourceType": "Islamic_dawah_video_platform",
+      "languageCoverage": [
+        "fr",
+        "en",
+        "ar",
+        "es",
+        "de",
+        "ru",
+        "pt",
+        "zh",
+        "ja",
+        "it",
+        "tl",
+        "hi",
+        "sw",
+        "ko",
+        "he"
+      ],
+      "coverage": [
+        "website",
+        "articles",
+        "videos",
+        "video-categories",
+        "e-books",
+        "islam-at-a-glance",
+        "site-search",
+        "scientific-miracles-of-the-holy-quran",
+        "scientific-miracles-of-prophetic-sayings",
+        "quran",
+        "prophet-muhammad",
+        "comparative-religion",
+        "islamic-history",
+        "new-muslims",
+        "worship-and-practice",
+        "hereafter",
+        "current-issues",
+        "systems-in-islam"
+      ],
+      "integration": {
+        "discovery": true,
+        "browserReference": true,
+        "evidenceCandidate": true,
+        "reusableMediaByDefault": false,
+        "embeddingByDefault": false,
+        "transformationByDefault": false
+      },
+      "rights": {
+        "defaultStatus": "restricted",
+        "basis": "Website footer states Copyright © 2006 - 2026 IslamReligion.com. All rights reserved.",
+        "rightsEvidenceUrl": "https://www.islamreligion.com/videos",
+        "publicAvailabilityDoesNotGrantReuse": true,
+        "explicitPermissionOrCompatibleLicenseRequiredForReuse": true
+      },
+      "integrity": {
+        "useAsIslamicContext": true,
+        "useAsSoleScientificPrimaryEvidence": false,
+        "interpretiveClaimsRequireIndependentEvidenceVerification": true
+      },
+      "verifiedAt": "2026-09-28",
+      "languageMode": "localized_path_index",
+      "defaultLanguage": "en",
+      "languagePathTemplate": "https://www.islamreligion.com/{lang}/videos",
+      "englishPath": "https://www.islamreligion.com/videos",
+      "supportedLanguages": [
+        {
+          "code": "en",
+          "name": "English",
+          "path": "/videos"
+        },
+        {
+          "code": "ar",
+          "name": "العربية",
+          "path": "/ar/videos"
+        },
+        {
+          "code": "es",
+          "name": "Español",
+          "path": "/es/videos"
+        },
+        {
+          "code": "fr",
+          "name": "Français",
+          "path": "/fr/videos"
+        },
+        {
+          "code": "de",
+          "name": "Deutsch",
+          "path": "/de/videos"
+        },
+        {
+          "code": "ru",
+          "name": "Русский",
+          "path": "/ru/videos"
+        },
+        {
+          "code": "pt",
+          "name": "Português",
+          "path": "/pt/videos"
+        },
+        {
+          "code": "zh",
+          "name": "中文",
+          "path": "/zh/videos"
+        },
+        {
+          "code": "ja",
+          "name": "日本語",
+          "path": "/ja/videos"
+        },
+        {
+          "code": "it",
+          "name": "Italiano",
+          "path": "/it/videos"
+        },
+        {
+          "code": "tl",
+          "name": "Tagalog",
+          "path": "/tl/videos"
+        },
+        {
+          "code": "hi",
+          "name": "हिन्दी",
+          "path": "/hi/videos"
+        },
+        {
+          "code": "sw",
+          "name": "Kiswahili",
+          "path": "/sw/videos"
+        },
+        {
+          "code": "ko",
+          "name": "한국어",
+          "path": "/ko/videos"
+        },
+        {
+          "code": "he",
+          "name": "עברית",
+          "path": "/he/videos"
+        }
+      ],
+      "localizationEvidenceUrl": "https://www.islamreligion.com/ar/videos",
+      "localizationEvidenceNote": "The site's language selector exposes English, Arabic, Spanish, French, German, Russian, Portuguese, Chinese, Japanese, Italian, Tagalog, Hindi, Kiswahili, Korean and Hebrew; localized video paths use the language index before /videos, while English uses /videos.",
+      "collections": [
+        {
+          "id": "33",
+          "nameAr": "أدلة أن الإسلام هو الحق",
+          "nameFr": "Preuves que l'Islam est la vérité",
+          "url": "https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite",
+          "categoryType": "video-category",
+          "parentSourceId": "islamreligion-videos",
+          "role": "dawah_video_category_reference",
+          "languageInvariantId": true,
+          "localizedSlugMustBeSourceResolved": true,
+          "coverage": [
+            "scientific-miracles-of-the-holy-quran",
+            "scientific-miracles-of-prophetic-sayings",
+            "muhammad-in-the-bible-and-other-scriptures",
+            "authenticity-and-preservation-of-the-quran",
+            "evidence-of-muhammads-prophethood",
+            "logical-proofs",
+            "existence-of-god"
+          ],
+          "observedFrenchCounts": {
+            "totalVideos": 5,
+            "logicalProofs": 2,
+            "otherOrUnclassified": 3
+          },
+          "evidenceBoundary": "secondary_dawah_context_not_scientific_primary_evidence",
+          "mediaBoundary": "reference_only_until_explicit_license_or_permission",
+          "languageIdInvariant": true,
+          "urlRole": "verified_french_category_entry",
+          "languageVariants": [
+            {
+              "lang": "fr",
+              "categoryId": "33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite",
+              "verified": true
+            },
+            {
+              "lang": "en",
+              "categoryId": "33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/category/33/preuves-que-lislam-est-la-verite",
+              "verified": true
+            },
+            {
+              "lang": "es",
+              "categoryId": "33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/es/category/33/preuves-que-lislam-est-la-verite",
+              "verified": true
+            },
+            {
+              "lang": "ru",
+              "categoryId": "33",
+              "slug": null,
+              "url": null,
+              "verified": false,
+              "discoveryRequired": true
+            },
+            {
+              "lang": "ar",
+              "categoryId": "33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/ar/category/33/preuves-que-lislam-est-la-verite",
+              "verified": true,
+              "discoveryRequired": true
+            }
+          ],
+          "localizedPathRule": "Preserve the category route and switch only the leading language index; English is the unprefixed default. Do not translate/rewrite the numeric ID or slug unless the source itself supplies a different route.",
+          "videosWithinCategoryNote": "The French category page currently exposes a Videos section and reports 5 videos; its article taxonomy is separate from the site's top-level localized video-category counts.",
+          "note": "Verified French localized category uses ID 33; an earlier category classification was incorrect and has been removed.",
+          "localizedRouteTemplate": "https://www.islamreligion.com/{lang}/category/33/preuves-que-lislam-est-la-verite",
+          "localizedSlugMustBeResolvedFromSource": false,
+          "languageIndexedRoute": true,
+          "routeRule": "Replace only the leading language index for localized routes; English uses the unprefixed default. Preserve the source route exactly unless the source navigation supplies another URL."
+        }
+      ],
+      "canonicalHome": "https://www.islamreligion.com/",
+      "languageDiscovery": {
+        "mode": "source_navigation",
+        "sourceUrl": "https://www.islamreligion.com/",
+        "currentObservedCount": 15,
+        "currentObservedLanguages": [
+          {
+            "code": "en",
+            "name": "English"
+          },
+          {
+            "code": "ar",
+            "name": "العربية"
+          },
+          {
+            "code": "es",
+            "name": "Español"
+          },
+          {
+            "code": "fr",
+            "name": "Français"
+          },
+          {
+            "code": "de",
+            "name": "Deutsch"
+          },
+          {
+            "code": "ru",
+            "name": "Русский"
+          },
+          {
+            "code": "pt",
+            "name": "Português"
+          },
+          {
+            "code": "zh",
+            "name": "中文"
+          },
+          {
+            "code": "ja",
+            "name": "日本語"
+          },
+          {
+            "code": "it",
+            "name": "Italiano"
+          },
+          {
+            "code": "tl",
+            "name": "Tagalog"
+          },
+          {
+            "code": "hi",
+            "name": "हिन्दी"
+          },
+          {
+            "code": "sw",
+            "name": "Kiswahili"
+          },
+          {
+            "code": "ko",
+            "name": "한국어"
+          },
+          {
+            "code": "he",
+            "name": "עברית"
+          }
+        ],
+        "futureLanguagesAllowed": true,
+        "doNotTreatObservedListAsExhaustive": true,
+        "resolutionRule": "Discover language links from the source's localized home/navigation; retain exact source-provided language code, URL and label."
+      },
+      "localizedSiteTemplate": "https://www.islamreligion.com/{lang}",
+      "localizedVideosTemplate": "https://www.islamreligion.com/{lang}/videos",
+      "unprefixedEnglishVideos": "https://www.islamreligion.com/videos",
+      "routeGraph": [
+        "localized_home",
+        "localized_videos",
+        "localized_video_category",
+        "localized_video_item",
+        "localized_child_category"
+      ],
+      "primaryEntryPoints": [
+        "https://www.islamreligion.com/",
+        "https://www.islamreligion.com/videos",
+        "https://www.islamreligion.com/fr/videos",
+        "https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite"
+      ],
+      "resourceGraph": [
+        {
+          "id": "islamreligion-home",
+          "kind": "website-home",
+          "url": "https://www.islamreligion.com/",
+          "language": "global",
+          "title": "IslamReligion.com",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-islam-at-a-glance",
+          "kind": "overview",
+          "url": "https://www.islamreligion.com/islam-at-a-glance",
+          "language": "en",
+          "title": "Islam at a Glance",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-articles",
+          "kind": "articles-hub",
+          "url": "https://www.islamreligion.com/articles",
+          "language": "global",
+          "title": "Articles",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-e-books",
+          "kind": "ebooks-hub",
+          "url": "https://www.islamreligion.com/e-books",
+          "language": "global",
+          "title": "E-books",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-videos",
+          "kind": "videos-hub",
+          "url": "https://www.islamreligion.com/videos",
+          "language": "global",
+          "title": "Videos",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1033",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1033/evidence-islam-is-truth",
+          "language": "en",
+          "title": "Evidence Islam is Truth",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-124",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/124/how-to-convert-to-islam",
+          "language": "en",
+          "title": "How to Convert to Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1043",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1043/benefits-of-islam",
+          "language": "en",
+          "title": "Benefits of Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1059",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1059/hereafter",
+          "language": "en",
+          "title": "The Hereafter",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1055",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1055/worship-and-practice",
+          "language": "en",
+          "title": "Worship and Practice",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1124",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1124/how-to-convert-to-islam",
+          "language": "en",
+          "title": "How to Convert to Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1143",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1143/short-videos-about-islam",
+          "language": "en",
+          "title": "Short Videos About Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1131",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1131/new-muslims",
+          "language": "en",
+          "title": "New Muslims",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1091",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1091/systems-in-islam",
+          "language": "en",
+          "title": "Systems in Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-127",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/127/islamic-songs-nasheed",
+          "language": "en",
+          "title": "Islamic Songs (Nasheed)",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1087",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1087/islamic-history",
+          "language": "en",
+          "title": "Islamic History",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1083",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1083/current-issues",
+          "language": "en",
+          "title": "Current Issues",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1079",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1079/prophet-muhammad",
+          "language": "en",
+          "title": "The Prophet Muhammad",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1075",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1075/holy-quran",
+          "language": "en",
+          "title": "The Holy Quran",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1068",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1068/comparative-religion",
+          "language": "en",
+          "title": "Comparative Religion",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1063",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1063/stories-of-new-muslims",
+          "language": "en",
+          "title": "Stories of New Muslims",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-search-scientific-quran",
+          "kind": "search-endpoint-example",
+          "url": "https://www.islamreligion.com/search?query=scientific-miracles-of-holy-quran&search_type=all",
+          "language": "en",
+          "title": "Search: scientific miracles of Holy Quran",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-search-scientific-prophet",
+          "kind": "search-endpoint-example",
+          "url": "https://www.islamreligion.com/search?query=scientific-miracles-of-prophet-muhammad-sayings&search_type=all",
+          "language": "en",
+          "title": "Search: scientific miracles of Prophet Muhammad sayings",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-search-quran-authenticity",
+          "kind": "search-endpoint-example",
+          "url": "https://www.islamreligion.com/search?query=authenticity-and-preservation-of-holy-quran&search_type=all",
+          "language": "en",
+          "title": "Search: authenticity and preservation of Holy Quran",
+          "sourceNavigationRequired": true
+        }
+      ],
+      "resourceGraphPolicy": {
+        "relationship": "all_resources_belong_to_one_IslamReligion_source_family",
+        "preserveDistinctRoutes": true,
+        "preserveDuplicateCategoryIds": true,
+        "doNotDeduplicateByTitle": true,
+        "searchExamplesAreDiscoveryEndpoints": true,
+        "localizedRouteResolution": "discover_or_switch_language_index_from_source_navigation",
+        "rightsInheritedFromSource": "restricted_unless_explicit_license_or_permission"
+      }
+    }
   ],
   "maqasid": {
     "titleAr": "مقاصد الشريعة",
-    "subsections": ["الضروريات الخمس", "الحاجيات", "التحسينيات", "المقاصد العامة", "المقاصد الخاصة", "المقاصد الجزئية", "القواعد والضوابط", "التطبيقات في العبادات والمعاملات والأسرة"],
-    "daruriyyat": ["حفظ الدين", "حفظ النفس", "حفظ العقل", "حفظ النسل", "حفظ المال"]
+    "subsections": [
+      "الضروريات الخمس",
+      "الحاجيات",
+      "التحسينيات",
+      "المقاصد العامة",
+      "المقاصد الخاصة",
+      "المقاصد الجزئية",
+      "القواعد والضوابط",
+      "التطبيقات في العبادات والمعاملات والأسرة"
+    ],
+    "daruriyyat": [
+      "حفظ الدين",
+      "حفظ النفس",
+      "حفظ العقل",
+      "حفظ النسل",
+      "حفظ المال"
+    ]
   }
 }

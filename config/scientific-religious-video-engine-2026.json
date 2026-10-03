@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "verifiedAt": "2026-08-31",
   "purpose": "A registry-only blueprint for Din Allah Encyclopedia scientific-religious video synthesis. It generates original documentary videos from evidence, licensed media, and synthetic scenes without changing canonical scholarly content or runtime dependencies.",
   "scope": "candidate_benchmark_only",
@@ -66,55 +66,178 @@
     "wordHighlighting": "Use word-level alignment only after a rights-cleared recitation is selected."
   },
   "videoCreationEngines": {
-    "question_understanding": {"role":"Turn the browser question into explicit sub-questions, claims, visual concepts and evidence needs.","status":"candidate"},
-    "islamic_evidence": {"role":"Retrieve Quran, tafsir, authenticated hadith and scholarly explanations without altering canonical text.","status":"candidate"},
-    "scientific_evidence": {"role":"Retrieve primary literature, institutional sources, datasets and authoritative scientific references.","status":"candidate"},
-    "claim_verification": {"role":"Classify evidence strength and block unsupported miracle/health claims.","status":"candidate"},
-    "evidence_graph": {"role":"Link claim -> source -> quote/observation -> verse/hadith -> scene.","status":"candidate"},
-    "global_media_discovery": {"role":"Find reusable media by explicit license/permission and provenance; non-cleared media remains reference-only.","status":"candidate"},
-    "original_scene_generation": {"role":"Generate new scientific or explanatory visuals when no suitable cleared footage exists.","status":"candidate"},
-    "semantic_scene_composer": {"role":"Map every claim to visual evidence, overlays, references and timing.","status":"candidate"},
-    "scene_analysis": {"role":"Detect cuts, shots, motion and usable segments for lawful source material.","status":"candidate"},
-    "quran_word_alignment": {"role":"Align a rights-cleared recitation to Quran words/characters for synchronized highlighting.","status":"candidate"},
-    "multilingual_translation": {"role":"Render approved translations/subtitles in the browser language while preserving source metadata.","status":"candidate"},
-    "voice_engine": {"role":"Manage narration/recitation assets and licensing; cloning is blocked unless explicit rights are recorded.","status":"license_gated"},
-    "timeline_composer": {"role":"Create a deterministic edit timeline that can be re-rendered when evidence changes.","status":"candidate"},
-    "documentary_director": {"role":"Select pedagogical order, pacing, transitions and conclusion without changing evidence strength.","status":"candidate"},
-    "provenance_manifest": {"role":"Persist source, license, checksum, model, version and timing metadata for every asset.","status":"candidate"},
-    "render_engine": {"role":"Render masters and delivery variants up to the configured 48K-class ceiling.","status":"candidate"}
+    "question_understanding": {
+      "role": "Turn the browser question into explicit sub-questions, claims, visual concepts and evidence needs.",
+      "status": "candidate"
+    },
+    "islamic_evidence": {
+      "role": "Retrieve Quran, tafsir, authenticated hadith and scholarly explanations without altering canonical text.",
+      "status": "candidate"
+    },
+    "scientific_evidence": {
+      "role": "Retrieve primary literature, institutional sources, datasets and authoritative scientific references.",
+      "status": "candidate"
+    },
+    "claim_verification": {
+      "role": "Classify evidence strength and block unsupported miracle/health claims.",
+      "status": "candidate"
+    },
+    "evidence_graph": {
+      "role": "Link claim -> source -> quote/observation -> verse/hadith -> scene.",
+      "status": "candidate"
+    },
+    "global_media_discovery": {
+      "role": "Find reusable media by explicit license/permission and provenance; non-cleared media remains reference-only.",
+      "status": "candidate"
+    },
+    "original_scene_generation": {
+      "role": "Generate new scientific or explanatory visuals when no suitable cleared footage exists.",
+      "status": "candidate"
+    },
+    "semantic_scene_composer": {
+      "role": "Map every claim to visual evidence, overlays, references and timing.",
+      "status": "candidate"
+    },
+    "scene_analysis": {
+      "role": "Detect cuts, shots, motion and usable segments for lawful source material.",
+      "status": "candidate"
+    },
+    "quran_word_alignment": {
+      "role": "Align a rights-cleared recitation to Quran words/characters for synchronized highlighting.",
+      "status": "candidate"
+    },
+    "multilingual_translation": {
+      "role": "Render approved translations/subtitles in the browser language while preserving source metadata.",
+      "status": "candidate"
+    },
+    "voice_engine": {
+      "role": "Manage narration/recitation assets and licensing; cloning is blocked unless explicit rights are recorded.",
+      "status": "license_gated"
+    },
+    "timeline_composer": {
+      "role": "Create a deterministic edit timeline that can be re-rendered when evidence changes.",
+      "status": "candidate"
+    },
+    "documentary_director": {
+      "role": "Select pedagogical order, pacing, transitions and conclusion without changing evidence strength.",
+      "status": "candidate"
+    },
+    "provenance_manifest": {
+      "role": "Persist source, license, checksum, model, version and timing metadata for every asset.",
+      "status": "candidate"
+    },
+    "render_engine": {
+      "role": "Render masters and delivery variants up to the configured 48K-class ceiling.",
+      "status": "candidate"
+    }
   },
   "technicalCandidates": {
     "video_generation": [
-      {"name":"Wan2.1","status":"candidate","softwareOrModelLicense":"Apache-2.0","rightsGate":"model_and_dataset_terms_still_required","source":"https://github.com/Wan-Video/Wan2.1"},
-      {"name":"LTX-2.x","status":"license_gated","softwareOrModelLicense":"LTX-2.x Community License","rightsGate":"commercial_entity_and_attachment_terms_must_be_verified_before_use","source":"https://github.com/Lightricks/LTX-2"},
-      {"name":"HunyuanVideo","status":"license_gated","softwareOrModelLicense":"Tencent Hunyuan Community License","rightsGate":"territory_and_use_terms_must_be_verified_before_use","source":"https://github.com/Tencent-Hunyuan/HunyuanVideo"}
+      {
+        "name": "Wan2.1",
+        "status": "candidate",
+        "softwareOrModelLicense": "Apache-2.0",
+        "rightsGate": "model_and_dataset_terms_still_required",
+        "source": "https://github.com/Wan-Video/Wan2.1"
+      },
+      {
+        "name": "LTX-2.x",
+        "status": "license_gated",
+        "softwareOrModelLicense": "LTX-2.x Community License",
+        "rightsGate": "commercial_entity_and_attachment_terms_must_be_verified_before_use",
+        "source": "https://github.com/Lightricks/LTX-2"
+      },
+      {
+        "name": "HunyuanVideo",
+        "status": "license_gated",
+        "softwareOrModelLicense": "Tencent Hunyuan Community License",
+        "rightsGate": "territory_and_use_terms_must_be_verified_before_use",
+        "source": "https://github.com/Tencent-Hunyuan/HunyuanVideo"
+      }
     ],
     "timeline_and_editing": [
-      {"name":"OpenTimelineIO","status":"candidate","softwareLicense":"Apache-2.0","source":"https://github.com/AcademySoftwareFoundation/OpenTimelineIO"},
-      {"name":"Remotion","status":"license_gated","softwareLicense":"Remotion 5 dual/license policy","rightsGate":"entity_eligibility_and_company_license_must_be_checked","source":"https://github.com/remotion-dev/remotion"}
+      {
+        "name": "OpenTimelineIO",
+        "status": "candidate",
+        "softwareLicense": "Apache-2.0",
+        "source": "https://github.com/AcademySoftwareFoundation/OpenTimelineIO"
+      },
+      {
+        "name": "Remotion",
+        "status": "license_gated",
+        "softwareLicense": "Remotion 5 dual/license policy",
+        "rightsGate": "entity_eligibility_and_company_license_must_be_checked",
+        "source": "https://github.com/remotion-dev/remotion"
+      }
     ],
     "scene_analysis": [
-      {"name":"PySceneDetect","status":"candidate","softwareLicense":"BSD-3-Clause","source":"https://github.com/Breakthrough/PySceneDetect"}
+      {
+        "name": "PySceneDetect",
+        "status": "candidate",
+        "softwareLicense": "BSD-3-Clause",
+        "source": "https://github.com/Breakthrough/PySceneDetect"
+      }
     ],
     "alignment": [
-      {"name":"WhisperX","status":"candidate","softwareLicense":"verify_current_repository_and_dependency_terms","capability":"word_level_timestamps_and_forced_alignment","source":"https://github.com/m-bain/whisperX"}
+      {
+        "name": "WhisperX",
+        "status": "candidate",
+        "softwareLicense": "verify_current_repository_and_dependency_terms",
+        "capability": "word_level_timestamps_and_forced_alignment",
+        "source": "https://github.com/m-bain/whisperX"
+      }
     ],
     "rendering_and_transcode": [
-      {"name":"FFmpeg","status":"candidate","softwareLicense":"LGPL/GPL depending on build and enabled components","rightsGate":"record_exact_build_configuration","source":"https://ffmpeg.org/"}
+      {
+        "name": "FFmpeg",
+        "status": "candidate",
+        "softwareLicense": "LGPL/GPL depending on build and enabled components",
+        "rightsGate": "record_exact_build_configuration",
+        "source": "https://ffmpeg.org/"
+      }
     ],
     "image_restoration": [
-      {"name":"Real-ESRGAN","status":"license_gated","softwareOrModelLicense":"verify_current_project_and_each_weight","source":"https://github.com/xinntao/Real-ESRGAN"}
+      {
+        "name": "Real-ESRGAN",
+        "status": "license_gated",
+        "softwareOrModelLicense": "verify_current_project_and_each_weight",
+        "source": "https://github.com/xinntao/Real-ESRGAN"
+      }
     ]
   },
   "outputProfiles": {
-    "720p": {"maxWidth":1280,"maxHeight":720},
-    "1080p": {"maxWidth":1920,"maxHeight":1080},
-    "1440p": {"maxWidth":2560,"maxHeight":1440},
-    "4K": {"maxWidth":3840,"maxHeight":2160},
-    "8K": {"maxWidth":7680,"maxHeight":4320},
-    "16K": {"maxWidth":15360,"maxHeight":8640},
-    "32K": {"maxWidth":30720,"maxHeight":17280},
-    "48K": {"maxWidth":46080,"maxHeight":25920}
+    "720p": {
+      "maxWidth": 1280,
+      "maxHeight": 720
+    },
+    "1080p": {
+      "maxWidth": 1920,
+      "maxHeight": 1080
+    },
+    "1440p": {
+      "maxWidth": 2560,
+      "maxHeight": 1440
+    },
+    "4K": {
+      "maxWidth": 3840,
+      "maxHeight": 2160
+    },
+    "8K": {
+      "maxWidth": 7680,
+      "maxHeight": 4320
+    },
+    "16K": {
+      "maxWidth": 15360,
+      "maxHeight": 8640
+    },
+    "32K": {
+      "maxWidth": 30720,
+      "maxHeight": 17280
+    },
+    "48K": {
+      "maxWidth": 46080,
+      "maxHeight": 25920
+    }
   },
   "outputPolicy": {
     "maximumHorizontalPixels": 46080,
@@ -126,13 +249,640 @@
     "qualityRequirement": "Upscaling may not invent or alter Quran text, hadith text, scientific labels, citations, or factual diagrams; text-bearing layers must be rendered from source vectors at final resolution."
   },
   "assetPolicy": {
-    "sourceClasses": ["public_domain","compatible_open_license","explicit_permission","original_generated","reference_only_not_embeddable"],
+    "sourceClasses": [
+      "public_domain",
+      "compatible_open_license",
+      "explicit_permission",
+      "original_generated",
+      "reference_only_not_embeddable"
+    ],
     "referenceOnlyMeans": "A discovered third-party video may inform research but cannot be embedded, redistributed or transformed unless the rights gate permits it.",
-    "manifestFields": ["assetId","sourceUrl","creator","license","licenseEvidence","retrievedAt","sha256","usageScope","attribution","modelOrTool","modelVersion"]
+    "manifestFields": [
+      "assetId",
+      "sourceUrl",
+      "creator",
+      "license",
+      "licenseEvidence",
+      "retrievedAt",
+      "sha256",
+      "usageScope",
+      "attribution",
+      "modelOrTool",
+      "modelVersion"
+    ]
   },
   "promotionPolicy": {
     "automaticRuntimePromotion": false,
     "automaticCorpusMutation": false,
-    "productionUseRequires": ["rights_verified","evidence_verified","security_passed","quality_benchmark_passed","human_review","provenance_manifest_complete","CI_passed"]
+    "gates": [
+      "rights",
+      "evidence_verification",
+      "scientific_religious_integrity",
+      "security",
+      "arabic_quality",
+      "audiovisual_quality",
+      "performance_resource_cost",
+      "provenance",
+      "human_review",
+      "CI"
+    ],
+    "productionUseRequires": [
+      "rights_verified",
+      "evidence_verified",
+      "scientific_religious_integrity_passed",
+      "security_passed",
+      "arabic_quality_passed",
+      "audiovisual_quality_passed",
+      "performance_resource_cost_passed",
+      "provenance_manifest_complete",
+      "human_review",
+      "CI_passed"
+    ],
+    "noAutomaticPromotionOf": [
+      "video_models",
+      "voice",
+      "footage_sources",
+      "renderers"
+    ]
+  },
+  "runtimeBoundary": {
+    "registryOnly": true,
+    "runtimeDependency": false,
+    "canonicalCorpusMutation": false,
+    "automaticModelOrMediaPromotion": false,
+    "generatedOutputCannotBecomeCanonicalByDefault": true
+  },
+  "claimPolicy": {
+    "separatedClaimTypes": [
+      "quran_text",
+      "quran_translation_meaning",
+      "quran_tafsir",
+      "hadith_text",
+      "hadith_grading",
+      "scientific_observation",
+      "scientific_consensus",
+      "scientific_hypothesis",
+      "historical_report",
+      "interpretive_relationship"
+    ],
+    "requiredForEveryScene": [
+      "claimIds",
+      "evidenceIds"
+    ],
+    "relationStrengthMustBeExplicit": true,
+    "interpretiveRelationshipCannotBecomeScientificFact": true,
+    "interpretiveRelationshipCannotBecomeReligiousRuling": true,
+    "unsupportedScientificClaimBlocksFinalTimeline": true,
+    "unsupportedReligiousClaimBlocksFinalTimeline": true
+  },
+  "sceneContract": {
+    "sceneMustReferenceClaimEvidence": true,
+    "fields": [
+      "sceneId",
+      "purpose",
+      "claimIds",
+      "evidenceIds",
+      "visualSource",
+      "rightsState",
+      "assetIds",
+      "timelineRange"
+    ],
+    "thirdPartyVideoDefault": "reference-only-until-media-rights-verified",
+    "publicOnInternetDoesNotMeanReusable": true
+  },
+  "mediaRightsPolicy": {
+    "embeddableClasses": [
+      "public_domain",
+      "compatible_open_license",
+      "explicit_permission",
+      "original_generated"
+    ],
+    "thirdPartySearchResultDefault": "reference_only_not_embeddable",
+    "permissionRequiredBeforeTransformOrRedistribution": true,
+    "licenseAndPermissionStoredPerAsset": true
+  },
+  "originalCreationPolicy": {
+    "preferredWhenClearedFootageUnavailable": true,
+    "allowedVisualTypes": [
+      "scientific_visualization",
+      "3d_explanatory_scene",
+      "map",
+      "diagram",
+      "animation",
+      "simulation",
+      "original_illustration"
+    ],
+    "candidateModelsOnly": true,
+    "modelPromotionIndependentOfMediaPromotion": true
+  },
+  "quranSynchronization": {
+    "quranArabicText": "verbatim_source_bound",
+    "translationMeanings": "distinct_assets",
+    "recitationRightsRequired": true,
+    "wordLevelModeRequires": [
+      "rights_cleared_recitation",
+      "trusted_word_or_character_timing"
+    ],
+    "fallbackMode": "ayah_level",
+    "timingsDrive": [
+      "word_highlighting",
+      "pronunciation_linked_animation",
+      "translation_timing",
+      "accessibility_captions"
+    ],
+    "noTextMutationDuringAlignment": true
+  },
+  "renderArchitecture": {
+    "stages": [
+      "evidence_and_storyboard",
+      "generation_or_lawful_media_acquisition",
+      "scene_analysis",
+      "composition",
+      "quran_hadith_translation_audio_synchronization",
+      "text_vector_render_at_target_resolution",
+      "eligible_raster_restoration_upscaling",
+      "final_encode",
+      "provenance_manifest"
+    ],
+    "landscape48K": "46080x25920",
+    "portrait48K": "25920x46080",
+    "outputCeilingOnly": true,
+    "native48KGenerationNotRequired": true,
+    "textQuranCitationsAndFactualDiagramsRenderedAsFinalResolutionVectorOrText": true,
+    "repeatedRasterUpscalingOfTextForbidden": true
+  },
+  "reproducibility": {
+    "deterministicTimelineManifest": true,
+    "rebuildWhenEvidenceChanges": true,
+    "rebuildWhenLicenseChanges": true,
+    "rebuildWhenTranslationChanges": true,
+    "assetProvenanceRequired": [
+      "visual",
+      "audio",
+      "model",
+      "citation"
+    ],
+    "requiredPerAssetFields": [
+      "assetId",
+      "sourceUrl",
+      "creator",
+      "license",
+      "licenseEvidence",
+      "retrievedAt",
+      "sha256",
+      "usageScope",
+      "attribution",
+      "modelOrTool",
+      "modelVersion"
+    ]
+  },
+  "islamicVideoSources": [
+    {
+      "sourceId": "islamreligion-videos",
+      "name": "IslamReligion.com — Videos",
+      "localizedEntryPoints": {
+        "template": "https://www.islamreligion.com/{lang}/videos",
+        "english": "https://www.islamreligion.com/videos",
+        "supportedLanguages": [
+          "en",
+          "ar",
+          "es",
+          "fr",
+          "de",
+          "ru",
+          "pt",
+          "zh",
+          "ja",
+          "it",
+          "tl",
+          "hi",
+          "sw",
+          "ko",
+          "he"
+        ],
+        "examples": {
+          "ar": "https://www.islamreligion.com/ar/videos",
+          "ru": "https://www.islamreligion.com/ru/videos",
+          "fr": "https://www.islamreligion.com/fr/videos"
+        }
+      },
+      "role": "dawah_editorial_reference_source_family",
+      "discoveryMode": "search_and_browser_reference",
+      "relevantCollections": [
+        "The Scientific Miracles of the Holy Quran",
+        "The Scientific Miracles of the Prophet Muhammad Sayings",
+        "The Holy Quran",
+        "Evidence of Muhammad's Prophethood"
+      ],
+      "currentObservedCoverage": {
+        "evidenceIslamIsTruthVideos": 123,
+        "scientificMiraclesOfHolyQuranVideos": 17,
+        "holyQuranVideos": 48
+      },
+      "evidenceBoundary": "secondary_dawah_context_not_scientific_primary_evidence",
+      "mediaBoundary": "reference_only_until_explicit_license_or_permission",
+      "rightsDefault": "restricted",
+      "rightsEvidence": "https://www.islamreligion.com/videos",
+      "licenseEvidenceNote": "The site footer currently states Copyright © 2006 - 2026 IslamReligion.com. All rights reserved.",
+      "integrateIntoTimelineOnlyAfter": "media_rights_gate_passes",
+      "interpretiveClaimsNeedIndependentVerification": true,
+      "corpusMutation": false,
+      "languageRouting": "Use the user's selected language index when supported; English is the unprefixed /videos route.",
+      "localizationEvidence": "https://www.islamreligion.com/ar/videos",
+      "categories": [
+        {
+          "id": "33",
+          "labelAr": "أدلة أن الإسلام هو الحق",
+          "labelFr": "Preuves que l'Islam est la vérité",
+          "parent": "videos",
+          "url": "https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite",
+          "languageInvariantId": true,
+          "localizedSlugMustBeResolvedFromSource": false,
+          "role": "dawah_video_category_reference",
+          "observedFrenchVideoCount": 5,
+          "observedFrenchSubcategories": [
+            "Preuves logiques",
+            "Défaut"
+          ],
+          "includesScientificMiraclesSubcategoryInSiteTaxonomy": true,
+          "mediaBoundary": "reference_only_until_explicit_license_or_permission",
+          "languageIdInvariant": true,
+          "urlRole": "verified_french_category_entry",
+          "languageVariants": [
+            {
+              "lang": "fr",
+              "categoryId": "33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/fr/category/33/preuves-que-lislam-est-la-verite",
+              "verified": true
+            },
+            {
+              "lang": "en",
+              "categoryId": "33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/category/33/preuves-que-lislam-est-la-verite",
+              "verified": true
+            },
+            {
+              "lang": "es",
+              "categoryId": "33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/es/category/33/preuves-que-lislam-est-la-verite",
+              "verified": true
+            },
+            {
+              "lang": "ru",
+              "categoryId": "33",
+              "slug": null,
+              "url": null,
+              "verified": false,
+              "discoveryRequired": true
+            },
+            {
+              "lang": "ar",
+              "categoryId": "33",
+              "slug": "preuves-que-lislam-est-la-verite",
+              "url": "https://www.islamreligion.com/ar/category/33/preuves-que-lislam-est-la-verite",
+              "verified": true,
+              "discoveryRequired": true
+            }
+          ],
+          "localizedPathRule": "Preserve the category route and switch only the leading language index; English is the unprefixed default. Do not synthesize localized IDs or slugs.",
+          "note": "Verified French localized category uses ID 33; an earlier category classification was incorrect and has been removed.",
+          "localizedRouteTemplate": "https://www.islamreligion.com/{lang}/category/33/preuves-que-lislam-est-la-verite",
+          "languageIndexedRoute": true,
+          "routeRule": "Replace only the leading language index for localized routes; English uses the unprefixed default. Preserve the source route exactly unless the source navigation supplies another URL."
+        }
+      ],
+      "canonicalHome": "https://www.islamreligion.com/",
+      "languageDiscovery": {
+        "mode": "source_navigation",
+        "sourceUrl": "https://www.islamreligion.com/",
+        "currentObservedCount": 15,
+        "futureLanguagesAllowed": true,
+        "doNotTreatObservedListAsExhaustive": true,
+        "resolutionRule": "Discover the site's current language-navigation links and preserve exact source-provided language code, label and localized URL."
+      },
+      "localizedSiteTemplate": "https://www.islamreligion.com/{lang}",
+      "localizedVideosTemplate": "https://www.islamreligion.com/{lang}/videos",
+      "unprefixedEnglishVideos": "https://www.islamreligion.com/videos",
+      "routeGraph": [
+        "localized_home",
+        "localized_videos",
+        "localized_video_category",
+        "localized_video_item",
+        "localized_child_category"
+      ],
+      "resourceGraph": [
+        {
+          "id": "islamreligion-home",
+          "kind": "website-home",
+          "url": "https://www.islamreligion.com/",
+          "language": "global",
+          "title": "IslamReligion.com",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-islam-at-a-glance",
+          "kind": "overview",
+          "url": "https://www.islamreligion.com/islam-at-a-glance",
+          "language": "en",
+          "title": "Islam at a Glance",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-articles",
+          "kind": "articles-hub",
+          "url": "https://www.islamreligion.com/articles",
+          "language": "global",
+          "title": "Articles",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-e-books",
+          "kind": "ebooks-hub",
+          "url": "https://www.islamreligion.com/e-books",
+          "language": "global",
+          "title": "E-books",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-videos",
+          "kind": "videos-hub",
+          "url": "https://www.islamreligion.com/videos",
+          "language": "global",
+          "title": "Videos",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1033",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1033/evidence-islam-is-truth",
+          "language": "en",
+          "title": "Evidence Islam is Truth",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-124",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/124/how-to-convert-to-islam",
+          "language": "en",
+          "title": "How to Convert to Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1043",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1043/benefits-of-islam",
+          "language": "en",
+          "title": "Benefits of Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1059",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1059/hereafter",
+          "language": "en",
+          "title": "The Hereafter",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1055",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1055/worship-and-practice",
+          "language": "en",
+          "title": "Worship and Practice",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1124",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1124/how-to-convert-to-islam",
+          "language": "en",
+          "title": "How to Convert to Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1143",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1143/short-videos-about-islam",
+          "language": "en",
+          "title": "Short Videos About Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1131",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1131/new-muslims",
+          "language": "en",
+          "title": "New Muslims",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1091",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1091/systems-in-islam",
+          "language": "en",
+          "title": "Systems in Islam",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-127",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/127/islamic-songs-nasheed",
+          "language": "en",
+          "title": "Islamic Songs (Nasheed)",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1087",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1087/islamic-history",
+          "language": "en",
+          "title": "Islamic History",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1083",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1083/current-issues",
+          "language": "en",
+          "title": "Current Issues",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1079",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1079/prophet-muhammad",
+          "language": "en",
+          "title": "The Prophet Muhammad",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1075",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1075/holy-quran",
+          "language": "en",
+          "title": "The Holy Quran",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1068",
+          "kind": "article-category",
+          "url": "https://www.islamreligion.com/category/1068/comparative-religion",
+          "language": "en",
+          "title": "Comparative Religion",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-category-1063",
+          "kind": "video-category",
+          "url": "https://www.islamreligion.com/category/1063/stories-of-new-muslims",
+          "language": "en",
+          "title": "Stories of New Muslims",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-search-scientific-quran",
+          "kind": "search-endpoint-example",
+          "url": "https://www.islamreligion.com/search?query=scientific-miracles-of-holy-quran&search_type=all",
+          "language": "en",
+          "title": "Search: scientific miracles of Holy Quran",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-search-scientific-prophet",
+          "kind": "search-endpoint-example",
+          "url": "https://www.islamreligion.com/search?query=scientific-miracles-of-prophet-muhammad-sayings&search_type=all",
+          "language": "en",
+          "title": "Search: scientific miracles of Prophet Muhammad sayings",
+          "sourceNavigationRequired": true
+        },
+        {
+          "id": "islamreligion-search-quran-authenticity",
+          "kind": "search-endpoint-example",
+          "url": "https://www.islamreligion.com/search?query=authenticity-and-preservation-of-holy-quran&search_type=all",
+          "language": "en",
+          "title": "Search: authenticity and preservation of Holy Quran",
+          "sourceNavigationRequired": true
+        }
+      ],
+      "resourceGraphPolicy": {
+        "relationship": "all_resources_belong_to_one_IslamReligion_source_family",
+        "preserveDistinctRoutes": true,
+        "preserveDuplicateCategoryIds": true,
+        "doNotDeduplicateByTitle": true,
+        "searchExamplesAreDiscoveryEndpoints": true,
+        "localizedRouteResolution": "discover_or_switch_language_index_from_source_navigation",
+        "rightsInheritedFromSource": "restricted_unless_explicit_license_or_permission"
+      },
+      "coverage": [
+        "website",
+        "articles",
+        "videos",
+        "video-categories",
+        "e-books",
+        "islam-at-a-glance",
+        "site-search",
+        "scientific-miracles-of-the-holy-quran",
+        "scientific-miracles-of-prophetic-sayings",
+        "quran",
+        "prophet-muhammad",
+        "comparative-religion",
+        "islamic-history",
+        "new-muslims",
+        "worship-and-practice",
+        "hereafter",
+        "current-issues",
+        "systems-in-islam"
+      ]
+    }
+  ],
+  "evidenceToOriginalMultilingualProduction": {
+    "enabled": true,
+    "name": "Evidence-to-Original Multilingual Production",
+    "inputMode": "reference_and_evidence_extraction",
+    "sourceVideoUse": {
+      "publicVideoMayBeIndexed": true,
+      "publicVideoMayBeWatchedForResearch": true,
+      "rawVideoReuse": false,
+      "audioReuse": false,
+      "frameReuse": false,
+      "clipReuse": false,
+      "transcriptVerbatimReuse": false,
+      "briefQuotationOnlyWhenRightsPolicyAuthorizes": true,
+      "sourceLinkRequired": true
+    },
+    "extraction": {
+      "capture": [
+        "sourceVideoId",
+        "sourceUrl",
+        "title",
+        "creator",
+        "publicationDate",
+        "category",
+        "claimStatements",
+        "supportingReferences",
+        "timestamps",
+        "onScreenCitations",
+        "scientificTerms",
+        "quranReferences",
+        "hadithReferences",
+        "scholarlyReferences"
+      ],
+      "preserveSourceAttribution": true,
+      "preserveTimestampEvidence": true,
+      "distinguishPresenterClaimFromIndependentEvidence": true
+    },
+    "verification": {
+      "religiousClaims": {
+        "quran": "verify_against_canonical_quran_source",
+        "hadith": "verify_text_collection_reference_and_grading_separately",
+        "tafsir": "preserve_exegesis_attribution"
+      },
+      "scientificClaims": {
+        "required": "independent_scientific_source_verification",
+        "preferredEvidence": [
+          "primary_literature",
+          "institutional_scientific_sources",
+          "authoritative_datasets"
+        ],
+        "sourceVideoAloneInsufficient": true
+      },
+      "interpretiveLinks": {
+        "allowed": true,
+        "label": "interpretive_relationship",
+        "cannotPromoteToScientificFact": true,
+        "cannotPromoteToReligiousRuling": true
+      }
+    },
+    "multilingualProduction": {
+      "sourceLanguageMayBeEnglish": true,
+      "targetLanguageScope": "all_languages_supported_by_Din_Allah_Encyclopedia",
+      "siteLanguageListIsNotTargetLanguageLimit": true,
+      "flow": [
+        "source_video_reference",
+        "evidence_extraction",
+        "independent_verification",
+        "neutral_claim_evidence_representation",
+        "original_script_generation",
+        "target_language_translation_and_localization",
+        "original_visual_generation_or_rights_cleared_media",
+        "target_language_narration",
+        "rights_and_provenance_validation"
+      ],
+      "preserveCanonicalQuranArabic": true,
+      "translateMeaningSeparately": true,
+      "recitationRemainsArabic": true,
+      "targetNarrationFollowsUserLanguage": true
+    },
+    "output": {
+      "originalScriptRequired": true,
+      "originalVisualPlanRequired": true,
+      "originalNarrationOrRightsClearedAudioRequired": true,
+      "sourceAttributionInManifestRequired": true,
+      "claimEvidenceTraceabilityRequired": true,
+      "sourceVideoDoesNotBecomeOutputMediaByDefault": true
+    }
   }
 }
