@@ -15,7 +15,8 @@ export const VIDEO_ENGINE_STATES = Object.freeze([
 
 export function evaluateVideoEngineReadiness({
   engineId,
-  licenseCleared=false,
+  localUseCleared=false,
+  publicDistributionCleared=false,
   weightsPresent=false,
   revisionVerified=false,
   sha256Verified=false,
@@ -25,29 +26,31 @@ export function evaluateVideoEngineReadiness({
   distributionTarget="private"
 }={}) {
   if (!engineId) return {status:"blocked",reason:"engineId is required"};
-  if (!licenseCleared) {
+  if (!localUseCleared) {
     return {
       status: distributionTarget === "private" && weightsPresent ? "stored_private_review" : "blocked",
-      reason: "model license/redistribution clearance is required before execution or public exposure",
+      reason: "local use remains subject to the upstream license terms and project review",
       execution_allowed:false,
+      public_distribution_allowed:Boolean(publicDistributionCleared),
       quota_required:false
     };
   }
-  if (!weightsPresent) return {status:"blocked",reason:"model weights/components are not present",execution_allowed:false,quota_required:false};
+  if (!weightsPresent) return {status:"blocked",reason:"model weights/components are not present",execution_allowed:false,public_distribution_allowed:false,quota_required:false};
   if (!revisionVerified || !sha256Verified) {
-    return {status:"blocked",reason:"immutable revision and SHA-256 verification are required",execution_allowed:false,quota_required:false};
+    return {status:"blocked",reason:"immutable revision and SHA-256 verification are required",execution_allowed:false,public_distribution_allowed:false,quota_required:false};
   }
-  if (!runtimePresent) return {status:"blocked",reason:"runtime components are not present or verified",execution_allowed:false,quota_required:false};
+  if (!runtimePresent) return {status:"blocked",reason:"runtime components are not present or verified",execution_allowed:false,public_distribution_allowed:false,quota_required:false};
   if (!dependenciesVerified) {
-    return {status:"dependency_blocked",reason:"required runtime dependencies are not verified",execution_allowed:false,quota_required:false};
+    return {status:"dependency_blocked",reason:"required runtime dependencies are not verified",execution_allowed:false,public_distribution_allowed:Boolean(publicDistributionCleared),quota_required:false};
   }
   if (!e2eSmokeTestPassed) {
-    return {status:"runtime_unverified",reason:"end-to-end generation smoke test has not passed",execution_allowed:false,quota_required:false};
+    return {status:"runtime_unverified",reason:"end-to-end generation smoke test has not passed",execution_allowed:false,public_distribution_allowed:Boolean(publicDistributionCleared),quota_required:false};
   }
   return {
     status:"ready",
     reason:"local video engine is execution-ready",
     execution_allowed:true,
+    public_distribution_allowed:Boolean(publicDistributionCleared),
     quota_required:false,
     limits:["gpu_compute","host_memory","storage","runtime_time"],
     corpus_write_allowed:false,
