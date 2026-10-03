@@ -68,7 +68,7 @@ export function selectMultimodalModel({
 }
 
 export function isProductionRuntimeReady(model) {
-  if (model.weight_status !== "cleared") return false;
+  if (model.weight_integrity_status !== "verified") return false;
   if (model.local_use_status !== "cleared") return false;
   if (model.runtime_status && model.runtime_status !== "ready") return false;
   if (model.execution_proof && model.execution_proof !== "e2e_verified") return false;
