@@ -8,6 +8,7 @@ import { buildHistoricalResearchContext } from "./prophets-companions-genealogy-
 import { searchOfficialInstitutions, officialInstitutionPolicy } from "./official-institution-search.js";
 import { searchRijalResearch } from "./rijal-search.js";
 import { searchScholars } from "./scholar-research.js";
+import { getSearchArchitectureContract, normalizeHadithEvidence, normalizeSearchResult } from "./search-architecture.js";
 
 export function buildUnifiedSourceRecords() {
   const registryRecords = listSources().map((source) => ({
@@ -15,6 +16,8 @@ export function buildUnifiedSourceRecords() {
     title: source.nameAr || source.id,
     aliases: source.aliases || [],
     topic: source.category,
+    sourceId: source.id,
+    sourceType: source.sourceKind || "registry-source",
     source: source.url || source.id,
     verification: source.verification || "verified",
     corpus: "sunni",
@@ -30,6 +33,8 @@ export function buildUnifiedSourceRecords() {
     title: book.nameAr || book.title || book.id,
     aliases: book.aliases || [],
     topic: book.category || book.subject || "books",
+    sourceId: (book.sourceHostIds || [])[0] || "book-catalog",
+    sourceType: "book",
     source: (book.sourceHostIds || [])[0] || "book-catalog",
     verification: book.status === "verified" ? "verified" : "bibliographic-record",
     corpus: "sunni",
@@ -45,6 +50,8 @@ export function buildUnifiedSourceRecords() {
     title: section.nameAr,
     aliases: section.aliases || [],
     topic: section.id,
+    sourceId: "shamela",
+    sourceType: "bibliographic-index",
     source: "https://shamela.ws/",
     verification: "bibliographic-index",
     corpus: "sunni",
@@ -100,14 +107,23 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
   const rijalResearch = searchRijalResearch(query);
   const scholarMatches = searchScholars(query, { limit: 20 });
   const mergedSourceMatches = [...sourceMatches, ...fiqh, ...historicalRecords, ...officialInstitutions]
-    .sort((a, b) => (b.relevance || 0) - (a.relevance || 0));
+    .sort((a, b) => (b.relevance || 0) - (a.relevance || 0))
+    .map((item) => normalizeSearchResult({ ...item, evidence: buildEvidence(item) }));
+
+  const hadithItems = Array.isArray(hadithData)
+    ? hadithData
+    : (hadithData?.results || hadithData?.hadiths || hadithData?.data || []);
+  const hadithResearch = Array.isArray(hadithItems)
+    ? hadithItems.map(normalizeHadithEvidence)
+    : [];
 
   return {
     query,
     responseLanguage: responseLocale,
     hadith: hadithData,
+    hadithResearch,
     scholarMatches,
-    sourceMatches: mergedSourceMatches.map((item) => ({ ...item, evidence: buildEvidence(item) })),
+    sourceMatches: mergedSourceMatches,
     fiqhResearch: {
       matched: fiqh.length > 0,
       records: fiqh,
@@ -144,7 +160,22 @@ export async function unifiedSearch(query, { signal, includePotentialMatches = f
       rijalBookLocatorRequiredForEvidence: true,
       scholarCatalogIsDiscoveryLayer: true,
       scholarPresenceDoesNotEqualEndorsement: true,
-      scholarAttributionRequiresEvidence: true
+      scholarAttributionRequiresEvidence: true,
+      unifiedSearchEntrypoint: "/search?q=...",
+      searchArchitectureContractVersion: getSearchArchitectureContract().version,
+      searchResultSourceTypeRequired: true,
+      bibliographicMetadataPreservedWhenAvailable: true,
+      hadithCollectionDoesNotEqualAuthenticity: true,
+      hadithGradingKeptSeparateFromSource: true,
+      revelationCauseRequiresVerifiedSource: true,
+      thematicSimilarityCannotProveRevelationCause: true,
+      weakReportsRemainExplicitlyLabeled: true,
+      maqasidHierarchyPreserved: true,
+      libraryPdfDocxRightsGated: true,
+      recitationDownloadRightsGated: true,
+      recitationWordSyncRequiresTrustedTiming: true,
+      rtlLtrSupported: true,
+      originalSourceLanguagePreserved: true
     }
   };
 }
