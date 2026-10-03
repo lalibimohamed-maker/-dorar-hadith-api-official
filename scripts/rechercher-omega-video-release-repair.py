@@ -227,13 +227,11 @@ def delete_asset(name: str):
 
 
 def repair(release: dict, manifest: dict, initial_assets: dict[str, dict], audit_result: dict):
-    if not HF_TOKEN:
-        raise RuntimeError("HF_TOKEN is required for repair mode")
     if not MODEL_ID or not REVISION:
         raise RuntimeError("MODEL_ID and REVISION are required for repair mode")
 
     chunk_bytes = int(manifest.get("chunk_bytes", CHUNK_BYTES))
-    fs = HfFileSystem(token=HF_TOKEN, block_size=8 * 1024 * 1024)
+    fs = HfFileSystem(token=HF_TOKEN or None, block_size=8 * 1024 * 1024)
     upload_url = release["upload_url"].replace("{?name,label}", "")
     repaired = []
 
