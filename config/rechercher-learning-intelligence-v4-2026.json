@@ -1,0 +1,42 @@
+{
+  "engine": "rechercher-learning-intelligence-v4",
+  "version": "4.0.0",
+  "status": "executable-foundation",
+  "principle": "Learning Intelligence serves source-grounded learning and research; it never becomes an authority and never controls acquisition.",
+  "capabilities": [
+    {"id":"knowledge_gap_diagnosis","status":"IMPLEMENTED","engine":"rechercher-learning-intelligence-v4-engine.js"},
+    {"id":"prerequisite_similarity_paths","status":"IMPLEMENTED","engine":"rechercher-learning-intelligence-v4-engine.js"},
+    {"id":"blocked_learning_recovery","status":"IMPLEMENTED","engine":"rechercher-learning-intelligence-v4-engine.js"},
+    {"id":"explainable_personalized_recommendations","status":"IMPLEMENTED","engine":"rechercher-learning-intelligence-v4-engine.js"},
+    {"id":"four_knowledge_graph_layers","status":"IMPLEMENTED","layers":["SOURCE_GRAPH","DOMAIN_ONTOLOGY","LEARNING_RESOURCE_GRAPH","LEARNER_STATE_GRAPH"]},
+    {"id":"evidence_provenance_trails","status":"IMPLEMENTED"},
+    {"id":"contradiction_aware_research","status":"IMPLEMENTED"},
+    {"id":"confidence_calibration","status":"IMPLEMENTED"},
+    {"id":"teach_back","status":"IMPLEMENTED"},
+    {"id":"socratic_guidance","status":"IMPLEMENTED"},
+    {"id":"research_apprenticeship","status":"IMPLEMENTED"},
+    {"id":"cognitive_load_controls","status":"IMPLEMENTED"},
+    {"id":"transfer_laboratory","status":"IMPLEMENTED"},
+    {"id":"continuous_ablation_evaluation","status":"IMPLEMENTED"},
+    {"id":"privacy_preserving_learner_model","status":"IMPLEMENTED"},
+    {"id":"offline_first_learning_resilience","status":"IMPLEMENTED"},
+    {"id":"teacher_scholar_review_channel","status":"IMPLEMENTED"},
+    {"id":"translation_alignment_memory","status":"IMPLEMENTED"},
+    {"id":"cross_language_terminology_map","status":"IMPLEMENTED"},
+    {"id":"accessibility_adaptive_presentation","status":"IMPLEMENTED"}
+  ],
+  "safety_contract": {
+    "learning_intelligence_cannot_stop_pdf_download": true,
+    "learning_intelligence_cannot_disable_acquisition": true,
+    "learning_intelligence_cannot_bypass_rights_or_provenance": true,
+    "learning_intelligence_cannot_modify_original_pdf": true,
+    "learning_intelligence_cannot_modify_canonical_quran_arabic": true,
+    "learning_intelligence_cannot_erase_madhhab_or_scholarly_differences": true,
+    "ai_output_is_non_authoritative_without_human_review": true,
+    "unknown_or_restricted_rights_are_not_publishable": true
+  },
+  "evidence_policy": "Every research/learning claim remains source-linked; uncertainty and disagreement are preserved rather than silently collapsed.",
+  "privacy_policy": "Learner state stores minimum necessary pseudonymous identifiers; raw private answers are not required for graph-level recommendations.",
+  "offline_policy": "Offline mode may cache only permitted learning metadata/resources and must preserve provenance and rights state.",
+  "evaluation_policy": "Ablation/evaluation records compare learning strategies without rewriting authoritative source data."
+}

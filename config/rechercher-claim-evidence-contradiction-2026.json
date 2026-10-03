@@ -1,0 +1,45 @@
+{
+  "stage": "V7_GLOBAL_RESEARCH_GRAPH",
+  "component": "CLAIM_EVIDENCE_CONTRADICTION_ENGINE",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "pipeline": [
+    "PAGE",
+    "PASSAGE",
+    "CLAIM",
+    "EVIDENCE",
+    "CONTRADICTION",
+    "SCHOLAR_REVIEW",
+    "VERIFIED_GRAPH"
+  ],
+  "claimStatuses": [
+    "DIRECT_SOURCE",
+    "DERIVED",
+    "SCHOLARLY_INTERPRETATION",
+    "AI_SYNTHESIS",
+    "HYPOTHESIS",
+    "DISPUTED"
+  ],
+  "reviewStates": [
+    "UNREVIEWED",
+    "REVIEW_REQUIRED",
+    "SCHOLAR_REVIEWED",
+    "VERIFIED"
+  ],
+  "invariants": {
+    "provenanceRequired": true,
+    "aiCannotSelfVerify": true,
+    "missingEndpointsRejected": true,
+    "contradictionsRemainExplicit": true,
+    "sourceIdentityImmutable": true,
+    "contentHashImmutable": true,
+    "originalPdfImmutable": true,
+    "canonicalQuranArabicImmutable": true
+  },
+  "handoffs": [
+    "PAGE_PASSAGE_TO_CLAIM",
+    "CLAIM_TO_EVIDENCE",
+    "CLAIM_TO_CONTRADICTION",
+    "EVIDENCE_TO_SCHOLAR_REVIEW",
+    "REVIEW_TO_V7_GRAPH"
+  ]
+}

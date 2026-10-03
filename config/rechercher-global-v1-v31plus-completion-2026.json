@@ -1,0 +1,43 @@
+{
+  "engine": "rechercher-global-v1-v31plus-completion",
+  "version": "2.0.0",
+  "scope": "V1_V31_PLUS",
+  "principle": "Rechercher is treated as one integrated architecture: every stage must have a contract, evidence boundary, compatible handoffs, tests and global safety gates. V31+ is extensible but never exempt from the same gates.",
+  "stage_families": {
+    "V1_V8": { "from": 1, "to": 8, "purpose": "foundation_to_adaptive_learning" },
+    "V9_V20": { "from": 9, "to": 20, "purpose": "global_deep_research_worldwide_evolution_knowledge_intelligence_education" },
+    "V21_V30": { "from": 21, "to": 30, "purpose": "world_knowledge_intelligence" },
+    "V31_PLUS": { "from": 31, "to": null, "purpose": "knowledge_commons_research_ecosystem_and_future_extensions" }
+  },
+  "completion_gates": [
+    "unit_tests", "integration_tests", "contract_tests", "full_ci", "security_gates", "governance_gates",
+    "rights_gate", "provenance_gate", "immutability_gate", "scholar_review_gate", "ai_authority_boundary_gate",
+    "cross_stage_handoff_gate", "resource_registry_gate", "observability_gate", "rollback_recovery_gate",
+    "continuous_evolution_gate"
+  ],
+  "completion_rule": "COMPLETE only when every registered V1-V31+ stage is IMPLEMENTED, all required contracts are valid, all cross-stage handoffs are compatible, and every global gate passes.",
+  "safety_invariants": {
+    "unknown_rights_never_publishable": true,
+    "restricted_rights_never_publishable": true,
+    "provenance_required_for_verification": true,
+    "original_pdf_immutable": true,
+    "canonical_quran_arabic_immutable": true,
+    "ai_cannot_self_verify": true,
+    "learning_never_overrides_scholarly_authority": true,
+    "acquisition_independent_from_learning": true,
+    "disagreements_remain_explicit": true,
+    "absence_is_not_proof_of_absence": true
+  },
+  "integration_model": [
+    "DISCOVER", "IDENTIFY", "DEDUPLICATE", "VERIFY_SOURCE", "CHECK_RIGHTS", "ACQUIRE_OR_REFERENCE",
+    "VALIDATE", "EXTRACT", "ALIGN", "GRAPH", "EVIDENCE", "LEARN", "REVIEW", "PUBLISH_IF_ALLOWED",
+    "MEASURE_GAPS", "RESEARCH_AGAIN"
+  ],
+  "v31_plus_policy": "Open extension space with the same stage contract, provenance, rights, review, security, governance, observability and recovery requirements as V1-V30.",
+  "verification": {
+    "parent_pr": 530,
+    "parent_pr_state": "DRAFT_NOT_MERGED",
+    "integration_branch": "feat/rechercher-v1-v31plus-integration",
+    "global_complete_claim": false
+  }
+}

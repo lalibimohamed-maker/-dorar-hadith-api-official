@@ -1,0 +1,47 @@
+{
+  "stageId": "V6_GLOBAL_SOURCE_INTELLIGENCE",
+  "version": "2026.09",
+  "status": "FOUNDATION_IMPLEMENTED_EXTENSION_POINT",
+  "dependsOn": ["V5_GLOBAL_RESEARCH"],
+  "flow": [
+    "DISCOVERY",
+    "SOURCE_CLASSIFICATION",
+    "IDENTITY",
+    "DEDUPLICATION",
+    "PROVENANCE",
+    "RIGHTS",
+    "WORK_EDITION_MANUSCRIPT",
+    "VERIFIED_SOURCE",
+    "EVIDENCE_HANDOFF"
+  ],
+  "outputs": ["SOURCE_CANDIDATE", "VERIFIED_SOURCE"],
+  "publishability": {
+    "ALLOWED": true,
+    "RESTRICTED": false,
+    "UNKNOWN": false,
+    "EXPLICIT_PERMISSION_REQUIRED": false
+  },
+  "immutable": [
+    "sourceIdentity",
+    "contentHash",
+    "canonicalQuranArabic",
+    "originalPdf"
+  ],
+  "safety": {
+    "rightsBypass": false,
+    "provenanceBypass": false,
+    "sourceIdentityMutation": false,
+    "contentHashMutation": false,
+    "canonicalQuranArabicMutation": false,
+    "originalPdfMutation": false,
+    "acquisitionIndependent": true
+  },
+  "integration": {
+    "inbound": "V5_GLOBAL_RESEARCH",
+    "outbound": "V7_RESEARCH_EVIDENCE_GRAPH",
+    "handoffCompatibilityRequired": true,
+    "traceRequired": true,
+    "replanObservable": true
+  },
+  "completionGate": "OPEN_EXTENSION_POINT_UNTIL_FULL_IMPLEMENTATION_INTEGRATION_TESTS_SECURITY_AND_GOVERNANCE_PASS"
+}
