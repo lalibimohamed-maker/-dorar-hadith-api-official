@@ -72,8 +72,14 @@ test("Starter engine acquisition pins immutable full SHAs and stays review-only"
   for (const engine of profile.engines) {
     assert.match(engine.revision, /^[0-9a-f]{40}$/);
     assert.equal(engine.license_status, "verified_source_license");
-    assert.equal(engine.acquisition, "github_release");
-    assert.match(engine.release_tag, /^rechercher-omega-engines-v0\.1\.0$/);
+    if (engine.acquisition === "github_release") {
+      assert.match(engine.release_tag, /^rechercher-omega-engines-v0\.1\.0$/);
+    } else {
+      assert.equal(engine.acquisition, "external_release_reference");
+      assert.equal(engine.upstream_release_repository, "lalibimohamed-maker/-dorar-hadith-api-official");
+      assert.equal(engine.upstream_release_tag, "rechercher-free-local-models-2026-10");
+      assert.equal(engine.upstream_release_asset, "qwen3-0.6b.tar.zst");
+    }
   }
 });
 
@@ -108,7 +114,10 @@ test("persistent Release manifest keeps binary weights out of Git", async () => 
   ));
   assert.equal(release.policy.github_release_assets_only, true);
   assert.equal(release.policy.no_git_tracked_weights, true);
-  assert.equal(release.engines.length, 3);
+  assert.equal(release.engines.length, 2);
+  assert.equal(release.external_release_references.length, 1);
+  assert.equal(release.external_release_references[0].logical_id, "qwen3");
+  assert.equal(release.external_release_references[0].source_release_tag, "rechercher-free-local-models-2026-10");
   assert.ok(release.engines.every(engine =>
     engine.revision.length === 40 &&
     engine.asset_plan.every(name => !name.endsWith(".bin"))
