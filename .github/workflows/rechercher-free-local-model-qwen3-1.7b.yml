@@ -40,14 +40,13 @@ jobs:
           set -euo pipefail
           TAG='rechercher-free-local-models-2026-10-qwen3-1.7b'
           required=(
-            qwen3-1.7b.tar.zst.part-00
-            qwen3-1.7b.tar.zst.part-01
             LICENSE-Qwen3-1.7B
             README-Qwen3-1.7B.md
             Qwen3-1.7B-config.json
             runtime-verification.json
             RELEASE-PARTS.json
             SHA256SUMS.txt
+            ARCHIVE-SHA256.txt
           )
           asset_names="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || true)"
           complete=true
@@ -57,9 +56,14 @@ jobs:
               break
             fi
           done
+          part_count="$(grep -Ec '^qwen3-1\.7b\.tar\.zst\.part-[0-9]+$' <<<"$asset_names" || true)"
+          if [ "$part_count" -lt 1 ]; then
+            complete=false
+          fi
           echo "complete=$complete" >> "$GITHUB_OUTPUT"
+          echo "release_part_count=$part_count" >> "$GITHUB_OUTPUT"
           if [ "$complete" = true ]; then
-            echo "Complete Qwen3-1.7B Release already exists; skipping re-acquisition."
+            echo "Complete Qwen3-1.7B Release already exists; skipping re-acquisition ($part_count parts)."
           else
             echo "Qwen3-1.7B Release is incomplete; acquisition will run."
           fi
@@ -135,7 +139,7 @@ jobs:
           print(json.dumps(evidence, ensure_ascii=False))
           PY
 
-      - name: Split release payload into GitHub-safe assets
+      - name: Split and hash release payload
         if: steps.release_preflight.outputs.complete != 'true'
         run: |
           set -euo pipefail
@@ -143,44 +147,56 @@ jobs:
           split -b 1800M -d -a 2 qwen17-release/qwen3-1.7b.tar.zst qwen17-release/qwen3-1.7b.tar.zst.part-
           python3 - <<'PY'
           import hashlib, json, pathlib
-          root=pathlib.Path('qwen17-release')
-          archive=root/'qwen3-1.7b.tar.zst'
-          parts=sorted(root.glob('qwen3-1.7b.tar.zst.part-*'))
+
+          root = pathlib.Path('qwen17-release')
+          archive = root / 'qwen3-1.7b.tar.zst'
+          parts = sorted(root.glob('qwen3-1.7b.tar.zst.part-*'))
           if not parts:
               raise SystemExit('no archive parts produced')
-          entries=[{
-              'name':p.name,
-              'bytes':p.stat().st_size,
-              'sha256':hashlib.sha256(p.read_bytes()).hexdigest()
-          } for p in parts]
-          meta={
-              'schema':'dinullah.local-model-release-parts.v1',
-              'model':'Qwen/Qwen3-1.7B',
-              'archive':archive.name,
-              'archiveBytes':archive.stat().st_size,
-              'partSizeBytes':1800*1024*1024,
-              'parts':entries,
-              'reassemble':'cat qwen3-1.7b.tar.zst.part-* > qwen3-1.7b.tar.zst',
-              'verify':'sha256sum -c SHA256SUMS.txt'
-          }
-          json.dump(meta, open(root/'RELEASE-PARTS.json','w'), ensure_ascii=False, indent=2)
-          print(json.dumps(meta, ensure_ascii=False))
-          PY
 
-      - name: Hash release assets
-        if: steps.release_preflight.outputs.complete != 'true'
-        run: |
-          set -euo pipefail
-          rm -f qwen17-release/SHA256SUMS.txt
-          sha256sum \
-            qwen17-release/qwen3-1.7b.tar.zst \
-            qwen17-release/qwen3-1.7b.tar.zst.part-* \
-            qwen17-release/LICENSE-Qwen3-1.7B \
-            qwen17-release/README-Qwen3-1.7B.md \
-            qwen17-release/Qwen3-1.7B-config.json \
-            qwen17-release/runtime-verification.json \
-            qwen17-release/RELEASE-PARTS.json \
-            > qwen17-release/SHA256SUMS.txt
+          def sha256_file(path):
+              h = hashlib.sha256()
+              with path.open('rb') as stream:
+                  for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          entries = [{
+              'name': p.name,
+              'bytes': p.stat().st_size,
+              'sha256': sha256_file(p)
+          } for p in parts]
+
+          archive_sha256 = sha256_file(archive)
+          meta = {
+              'schema': 'dinullah.local-model-release-parts.v2',
+              'model': 'Qwen/Qwen3-1.7B',
+              'archive': archive.name,
+              'archiveBytes': archive.stat().st_size,
+              'archiveSha256': archive_sha256,
+              'partSizeBytes': 1800 * 1024 * 1024,
+              'parts': entries,
+              'reassemble': 'cat qwen3-1.7b.tar.zst.part-* > qwen3-1.7b.tar.zst',
+              'verifyParts': 'sha256sum -c SHA256SUMS.txt',
+              'verifyArchive': 'sha256sum -c ARCHIVE-SHA256.txt'
+          }
+          json.dump(meta, open(root / 'RELEASE-PARTS.json', 'w'), ensure_ascii=False, indent=2)
+          print(json.dumps(meta, ensure_ascii=False))
+
+          with open(root / 'SHA256SUMS.txt', 'w', encoding='utf-8') as out:
+              for path in [
+                  *parts,
+                  root / 'LICENSE-Qwen3-1.7B',
+                  root / 'README-Qwen3-1.7B.md',
+                  root / 'Qwen3-1.7B-config.json',
+                  root / 'runtime-verification.json',
+                  root / 'RELEASE-PARTS.json'
+              ]:
+                  out.write(f'{sha256_file(path)}  {path.name}\\n')
+
+          with open(root / 'ARCHIVE-SHA256.txt', 'w', encoding='utf-8') as out:
+              out.write(f'{archive_sha256}  {archive.name}\\n')
+          PY
 
       - name: Publish release
         if: steps.release_preflight.outputs.complete != 'true'
@@ -192,7 +208,7 @@ jobs:
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
             gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
               --title 'Rechercher — Qwen3-1.7B local model' \
-              --notes 'Explicitly declared Qwen3-1.7B Apache-2.0 local weight target. Payload is split into sub-2-GB release assets; reconstruct and verify SHA256SUMS before runtime admission. FreeLLM is discovery-only.'
+              --notes 'Explicitly declared Qwen3-1.7B Apache-2.0 local weight target. Payload is split into sub-2-GB release assets. SHA256SUMS.txt covers the downloadable release assets; ARCHIVE-SHA256.txt records the reconstructed archive digest; RELEASE-PARTS.json provides ordered parts and archive provenance. FreeLLM is discovery-only.'
           gh release upload "$TAG" \
             qwen17-release/qwen3-1.7b.tar.zst.part-* \
             qwen17-release/LICENSE-Qwen3-1.7B \
@@ -201,4 +217,5 @@ jobs:
             qwen17-release/runtime-verification.json \
             qwen17-release/RELEASE-PARTS.json \
             qwen17-release/SHA256SUMS.txt \
+            qwen17-release/ARCHIVE-SHA256.txt \
             --repo "$GITHUB_REPOSITORY" --clobber
