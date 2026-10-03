@@ -63,10 +63,23 @@ jobs:
               if [ -n "$status" ]; then
                 current="$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')"
                 if [ "$current" = "$sha" ]; then
-                  git -C "$wt" add .github/workflows scripts 2>/dev/null || true
+                  workflow_status="$(printf '%s\n' "$status" | awk '$2 ~ /^\.github\/workflows\// {print}')"
+                  script_status="$(printf '%s\n' "$status" | awk '$2 ~ /^scripts\// {print}')"
+
+                  # GITHUB_TOKEN/App credentials cannot grant themselves the
+                  # repository-level workflow-file permission. Push script-only
+                  # repairs here; workflow-file repairs are reported for the
+                  # existing workflow-aware GitHub connection to apply.
+                  if [ -n "$script_status" ]; then
+                    git -C "$wt" add scripts 2>/dev/null || true
+                  fi
                   if ! git -C "$wt" diff --cached --quiet; then
-                    git -C "$wt" commit -m 'chore(governance): self-heal branch workflow policy'
+                    git -C "$wt" commit -m 'chore(governance): self-heal branch policy'
                     git -C "$wt" push origin "HEAD:refs/heads/$branch"
+                  fi
+                  if [ -n "$workflow_status" ]; then
+                    echo "::warning::Workflow-policy repairs detected on $branch but were not pushed because the runtime credential lacks workflow-file permission."
+                    printf '%s\n' "$workflow_status" | sed 's/^/::notice::Deferred workflow repair: /'
                   fi
                 fi
               fi
