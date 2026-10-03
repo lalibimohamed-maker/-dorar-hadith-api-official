@@ -246,6 +246,27 @@ jobs:
           fi
           torchrun --nproc_per_node=1 generate.py             --prompt "$PROMPT"             "${image_args[@]}"             --resolution "$resolution"             --aspect_ratio 16:9             --seed 1             --rewrite false             --cfg_distilled "$cfg_distilled"             --enable_step_distill "$step_distill"             --sparse_attn false --use_sageattn false             --enable_cache false --cache_type deepcache             --overlap_group_offloading false             --sr false --save_pre_sr_video             --output_path "$OUTPUT_PATH"             --model_path "$MODEL_DIR"
 
+      - name: Validate generated MP4 quality gate
+        env:
+          ENGINE: ${{ inputs.engine }}
+          OUTPUT_PATH: ${{ runner.temp }}/omega-${{ inputs.engine == 'ltx-2' && 'ltx2' || 'hunyuan' }}-output.mp4
+        run: |
+          set -euo pipefail
+          test -s "$OUTPUT_PATH"
+          command -v ffprobe
+          python3 - "$OUTPUT_PATH" <<'PY'
+          import json, subprocess, sys
+          path=sys.argv[1]
+          p=subprocess.run(["ffprobe","-v","error","-show_streams","-show_format","-of","json",path],check=True,capture_output=True,text=True)
+          data=json.loads(p.stdout)
+          streams=[s for s in data.get("streams",[]) if s.get("codec_type")=="video"]
+          if not streams:
+              raise SystemExit("generated artifact contains no video stream")
+          duration=float(data.get("format",{}).get("duration") or 0)
+          if duration <= 0:
+              raise SystemExit("generated artifact has no positive duration")
+          print(json.dumps({"status":"generated_mp4_validated","duration_seconds":duration,"video_codec":streams[0].get("codec_name"),"width":streams[0].get("width"),"height":streams[0].get("height"),"nb_frames":streams[0].get("nb_frames")},ensure_ascii=False))
+          PY
       - name: Write generation manifest
         env:
           ENGINE: ${{ inputs.engine }}
