@@ -120,7 +120,8 @@
       "activation_rule": "license_clearance + dependency_verification + e2e_smoke_test",
       "runtime_status": "dependency_blocked",
       "primary_model": false,
-      "role": "optional_local_media_engine"
+      "role": "optional_local_media_engine",
+      "runtime_environment_id": "hunyuanvideo15-pytorch"
     },
     {
       "id": "ltx-2",
@@ -152,7 +153,8 @@
       "primary_model": false,
       "role": "optional_local_media_engine",
       "source_revision": "dfcc2108383fe1aaa0584bdf55d368a4bdadd90c",
-      "revision_type": "immutable_hf_commit"
+      "revision_type": "immutable_hf_commit",
+      "runtime_environment_id": "ltx2-pinned-python"
     },
     {
       "id": "cogvideox",
