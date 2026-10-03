@@ -15,6 +15,9 @@ on:
         required: true
         default: false
         type: boolean
+  push:
+    branches:
+      - feat/rechercher-omega-multimodal-intelligence
 
 permissions:
   contents: read
@@ -27,7 +30,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           REPO: lalibimohamed-maker/rechercher-omega-engine-storage
-          ENGINE: ${{ inputs.engine }}
+          ENGINE: ${{ inputs.engine || 'ltx-2' }}
         run: |
           set -euo pipefail
           case "$ENGINE" in
@@ -58,9 +61,9 @@ jobs:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
-          OMEGA_STORAGE_RELEASE_TAG: ${{ inputs.engine == 'ltx-2' && 'rechercher-omega-ltx2-v1.0.0' || 'rechercher-omega-hunyuanvideo15-v1.0.0' }}
-          MODEL_ID: ${{ inputs.engine == 'ltx-2' && 'Lightricks/LTX-2' || 'tencent/HunyuanVideo-1.5' }}
-          REVISION: ${{ inputs.engine == 'ltx-2' && 'dfcc2108383fe1aaa0584bdf55d368a4bdadd90c' || '9b49404b3f5df2a8f0b31df27a0c7ab872e7b038' }}
+          OMEGA_STORAGE_RELEASE_TAG: ${{ (inputs.engine || 'ltx-2') == 'ltx-2' && 'rechercher-omega-ltx2-v1.0.0' || 'rechercher-omega-hunyuanvideo15-v1.0.0' }}
+          MODEL_ID: ${{ (inputs.engine || 'ltx-2') == 'ltx-2' && 'Lightricks/LTX-2' || 'tencent/HunyuanVideo-1.5' }}
+          REVISION: ${{ (inputs.engine || 'ltx-2') == 'ltx-2' && 'dfcc2108383fe1aaa0584bdf55d368a4bdadd90c' || '9b49404b3f5df2a8f0b31df27a0c7ab872e7b038' }}
           CHUNK_BYTES: "536870912"
           AUDIT_ONLY: "true"
         run: |
@@ -69,7 +72,7 @@ jobs:
           python3 scripts/rechercher-omega-video-release-repair.py
 
   e2e-smoke:
-    if: ${{ inputs.run_e2e_smoke }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_e2e_smoke) || github.event_name == 'push' }}
     runs-on: [self-hosted, linux, x64, gpu]
     permissions:
       contents: read
@@ -96,7 +99,7 @@ jobs:
           PY
       - name: Run fixed engine smoke harness
         env:
-          ENGINE: ${{ inputs.engine }}
+          ENGINE: ${{ inputs.engine || 'ltx-2' }}
           MODEL_PATH: ${{ vars.OMEGA_VIDEO_ENGINE_MODEL_PATH }}
         run: |
           set -euo pipefail
