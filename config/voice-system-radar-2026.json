@@ -1,0 +1,174 @@
+{
+  "schema": "dinullah.voice-system-radar.v3",
+  "purpose": "Unified local-first voice assistant inventory for Al-Huda.",
+  "systemInvocation": {
+    "apple": {
+      "appIntents": true,
+      "appShortcuts": true,
+      "vocalShortcuts": true,
+      "userDefinedWakePhrase": true
+    },
+    "android": {
+      "voiceInteractionService": true,
+      "voiceInteractionSessionService": true,
+      "userSelectedAssistant": true,
+      "hotwording": true
+    },
+    "web": {
+      "browserLocaleSeed": true,
+      "spokenLanguageDetection": true,
+      "webAssemblyRuntime": true
+    },
+    "harmonyOS": {
+      "arkTS": true,
+      "xiaoyiSkill": true,
+      "intentsKit": true,
+      "coreSpeechKit": true,
+      "systemEntry": "skill-or-agent",
+      "nativeProject": "apps/harmony"
+    },
+    "tv": {
+      "androidTV": "reuse-android-assistant-adapter",
+      "harmonyTV": "reuse-harmonyOS-device-profile",
+      "systemRemoteMicrophone": "platform-permissions-required"
+    },
+    "wearables": {
+      "wearOS": "reuse-android-assistant-adapter",
+      "harmonyWear": "reuse-harmonyOS-device-profile"
+    },
+    "automotive": {
+      "androidAutomotive": "platform-specific-assistant-surface",
+      "harmonyAutomotive": "platform-specific-agent-or-skill-surface"
+    },
+    "smartHome": {
+      "gateway": "AL-HUDA-core-over-platform-adapter",
+      "localControl": "permission-and-device-api-gated"
+    }
+  },
+  "voiceCore": {
+    "primaryUnifiedRuntime": "sherpa-onnx",
+    "questionInputEngine": "qwen3-asr",
+    "asr": [
+      "qwen3-asr-0.6b",
+      "qwen3-asr-1.7b",
+      "whisper.cpp",
+      "faster-whisper"
+    ],
+    "tts": [
+      "sherpa-onnx",
+      "piper1-gpl"
+    ],
+    "vad": [
+      "sherpa-onnx",
+      "silero-vad"
+    ],
+    "keywordSpotting": [
+      "sherpa-onnx-open-vocabulary-kws",
+      "openWakeWord"
+    ],
+    "languageId": [
+      "qwen3-asr",
+      "sherpa-onnx-whisper-multilingual"
+    ],
+    "punctuation": [
+      "sherpa-onnx-punctuation"
+    ],
+    "speakerIdentification": [
+      "sherpa-onnx"
+    ],
+    "diarization": [
+      "sherpa-onnx"
+    ],
+    "audioTagging": [
+      "sherpa-onnx"
+    ],
+    "audioFrontEnd": [
+      "aec",
+      "noise-suppression",
+      "automatic-gain-control",
+      "resampling",
+      "clipping-detection"
+    ],
+    "turnTaking": [
+      "endpointing",
+      "barge-in",
+      "tts-ducking",
+      "interruption-cancellation"
+    ]
+  },
+  "questionAnswerPath": {
+    "input": "voice-or-text",
+    "voicePath": "microphone -> VAD -> Qwen3-ASR -> normalized-question",
+    "reasoningEngines": [
+      "Al-Huda",
+      "Al-Taqwa"
+    ],
+    "outputPath": "reasoned-answer -> optional-TTS",
+    "audioLoopbackForbidden": true,
+    "fallback": "text-input-or-whisper-cpp"
+  },
+  "assistantIdentity": {
+    "assistantName": "Al-Huda",
+    "arabicName": "الهُدَى",
+    "wakeWord": "الهُدَى"
+  },
+  "wakePhrase": {
+    "defaultDisplayName": "الهُدَى",
+    "userCanChooseCustomShortPhrase": true,
+    "perLanguageAliases": true,
+    "customArabicModelRequired": true,
+    "modelStatus": "BUILD_AND_RUNTIME_VERIFY_REQUIRED",
+    "arabicSpokenForm": "الهُدَى",
+    "arabicTtsText": "الهُدَى",
+    "renameStatus": "MIGRATED_TO_AL_HUDA"
+  },
+  "speakerProfiles": {
+    "mode": "optional",
+    "profiles": [
+      1,
+      2,
+      3
+    ],
+    "unlimitedGroupMode": true,
+    "speakerEnrollment": true,
+    "localOnlyPreferred": true,
+    "rawVoiceRetentionDefault": false,
+    "speakerEmbeddingsOnlyPreferred": true,
+    "explicitConsentRequired": true,
+    "fallback": "open-microphone-without-speaker-identification"
+  },
+  "engineToEngineDialogue": {
+    "enabled": true,
+    "displayName": "حوار المحركات",
+    "englishName": "Engine-to-Engine Dialogue",
+    "protocol": "structured-message",
+    "audioLoopbackForbiddenByDefault": true,
+    "maxTurnsRequired": true,
+    "loopDetectionRequired": true,
+    "userStopRequired": true,
+    "microphoneIsolationDuringInternalDialogue": true,
+    "humanSupervisedMode": true,
+    "autonomousModeOptional": true,
+    "speakerProfilesIndependent": true,
+    "simultaneousMultiSpeakerRequiresDiarization": true,
+    "engineA": "Al-Huda",
+    "engineB": "Al-Taqwa",
+    "arabicEngineA": "الهُدَى",
+    "arabicEngineB": "الْتَقْوَى",
+    "defaultDomain": "dinullah-religious-scholarly",
+    "sourcesWrittenByDefault": true,
+    "fullDialogueCopy": true
+  },
+  "quran": {
+    "syntheticTtsForbiddenForRecitation": true,
+    "recitationIsSeparateAssetPipeline": true
+  },
+  "completionPolicy": {
+    "releasePresenceIsNotRuntimeProof": true,
+    "acquiredIsNotLoaded": true,
+    "loadedIsNotInferenceVerified": true,
+    "inferenceVerifiedIsNotEndToEndVerified": true,
+    "noGapClosureWithoutEvidence": true
+  },
+  "platformAdapterRule": "One native adapter per OS family; device profile inside the adapter; shared reasoning and provenance core"
+}

@@ -1,0 +1,414 @@
+name: Rechercher — Voice gap acquisition to Releases
+on:
+  schedule:
+    - cron: "47 * * * *"
+  workflow_dispatch:
+    inputs:
+      include_nabra:
+        description: "Stage the license-gated Nabra Arabic TTS weights into the draft quarantine release."
+        required: false
+        default: true
+        type: boolean
+      include_piper_ar_jo:
+        description: "Stage the license-gated Piper ar_JO Kareem weights into the draft quarantine release."
+        required: false
+        default: true
+        type: boolean
+      include_whisper_multilingual:
+        description: "Stage multilingual whisper.cpp ggml-base into the draft quarantine release."
+        required: false
+        default: true
+        type: boolean
+      include_pyannote_gated:
+        description: "Attempt gated pyannote acquisition when HF_TOKEN is configured; quarantine only."
+        required: false
+        default: false
+        type: boolean
+  push:
+    branches:
+      - feat/rechercher-voice-harmony-acquisition-v2
+      - main
+    paths:
+      - .github/workflows/rechercher-voice-gap-acquisition.yml
+      - config/voice-model-acquisition-manifest-2026.json
+permissions:
+  contents: read
+concurrency:
+  group: rechercher-voice-gap-acquisition
+  cancel-in-progress: false
+jobs:
+  acquire:
+    # SECURITY-JUSTIFICATION: this job publishes only payloads that passed the acquisition
+    # and verification gates; write access is scoped to this job.
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - name: Inspect existing gap Release
+        id: gap_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-gap-2026-10
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets > /tmp/gap-release.json 2>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            printf '%s\n' '{"assets":[]}' > /tmp/gap-release.json
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          jq -r '.assets[].name' /tmp/gap-release.json | sort > /tmp/gap-assets.txt
+          grep -Fxq 'Qwen3-ForcedAligner-0.6B.tar.bz2' /tmp/gap-assets.txt && echo 'forced=true' >> "$GITHUB_OUTPUT" || echo 'forced=false' >> "$GITHUB_OUTPUT"
+          grep -Fxq 'gtcrn_simple.onnx' /tmp/gap-assets.txt && echo 'gtcrn=true' >> "$GITHUB_OUTPUT" || echo 'gtcrn=false' >> "$GITHUB_OUTPUT"
+          grep -Fxq 'gtcrn-runtime-verification.json' /tmp/gap-assets.txt && echo 'gtcrn_verified=true' >> "$GITHUB_OUTPUT" || echo 'gtcrn_verified=false' >> "$GITHUB_OUTPUT"
+          echo 'kws=review-required' >> "$GITHUB_OUTPUT"
+          echo 'punct=review-required' >> "$GITHUB_OUTPUT"
+          echo 'speaker=review-required' >> "$GITHUB_OUTPUT"
+          echo 'diarization=review-required' >> "$GITHUB_OUTPUT"
+          echo 'audio=review-required' >> "$GITHUB_OUTPUT"
+          if grep -Fq 'Qwen3-ForcedAligner-0.6B.tar.bz2' /tmp/gap-assets.txt &&
+             grep -Fq 'gtcrn_simple.onnx' /tmp/gap-assets.txt &&
+             grep -Fq 'gtcrn-runtime-verification.json' /tmp/gap-assets.txt; then
+            echo "any_missing=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any_missing=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl jq python3 python3-pip tar bzip2
+          python3 -m pip install --disable-pip-version-check --no-cache-dir sherpa-onnx numpy soundfile
+
+      - name: Prepare manifest
+        run: |
+          set -euo pipefail
+          rm -rf voice-gap-release-assets
+          mkdir -p voice-gap-release-assets
+          cp config/voice-model-acquisition-manifest-2026.json voice-gap-release-assets/manifest.json
+
+      - name: Acquire Qwen3 ForcedAligner 0.6B
+        if: ${{ steps.gap_release.outputs.forced != 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub qwen-asr
+          hf download Qwen/Qwen3-ForcedAligner-0.6B --local-dir voice-gap-release-assets/Qwen3-ForcedAligner-0.6B
+          test -s voice-gap-release-assets/Qwen3-ForcedAligner-0.6B/model.safetensors
+          test -s voice-gap-release-assets/Qwen3-ForcedAligner-0.6B/config.json
+
+      - name: Runtime inference verification — Qwen3 ForcedAligner
+        if: ${{ steps.gap_release.outputs.forced != 'true' }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, torch
+          from qwen_asr import Qwen3ForcedAligner
+          model=Qwen3ForcedAligner.from_pretrained(
+              "voice-gap-release-assets/Qwen3-ForcedAligner-0.6B",
+              dtype=torch.float32,
+              device_map="cpu"
+          )
+          results=model.align(
+              audio="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-ASR-Repo/asr_zh.wav",
+              text="甚至出现交易几乎停滞的情况。",
+              language="Chinese",
+          )
+          assert results and results[0], "forced aligner returned no alignment"
+          first=results[0][0]
+          assert first.text and first.end_time >= first.start_time
+          json.dump({
+              "id":"qwen3-forced-aligner-0.6b",
+              "runtime":"verified",
+              "segments":len(results[0]),
+              "firstSegmentNonEmpty":True
+          },open("voice-gap-release-assets/forced-aligner-runtime-verification.json","w"),ensure_ascii=False,indent=2)
+          print("Qwen3 ForcedAligner runtime verified; segments=",len(results[0]))
+          PY
+
+      - name: Acquire GTCRN speech enhancement weight
+        if: ${{ steps.gap_release.outputs.gtcrn != 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors \
+            -o voice-gap-release-assets/gtcrn_simple.onnx \
+            https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx
+          test -s voice-gap-release-assets/gtcrn_simple.onnx
+
+      - name: Runtime verify GTCRN speech enhancement
+        if: ${{ steps.gap_release.outputs.gtcrn_verified != 'true' }}
+        run: |
+          set -euo pipefail
+          if [ ! -s voice-gap-release-assets/gtcrn_simple.onnx ]; then
+            curl -fL --retry 5 --retry-all-errors \
+              -o voice-gap-release-assets/gtcrn_simple.onnx \
+              https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx
+          fi
+          curl -fL --retry 5 --retry-all-errors \
+            -o voice-gap-release-assets/inp_16k.wav \
+            https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/inp_16k.wav
+          test -s voice-gap-release-assets/inp_16k.wav
+          python3 - <<'PY'
+          import json
+          import numpy as np
+          import sherpa_onnx
+          import soundfile as sf
+          from pathlib import Path
+
+          model = Path('voice-gap-release-assets/gtcrn_simple.onnx')
+          wav = Path('voice-gap-release-assets/inp_16k.wav')
+          model_config = sherpa_onnx.OfflineSpeechDenoiserModelConfig(
+              gtcrn=sherpa_onnx.OfflineSpeechDenoiserGtcrnModelConfig(model=str(model)),
+              debug=False,
+              num_threads=1,
+              provider='cpu',
+          )
+          config = sherpa_onnx.OfflineSpeechDenoiserConfig(model=model_config)
+          assert config.validate(), config
+          denoiser = sherpa_onnx.OfflineSpeechDenoiser(config)
+          samples, sample_rate = sf.read(str(wav), always_2d=True, dtype='float32')
+          samples = np.ascontiguousarray(samples[:, 0])
+          result = denoiser(samples, sample_rate)
+          assert result is not None and result.samples is not None and len(result.samples) > 0
+          sf.write('/tmp/gtcrn-enhanced.wav', result.samples, result.sample_rate)
+          assert Path('/tmp/gtcrn-enhanced.wav').stat().st_size > 0
+          print('GTCRN runtime verified:', result.sample_rate, len(result.samples))
+          json.dump({
+              'id': 'sherpa-onnx-gtcrn-noise-suppression',
+              'runtime': 'sherpa-onnx OfflineSpeechDenoiser',
+              'verified': True,
+              'model': str(model),
+              'testAudio': str(wav),
+              'sampleRate': result.sample_rate,
+              'outputSamples': len(result.samples),
+          }, open('voice-gap-release-assets/gtcrn-runtime-verification.json', 'w'), indent=2)
+          PY
+      - name: Acquire KWS base model
+        if: ${{ false }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/kws-base.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2
+          test -s voice-gap-release-assets/kws-base.tar.bz2
+
+      - name: Acquire punctuation model
+        if: ${{ false }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/punctuation.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2
+          test -s voice-gap-release-assets/punctuation.tar.bz2
+
+      - name: Acquire speaker identification model
+        if: ${{ false }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/speaker-id.onnx https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx
+          test -s voice-gap-release-assets/speaker-id.onnx
+
+      - name: Acquire speaker segmentation model
+        if: ${{ false }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/pyannote-segmentation.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2
+          test -s voice-gap-release-assets/pyannote-segmentation.tar.bz2
+
+      - name: Acquire audio tagging model
+        if: ${{ false }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors -o voice-gap-release-assets/audio-tagging.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/audio-tagging-models/sherpa-onnx-zipformer-audio-tagging-2024-04-09.tar.bz2
+          test -s voice-gap-release-assets/audio-tagging.tar.bz2
+
+      - name: Validate payloads, provenance and size
+        if: ${{ steps.gap_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path("voice-gap-release-assets/manifest.json").read_text())
+          assert manifest["policy"]["noGitLFS"] is True
+          assert manifest["policy"]["checksumRequired"] is True
+          assets=list(Path("voice-gap-release-assets").glob("*"))
+          assets=[p for p in assets if p.name != "manifest.json" and p.is_file()]
+          assert assets, "no assets acquired"
+          for p in assets:
+              size=p.stat().st_size
+              assert size > 0, p
+              assert size < 2*1024*1024*1024, f"{p} exceeds GitHub release asset limit"
+          print("validated assets:", [(p.name,p.stat().st_size) for p in assets])
+          PY
+
+      - name: Create checksums
+        if: ${{ steps.gap_release.outputs.any_missing == 'true' }}
+        run: |
+          set -euo pipefail
+          cd voice-gap-release-assets
+          if [ -d Qwen3-ForcedAligner-0.6B ]; then tar -cjf Qwen3-ForcedAligner-0.6B.tar.bz2 Qwen3-ForcedAligner-0.6B; rm -rf Qwen3-ForcedAligner-0.6B; fi
+          sha256sum * > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+
+      - name: Publish verified assets automatically to Release
+        if: ${{ steps.gap_release.outputs.any_missing == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-gap-2026-10
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Automatic Rechercher gap acquisition. Payloads are verified before publication."
+          fi
+          for asset in voice-gap-release-assets/*; do
+            [ -f "$asset" ] || continue
+            name=$(basename "$asset")
+            if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets | jq -e --arg n "$name" '.assets[] | select(.name==$n)' >/dev/null; then
+              gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+            fi
+          done
+
+  # Gated / model-specific-review weights are persisted in a draft quarantine release.
+  # They are never uploaded to the public gap release until redistribution/access gates pass.
+  quarantine:
+    name: Acquire gated voice weights to draft quarantine
+    # security-justification: contents: write is required only to maintain draft quarantine Release assets; they are never public until separate license/access gates pass.
+    env:
+      HAS_HF_TOKEN: ${{ secrets.HF_TOKEN != '' }}
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Inspect quarantine Release
+        id: quarantine_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-quarantine-2026-10
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets > /tmp/quarantine-release.json 2>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            printf '%s\n' '{"assets":[]}' > /tmp/quarantine-release.json
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          jq -r '.assets[].name' /tmp/quarantine-release.json | sort > /tmp/quarantine-assets.txt
+
+      - name: Install acquisition tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl jq python3 python3-pip tar bzip2
+          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
+
+      - name: Prepare quarantine workspace
+        run: |
+          set -euo pipefail
+          rm -rf voice-quarantine-assets
+          mkdir -p voice-quarantine-assets
+          cp config/voice-model-acquisition-manifest-2026.json voice-quarantine-assets/manifest.json
+
+      - name: Acquire Nabra Arabic int8
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.include_nabra }}
+        run: |
+          set -euo pipefail
+          if ! grep -Fxq 'nabra-82m-arabic-int8.tar.bz2' /tmp/quarantine-assets.txt; then
+            curl -fL --retry 5 --retry-all-errors \
+              -o voice-quarantine-assets/nabra-82m-arabic-int8.tar.bz2 \
+              https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/nabra-82m-arabic-int8.tar.bz2
+            test -s voice-quarantine-assets/nabra-82m-arabic-int8.tar.bz2
+          fi
+
+      - name: Acquire Piper ar_JO Kareem medium
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.include_piper_ar_jo }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          if ! grep -Fxq 'piper-ar-jo-kareem-medium.tar.bz2' /tmp/quarantine-assets.txt; then
+            rm -rf voice-quarantine-assets/piper-ar_JO-kareem-medium
+            hf download rhasspy/piper-voices \
+              ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx \
+              ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx.json \
+              ar/ar_JO/kareem/medium/MODEL_CARD \
+              --local-dir voice-quarantine-assets/piper-ar_JO-kareem-medium
+            tar -cjf voice-quarantine-assets/piper-ar-jo-kareem-medium.tar.bz2 \
+              -C voice-quarantine-assets piper-ar_JO-kareem-medium
+            rm -rf voice-quarantine-assets/piper-ar_JO-kareem-medium
+            test -s voice-quarantine-assets/piper-ar-jo-kareem-medium.tar.bz2
+          fi
+
+      - name: Acquire multilingual whisper.cpp base
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.include_whisper_multilingual }}
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          if ! grep -Fxq 'whisper-cpp-ggml-base.bin' /tmp/quarantine-assets.txt; then
+            hf download ggerganov/whisper.cpp ggml-base.bin --local-dir voice-quarantine-assets/whisper-cpp-multilingual
+            mv voice-quarantine-assets/whisper-cpp-multilingual/ggml-base.bin voice-quarantine-assets/whisper-cpp-ggml-base.bin
+            rm -rf voice-quarantine-assets/whisper-cpp-multilingual
+            test -s voice-quarantine-assets/whisper-cpp-ggml-base.bin
+          fi
+
+      - name: Acquire gated pyannote diarization when HF_TOKEN exists
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_pyannote_gated && env.HAS_HF_TOKEN == 'true' }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          if ! grep -Fxq 'pyannote-speaker-diarization-3.1.tar.bz2' /tmp/quarantine-assets.txt; then
+            rm -rf voice-quarantine-assets/pyannote-speaker-diarization-3.1
+            hf auth login --token "$HF_TOKEN" --add-to-git-credential false
+            hf download pyannote/speaker-diarization-3.1 --local-dir voice-quarantine-assets/pyannote-speaker-diarization-3.1 --token "$HF_TOKEN"
+            tar -cjf voice-quarantine-assets/pyannote-speaker-diarization-3.1.tar.bz2 -C voice-quarantine-assets pyannote-speaker-diarization-3.1
+            rm -rf voice-quarantine-assets/pyannote-speaker-diarization-3.1
+            test -s voice-quarantine-assets/pyannote-speaker-diarization-3.1.tar.bz2
+          fi
+
+      - name: Validate and checksum quarantine payloads
+        run: |
+          set -euo pipefail
+          cd voice-quarantine-assets
+          python3 - <<'PY'
+          from pathlib import Path
+          files=[p for p in Path('.').glob('*') if p.is_file() and p.name != 'manifest.json']
+          for p in files:
+              size=p.stat().st_size
+              assert size > 0, p
+              assert size < 2*1024*1024*1024, f"{p} exceeds GitHub release asset limit"
+          print("quarantine payloads:", [(p.name,p.stat().st_size) for p in files])
+          PY
+          sha256sum * > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+
+      - name: Create draft quarantine Release and upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-quarantine-2026-10
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --title "$TAG" --notes "Draft quarantine for model-specific license/access review. Draft presence is not public redistribution approval."
+          fi
+          for asset in voice-quarantine-assets/*; do
+            [ -f "$asset" ] || continue
+            name=$(basename "$asset")
+            if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets | jq -e --arg n "$name" '.assets[] | select(.name==$n)' >/dev/null; then
+              gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+            fi
+          done

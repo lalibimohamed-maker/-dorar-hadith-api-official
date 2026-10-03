@@ -1,0 +1,72 @@
+{
+  "schema": "dinullah.platform-assistant-integration.v1",
+  "assistant": {
+    "name": "Al-Huda",
+    "arabicName": "الهُدَى",
+    "wakePhrase": "الهُدَى"
+  },
+  "principle": "OS-native integration adapters call the same Al-Huda core; no platform adapter modifies Corpus content.",
+  "platforms": {
+    "ios": {
+      "status": "implemented-in-repository",
+      "mechanisms": ["App Intents", "App Shortcuts", "Siri system experiences"],
+      "settingsSurface": "Siri/Shortcuts user configuration",
+      "defaultAssistantReplacement": false
+    },
+    "android": {
+      "status": "implemented-in-repository",
+      "mechanisms": ["VoiceInteractionService", "VoiceInteractionSessionService", "Android assistant role"],
+      "settingsSurface": "system assistant/voice input settings",
+      "defaultAssistantReplacement": "user-selected-system-role"
+    },
+    "harmonyOS": {
+      "status": "native-arkts-scaffold-and-xiaoyi-skill-contract",
+      "mechanisms": ["ArkTS", "Xiaoyi Skill/Agent", "Intents Kit", "Core Speech Kit"],
+      "settingsSurface": "HarmonyOS system AI/assistant entry when Huawei exposes the Skill",
+      "defaultAssistantReplacement": false,
+      "approvalRequired": true
+    },
+    "web": {
+      "status": "implemented-in-repository",
+      "mechanisms": ["Web Speech APIs", "PWA", "WebAssembly/local runtime"],
+      "settingsSurface": "browser permissions and PWA settings",
+      "defaultAssistantReplacement": false
+    },
+    "androidTV": {
+      "status": "inherits-android-assistant-adapter",
+      "mechanisms": ["Android voice interaction", "TV-specific UI profile"],
+      "settingsSurface": "TV assistant/input settings",
+      "defaultAssistantReplacement": "platform-dependent-user-selection"
+    },
+    "wearOS": {
+      "status": "inherits-android-assistant-adapter",
+      "mechanisms": ["VoiceInteractionService", "compact voice UI", "device microphone"],
+      "settingsSurface": "watch assistant/input settings",
+      "defaultAssistantReplacement": "platform-dependent-user-selection"
+    },
+    "harmonyTV": {
+      "status": "inherits-harmony-device-profile",
+      "mechanisms": ["Xiaoyi Skill/Agent", "ArkTS TV profile"],
+      "settingsSurface": "Huawei TV system AI entry when available",
+      "defaultAssistantReplacement": false
+    },
+    "harmonyWearable": {
+      "status": "inherits-harmony-device-profile",
+      "mechanisms": ["HarmonyOS Skill/Agent", "wearable voice profile"],
+      "settingsSurface": "device system AI entry when available",
+      "defaultAssistantReplacement": false
+    },
+    "automotive": {
+      "status": "adapter-contract",
+      "mechanisms": ["platform voice assistant surface", "hands-free microphone permissions"],
+      "settingsSurface": "vehicle assistant/input settings",
+      "defaultAssistantReplacement": false
+    },
+    "smartHome": {
+      "status": "adapter-contract",
+      "mechanisms": ["local gateway", "device API permissions", "voice endpoint"],
+      "settingsSurface": "hub/device assistant configuration",
+      "defaultAssistantReplacement": false
+    }
+  }
+}

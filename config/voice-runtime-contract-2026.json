@@ -1,0 +1,16 @@
+{
+  "schema":"dinullah.voice-runtime-contract.v1",
+  "assistant":"Al-Huda",
+  "contractVersion":1,
+  "pipeline":["permission-check","audio-capture","vad","asr","normalization","reasoning","tts-or-verified-recitation"],
+  "evidenceRequired":["model-id","model-version","license-evidence","sha256","backend","device-profile","self-test","inference-test"],
+  "failureModes":["permission-denied","model-missing","checksum-mismatch","license-unreviewed","backend-unavailable","out-of-memory","thermal-pressure","inference-invalid","cancelled"],
+  "policies":{
+    "failClosed":true,
+    "noImplicitRemote":true,
+    "noCorpusModification":true,
+    "quranRecitationOriginalAudioOnly":true,
+    "neverReportSuccessWithoutInferenceEvidence":true,
+    "userMayCancelAtEveryStage":true
+  }
+}

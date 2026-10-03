@@ -1,0 +1,22 @@
+{
+  "assistant": "Al-Huda",
+  "arabicName": "الهُدَى",
+  "wakePhrase": "الهُدَى",
+  "input": {
+    "vad": "silero-vad",
+    "asr": ["qwen3-asr-0.6b", "qwen3-asr-1.7b", "whisper.cpp"],
+    "languageIdentification": "qwen3-asr"
+  },
+  "reasoning": ["Al-Huda", "Al-Taqwa"],
+  "output": {
+    "tts": "optional",
+    "quranRecitationSeparate": true
+  },
+  "deviceProfiles": {
+    "phone": {"lowLatency": true, "fullScreen": true},
+    "tablet": {"lowLatency": true, "splitPane": true},
+    "2in1": {"keyboardAndVoice": true},
+    "tv": {"remoteVoiceInput": true, "largeText": true},
+    "wearable": {"shortTurns": true, "lowPower": true}
+  }
+}

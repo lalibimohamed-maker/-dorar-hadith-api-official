@@ -27,13 +27,16 @@ test('Al Quran Cloud provider returns explicit audio provenance', async () => {
     },
   });
 
-  const result = await provider.execute({ ayah: 1, verifiedOnly: true });
+  const result = await provider.execute({ ayah: 1, qiraah: 'asim', riwayah: 'hafs', verifiedOnly: true });
   assert.equal(result.domain, 'quran-recitation');
   assert.equal(result.reciter, 'Mishary Rashid Alafasy');
   assert.equal(result.source, 'Al Quran Cloud');
   assert.equal(result.verified, true);
   assert.match(result.audioUrl, /^https:\/\//);
   assert.equal(result.provenance.edition, 'ar.alafasy');
+  assert.equal(result.provenance.qiraah, 'asim');
+  assert.equal(result.provenance.riwayah, 'hafs');
+  assert.equal(result.provenance.mappingEvidence.source, 'Quran-Uni');
 });
 
 test('provider exposes a source-backed catalog of audio editions', async () => {
@@ -62,4 +65,22 @@ test('provider rejects incomplete provider audio metadata', async () => {
     fetchImpl: async () => response({ data: { number: 1, audio: null, edition: {} } }),
   });
   await assert.rejects(() => provider.execute({ ayah: 1 }), /incomplete Quran recitation provenance/);
+});
+
+
+test('provider refuses a reciter edition without an evidence-backed qiraah/riwayah mapping', async () => {
+  const provider = createAlQuranCloudRecitationProvider({
+    edition: 'ar.other',
+    fetchImpl: async () => response({
+      data: {
+        number: 1,
+        audio: 'https://cdn.example.invalid/audio.mp3',
+        edition: { identifier: 'ar.other', name: 'Another Reciter' },
+      },
+    }),
+  });
+  await assert.rejects(
+    () => provider.execute({ ayah: 1, qiraah: 'asim', riwayah: 'hafs' }),
+    /No evidence-backed qiraah\/riwayah mapping/,
+  );
 });

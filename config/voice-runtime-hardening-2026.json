@@ -1,0 +1,34 @@
+{
+  "schema":"dinullah.voice-runtime-hardening.v1",
+  "assistant":"Al-Huda",
+  "reference":"VoiceStudio",
+  "principles":{
+    "selfTestBeforeReady":true,
+    "crashIsolation":true,
+    "resumePartialDownloads":true,
+    "contentAddressedModelRefs":true,
+    "engineReadinessSeparateFromInstallation":true,
+    "resourceHeadroomRouting":true,
+    "longformCheckpointing":true,
+    "noImplicitRemote":true
+  },
+  "evidence":{
+    "installed": "files-and-metadata-present",
+    "loadable": "backend-can-load-model",
+    "inferenceVerified": "real-input-produces-valid-output",
+    "ready": "all-required-evidence-present"
+  },
+  "rechercherIntegration":{
+    "downloadResume":true,
+    "checksumRequired":true,
+    "modelIdentityRequired":true,
+    "runtimeSelfTestRequired":true,
+    "partialDownloadMustNotBecomeSuccess":true
+  },
+  "boundaries":{
+    "noCorpusModification":true,
+    "noImplicitVoiceClone":true,
+    "quranRecitationOriginalAudioOnly":true,
+    "remoteWorkerOptInOnly":true
+  }
+}

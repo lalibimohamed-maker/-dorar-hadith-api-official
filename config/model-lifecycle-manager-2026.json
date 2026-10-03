@@ -1,0 +1,16 @@
+{
+  "schema":"dinullah.model-lifecycle-manager.v1",
+  "purpose":"Lifecycle contract for local voice models; acquisition, integrity, load, warmup, unload and resource-aware selection are distinct states.",
+  "assistant":"Al-Huda",
+  "states":["declared","acquired","checksum-verified","license-reviewed","loadable","loaded","warm","inference-verified","unloaded","failed"],
+  "models":["qwen3-asr-0.6b","qwen3-asr-1.7b","sherpa-onnx-vad-silero","sherpa-onnx-punctuation","sherpa-onnx-speaker-recognition","sherpa-onnx-audio-tagging","al-huda-arabic-kws"],
+  "rules":{
+    "releasePresenceIsNotRuntimeProof":true,
+    "checksumRequired":true,
+    "licenseReviewRequired":true,
+    "lazyLoadPreferred":true,
+    "unloadOnMemoryPressure":true,
+    "thermalGovernorRequired":true,
+    "neverDownloadImplicitly":true
+  }
+}

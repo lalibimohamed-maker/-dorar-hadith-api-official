@@ -1,0 +1,147 @@
+{
+  "schema": "dinullah.voice-engine-intelligence.v1",
+  "assistant": {
+    "name": "Al-Huda",
+    "arabicName": "الهُدَى"
+  },
+  "reference": {
+    "project": "VoiceStudio",
+    "repository": "debpalash/VoiceStudio",
+    "license": "AGPL-3.0-only",
+    "role": "architecture-and-capability-reference",
+    "notRuntimeDependency": true,
+    "notCorpusDependency": true
+  },
+  "capabilitiesToExploit": {
+    "engineCatalogue": {
+      "enabled": true,
+      "purpose": "catalogue engines/models by capability, device routing, install state, license and verification state",
+      "mapsTo": "config/model-lifecycle-manager-2026.json"
+    },
+    "localFirstRuntime": {
+      "enabled": true,
+      "policy": "local-first",
+      "remoteOptional": true,
+      "noImplicitRemoteExecution": true
+    },
+    "lazyLoading": {
+      "enabled": true,
+      "required": true,
+      "resourceAwareSelection": true
+    },
+    "localApi": {
+      "enabled": true,
+      "role": "optional-local-control-plane",
+      "mustRespect": [
+        "permission-boundary",
+        "model-license",
+        "provenance"
+      ]
+    },
+    "mcp": {
+      "enabled": true,
+      "role": "agent-tooling-boundary",
+      "allowedOperations": [
+        "health",
+        "list-engines",
+        "list-voices",
+        "transcribe",
+        "synthesize"
+      ],
+      "forbiddenOperations": [
+        "modify-corpus",
+        "publish-source-content",
+        "bypass-rights-gates"
+      ]
+    },
+    "healthAndDiagnostics": {
+      "enabled": true,
+      "requiredEvidence": [
+        "backend-health",
+        "active-device",
+        "model-state",
+        "inference-result"
+      ]
+    },
+    "multilingualSpeech": {
+      "enabled": true,
+      "sourceProjectClaim": "646 languages",
+      "verificationRule": "do-not-promote-language-coverage-to-Al-Huda-without-engine-and-license evidence"
+    },
+    "longFormAudio": {
+      "enabled": true,
+      "target": [
+        "audiobook",
+        "continuous-reading",
+        "long-response-rendering"
+      ],
+      "mustPreserve": [
+        "text-provenance",
+        "timing",
+        "source-boundary"
+      ]
+    },
+    "voiceProfiles": {
+      "enabled": true,
+      "policy": "consent-and-provenance-required",
+      "quranRecitationExcluded": true
+    }
+  },
+  "alHudaMapping": {
+    "wake": "al-huda-kws",
+    "vad": "silero-vad",
+    "asr": [
+      "qwen3-asr-0.6b",
+      "qwen3-asr-1.7b"
+    ],
+    "tts": [
+      "sherpa-onnx",
+      "piper1-gpl"
+    ],
+    "recitation": "verified-source-only-separate-pipeline",
+    "reasoning": [
+      "Al-Huda",
+      "Al-Taqwa"
+    ]
+  },
+  "hardBoundaries": {
+    "noCorpusModification": true,
+    "quranArabicCanonical": true,
+    "quranRecitationUsesOriginalAudio": true,
+    "noVoiceCloneForRecitation": true,
+    "releasePresenceIsNotRuntimeProof": true,
+    "modelLicenseReviewRequired": true,
+    "checksumRequired": true,
+    "neverDownloadImplicitly": true,
+    "gatedOrPrivateModelFilesRequireQuarantine": true
+  },
+  "capabilities": [
+    "streamingAsrTts",
+    "checkpointedLongForm",
+    "crashIsolatedWorkerSupervision",
+    "openAiCompatibleLocalSpeech",
+    "jsonRpcLocalSpeech",
+    "versionedSpeechDiscovery",
+    "voiceStudioStreamInterop",
+    "releaseBoundLocalQwenASR",
+    "voiceStudioToAlHudaLocalAudio"
+  ],
+  "exploitation": {
+    "revision": "2026-10-02-v6",
+    "localPlatform": "src/voice-local-platform.js",
+    "streamRuntime": "src/voice-stream-runtime.js",
+    "longFormRunner": "src/voice-longform-runner.js",
+    "workerSupervisor": "src/voice-worker-supervisor.js",
+    "lifecycleGate": "src/model-lifecycle-manager.js",
+    "note": "Capabilities are implemented as Din Allah-native adapters/contracts; VoiceStudio remains a reference and never a runtime dependency.",
+    "engineSelection": "src/voice-engine-selector.js",
+    "releaseResolver": "src/voice-release-ref-resolver.js",
+    "runnableSelectionRule": "engine must resolve to an observed runtime-verified Release asset",
+    "discovery": "src/voice-local-platform.js",
+    "voiceStudioStreamAdapter": "src/voice-studio-stream-adapter.js",
+    "protocolEnvelope": "voicestudio.speech.v1",
+    "localASRRuntime": "src/al-huda-local-asr-runtime.js",
+    "voiceStudioLocalAudioBridge": "src/voice-studio-stream-adapter.js",
+    "qwenRunner": "scripts/qwen3-asr-runner.py"
+  }
+}

@@ -1,0 +1,49 @@
+name: Rechercher — optional voice license audit
+
+on:
+  schedule:
+    - cron: "57 * * * *"
+  push:
+    branches:
+      - feat/rechercher-voice-harmony-acquisition-v2
+      - main
+    paths:
+      - .github/workflows/rechercher-voice-optional-gap-acquisition.yml
+      - config/model-license-evidence-f5-tts-v1-base.json
+      - config/model-license-evidence-piper-en-us-libritts-high.json
+      - config/voice-model-acquisition-manifest-2026.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-optional-voice-license-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Audit optional voice licensing
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for p in [
+              Path("config/model-license-evidence-f5-tts-v1-base.json"),
+              Path("config/model-license-evidence-piper-en-us-libritts-high.json"),
+          ]:
+              data=json.loads(p.read_text())
+              text=json.dumps(data,ensure_ascii=False).lower()
+              assert data, p
+              print(p, "license evidence loaded")
+              print("  automatic_release=false")
+          print("Optional F5-TTS/Piper weights remain audit-only until model/voice redistribution evidence is separately cleared.")
+          PY

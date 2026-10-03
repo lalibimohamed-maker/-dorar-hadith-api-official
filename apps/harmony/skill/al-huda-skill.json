@@ -1,0 +1,44 @@
+{
+  "schema": "dinullah.al-huda.harmony-skill.v1",
+  "assistant": {
+    "name": "Al-Huda",
+    "arabicName": "الهُدَى",
+    "wakePhrase": "الهُدَى"
+  },
+  "entry": {
+    "provider": "Huawei Xiaoyi Skill / Agent",
+    "systemLevel": true,
+    "requiresHuaweiDeveloperRegistration": true,
+    "requiresHuaweiReviewOrApproval": true,
+    "customIntentsNotAssumed": true,
+    "usePreconfiguredIntentsWhenRequired": true
+  },
+  "actions": [
+    {
+      "id": "ask_al_huda",
+      "label": "Ask Al-Huda",
+      "input": "spoken-or-text-question",
+      "output": "source-grounded-answer",
+      "speechOutput": "optional"
+    },
+    {
+      "id": "open_reader",
+      "label": "Open Din Allah Reader",
+      "input": "book-or-source",
+      "output": "reader-surface"
+    },
+    {
+      "id": "play_quran_recitation",
+      "label": "Play verified Quran recitation",
+      "input": "surah-ayah-qiraah-riwayah-reciter",
+      "output": "verified-or-rights-cleared-audio-only"
+    }
+  ],
+  "deviceProfiles": ["phone", "tablet", "2in1", "tv", "wearable"],
+  "security": {
+    "microphoneUserConsent": true,
+    "continuousBackgroundListeningRequiresSystemSupport": true,
+    "audioLoopbackForbidden": true,
+    "corpusMutationForbidden": true
+  }
+}

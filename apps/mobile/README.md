@@ -20,7 +20,7 @@
 
 - iOS/iPadOS: Capacitor + مشروع Xcode عند توليده. نشر App Store يحتاج عضوية Apple Developer وتوقيع Apple.
 - Android: Capacitor + مشروع Android Studio عند توليده.
-- HarmonyOS/Huawei: تبقى نسخة PWA قابلة للاستخدام، ويُجهّز مسار HarmonyOS أصلي مستقل عندما نقرر اعتماد ArkTS/DevEco Studio بدل افتراض أن Capacitor يغطي HarmonyOS.
+- HarmonyOS/Huawei: يوجد الآن مسار ArkTS/DevEco Studio أصلي داخل `apps/harmony`، مع تكامل Skill/Agent/Intents Kit كمدخل نظامي حيث يدعمه إصدار الجهاز؛ لا نفترض أن Capacitor يغطي HarmonyOS.
 
 ## الأمان والحقوق
 

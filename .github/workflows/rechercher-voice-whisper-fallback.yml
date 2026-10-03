@@ -1,0 +1,144 @@
+name: Rechercher — Whisper multilingual fallback acquisition
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/rechercher-voice-harmony-acquisition-v2
+      - main
+    paths:
+      - .github/workflows/rechercher-voice-whisper-fallback.yml
+      - config/voice-model-acquisition-manifest-2026.json
+      - src/whisper-cpp-provider.js
+      - test/whisper-cpp-provider.test.js
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-voice-whisper-fallback
+  cancel-in-progress: false
+
+jobs:
+  acquire-verify-publish:
+    # security-justification: contents: write is required only to publish the checksum/provenance/runtime-verified Whisper fallback Release asset; it does not write source files or Corpus content.
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Inspect fallback Release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-fallback-2026-10
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets > /tmp/release.json 2>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            printf '%s\n' '{"assets":[]}' > /tmp/release.json
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          jq -r '.assets[].name' /tmp/release.json | sort > /tmp/assets.txt
+          grep -Fxq 'whisper-cpp-ggml-base.bin' /tmp/assets.txt && echo "model=true" >> "$GITHUB_OUTPUT" || echo "model=false" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install build tools
+        if: ${{ steps.release.outputs.model != 'true' }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake git curl jq python3
+
+      - name: Acquire whisper.cpp source
+        if: ${{ steps.release.outputs.model != 'true' }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch v1.9.4 https://github.com/ggml-org/whisper.cpp.git /tmp/whisper.cpp
+          test -f /tmp/whisper.cpp/LICENSE
+
+      - name: Build whisper-cli
+        if: ${{ steps.release.outputs.model != 'true' }}
+        run: |
+          set -euo pipefail
+          cmake -S /tmp/whisper.cpp -B /tmp/whisper.cpp/build -DWHISPER_BUILD_TESTS=OFF
+          cmake --build /tmp/whisper.cpp/build --config Release --target whisper-cli -j2
+          test -x /tmp/whisper.cpp/build/bin/whisper-cli
+
+      - name: Acquire multilingual ggml-base weight
+        if: ${{ steps.release.outputs.model != 'true' }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/voice-fallback
+          curl -fL --retry 5 --retry-all-errors             -o /tmp/voice-fallback/whisper-cpp-ggml-base.bin             https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin
+          test -s /tmp/voice-fallback/whisper-cpp-ggml-base.bin
+          actual="$(sha256sum /tmp/voice-fallback/whisper-cpp-ggml-base.bin | awk '{print $1}')"
+          test "$actual" = "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe"
+
+      - name: Runtime verify whisper.cpp multilingual fallback
+        if: ${{ steps.release.outputs.model != 'true' }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors             -o /tmp/voice-fallback/jfk.wav             https://raw.githubusercontent.com/ggml-org/whisper.cpp/v1.9.4/samples/jfk.wav
+          test -s /tmp/voice-fallback/jfk.wav
+
+          /tmp/whisper.cpp/build/bin/whisper-cli             -m /tmp/voice-fallback/whisper-cpp-ggml-base.bin             -f /tmp/voice-fallback/jfk.wav             -l auto             -oj             -of /tmp/voice-fallback/verification             -np             -nt
+
+          test -s /tmp/voice-fallback/verification.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("/tmp/voice-fallback/verification.json")
+          data=json.loads(p.read_text())
+          text=" ".join(str(x.get("text","")) for x in data.get("transcription",[])).strip()
+          assert text, "whisper.cpp returned empty transcription"
+          lang=(data.get("result") or {}).get("language")
+          assert lang, "whisper.cpp did not report a language"
+          print("whisper.cpp runtime verified:", lang)
+          print("transcript:", text[:240])
+          PY
+
+      - name: Prepare Release metadata
+        if: ${{ steps.release.outputs.model != 'true' }}
+        run: |
+          set -euo pipefail
+          cp /tmp/voice-fallback/whisper-cpp-ggml-base.bin whisper-cpp-ggml-base.bin
+          cat > whisper-runtime-verification.json <<'JSON'
+          {
+            "engine": "whisper-cpp-ggml-base-multilingual",
+            "runtime": "whisper.cpp v1.9.4",
+            "weight": "ggml-base.bin",
+            "weightSha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+            "license": "MIT",
+            "verified": true,
+            "testAudio": "whisper.cpp v1.9.4 samples/jfk.wav"
+          }
+          JSON
+          cat config/voice-model-acquisition-manifest-2026.json > voice-model-manifest.json
+          sha256sum whisper-cpp-ggml-base.bin whisper-runtime-verification.json voice-model-manifest.json > SHA256SUMS.txt
+
+      - name: Publish verified fallback Release
+        if: ${{ steps.release.outputs.model != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-fallback-2026-10
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY"               --title "$TAG"               --notes "Multilingual local ASR fallback. Weight, checksum, provenance and runtime verification recorded."
+          fi
+          gh release upload "$TAG" whisper-cpp-ggml-base.bin whisper-runtime-verification.json voice-model-manifest.json SHA256SUMS.txt             --repo "$GITHUB_REPOSITORY" --clobber
+
+      - name: Validate existing published fallback
+        if: ${{ steps.release.outputs.model == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: rechercher-voice-fallback-2026-10
+        run: |
+          set -euo pipefail
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets             | jq -e '.assets[] | select(.name=="whisper-cpp-ggml-base.bin")' >/dev/null

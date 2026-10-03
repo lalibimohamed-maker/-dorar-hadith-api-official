@@ -1,0 +1,134 @@
+{
+  "schema": "dinullah.engine-to-engine-dialogue.v2",
+  "displayName": "حوار المحركات",
+  "englishName": "Engine-to-Engine Dialogue",
+  "defaultDomain": "dinullah-religious-scholarly",
+  "domainPolicy": {
+    "sourceOfTruth": "dinullah-corpus-and-verified-search",
+    "requiresProvenanceForSubstantiveClaims": true,
+    "requiresSourceBackedRetrieval": true,
+    "allowedDomains": [
+      "quran-and-tafsir",
+      "hadith",
+      "aqidah",
+      "fiqh",
+      "sirah",
+      "islamic-history",
+      "arabic-and-linguistics",
+      "islamic-scholarly-studies"
+    ],
+    "outOfDomainRouting": "reject-unless-explicitly-switched-to-general-assistant-mode"
+  },
+  "engines": [
+    {
+      "id": "al-huda",
+      "displayName": "Al-Huda",
+      "arabicDisplayName": "الهُدَى",
+      "arabicTtsText": "الهُدَى"
+    },
+    {
+      "id": "al-taqwa",
+      "displayName": "Al-Taqwa",
+      "arabicDisplayName": "الْتَقْوَى",
+      "arabicTtsText": "الْتَقْوَى"
+    }
+  ],
+  "speechAndText": {
+    "userInput": [
+      "voice",
+      "text"
+    ],
+    "engineDialogueTranscript": "text",
+    "engineSpeechOutput": "optional-user-controlled",
+    "sources": "text-only",
+    "sourceAttributionSpeechDefault": false,
+    "sourceAttributionAlwaysVisibleInTranscript": true
+  },
+  "export": {
+    "userCanCopyFullDialogue": true,
+    "includeAllEngineTurns": true,
+    "includeUserTurns": true,
+    "includeSourcesAndProvenance": true,
+    "includeTimestamps": true
+  },
+  "purpose": "Controlled internal dialogue between two named engines without routing generated audio back through the physical microphone.",
+  "defaultMode": "human-supervised",
+  "modes": [
+    {
+      "id": "human-supervised",
+      "description": "The user starts/stops the exchange and can inspect and copy the complete written dialogue.",
+      "autonomousTurnLimit": 8
+    },
+    {
+      "id": "autonomous",
+      "description": "Optional bounded engine-to-engine exchange.",
+      "autonomousTurnLimit": 6,
+      "requiresExplicitUserEnable": true
+    }
+  ],
+  "transport": {
+    "preferred": "structured-message",
+    "formats": [
+      "json-message",
+      "text"
+    ],
+    "audioLoopback": false,
+    "physicalMicrophoneInjection": false,
+    "ttsPlaybackToPeerAsInput": false
+  },
+  "turnProtocol": {
+    "messageFields": [
+      "conversationId",
+      "turnId",
+      "engineId",
+      "role",
+      "content",
+      "language",
+      "confidence",
+      "timestamp",
+      "provenance",
+      "sources",
+      "domain"
+    ],
+    "roles": [
+      "user-proxy",
+      "engine-a",
+      "engine-b",
+      "system"
+    ],
+    "terminationSignals": [
+      "user-stop",
+      "max-turns",
+      "loop-detected",
+      "timeout",
+      "error"
+    ]
+  },
+  "safety": {
+    "loopDetectionRequired": true,
+    "duplicateResponseSuppression": true,
+    "maxTurnLimitRequired": true,
+    "perTurnTimeoutRequired": true,
+    "userStopMustInterruptImmediately": true,
+    "microphoneIsolationDuringInternalDialogue": true,
+    "noPrivilegeEscalationBetweenEngines": true,
+    "sensitiveActionsRequireHumanConfirmation": true
+  },
+  "speakerHandling": {
+    "oneProfile": true,
+    "twoProfiles": true,
+    "threeProfiles": true,
+    "groupProfiles": true,
+    "openMicWithoutIdentification": true,
+    "simultaneousSpeechRequiresRuntimeVerifiedDiarization": true
+  },
+  "quranPolicy": {
+    "syntheticTtsAsRecitation": false,
+    "recitationAssetsRemainSeparate": true
+  },
+  "completionPolicy": {
+    "configuredIsNotRuntimeVerified": true,
+    "releasePresenceIsNotRuntimeProof": true,
+    "dialogueFeatureRequiresEndToEndTest": true
+  }
+}

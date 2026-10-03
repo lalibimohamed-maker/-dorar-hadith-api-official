@@ -13,7 +13,10 @@ test("Quran recitation UI exposes a verified reciter/edition selector", () => {
 });
 
 test("selector never creates unverified options", () => {
-  assert.match(ui, /filter\(\(item\) => item && item\.audioUrl && item\.source && item\.reciter\)/);
+  assert.match(ui, /state\.options\.filter\(item =>/);
+  assert.match(ui, /item\.qiraah === state\.qiraah/);
+  assert.match(ui, /item\.riwayah === state\.riwayah/);
+  assert.match(ui, /item\.audioUrl && item\.source && item\.reciter/);
 });
 
 test("Quran recitation selector remains separate from generated speech", () => {

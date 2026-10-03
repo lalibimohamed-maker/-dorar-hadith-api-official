@@ -8,10 +8,10 @@
     "Track rights at item/source level; discoverability or API availability is not redistribution permission.",
     "Keep authoritative Quran text, translations, tafsir, recitation audio, manuscript images and OCR/search derivatives as distinct assets.",
     "OCR is a search/readability aid and must not silently replace authoritative source text.",
-    "User-named Bawabat Al-Ilm is retained exactly as a discovery target until its exact URL is verified; do not substitute similarly named sites."
+    "Al-Huda is the canonical assistant identity; external voice providers remain separate discovery targets."
   ],
   "voice_engines": [
-    {"name":"بوابة العلم / Bawabat Al-Ilm","url":null,"status":"USER_IDENTIFIED_NEEDS_EXACT_URL_VERIFICATION","roles":["voice_engine","text_to_speech","multilingual_voice"]},
+    {"name":"Al-Huda","url":null,"status":"CANONICAL_LOCAL_ASSISTANT_IDENTITY","roles":["assistant","voice_input","local_voice_runtime"]},
     {"name":"Google Cloud Text-to-Speech","url":"https://cloud.google.com/text-to-speech","status":"verified_global_target","roles":["text_to_speech","multilingual_voice"]},
     {"name":"Microsoft Azure AI Speech","url":"https://azure.microsoft.com/products/ai-services/ai-speech","status":"verified_global_target","roles":["text_to_speech","speech","multilingual_voice"]},
     {"name":"Amazon Polly","url":"https://aws.amazon.com/polly/","status":"verified_global_target","roles":["text_to_speech","multilingual_voice"]},

@@ -24,7 +24,7 @@ The session export contract supports `mp3`, `mp4-4k`, `pdf`, and `docx`. Binary 
 
 ## Assistant/device control
 
-The runtime is designed as a capability layer for web, iOS and Android clients. Device controls are permission-gated by the operating system. The server cannot and must not assume arbitrary access to microphone, speakers, files, calls, notifications, or device settings. Voice activation can be implemented as an opt-in assistant mode using platform permissions.
+The runtime is designed as a shared capability layer for web, iOS, Android, HarmonyOS and derived device surfaces; every OS uses its native adapter. Device controls are permission-gated by the operating system. The server cannot and must not assume arbitrary access to microphone, speakers, files, calls, notifications, or device settings. Voice activation is implemented only through the native permissions and system integration contract of the selected platform.
 
 ## Security and provenance
 

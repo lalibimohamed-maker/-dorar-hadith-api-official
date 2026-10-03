@@ -1,0 +1,41 @@
+{
+  "schema": "dinullah.voice-engine-status.v1",
+  "checkedAt": "2026-10-02",
+  "policy": {
+    "releasePresenceIsNotRuntimeProof": true,
+    "acquiredIsNotLoaded": true,
+    "runnableRequiresRuntimeAndLicenseEvidence": true
+  },
+  "verified": {
+    "asr": ["qwen3-asr-0.6b", "qwen3-asr-1.7b"],
+    "vad": ["silero-vad"],
+    "wake-word": ["al-huda-kws"]
+  },
+  "verifiedSpecialPurpose": {
+    "forced-alignment": {
+      "engine": "qwen3-forced-aligner-0.6b",
+      "release": "rechercher-voice-gap-2026-10",
+      "license": "Apache-2.0",
+      "runtimeVerified": true,
+      "arabicSupported": false
+    },
+    "tts": {
+      "engine": "piper-en-us-libritts-high",
+      "release": "rechercher-voice-optional-2026-10",
+      "license": "CC-BY-4.0",
+      "runtimeVerified": true,
+      "default": false
+    }
+  },
+  "gated": [
+    "piper-ar-jo-kareem-medium",
+    "nabra-82m-arabic-int8",
+    "whisper-cpp-ggml-base-multilingual",
+    "sherpa-onnx-speaker-recognition",
+    "sherpa-onnx-punctuation",
+    "sherpa-onnx-audio-tagging",
+    "sherpa-onnx-pyannote-segmentation-3",
+    "pyannote-speaker-diarization-3.1",
+    "f5-tts-v1-base"
+  ]
+}

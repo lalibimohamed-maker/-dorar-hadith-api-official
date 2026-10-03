@@ -1,0 +1,449 @@
+name: Rechercher voice runtime acquisition
+
+"on":
+  schedule:
+    - cron: "17 * * * *"
+  push:
+    branches:
+      - feat/rechercher-voice-harmony-acquisition-v2
+      - main
+    paths:
+      - .github/workflows/rechercher-voice-runtime-acquisition.yml
+      - config/voice-model-acquisition-manifest-2026.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-voice-runtime-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquire:
+    # SECURITY-JUSTIFICATION: this job must publish verified model assets to GitHub Releases;
+    # the permission is scoped to this job rather than the whole workflow.
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+
+    steps:
+      - name: Inspect runtime Release
+        id: release
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          TAG: rechercher-voice-runtime-2026-10
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets > /tmp/release.json 2>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            printf '%s\n' '{"assets":[]}' > /tmp/release.json
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          jq -r '.assets[].name' /tmp/release.json | sort > /tmp/assets.txt
+          grep -Fxq 'Qwen3-ASR-0.6B.tar.bz2' /tmp/assets.txt && echo "qwen06=true" >> "$GITHUB_OUTPUT" || echo "qwen06=false" >> "$GITHUB_OUTPUT"
+          grep -Fxq 'Qwen3-ASR-1.7B.parts.SHA256SUMS.txt' /tmp/assets.txt && echo "qwen17=true" >> "$GITHUB_OUTPUT" || echo "qwen17=false" >> "$GITHUB_OUTPUT"
+          grep -Fxq 'silero_vad.onnx' /tmp/assets.txt && echo "silero=true" >> "$GITHUB_OUTPUT" || echo "silero=false" >> "$GITHUB_OUTPUT"
+          if grep -Fxq 'Qwen3-ASR-0.6B.tar.bz2' /tmp/assets.txt &&
+             grep -Fxq 'Qwen3-ASR-1.7B.parts.SHA256SUMS.txt' /tmp/assets.txt &&
+             grep -Fxq 'silero_vad.onnx' /tmp/assets.txt; then
+            echo "any_missing=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any_missing=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install acquisition and inference tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y curl jq python3 python3-pip tar bzip2 espeak-ng
+          python3 -m pip install --disable-pip-version-check --no-cache-dir qwen-asr onnxruntime numpy scipy soundfile
+
+      - name: Validate approved runtime targets
+        if: "${{ steps.release.outputs.any_missing == 'true' }}"
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path("config/voice-model-acquisition-manifest-2026.json").read_text())
+          by_id={x["id"]:x for x in manifest["targets"]}
+          required=["qwen3-asr-0.6b","qwen3-asr-1.7b","sherpa-onnx-vad-silero"]
+          for target_id in required:
+              target=by_id[target_id]
+              assert target.get("releaseEligible") is not False, target_id
+              assert target.get("status","").startswith("acquire"), target_id
+          assert by_id["qwen3-asr-0.6b"]["license"]=="Apache-2.0"
+          assert by_id["qwen3-asr-1.7b"]["license"]=="Apache-2.0"
+          print("approved runtime targets validated:", required)
+          PY
+
+      - name: Acquire Qwen3-ASR 0.6B
+        if: "${{ steps.release.outputs.qwen06 != 'true' }}"
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+          RECHERCHER_VOICE_ACQUISITION_REVISION: "2026-10-02"
+        run: |
+          set -euo pipefail
+          echo "Rechercher voice acquisition revision: $RECHERCHER_VOICE_ACQUISITION_REVISION"
+          hf download Qwen/Qwen3-ASR-0.6B --local-dir voice-release-assets/Qwen3-ASR-0.6B
+          test -s voice-release-assets/Qwen3-ASR-0.6B/config.json
+          test -s voice-release-assets/Qwen3-ASR-0.6B/model.safetensors
+          test -s voice-release-assets/Qwen3-ASR-0.6B/preprocessor_config.json
+
+      - name: Acquire Qwen3-ASR 1.7B
+        if: "${{ steps.release.outputs.qwen17 != 'true' }}"
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          hf download Qwen/Qwen3-ASR-1.7B --local-dir voice-release-assets/Qwen3-ASR-1.7B
+          test -s voice-release-assets/Qwen3-ASR-1.7B/config.json
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model-00001-of-00002.safetensors
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model-00002-of-00002.safetensors
+          test -s voice-release-assets/Qwen3-ASR-1.7B/model.safetensors.index.json
+
+      - name: Acquire Silero VAD
+        if: "${{ steps.release.outputs.silero != 'true' }}"
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors \
+            -o voice-release-assets/silero_vad.onnx \
+            https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
+          test -s voice-release-assets/silero_vad.onnx
+
+      - name: Runtime verify Qwen3-ASR 0.6B
+        if: "${{ steps.release.outputs.qwen06 != 'true' }}"
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import torch
+          from qwen_asr import Qwen3ASRModel
+          model=Qwen3ASRModel.from_pretrained(
+              "voice-release-assets/Qwen3-ASR-0.6B",
+              dtype=torch.float32,
+              device_map="cpu",
+              max_inference_batch_size=1,
+              max_new_tokens=128,
+              local_files_only=True
+          )
+          result=model.transcribe(
+              audio="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-ASR-Repo/asr_en.wav",
+              language=None,
+              return_time_stamps=False
+          )[0]
+          assert result.language
+          assert result.text.strip()
+
+          import subprocess
+          subprocess.run([
+              "espeak-ng","-v","ar","-s","160","-a","140","-w",
+              "/tmp/al-huda-arabic.wav",
+              "السلام عليكم ورحمة الله وبركاته"
+          ], check=True)
+          arabic=model.transcribe(
+              audio="/tmp/al-huda-arabic.wav",
+              language="Arabic",
+              return_time_stamps=False
+          )[0]
+          assert arabic.language
+          assert arabic.text.strip()
+          print("qwen3-asr-0.6b runtime verified:", result.language, "Arabic sample:", arabic.text)
+          PY
+
+      - name: Runtime verify Qwen3-ASR 1.7B
+        if: "${{ steps.release.outputs.qwen17 != 'true' }}"
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import torch
+          from qwen_asr import Qwen3ASRModel
+          model=Qwen3ASRModel.from_pretrained(
+              "voice-release-assets/Qwen3-ASR-1.7B",
+              dtype=torch.float32,
+              device_map="cpu",
+              max_inference_batch_size=1,
+              max_new_tokens=128,
+              local_files_only=True
+          )
+          result=model.transcribe(
+              audio="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-ASR-Repo/asr_en.wav",
+              language=None,
+              return_time_stamps=False
+          )[0]
+          assert result.language
+          assert result.text.strip()
+
+          import subprocess
+          subprocess.run([
+              "espeak-ng","-v","ar","-s","160","-a","140","-w",
+              "/tmp/al-huda-arabic-17b.wav",
+              "السلام عليكم ورحمة الله وبركاته"
+          ], check=True)
+          arabic=model.transcribe(
+              audio="/tmp/al-huda-arabic-17b.wav",
+              language="Arabic",
+              return_time_stamps=False
+          )[0]
+          assert arabic.language
+          assert arabic.text.strip()
+          print("qwen3-asr-1.7b runtime verified:", result.language, "Arabic sample:", arabic.text)
+          PY
+
+      - name: Runtime verify Silero VAD
+        if: "${{ steps.release.outputs.silero != 'true' }}"
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import numpy as np
+          import onnxruntime as ort
+
+          path="voice-release-assets/silero_vad.onnx"
+          session=ort.InferenceSession(path, providers=["CPUExecutionProvider"])
+          inputs={x.name:x for x in session.get_inputs()}
+          names=set(inputs)
+          print("Silero VAD ONNX inputs:", {k: str(v.shape) for k,v in inputs.items()})
+
+          def concrete_shape(meta, sample_size=512, hidden_size=64):
+              shape=[]
+              for i,d in enumerate(meta.shape):
+                  if isinstance(d, int) and d > 0:
+                      shape.append(d)
+                      continue
+                  if len(meta.shape) == 2:
+                      shape.append(sample_size if i == len(meta.shape)-1 else 1)
+                  elif len(meta.shape) == 3:
+                      if i == 0:
+                          shape.append(2)
+                      elif i == 1:
+                          shape.append(1)
+                      else:
+                          shape.append(hidden_size)
+                  else:
+                      shape.append(1)
+              return tuple(shape)
+
+          def zeros(meta, sample_size=512, hidden_size=64, dtype=np.float32):
+              shape=concrete_shape(meta, sample_size, hidden_size)
+              return np.zeros(shape, dtype=dtype)
+
+          ok=False
+          if {"x","h","c"} <= names:
+              for sample_size in (512,576,1024):
+                  for hidden_size in (64,128):
+                      try:
+                          feeds={
+                              "x": zeros(inputs["x"], sample_size, hidden_size),
+                              "h": zeros(inputs["h"], sample_size, hidden_size),
+                              "c": zeros(inputs["c"], sample_size, hidden_size),
+                          }
+                          out=session.run(None, feeds)
+                          assert out and np.asarray(out[0]).size
+                          ok=True
+                          print("silero_vad runtime verified using x/h/c contract",
+                                "sample_size=", sample_size,
+                                "hidden_size=", hidden_size)
+                          break
+                      except Exception as exc:
+                          print("x/h/c probe failed:", type(exc).__name__, str(exc))
+                  if ok:
+                      break
+          elif {"input","state","sr"} <= names:
+              for sample_size in (512,576,1024,256):
+                  try:
+                      audio=zeros(inputs["input"], sample_size, 64)
+                      state=zeros(inputs["state"], sample_size, 128)
+                      sr_shape=concrete_shape(inputs["sr"], sample_size, 64)
+                      sr=np.full(sr_shape,16000,dtype=np.int64)
+                      out=session.run(None, {"input":audio,"state":state,"sr":sr})
+                      assert len(out)>=2 and np.asarray(out[0]).size and np.asarray(out[1]).size
+                      ok=True
+                      print("silero_vad runtime verified using input/state/sr contract",
+                            "sample_size=", sample_size)
+                      break
+                  except Exception as exc:
+                      print("input/state/sr probe failed:", type(exc).__name__, str(exc))
+          else:
+              raise AssertionError(f"unsupported Silero VAD ONNX input contract: {sorted(names)}")
+
+          assert ok, "Silero VAD runtime verification failed for all supported input contracts"
+          PY
+
+      - name: Package verified Release assets
+        if: "${{ steps.release.outputs.any_missing == 'true' }}"
+        run: |
+          set -euo pipefail
+          mkdir -p voice-release-assets
+          test -f voice-release-assets/silero_vad.onnx || true
+          cd voice-release-assets
+          if [ -d Qwen3-ASR-0.6B ]; then tar -cjf Qwen3-ASR-0.6B.tar.bz2 Qwen3-ASR-0.6B; rm -rf Qwen3-ASR-0.6B; fi
+          if [ -d Qwen3-ASR-1.7B ]; then
+            tar -cjf - Qwen3-ASR-1.7B | split -b 1900m - Qwen3-ASR-1.7B.tar.bz2.part-
+            sha256sum Qwen3-ASR-1.7B.tar.bz2.part-* > Qwen3-ASR-1.7B.parts.SHA256SUMS.txt
+            rm -rf Qwen3-ASR-1.7B
+          fi
+          cp ../config/voice-model-acquisition-manifest-2026.json manifest.json
+          find . -maxdepth 1 -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+
+      - name: Publish verified assets automatically to Release
+        if: "${{ steps.release.outputs.any_missing == 'true' }}"
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          TAG: rechercher-voice-runtime-2026-10
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "Automatic Rechercher voice runtime acquisition. Verified assets only."
+          fi
+          for asset in voice-release-assets/*; do
+            [ -f "$asset" ] || continue
+            name=$(basename "$asset")
+            if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets | jq -e --arg n "$name" '.assets[] | select(.name==$n)' >/dev/null; then
+              gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY" --clobber
+            fi
+          done
+
+
+  runtime-verify-existing-release:
+    name: Runtime verify existing voice Release assets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install inference tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y jq python3 python3-pip tar bzip2 espeak-ng
+          python3 -m pip install --disable-pip-version-check --no-cache-dir qwen-asr onnxruntime numpy scipy soundfile
+
+      - name: Download verified Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          gh release download rechercher-voice-runtime-2026-10 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'Qwen3-ASR-0.6B.tar.bz2' \
+            --pattern 'Qwen3-ASR-1.7B.tar.bz2.part-*' \
+            --pattern 'silero_vad.onnx' \
+            --dir release-assets
+          test -s release-assets/Qwen3-ASR-0.6B.tar.bz2
+          test -s release-assets/silero_vad.onnx
+          ls -lh release-assets
+
+      - name: Reconstruct and unpack Qwen3-ASR models
+        run: |
+          set -euo pipefail
+          mkdir -p models/Qwen3-ASR-0.6B models/Qwen3-ASR-1.7B
+          tar -xjf release-assets/Qwen3-ASR-0.6B.tar.bz2 -C models/Qwen3-ASR-0.6B --strip-components=1
+          parts=(release-assets/Qwen3-ASR-1.7B.tar.bz2.part-*)
+          test "${#parts[@]}" -ge 2
+          cat "${parts[@]}" > /tmp/Qwen3-ASR-1.7B.tar.bz2
+          tar -xjf /tmp/Qwen3-ASR-1.7B.tar.bz2 -C models/Qwen3-ASR-1.7B --strip-components=1
+          test -s models/Qwen3-ASR-0.6B/model.safetensors
+          test -s models/Qwen3-ASR-1.7B/model.safetensors.index.json
+          test -s models/Qwen3-ASR-1.7B/model-00001-of-00002.safetensors
+          test -s models/Qwen3-ASR-1.7B/model-00002-of-00002.safetensors
+
+      - name: Runtime verify Qwen3-ASR 0.6B from Release
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          import torch
+          from qwen_asr import Qwen3ASRModel
+          model=Qwen3ASRModel.from_pretrained(
+              "models/Qwen3-ASR-0.6B",
+              dtype=torch.float32,
+              device_map="cpu",
+              max_inference_batch_size=1,
+              max_new_tokens=128,
+              local_files_only=True
+          )
+          subprocess.run([
+              "espeak-ng","-v","ar","-s","160","-a","140","-w",
+              "/tmp/al-huda-ar-06.wav",
+              "السلام عليكم ورحمة الله وبركاته"
+          ], check=True)
+          result=model.transcribe(
+              audio="/tmp/al-huda-ar-06.wav",
+              language="Arabic",
+              return_time_stamps=False
+          )[0]
+          assert result.language
+          assert result.text.strip()
+          print("Qwen3-ASR-0.6B Release inference OK:", result.language, result.text)
+          PY
+
+      - name: Runtime verify Qwen3-ASR 1.7B from Release
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          import torch
+          from qwen_asr import Qwen3ASRModel
+          model=Qwen3ASRModel.from_pretrained(
+              "models/Qwen3-ASR-1.7B",
+              dtype=torch.float32,
+              device_map="cpu",
+              max_inference_batch_size=1,
+              max_new_tokens=128,
+              local_files_only=True
+          )
+          subprocess.run([
+              "espeak-ng","-v","ar","-s","160","-a","140","-w",
+              "/tmp/al-huda-ar-17.wav",
+              "السلام عليكم ورحمة الله وبركاته"
+          ], check=True)
+          result=model.transcribe(
+              audio="/tmp/al-huda-ar-17.wav",
+              language="Arabic",
+              return_time_stamps=False
+          )[0]
+          assert result.language
+          assert result.text.strip()
+          print("Qwen3-ASR-1.7B Release inference OK:", result.language, result.text)
+          PY
+
+      - name: Runtime verify Silero VAD from Release
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import numpy as np
+          import onnxruntime as ort
+          session=ort.InferenceSession("release-assets/silero_vad.onnx", providers=["CPUExecutionProvider"])
+          names={x.name:x for x in session.get_inputs()}
+          print("Silero inputs:", sorted(names))
+          if {"x","h","c"} <= set(names):
+              out=session.run(None,{
+                  "x":np.zeros((1,512),dtype=np.float32),
+                  "h":np.zeros((2,1,64),dtype=np.float32),
+                  "c":np.zeros((2,1,64),dtype=np.float32),
+              })
+          elif {"input","state","sr"} <= set(names):
+              out=session.run(None,{
+                  "input":np.zeros((1,512),dtype=np.float32),
+                  "state":np.zeros((2,1,128),dtype=np.float32),
+                  "sr":np.array([16000],dtype=np.int64),
+              })
+          else:
+              raise SystemExit("unsupported Silero VAD input contract: "+repr(sorted(names)))
+          assert out
+          print("Silero VAD Release inference OK; outputs:", len(out))
+          PY
+

@@ -1,0 +1,72 @@
+{
+  "schema": "dinullah.platform-voice-lifecycle.v1",
+  "assistant": "Al-Huda",
+  "wakeWord": "الهُدَى",
+  "permissions": {
+    "microphone": true,
+    "notifications": false,
+    "backgroundAudio": false
+  },
+  "batteryThermal": {
+    "adaptiveModelSelection": true,
+    "cpuBudgetRequired": true,
+    "thermalDowngradeRequired": true,
+    "backgroundListeningRequiresPlatformSupport": true
+  },
+  "ios": {
+    "appIntents": true,
+    "appShortcuts": true,
+    "vocalShortcuts": true,
+    "nativeEvidenceRequired": true
+  },
+  "android": {
+    "voiceInteractionService": true,
+    "sessionService": true,
+    "selectedAssistant": true,
+    "hotwording": true,
+    "nativeEvidenceRequired": true
+  },
+  "webAssembly": {
+    "required": true,
+    "browserEvidenceRequired": true
+  },
+  "harmonyOS": {
+    "nativeArkTS": true,
+    "devEcoStudio": true,
+    "xiaoyiSkill": true,
+    "intentsKit": true,
+    "coreSpeechKit": true,
+    "systemLevelEntry": "skill-or-agent",
+    "defaultAssistantReplacementNotAssumed": true,
+    "nativeEvidenceRequired": true
+  },
+  "deviceFamilies": {
+    "android": [
+      "phone",
+      "tablet",
+      "tv",
+      "wearable",
+      "automotive"
+    ],
+    "harmonyOS": [
+      "phone",
+      "tablet",
+      "2in1",
+      "tv",
+      "wearable",
+      "automotive"
+    ],
+    "apple": [
+      "iphone",
+      "ipad",
+      "apple-watch",
+      "apple-tv"
+    ],
+    "web": [
+      "pwa",
+      "desktop",
+      "browser"
+    ]
+  },
+  "integrationPrinciple": "OS-native adapter per platform; shared Al-Huda core; no Corpus modification"
+}
