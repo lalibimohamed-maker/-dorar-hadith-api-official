@@ -124,7 +124,12 @@
       "runtime_environment_id": "hunyuanvideo15-pytorch",
       "local_use_status": "review_required_under_upstream_terms",
       "redistribution_status": "review_required",
-      "weight_integrity_status": "manifest_present_not_revalidated"
+      "weight_integrity_status": "manifest_present_not_revalidated",
+      "default_profiles": {
+        "text_to_video": "480p-t2v-distilled",
+        "image_to_video": "480p-i2v-step-distilled"
+      },
+      "default_profile": "480p-i2v-step-distilled"
     },
     {
       "id": "ltx-2",
@@ -162,7 +167,14 @@
       "redistribution_status": "review_required",
       "weight_integrity_status": "manifest_present_not_revalidated",
       "storage_asset_count": 619,
-      "storage_total_bytes": 314290868180
+      "storage_total_bytes": 314290868180,
+      "default_profiles": {
+        "text_to_video": "distilled-diffusers-split",
+        "image_to_video": "distilled-diffusers-split",
+        "video_to_video": "distilled-diffusers-split",
+        "audio_video_generation": "distilled-diffusers-split"
+      },
+      "default_profile": "distilled-diffusers-split"
     },
     {
       "id": "cogvideox",
