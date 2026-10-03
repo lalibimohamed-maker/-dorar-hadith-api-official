@@ -6,9 +6,13 @@ import json, os, platform, subprocess, sys
 from pathlib import Path
 
 engine=os.environ.get("ENGINE","").strip()
+profile=os.environ.get("PROFILE","").strip()
 model_path=Path(os.environ.get("MODEL_PATH","")).expanduser()
+
 if engine not in {"hunyuanvideo-1.5","ltx-2"}:
     raise SystemExit("unsupported engine")
+if not profile:
+    raise SystemExit("PROFILE is required")
 if not model_path.exists():
     raise SystemExit(f"MODEL_PATH does not exist: {model_path}")
 if platform.system() != "Linux":
@@ -23,6 +27,7 @@ if not torch.cuda.is_available():
 
 result={
     "engine":engine,
+    "profile":profile,
     "model_path":str(model_path),
     "cuda_version":torch.version.cuda,
     "gpu_count":torch.cuda.device_count(),
