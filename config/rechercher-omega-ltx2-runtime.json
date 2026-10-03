@@ -32,7 +32,7 @@
       "ICLoraPipeline"
     ],
     "linux_cuda_supported": true,
-    "matching_text_encoder_required": false,
+    "matching_text_encoder_required": true,
     "checkpoint_layout_verification_required": true,
     "component_verification_required": [
       "transformer",
@@ -41,8 +41,8 @@
       "audio_vae",
       "vocoder"
     ],
-    "note": "The pinned LTX-2 checkpoint contains its text_encoder component. Verify that the checkpoint layout and runtime package remain matched; do not silently substitute a different checkpoint family.",
-    "embedded_text_encoder_required": true
+    "note": "LTX-2 supports distinct loading modes: Diffusers split mode can use stored text-encoder component files; ltx-pipelines monolith mode requires a separate Gemma root. These modes must not be mixed.",
+    "embedded_text_encoder_required": false
   },
   "execution": {
     "local_weight_execution": true,
@@ -61,9 +61,10 @@
     "license_clearance",
     "stored_release_manifest_verification",
     "sha256_verification",
-    "matching_text_encoder_verification",
     "runtime_component_verification",
-    "e2e_smoke_test"
+    "e2e_smoke_test",
+    "runtime_mode_selected",
+    "text_encoder_source_verified_for_selected_runtime_mode"
   ],
   "revision_type": "immutable_hf_commit",
   "checkpoint_proof": {
@@ -93,5 +94,23 @@
     "isolation_required": true,
     "generic_omega_stack_substitution": false
   },
-  "storage_total_bytes": 314290868180
+  "storage_total_bytes": 314290868180,
+  "runtime_modes": {
+    "diffusers-split": {
+      "loader": "diffusers.LTX2Pipeline",
+      "text_encoder_mode": "embedded_split_component",
+      "stored_text_encoder_formats": [
+        "text_encoder/diffusion_pytorch_model-00001-of-00012.safetensors",
+        "text_encoder/model-00001-of-00011.safetensors"
+      ],
+      "mode_selection": "loader_must_match_exact_text_encoder_format",
+      "external_gemma_required": false
+    },
+    "ltx-pipelines-monolith": {
+      "loader": "ltx_pipelines",
+      "text_encoder_mode": "external_gemma_root",
+      "external_gemma_required": true,
+      "note": "The LTX-2 pipeline installation guide documents a Gemma text encoder for monolith checkpoint mode."
+    }
+  }
 }
