@@ -316,10 +316,17 @@ jobs:
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
-          json="$(gh api "repos/$REPO/releases/tags/$RELEASE_TAG" 2>/dev/null || true)"
+          release_json="$RUNNER_TEMP/omega-release-${{ matrix.id }}.json"
           complete="false"
-          if [ -n "$json" ]; then
-            if python -c 'import json,sys; j=json.loads(sys.argv[1]); assets={x.get("name") for x in j.get("assets",[])}; raise SystemExit(0 if ("release-manifest.json" in assets and any(str(n).startswith("omega__") for n in assets)) else 1)' "$json"; then
+          if gh api "repos/$REPO/releases/tags/$RELEASE_TAG" > "$release_json" 2>/dev/null; then
+            if python - "$release_json" <<'PY'
+          import json,sys
+          with open(sys.argv[1], encoding="utf-8") as fh:
+              j=json.load(fh)
+          assets={str(x.get("name")) for x in j.get("assets",[])}
+          raise SystemExit(0 if ("release-manifest.json" in assets and any(n.startswith("omega__") for n in assets)) else 1)
+          PY
+            then
               complete="true"
             fi
           fi
