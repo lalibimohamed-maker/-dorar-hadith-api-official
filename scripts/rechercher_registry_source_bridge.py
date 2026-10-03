@@ -111,7 +111,7 @@ def extract_pdf_candidates(source_url: str) -> dict:
                 break
 
         # Also catch plain absolute PDF URLs embedded in source JSON/HTML.
-        for raw in re.findall(r"https://[^\s"'<>]+\.pdf(?:\?[^\s"'<>]*)?", page, re.I):
+        for raw in re.findall(r"https://[^\s\"\'<>]+\.pdf(?:\?[^\s\"\'<>]*)?", page, re.I):
             u = html.unescape(raw).rstrip("),.;")
             if u not in seen and len(result["pdfs"]) < MAX_PDFS_PER_SOURCE:
                 seen.add(u)
