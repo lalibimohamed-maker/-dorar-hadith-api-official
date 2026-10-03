@@ -52,6 +52,17 @@ jobs:
               raise SystemExit("missing persistent release assets: "+", ".join(missing))
           print("Release:",data["url"])
           print("Verified assets:",len(expected))
+
+          shared_tag="rechercher-free-local-models-2026-10"
+          shared_raw=subprocess.check_output(["gh","release","view",shared_tag,"--json","isDraft,isPrerelease,assets,url"],text=True)
+          shared=json.loads(shared_raw)
+          if shared.get("isDraft") or shared.get("isPrerelease"):
+              raise SystemExit("shared Qwen3 release must be stable: "+shared_tag)
+          shared_assets={a["name"] for a in shared["assets"]}
+          required_shared="qwen3-0.6b.tar.zst"
+          if required_shared not in shared_assets:
+              raise SystemExit("missing shared Qwen3 asset: "+required_shared)
+          print("Shared Qwen3 release verified:",shared["url"])
           PY
 
       - name: Enforce no scheduled weight downloads
