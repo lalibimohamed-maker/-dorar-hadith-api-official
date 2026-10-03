@@ -78,21 +78,36 @@ def release_assets(release: dict) -> dict[str, dict]:
 
 
 def download_manifest(release: dict) -> dict:
-    assets = release_assets(release)
-    meta = assets.get("release-manifest.json")
-    if not meta:
-        raise RuntimeError("release-manifest.json is missing")
-    request = urllib.request.Request(
-        meta["browser_download_url"],
-        headers={
-            "Authorization": f"Bearer {TOKEN}",
-            "Accept": "application/octet-stream",
-            "User-Agent": "Rechercher-Omega-Video-Release-Repair/1.0",
-        },
+    """Download the small manifest through authenticated gh release download."""
+    target = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / f"omega-release-manifest-{TAG}.json"
+    if target.exists():
+        target.unlink()
+    proc = subprocess.run(
+        [
+            "gh",
+            "release",
+            "download",
+            TAG,
+            "--repo",
+            REPO,
+            "--pattern",
+            "release-manifest.json",
+            "--output",
+            str(target),
+            "--clobber",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        env={**os.environ, "GH_TOKEN": TOKEN},
     )
-    context = ssl.create_default_context()
-    with urllib.request.urlopen(request, context=context, timeout=180) as response:
-        return json.load(response)
+    if proc.returncode != 0 or not target.is_file():
+        detail = (proc.stderr or proc.stdout or "").strip()
+        raise RuntimeError(f"failed to download release manifest: {detail[:1200]}")
+    try:
+        return json.loads(target.read_text(encoding="utf-8"))
+    finally:
+        target.unlink(missing_ok=True)
 
 
 def expected_part_lengths(size: int, chunk_bytes: int) -> list[int]:
