@@ -109,6 +109,15 @@ jobs:
           print(json.dumps({"engine":os.environ["ENGINE"],"profile":p["id"],"revision":cfg[key]["model_revision"]},ensure_ascii=False))
           PY
 
+      - name: Preflight staged model runtime layout
+        env:
+          ENGINE: ${{ inputs.engine }}
+          PROFILE: ${{ inputs.profile }}
+          MODEL_PATH: ${{ runner.temp }}/omega-video-model
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher-omega-video-runtime-smoke.py
+
       - name: Install LTX-2 upstream runtime at an immutable code commit
         if: ${{ inputs.engine == 'ltx-2' }}
         env:
