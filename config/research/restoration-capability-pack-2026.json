@@ -1,0 +1,57 @@
+{
+  "schemaVersion":"1.0.0",
+  "version":"2026-08-30",
+  "purpose":"Free-first restoration pack for degraded historical scans: haze, blur, fading, uneven background, stains, bleed-through and weak ink.",
+  "freeFirst":true,
+  "noPaidDependencyRequired":true,
+  "capabilities":{
+    "illuminationCorrection":true,
+    "backgroundEstimation":true,
+    "denoising":true,
+    "nonLocalMeansDenoising":true,
+    "waveletDenoising":true,
+    "bilateralDenoising":true,
+    "deconvolution":true,
+    "unsharpMasking":true,
+    "morphology":true,
+    "inpaintingForNonTextDefects":true,
+    "deskew":true,
+    "dewarp":true,
+    "contrastStretch":true,
+    "localContrast":true,
+    "despeckle":true,
+    "bleedThroughSuppression":true,
+    "inkBackgroundSeparation":true
+  },
+  "enginesAndLibraries":[
+    {"id":"scikit-image","role":"denoising-deconvolution-background-estimation-and-restoration","license":"BSD-3-Clause"},
+    {"id":"opencv","role":"geometry-contrast-morphology-and-quality-analysis","license":"Apache-2.0"},
+    {"id":"imagemagick","role":"deskew-despeckle-enhancement-normalization-and-difference-analysis","license":"ImageMagick-License"},
+    {"id":"scantailor-advanced","role":"page-layout-dewarp-deskew-and-adaptive-binarization","license":"GPL-3.0"}
+  ],
+  "safety":{
+    "restorationCannotInventGlyphs":true,
+    "restorationCannotChangeDiplomaticText":true,
+    "textRegionPreservationRequired":true,
+    "compareRestoredPageAgainstSource":true,
+    "useInpaintingOnlyForApprovedNonTextDefects":true,
+    "deconvolutionMustPassArtifactGate":true,
+    "aggressiveSharpeningRequiresQualityGate":true
+  },
+  "adaptivePolicy":{
+    "cleanPage":"minimal_processing",
+    "fadedPage":"local_contrast_and_ink_recovery",
+    "noisyPage":"edge_preserving_denoising",
+    "blurredPage":"conditional_deconvolution",
+    "unevenPaper":"background_estimation_then_local_normalization",
+    "stainedPage":"non_text_masking_then_local_repair",
+    "bleedThroughPage":"backside_suppression_then_text_preservation",
+    "severelyDamagedPage":"quarantine_and_parallel_source_cross_check"
+  },
+  "references":[
+    "scikit-image restoration documentation",
+    "ImageMagick command-line image enhancement documentation",
+    "ScanTailor Advanced documentation",
+    "OCR-D workflow model"
+  ]
+}

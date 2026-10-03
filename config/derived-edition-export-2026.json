@@ -1,0 +1,26 @@
+{
+  "version": "2026-08-30",
+  "freeFirst": true,
+  "noPaidDependencyRequired": true,
+  "formats": {
+    "pdf": {"path":"native-pdf-or-pdf-a", "preservePageGeometry":true},
+    "docx": {"path":"docx-export", "fallback":"libreoffice-headless"},
+    "pptx": {"path":"presentation-export", "fallback":"libreoffice-headless"},
+    "epub": {"path":"structured-ebook-export"},
+    "html": {"path":"semantic-html-export"},
+    "txt": {"path":"plain-text-export"},
+    "markdown": {"path":"markdown-export"},
+    "pageXml": {"path":"ocr-d/page-xml"},
+    "altoXml": {"path":"ocr-d/alto-xml"},
+    "teiXml": {"path":"structured-scholarly-export"},
+    "ocrJson": {"path":"lossless-structured-ocr-export"}
+  },
+  "conversionRules": {
+    "neverConvertFromDerivedTextWithoutLinkingToSource": true,
+    "retainPageAndRegionProvenance": true,
+    "retainUncertaintyAnnotations": true,
+    "retainEditionIdentity": true,
+    "retainCopyrightAndLicenseMetadata": true,
+    "lossyConversionRequiresExplicitOptIn": true
+  }
+}

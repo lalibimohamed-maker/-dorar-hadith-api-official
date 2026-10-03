@@ -1,0 +1,205 @@
+{
+  "schemaVersion": "1.0.0",
+  "name": "free-book-processing-group",
+  "version": "2026-08-30",
+  "purpose": "Free-first, local, provider-neutral processing group for digital and non-digital books, with provenance and fail-closed quality gates.",
+  "costPolicy": {
+    "requiredSubscription": false,
+    "requiredPaidApi": false,
+    "localFirst": true,
+    "openSourcePreferred": true,
+    "futureLicenseMustBeRechecked": true,
+    "modelWeightsAreCheckedSeparately": true
+  },
+  "principles": {
+    "preserveOriginal": true,
+    "neverOverwriteSource": true,
+    "noSilentTextMutation": true,
+    "noAutomaticScholarlyPromotion": true,
+    "rightsCheckBeforeRedistribution": true,
+    "pageLevelQualityGate": true,
+    "engineDisagreementRequiresReview": true
+  },
+  "inputClasses": [
+    "born-digital-pdf",
+    "image-only-pdf",
+    "scanned-book",
+    "mixed-pdf",
+    "single-page-images",
+    "multipage-tiff",
+    "djvu",
+    "photographed-pages"
+  ],
+  "group": [
+    {
+      "id": "scantailor-advanced",
+      "project": "4lex4/scantailor-advanced",
+      "license": "GPL-3.0",
+      "role": "book-image-preprocessing",
+      "capabilities": ["page-splitting", "deskew", "content-selection", "dewarping", "adaptive-binarization", "original-background", "high-resolution-rendering"],
+      "enabled": true,
+      "authority": "visual-preprocessing-only"
+    },
+    {
+      "id": "opencv",
+      "project": "opencv/opencv",
+      "license": "Apache-2.0",
+      "role": "custom-image-quality-gates",
+      "capabilities": ["local-contrast", "noise-analysis", "background-sampling", "geometry-checks", "connected-components", "spot-detection"],
+      "enabled": true,
+      "authority": "visual-preprocessing-only"
+    },
+    {
+      "id": "unpaper",
+      "project": "unpaper/unpaper",
+      "license": "GPL-2.0",
+      "role": "conservative-scan-cleaning",
+      "capabilities": ["noise-filtering", "dark-edge-removal", "deskew-support", "book-page-cleaning"],
+      "enabled": true,
+      "authority": "preprocessing-only"
+    },
+    {
+      "id": "tesseract",
+      "project": "tesseract-ocr/tesseract",
+      "license": "Apache-2.0",
+      "role": "baseline-ocr",
+      "capabilities": ["arabic-ocr", "multilingual-ocr", "word-boxes", "printed-text"],
+      "enabled": true,
+      "authority": "candidate-text-only"
+    },
+    {
+      "id": "paddleocr",
+      "project": "PaddlePaddle/PaddleOCR",
+      "license": "Apache-2.0",
+      "role": "primary-document-ocr-and-layout",
+      "capabilities": ["arabic-ocr", "multilingual-ocr", "layout-analysis", "document-parsing", "warping", "scanning", "illumination", "skew"],
+      "enabled": true,
+      "authority": "candidate-text-and-layout-only"
+    },
+    {
+      "id": "kraken",
+      "project": "mittagessen/kraken",
+      "license": "Apache-2.0",
+      "role": "historical-and-nonlatin-ocr-verifier",
+      "capabilities": ["rtl", "bidi", "non-latin-scripts", "layout-analysis", "reading-order", "character-cuts", "ALTO", "PageXML", "hOCR"],
+      "enabled": true,
+      "authority": "candidate-text-only"
+    },
+    {
+      "id": "ocrmypdf",
+      "project": "ocrmypdf/OCRmyPDF",
+      "license": "MPL-2.0",
+      "role": "pdf-orchestration-and-searchable-layer",
+      "capabilities": ["ocr-layer", "deskew", "rotate-pages", "safe-cleaning", "pdf-a", "rtl-text-layer", "multilingual-rendering"],
+      "enabled": true,
+      "authority": "artifact-orchestration-only"
+    },
+    {
+      "id": "qpdf",
+      "project": "qpdf/qpdf",
+      "license": "Apache-2.0",
+      "role": "pdf-structure-integrity",
+      "capabilities": ["content-preserving-transformations", "split", "merge", "inspection", "linearization", "encryption"],
+      "enabled": true,
+      "authority": "pdf-structure-only"
+    },
+    {
+      "id": "poppler",
+      "project": "freedesktop/poppler",
+      "license": "GPL",
+      "role": "pdf-rendering-and-text-inspection",
+      "capabilities": ["pdf-rendering", "page-rasterization", "structure-inspection", "text-extraction"],
+      "enabled": true,
+      "authority": "rendering-and-inspection-only"
+    },
+    {
+      "id": "djvulibre",
+      "project": "djvulibre/djvulibre",
+      "license": "GPL-2.0",
+      "role": "scanned-document-interchange",
+      "capabilities": ["djvu-read-write", "bitonal-compression", "document-assembly", "format-conversion"],
+      "enabled": true,
+      "authority": "format-conversion-only"
+    },
+    {
+      "id": "imagemagick",
+      "project": "ImageMagick/ImageMagick",
+      "license": "ImageMagick-License",
+      "role": "general-image-conversion",
+      "capabilities": ["format-conversion", "resize", "crop", "metadata-inspection", "image-normalization"],
+      "enabled": true,
+      "authority": "conversion-only"
+    },
+    {
+      "id": "img2pdf",
+      "project": "myollie/img2pdf",
+      "license": "LGPL-3.0-or-later",
+      "role": "lossless-image-to-pdf-packaging",
+      "capabilities": ["lossless-image-embedding", "multi-page-pdf"],
+      "enabled": true,
+      "authority": "packaging-only"
+    },
+    {
+      "id": "real-esrgan",
+      "project": "xinntao/Real-ESRGAN",
+      "license": "BSD-3-Clause-code-license; model-license-must-be-checked",
+      "role": "optional-image-restoration",
+      "capabilities": ["real-world-restoration", "upscaling", "degradation-removal"],
+      "enabled": true,
+      "authority": "optional-restoration-only",
+      "gate": "never invent text; compare against original before acceptance"
+    }
+  ],
+  "optionalEngines": {
+    "surya": {
+      "project": "datalab-to/surya",
+      "role": "experimental-ocr-layout-verifier",
+      "status": "license-gated",
+      "reason": "Code and model-weight licensing are not equivalent; weights have additional restrictions. Do not treat as an unrestricted free core engine."
+    }
+  },
+  "orchestration": {
+    "mode": "parallel-ensemble-with-gates",
+    "stageOrder": [
+      "input-classification",
+      "preserve-original-and-hash",
+      "render-or-normalize",
+      "visual-preprocessing-candidates",
+      "parallel-ocr",
+      "layout-and-reading-order-cross-check",
+      "text-consensus",
+      "question-and-blank-position-detection",
+      "answer-placement-only-at-blank",
+      "visual-diff-against-source",
+      "pdf-integrity-check",
+      "rights-and-provenance-check",
+      "publish-derived-edition"
+    ],
+    "ocrConsensus": {
+      "minimumEnginesForNormalArabicPage": 2,
+      "preferredEngines": ["paddleocr", "tesseract", "kraken"],
+      "disagreementAction": "quarantine-page-for-review",
+      "neverUseSingleEngineAsScholarlyAuthority": true
+    },
+    "visualSafety": {
+      "blankMarker": "……………………",
+      "blankReplacement": "sample-local-background-and-mask-marker-only",
+      "preserveQuestion": true,
+      "preserveOriginalTypographyOutsideBlank": true,
+      "doNotRemoveDecorativeElements": true,
+      "rejectIfNonBlankPixelsChangeBeyondMask": true
+    }
+  },
+  "qualityGates": [
+    "source-hash-preserved",
+    "page-count-preserved",
+    "dimensions-preserved-or-recorded",
+    "no-unapproved-crop",
+    "no-unapproved-text-change",
+    "ocr-consensus-or-review",
+    "blank-mask-local-background-match",
+    "answer-box-within-original-blank-region",
+    "pdf-opens-and-validates",
+    "rights-status-known"
+  ]
+}

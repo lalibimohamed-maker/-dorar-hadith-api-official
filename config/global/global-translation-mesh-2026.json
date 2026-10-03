@@ -1,0 +1,12 @@
+{
+  "contractId":"global-translation-mesh-2026",
+  "freeFirst":true,
+  "paidDependencyRequired":false,
+  "engines":["argos-translate","libretranslate","opus-mt-marian-bergamot","apertium"],
+  "languageData":["Kaikki-Wiktionary","UniMorph","Unicode-CLDR","ICU"],
+  "quality":["ensemble-agreement","context-aware-translation","back-translation-check","COMET","SacreBLEU","chrF","spBLEU","FLORES-200"],
+  "locks":["named-entities","religious-terms","product-and-project-names","proper-names"],
+  "provenance":["sourceText","sourceEdition","engineVersions","glossaryVersion","qualityResults"],
+  "cacheKey":["contentHash","editionId","sourceLanguage","targetLanguage","glossaryVersion","translationEngineSet","modelVersions"],
+  "rules":{"humanVerifiedReligiousTranslationsArePreferred":true,"machineTranslationNeverSilentlyReplacesVerifiedText":true,"ambiguousTermsRequireContext":true,"originalTextAlwaysPreserved":true,"licensedModelsMustPassLicenseGate":true}
+}

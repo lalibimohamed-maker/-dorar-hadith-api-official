@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "purpose": "Free-first, provider-neutral fallback policy for Din Allah Encyclopedia.",
   "principles": {
     "freeFirst": true,
@@ -8,7 +8,8 @@
     "neverSilentlyLowerScientificAssurance": true,
     "automaticFallbackAllowedForHealthAndAvailability": true,
     "automaticScholarlyPromotionForbidden": true,
-    "betterMeansHigherVerifiedCapabilityNotJustPopularity": true
+    "betterMeansHigherVerifiedCapabilityNotJustPopularity": true,
+    "modelWeightsMustBeLicenseCheckedSeparately": true
   },
   "selectionOrder": [
     "eligible_free",
@@ -20,6 +21,48 @@
     "fallback_priority"
   ],
   "domains": {
+    "book_preprocessing": {
+      "primary": "scantailor-advanced",
+      "parallel_candidates": ["opencv", "unpaper"],
+      "minimum": "preserve_original_and_pass_page_visual_quality_gate"
+    },
+    "ocr": {
+      "primary": "paddleocr",
+      "fallbacks": ["tesseract-ocr", "kraken"],
+      "orchestrator": "ocrmypdf",
+      "minimum": "retain_source_image_and_verification_state",
+      "consensus": "at_least_two_independent_ocr_candidates_for_normal_arabic_pages"
+    },
+    "pdf_rendering": {
+      "primary": "poppler",
+      "fallbacks": ["pypdfium2"],
+      "minimum": "page_count_and_dimensions_must_be_preserved_or_recorded"
+    },
+    "pdf_structure": {
+      "primary": "qpdf",
+      "fallbacks": [],
+      "minimum": "output_pdf_must_open_and_pass_structure_checks"
+    },
+    "image_conversion": {
+      "primary": "imagemagick",
+      "fallbacks": ["pillow"],
+      "minimum": "no_unrequested_lossy_transcode"
+    },
+    "lossless_pdf_packaging": {
+      "primary": "img2pdf",
+      "fallbacks": [],
+      "minimum": "preserve_input_image_quality"
+    },
+    "djvu": {
+      "primary": "djvulibre",
+      "fallbacks": [],
+      "minimum": "conversion_is_recorded_and_original_is_preserved"
+    },
+    "image_restoration": {
+      "primary": "real-esrgan",
+      "fallbacks": [],
+      "minimum": "model-license-check-and-no-invented-text-gate"
+    },
     "malware": {
       "primary": "clamav",
       "fallbacks": ["yara-forge-core"],
@@ -45,11 +88,6 @@
       "fallbacks": [],
       "minimum": "fail_closed"
     },
-    "ocr": {
-      "primary": "tesseract-ocr",
-      "fallbacks": ["ocrmypdf"],
-      "minimum": "retain_source_image_and_verification_state"
-    },
     "speech_to_text": {
       "primary": "whisper-cpp",
       "fallbacks": ["faster-whisper"],
@@ -69,6 +107,7 @@
     "recordEngineVersion": true,
     "recordWhyPrimaryWasSkipped": true,
     "restorePrimaryWhenHealthy": true,
-    "doNotReplacePrimaryPermanentlyWithoutReview": true
+    "doNotReplacePrimaryPermanentlyWithoutReview": true,
+    "licenseGateBeforeActivation": true
   }
 }
