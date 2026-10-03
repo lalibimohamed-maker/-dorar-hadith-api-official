@@ -1,0 +1,135 @@
+{
+  "id": "rechercher-multilingual-learning-layer",
+  "version": "1.0.0",
+  "status": "foundation",
+  "titleAr": "طبقة التعلّم متعددة اللغات المرتبطة بالمصادر",
+  "titleEn": "Multilingual Source-Linked Learning Layer",
+  "principle": "Keep the verified source PDF and canonical religious text immutable; educational data is a separate, traceable layer.",
+  "languages": {
+    "policy": "locale-neutral",
+    "target": "all-world-languages",
+    "sourceTextRule": "Never translate or alter canonical Quran Arabic text, hadith source text, or the original PDF in place.",
+    "learningContent": "Localized independently from the source evidence.",
+    "fallback": ["user-locale", "source-language", "ar"],
+    "rtlAware": true
+  },
+  "evidenceStatuses": [
+    "SOURCE_VERIFIED",
+    "SCHOLAR_REVIEWED",
+    "DERIVED",
+    "AI_GENERATED",
+    "USER_CREATED",
+    "DISPUTED"
+  ],
+  "sourceAnchor": {
+    "required": [
+      "book",
+      "edition",
+      "volume",
+      "page",
+      "pdfHash",
+      "textRange",
+      "sourceUrl",
+      "rightsStatus"
+    ],
+    "immutability": "source-records-are-read-only",
+    "rightsGate": "learning-material-must-not-bypass-publication-or-download-rights"
+  },
+  "features": {
+    "spacedRepetition": {
+      "enabled": true,
+      "adaptive": true,
+      "scheduler": "configurable-and-testable",
+      "minimum": "source-linked-retrieval",
+      "successiveRelearning": true
+    },
+    "activeRecall": {
+      "enabled": true,
+      "mode": "optional-study-mode",
+      "questionTypes": [
+        "definition",
+        "evidence",
+        "face-of-indication",
+        "comparison",
+        "application",
+        "source-location"
+      ],
+      "neverBlocksReading": true
+    },
+    "progressiveSummarization": {
+      "enabled": true,
+      "levels": [
+        "original-full-text",
+        "terms-and-explanations",
+        "chapter-bullet-summary"
+      ],
+      "termSources": "controlled-sharia-terminology-dictionaries-and-verified-references"
+    },
+    "knowledgeGraph": {
+      "enabled": true,
+      "model": "controlled-ontology-plus-evidence-backed-relations",
+      "domains": ["quran", "tafsir", "hadith", "fiqh", "usul", "aqidah", "sirah", "scholars", "books", "concepts"],
+      "relationPolicy": "candidate-relations-require-evidence-and-validation-before-publication"
+    },
+    "interleavedLearning": {
+      "enabled": true,
+      "domains": ["fiqh", "hadith", "tafsir", "usul", "aqidah", "sirah"]
+    },
+    "bookQuiz": {
+      "enabled": true,
+      "levels": ["beginner", "student", "advanced", "research"],
+      "sourceLinked": true
+    },
+    "learningPaths": {
+      "enabled": true,
+      "paths": ["beginner", "quran", "tafsir", "hadith", "fiqh", "usul", "aqidah", "sirah", "research"],
+      "nonExclusive": true
+    },
+    "researchMode": {
+      "enabled": true,
+      "prompts": [
+        "what-is-it",
+        "what-is-the-evidence",
+        "what-is-the-face-of-indication",
+        "what-are-the-other-views",
+        "where-is-the-source"
+      ],
+      "requiresEvidence": true
+    }
+  },
+  "generationPolicy": {
+    "aiMayPropose": true,
+    "aiMayPublishUnreviewedReligiousClaim": false,
+    "generatedItemsRequireSource": true,
+    "generatedItemsRequireStatus": "AI_GENERATED",
+    "scholarReviewCanPromoteTo": "SCHOLAR_REVIEWED",
+    "preserveDisagreement": true,
+    "neverFlattenMadhhabDifferences": true
+  },
+  "qualityRules": {
+    "quran": "canonical-arabic-immutable",
+    "hadith": "grading-independent-from-book-presence",
+    "fiqh": "preserve-madhhab-and-scholar-attribution",
+    "usul": "avoid-overgeneralized-qati-zanni-rules; preserve technical nuance",
+    "hadithTerminology": "a narrator label alone never determines final hadith grade",
+    "wajibFard": "preserve school-specific terminology and differences",
+    "retrievalSafety": "retrieval practice must surface source evidence when correction is needed"
+  },
+  "rechercherIntegration": {
+    "upstream": "verified-pdf-acquisition-and-corpus-manifest",
+    "downstream": ["reader", "study-mode", "quiz", "graph", "learning-paths", "research-mode"],
+    "originalPdfMutation": false,
+    "acquisitionChanges": false,
+    "provenanceRequired": true
+  },
+  "implementationPhases": [
+    "A-source-linked-annotations",
+    "B-flashcards-and-active-recall",
+    "C-adaptive-spaced-repetition",
+    "D-progressive-summarization",
+    "E-controlled-semantic-tagging",
+    "F-islamic-knowledge-graph",
+    "G-multilingual-learning-paths",
+    "H-research-mode"
+  ]
+}
