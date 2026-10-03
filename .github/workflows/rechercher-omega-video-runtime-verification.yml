@@ -1,0 +1,85 @@
+name: Rechercher Omega — private video-engine runtime verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      engine:
+        description: "Video engine to verify"
+        required: true
+        type: choice
+        options:
+          - hunyuanvideo-1.5
+          - ltx-2
+      run_e2e_smoke:
+        description: "Run an actual local-weight smoke test on an authorized GPU runner"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  verify-private-storage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify private storage release metadata
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: lalibimohamed-maker/rechercher-omega-engine-storage
+          ENGINE: ${{ inputs.engine }}
+        run: |
+          set -euo pipefail
+          case "$ENGINE" in
+            hunyuanvideo-1.5)
+              TAG="rechercher-omega-hunyuanvideo15-v1.0.0"
+              REQUIRED="release-manifest.json LICENSE NOTICE hunyuanvideo15-runtime-manifest.json hunyuanvideo15-release-readiness.json omega__hunyuanvideo15__runtime.tar.gz"
+              ;;
+            ltx-2)
+              TAG="rechercher-omega-ltx2-v1.0.0"
+              REQUIRED="release-manifest.json LICENSE-2"
+              ;;
+            *) exit 2 ;;
+          esac
+          gh release view "$TAG" --repo "$REPO" --json isDraft,isPrerelease,assets --jq '.isDraft as $draft | .isPrerelease as $pre | "draft=\($draft) prerelease=\($pre)", (.assets[].name)' > "$RUNNER_TEMP/assets.txt"
+          grep -Fxq "draft=false prerelease=true" "$RUNNER_TEMP/assets.txt"
+          for name in $REQUIRED; do
+            grep -Fxq "$name" "$RUNNER_TEMP/assets.txt" || { echo "Missing asset: $name"; exit 1; }
+          done
+          echo "[OK] private release assets are present; no model weights were downloaded on the verifier runner."
+
+  e2e-smoke:
+    if: ${{ inputs.run_e2e_smoke }}
+    runs-on: [self-hosted, linux, x64, gpu]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - name: Verify GPU runtime
+        run: |
+          set -euo pipefail
+          test "$(uname -s)" = "Linux"
+          command -v python3
+          python3 - <<'PY'
+          import sys
+          try:
+              import torch
+          except Exception as exc:
+              raise SystemExit(f"PyTorch unavailable: {exc}")
+          if not torch.cuda.is_available():
+              raise SystemExit("CUDA GPU is required for video-engine e2e smoke test")
+          print("CUDA:", torch.version.cuda)
+          print("GPU count:", torch.cuda.device_count())
+          print("GPU 0:", torch.cuda.get_device_name(0))
+          PY
+      - name: Run fixed engine smoke harness
+        env:
+          ENGINE: ${{ inputs.engine }}
+          MODEL_PATH: ${{ vars.OMEGA_VIDEO_ENGINE_MODEL_PATH }}
+        run: |
+          set -euo pipefail
+          test -n "${MODEL_PATH:-}" || { echo "OMEGA_VIDEO_ENGINE_MODEL_PATH repository variable is required on the authorized GPU runner"; exit 1; }
+          test -e "$MODEL_PATH"
+          python3 scripts/rechercher-omega-video-runtime-smoke.py
