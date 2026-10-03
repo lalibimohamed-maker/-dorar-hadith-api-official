@@ -26,7 +26,13 @@
         ],
         "external_dependency": "Gemma text encoder",
         "steps": 8,
-        "runtime_proof": "not_verified"
+        "runtime_proof": "not_verified",
+        "release_asset_prefixes": [
+          "omega__ltx-2-19b-distilled.safetensors",
+          "omega__ltx-2-spatial-upscaler-x2-1.0.safetensors"
+        ],
+        "external_dependency_model_family": "Gemma 3 12B text encoder",
+        "text_encoder_mode": "external_gemma_root"
       },
       {
         "id": "distilled-diffusers-split",
@@ -46,7 +52,18 @@
         "text_encoder_format": "diffusers_sharded_12_part",
         "external_dependency": false,
         "steps": "documented two-stage",
-        "runtime_proof": "not_verified"
+        "runtime_proof": "not_verified",
+        "release_asset_prefixes": [
+          "omega__text_encoder__diffusion_pytorch_model-",
+          "omega__transformer__diffusion_pytorch_model-",
+          "omega__audio_vae__",
+          "omega__connectors__",
+          "omega__latent_upsampler__",
+          "omega__vae__",
+          "omega__vocoder__"
+        ],
+        "status": "experimental_split_candidate",
+        "default": false
       },
       {
         "id": "dev-fp4-monolith",
@@ -57,7 +74,10 @@
           "external_gemma_root"
         ],
         "external_dependency": "Gemma text encoder",
-        "runtime_proof": "not_verified"
+        "runtime_proof": "not_verified",
+        "release_asset_prefixes": [
+          "omega__ltx-2-19b-dev-fp4.safetensors"
+        ]
       },
       {
         "id": "distilled-fp8-monolith",
@@ -70,7 +90,11 @@
         ],
         "external_dependency": "Gemma text encoder",
         "steps": 8,
-        "runtime_proof": "not_verified"
+        "runtime_proof": "not_verified",
+        "release_asset_prefixes": [
+          "omega__ltx-2-19b-distilled-fp8.safetensors",
+          "omega__ltx-2-spatial-upscaler-x2-1.0.safetensors"
+        ]
       }
     ],
     "shared_components": {
@@ -81,6 +105,13 @@
       "vae": "vae/diffusion_pytorch_model.safetensors",
       "vocoder": "vocoder/diffusion_pytorch_model.safetensors",
       "text_encoder_policy": "Choose exactly one runtime mode: Diffusers split text-encoder shards OR external Gemma directory for ltx-pipelines monolith. Never mix."
+    },
+    "default_profile": "distilled-monolith",
+    "default_by_task": {
+      "text_to_video": "distilled-monolith",
+      "image_to_video": "distilled-monolith",
+      "video_to_video": "distilled-monolith",
+      "audio_video_generation": "distilled-monolith"
     }
   },
   "hunyuanvideo15": {
