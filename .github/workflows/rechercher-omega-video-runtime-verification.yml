@@ -48,6 +48,18 @@ jobs:
           done
           echo "[OK] private release assets are present; no model weights were downloaded on the verifier runner."
 
+      - name: Audit complete multipart Release integrity
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
+          OMEGA_STORAGE_RELEASE_TAG: ${{ inputs.engine == 'ltx-2' && 'rechercher-omega-ltx2-v1.0.0' || 'rechercher-omega-hunyuanvideo15-v1.0.0' }}
+          AUDIT_ONLY: "true"
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --no-input "huggingface_hub>=0.35,<1"
+          python3 scripts/rechercher-omega-video-release-repair.py
+
   e2e-smoke:
     if: ${{ inputs.run_e2e_smoke }}
     runs-on: [self-hosted, linux, x64, gpu]
