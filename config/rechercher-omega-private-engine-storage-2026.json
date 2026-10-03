@@ -17,13 +17,32 @@
     "gatedPrivate": [
       "pyannote-speaker-diarization",
       "piper-voice-packages"
+    ],
+    "videoEnginesReviewOnly": [
+      {
+        "id": "hunyuanvideo-1.5",
+        "storage_release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+        "asset_count": 707,
+        "status": "weights_and_runtime_bundle_present",
+        "public_redistribution": "blocked_pending_license_review",
+        "execution": "blocked_pending_license_and_dependency_verification"
+      },
+      {
+        "id": "ltx-2",
+        "storage_release_tag": "rechercher-omega-ltx2-v1.0.0",
+        "asset_count": 614,
+        "status": "weights_and_components_present",
+        "public_redistribution": "blocked_pending_license_review",
+        "execution": "blocked_pending_license_and_runtime_verification"
+      }
     ]
   },
   "integration": {
     "aiBranchPr": 566,
     "mediaIntegrationPr": 603,
     "conversationRuntime": "config/rechercher-omega-conversation-runtime-2026.json",
-    "bridge": "config/rechercher-omega-media-bridge-2026.json"
+    "bridge": "config/rechercher-omega-media-bridge-2026.json",
+    "videoEnginesReadiness": "config/rechercher-omega-video-engine-readiness-2026.json"
   },
   "states": {
     "privateResearchOnly": "stored for internal/non-commercial/research use subject to upstream terms",
