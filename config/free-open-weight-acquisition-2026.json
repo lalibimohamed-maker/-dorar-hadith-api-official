@@ -15,14 +15,15 @@
   "release": {
     "tag": "rechercher-free-local-models-2026-10",
     "assetDirectory": "models",
-    "checksumFile": "SHA256SUMS.txt"
+    "checksumFile": "SHA256SUMS.txt",
+    "archiveChecksumFile": "ARCHIVE-SHA256.txt"
   },
   "targets": [
     {
       "id": "qwen3-0.6b",
       "role": "local-general-reasoning-bootstrap",
       "upstream": "https://huggingface.co/Qwen/Qwen3-0.6B",
-      "revision": "main",
+      "revision": "61641f84fa567ab7b58e216b4930d2fe28bfd045",
       "license": "Apache-2.0",
       "sizeBytesObserved": 1520000000,
       "releaseEligible": true,
@@ -33,7 +34,7 @@
       "id": "qwen3-1.7b",
       "role": "local-general-reasoning-secondary",
       "upstream": "https://huggingface.co/Qwen/Qwen3-1.7B",
-      "revision": "main",
+      "revision": "3f1b00af457d7003d437d3e65dbd0e2c0afb1415",
       "license": "Apache-2.0",
       "sizeBytesObserved": 4080000000,
       "releaseEligible": true,
