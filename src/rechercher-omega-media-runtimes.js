@@ -19,6 +19,7 @@ export function buildKaggleMediaJob({kernel_slug,command,dataset_refs=[],...inpu
 export function buildLocalVideoEngineJob({
   engineId,
   modelRevision,
+  profileId,
   runtimeEnvironmentId,
   modelPathEnv = "OMEGA_VIDEO_ENGINE_MODEL_PATH",
   task,
@@ -31,14 +32,15 @@ export function buildLocalVideoEngineJob({
   if (!["hunyuanvideo-1.5", "ltx-2"].includes(engineId)) {
     throw new Error("unsupported managed local video engine: " + engineId);
   }
-  if (!modelRevision || !runtimeEnvironmentId || !task) {
-    throw new Error("local video engine job requires engine, immutable revision, runtime environment and task");
+  if (!modelRevision || !profileId || !runtimeEnvironmentId || !task) {
+    throw new Error("local video engine job requires engine, profile, immutable revision, runtime environment and task");
   }
   return {
     runtime: "managed-local-video",
     mode: "model_inference",
     engine_id: engineId,
     model_revision: modelRevision,
+    profile_id: profileId,
     runtime_environment_id: runtimeEnvironmentId,
     model_path_env: modelPathEnv,
     output_path_env: outputPathEnv,
