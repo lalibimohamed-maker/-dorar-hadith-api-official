@@ -578,17 +578,21 @@ jobs:
           REVISION: ${{ steps.revision.outputs.sha }}
         run: |
           set -euo pipefail
-          cat > "${RUNNER_TEMP}/sana-runtime-dependencies.json" <<JSON
-          {
-            "model_id": "$MODEL_ID",
-            "revision": "$REVISION",
-            "license": "Apache-2.0",
-            "runtime_status": "dependency_blocked",
-            "required_external_dependency": "google/gemma-2-2b-it",
-            "embedded": false,
-            "reason": "The SANA 2K/4K model card identifies Gemma2-2B-IT as a fixed pretrained text encoder; no dependency redistribution or bypass is attempted."
+          python - <<'PY'
+          import json, os
+          payload = {
+              "model_id": os.environ["MODEL_ID"],
+              "revision": os.environ["REVISION"],
+              "license": "Apache-2.0",
+              "runtime_status": "dependency_blocked",
+              "required_external_dependency": "google/gemma-2-2b-it",
+              "embedded": False,
+              "reason": "The SANA 2K/4K model card identifies Gemma2-2B-IT as a fixed pretrained text encoder; no dependency redistribution or bypass is attempted.",
           }
-          JSON
+          with open(os.path.join(os.environ["RUNNER_TEMP"], "sana-runtime-dependencies.json"), "w", encoding="utf-8") as fh:
+              json.dump(payload, fh, indent=2)
+              fh.write("\\n")
+          PY
           gh release upload "$RELEASE_TAG" "${RUNNER_TEMP}/sana-runtime-dependencies.json" --repo "$REPO" --clobber
 
       # release-manifest.json is a weights-only manifest; it never declares runtime completeness.
