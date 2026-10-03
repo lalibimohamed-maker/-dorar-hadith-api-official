@@ -15,7 +15,7 @@ const manifestPath = path.resolve(arg("manifest"));
 const repository = arg("repository", "lalibimohamed-maker/dinullah-matrix-6384-storage-01");
 const releasePrefix = arg("release-prefix", "rechercher-quran");
 if (!manifestPath) throw new Error("manifest argument is required");
-if (!/^\\S+\\/\\S+$/.test(repository)) throw new Error("invalid Release repository");
+if (!/^\S+\/\S+$/.test(repository)) throw new Error("invalid Release repository");
 if (!process.env.GH_TOKEN) throw new Error("GH_TOKEN is required");
 
 const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
@@ -37,7 +37,7 @@ const globalEligible = explicitEligible(manifest);
 const candidates = new Map();
 
 function addCandidate(candidatePath, eligible, provenance) {
-  if (!eligible || typeof candidatePath !== "string" || !/\\.pdf$/i.test(candidatePath)) return;
+  if (!eligible || typeof candidatePath !== "string" || !/\.pdf$/i.test(candidatePath)) return;
   const absolute = path.resolve(root, candidatePath);
   const relative = path.relative(root, absolute);
   if (relative.startsWith("..") || path.isAbsolute(relative)) return;
@@ -48,7 +48,7 @@ function walk(value, inheritedEligible = globalEligible, provenance = manifest) 
   if (!value || typeof value !== "object") return;
   const eligible = inheritedEligible || explicitEligible(value);
 
-  if (typeof value.path === "string" && /\\.pdf$/i.test(value.path)) {
+  if (typeof value.path === "string" && /\.pdf$/i.test(value.path)) {
     addCandidate(value.path, eligible, provenance);
   }
   if (value.acquired && typeof value.acquired === "object" && typeof value.acquired.path === "string") {
@@ -69,11 +69,13 @@ function walk(value, inheritedEligible = globalEligible, provenance = manifest) 
 }
 walk(manifest);
 
+const maxAssetBytes = 2 * 1024 * 1024 * 1024;
 const files = [];
 for (const item of candidates.values()) {
   try {
     const stat = await fs.stat(item.path);
     if (!stat.isFile() || stat.size < 1) continue;
+    if (stat.size >= maxAssetBytes) throw new Error("Release asset exceeds GitHub 2 GiB per-asset limit: " + item.path + " (" + stat.size + " bytes)");
     const fd = await fs.open(item.path, "r");
     const head = Buffer.alloc(5);
     await fd.read(head, 0, 5, 0);
@@ -117,7 +119,7 @@ for (const release of inventory) {
 const published = [];
 const skipped = [];
 for (const item of files) {
-  const sha = execFileSync("sha256sum", [item.path], { encoding: "utf8" }).trim().split(/\\s+/)[0];
+  const sha = execFileSync("sha256sum", [item.path], { encoding: "utf8" }).trim().split(/\s+/)[0];
   const digest = `sha256:${sha}`;
   if (existing.has(digest)) {
     skipped.push({ file: item.path, sha256: sha, reason: "existing_release_asset" });
@@ -125,6 +127,10 @@ for (const item of files) {
   }
   const asset = `${sha}_${path.basename(item.path)}`;
   gh(["release", "upload", tag, `${item.path}#${asset}`, "--repo", repository, "--clobber=false"]);
+  const releaseJson = JSON.parse(gh(["api", "-H", "Accept: application/vnd.github+json", `/repos/${repository}/releases/tags/${tag}`]));
+  const uploaded = (releaseJson.assets || []).find((candidate) => candidate.name === asset && candidate.state === "uploaded");
+  if (!uploaded) throw new Error("Release upload verification failed: " + asset);
+  if (String(uploaded.digest || "") !== digest) throw new Error("Release SHA-256 mismatch for " + asset + ": expected " + digest + ", got " + (uploaded.digest || "missing"));
   existing.add(digest);
   published.push({ file: item.path, sha256: sha, release: tag, asset, repository });
 }
@@ -139,7 +145,8 @@ const output = {
   blocked_candidates: candidates.size - files.length,
   encrypted_final_artifacts: false,
   lfs_pdf_persistence: false,
-  corpus_write: false
+  corpus_write: false,
+  release_verified: true
 };
 await fs.writeFile(path.join(path.dirname(manifestPath), "release-persistence.json"), JSON.stringify(output, null, 2) + "\n", "utf8");
 console.log(`QURAN_MATRIX_RELEASE_OK published=${published.length} skipped=${skipped.length} blocked=${output.blocked_candidates}`);
