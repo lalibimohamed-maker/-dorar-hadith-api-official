@@ -26,3 +26,12 @@ test("unknown profiles fail closed", async () => {
     /unknown video engine profile/,
   );
 });
+
+test("LTX-2 default profile is the fast distilled monolith path", async () => {
+  const profiles = await loadVideoEngineProfiles();
+  const data = profiles.ltx2;
+  assert.equal(data.default_profile, "distilled-monolith");
+  const profile = data.profiles.find(item => item.id === data.default_profile);
+  assert.ok(profile.release_asset_prefixes.includes("omega__ltx-2-19b-distilled.safetensors"));
+  assert.equal(profile.text_encoder_mode, "external_gemma_root");
+});
