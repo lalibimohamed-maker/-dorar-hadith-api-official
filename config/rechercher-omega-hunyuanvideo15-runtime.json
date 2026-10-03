@@ -92,5 +92,29 @@
     "requirements_source": "Tencent-Hunyuan/HunyuanVideo-1.5 requirements.txt",
     "isolation_required": true,
     "generic_omega_stack_substitution": false
+  },
+  "upstream_code_commit": "60783e704160023913bee78f0b47036d393d4dfa",
+  "profile_dependencies": {
+    "480p-i2v-step-distilled": [
+      "transformer:480p_i2v_step_distilled",
+      "vae",
+      "runtime_bundle"
+    ],
+    "480p-i2v-distilled": [
+      "transformer:480p_i2v_distilled",
+      "vae",
+      "runtime_bundle"
+    ],
+    "480p-t2v-distilled": [
+      "transformer:480p_t2v_distilled",
+      "vae",
+      "runtime_bundle"
+    ],
+    "720p-i2v-distilled-sparse": [
+      "transformer:720p_i2v_distilled_sparse",
+      "vae",
+      "runtime_bundle",
+      "upsampler:720p_sr_distilled"
+    ]
   }
 }
