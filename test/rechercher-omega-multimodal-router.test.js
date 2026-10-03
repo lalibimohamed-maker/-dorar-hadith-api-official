@@ -60,3 +60,15 @@ test("video fleet exposes isolated runtime environments", async () => {
   assert.equal(fleet.models.find(m => m.id === "hunyuanvideo-1.5").runtime_environment_id, "hunyuanvideo15-pytorch");
   assert.equal(fleet.models.find(m => m.id === "ltx-2").runtime_environment_id, "ltx2-pinned-python");
 });
+
+test("video candidates expose task-specific default profiles", async () => {
+  const fleet = await loadMultimodalFleet();
+  assert.equal(
+    fleet.models.find(m => m.id === "hunyuanvideo-1.5").default_profiles.image_to_video,
+    "480p-i2v-step-distilled",
+  );
+  assert.equal(
+    fleet.models.find(m => m.id === "ltx-2").default_profiles.text_to_video,
+    "distilled-diffusers-split",
+  );
+});
