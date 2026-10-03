@@ -1,0 +1,182 @@
+name: Rechercher Ω — guarded local video generation
+
+on:
+  workflow_dispatch:
+    inputs:
+      engine:
+        description: "Video engine"
+        required: true
+        type: choice
+        options:
+          - ltx-2
+          - hunyuanvideo-1.5
+      profile:
+        description: "Exact engine profile"
+        required: true
+        type: string
+      prompt:
+        description: "Generation prompt"
+        required: true
+        type: string
+      image_path:
+        description: "Optional local image path for image-to-video"
+        required: false
+        type: string
+      run_generation:
+        description: "Actually invoke the upstream inference pipeline on the authorized GPU runner"
+        required: true
+        default: false
+        type: boolean
+      terms_cleared:
+        description: "I have independently verified the applicable upstream license/use terms for this private execution"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    if: ${{ inputs.run_generation && inputs.terms_cleared }}
+    runs-on: [self-hosted, linux, x64, gpu]
+    timeout-minutes: 180
+    steps:
+      - name: Checkout Ω branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Validate GPU
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import torch
+          if not torch.cuda.is_available():
+              raise SystemExit("CUDA GPU is required")
+          print("CUDA:", torch.version.cuda)
+          print("GPUs:", torch.cuda.device_count())
+          for i in range(torch.cuda.device_count()):
+              print(i, torch.cuda.get_device_name(i))
+          PY
+
+      - name: Validate exact profile
+        env:
+          ENGINE: ${{ inputs.engine }}
+          PROFILE: ${{ inputs.profile }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, sys
+          cfg=json.load(open("config/rechercher-omega-video-engine-profiles-2026.json", encoding="utf-8"))
+          key="ltx2" if os.environ["ENGINE"]=="ltx-2" else "hunyuanvideo15"
+          ids={p["id"] for p in cfg[key]["profiles"]}
+          if os.environ["PROFILE"] not in ids:
+              raise SystemExit(f"unknown profile: {os.environ['ENGINE']}/{os.environ['PROFILE']}")
+          print("[OK] profile validated")
+          PY
+
+      - name: Materialize selected private weight profile
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          OMEGA_STORAGE_REPOSITORY: lalibimohamed-maker/rechercher-omega-engine-storage
+          OMEGA_STORAGE_RELEASE_TAG: ${{ inputs.engine == 'ltx-2' && 'rechercher-omega-ltx2-v1.0.0' || 'rechercher-omega-hunyuanvideo15-v1.0.0' }}
+          OMEGA_VIDEO_ENGINE_ID: ${{ inputs.engine }}
+          OMEGA_VIDEO_PROFILE_ID: ${{ inputs.profile }}
+          OMEGA_MATERIALIZE_DIR: ${{ runner.temp }}/omega-video-model
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher-omega-selective-materialize.py
+
+      - name: Install LTX-2 upstream runtime at an immutable code commit
+        if: ${{ inputs.engine == 'ltx-2' }}
+        env:
+          LTX_CODE_COMMIT: ${{ vars.LTX_UPSTREAM_CODE_COMMIT }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "$LTX_CODE_COMMIT" | grep -Eq '^[0-9a-f]{40}$'
+          git clone --filter=blob:none https://github.com/Lightricks/LTX-2.git "$RUNNER_TEMP/LTX-2"
+          git -C "$RUNNER_TEMP/LTX-2" fetch --depth 1 origin "$LTX_CODE_COMMIT"
+          git -C "$RUNNER_TEMP/LTX-2" checkout --detach "$LTX_CODE_COMMIT"
+          cd "$RUNNER_TEMP/LTX-2"
+          uv sync --frozen
+          uv run python -c 'import ltx_pipelines, ltx_core; print("LTX runtime import: OK")'
+          test -n "${HF_TOKEN:-}" || { echo "HF_TOKEN is required to obtain the matching Gemma dependency"; exit 1; }
+          mkdir -p "$RUNNER_TEMP/gemma-3-12b"
+          HF_TOKEN="$HF_TOKEN" uv run hf download google/gemma-3-12b-it-qat-q4_0-unquantized --local-dir "$RUNNER_TEMP/gemma-3-12b"
+
+      - name: Install HunyuanVideo-1.5 upstream runtime at pinned code commit
+        if: ${{ inputs.engine == 'hunyuanvideo-1.5' }}
+        run: |
+          set -euo pipefail
+          git clone --filter=blob:none https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5.git "$RUNNER_TEMP/HunyuanVideo-1.5"
+          git -C "$RUNNER_TEMP/HunyuanVideo-1.5" fetch --depth 1 origin 60783e704160023913bee78f0b47036d393d4dfa
+          git -C "$RUNNER_TEMP/HunyuanVideo-1.5" checkout --detach 60783e704160023913bee78f0b47036d393d4dfa
+          cd "$RUNNER_TEMP/HunyuanVideo-1.5"
+          test -f requirements.txt
+          python3 -m pip install -r requirements.txt
+
+      - name: Generate with LTX-2 DistilledPipeline
+        if: ${{ inputs.engine == 'ltx-2' && inputs.profile == 'distilled-monolith' }}
+        env:
+          PROMPT: ${{ inputs.prompt }}
+          IMAGE_PATH: ${{ inputs.image_path }}
+          MODEL_DIR: ${{ runner.temp }}/omega-video-model
+          GEMMA_ROOT: ${{ runner.temp }}/gemma-3-12b
+          OUTPUT_PATH: ${{ runner.temp }}/omega-ltx2-output.mp4
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/LTX-2"
+          checkpoint="$MODEL_DIR/ltx-2-19b-distilled.safetensors"
+          spatial="$MODEL_DIR/ltx-2-spatial-upscaler-x2-1.0.safetensors"
+          test -s "$checkpoint"
+          test -s "$spatial"
+          test -d "$GEMMA_ROOT"
+          args=(
+            -m ltx_pipelines.distilled
+            --distilled-checkpoint-path "$checkpoint"
+            --gemma-root "$GEMMA_ROOT"
+            --spatial-upsampler-path "$spatial"
+            --prompt "$PROMPT"
+            --output-path "$OUTPUT_PATH"
+            --height 512
+            --width 768
+            --num-frames 49
+            --frame-rate 24
+          )
+          if [ -n "${IMAGE_PATH:-}" ]; then
+            test -f "$IMAGE_PATH"
+            args+=(--image-conditioning-path "$IMAGE_PATH")
+          fi
+          uv run python "${args[@]}"
+
+      - name: Generate with HunyuanVideo-1.5
+        if: ${{ inputs.engine == 'hunyuanvideo-1.5' && (inputs.profile == '480p-i2v-step-distilled' || inputs.profile == '480p-t2v-distilled') }}
+        env:
+          PROMPT: ${{ inputs.prompt }}
+          IMAGE_PATH: ${{ inputs.image_path }}
+          MODEL_DIR: ${{ runner.temp }}/omega-video-model
+          OUTPUT_PATH: ${{ runner.temp }}/omega-hunyuan-output.mp4
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/HunyuanVideo-1.5"
+          resolution=480p
+          cfg_distilled=true
+          step_distill=false
+          image_args=()
+          if [ -n "${IMAGE_PATH:-}" ]; then
+            test -f "$IMAGE_PATH"
+            image_args+=(--image_path "$IMAGE_PATH")
+          fi
+          if [ "${{ inputs.profile }}" = "480p-i2v-step-distilled" ]; then
+            step_distill=true
+          fi
+          torchrun --nproc_per_node=1 generate.py             --prompt "$PROMPT"             "${image_args[@]}"             --resolution "$resolution"             --aspect_ratio 16:9             --seed 1             --rewrite false             --cfg_distilled "$cfg_distilled"             --enable_step_distill "$step_distill"             --sparse_attn false --use_sageattn false             --enable_cache false --cache_type deepcache             --overlap_group_offloading false             --sr false --save_pre_sr_video             --output_path "$OUTPUT_PATH"             --model_path "$MODEL_DIR"
+
+      - name: Upload generated video as non-scholarly artifact
+        uses: actions/upload-artifact@3d3c42e6b1fd0f9c2e8c6c7d4a3b6c5e4f7d8e9 # v7.0.1 placeholder
+        with:
+          name: omega-video-${{ inputs.engine }}-${{ inputs.profile }}
+          path: ${{ runner.temp }}/omega-*-output.mp4
+          if-no-files-found: error
