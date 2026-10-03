@@ -91,7 +91,7 @@ jobs:
       - name: Install LTX-2 upstream runtime at an immutable code commit
         if: ${{ inputs.engine == 'ltx-2' }}
         env:
-          LTX_CODE_COMMIT: ${{ vars.LTX_UPSTREAM_CODE_COMMIT }}
+          LTX_CODE_COMMIT: 28c3c73fe557666c3de176e1e50a5220152ccfca
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           set -euo pipefail
@@ -135,7 +135,7 @@ jobs:
           test -d "$GEMMA_ROOT"
           args=(
             -m ltx_pipelines.distilled
-            --distilled-checkpoint-path "$checkpoint"
+            --checkpoint-path "$checkpoint"
             --gemma-root "$GEMMA_ROOT"
             --spatial-upsampler-path "$spatial"
             --prompt "$PROMPT"
@@ -145,13 +145,28 @@ jobs:
             --num-frames 49
             --frame-rate 24
           )
-          # Image conditioning is enabled through the upstream pipeline's documented conditioning
-          # interface; this workflow does not invent a CLI flag that is not present in the pinned code.
           if [ -n "${IMAGE_PATH:-}" ]; then
-            echo "[INFO] image_path supplied; use an upstream-supported conditioning input for this profile."
             test -f "$IMAGE_PATH"
+            args+=(--image "$IMAGE_PATH" 0 1.0)
           fi
           uv run python "${args[@]}"
+
+      - name: Restore Hunyuan private runtime bundle
+        if: ${{ inputs.engine == 'hunyuanvideo-1.5' }}
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          STORAGE_REPO: lalibimohamed-maker/rechercher-omega-engine-storage
+          RELEASE_TAG: rechercher-omega-hunyuanvideo15-v1.0.0
+          MODEL_DIR: ${{ runner.temp }}/omega-video-model
+        run: |
+          set -euo pipefail
+          mkdir -p "$MODEL_DIR"
+          gh release download "$RELEASE_TAG"             --repo "$STORAGE_REPO"             --pattern "omega__hunyuanvideo15__runtime.tar.gz"             --dir "$RUNNER_TEMP/hunyuan-runtime"
+          runtime_tar="$RUNNER_TEMP/hunyuan-runtime/omega__hunyuanvideo15__runtime.tar.gz"
+          test -s "$runtime_tar"
+          tar -xzf "$runtime_tar" -C "$MODEL_DIR"
+          test -s "$MODEL_DIR/hunyuanvideo15-runtime-manifest.json"
+          echo "[OK] Hunyuan runtime bundle restored"
 
       - name: Generate with HunyuanVideo-1.5
         if: ${{ inputs.engine == 'hunyuanvideo-1.5' && (inputs.profile == '480p-i2v-step-distilled' || inputs.profile == '480p-t2v-distilled') }}
@@ -176,9 +191,40 @@ jobs:
           fi
           torchrun --nproc_per_node=1 generate.py             --prompt "$PROMPT"             "${image_args[@]}"             --resolution "$resolution"             --aspect_ratio 16:9             --seed 1             --rewrite false             --cfg_distilled "$cfg_distilled"             --enable_step_distill "$step_distill"             --sparse_attn false --use_sageattn false             --enable_cache false --cache_type deepcache             --overlap_group_offloading false             --sr false --save_pre_sr_video             --output_path "$OUTPUT_PATH"             --model_path "$MODEL_DIR"
 
+      - name: Write generation manifest
+        env:
+          ENGINE: ${{ inputs.engine }}
+          PROFILE: ${{ inputs.profile }}
+          PROMPT: ${{ inputs.prompt }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, platform, subprocess
+          engine=os.environ["ENGINE"]
+          profile=os.environ["PROFILE"]
+          prompt=os.environ["PROMPT"]
+          manifest={
+            "schema_version":"1.0.0",
+            "engine":engine,
+            "profile":profile,
+            "prompt_sha256":hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+            "runner_platform":platform.platform(),
+            "corpus_write_allowed":False,
+            "generated_media_is_evidence":False,
+            "rights_gate":"operator_terms_cleared",
+            "status":"generated_artifact_pending_quality_gate"
+          }
+          subprocess.run(["python3","-c","import json; print(json.dumps("+repr(manifest)+",ensure_ascii=False,indent=2))"],check=False)
+          with open(os.path.join(os.environ["RUNNER_TEMP"],"omega-generation-manifest.json"),"w",encoding="utf-8") as fh:
+              json.dump(manifest,fh,ensure_ascii=False,indent=2)
+              fh.write("\n")
+          PY
+
       - name: Upload generated video as non-scholarly artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: omega-video-${{ inputs.engine }}-${{ inputs.profile }}
-          path: ${{ runner.temp }}/omega-*-output.mp4
+          path: |
+            ${{ runner.temp }}/omega-*-output.mp4
+            ${{ runner.temp }}/omega-generation-manifest.json
           if-no-files-found: error
