@@ -71,7 +71,7 @@ export function isProductionRuntimeReady(model) {
   return true;
 }
 
-function buildMultimodalJob({
+export function buildMultimodalJob({
   fleet,
   task,
   input,
