@@ -55,3 +55,10 @@ Use:
 The storage verification job reads Release metadata only and does not download hundreds of gigabytes onto an ordinary GitHub runner.
 
 The optional GPU smoke job requires an authorized self-hosted Linux/CUDA runner with the model assets already staged locally. It never downloads the model and never accepts an arbitrary shell command.
+
+
+## LTX-2 pinned checkpoint
+
+Ω pins LTX-2 to Hugging Face revision `dfcc2108383fe1aaa0584bdf55d368a4bdadd90c`. The pinned model card identifies LTX-2 as a local-execution audio-video foundation model and lists the checkpoint components used by the runtime, including the embedded `text_encoder`. The pinned documentation also exposes an 8-step distilled checkpoint and a two-stage generation path. citeturn249611view0
+
+The Ω smoke harness therefore checks the actual checkpoint directory layout instead of assuming the later LTX-2.5 directory names.
