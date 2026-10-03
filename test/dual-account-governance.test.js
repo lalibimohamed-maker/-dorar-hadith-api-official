@@ -17,9 +17,9 @@ test('dual-account governance keeps sensitive controls primary-only', () => {
   assert.match(codeowners, /^\/package-lock\.json @lalibimohamed-maker$/m);
 });
 
-test('governance policy requires independent review and fail-closed boundaries', () => {
-  assert.match(policy, /No self-approval/);
+test('governance policy requires independent review and protected promotion', () => {
+  assert.match(policy, /independent review/);
   assert.match(policy, /protected `main`/);
-  assert.match(policy, /fails closed/);
-  assert.match(policy, /No silent promotion/);
+  assert.match(policy, /must not receive repository Admin or branch-protection bypass/);
+  assert.match(policy, /must not silently promote unverified scholarly material/);
 });
