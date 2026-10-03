@@ -20,6 +20,7 @@ concurrency:
 
 jobs:
   acquire:
+    # SECURITY-JUSTIFICATION: this job publishes only verified model payloads and evidence to GitHub Releases; write access is job-scoped and no repository files are written.
     permissions:
       contents: write
     runs-on: ubuntu-24.04
