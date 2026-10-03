@@ -40,6 +40,18 @@ on:
       - "docs/RECHERCHER-OMEGA-PHASE3.md"
       - "docs/RECHERCHER-OMEGA.md"
       - "docs/RECHERCHER-OMEGA-EXECUTION.md"
+      - "src/rechercher-omega-video-engine-profiles.js"
+      - "src/rechercher-omega-video-engine-readiness.js"
+      - "src/rechercher-omega-video-orchestrator.js"
+      - "src/rechercher-omega-media-runtimes.js"
+      - "test/rechercher-omega-video-engine-profiles.test.js"
+      - "test/rechercher-omega-video-engine-readiness.test.js"
+      - "test/rechercher-omega-video-orchestrator.test.js"
+      - "config/rechercher-omega-video-engine-profiles-2026.json"
+      - "config/rechercher-omega-video-engine-readiness-2026.json"
+      - "config/rechercher-omega-video-runtime-environments-2026.json"
+      - "config/rechercher-omega-video-license-compliance-2026.json"
+      - "scripts/rechercher-omega-selective-materialize.py"
       - ".github/workflows/rechercher-omega-ci.yml"
 
 permissions:
@@ -66,3 +78,10 @@ jobs:
         run: npm ci
       - name: Ω boundary tests
         run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-ai-capability-registry.test.js test/rechercher-omega-ai-runtime.test.js test/rechercher-omega-repository-intelligence.test.js test/rechercher-omega-integration.test.js test/rechercher-omega-global-deep-search.test.js test/rechercher-omega-hunyuan-runtime.test.js test/rechercher-omega-scholarly-fleet.test.js test/rechercher-ai-mcp-server.test.js
+      - name: Validate video runtime Python scripts
+        run: |
+          python3 -m py_compile scripts/rechercher-omega-selective-materialize.py scripts/rechercher-omega-video-runtime-smoke.py
+      - name: Validate video engine contracts
+        run: |
+          node --test test/rechercher-omega-video-engine-profiles.test.js test/rechercher-omega-video-engine-readiness.test.js test/rechercher-omega-video-orchestrator.test.js test/rechercher-omega-multimodal-router.test.js
+
