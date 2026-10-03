@@ -56,6 +56,7 @@ export function selectMultimodalModel({
     family:model.family,
     runtime,
     model_revision:model.source_revision ?? model.revision ?? model.starter_revision ?? null,
+    profile_id:model.default_profiles?.[task] ?? model.default_profile ?? null,
     license_status:model.license_status,
     weight_status:model.weight_status,
     runtime_environment_id:model.runtime_environment_id ?? null,
