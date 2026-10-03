@@ -1,4 +1,4 @@
-const CACHE_NAME = "deen-allah-offline-v1";
+const CACHE_NAME = "deen-allah-offline-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -11,6 +11,8 @@ const APP_SHELL = [
   "./self-test-question-schema.json",
   "./manifest.webmanifest",
   "./assets/pwa-icon-192.svg",
+  "./ui-enhancements.css",
+  "./ui-enhancements.js",
   "./offline.html"
 ];
 
@@ -26,6 +28,29 @@ self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
+
+  // Optional third-party UI enhancements are pinned to exact versions and
+  // cached only after a successful online fetch. Core/offline operation never
+  // depends on them.
+  const optionalUi =
+    (url.origin === "https://cdn.jsdelivr.net" &&
+      (url.pathname === "/npm/driver.js@1.4.0/dist/driver.js.iife.js" ||
+       url.pathname === "/npm/driver.js@1.4.0/dist/driver.css" ||
+       url.pathname === "/npm/lucide@0.534.0/dist/umd/lucide.min.js"));
+
+  if (optionalUi) {
+    event.respondWith(
+      caches.match(request).then(cached =>
+        cached || fetch(request).then(response => {
+          if (!response.ok) return response;
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          return response;
+        })
+      )
+    );
+    return;
+  }
 
   // API/global-source search stays network-first: offline mode must never pretend
   // that a global web search succeeded when the network is unavailable.

@@ -1,0 +1,222 @@
+name: Rechercher — Qwen3-1.7B local model to Releases
+
+"on":
+  schedule:
+    - cron: "17 4 * * 3"
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/rechercher-freellm-free-models-2026
+    paths:
+      - .github/workflows/rechercher-free-local-model-qwen3-1.7b.yml
+      - config/free-open-weight-acquisition-2026.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-free-local-qwen3-1-7b
+  cancel-in-progress: true
+
+jobs:
+  acquire:
+    # SECURITY-JUSTIFICATION: this job publishes only explicitly declared, license-reviewed and locally runtime-verified model payloads to a GitHub Release; write access is job-scoped and no repository files are written.
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Reuse existing Release when complete
+        id: release_preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG='rechercher-free-local-models-2026-10-qwen3-1.7b'
+          required=(
+            LICENSE-Qwen3-1.7B
+            README-Qwen3-1.7B.md
+            Qwen3-1.7B-config.json
+            runtime-verification.json
+            RELEASE-PARTS.json
+            SHA256SUMS.txt
+            ARCHIVE-SHA256.txt
+          )
+          asset_names="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || true)"
+          complete=true
+          for name in "${required[@]}"; do
+            if ! grep -Fxq "$name" <<<"$asset_names"; then
+              complete=false
+              break
+            fi
+          done
+          part_count="$(grep -Ec '^qwen3-1\.7b\.tar\.zst\.part-[0-9]+$' <<<"$asset_names" || true)"
+          if [ "$part_count" -lt 1 ]; then
+            complete=false
+          fi
+          echo "complete=$complete" >> "$GITHUB_OUTPUT"
+          echo "release_part_count=$part_count" >> "$GITHUB_OUTPUT"
+          if [ "$complete" = true ]; then
+            echo "Complete Qwen3-1.7B Release already exists; skipping re-acquisition ($part_count parts)."
+          else
+            echo "Qwen3-1.7B Release is incomplete; acquisition will run."
+          fi
+
+      - name: Install acquisition tools
+        if: steps.release_preflight.outputs.complete != 'true'
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
+
+      - name: Acquire Qwen3-1.7B
+        if: steps.release_preflight.outputs.complete != 'true'
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+          MODEL_REVISION: "3f1b00af457d7003d437d3e65dbd0e2c0afb1415"
+        run: |
+          set -euo pipefail
+          rm -rf qwen17-work qwen17-release
+          mkdir -p qwen17-work qwen17-release
+          hf download Qwen/Qwen3-1.7B \
+            --revision "$MODEL_REVISION" \
+            --local-dir qwen17-work/Qwen3-1.7B
+          test -s qwen17-work/Qwen3-1.7B/model-00001-of-00002.safetensors
+          test -s qwen17-work/Qwen3-1.7B/model-00002-of-00002.safetensors
+          test -s qwen17-work/Qwen3-1.7B/model.safetensors.index.json
+          test -s qwen17-work/Qwen3-1.7B/config.json
+          test -s qwen17-work/Qwen3-1.7B/tokenizer.json
+          test -s qwen17-work/Qwen3-1.7B/LICENSE
+          cp qwen17-work/Qwen3-1.7B/LICENSE qwen17-release/LICENSE-Qwen3-1.7B
+          cp qwen17-work/Qwen3-1.7B/README.md qwen17-release/README-Qwen3-1.7B.md
+          cp qwen17-work/Qwen3-1.7B/config.json qwen17-release/Qwen3-1.7B-config.json
+          tar --zstd -cf qwen17-release/qwen3-1.7b.tar.zst -C qwen17-work Qwen3-1.7B
+
+      - name: Verify archive and license
+        if: steps.release_preflight.outputs.complete != 'true'
+        run: |
+          set -euo pipefail
+          test -s qwen17-release/qwen3-1.7b.tar.zst
+          tar --zstd -tf qwen17-release/qwen3-1.7b.tar.zst | grep -Fx 'Qwen3-1.7B/model.safetensors.index.json'
+          grep -Eq 'Apache License|Apache-2.0' qwen17-release/LICENSE-Qwen3-1.7B
+          stat -c 'archive_bytes=%s' qwen17-release/qwen3-1.7b.tar.zst
+
+      - name: Runtime smoke test
+        if: steps.release_preflight.outputs.complete != 'true'
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --no-cache-dir torch transformers
+          python3 - <<'PY'
+          import json, torch
+          from transformers import AutoTokenizer, AutoModelForCausalLM
+          path='qwen17-work/Qwen3-1.7B'
+          tok=AutoTokenizer.from_pretrained(path, local_files_only=True)
+          model=AutoModelForCausalLM.from_pretrained(
+              path,
+              local_files_only=True,
+              torch_dtype=torch.float32,
+          )
+          inputs=tok('أجب بإيجاز: ما هو التوحيد؟', return_tensors='pt')
+          with torch.no_grad():
+              out=model.generate(**inputs, max_new_tokens=8, do_sample=False)
+          generated=tok.decode(out[0][inputs['input_ids'].shape[-1]:], skip_special_tokens=True).strip()
+          if not generated:
+              raise SystemExit('empty local inference output')
+          evidence={
+              'schema':'dinullah.local-model-runtime-evidence.v1',
+              'model':'Qwen/Qwen3-1.7B',
+              'revision':'3f1b00af457d7003d437d3e65dbd0e2c0afb1415',
+              'verified':True,
+              'outputChars':len(generated),
+          }
+          json.dump(evidence, open('qwen17-release/runtime-verification.json','w'), ensure_ascii=False, indent=2)
+          print(json.dumps(evidence, ensure_ascii=False))
+          PY
+
+      - name: Split and hash release payload
+        if: steps.release_preflight.outputs.complete != 'true'
+        run: |
+          set -euo pipefail
+          rm -f qwen17-release/qwen3-1.7b.tar.zst.part-*
+          split -b 1800M -d -a 2 qwen17-release/qwen3-1.7b.tar.zst qwen17-release/qwen3-1.7b.tar.zst.part-
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+
+          root = pathlib.Path('qwen17-release')
+          archive = root / 'qwen3-1.7b.tar.zst'
+          parts = sorted(root.glob('qwen3-1.7b.tar.zst.part-*'))
+          if not parts:
+              raise SystemExit('no archive parts produced')
+
+          def sha256_file(path):
+              h = hashlib.sha256()
+              with path.open('rb') as stream:
+                  for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          entries = [{
+              'name': p.name,
+              'bytes': p.stat().st_size,
+              'sha256': sha256_file(p)
+          } for p in parts]
+
+          archive_sha256 = sha256_file(archive)
+          meta = {
+              'schema': 'dinullah.local-model-release-parts.v2',
+              'model': 'Qwen/Qwen3-1.7B',
+              'archive': archive.name,
+              'archiveBytes': archive.stat().st_size,
+              'archiveSha256': archive_sha256,
+              'partSizeBytes': 1800 * 1024 * 1024,
+              'parts': entries,
+              'reassemble': 'cat qwen3-1.7b.tar.zst.part-* > qwen3-1.7b.tar.zst',
+              'verifyParts': 'sha256sum -c SHA256SUMS.txt',
+              'verifyArchive': 'sha256sum -c ARCHIVE-SHA256.txt'
+          }
+          json.dump(meta, open(root / 'RELEASE-PARTS.json', 'w'), ensure_ascii=False, indent=2)
+          print(json.dumps(meta, ensure_ascii=False))
+
+          with open(root / 'SHA256SUMS.txt', 'w', encoding='utf-8') as out:
+              for path in [
+                  *parts,
+                  root / 'LICENSE-Qwen3-1.7B',
+                  root / 'README-Qwen3-1.7B.md',
+                  root / 'Qwen3-1.7B-config.json',
+                  root / 'runtime-verification.json',
+                  root / 'RELEASE-PARTS.json'
+              ]:
+                  out.write(f'{sha256_file(path)}  {path.name}\\n')
+
+          with open(root / 'ARCHIVE-SHA256.txt', 'w', encoding='utf-8') as out:
+              out.write(f'{archive_sha256}  {archive.name}\\n')
+          PY
+
+      - name: Publish release
+        if: steps.release_preflight.outputs.complete != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='rechercher-free-local-models-2026-10-qwen3-1.7b'
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+              --title 'Rechercher — Qwen3-1.7B local model' \
+              --notes 'Explicitly declared Qwen3-1.7B Apache-2.0 local weight target. Payload is split into sub-2-GB release assets. SHA256SUMS.txt covers the downloadable release assets; ARCHIVE-SHA256.txt records the reconstructed archive digest; RELEASE-PARTS.json provides ordered parts and archive provenance. FreeLLM is discovery-only.'
+          gh release upload "$TAG" \
+            qwen17-release/qwen3-1.7b.tar.zst.part-* \
+            qwen17-release/LICENSE-Qwen3-1.7B \
+            qwen17-release/README-Qwen3-1.7B.md \
+            qwen17-release/Qwen3-1.7B-config.json \
+            qwen17-release/runtime-verification.json \
+            qwen17-release/RELEASE-PARTS.json \
+            qwen17-release/SHA256SUMS.txt \
+            qwen17-release/ARCHIVE-SHA256.txt \
+            --repo "$GITHUB_REPOSITORY" --clobber

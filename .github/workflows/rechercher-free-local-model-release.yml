@@ -1,0 +1,174 @@
+name: Rechercher — Free local model acquisition to Releases
+
+"on":
+  schedule:
+    - cron: "47 3 * * 1"
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/rechercher-freellm-free-models-2026
+    paths:
+      - .github/workflows/rechercher-free-local-model-release.yml
+      - config/free-open-weight-acquisition-2026.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-free-local-model-release
+  cancel-in-progress: true
+
+jobs:
+  acquire:
+    # SECURITY-JUSTIFICATION: this job publishes only verified model payloads and evidence to GitHub Releases; write access is job-scoped and no repository files are written.
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Reuse existing Release when complete
+        id: release_preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG='rechercher-free-local-models-2026-10'
+          required=(
+            qwen3-0.6b.tar.zst
+            LICENSE-Qwen3-0.6B
+            README-Qwen3-0.6B.md
+            Qwen3-0.6B-config.json
+            runtime-verification.json
+            SHA256SUMS.txt
+            ARCHIVE-SHA256.txt
+          )
+          asset_names="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || true)"
+          complete=true
+          for name in "${required[@]}"; do
+            if ! grep -Fxq "$name" <<<"$asset_names"; then
+              complete=false
+              break
+            fi
+          done
+          echo "complete=$complete" >> "$GITHUB_OUTPUT"
+          if [ "$complete" = true ]; then
+            echo "Complete Qwen3-0.6B Release already exists; skipping re-acquisition."
+          else
+            echo "Qwen3-0.6B Release is incomplete; acquisition will run."
+          fi
+
+      - name: Install acquisition tools
+        if: steps.release_preflight.outputs.complete != 'true'
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub safetensors
+
+      - name: Prepare model payload
+        if: steps.release_preflight.outputs.complete != 'true'
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+          MODEL_REVISION: "61641f84fa567ab7b58e216b4930d2fe28bfd045"
+        run: |
+          set -euo pipefail
+          rm -rf release-model models-work
+          mkdir -p release-model models-work
+          hf download Qwen/Qwen3-0.6B \
+            --revision "$MODEL_REVISION" \
+            --local-dir models-work/Qwen3-0.6B
+          test -s models-work/Qwen3-0.6B/model.safetensors
+          test -s models-work/Qwen3-0.6B/config.json
+          test -s models-work/Qwen3-0.6B/tokenizer.json
+          test -s models-work/Qwen3-0.6B/LICENSE
+          cp models-work/Qwen3-0.6B/LICENSE release-model/LICENSE-Qwen3-0.6B
+          cp models-work/Qwen3-0.6B/README.md release-model/README-Qwen3-0.6B.md
+          cp models-work/Qwen3-0.6B/config.json release-model/Qwen3-0.6B-config.json
+          tar --zstd -cf release-model/qwen3-0.6b.tar.zst -C models-work Qwen3-0.6B
+
+      - name: Verify payload integrity and size
+        if: steps.release_preflight.outputs.complete != 'true'
+        run: |
+          set -euo pipefail
+          test -s release-model/qwen3-0.6b.tar.zst
+          bytes="$(stat -c '%s' release-model/qwen3-0.6b.tar.zst)"
+          test "$bytes" -lt 2147483648
+          tar --zstd -tf release-model/qwen3-0.6b.tar.zst | grep -Fx 'Qwen3-0.6B/model.safetensors'
+
+      - name: Runtime smoke test
+        if: steps.release_preflight.outputs.complete != 'true'
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --no-cache-dir torch transformers
+          python3 - <<'PY'
+          import json, torch
+          from transformers import AutoTokenizer, AutoModelForCausalLM
+          path='models-work/Qwen3-0.6B'
+          tok=AutoTokenizer.from_pretrained(path, local_files_only=True)
+          model=AutoModelForCausalLM.from_pretrained(
+              path,
+              local_files_only=True,
+              torch_dtype=torch.float32,
+          )
+          inputs=tok('أجب بإيجاز: ما هو التوحيد؟', return_tensors='pt')
+          with torch.no_grad():
+              out=model.generate(**inputs, max_new_tokens=12, do_sample=False)
+          generated=tok.decode(
+              out[0][inputs['input_ids'].shape[-1]:],
+              skip_special_tokens=True
+          ).strip()
+          if not generated:
+              raise SystemExit('empty local inference output')
+          evidence={
+              'schema':'dinullah.local-model-runtime-evidence.v1',
+              'model':'Qwen/Qwen3-0.6B',
+              'revision':'61641f84fa567ab7b58e216b4930d2fe28bfd045',
+              'verified':True,
+              'outputChars':len(generated),
+          }
+          json.dump(evidence, open('release-model/runtime-verification.json','w'), ensure_ascii=False, indent=2)
+          print(json.dumps(evidence, ensure_ascii=False))
+          PY
+
+      - name: Hash release assets
+        if: steps.release_preflight.outputs.complete != 'true'
+        run: |
+          set -euo pipefail
+          sha256sum \
+            release-model/LICENSE-Qwen3-0.6B \
+            release-model/README-Qwen3-0.6B.md \
+            release-model/Qwen3-0.6B-config.json \
+            release-model/runtime-verification.json \
+            release-model/qwen3-0.6b.tar.zst \
+            > release-model/SHA256SUMS.txt
+          sha256sum release-model/qwen3-0.6b.tar.zst | awk '{print $1 "  qwen3-0.6b.tar.zst"}' > release-model/ARCHIVE-SHA256.txt
+
+      - name: Publish release
+        if: steps.release_preflight.outputs.complete != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='rechercher-free-local-models-2026-10'
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            :
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+              --title 'Rechercher — Free local models' \
+              --notes 'Explicitly approved local model weights. Downloaded release assets are covered by SHA256SUMS.txt; ARCHIVE-SHA256.txt records the full archive digest. FreeLLM is discovery-only; upstream model-card license/provenance and runtime checks remain authoritative.'
+          fi
+          gh release upload "$TAG" \
+            release-model/qwen3-0.6b.tar.zst \
+            release-model/LICENSE-Qwen3-0.6B \
+            release-model/README-Qwen3-0.6B.md \
+            release-model/Qwen3-0.6B-config.json \
+            release-model/runtime-verification.json \
+            release-model/SHA256SUMS.txt \
+            release-model/ARCHIVE-SHA256.txt \
+            --repo "$GITHUB_REPOSITORY" --clobber

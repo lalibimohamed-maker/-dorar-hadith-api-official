@@ -1,0 +1,62 @@
+{
+  "schema": "dinullah.freellm-discovery-registry.v2",
+  "purpose": "Treat freellm.net as a live discovery registry for free or trial LLM APIs while keeping provider truth, model weights, licensing and runtime evidence separate.",
+  "canonicalSource": {
+    "id": "freellm-net",
+    "url": "https://freellm.net/",
+    "modelsUrl": "https://freellm.net/models/",
+    "agentIndexUrl": "https://freellm.net/llms.txt",
+    "statusUrl": "https://freellm.net/free-llm-api-status",
+    "aboutUrl": "https://freellm.net/about",
+    "sourceKind": "live-directory",
+    "refreshCadence": "daily",
+    "selectionPolicy": "discovery-only",
+    "trackingParameters": "ignored"
+  },
+  "mirror": {
+    "url": "https://github.com/open-free-llm-api/awesome-freellm-apis",
+    "purpose": "machine-readable public mirror and provenance cross-check",
+    "license": "MIT"
+  },
+  "rules": {
+    "freellmIsNotWeightAuthority": true,
+    "providerIsRuntimeAuthority": true,
+    "upstreamModelCardIsLicenseAuthority": true,
+    "liveApiVerificationRequired": true,
+    "statusPageIsFreshnessSignalOnly": true,
+    "llmsTxtIsAgentNavigationOnly": true,
+    "apiKeysNeverCommitted": true,
+    "silentPaidFallback": false,
+    "silentRemotePromotionFromOfflineMode": false,
+    "corpusWriteAllowed": false,
+    "runtimeMayConsumeSnapshotWithoutNetwork": true
+  },
+  "capturedFields": [
+    "provider",
+    "modelId",
+    "status",
+    "verification",
+    "contextWindow",
+    "modalities",
+    "rateLimit",
+    "freeTier",
+    "noCreditCard",
+    "noPhoneVerification",
+    "openWeights",
+    "weightsUrl"
+  ],
+  "weightFlow": {
+    "discovery": "freellm.net",
+    "licenseAndProvenance": "upstream-model-card",
+    "acquisition": "explicit-target-only",
+    "verification": "checksum-plus-runtime",
+    "storage": "github-releases",
+    "gitLfs": false,
+    "repositoryPayloads": false
+  },
+  "integration": {
+    "localConsumerInferenceRuntime": "config/local-consumer-inference-runtime-2026.json",
+    "modelLifecycle": "config/model-lifecycle-manager-2026.json",
+    "offlineFirst": true
+  }
+}
