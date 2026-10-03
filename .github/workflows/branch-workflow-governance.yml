@@ -69,7 +69,7 @@ jobs:
               continue
             fi
 
-            governance_status="$(git -C "$worktree" status --porcelain --untracked-files=all               | awk '$2 ~ /^(.github/workflows|scripts)// {print}')"
+            governance_status="$(git -C "$worktree" status --porcelain --untracked-files=all | awk '$2 ~ /^(\.github\/workflows|scripts)\// {print}')"
 
             if [ -z "$governance_status" ]; then
               echo "COMPLIANT $branch"
@@ -77,8 +77,8 @@ jobs:
               continue
             fi
 
-            workflow_status="$(printf '%s\n' "$governance_status" | awk '$2 ~ /^.github/workflows// {print}')"
-            script_status="$(printf '%s\n' "$governance_status" | awk '$2 ~ /^scripts// {print}')"
+            workflow_status="$(printf '%s\n' "$governance_status" | awk '$2 ~ /^\.github\/workflows\// {print}')"
+            script_status="$(printf '%s\n' "$governance_status" | awk '$2 ~ /^scripts\// {print}')"
 
             if [ "$branch" = "main" ]; then
               echo "PROTECTED_MAIN_DRIFT $branch"
