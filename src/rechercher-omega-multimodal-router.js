@@ -57,6 +57,8 @@ export function selectMultimodalModel({
     runtime,
     license_status:model.license_status,
     weight_status:model.weight_status,
+    runtime_environment_id:model.runtime_environment_id ?? null,
+    requires_isolated_runtime_environment:Boolean(model.runtime_environment_id),
     requires_license_clearance:true,
     corpus_write_allowed:false,
     generated_media_is_evidence:false,
