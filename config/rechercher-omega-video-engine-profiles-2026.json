@@ -149,7 +149,7 @@
         "steps": "distilled",
         "runtime_proof": "not_verified",
         "release_asset_prefixes": [
-          "omega__vae__"
+          "omega__transformer__480p_i2v_distilled__diffusion_pytorch_model.safetensors"
         ],
         "runtime_asset_bundle": "omega__hunyuanvideo15__runtime.tar.gz"
       },
@@ -161,7 +161,7 @@
         "steps": "step_distilled",
         "runtime_proof": "not_verified",
         "release_asset_prefixes": [
-          "omega__vae__"
+          "omega__transformer__480p_i2v_step_distilled__diffusion_pytorch_model.safetensors"
         ],
         "runtime_asset_bundle": "omega__hunyuanvideo15__runtime.tar.gz"
       },
@@ -173,7 +173,7 @@
         "steps": "distilled",
         "runtime_proof": "not_verified",
         "release_asset_prefixes": [
-          "omega__vae__"
+          "omega__transformer__480p_t2v_distilled__diffusion_pytorch_model.safetensors"
         ],
         "runtime_asset_bundle": "omega__hunyuanvideo15__runtime.tar.gz"
       },
@@ -185,7 +185,7 @@
         "steps": "distilled_sparse",
         "runtime_proof": "not_verified",
         "release_asset_prefixes": [
-          "omega__vae__"
+          "omega__transformer__720p_i2v_distilled_sparse__diffusion_pytorch_model.safetensors"
         ],
         "runtime_asset_bundle": "omega__hunyuanvideo15__runtime.tar.gz"
       }
@@ -196,6 +196,11 @@
       "upsampler_1080p": "upsampler/1080p_sr_distilled/diffusion_pytorch_model.safetensors",
       "runtime_bundle": "hunyuanvideo15/runtime.tar.gz",
       "readiness_manifest": "hunyuanvideo15-release-readiness.json"
+    },
+    "default_profile": "480p-i2v-step-distilled",
+    "default_by_task": {
+      "text_to_video": "480p-t2v-distilled",
+      "image_to_video": "480p-i2v-step-distilled"
     }
   },
   "activation_rule": "A profile is executable only after local-use rights, manifest/SHA verification, compatible runtime/dependencies and an end-to-end smoke generation test are all cleared."
