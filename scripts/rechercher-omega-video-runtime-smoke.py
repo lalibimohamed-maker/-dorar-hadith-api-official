@@ -21,8 +21,10 @@ CONFIG_PATH = Path(
 )
 ENGINE = os.environ.get("ENGINE", "").strip()
 PROFILE = os.environ.get("PROFILE", "").strip()
-MODEL_PATH = Path(os.environ.get("MODEL_PATH", "")).expanduser()
-GEMMA_ROOT = Path(os.environ.get("GEMMA_ROOT", "")).expanduser()
+MODEL_PATH_RAW = os.environ.get("MODEL_PATH", "").strip()
+GEMMA_ROOT_RAW = os.environ.get("GEMMA_ROOT", "").strip()
+MODEL_PATH = Path(MODEL_PATH_RAW).expanduser()
+GEMMA_ROOT = Path(GEMMA_ROOT_RAW).expanduser()
 REQUIRE_EXTERNAL_DEPENDENCIES = (
     os.environ.get("REQUIRE_EXTERNAL_DEPENDENCIES", "false").strip().lower() == "true"
 )
@@ -37,7 +39,7 @@ def fail(message: str) -> None:
 
 if ENGINE not in {"hunyuanvideo-1.5", "ltx-2"}:
     fail("unsupported engine")
-if not str(MODEL_PATH):
+if not MODEL_PATH_RAW:
     fail("MODEL_PATH is required")
 if not MODEL_PATH.exists():
     fail(f"MODEL_PATH does not exist: {MODEL_PATH}")
@@ -115,7 +117,7 @@ if ENGINE == "ltx-2":
         if requirement == "spatial_upscaler":
             require_component("ltx-2-spatial-upscaler-x2-1.0.safetensors")
         elif requirement == "external_gemma_root":
-            if not GEMMA_ROOT:
+            if not GEMMA_ROOT_RAW:
                 if REQUIRE_EXTERNAL_DEPENDENCIES:
                     missing.append("GEMMA_ROOT")
                 else:
