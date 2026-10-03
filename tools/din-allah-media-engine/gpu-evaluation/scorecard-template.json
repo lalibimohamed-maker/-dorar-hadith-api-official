@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "engineId": "din-allah-media-engine-clean-2026",
+  "experimentId": "REPLACE_WITH_RUN_ID",
+  "candidate": {
+    "id": "wan2.2",
+    "family": "Wan 2.2",
+    "checkpoint": "REQUIRED",
+    "upstreamRevision": "REQUIRED"
+  },
+  "prompt": {
+    "suiteId": "din-allah-media-engine-gpu-2026-01",
+    "promptId": "REQUIRED",
+    "promptSha256": "REQUIRED",
+    "seed": null
+  },
+  "runtime": {
+    "provider": "REQUIRED",
+    "gpu": "REQUIRED",
+    "vramGb": null,
+    "driver": null,
+    "runtimeImage": "REQUIRED"
+  },
+  "media": {
+    "pathOutsideGit": "REQUIRED",
+    "sha256": "REQUIRED",
+    "durationSeconds": null,
+    "width": null,
+    "height": null,
+    "fps": null,
+    "videoCodec": null,
+    "audioPresent": false
+  },
+  "rights": {
+    "termsUrl": "REQUIRED",
+    "inputRights": "REQUIRED",
+    "checkpointStatus": "REQUIRED"
+  },
+  "evaluation": {
+    "vbench2": null,
+    "vbench": null,
+    "avgenBench": null,
+    "humanReviewRequired": true
+  },
+  "publication": {
+    "status": "pending_review",
+    "generatedVideoIsEvidence": false,
+    "quranTextEmbedded": false,
+    "quranRecitationEmbedded": false
+  }
+}
