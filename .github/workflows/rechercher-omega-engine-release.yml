@@ -164,7 +164,7 @@ jobs:
           PY
 
           for asset_name in qwen3-model.safetensors qwen3-runtime-files.tar.gz qwen3-release-manifest.json; do
-            asset_id="$(gh release view "$TAG" --json assets --jq ".assets[] | select(.name == \"$asset_name\") | .id" | head -n1)"
+            asset_id="$(gh api "repos/$GITHUB_REPOSITORY/releases/$TAG/assets" --paginate --jq '.[] | select(.name == "'\''"$asset_name"'\''") | .id' | head -n1)"
             if [ -n "$asset_id" ]; then
               echo "Deleting retired legacy asset: $asset_name ($asset_id)"
               gh api --method DELETE "/repos/$GITHUB_REPOSITORY/releases/assets/$asset_id"
