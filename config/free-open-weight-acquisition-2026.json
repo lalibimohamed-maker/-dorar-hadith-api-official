@@ -1,0 +1,33 @@
+{
+  "schema": "dinullah.free-open-weight-acquisition.v1",
+  "purpose": "Explicit acquisition targets for local reasoning weights discovered or cross-checked through the free-LLM layer; only eligible upstream licenses can reach Releases.",
+  "discoverySource": "https://freellm.net/models/",
+  "policy": {
+    "explicitTargetsOnly": true,
+    "upstreamLicenseEvidenceRequired": true,
+    "checksumRequired": true,
+    "runtimeVerificationRequired": true,
+    "releaseOnly": true,
+    "gitLfs": false,
+    "corpusWriteAllowed": false,
+    "silentRemoteFallback": false
+  },
+  "release": {
+    "tag": "rechercher-free-local-models-2026-10",
+    "assetDirectory": "models",
+    "checksumFile": "SHA256SUMS.txt"
+  },
+  "targets": [
+    {
+      "id": "qwen3-0.6b",
+      "role": "local-general-reasoning-bootstrap",
+      "upstream": "https://huggingface.co/Qwen/Qwen3-0.6B",
+      "revision": "main",
+      "license": "Apache-2.0",
+      "sizeBytesObserved": 1520000000,
+      "releaseEligible": true,
+      "asset": "qwen3-0.6b.tar.zst",
+      "notes": "Small bootstrap model for local-first reasoning. FreeLLM is discovery-only; the upstream Hugging Face model card is the weight/license authority."
+    }
+  ]
+}
