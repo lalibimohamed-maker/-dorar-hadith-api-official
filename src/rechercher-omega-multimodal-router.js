@@ -95,12 +95,19 @@ export function buildMultimodalJob({
   };
 }
 
-export function assertMultimodalBoundary(plan) {
+export function assertMultimodalBoundary(plan, { publicDistributionRequired = false } = {}) {
   if (plan.corpus_write_allowed) throw new Error("multimodal boundary violation: Corpus writes are forbidden");
   if (plan.generated_media_is_evidence) throw new Error("multimodal boundary violation: generated media cannot be evidence");
   if (plan.status === "ready" && !plan.provenance_required) throw new Error("multimodal boundary violation: provenance is required");
-  if (plan.status === "ready" && (plan.license_status !== "cleared" || plan.weight_status !== "cleared")) {
-    throw new Error("multimodal boundary violation: production execution requires cleared license and weights");
+  if (plan.status === "ready" && plan.local_use_status && plan.local_use_status !== "cleared") {
+    throw new Error("multimodal boundary violation: local-use rights are not cleared");
+  }
+  if (plan.status === "ready" && plan.weight_status !== "cleared") {
+    throw new Error("multimodal boundary violation: weights are not cleared");
+  }
+  if (publicDistributionRequired && plan.status === "ready" &&
+      (plan.redistribution_status !== "cleared" && plan.redistribution_status !== "permitted_subject_to_recorded_terms")) {
+    throw new Error("multimodal boundary violation: redistribution terms are not cleared");
   }
   return true;
 }
