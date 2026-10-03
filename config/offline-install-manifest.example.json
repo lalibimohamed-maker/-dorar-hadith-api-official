@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0.0",
+  "artifact": {
+    "model_id": "example/model",
+    "version": "0.0.0",
+    "revision": "replace-with-verified-revision",
+    "license": "replace-with-verified-license",
+    "total_size_bytes": 1,
+    "total_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "signature": {
+      "algorithm": "ed25519",
+      "public_key_id": "omega-release-root-v1",
+      "signature_base64": "REPLACE_WITH_VERIFIED_DETACHED_SIGNATURE"
+    }
+  },
+  "tokenizer": {
+    "files": [
+      {
+        "name": "tokenizer.json",
+        "bytes": 1,
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "unicode_test_profile": "quran-canonical-roundtrip-v1"
+  },
+  "runtime_profile": {
+    "estimated_peak_ram_bytes": 1,
+    "runtime_overhead_bytes": 1,
+    "index_peak_ram_bytes": 1,
+    "tokenizer_runtime_bytes": 1,
+    "concurrent_buffer_bytes": 1,
+    "safety_margin_bytes": 1,
+    "supported_runtimes": ["onnxruntime-web","llama.cpp"],
+    "platform_caps_bytes": {}
+  },
+  "evidence_index": {
+    "type": "orama-text",
+    "index_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "content_sha256_field": "content_sha256",
+    "node_id_field": "node_id"
+  },
+  "distribution": {
+    "release_asset": "model.part-00",
+    "chunks": [
+      {
+        "index": 0,
+        "asset": "model.part-00",
+        "bytes": 1,
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "blocks": [
+          {
+            "index": 0,
+            "offset": 0,
+            "bytes": 1,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      }
+    ],
+    "resume": {
+      "supports_http_range": true,
+      "requires_content_range_206": true,
+      "validator": "etag-or-last-modified"
+    }
+  },
+  "verification_policy": {
+    "fail_closed": true,
+    "offline_only_must_never_network": true,
+    "no_corpus_writes": true,
+    "no_unverified_weight_loading": true,
+    "no_git_lfs": true
+  }
+}

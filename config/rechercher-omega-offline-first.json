@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "policy": {
     "default_mode": "auto",
     "offline_only_must_never_require_network": true,
@@ -63,10 +63,28 @@
     "release_asset_distribution": "github-releases"
   },
   "device_policy": {
-    "browser_memory_budget_fraction": 0.35,
-    "default_reserve_bytes": 268435456,
+    "browser_model_budget_fraction": 0.35,
+    "default_safety_reserve_bytes": 268435456,
     "never_assume_that_file_size_equals_peak_ram": true,
+    "device_memory_is_approximate": true,
+    "effective_cap_is_min_of_known_caps": true,
+    "required_memory_includes_runtime_index_tokenizer_buffers_and_safety": true,
+    "platform_process_cap_bytes": null,
+    "native_webview_cap_bytes": null,
     "4gb_devices_are_not_promised_to_run_1_8gb_models": true
+  },
+  "distribution_policy": {
+    "release_asset_distribution": "github-releases",
+    "git_lfs_allowed": false,
+    "http_range_resume": true,
+    "range_resume_requires_206": true,
+    "range_resume_requires_content_range": true,
+    "resume_validator": [
+      "etag",
+      "last-modified"
+    ],
+    "block_hash_verification": true,
+    "default_block_size_bytes": 16777216
   },
   "validated_tool_versions": {
     "onnxruntime-web": "1.30.0",

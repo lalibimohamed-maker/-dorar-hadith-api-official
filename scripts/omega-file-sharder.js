@@ -6,6 +6,7 @@ import { createHash } from "node:crypto";
 import { once } from "node:events";
 
 export const DEFAULT_CHUNK_BYTES = 1900 * 1024 * 1024;
+export const DEFAULT_BLOCK_BYTES = 16 * 1024 * 1024;
 export const MAX_GITHUB_RELEASE_ASSET_BYTES = 2147483647;
 
 export function sha256(value){
@@ -22,20 +23,13 @@ function chunkName(fileName,index,width){
   return fileName+".part-"+String(index).padStart(width,"0");
 }
 
-async function hashFile(filePath){
-  const hash=createHash("sha256");
-  const input=fs.createReadStream(filePath,{highWaterMark:1024*1024});
-  let bytes=0;
-  for await(const chunk of input){ hash.update(chunk); bytes+=chunk.length; }
-  return {sha256:hash.digest("hex"),bytes};
-}
-
 export async function shardModelFile(
   filePath,
   outputDir,
-  {chunkBytes=DEFAULT_CHUNK_BYTES,cleanOutput=false,assetPrefix=null}={}
+  {chunkBytes=DEFAULT_CHUNK_BYTES,blockBytes=DEFAULT_BLOCK_BYTES,cleanOutput=false,assetPrefix=null}={}
 ){
   chunkBytes=parsePositiveInteger(chunkBytes,"chunkBytes");
+  blockBytes=parsePositiveInteger(blockBytes,"blockBytes");
   if(chunkBytes>=MAX_GITHUB_RELEASE_ASSET_BYTES) {
     throw new RangeError("chunkBytes must be below the GitHub Release per-asset limit");
   }
@@ -67,6 +61,10 @@ export async function shardModelFile(
       const targetPath=path.join(out,name);
       const output=fs.createWriteStream(targetPath,{flags:"wx"});
       const chunkHash=createHash("sha256");
+      const blockHashes=[];
+      let blockHash=createHash("sha256");
+      let blockWritten=0;
+      let blockOffset=0;
       let written=0;
 
       try{
@@ -78,8 +76,28 @@ export async function shardModelFile(
           if(!output.write(bytes)) await once(output,"drain");
           chunkHash.update(bytes);
           globalHash.update(bytes);
+
+          let localOffset=0;
+          while(localOffset<bytes.length){
+            const take=Math.min(blockBytes-blockWritten,bytes.length-localOffset);
+            const slice=bytes.subarray(localOffset,localOffset+take);
+            blockHash.update(slice);
+            blockWritten+=take;
+            localOffset+=take;
+            if(blockWritten===blockBytes){
+              blockHashes.push({index:blockHashes.length,offset:blockOffset,bytes:blockWritten,sha256:blockHash.digest("hex")});
+              blockOffset+=blockWritten;
+              blockHash=createHash("sha256");
+              blockWritten=0;
+            }
+          }
           written+=bytesRead;
         }
+
+        if(blockWritten>0){
+          blockHashes.push({index:blockHashes.length,offset:blockOffset,bytes:blockWritten,sha256:blockHash.digest("hex")});
+        }
+
         await new Promise((resolve,reject)=>{
           output.once("error",reject);
           output.end(resolve);
@@ -91,7 +109,14 @@ export async function shardModelFile(
       }
 
       const sha=chunkHash.digest("hex");
-      chunks.push({index,name,bytes:written,sha256:sha});
+      chunks.push({
+        index,
+        name,
+        bytes:written,
+        sha256:sha,
+        block_size_bytes:blockBytes,
+        blocks:blockHashes
+      });
       offset+=written;
     }
 
@@ -101,13 +126,14 @@ export async function shardModelFile(
     }
 
     const manifest={
-      schema_version:"1.0.0",
+      schema_version:"1.1.0",
       format:"dinullah/omega-sharded-file",
       algorithm:"sha256",
       model_name:modelName,
       total_size:totalSize,
       total_sha256:globalHash.digest("hex"),
       chunk_size_bytes:chunkBytes,
+      block_size_bytes:blockBytes,
       chunk_count:chunks.length,
       chunks
     };
@@ -124,11 +150,12 @@ export async function shardModelFile(
 if(import.meta.url===`file://${process.argv[1]}`){
   const [, , input, output, ...args]=process.argv;
   if(!input||!output){
-    console.error("usage: omega-file-sharder.js <input> <output-dir> [chunk-bytes] [asset-prefix]");
+    console.error("usage: omega-file-sharder.js <input> <output-dir> [chunk-bytes] [block-bytes] [asset-prefix]");
     process.exit(2);
   }
   const chunkBytes=args[0]?Number(args[0]):DEFAULT_CHUNK_BYTES;
-  const assetPrefix=args[1]||null;
-  const result=await shardModelFile(input,output,{chunkBytes,assetPrefix});
+  const blockBytes=args[1]?Number(args[1]):DEFAULT_BLOCK_BYTES;
+  const assetPrefix=args[2]||null;
+  const result=await shardModelFile(input,output,{chunkBytes,blockBytes,assetPrefix});
   console.log(JSON.stringify(result.manifest,null,2));
 }

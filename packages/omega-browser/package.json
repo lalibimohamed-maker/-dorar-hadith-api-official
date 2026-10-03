@@ -1,0 +1,11 @@
+{
+  "name": "@dinullah/omega-browser",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Isolated Offline & Local-First browser package for Rechercher Omega.",
+  "scripts": {
+    "build": "node build.js",
+    "check": "node --check build.js && find src -type f -name '*.js' -print0 | xargs -0 -n1 node --check"
+  }
+}
