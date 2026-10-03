@@ -1,0 +1,24 @@
+{
+  "schema":"din-allah/global-multilingual-knowledge-network/v1",
+  "version":"1.0.0",
+  "layer":"presentation-and-retrieval",
+  "sharedKnowledgeGraph":true,
+  "identityMutation":false,
+  "evidenceStatusMutation":false,
+  "pipeline":["user-language","intent-detection","multilingual-retrieval","source-verification","provenance-graph","response-user-language"],
+  "languageFields":["uiLanguage","queryLanguage","responseLanguage","sourceLanguage"],
+  "rules":{
+    "autoDetectUserLanguage":true,
+    "replyInDetectedLanguageWhenPossible":true,
+    "supportLanguagesOutsideConfiguredUI":true,
+    "mixedLanguageQueries":true,
+    "canonicalEntityAliasSearch":true,
+    "originalSourceNeverReplacedByTranslation":true,
+    "machineTranslationsClearlyLabeled":true,
+    "rtlLtrAutomatic":true,
+    "claimRequiresProvenance":true,
+    "insufficientEvidenceMustStop":true
+  },
+  "translationStates":["source-original","machine-draft","human-reviewed","verified"],
+  "mediaDefaultAuthority":false
+}
