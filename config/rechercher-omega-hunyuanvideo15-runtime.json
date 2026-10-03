@@ -57,5 +57,32 @@
       "license": "flux-1-dev-non-commercial-license",
       "status": "gated_access_required"
     }
+  ],
+  "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+  "storage_visibility": "private",
+  "storage_release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+  "storage_asset_count": 707,
+  "execution": {
+    "local_weight_execution": true,
+    "api_token_quota_required": false,
+    "compute_bounded": [
+      "gpu_memory",
+      "host_memory",
+      "storage",
+      "runtime_time"
+    ],
+    "e2e_smoke_test_required": true,
+    "corpus_write_allowed": false,
+    "generated_media_is_evidence": false,
+    "provenance_required": true
+  },
+  "runtime_status": "dependency_blocked",
+  "execution_proof": "not_e2e_verified",
+  "activation_gate": [
+    "license_clearance",
+    "stored_release_manifest_verification",
+    "sha256_verification",
+    "external_dependency_verification",
+    "e2e_smoke_test"
   ]
 }
