@@ -112,6 +112,23 @@
       "image_to_video": "distilled-monolith",
       "video_to_video": "distilled-monolith",
       "audio_video_generation": "distilled-monolith"
+    },
+    "profile_selection_rules": {
+      "distilled-monolith": {
+        "load_layout": "monolith",
+        "primary_checkpoint_asset": "ltx-2-19b-distilled.safetensors",
+        "external_dependency_model": "google/gemma-3-12b-it-qat-q4_0-unquantized",
+        "spatial_upsampler_asset": "ltx-2-spatial-upscaler-x2-1.0.safetensors",
+        "execution_cli": "ltx_pipelines.distilled --distilled-checkpoint-path",
+        "fast_path": true
+      },
+      "dev-fp4-monolith": {
+        "load_layout": "monolith",
+        "primary_checkpoint_asset": "ltx-2-19b-dev-fp4.safetensors",
+        "external_dependency_model": "google/gemma-3-12b-it-qat-q4_0-unquantized",
+        "execution_cli": "ltx_pipelines.ti2vid_two_stages",
+        "fast_path": false
+      }
     }
   },
   "hunyuanvideo15": {
