@@ -73,12 +73,13 @@ jobs:
         if: steps.release_preflight.outputs.complete != 'true'
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
+          MODEL_REVISION: "61641f84fa567ab7b58e216b4930d2fe28bfd045"
         run: |
           set -euo pipefail
           rm -rf release-model models-work
           mkdir -p release-model models-work
           hf download Qwen/Qwen3-0.6B \
-            --revision main \
+            --revision "$MODEL_REVISION" \
             --local-dir models-work/Qwen3-0.6B
           test -s models-work/Qwen3-0.6B/model.safetensors
           test -s models-work/Qwen3-0.6B/config.json
@@ -127,6 +128,7 @@ jobs:
           evidence={
               'schema':'dinullah.local-model-runtime-evidence.v1',
               'model':'Qwen/Qwen3-0.6B',
+              'revision':'61641f84fa567ab7b58e216b4930d2fe28bfd045',
               'verified':True,
               'outputChars':len(generated),
           }
