@@ -27,3 +27,10 @@ test('node type filtering preserves traversal but filters returned nodes', () =>
   const result = traverse(graph, 'q1', { maxDepth: 4, nodeTypes: ['hadith','sirah_event'] });
   assert.deepEqual(result.map(x => x.node.id), ['h1','s1']);
 });
+
+
+test('reverse traversal reaches underlying source-side nodes', () => {
+  const graph = fixture();
+  const result = traverse(graph, 'h1', { maxDepth: 2, direction: 'in' });
+  assert.deepEqual(result.map(x => x.node.id), ['t1','q1']);
+});

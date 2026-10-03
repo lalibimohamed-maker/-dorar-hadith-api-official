@@ -1,4 +1,4 @@
-import { validateGraph, validateNode, validateEdge, assertSourceBackedEvidence, isTrustedEvidence } from './deen-graph-contract.js';
+import { validateGraph, validateNode, validateEdge, validateTrustedPath, assertSourceBackedEvidence, isTrustedEvidence } from './deen-graph-contract.js';
 
 export function createGraph() {
   return { nodes: new Map(), edges: new Map(), adjacency: new Map() };
@@ -37,14 +37,21 @@ export function getTrustedNodes(graph) {
   );
 }
 
-export function neighbors(graph, nodeId, { edgeTypes = null } = {}) {
+export function neighbors(graph, nodeId, { edgeTypes = null, direction = "out", trustedOnly = false } = {}) {
   if (!graph.nodes.has(nodeId)) return [];
   const allowed = edgeTypes ? new Set(edgeTypes) : null;
-  return graph.adjacency.get(nodeId)
-    .map((id) => graph.edges.get(id))
-    .filter((edge) => !allowed || allowed.has(edge.type))
-    .map((edge) => graph.nodes.get(edge.to))
-    .filter(Boolean);
+  const matches = [];
+  for (const edge of graph.edges.values()) {
+    const outgoing = edge.from === nodeId;
+    const incoming = edge.to === nodeId;
+    if ((direction === "out" && !outgoing) || (direction === "in" && !incoming) || (direction === "both" && !outgoing && !incoming)) continue;
+    if (allowed && !allowed.has(edge.type)) continue;
+    if (trustedOnly && (!isTrustedEvidence(edge.provenance) || !isTrustedEvidence(graph.nodes.get(edge.from)?.provenance) || !isTrustedEvidence(graph.nodes.get(edge.to)?.provenance))) continue;
+    const targetId = outgoing ? edge.to : edge.from;
+    const node = graph.nodes.get(targetId);
+    if (node) matches.push(node);
+  }
+  return matches;
 }
 
 export function snapshotGraph(graph) {
@@ -54,6 +61,7 @@ export function snapshotGraph(graph) {
   };
 }
 
-export function validateRuntimeGraph(graph) {
-  return validateGraph(snapshotGraph(graph));
+export function validateRuntimeGraph(graph, { trustedOnly = false } = {}) {
+  const snapshot = snapshotGraph(graph);
+  return trustedOnly ? validateTrustedPath(snapshot) : validateGraph(snapshot);
 }

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-09-28",
+  "agent": "din-allah-grounded-agent-v1",
+  "pipeline": [
+    "intent_router",
+    "existing_search_tools",
+    "evidence_context",
+    "local_or_interchangeable_model",
+    "reference_verifier",
+    "response"
+  ],
+  "tooling": {
+    "unifiedSearch": "src/unified-search.js",
+    "toolRegistry": "src/ai/agent-tool-registry.mjs",
+    "intentRouter": "src/ai/agent-intent-router.mjs",
+    "evidenceBuilder": "src/ai/evidence-context-builder.mjs",
+    "responseVerifier": "src/ai/response-verifier.mjs"
+  },
+  "model": {
+    "default": "qwen3-8b-instruct-q4_k_m",
+    "providerInterface": "generateFn",
+    "localRuntime": "src/ai/local-llm-runtime.mjs",
+    "autoDownload": false,
+    "remoteRequired": false
+  },
+  "answerPolicy": {
+    "evidenceRequired": true,
+    "inventedCitationRejected": true,
+    "unsupportedAnswerRejected": true,
+    "hadithAuthenticityDelegatedToEvidence": true,
+    "fiqhDisagreementPreserved": true,
+    "generatedTextIsCanonical": false,
+    "canonicalCorpusMutation": false,
+    "acquisitionBlocking": false
+  },
+  "memory": {
+    "enabled": false,
+    "futurePhaseRequiresConsent": true,
+    "personalDataSeparated": true,
+    "retentionMustBeExplicit": true
+  }
+}

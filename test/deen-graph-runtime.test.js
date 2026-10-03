@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createGraph, addNode, addEdge, addEvidence, neighbors, validateRuntimeGraph } from '../src/deen-graph-runtime.js';
+import { isTrustedEvidence } from '../src/deen-graph-contract.js';
 
 test('graph accepts source-backed nodes and relations', () => {
   const graph = createGraph();
@@ -22,4 +23,27 @@ test('graph rejects dangling edges', () => {
   const graph = createGraph();
   addNode(graph, { id: 'h:1', type: 'hadith', provenance: { sourceId: 'bukhari', citation: '1' } });
   assert.throws(() => addEdge(graph, { id: 'e:1', from: 'h:1', to: 'missing', type: 'related_to', provenance: { sourceId: 'x', citation: 'x' } }), /endpoints/);
+});
+
+
+test('trusted traversal requires verified provenance on nodes and edges', () => {
+  const graph = createGraph();
+  addNode(graph, { id: 'q:1', type: 'quran_verse', provenance: { sourceId: 'quran', citation: '1:1', verificationState: 'source_verified', rights: 'canonical-source' } });
+  addNode(graph, { id: 'h:1', type: 'hadith', provenance: { sourceId: 'bukhari', citation: '1', verificationState: 'edition_verified', rights: 'source-dependent' } });
+  addEdge(graph, {
+    id: 'e:1',
+    from: 'h:1',
+    to: 'q:1',
+    type: 'related_to',
+    provenance: { sourceId: 'bukhari', citation: '1', verificationState: 'edition_verified', rights: 'source-dependent' }
+  });
+  assert.equal(validateRuntimeGraph(graph, { trustedOnly: true }).trusted, true);
+  assert.equal(neighbors(graph, 'h:1', { direction: 'both', trustedOnly: true })[0].id, 'q:1');
+});
+
+
+test('trusted nodes require explicit rights metadata', () => {
+  const graph = createGraph();
+  addNode(graph, { id: 'h:1', type: 'hadith', provenance: { sourceId: 'bukhari', citation: '1', verificationState: 'source_verified' } });
+  assert.equal(isTrustedEvidence(graph.nodes.get('h:1').provenance), false);
 });

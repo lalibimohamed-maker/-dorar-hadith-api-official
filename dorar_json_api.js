@@ -2,6 +2,7 @@ import http from "node:http";
 import { URL } from "node:url";
 import crypto from "node:crypto";
 import { unifiedSearch } from "./src/unified-search.js";
+import { runGroundedAssistant } from "./src/assistant-runtime.js";
 import { getMaqasid, getSource, listCategories, listSources } from "./src/source-registry.js";
 import { listAuthors, listBooks } from "./src/book-catalog.js";
 import { DEFAULT_LOCALE, detectLocale, listLocales, localeFromRequest } from "./src/i18n.js";
@@ -52,7 +53,7 @@ const server = http.createServer(async (req, res) => {
   if (rawKey && (!app || !app.enabled)) return sendJson(res, 401, { error: "Invalid or disabled API key" });
   if (!consume(app ? `app:${keyHash}` : `ip:${clientIp(req)}`, app ? APP_MAX_PER_WINDOW : PUBLIC_MAX_PER_WINDOW, PUBLIC_WINDOW_MS)) return sendJson(res, 429, { error: "Rate limit exceeded", retryAfterSeconds: 60 });
 
-  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة دين الله", nameEn: "Deen Allah Encyclopedia", service: "Deen Allah API", version: API_VERSION, locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid", tajweed: "/tajweed", tajweedLesson: "/tajweed/lesson?id=letters", fiqh: "/fiqh", fiqhResearch: "/fiqh/research?q=...", fiqhTemplate: "/fiqh/template?q=...", domains: "/research/domains", domain: "/research/domain?id=tafsir", scholars: "/research/scholars?q=...&domain=aqeedah", hadithMethodology: "/hadith/methodology", narratorGrades: "/hadith/narrator-grades", chainPhenomena: "/hadith/chain-phenomena", rijalBooks: "/hadith/rijal-books", narratorProfile: "/hadith/narrator/profile?name=...", narratorCompare: "/hadith/narrator/compare", inheritance: "/inheritance?estate=100000&sons=1&daughters=1&madhhab=hanbali", inheritanceMadhahib: "/inheritance/madhahib", inheritanceComplexCases: "/inheritance/complex-cases" } });
+  if (url.pathname === "/") return sendJson(res, 200, { name: "موسوعة دين الله", nameEn: "Deen Allah Encyclopedia", service: "Deen Allah API", version: API_VERSION, locale, direction: locale.dir, endpoints: { health: "/health", locales: "/locales", search: "/search?q=...", assistant: "/assistant?q=...", quranAyah: "/quran/ayah?verse=1:1&translationIds=...&tafsirIds=...", quranTranslations: "/quran/translations?lang=en", sources: "/sources", books: "/books", authors: "/authors", categories: "/categories", maqasid: "/maqasid", tajweed: "/tajweed", tajweedLesson: "/tajweed/lesson?id=letters", fiqh: "/fiqh", fiqhResearch: "/fiqh/research?q=...", fiqhTemplate: "/fiqh/template?q=...", domains: "/research/domains", domain: "/research/domain?id=tafsir", scholars: "/research/scholars?q=...&domain=aqeedah", hadithMethodology: "/hadith/methodology", narratorGrades: "/hadith/narrator-grades", chainPhenomena: "/hadith/chain-phenomena", rijalBooks: "/hadith/rijal-books", narratorProfile: "/hadith/narrator/profile?name=...", narratorCompare: "/hadith/narrator/compare", inheritance: "/inheritance?estate=100000&sons=1&daughters=1&madhhab=hanbali", inheritanceMadhahib: "/inheritance/madhahib", inheritanceComplexCases: "/inheritance/complex-cases" } });
   if (url.pathname === "/locales") return sendJson(res, 200, { default: DEFAULT_LOCALE, count: listLocales().length, locales: listLocales() });
   if (url.pathname === "/categories") return sendJson(res, 200, { locale, direction: locale.dir, categories: listCategories() });
   if (url.pathname === "/sources") return sendJson(res, 200, { locale, sources: listSources({ category: requireString(url.searchParams.get("category")), role: requireString(url.searchParams.get("role")), country: requireString(url.searchParams.get("country")) }) });
@@ -85,6 +86,33 @@ const server = http.createServer(async (req, res) => {
 
   if (url.pathname === "/quran/translations") { try { return sendJson(res, 200, { locale, translations: await listQuranTranslations(requireString(url.searchParams.get("lang")) || locale.code) }); } catch (error) { return sendJson(res, 502, { error: error.message, locale }); } }
   if (url.pathname === "/quran/ayah") { const verse = requireString(url.searchParams.get("verse")); if (!verse) return sendJson(res, 400, { error: "Missing required query parameter: verse (e.g. 1:1)" }); const translationIds = (url.searchParams.get("translationIds") || "").split(",").map(Number).filter(Number.isInteger).filter((n)=>n>0); const tafsirIds = (url.searchParams.get("tafsirIds") || "").split(",").map(Number).filter(Number.isInteger).filter((n)=>n>0); try { const data = await getQuranAyah({ verseKey: verse, translationIds, tafsirIds, language: locale.code, words: url.searchParams.get("words") === "true" }); return data ? sendJson(res, 200, { locale, direction: locale.dir, data }) : sendJson(res, 404, { error: "Ayah not found" }); } catch (error) { const status = error.code === "QF_NOT_CONFIGURED" ? 503 : 502; return sendJson(res, status, { error: error.message, locale, setup: status === 503 ? "Configure QF_CLIENT_ID and QF_CLIENT_SECRET on the server" : undefined }); } }
+
+  if (url.pathname === "/assistant") {
+    if (process.env.ENABLE_LOCAL_AGENT_API !== "true") {
+      return sendJson(res, 503, { error: "Local grounded agent API is disabled", code: "LOCAL_AGENT_API_DISABLED", locale });
+    }
+    const q = queryText;
+    if (!q) return sendJson(res, 400, { error: "Missing required query parameter: q", locale });
+    if (q.length > MAX_QUERY_LENGTH) return sendJson(res, 413, { error: `Query exceeds maximum length of ${MAX_QUERY_LENGTH} characters`, locale });
+    if (!process.env.DEEN_LLM_MODEL_PATH || !process.env.DEEN_LLM_MODEL_SHA256) {
+      return sendJson(res, 503, { error: "Local agent model is not configured with a path and SHA-256", code: "LOCAL_AGENT_MODEL_NOT_CONFIGURED", locale });
+    }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), Number(process.env.LOCAL_AGENT_TIMEOUT_MS || 60_000));
+    try {
+      const data = await runGroundedAssistant({
+        query: q,
+        language: locale.code,
+        signal: controller.signal
+      });
+      return sendJson(res, data.verification.status === "rejected" ? 422 : 200, { ...data, locale, direction: locale.dir });
+    } catch (error) {
+      const status = error?.code === "LOCAL_AI_MODEL_SHA256_MISMATCH" || error?.code === "LOCAL_AI_MODEL_SHA256_MISSING" ? 503 : 502;
+      return sendJson(res, status, { error: error.message || "Local grounded agent failed", code: error.code || "LOCAL_AGENT_FAILURE", locale });
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
 
   if (url.pathname === "/search") { const q = queryText; if (!q) return sendJson(res, 400, { error: "Missing required query parameter: q" }); if (q.length > MAX_QUERY_LENGTH) return sendJson(res, 413, { error: `Query exceeds maximum length of ${MAX_QUERY_LENGTH} characters` }); const controller = new AbortController(), timeout = setTimeout(()=>controller.abort(), REQUEST_TIMEOUT_MS); try { const data = await unifiedSearch(q, { signal: controller.signal, responseLocale: locale.code, includePotentialMatches: url.searchParams.get("includePotentialMatches") === "true" }); return sendJson(res, 200, { ...data, locale, direction: locale.dir, languageDetection: { explicit: Boolean(requestedLanguage), detectedFromQuery: !requestedLanguage && Boolean(detectLocale(q)), selected: locale.code } }); } catch (error) { return sendJson(res, 502, { error: error?.name === "AbortError" ? "Search request timed out" : "Unable to retrieve unified search results", source: "Dorar.net", locale }); } finally { clearTimeout(timeout); } }
   return sendJson(res, 404, { error: "Not found" });

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-09-28",
+  "purpose": "Free-first local inference plane for Deen Allah Encyclopedia. The runtime enriches answers downstream from verified Corpus/Search and never mutates canonical religious content.",
+  "runtime": {
+    "adapter": "node-llama-cpp",
+    "bindingLicense": "MIT",
+    "recommendedSeries": "3.22.x",
+    "repo": "https://github.com/withcatai/node-llama-cpp",
+    "offlineAfterInstallation": true,
+    "autoDownloadModels": false,
+    "autoDownloadRuntime": false,
+    "lazyLoad": true
+  },
+  "roles": {
+    "generation": {
+      "modelId": "qwen3-8b-instruct-q4_k_m",
+      "source": "https://huggingface.co/Qwen/Qwen3-8B-GGUF",
+      "modelLicense": "Apache-2.0",
+      "modelPathEnv": "DEEN_LLM_MODEL_PATH",
+      "sha256Env": "DEEN_LLM_MODEL_SHA256",
+      "localOnly": true
+    },
+    "embedding": {
+      "modelId": "bge-m3-q8_0",
+      "source": "https://huggingface.co/cstr/bge-m3-GGUF",
+      "baseModelSource": "https://huggingface.co/BAAI/bge-m3",
+      "modelLicense": "MIT",
+      "modelPathEnv": "DEEN_EMBEDDING_MODEL_PATH",
+      "sha256Env": "DEEN_EMBEDDING_MODEL_SHA256",
+      "dimensions": 1024,
+      "maxTokens": 8192,
+      "languages": "100+"
+    },
+    "reranker": {
+      "modelId": "bge-reranker-v2-m3-q8_0",
+      "source": "https://huggingface.co/cstr/bge-reranker-v2-m3-GGUF",
+      "baseModelSource": "https://huggingface.co/BAAI/bge-reranker-v2-m3",
+      "modelLicense": "Apache-2.0",
+      "modelPathEnv": "DEEN_RERANKER_MODEL_PATH",
+      "sha256Env": "DEEN_RERANKER_MODEL_SHA256",
+      "multilingual": true
+    }
+  },
+  "executionPolicy": {
+    "networkRequired": false,
+    "unknownWeightChecksumFailsClosed": true,
+    "remoteModelFetchDisabled": true,
+    "canonicalCorpusMutation": false,
+    "learningBlockingAcquisition": false,
+    "generatedTextBecomesCorpus": false,
+    "sourceAttributionRequired": true,
+    "scholarlyDisagreementPreserved": true,
+    "quranArabicCanonicalTextUntouched": true,
+    "hadithCanonicalTextUntouched": true,
+    "rightsMetadataPreserved": true
+  }
+}

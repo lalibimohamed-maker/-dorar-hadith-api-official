@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Single source-aware knowledge graph contract for Deen Allah Encyclopedia.",
+  "evidenceLayers": ["primary_text","scholarly_interpretation","metadata","relation","generated_assistance"],
+  "verificationStates": ["ingested","pending_review","pending_verification","source_verified","edition_verified","scholar_reviewed"],
+  "trustedVerificationStates": ["source_verified","edition_verified","scholar_reviewed"],
+  "canonicalFlow": ["quran_verse -> tafsir -> asbab_al_nuzul -> sirah_event -> hadith -> narrator/rijal -> hadith_criticism -> explanation -> fiqh_ruling/aqeedah_statement/benefits -> scholar_statement -> fatwa"],
+  "reverseTraversal": true,
+  "edgeProvenanceRequired": true,
+  "generatedTextIsEvidence": false,
+  "conflictingScholarlyJudgmentsRemainDistinct": true,
+  "searchRankIsReligiousJudgment": false,
+  "canonicalCorpusMutation": false,
+  "rightsAttachedToCorpusSources": true,
+  "hadithFirstIngestionGate": {
+    "requiresSource": true,
+    "requiresEdition": true,
+    "requiresRights": true,
+    "requiresIntegrity": true,
+    "legalOrTextualIngestionClaimFromManifestAlone": false
+  }
+}

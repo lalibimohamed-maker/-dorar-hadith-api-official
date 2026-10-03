@@ -9,6 +9,25 @@ function toPositiveInt(value, fallback) {
   return Number.isFinite(number) && number > 0 ? Math.floor(number) : fallback;
 }
 
+function acceptsEncoding(header, encoding) {
+  const entries = String(header || "")
+    .toLowerCase()
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const [name, ...params] = part.split(";").map((value) => value.trim());
+      const qualityParam = params.find((value) => value.startsWith("q="));
+      const quality = qualityParam ? Number(qualityParam.slice(2)) : 1;
+      return { name, quality: Number.isFinite(quality) ? quality : 0 };
+    });
+
+  const direct = entries.find((entry) => entry.name === encoding);
+  if (direct) return direct.quality > 0;
+  const wildcard = entries.find((entry) => entry.name === "*");
+  return Boolean(wildcard && wildcard.quality > 0);
+}
+
 export function createAccelerationMesh(options = {}) {
   const maxEntries = toPositiveInt(options.maxEntries, DEFAULT_MAX_ENTRIES);
   const maxBytes = toPositiveInt(options.maxBytes, DEFAULT_MAX_BYTES);
@@ -70,14 +89,19 @@ export function createAccelerationMesh(options = {}) {
     if (buffer.length > maxBytes) return;
     const ttlMs = toPositiveInt(meta.ttlMs, 30_000);
     remove(key);
+    const unsafeHeaderNames = new Set(["set-cookie", "authorization", "proxy-authorization", "www-authenticate"]);
+    const headers = Object.fromEntries(
+      Object.entries(meta.headers || {}).filter(([name]) => !unsafeHeaderNames.has(String(name).toLowerCase()))
+    );
+    if (!headers["content-type"] && meta.contentType) headers["content-type"] = meta.contentType;
     const entry = {
       body: buffer,
       size: buffer.length,
       status: Number(meta.status || 200),
-      contentType: meta.contentType || "application/json; charset=utf-8",
-      etag: meta.etag || `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`,
+      headers,
+      contentType: meta.contentType || headers["content-type"] || "application/json; charset=utf-8",
+      etag: meta.etag || headers.etag || `"${crypto.createHash("sha256").update(buffer).digest("hex")}"`,
       ttlMs,
-      staleWhileRevalidate: toPositiveInt(meta.staleWhileRevalidate, 0),
       expiresAt: Date.now() + ttlMs,
     };
     cache.set(key, entry);
@@ -101,12 +125,11 @@ export function createAccelerationMesh(options = {}) {
   function compress(body, acceptEncoding) {
     const input = Buffer.isBuffer(body) ? body : Buffer.from(body);
     if (input.length < minCompressBytes) return { body: input, encoding: null };
-    const accepts = String(acceptEncoding || "").toLowerCase();
-    if (accepts.includes("br")) {
+    if (acceptsEncoding(acceptEncoding, "br")) {
       compressedResponses += 1;
       return { body: zlib.brotliCompressSync(input), encoding: "br" };
     }
-    if (accepts.includes("gzip")) {
+    if (acceptsEncoding(acceptEncoding, "gzip")) {
       compressedResponses += 1;
       return { body: zlib.gzipSync(input, { level: zlib.constants.Z_BEST_SPEED }), encoding: "gzip" };
     }
@@ -116,6 +139,7 @@ export function createAccelerationMesh(options = {}) {
   function profile() {
     return {
       enabled: true,
+      tier: "L1-memory",
       entries: cache.size,
       bytes,
       maxEntries,
@@ -127,6 +151,7 @@ export function createAccelerationMesh(options = {}) {
       compressedResponses,
       etagHits,
       coalesced,
+      externalBackends: "optional-not-loaded",
     };
   }
 
@@ -139,8 +164,12 @@ export function createAccelerationMesh(options = {}) {
 
 export function cachePolicyForPath(pathname) {
   const path = String(pathname || "/");
-  if (path === "/health" || path === "/performance" || path === "/") return { cache: false };
-  if (path === "/search" || path.startsWith("/research/scholars") || path.startsWith("/fiqh/research")) return { cache: true, ttlMs: 8_000, staleWhileRevalidate: 30 };
-  if (path.startsWith("/quran/ayah") || path.startsWith("/quran/translations")) return { cache: true, ttlMs: 120_000, staleWhileRevalidate: 600 };
-  return { cache: true, ttlMs: 60_000, staleWhileRevalidate: 300 };
+  if (path === "/health" || path === "/performance" || path === "/" || path === "/assistant") return { cache: false };
+  if (path === "/search" || path.startsWith("/research/scholars") || path.startsWith("/fiqh/research")) {
+    return { cache: true, ttlMs: 8_000 };
+  }
+  if (path.startsWith("/quran/ayah") || path.startsWith("/quran/translations")) {
+    return { cache: true, ttlMs: 120_000 };
+  }
+  return { cache: true, ttlMs: 60_000 };
 }
