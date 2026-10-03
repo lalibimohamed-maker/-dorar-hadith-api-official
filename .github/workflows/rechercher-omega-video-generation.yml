@@ -154,6 +154,35 @@ jobs:
           test -f requirements.txt
           python3 -m pip install -r requirements.txt
 
+      - name: Restore Hunyuan private runtime bundle
+        if: ${{ inputs.engine == 'hunyuanvideo-1.5' }}
+        env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          STORAGE_REPO: lalibimohamed-maker/rechercher-omega-engine-storage
+          RELEASE_TAG: rechercher-omega-hunyuanvideo15-v1.0.0
+          MODEL_DIR: ${{ runner.temp }}/omega-video-model
+        run: |
+          set -euo pipefail
+          mkdir -p "$MODEL_DIR"
+          gh release download "$RELEASE_TAG"             --repo "$STORAGE_REPO"             --pattern "omega__hunyuanvideo15__runtime.tar.gz"             --dir "$RUNNER_TEMP/hunyuan-runtime"
+          runtime_tar="$RUNNER_TEMP/hunyuan-runtime/omega__hunyuanvideo15__runtime.tar.gz"
+          test -s "$runtime_tar"
+          tar -xzf "$runtime_tar" -C "$MODEL_DIR"
+          test -s "$MODEL_DIR/hunyuanvideo15-runtime-manifest.json"
+          echo "[OK] Hunyuan runtime bundle restored"
+
+      - name: Preflight staged model runtime layout
+        env:
+          ENGINE: ${{ inputs.engine }}
+          PROFILE: ${{ inputs.profile }}
+          MODEL_PATH: ${{ runner.temp }}/omega-video-model
+          GEMMA_ROOT: ${{ runner.temp }}/gemma-3-12b
+          REQUIRE_EXTERNAL_DEPENDENCIES: "true"
+          REQUIRE_RUNTIME_BUNDLE: ${{ inputs.engine == 'hunyuanvideo-1.5' && 'true' || 'false' }}
+        run: |
+          set -euo pipefail
+          python3 scripts/rechercher-omega-video-runtime-smoke.py
+
       - name: Generate with LTX-2 DistilledPipeline
         if: ${{ inputs.engine == 'ltx-2' && inputs.profile == 'distilled-monolith' }}
         env:
@@ -187,35 +216,6 @@ jobs:
             args+=(--image-conditioning-path "$IMAGE_PATH")
           fi
           uv run python "${args[@]}"
-
-      - name: Restore Hunyuan private runtime bundle
-        if: ${{ inputs.engine == 'hunyuanvideo-1.5' }}
-        env:
-          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
-          STORAGE_REPO: lalibimohamed-maker/rechercher-omega-engine-storage
-          RELEASE_TAG: rechercher-omega-hunyuanvideo15-v1.0.0
-          MODEL_DIR: ${{ runner.temp }}/omega-video-model
-        run: |
-          set -euo pipefail
-          mkdir -p "$MODEL_DIR"
-          gh release download "$RELEASE_TAG"             --repo "$STORAGE_REPO"             --pattern "omega__hunyuanvideo15__runtime.tar.gz"             --dir "$RUNNER_TEMP/hunyuan-runtime"
-          runtime_tar="$RUNNER_TEMP/hunyuan-runtime/omega__hunyuanvideo15__runtime.tar.gz"
-          test -s "$runtime_tar"
-          tar -xzf "$runtime_tar" -C "$MODEL_DIR"
-          test -s "$MODEL_DIR/hunyuanvideo15-runtime-manifest.json"
-          echo "[OK] Hunyuan runtime bundle restored"
-
-      - name: Preflight staged model runtime layout
-        env:
-          ENGINE: ${{ inputs.engine }}
-          PROFILE: ${{ inputs.profile }}
-          MODEL_PATH: ${{ runner.temp }}/omega-video-model
-          GEMMA_ROOT: ${{ runner.temp }}/gemma-3-12b
-          REQUIRE_EXTERNAL_DEPENDENCIES: "true"
-          REQUIRE_RUNTIME_BUNDLE: ${{ inputs.engine == 'hunyuanvideo-1.5' && 'true' || 'false' }}
-        run: |
-          set -euo pipefail
-          python3 scripts/rechercher-omega-video-runtime-smoke.py
 
       - name: Generate with HunyuanVideo-1.5
         if: ${{ inputs.engine == 'hunyuanvideo-1.5' && (inputs.profile == '480p-i2v-distilled' || inputs.profile == '480p-i2v-step-distilled' || inputs.profile == '480p-t2v-distilled') }}
