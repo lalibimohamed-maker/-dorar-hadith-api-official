@@ -147,47 +147,54 @@ def expected_assets(item: dict, chunk_bytes: int) -> list[tuple[str, int]]:
         expected.append((name, length))
     return expected
 def source_expected_assets(chunk_bytes: int) -> list[dict]:
-    """Build the release-part expectation from the pinned source revision."""
+    """Build the exact Release-part expectation from the pinned HF tree."""
     if not MODEL_ID or not REVISION:
         raise RuntimeError("MODEL_ID and REVISION are required for source audit")
     from huggingface_hub import HfApi
 
-    info = HfApi(token=HF_TOKEN or None).model_info(
-        MODEL_ID,
+    api = HfApi(token=HF_TOKEN or None)
+    entries = []
+    for entry in api.list_repo_tree(
+        repo_id=MODEL_ID,
+        recursive=True,
+        expand=False,
         revision=REVISION,
-        files_metadata=True,
-    )
-    allowed = {".safetensors", ".bin", ".pt", ".pth", ".onnx"}
-    expected = []
-    for sibling in sorted(info.siblings, key=lambda item: item.rfilename):
-        source_path = str(sibling.rfilename)
-        if Path(source_path).suffix.lower() not in allowed:
+    ):
+        source_path = getattr(entry, "path", None)
+        if not source_path:
             continue
-        source_size = int(sibling.size or 0)
+        if not Path(source_path).suffix.lower() in {".safetensors", ".bin", ".pt", ".pth", ".onnx"}:
+            continue
+        source_size = int(getattr(entry, "size", 0) or 0)
         if source_size <= 0:
             continue
         safe = "".join(
             ch if ch.isalnum() or ch in "._-" else "_"
-            for ch in source_path.replace("/", "__")
+            for ch in str(source_path).replace("/", "__")
         )
         lengths = expected_part_lengths(source_size, chunk_bytes)
         if len(lengths) == 1:
             names = [f"omega__{safe}"]
         else:
             names = [f"omega__{safe}.part-{i:04d}" for i in range(len(lengths))]
-        expected.append(
+        lfs = getattr(entry, "lfs", None)
+        if isinstance(lfs, dict):
+            source_sha = lfs.get("sha256")
+        else:
+            source_sha = getattr(lfs, "sha256", None)
+        entries.append(
             {
-                "source_path": source_path,
+                "source_path": str(source_path),
                 "bytes": source_size,
-                "sha256": (
-                    getattr(getattr(sibling, "lfs", None), "sha256", None)
-                    if getattr(sibling, "lfs", None) is not None
-                    else None
-                ),
+                "sha256": source_sha,
                 "assets": list(zip(names, lengths)),
             }
         )
-    return expected
+    if not entries:
+        raise RuntimeError(
+            f"No supported model weight files found at pinned HF revision: {MODEL_ID}@{REVISION}"
+        )
+    return entries
 
 
 def audit_source_release(release: dict, assets: dict[str, dict], chunk_bytes: int) -> dict:
