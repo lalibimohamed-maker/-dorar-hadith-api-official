@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Selective local-weight profiles for Rechercher Ω video engines. Profiles choose a model variant without downloading the complete private Release.",
+  "policy": {
+    "selected_profile_only": true,
+    "never_materialize_entire_release_by_default": true,
+    "weights_downloaded_from_private_release_only": true,
+    "runtime_code_from_pinned_upstream_revision": true,
+    "manifest_sha256_required": true,
+    "corpus_write_allowed": false,
+    "public_redistribution_disabled": true
+  },
+  "ltx2": {
+    "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+    "storage_release_tag": "rechercher-omega-ltx2-v1.0.0",
+    "model_revision": "dfcc2108383fe1aaa0584bdf55d368a4bdadd90c",
+    "profiles": [
+      {
+        "id": "distilled",
+        "model_weight": "ltx-2-19b-distilled.safetensors",
+        "model_weight_size_bytes": 43285058186,
+        "steps": 8,
+        "purpose": "fast local generation candidate",
+        "requires": [
+          "audio_vae",
+          "connectors",
+          "latent_upsampler",
+          "text_encoder",
+          "tokenizer",
+          "transformer",
+          "vae",
+          "vocoder",
+          "scheduler"
+        ],
+        "runtime_proof": "not_verified"
+      },
+      {
+        "id": "dev-fp4",
+        "model_weight": "ltx-2-19b-dev-fp4.safetensors",
+        "model_weight_size_bytes": 19988416674,
+        "steps": "runtime_configured",
+        "purpose": "quantized local generation candidate",
+        "requires": [
+          "audio_vae",
+          "connectors",
+          "text_encoder",
+          "tokenizer",
+          "transformer",
+          "vae",
+          "vocoder",
+          "scheduler"
+        ],
+        "runtime_proof": "not_verified"
+      },
+      {
+        "id": "distilled-fp8",
+        "model_weight": "ltx-2-19b-distilled-fp8.safetensors",
+        "model_weight_size_bytes": 27078716346,
+        "steps": 8,
+        "purpose": "lower-memory distilled candidate",
+        "requires": [
+          "audio_vae",
+          "connectors",
+          "latent_upsampler",
+          "text_encoder",
+          "tokenizer",
+          "transformer",
+          "vae",
+          "vocoder",
+          "scheduler"
+        ],
+        "runtime_proof": "not_verified"
+      }
+    ],
+    "shared_components": {
+      "audio_vae": "audio_vae/diffusion_pytorch_model.safetensors",
+      "connectors": "connectors/diffusion_pytorch_model.safetensors",
+      "latent_upsampler": "latent_upsampler/diffusion_pytorch_model.safetensors",
+      "text_encoder_format": "diffusers_sharded_12_part_or_transformers_11_part_must_match_runtime_loader",
+      "vae": "vae/diffusion_pytorch_model.safetensors",
+      "vocoder": "vocoder/diffusion_pytorch_model.safetensors"
+    }
+  },
+  "hunyuanvideo15": {
+    "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+    "storage_release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+    "model_revision": "9b49404b3f5df2a8f0b31df27a0c7ab872e7b038",
+    "profiles": [
+      {
+        "id": "480p-i2v-distilled",
+        "transformer_asset_prefix": "transformer__480p_i2v_distilled__diffusion_pytorch_model.safetensors",
+        "transformer_size_bytes": 33306632192,
+        "purpose": "image-to-video local generation candidate",
+        "steps": "distilled",
+        "runtime_proof": "not_verified"
+      },
+      {
+        "id": "480p-i2v-step-distilled",
+        "transformer_asset_prefix": "transformer__480p_i2v_step_distilled__diffusion_pytorch_model.safetensors",
+        "transformer_size_bytes": 33325523336,
+        "purpose": "step-distilled image-to-video candidate",
+        "steps": "step_distilled",
+        "runtime_proof": "not_verified"
+      },
+      {
+        "id": "480p-t2v-distilled",
+        "transformer_asset_prefix": "transformer__480p_t2v_distilled__diffusion_pytorch_model.safetensors",
+        "transformer_size_bytes": 33306632192,
+        "purpose": "text-to-video local generation candidate",
+        "steps": "distilled",
+        "runtime_proof": "not_verified"
+      },
+      {
+        "id": "720p-i2v-distilled-sparse",
+        "transformer_asset_prefix": "transformer__720p_i2v_distilled_sparse__diffusion_pytorch_model.safetensors",
+        "transformer_size_bytes": 33306632192,
+        "purpose": "720p sparse image-to-video candidate",
+        "steps": "distilled_sparse",
+        "runtime_proof": "not_verified"
+      }
+    ],
+    "shared_components": {
+      "vae": "vae/diffusion_pytorch_model.safetensors",
+      "upsampler_720p": "upsampler/720p_sr_distilled/diffusion_pytorch_model.safetensors",
+      "upsampler_1080p": "upsampler/1080p_sr_distilled/diffusion_pytorch_model.safetensors",
+      "runtime_bundle": "hunyuanvideo15/runtime.tar.gz",
+      "readiness_manifest": "hunyuanvideo15-release-readiness.json"
+    }
+  },
+  "activation_rule": "A profile is executable only after local-use rights, manifest/SHA verification, compatible runtime/dependencies and an end-to-end smoke generation test are all cleared."
+}
