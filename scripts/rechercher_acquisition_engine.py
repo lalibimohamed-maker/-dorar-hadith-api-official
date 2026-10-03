@@ -73,16 +73,16 @@ def fetch(url):
 
 
 def document_links(page, base):
-    pdfs, docxs, seen = [], [], set()
+    pdfs, fallbacks, seen = [], [], set()
     for m in re.finditer(r'href=["\']([^"\']+)["\']', page, re.I):
         u = normalize_url(urljoin(base, html.unescape(m.group(1))))
         if u in seen or re.search(r"\.pdf\.enc(?:\?|$)", u, re.I):
             continue
         if re.search(r"\.pdf(?:\?|$)", u, re.I):
             seen.add(u); pdfs.append(u)
-        elif re.search(r"\.docx(?:\?|$)", u, re.I):
-            seen.add(u); docxs.append(u)
-    return pdfs, docxs
+        elif re.search(r"\.(docx|doc|odt|rtf|txt|jpg|jpeg|png|tif|tiff)(?:\?|$)", u, re.I):
+            seen.add(u); fallbacks.append(u)
+    return pdfs, fallbacks
 
 
 def qpdf_check(path):
@@ -235,11 +235,12 @@ def candidate_urls(source):
     if re.search(r"\.pdf(?:\?|$)", page, re.I) and not re.search(r"\.pdf\.enc(?:\?|$)", page, re.I):
         return [normalize_url(page)]
     try:
-        discovered_pdf, discovered_docx = document_links(fetch(page), page)
+        discovered_pdf, discovered_fallback = document_links(fetch(page), page)
     except Exception:
-        discovered_pdf, discovered_docx = [], []
-    # Prefer PDF; DOCX is the fallback only when no PDF exists.
-    return discovered_pdf or discovered_docx or [normalize_url(page)]
+        discovered_pdf, discovered_fallback = [], []
+    # PDF is mandatory as the canonical download output. Only when no PDF exists,
+    # acquire a supported document/image source and convert it to canonical PDF.
+    return discovered_pdf or discovered_fallback or [normalize_url(page)]
 
 
 def acquire_volume(book, volume, expected, work):
@@ -268,22 +269,26 @@ def acquire_volume(book, volume, expected, work):
             else:
                 urls = urls[:MAX_SOURCE_ATTEMPTS]
             for url_index, url in enumerate(urls[:MAX_SOURCE_ATTEMPTS], 1):
-                is_docx = bool(re.search(r"\.docx(?:\?|$)", url, re.I))
+                source_ext = (Path(urlsplit(url).path).suffix or "").lower()
+                is_fallback = source_ext in {".docx", ".doc", ".odt", ".rtf", ".txt", ".jpg", ".jpeg", ".png", ".tif", ".tiff"}
                 candidate = work / f"{volume:03d}.candidate-{source_index}-{url_index}.pdf"
-                download_path = work / f"{volume:03d}.candidate-{source_index}-{url_index}.docx" if is_docx else candidate
+                download_path = work / f"{volume:03d}.candidate-{source_index}-{url_index}{source_ext}" if is_fallback else candidate
                 try:
                     if re.search(r"\.pdf\.enc(?:\?|$)", url, re.I):
                         attempts.append({"source": url, "status": "encrypted_rejected"})
                         continue
-                    print(f"Quality candidate {book_key(book)} volume {volume}/{expected} source {source_index}/{len(sources)} format={'DOCX' if is_docx else 'PDF'}: {url}", flush=True)
+                    print(f"Quality candidate {book_key(book)} volume {volume}/{expected} source {source_index}/{len(sources)} format={source_ext.lstrip(".").upper() if is_fallback else "PDF"}: {url}", flush=True)
                     download(url, download_path)
-                    if is_docx:
-                        subprocess.run(["libreoffice", "--headless", "--convert-to", "pdf", "--outdir", str(work), str(download_path)], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                        converted = work / (download_path.stem + ".pdf")
-                        if not converted.exists():
-                            attempts.append({"source": url, "status": "docx_conversion_failed"})
-                            continue
-                        converted.replace(candidate)
+                    if is_fallback:
+                        if source_ext in {".jpg", ".jpeg", ".png", ".tif", ".tiff"}:
+                            subprocess.run(["img2pdf", str(download_path), "-o", str(candidate)], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                        else:
+                            subprocess.run(["libreoffice", "--headless", "--convert-to", "pdf", "--outdir", str(work), str(download_path)], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                            converted = work / (download_path.stem + ".pdf")
+                            if not converted.exists():
+                                attempts.append({"source": url, "status": "source_to_pdf_conversion_failed", "source_format": source_ext.lstrip(".")})
+                                continue
+                            converted.replace(candidate)
                     if candidate.read_bytes()[:4] != b"%PDF":
                         attempts.append({"source": url, "status": "invalid_signature"})
                         continue
@@ -308,7 +313,7 @@ def acquire_volume(book, volume, expected, work):
                     else:
                         candidate.unlink(missing_ok=True)
                 except Exception as exc:
-                    attempts.append({"source": url, "status": "download_or_quality_error", "error": str(exc)})
+                    attempts.append({"source": url, "status": "download_or_conversion_or_quality_error", "error": str(exc)})
                 finally:
                     download_path.unlink(missing_ok=True)
                     if candidate.exists() and (best is None or best.get("path") != str(candidate)):

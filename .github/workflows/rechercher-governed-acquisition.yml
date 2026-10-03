@@ -103,18 +103,20 @@ jobs:
           set -euo pipefail
           python3 scripts/rechercher_pdf_storage_hygiene.py --root "$GITHUB_WORKSPACE" --glob 'artifacts/**/*.pdf' --glob 'artifacts/*.pdf' --canonicalize
 
-      - name: Discover real PDF/DOCX candidates from PR #561 registry
+      - name: Discover PDF-first candidates from PR #561 registry (DOCX/other documents/images are fallback inputs converted to PDF)
         run: |
           set -euo pipefail
           python3 scripts/rechercher_registry_document_discovery.py
 
-      - name: Acquire PDFs through the single unbounded Hijri chronological queue
+      - name: Acquire canonical PDFs through the single unbounded Hijri chronological queue (PDF first; fallback source conversion when no PDF exists)
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y qpdf poppler-utils libreoffice-writer
+          sudo apt-get install -y qpdf poppler-utils libreoffice-writer img2pdf pandoc ocrmypdf tesseract-ocr tesseract-ocr-ara python3-pip
+          python3 -m pip install --break-system-packages --no-cache-dir pdf2docx PyMuPDF python-pptx
           sudo apt-get clean
           python3 scripts/rechercher_sequential_acquisition.py --root "$GITHUB_WORKSPACE"
+          python3 -m py_compile scripts/rechercher_pdf_conversion_engine.py
           test -s artifacts/registry-document-candidates.json
           df -h "$GITHUB_WORKSPACE"
 
