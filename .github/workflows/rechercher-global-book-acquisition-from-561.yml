@@ -48,7 +48,11 @@ jobs:
           test -n "$state_sha"
           git fetch origin "$state_ref:refs/remotes/origin/$STATE_BRANCH"
           for path in $STATE_FILES; do
-            git checkout "origin/$STATE_BRANCH" -- "$path"
+            if git cat-file -e "origin/$STATE_BRANCH:$path" 2>/dev/null; then
+              git checkout "origin/$STATE_BRANCH" -- "$path"
+            else
+              echo "ACQUISITION_STATE_FILE_ABSENT path=$path"
+            fi
           done
           echo "ACQUISITION_STATE_RESTORED branch=$STATE_BRANCH sha=$state_sha"
 
