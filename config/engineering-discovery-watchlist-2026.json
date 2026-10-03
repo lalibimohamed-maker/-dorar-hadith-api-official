@@ -1,0 +1,129 @@
+{
+  "schema": "dinullah.engineering-discovery-watchlist.v1",
+  "purpose": "Track useful open-source and developer-facing projects discovered during engineering research without turning discovery links into production dependencies.",
+  "productionIntegrations": [
+    {
+      "id": "driverjs",
+      "source": "https://driverjs.com/",
+      "upstream": "https://github.com/nilbuild/driver.js",
+      "role": "web-ui-guided-tours-and-contextual-focus",
+      "policy": "optional-progressive-enhancement",
+      "pinnedVersion": "1.4.0",
+      "license": "MIT"
+    },
+    {
+      "id": "lucide",
+      "source": "https://lucide.dev/",
+      "upstream": "https://github.com/lucide-icons/lucide",
+      "role": "web-ui-icons",
+      "policy": "local-or-pinned-static-assets",
+      "pinnedVersion": "0.534.0",
+      "license": "ISC"
+    },
+    {
+      "id": "aura-gradients",
+      "source": "https://auragradients.vercel.app/",
+      "role": "visual-inspiration-only",
+      "policy": "no-runtime-dependency",
+      "license": "review-before-copying-assets"
+    }
+  ],
+  "developerTools": [
+    {
+      "id": "ecc",
+      "source": "https://github.com/affaan-m/ECC",
+      "role": "agent-harness-methodology",
+      "policy": "methodology-only",
+      "license": "MIT"
+    },
+    {
+      "id": "gemini-cli",
+      "source": "https://github.com/google-gemini/gemini-cli",
+      "role": "developer-agent-and-mcp-experimentation",
+      "policy": "developer-only",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "gitingest",
+      "source": "https://gitingest.com/",
+      "upstream": "https://github.com/coderamp-labs/gitingest",
+      "role": "repository-to-llm-context",
+      "policy": "developer-only",
+      "license": "MIT"
+    },
+    {
+      "id": "gitdiagram",
+      "source": "https://gitdiagram.com/",
+      "role": "architecture-visualization",
+      "policy": "developer-documentation-only"
+    },
+    {
+      "id": "wtfjs",
+      "source": "https://github.com/denysdovhan/wtfjs",
+      "role": "javascript-edge-case-test-reference",
+      "policy": "reference-only",
+      "license": "WTFPL"
+    },
+    {
+      "id": "flexboxlabs",
+      "source": "https://flexboxlabs.netlify.app/",
+      "role": "responsive-layout-reference",
+      "policy": "reference-only"
+    }
+  ],
+  "discoveryRadar": [
+    "https://github.com/topics/mcp",
+    "https://github.com/topics/agent-harness",
+    "https://github.com/topics/agent-framework",
+    "https://github.com/topics/llm",
+    "https://github.com/topics/developer-tools",
+    "https://github.com/topics/coding-agents",
+    "https://github.com/topics/ai-agent",
+    "https://github.com/topics/autonomous-agents",
+    "https://github.com/topics/machine-learning",
+    "https://github.com/topics/deep-neural-networks",
+    "https://github.com/topics/anthropic",
+    "https://github.com/topics/claude",
+    "https://github.com/topics/claude-code",
+    "https://github.com/topics/productivity"
+  ],
+  "externalOptionalTools": [
+    {
+      "id": "n8n",
+      "source": "https://github.com/n8n-io/n8n",
+      "role": "external-workflow-orchestration",
+      "policy": "never-embed-without-license-review",
+      "license": "Sustainable-Use-License"
+    },
+    {
+      "id": "apivault",
+      "source": "https://apivault.dev/",
+      "role": "api-discovery",
+      "policy": "discovery-only-independent-verification-required"
+    },
+    {
+      "id": "notion",
+      "source": "https://notion.com/",
+      "role": "personal-research-notes",
+      "policy": "never-canonical-corpus"
+    }
+  ],
+  "referenceOnly": [
+    {
+      "id": "reactbits",
+      "source": "https://reactbits.dev/get-started/index",
+      "policy": "design-reference-only-no-react-migration"
+    },
+    {
+      "id": "leftrighthand",
+      "source": "https://leftrighthand.vercel.app/",
+      "policy": "unresolved-until-purpose-and-license-are-verified"
+    }
+  ],
+  "rules": {
+    "corpusWritesAllowed": false,
+    "unverifiedLicenseMayEnterProduction": false,
+    "discoveryDoesNotImplyTrust": true,
+    "developerToolDoesNotBecomeRuntimeDependencyByDiscovery": true
+  }
+}
