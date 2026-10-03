@@ -1,0 +1,48 @@
+{
+  "schema": "din-allah/rechercher-pdf-rights-routing/v1",
+  "routes": {
+    "verified-redistributable": {
+      "storage_class": "public-release",
+      "repository_prefix": "dinullah-pdf-storage-",
+      "publish": true,
+      "public_download": true
+    },
+    "research-only": {
+      "storage_class": "developer-review-vault",
+      "publish": false,
+      "public_download": false,
+      "corpus_write": false
+    },
+    "rights-unclear": {
+      "storage_class": "developer-review-vault",
+      "publish": false,
+      "public_download": false,
+      "corpus_write": false,
+      "requires_rights_review": true
+    },
+    "restricted": {
+      "storage_class": "metadata-only-unless-lawful-private-retention",
+      "publish": false,
+      "public_download": false,
+      "corpus_write": false
+    },
+    "prohibited": {
+      "storage_class": "blocked",
+      "publish": false,
+      "public_download": false,
+      "corpus_write": false
+    }
+  },
+  "gates": {
+    "never_infer_redistribution_rights": true,
+    "never_publish_research_only": true,
+    "never_publish_rights_unclear": true,
+    "never_publish_restricted": true,
+    "never_publish_prohibited": true,
+    "never_write_review_material_to_public_corpus": true,
+    "require_provenance": true,
+    "require_rights_evidence_for_public": true,
+    "require_verification_for_public": true,
+    "require_sha256": true
+  }
+}

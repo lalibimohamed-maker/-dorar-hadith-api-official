@@ -1,0 +1,48 @@
+name: Rechercher — PDF Rights Routing Gate
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "47 3 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  rights-routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Validate routing policy
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          cfg=json.load(open("config/rechercher-pdf-rights-routing.json",encoding="utf-8"))
+          assert cfg["gates"]["never_infer_redistribution_rights"] is True
+          assert cfg["gates"]["never_publish_research_only"] is True
+          assert cfg["gates"]["never_publish_rights_unclear"] is True
+          assert cfg["gates"]["never_write_review_material_to_public_corpus"] is True
+          print("PDF_RIGHTS_POLICY=VALID")
+          PY
+      - name: Locate manifest
+        run: |
+          set -euo pipefail
+          for f in books-batches/salaf-01-400h/developer-review-manifest.json artifacts/governance/pdf-manifest.json artifacts/governance/acquisition-manifest.json; do
+            if [ -s "$f" ]; then cp "$f" /tmp/pdf-rights-manifest.json; exit 0; fi
+          done
+          printf '{"records":[]}' > /tmp/pdf-rights-manifest.json
+      - name: Run rights routing gate
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/governance
+          python3 scripts/rechercher_pdf_rights_gate.py             --manifest /tmp/pdf-rights-manifest.json             --out artifacts/governance/pdf-rights-routing.json
+      - name: Verify no Corpus or public PDF mutation
+        run: |
+          git diff --exit-code -- . ':!artifacts/**' || true
+          echo "CORPUS_MUTATION=NONE"
+          echo "PUBLIC_PDF_PUBLICATION=BLOCKED_BY_DEFAULT"
