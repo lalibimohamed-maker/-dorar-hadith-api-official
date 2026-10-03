@@ -119,7 +119,7 @@
         "primary_checkpoint_asset": "ltx-2-19b-distilled.safetensors",
         "external_dependency_model": "google/gemma-3-12b-it-qat-q4_0-unquantized",
         "spatial_upsampler_asset": "ltx-2-spatial-upscaler-x2-1.0.safetensors",
-        "execution_cli": "ltx_pipelines.distilled --distilled-checkpoint-path",
+        "execution_cli": "python -m ltx_pipelines.distilled --checkpoint-path",
         "fast_path": true,
         "required_assets": [
           "ltx-2-19b-distilled.safetensors",
