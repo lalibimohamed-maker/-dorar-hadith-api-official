@@ -14,7 +14,8 @@
       "blocked"
     ],
     "scheduled_downloads": false,
-    "release_distribution": true
+    "release_distribution": true,
+    "external_release_reference_allowed": true
   },
   "engines": [
     {
@@ -29,12 +30,14 @@
         "text",
         "tool_use"
       ],
-      "acquisition": "github_release",
+      "acquisition": "external_release_reference",
       "revision_type": "immutable_hf_commit",
       "license_status": "verified_source_license",
-      "license_basis": "Hugging Face model card declares Apache-2.0; redistribution/promotion remains subject to project rights gate.",
-      "release_tag": "rechercher-omega-engines-v0.1.0",
-      "release_asset_prefix": "qwen3"
+      "license_basis": "Hugging Face model card declares Apache-2.0; the shared local-weight Release remains subject to the project rights gate.",
+      "upstream_release_repository": "lalibimohamed-maker/-dorar-hadith-api-official",
+      "upstream_release_tag": "rechercher-free-local-models-2026-10",
+      "upstream_release_asset": "qwen3-0.6b.tar.zst",
+      "notes": "Omega no longer republishes a duplicate Qwen3 payload. It consumes the shared Releases-backed Qwen3-0.6B package maintained by the local consumer inference path (#621)."
     },
     {
       "logical_id": "paddleocr-vl",
