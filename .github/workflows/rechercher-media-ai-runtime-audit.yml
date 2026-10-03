@@ -1,0 +1,64 @@
+name: Rechercher — Media AI Voice Runtime Audit
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/rechercher-media-ai-runtime-audit.yml'
+      - 'scripts/media-ai-voice-runtime-audit.mjs'
+      - 'src/**'
+      - 'config/**'
+      - 'test/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: media-ai-voice-runtime-audit
+  cancel-in-progress: false
+
+jobs:
+  runtime-audit:
+    name: Runtime audit — media + AI + يا بوابة العلم
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Node setup
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v6.0.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install repository dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Install approved base media runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg tesseract-ocr
+          ffmpeg -version | head -n 1
+          tesseract --version | head -n 1
+
+      - name: Run existing engine contract and runtime-facing tests
+        run: |
+          node --test             test/din-allah-media-engine-clean.test.js             test/media-provider-adapters.test.js             test/assistant-runtime.test.js             test/multimodal-runtime.test.js             test/voice-config.test.js             test/voice-e2e-routing.test.js             test/quran-video-engines.test.js             test/free-first-engine-control-plane.test.mjs             test/media-quality-ladder.test.mjs             test/media-quality-orchestrator.test.js             test/media-tool-discovery-policy.test.js
+
+      - name: Execute runtime capability audit
+        run: node scripts/media-ai-voice-runtime-audit.mjs
+
+      - name: Upload immutable audit evidence
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v6.0.0
+        with:
+          name: media-ai-voice-runtime-audit
+          path: |
+            audit-output/media-ai-voice-runtime-audit.json
+            audit-output/media-ai-voice-runtime-audit.md
+          if-no-files-found: error
+          retention-days: 30
