@@ -120,7 +120,11 @@
         "external_dependency_model": "google/gemma-3-12b-it-qat-q4_0-unquantized",
         "spatial_upsampler_asset": "ltx-2-spatial-upscaler-x2-1.0.safetensors",
         "execution_cli": "ltx_pipelines.distilled --distilled-checkpoint-path",
-        "fast_path": true
+        "fast_path": true,
+        "required_assets": [
+          "ltx-2-19b-distilled.safetensors",
+          "ltx-2-spatial-upscaler-x2-1.0.safetensors"
+        ]
       },
       "dev-fp4-monolith": {
         "load_layout": "monolith",
@@ -129,7 +133,8 @@
         "execution_cli": "ltx_pipelines.ti2vid_two_stages",
         "fast_path": false
       }
-    }
+    },
+    "upstream_code_commit": "28c3c73fe557666c3de176e1e50a5220152ccfca"
   },
   "hunyuanvideo15": {
     "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
@@ -142,7 +147,11 @@
         "transformer_size_bytes": 33306632192,
         "purpose": "image-to-video local generation candidate",
         "steps": "distilled",
-        "runtime_proof": "not_verified"
+        "runtime_proof": "not_verified",
+        "release_asset_prefixes": [
+          "omega__vae__"
+        ],
+        "runtime_asset_bundle": "omega__hunyuanvideo15__runtime.tar.gz"
       },
       {
         "id": "480p-i2v-step-distilled",
@@ -150,7 +159,11 @@
         "transformer_size_bytes": 33325523336,
         "purpose": "step-distilled image-to-video candidate",
         "steps": "step_distilled",
-        "runtime_proof": "not_verified"
+        "runtime_proof": "not_verified",
+        "release_asset_prefixes": [
+          "omega__vae__"
+        ],
+        "runtime_asset_bundle": "omega__hunyuanvideo15__runtime.tar.gz"
       },
       {
         "id": "480p-t2v-distilled",
@@ -158,7 +171,11 @@
         "transformer_size_bytes": 33306632192,
         "purpose": "text-to-video local generation candidate",
         "steps": "distilled",
-        "runtime_proof": "not_verified"
+        "runtime_proof": "not_verified",
+        "release_asset_prefixes": [
+          "omega__vae__"
+        ],
+        "runtime_asset_bundle": "omega__hunyuanvideo15__runtime.tar.gz"
       },
       {
         "id": "720p-i2v-distilled-sparse",
@@ -166,7 +183,11 @@
         "transformer_size_bytes": 33306632192,
         "purpose": "720p sparse image-to-video candidate",
         "steps": "distilled_sparse",
-        "runtime_proof": "not_verified"
+        "runtime_proof": "not_verified",
+        "release_asset_prefixes": [
+          "omega__vae__"
+        ],
+        "runtime_asset_bundle": "omega__hunyuanvideo15__runtime.tar.gz"
       }
     ],
     "shared_components": {
