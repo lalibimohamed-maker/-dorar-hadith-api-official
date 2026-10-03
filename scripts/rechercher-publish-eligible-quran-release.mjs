@@ -12,7 +12,6 @@ function arg(name, fallback = "") {
   if (value.startsWith(`${prefix}=`)) return value.slice(prefix.length);
   return process.argv[index + 1] ?? fallback;
 }
-
 const root = path.resolve(arg("root", "."));
 let manifestPath = path.resolve(arg("manifest"));
 if (!arg("manifest")) throw new Error("manifest argument is required");
