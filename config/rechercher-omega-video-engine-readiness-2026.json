@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Operational contract for local video engines in Rechercher Omega. A stored model is not automatically executable; local generation is compute-bounded rather than API-token-bounded.",
+  "policy": {
+    "free_first": true,
+    "paid_api_quota_required": false,
+    "api_token_quota_semantics": "not_applicable_to_local_weight_execution",
+    "corpus_write_allowed": false,
+    "generated_media_is_evidence": false,
+    "public_distribution_requires_license_clearance": true,
+    "execution_requires_revision_and_sha256": true,
+    "execution_requires_runtime_dependency_verification": true,
+    "execution_requires_e2e_smoke_test": true,
+    "private_storage_allowed_for_review": true
+  },
+  "engines": [
+    {
+      "id": "hunyuanvideo-1.5",
+      "family": "video-generation",
+      "source_repo": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5",
+      "source_model_id": "tencent/HunyuanVideo-1.5",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "storage_visibility": "private",
+      "storage_release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+      "storage_status": "weights_present",
+      "storage_asset_count": 707,
+      "runtime_bundle": "omega__hunyuanvideo15__runtime.tar.gz",
+      "runtime_manifest": "hunyuanvideo15-runtime-manifest.json",
+      "readiness_manifest": "hunyuanvideo15-release-readiness.json",
+      "license_status": "review_required",
+      "distribution_status": "private_review_only",
+      "runtime_status": "dependency_blocked",
+      "execution_proof": "not_e2e_verified",
+      "execution_modes": [
+        "local-gpu",
+        "kaggle-gpu"
+      ],
+      "quota_required": false,
+      "compute_limits_are_the_real_limit": true,
+      "upstream_hardware_note": "Official project states NVIDIA CUDA GPU and 14 GB minimum VRAM with offloading enabled.",
+      "required_dependencies": [
+        {
+          "id": "qwen2.5-vl-7b-instruct",
+          "status": "public_dependency_not_embedded"
+        },
+        {
+          "id": "byt5-small",
+          "status": "public_dependency_not_embedded"
+        },
+        {
+          "id": "glyph-sdxl-v2",
+          "status": "rights_review_required"
+        },
+        {
+          "id": "flux-redux-dev",
+          "status": "gated_access_required"
+        }
+      ],
+      "activation": {
+        "when": [
+          "license_clearance",
+          "dependency_verification",
+          "immutable_revision_or_storage_manifest_verification",
+          "sha256_verification",
+          "e2e_smoke_test"
+        ],
+        "otherwise": "queue_without_execution"
+      }
+    },
+    {
+      "id": "ltx-2",
+      "family": "audio-video-generation",
+      "source_repo": "https://github.com/Lightricks/LTX-2",
+      "source_model_id": "Lightricks/LTX-2",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "storage_visibility": "private",
+      "storage_release_tag": "rechercher-omega-ltx2-v1.0.0",
+      "storage_status": "weights_present",
+      "storage_asset_count": 614,
+      "license_status": "review_required",
+      "distribution_status": "private_review_only",
+      "runtime_status": "runtime_unverified",
+      "execution_proof": "not_e2e_verified",
+      "execution_modes": [
+        "local-gpu",
+        "kaggle-gpu"
+      ],
+      "quota_required": false,
+      "compute_limits_are_the_real_limit": true,
+      "runtime_components_expected": [
+        "transformer",
+        "text_encoder",
+        "video_vae",
+        "audio_vae",
+        "vocoder"
+      ],
+      "matching_text_encoder_required": true,
+      "checkpoint_layout_must_be_verified": true,
+      "activation": {
+        "when": [
+          "license_clearance",
+          "matching_text_encoder_verification",
+          "runtime_component_verification",
+          "immutable_revision_or_storage_manifest_verification",
+          "sha256_verification",
+          "e2e_smoke_test"
+        ],
+        "otherwise": "queue_without_execution"
+      }
+    }
+  ],
+  "execution_contract": {
+    "local_execution": "model weights are loaded by a local/runtime GPU process; no per-video API token quota is assumed",
+    "hosted_gpu_execution": "Kaggle or an authorized GPU runner may execute the same local-weight contract",
+    "public_service_execution": "must pass the same model license/rights gate before exposing remote access",
+    "persistence": "weights stay in GitHub Releases/private storage; never committed into Git history",
+    "corpus_boundary": "generated media remains outside scholarly Corpus"
+  }
+}
