@@ -34,7 +34,8 @@ test("execution requires runtime, dependencies, immutable revision, SHA-256 and 
   assert.equal(blocked.status,"dependency_blocked");
   const ready=evaluateVideoEngineReadiness({
     engineId:"ltx-2",
-    licenseCleared:true,
+    localUseCleared:true,
+    publicDistributionCleared:false,
     weightsPresent:true,
     revisionVerified:true,
     sha256Verified:true,
@@ -57,4 +58,22 @@ test("local video generation has no per-video API token quota",()=>{
   assert.equal(contract.quota.required,false);
   assert.equal(contract.quota.semantics,"not_applicable_to_local_weight_execution");
   assert.equal(contract.corpus_write_allowed,false);
+});
+
+test("public redistribution clearance is not required for private local execution once local-use is cleared",()=>{
+  const result=evaluateVideoEngineReadiness({
+    engineId:"ltx-2",
+    localUseCleared:true,
+    publicDistributionCleared:false,
+    weightsPresent:true,
+    revisionVerified:true,
+    sha256Verified:true,
+    runtimePresent:true,
+    dependenciesVerified:true,
+    e2eSmokeTestPassed:true,
+    distributionTarget:"private"
+  });
+  assert.equal(result.status,"ready");
+  assert.equal(result.execution_allowed,true);
+  assert.equal(result.public_distribution_allowed,false);
 });
