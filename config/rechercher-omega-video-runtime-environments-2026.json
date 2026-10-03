@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Isolated, model-specific execution environments for Rechercher Omega local video engines. A shared generic AI stack is not assumed to be compatible with every model family.",
+  "policy": {
+    "free_first": true,
+    "paid_api_dependency": false,
+    "isolated_environment_per_engine": true,
+    "no_automatic_cross_engine_dependency_substitution": true,
+    "public_distribution_requires_license_clearance": true
+  },
+  "environments": [
+    {
+      "id": "ltx2-pinned-python",
+      "engine_ids": [
+        "ltx-2"
+      ],
+      "source_repo": "https://github.com/Lightricks/LTX-2",
+      "checkpoint_revision": "dfcc2108383fe1aaa0584bdf55d368a4bdadd90c",
+      "python": "3.12+",
+      "cuda": ">12.7",
+      "pytorch": "~=2.7",
+      "package_manager": "uv",
+      "install_mode": "upstream_uv_sync",
+      "runtime_packages": [
+        "ltx-core",
+        "ltx-pipelines",
+        "ltx-kernels"
+      ],
+      "optional_acceleration": [
+        "natten"
+      ],
+      "checkpoint_layout": [
+        "audio_vae",
+        "connectors",
+        "latent_upsampler",
+        "scheduler",
+        "text_encoder",
+        "tokenizer",
+        "transformer",
+        "vae",
+        "vocoder"
+      ],
+      "notes": "Use the upstream LTX-2 environment in isolation. Do not silently substitute the Ω generic torch/diffusers versions."
+    },
+    {
+      "id": "hunyuanvideo15-pytorch",
+      "engine_ids": [
+        "hunyuanvideo-1.5"
+      ],
+      "source_repo": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5",
+      "checkpoint_revision": "9b49404b3f5df2a8f0b31df27a0c7ab872e7b038",
+      "python": ">=3.10",
+      "cuda": "compatible with installed PyTorch",
+      "pytorch": ">=2.6.0",
+      "requirements_source": "upstream requirements.txt",
+      "fixed_dependencies": {
+        "peft": "0.17.0",
+        "einops": "0.8.0",
+        "numpy": "1.26.4",
+        "pillow": "11.3.0",
+        "imageio": "2.37.0",
+        "imageio-ffmpeg": "0.6.0",
+        "torchaudio": "2.6.0",
+        "diffusers": "0.35.0",
+        "qwen-vl-utils": "0.0.8",
+        "huggingface-hub": "0.34.0",
+        "transformers": "4.57.1"
+      },
+      "optional_acceleration": [
+        "flash-attention",
+        "flex-block-attn",
+        "sageattention",
+        "sgl-kernel"
+      ],
+      "checkpoint_layout": [
+        "scheduler",
+        "transformer",
+        "upsampler",
+        "vae",
+        "text_encoder",
+        "vision_encoder"
+      ],
+      "notes": "Hunyuan needs external text/vision components; see the engine contract for the license/access gates."
+    }
+  ]
+}
