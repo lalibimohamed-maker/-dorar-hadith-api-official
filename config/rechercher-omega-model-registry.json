@@ -105,7 +105,22 @@
       "license_review": "required",
       "license_status": "review_required",
       "acquisition_class": "github_release_draft",
-      "release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0"
+      "release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "storage_visibility": "private",
+      "storage_release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+      "storage_status": "weights_present",
+      "runtime_artifact_status": "packaged_unverified_execution",
+      "execution_proof": "not_e2e_verified",
+      "quota_required": false,
+      "execution_modes": [
+        "local-gpu",
+        "kaggle-gpu"
+      ],
+      "activation_rule": "license_clearance + dependency_verification + e2e_smoke_test",
+      "runtime_status": "dependency_blocked",
+      "primary_model": false,
+      "role": "optional_local_media_engine"
     },
     {
       "id": "ltx-2",
@@ -120,7 +135,22 @@
       "license_review": "required",
       "license_status": "review_required",
       "acquisition_class": "github_release_draft",
-      "release_tag": "rechercher-omega-ltx2-v1.0.0"
+      "release_tag": "rechercher-omega-ltx2-v1.0.0",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "storage_visibility": "private",
+      "storage_release_tag": "rechercher-omega-ltx2-v1.0.0",
+      "storage_status": "weights_present",
+      "runtime_artifact_status": "weights_and_components_present",
+      "execution_proof": "not_e2e_verified",
+      "quota_required": false,
+      "execution_modes": [
+        "local-gpu",
+        "kaggle-gpu"
+      ],
+      "activation_rule": "license_clearance + dependency_verification + e2e_smoke_test",
+      "runtime_status": "runtime_unverified",
+      "primary_model": false,
+      "role": "optional_local_media_engine"
     },
     {
       "id": "cogvideox",
