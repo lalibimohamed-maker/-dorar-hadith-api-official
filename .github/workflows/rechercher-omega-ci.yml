@@ -80,7 +80,7 @@ jobs:
         run: node --test test/rechercher-omega-orchestrator.test.js test/rechercher-omega-execution-router.test.js test/rechercher-omega-adapters.test.js test/rechercher-omega-ai-capability-registry.test.js test/rechercher-omega-ai-runtime.test.js test/rechercher-omega-repository-intelligence.test.js test/rechercher-omega-integration.test.js test/rechercher-omega-global-deep-search.test.js test/rechercher-omega-hunyuan-runtime.test.js test/rechercher-omega-scholarly-fleet.test.js test/rechercher-ai-mcp-server.test.js
       - name: Validate video runtime Python scripts
         run: |
-          python3 -m py_compile scripts/rechercher-omega-selective-materialize.py scripts/rechercher-omega-video-runtime-smoke.py
+          python3 -m py_compile scripts/rechercher-omega-selective-materialize.py scripts/rechercher-omega-video-runtime-smoke.py scripts/rechercher-omega-video-release-repair.py
       - name: Validate video engine contracts
         run: |
           node --test test/rechercher-omega-video-engine-profiles.test.js test/rechercher-omega-video-engine-readiness.test.js test/rechercher-omega-video-orchestrator.test.js test/rechercher-omega-multimodal-router.test.js
