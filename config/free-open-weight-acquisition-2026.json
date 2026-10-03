@@ -28,6 +28,19 @@
       "releaseEligible": true,
       "asset": "qwen3-0.6b.tar.zst",
       "notes": "Small bootstrap model for local-first reasoning. FreeLLM is discovery-only; the upstream Hugging Face model card is the weight/license authority."
+    },
+    {
+      "id": "qwen3-1.7b",
+      "role": "local-general-reasoning-secondary",
+      "upstream": "https://huggingface.co/Qwen/Qwen3-1.7B",
+      "revision": "main",
+      "license": "Apache-2.0",
+      "sizeBytesObserved": 4080000000,
+      "releaseEligible": true,
+      "asset": "qwen3-1.7b.tar.zst",
+      "releaseStrategy": "split-under-2gb-release-assets",
+      "releaseTag": "rechercher-free-local-models-2026-10-qwen3-1.7b",
+      "notes": "Second local reasoning target. Split into release parts because upstream payload is about 4.08 GB; local reconstruction is required before runtime admission."
     }
   ]
 }
