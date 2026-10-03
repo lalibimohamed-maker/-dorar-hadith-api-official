@@ -83,5 +83,14 @@
       "vocoder"
     ],
     "embedded_text_encoder": true
+  },
+  "runtime_environment_id": "ltx2-pinned-python",
+  "execution_environment": {
+    "python": "3.12+",
+    "cuda": ">12.7",
+    "pytorch": "~=2.7",
+    "install": "upstream uv sync",
+    "isolation_required": true,
+    "generic_omega_stack_substitution": false
   }
 }
