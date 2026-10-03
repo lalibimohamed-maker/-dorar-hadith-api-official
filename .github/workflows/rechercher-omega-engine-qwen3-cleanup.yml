@@ -75,10 +75,18 @@ jobs:
           fi
           echo "Legacy Qwen3 assets removed successfully."
 
-      - name: Verify release has only active Omega starter engines
+      - name: Verify active Omega asset set
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          actual="$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --paginate --jq '.[].name' 2>/dev/null || true)"
-          echo "Cleanup verification complete."
+          release_id="$(gh release view rechercher-omega-engines-v0.1.0 --json databaseId --jq '.databaseId')"
+          assets="$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --paginate --jq '.[].name')"
+          printf '%s\n' "$assets"
+          for required in paddleocr-vl-runtime-files.tar.gz paddleocr-vl-release-manifest.json whisper-tiny-model.safetensors whisper-tiny-release-manifest.json; do
+            grep -Fx "$required" <<< "$assets" >/dev/null || {
+              echo "Missing active Omega asset: $required"
+              exit 1
+            }
+          done
+          echo "Active Omega starter assets verified."
