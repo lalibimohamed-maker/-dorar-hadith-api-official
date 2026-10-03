@@ -77,15 +77,12 @@ jobs:
               continue
             fi
 
-            workflow_status="$(printf '%s
-' "$governance_status" | awk '$2 ~ /^.github/workflows// {print}')"
-            script_status="$(printf '%s
-' "$governance_status" | awk '$2 ~ /^scripts// {print}')"
+            workflow_status="$(printf '%s\n' "$governance_status" | awk '$2 ~ /^.github/workflows// {print}')"
+            script_status="$(printf '%s\n' "$governance_status" | awk '$2 ~ /^scripts// {print}')"
 
             if [ "$branch" = "main" ]; then
               echo "PROTECTED_MAIN_DRIFT $branch"
-              printf '%s
-' "$governance_status"
+              printf '%s\n' "$governance_status"
               echo "NOTICE workflow-file repair on protected main is deferred to reviewed PR."
               git worktree remove --force "$worktree"
               continue
@@ -102,8 +99,7 @@ jobs:
             # .github/workflows changes with it; GitHub rejects such pushes.
             if [ -n "$workflow_status" ]; then
               echo "POLICY_DEFERRED_WORKFLOW_PERMISSION $branch"
-              printf '%s
-' "$workflow_status"
+              printf '%s\n' "$workflow_status"
             fi
 
             if [ -n "$script_status" ]; then
