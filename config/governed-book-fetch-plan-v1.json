@@ -1,0 +1,24 @@
+{
+  "schema":"din-allah/governed-book-fetch-plan/v1",
+  "version":"1.0.0",
+  "mode":"planning-only",
+  "maxBytes":26214400,
+  "maxMiB":25,
+  "formats":["pdf","text","epub"],
+  "contentTypes":{
+    "pdf":["application/pdf"],
+    "text":["text/plain"],
+    "epub":["application/epub+zip","application/epub"]
+  },
+  "requirements":{
+    "https":true,
+    "sourceConnectorPassed":true,
+    "provenanceVerified":true,
+    "rightsClear":true,
+    "validationPassed":true
+  },
+  "onFailure":"blocked",
+  "executesHttpFetch":false,
+  "writesStorage":false,
+  "inspectsContent":false
+}
