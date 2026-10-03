@@ -1,0 +1,27 @@
+{
+  "stage": "GLOBAL_EDITION_MANUSCRIPT_COMPARISON",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "capabilities": [
+    "WORK_EDITION_RECONCILIATION",
+    "MANIFESTATION_COMPARISON",
+    "PAGE_LEVEL_COMPARISON",
+    "TEXT_IMAGE_VARIANT_DETECTION",
+    "PROVENANCE_REQUIRED_COMPARISON",
+    "SCHOLAR_REVIEW_GATE"
+  ],
+  "inputs": ["WORK", "EDITION", "MANIFESTATION", "IIIF_CANVAS", "PAGE", "PASSAGE"],
+  "outputs": ["COMPARISON_RECORD", "DIVERGENCE_CANDIDATE", "REVIEW_REQUIRED"],
+  "safety": {
+    "source_immutable": true,
+    "provenance_required": true,
+    "rights_gate_preserved": true,
+    "original_pdf_immutable": true,
+    "canonical_quran_arabic_immutable": true
+  },
+  "handoffs": [
+    "MANIFESTATION_TO_COMPARISON",
+    "PAGE_TO_COMPARISON",
+    "COMPARISON_TO_EVIDENCE_GRAPH",
+    "COMPARISON_TO_SCHOLAR_REVIEW"
+  ]
+}

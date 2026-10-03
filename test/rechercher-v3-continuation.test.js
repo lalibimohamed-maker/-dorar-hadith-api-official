@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createRecitationEngine,registerVerse,registerRecording,alignRecording,addCandidateError,reviewFinding} from '../src/rechercher-recitation-engine.js';
+import {createResearchWorkspace,registerQuestion,addEvidence,addClaim,reviewClaim,publishableClaim} from '../src/rechercher-research-workspace.js';
+
+test('recitation findings remain candidates until human verification',()=>{const e=createRecitationEngine();registerVerse(e,{verseId:'v1',surah:1,ayah:1,arabic:'بِسْمِ اللَّهِ',sourceId:'quran',sourceHash:'h1'});registerRecording(e,{recordingId:'r1',verseId:'v1',audioHash:'a1'});alignRecording(e,{alignmentId:'a1',recordingId:'r1',startMs:0,endMs:1000,textRange:'v1'});addCandidateError(e,{findingId:'f1',recordingId:'r1',alignmentId:'a1',type:'PRONUNCIATION',description:'candidate'});assert.equal(e.findings.get('f1').state,'CANDIDATE_ERROR');assert.throws(()=>reviewFinding(e,{findingId:'f1',reviewerRole:'STUDENT',verdict:'VERIFIED'}));reviewFinding(e,{findingId:'f1',reviewerRole:'SCHOLAR',verdict:'VERIFIED'});assert.equal(e.findings.get('f1').state,'HUMAN_VERIFIED');});
+
+test('research claims require reviewed evidence and allowed rights',()=>{const w=createResearchWorkspace();registerQuestion(w,{questionId:'q1',text:'ما الدليل؟',domain:'FIQH'});addEvidence(w,{evidenceId:'e1',questionId:'q1',sourceId:'book',sourceHash:'h1',locator:'p.1',rightsStatus:'ALLOWED'});addClaim(w,{claimId:'c1',questionId:'q1',text:'claim',evidenceIds:['e1']});assert.equal(publishableClaim(w,'c1'),false);reviewClaim(w,{claimId:'c1',reviewerRole:'SCHOLAR',verdict:'APPROVED'});assert.equal(publishableClaim(w,'c1'),true);});

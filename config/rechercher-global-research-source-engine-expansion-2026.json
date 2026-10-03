@@ -1,0 +1,170 @@
+{
+  "schema_version": "1.0",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "purpose": "Permanent registry of lawful global research and discovery engines for @Rechercher, designed to maximize book discovery and high-quality manifestation acquisition without making discovery a blocker for acquisition.",
+  "principles": [
+    "Discovery failure must never equal work failure.",
+    "Prefer primary, official, open, public-domain, or explicitly licensed sources.",
+    "Keep work, edition, manifestation, page, passage, and source identities distinct.",
+    "Preserve provenance, rights evidence, retrieval date, and content hash.",
+    "Rank multiple manifestations by identity match, completeness, image/PDF quality, rights, and provenance.",
+    "Do not bypass authentication, access controls, robots restrictions, paywalls, rate limits, or anti-abuse controls.",
+    "AI synthesis cannot promote an unverified relationship to authoritative evidence without evidence and review."
+  ],
+  "global_discovery_engines": {
+    "iiif": [
+      "presentation_manifest_discovery",
+      "canvas_page_discovery",
+      "annotation_page_discovery",
+      "content_search",
+      "change_discovery",
+      "image_service_resolution",
+      "multimedia_canvas_alignment"
+    ],
+    "openalex": [
+      "works_search",
+      "authors_search",
+      "sources_search",
+      "institutions_search",
+      "topics_search",
+      "keywords_search",
+      "open_access_pdf_discovery",
+      "citation_neighborhood",
+      "author_disambiguation",
+      "institution_resolution",
+      "collection_filtering",
+      "reproducible_paging"
+    ],
+    "crossref": [
+      "doi_resolution",
+      "works_search",
+      "license_metadata",
+      "full_text_link_discovery",
+      "reference_metadata",
+      "orcid_ror_resolution",
+      "oai_pmh_discovery",
+      "openurl_resolution",
+      "public_bulk_metadata"
+    ],
+    "library_catalogs": [
+      "library_of_congress",
+      "worldcat",
+      "hathitrust",
+      "national_libraries",
+      "university_libraries",
+      "union_catalogs"
+    ],
+    "digital_heritage": [
+      "gallica_bnf",
+      "biblissima_iiif",
+      "europeana",
+      "dpla",
+      "digital_bodleian",
+      "bayerische_staatsbibliothek",
+      "arabic_collections_online",
+      "digital_manuscript_collections"
+    ],
+    "islamic_corpora": [
+      "openiti",
+      "islamic_manuscript_catalogs",
+      "islamic_digital_libraries",
+      "scholarly_islamic_repositories"
+    ],
+    "book_and_archive_discovery": [
+      "open_library",
+      "internet_archive",
+      "google_books",
+      "institutional_repositories",
+      "open_repositories"
+    ]
+  },
+  "source_record": {
+    "required_identity": [
+      "source_id",
+      "source_uri",
+      "work_id",
+      "edition_id",
+      "manifestation_id"
+    ],
+    "required_evidence": [
+      "source_identity",
+      "provenance",
+      "rights_state"
+    ],
+    "recommended_metadata": [
+      "title",
+      "author",
+      "death_year_hijri",
+      "language",
+      "script",
+      "publication_date",
+      "publisher",
+      "institution",
+      "catalog_identifier",
+      "doi",
+      "isbn",
+      "iiif_manifest",
+      "page_count",
+      "file_format",
+      "file_size",
+      "resolution",
+      "retrieval_date",
+      "content_hash",
+      "license_uri"
+    ]
+  },
+  "manifestation_quality": {
+    "ranking_dimensions": [
+      "identity_match",
+      "edition_match",
+      "completeness",
+      "page_image_quality",
+      "pdf_integrity",
+      "ocr_quality",
+      "provenance_strength",
+      "rights_clarity",
+      "source_authority",
+      "downloadability"
+    ],
+    "fallback": "SOURCE_A_FAILURE_MUST_CONTINUE_TO_SOURCE_B_C_D",
+    "retain_alternatives": true
+  },
+  "gap_intelligence": {
+    "enabled": true,
+    "negative_evidence_is_not_nonexistence": true,
+    "track": [
+      "no_match",
+      "metadata_only",
+      "restricted_copy",
+      "poor_quality_copy",
+      "missing_pages",
+      "edition_unresolved",
+      "manifestation_unresolved",
+      "rights_unknown",
+      "ocr_missing",
+      "iiif_missing"
+    ]
+  },
+  "integration_targets": [
+    "V5_COGNITIVE_LEARNING_INTELLIGENCE",
+    "V6_GLOBAL_MULTILINGUAL_SOURCE_INTELLIGENCE",
+    "V7_GLOBAL_RESEARCH_EVIDENCE_GRAPH",
+    "ACQUISITION_ENGINE",
+    "PDF_VALIDATION",
+    "OCR_HTR",
+    "WORK_EDITION_MANIFESTATION_GRAPH",
+    "PROVENANCE_RIGHTS_GATE"
+  ],
+  "completion_gate": {
+    "required": [
+      "unit_tests",
+      "integration_tests",
+      "ci_green",
+      "security_green",
+      "governance_green",
+      "rights_invariants_green",
+      "acquisition_non_blocking_green"
+    ],
+    "until_all_pass": "IMPLEMENTED_FOUNDATION"
+  }
+}
