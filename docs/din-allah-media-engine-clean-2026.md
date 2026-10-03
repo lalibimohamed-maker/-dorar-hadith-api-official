@@ -1,39 +1,39 @@
 # Din Allah Media Engine — Clean Build 2026
 
-A clean foundation for a separate media studio, built directly from current `main`.
+A clean, separate media-studio foundation built directly from `main`.
 
 ## Pipeline
 
 `brief → evidence packet → storyboard → visual source → quality evaluation → Quran text → verified recitation → sync → composition → master validation → human review → export`
 
-The visual route may be original/self-hosted generation or lawfully cleared imported media. Public availability alone never grants reuse rights.
+The engine is contract-first. Actual generation, media import, OCR, recitation processing, composition and export are adapters that must pass the gates defined here.
 
-## Quran integrity
+## Integrity boundaries
 
-The video model never generates Quranic text or Quranic recitation. Arabic Quran text is bound from a verified canonical source and remains verbatim. Recitation is a separate rights-cleared asset. Meaning translations are distinct from the Arabic source.
+Quranic Arabic text is bound from a verified canonical source and remains verbatim. The video model never generates Quranic text or Quranic recitation. Recitation is a separate rights-cleared Arabic asset. Translations remain distinct from the Arabic source.
 
-## Scientific integrity
+Generated scenes are illustrations, not evidence. Claims must point to source-backed evidence. Uncertainty and interpretive links remain explicit.
 
-A generated scene is an illustration, not scientific evidence. Claims must remain linked to source evidence, with uncertainty and interpretive links kept explicit.
+## Rights and provenance
+
+Public availability never implies reuse permission. Imported visuals, Quran text, recitation and exported media require explicit provenance and cleared reuse status. The contract does not grant rights by itself.
 
 ## Evaluation
 
-VBench-2.0 is the primary external benchmark and VBench is a secondary baseline. VBench-2.0 expands evaluation beyond basic prompt/pixel quality to intrinsic faithfulness, commonsense reasoning, physics realism, human motion and creative composition, and it supports evaluation of custom videos for applicable dimensions. citehttps://github.com/Vchitect/VBench/blob/master/VBench-2.0/README.md
+VBench-2.0 is the primary external benchmark contract and VBench is the secondary baseline. CI does not download large video models or benchmark packages. Model generation happens later on dedicated compute using the same prompt suite and scorecard.
 
 Custom gates cover Quran text integrity, recitation integrity, provenance, rights, unintended generated text, temporal consistency and audio-stream integrity.
 
-## Candidate generation models
+## Clean-build invariants
 
-Candidates remain non-binding and are not installed by CI. Wan 2.2 is a strong first candidate because its official repository is public, dedicated to video generation, and declares Apache-2.0 for the repository. citehttps://api.github.com/repos/Wan-Video/Wan2.2
+- No heavy video downloads in ordinary PR CI.
+- No generated media committed to Git.
+- No runtime dependency added by the media layer.
+- No Corpus mutation.
+- No blocking dependency on Rechercher acquisition.
+- 48K is a render ceiling, not a claim of native 48K generation.
+- Text, Quran, citations and factual diagrams are separate clean composition layers.
 
-Exact checkpoint/model terms must still be recorded before production use.
+## Future adapters
 
-## Why this build is different
-
-No heavy video downloads. No documentary renderer in normal PR CI. No generated media committed to Git. No runtime dependency added. No Corpus mutation.
-
-Actual model generation will run later on a dedicated compute runner, using the same prompt suite and scorecard so models are compared fairly.
-
-## Output quality
-
-48K remains a render ceiling, not a claim of native 48K generation. Text, Quran, citations and factual diagrams are rendered as independent clean layers at the final target size.
+Generation models, visual import connectors, OCR, recitation alignment, audio/video sync, composition and exporters remain replaceable adapters. Exact model/checkpoint terms and rights are recorded before production use; candidate models are non-binding.
