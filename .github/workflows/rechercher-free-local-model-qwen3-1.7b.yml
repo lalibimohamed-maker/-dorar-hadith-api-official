@@ -120,7 +120,7 @@ jobs:
               'model':'Qwen/Qwen3-1.7B',
               'archive':archive.name,
               'archiveBytes':archive.stat().st_size,
-              'partSizeBytes':1800*1000*1000,
+              'partSizeBytes':1800*1024*1024,
               'parts':entries,
               'reassemble':'cat qwen3-1.7b.tar.zst.part-* > qwen3-1.7b.tar.zst',
               'verify':'sha256sum -c SHA256SUMS.txt'
