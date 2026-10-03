@@ -33,8 +33,12 @@
       "release_tag": "rechercher-omega-wan22-ti2v5b-v1.0.0",
       "release_visibility": "prerelease",
       "estimated_gb": 34.2,
-      "acquisition": "github_release",
-      "rights_promotion_status": "blocked_until_clearance"
+      "acquisition": "direct_streaming_in_progress",
+      "rights_promotion_status": "blocked_until_clearance",
+      "runtime_status": "acquisition_in_progress",
+      "progress_status": "running",
+      "transport": "python-streaming-http-range",
+      "resume_policy": "reuse_existing_release_assets_at_pinned_revision"
     },
     {
       "id": "cogvideox-2b",
@@ -44,8 +48,12 @@
       "release_tag": "rechercher-omega-cogvideox2b-v1.0.0",
       "release_visibility": "prerelease",
       "estimated_gb": 13.8,
-      "acquisition": "github_release",
-      "rights_promotion_status": "blocked_until_clearance"
+      "acquisition": "runner_gated",
+      "rights_promotion_status": "blocked_until_clearance",
+      "runtime_status": "runner_required",
+      "progress_status": "waiting_for_runner",
+      "transport": "python-streaming-http-range",
+      "resume_policy": "start_after_runner_available; reuse_existing_release_assets_at_pinned_revision"
     },
     {
       "id": "cosyvoice2-0.5b",
@@ -66,7 +74,7 @@
       "release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
       "release_visibility": "draft_review_only",
       "estimated_gb": 372,
-      "acquisition": "github_release_draft",
+      "acquisition": "disabled_automatic_review_only",
       "rights_promotion_status": "draft_only_pending_license_review",
       "runtime_status": "core_weights_acquired_core_runtime_packaged",
       "runnable_status": "dependency_blocked",
@@ -97,7 +105,9 @@
           "status": "gated_access_required",
           "license": "flux-1-dev-non-commercial-license"
         }
-      ]
+      ],
+      "progress_status": "review_only",
+      "transport": "not_started_until_license_clearance"
     },
     {
       "id": "ltx-2",
@@ -107,8 +117,10 @@
       "release_tag": "rechercher-omega-ltx2-v1.0.0",
       "release_visibility": "draft_review_only",
       "estimated_gb": 314,
-      "acquisition": "github_release_draft",
-      "rights_promotion_status": "draft_only_pending_license_review"
+      "acquisition": "disabled_automatic_review_only",
+      "rights_promotion_status": "draft_only_pending_license_review",
+      "progress_status": "review_only",
+      "transport": "not_started_until_license_clearance"
     },
     {
       "id": "sana-sprint-1.6b",
@@ -142,7 +154,13 @@
       "replaces_omega": false,
       "omega_supports": true,
       "official_source": "https://github.com/XHToken/Spark-X2.5",
-      "runtime_support": ["llama.cpp", "MLX", "Ollama", "SGLang", "vLLM"],
+      "runtime_support": [
+        "llama.cpp",
+        "MLX",
+        "Ollama",
+        "SGLang",
+        "vLLM"
+      ],
       "source_model_license": "apache-2.0"
     },
     {
@@ -159,7 +177,13 @@
       "primary_model": false,
       "replaces_omega": false,
       "omega_supports": true,
-    "runtime_options": ["ollama", "llama.cpp", "vllm", "sglang", "mlx"],
+      "runtime_options": [
+        "ollama",
+        "llama.cpp",
+        "vllm",
+        "sglang",
+        "mlx"
+      ],
       "omega_stage": "reasoning",
       "upstream": "https://github.com/XHToken/Spark-X2.5",
       "ollama_model": "SparkLLM/Spark-X2.5-4B"
@@ -190,5 +214,12 @@
     "SANA-Sprint-1.6B weights are public Apache-2.0 at the pinned HF revision; its executable runtime depends on Gemma2-2B-IT, which is tracked separately and is not silently redistributed."
   ],
   "continuationRequestedAt": "2026-09-30",
-  "continuationPolicy": "download_verified_free_first_engines_to_release_assets; never_commit_weights"
+  "continuationPolicy": "python_streaming_http_range; never_buffer_complete_model_on_runner; resume_from_existing_release_assets_at_immutable_revision; runner_gated_engines_wait_for_runner; review_only_engines_are_not_automatically_acquired",
+  "transport": {
+    "carrier": "python-streaming",
+    "protocol": "HTTP-Range",
+    "runner_memory_policy": "never_buffer_complete_model",
+    "resume": "reuse_existing_release_assets",
+    "revision_policy": "immutable_revision_required"
+  }
 }
