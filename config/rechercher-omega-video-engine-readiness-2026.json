@@ -88,10 +88,14 @@
       "quota_required": false,
       "compute_limits_are_the_real_limit": true,
       "runtime_components_expected": [
-        "transformer",
-        "text_encoder",
-        "video_vae",
         "audio_vae",
+        "connectors",
+        "latent_upsampler",
+        "scheduler",
+        "text_encoder",
+        "tokenizer",
+        "transformer",
+        "vae",
         "vocoder"
       ],
       "matching_text_encoder_required": true,
@@ -108,7 +112,10 @@
         "otherwise": "queue_without_execution"
       },
       "source_revision": "dfcc2108383fe1aaa0584bdf55d368a4bdadd90c",
-      "revision_type": "immutable_hf_commit"
+      "revision_type": "immutable_hf_commit",
+      "embedded_text_encoder": true,
+      "matching_text_encoder_external_dependency": false,
+      "checkpoint_layout_verified_against_upstream": true
     }
   ],
   "execution_contract": {
