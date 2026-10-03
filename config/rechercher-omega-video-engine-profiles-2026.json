@@ -16,11 +16,22 @@
     "model_revision": "dfcc2108383fe1aaa0584bdf55d368a4bdadd90c",
     "profiles": [
       {
-        "id": "distilled",
+        "id": "distilled-monolith",
+        "loader": "ltx-pipelines.DistilledPipeline",
         "model_weight": "ltx-2-19b-distilled.safetensors",
         "model_weight_size_bytes": 43285058186,
+        "requires": [
+          "spatial_upscaler",
+          "external_gemma_root"
+        ],
+        "external_dependency": "Gemma text encoder",
         "steps": 8,
-        "purpose": "fast local generation candidate",
+        "runtime_proof": "not_verified"
+      },
+      {
+        "id": "distilled-diffusers-split",
+        "loader": "diffusers.LTX2Pipeline",
+        "model_weight": "split transformer/text-encoder component set",
         "requires": [
           "audio_vae",
           "connectors",
@@ -32,43 +43,33 @@
           "vocoder",
           "scheduler"
         ],
+        "text_encoder_format": "diffusers_sharded_12_part",
+        "external_dependency": false,
+        "steps": "documented two-stage",
         "runtime_proof": "not_verified"
       },
       {
-        "id": "dev-fp4",
+        "id": "dev-fp4-monolith",
+        "loader": "ltx-pipelines",
         "model_weight": "ltx-2-19b-dev-fp4.safetensors",
         "model_weight_size_bytes": 19988416674,
-        "steps": "runtime_configured",
-        "purpose": "quantized local generation candidate",
         "requires": [
-          "audio_vae",
-          "connectors",
-          "text_encoder",
-          "tokenizer",
-          "transformer",
-          "vae",
-          "vocoder",
-          "scheduler"
+          "external_gemma_root"
         ],
+        "external_dependency": "Gemma text encoder",
         "runtime_proof": "not_verified"
       },
       {
-        "id": "distilled-fp8",
+        "id": "distilled-fp8-monolith",
+        "loader": "ltx-pipelines.DistilledPipeline",
         "model_weight": "ltx-2-19b-distilled-fp8.safetensors",
         "model_weight_size_bytes": 27078716346,
-        "steps": 8,
-        "purpose": "lower-memory distilled candidate",
         "requires": [
-          "audio_vae",
-          "connectors",
-          "latent_upsampler",
-          "text_encoder",
-          "tokenizer",
-          "transformer",
-          "vae",
-          "vocoder",
-          "scheduler"
+          "spatial_upscaler",
+          "external_gemma_root"
         ],
+        "external_dependency": "Gemma text encoder",
+        "steps": 8,
         "runtime_proof": "not_verified"
       }
     ],
@@ -78,7 +79,8 @@
       "latent_upsampler": "latent_upsampler/diffusion_pytorch_model.safetensors",
       "text_encoder_format": "diffusers_sharded_12_part_or_transformers_11_part_must_match_runtime_loader",
       "vae": "vae/diffusion_pytorch_model.safetensors",
-      "vocoder": "vocoder/diffusion_pytorch_model.safetensors"
+      "vocoder": "vocoder/diffusion_pytorch_model.safetensors",
+      "text_encoder_policy": "Choose exactly one runtime mode: Diffusers split text-encoder shards OR external Gemma directory for ltx-pipelines monolith. Never mix."
     }
   },
   "hunyuanvideo15": {
