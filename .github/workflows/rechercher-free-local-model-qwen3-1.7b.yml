@@ -31,12 +31,78 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Reuse or repair an existing Release
+        id: release_preflight
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='rechercher-free-local-models-2026-10-qwen3-1.7b'
+          required=(
+            qwen3-1.7b.tar.zst.part-00
+            qwen3-1.7b.tar.zst.part-01
+            LICENSE-Qwen3-1.7B
+            README-Qwen3-1.7B.md
+            Qwen3-1.7B-config.json
+            runtime-verification.json
+            RELEASE-PARTS.json
+            SHA256SUMS.txt
+          )
+          complete=true
+          asset_names="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || true)"
+          for name in "\${required[@]}"; do
+            if ! grep -Fxq "$name" <<<"$asset_names"; then
+              complete=false
+              break
+            fi
+          done
+
+          if [ "$complete" = true ]; then
+            mkdir -p release-repair
+            gh release download "$TAG" \
+              --pattern RELEASE-PARTS.json \
+              --pattern SHA256SUMS.txt \
+              --dir release-repair \
+              --repo "$GITHUB_REPOSITORY"
+            python3 - <<'PY'
+            import hashlib, json, pathlib
+            root=pathlib.Path('release-repair')
+            manifest=json.loads((root/'RELEASE-PARTS.json').read_text(encoding='utf-8'))
+            manifest['partSizeBytes']=1800*1024*1024
+            (root/'RELEASE-PARTS.json').write_text(
+                json.dumps(manifest, ensure_ascii=False, indent=2) + '\n',
+                encoding='utf-8'
+            )
+            digest=hashlib.sha256((root/'RELEASE-PARTS.json').read_bytes()).hexdigest()
+            lines=(root/'SHA256SUMS.txt').read_text(encoding='utf-8').splitlines()
+            replaced=[]
+            found=False
+            for line in lines:
+                if line.endswith('qwen17-release/RELEASE-PARTS.json'):
+                    replaced.append(f'{digest}  qwen17-release/RELEASE-PARTS.json')
+                    found=True
+                else:
+                    replaced.append(line)
+            if not found:
+                raise SystemExit('RELEASE-PARTS checksum entry missing')
+            (root/'SHA256SUMS.txt').write_text('\n'.join(replaced)+'\n', encoding='utf-8')
+            PY
+            gh release upload "$TAG" \
+              release-repair/RELEASE-PARTS.json \
+              release-repair/SHA256SUMS.txt \
+              --repo "$GITHUB_REPOSITORY" --clobber
+          fi
+
+          echo "complete=$complete" >> "$GITHUB_OUTPUT"
+
       - name: Install acquisition tools
+        if: steps.release_preflight.outputs.complete != 'true'
         run: |
           set -euo pipefail
           python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub
 
       - name: Acquire Qwen3-1.7B
+        if: steps.release_preflight.outputs.complete != 'true'
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -58,6 +124,7 @@ jobs:
           tar --zstd -cf qwen17-release/qwen3-1.7b.tar.zst -C qwen17-work Qwen3-1.7B
 
       - name: Verify archive and license
+        if: steps.release_preflight.outputs.complete != 'true'
         run: |
           set -euo pipefail
           test -s qwen17-release/qwen3-1.7b.tar.zst
@@ -66,6 +133,7 @@ jobs:
           stat -c 'archive_bytes=%s' qwen17-release/qwen3-1.7b.tar.zst
 
       - name: Runtime smoke test
+        if: steps.release_preflight.outputs.complete != 'true'
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -99,6 +167,7 @@ jobs:
           PY
 
       - name: Split release payload into GitHub-safe assets
+        if: steps.release_preflight.outputs.complete != 'true'
         run: |
           set -euo pipefail
           rm -f qwen17-release/qwen3-1.7b.tar.zst.part-*
@@ -130,6 +199,7 @@ jobs:
           PY
 
       - name: Hash release assets
+        if: steps.release_preflight.outputs.complete != 'true'
         run: |
           set -euo pipefail
           rm -f qwen17-release/SHA256SUMS.txt
@@ -144,6 +214,7 @@ jobs:
             > qwen17-release/SHA256SUMS.txt
 
       - name: Publish release
+        if: steps.release_preflight.outputs.complete != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
