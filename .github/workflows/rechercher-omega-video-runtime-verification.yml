@@ -26,6 +26,11 @@ jobs:
   verify-private-storage:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
       - name: Verify private storage release metadata
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
