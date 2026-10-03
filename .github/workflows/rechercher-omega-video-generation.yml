@@ -47,6 +47,13 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Validate required runner labels
+        run: |
+          set -euo pipefail
+          test "${RUNNER_OS}" = "Linux"
+          test "${RUNNER_ARCH}" = "X64"
+          echo "[OK] self-hosted Linux x64 GPU runner selected"
+
       - name: Validate GPU
         run: |
           set -euo pipefail
@@ -87,6 +94,20 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/rechercher-omega-selective-materialize.py
+
+      - name: Record selected profile and immutable revision
+        env:
+          ENGINE: ${{ inputs.engine }}
+          PROFILE: ${{ inputs.profile }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os
+          cfg=json.load(open("config/rechercher-omega-video-engine-profiles-2026.json",encoding="utf-8"))
+          key="ltx2" if os.environ["ENGINE"]=="ltx-2" else "hunyuanvideo15"
+          p=next(x for x in cfg[key]["profiles"] if x["id"]==os.environ["PROFILE"])
+          print(json.dumps({"engine":os.environ["ENGINE"],"profile":p["id"],"revision":cfg[key]["model_revision"]},ensure_ascii=False))
+          PY
 
       - name: Install LTX-2 upstream runtime at an immutable code commit
         if: ${{ inputs.engine == 'ltx-2' }}
