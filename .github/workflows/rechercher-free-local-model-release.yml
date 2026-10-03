@@ -42,7 +42,7 @@ jobs:
           set -euo pipefail
           rm -rf release-model models-work
           mkdir -p release-model models-work
-          python3 -m huggingface_hub download Qwen/Qwen3-0.6B \
+          hf download Qwen/Qwen3-0.6B \
             --revision main \
             --local-dir models-work/Qwen3-0.6B
           test -s models-work/Qwen3-0.6B/model.safetensors
