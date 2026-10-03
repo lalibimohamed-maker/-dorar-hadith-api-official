@@ -11,10 +11,16 @@ function arg(name, fallback = "") {
 }
 
 const root = path.resolve(arg("root", "."));
-const manifestPath = path.resolve(arg("manifest"));
+let manifestPath = path.resolve(arg("manifest"));
+if (!arg("manifest")) throw new Error("manifest argument is required");
+try {
+  const manifestStat = await fs.stat(manifestPath);
+  if (manifestStat.isDirectory()) manifestPath = path.join(manifestPath, "manifest.json");
+} catch {
+  throw new Error(`manifest path does not exist: ${manifestPath}`);
+}
 const repository = arg("repository", "lalibimohamed-maker/dinullah-matrix-6384-storage-01");
 const releasePrefix = arg("release-prefix", "rechercher-quran");
-if (!manifestPath) throw new Error("manifest argument is required");
 if (!/^\S+\/\S+$/.test(repository)) throw new Error("invalid Release repository");
 if (!process.env.GH_TOKEN) throw new Error("GH_TOKEN is required");
 
