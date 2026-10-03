@@ -120,6 +120,7 @@ export function orchestrateVideoPlan({
         task: scene.generation_task,
         model: modelId,
         model_revision: modelRevision,
+        video_profile: scene.video_profile ?? scene.generation_config?.video_profile ?? selection.profile_id ?? null,
         runtime: selection.runtime,
         cache_key: cacheKey,
         prompt_hash_input: scene.prompt ?? "",
@@ -191,6 +192,7 @@ function buildRuntimeJob(runtime, scene, selection = {}) {
     return buildLocalVideoEngineJob({
       engineId: selection.model_id,
       modelRevision: selection.model_revision ?? scene.model_revision,
+      profileId: scene.video_profile ?? scene.generation_config?.video_profile ?? selection.profile_id,
       runtimeEnvironmentId: selection.runtime_environment_id,
       task: scene.generation_task,
       prompt: scene.prompt,
