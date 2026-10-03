@@ -40,7 +40,16 @@
         "vae",
         "vocoder"
       ],
-      "notes": "Use the upstream LTX-2 environment in isolation. Do not silently substitute the Ω generic torch/diffusers versions."
+      "notes": "Use the upstream LTX-2 environment in isolation. Do not silently substitute the Ω generic torch/diffusers versions.",
+      "text_encoder_modes": {
+        "diffusers_split": "stored_split_component",
+        "ltx_pipelines_monolith": "external_gemma_root"
+      },
+      "external_dependency_for_monolith": {
+        "model_family": "LTX-2",
+        "dependency": "Gemma text encoder",
+        "status": "required_for_monolith"
+      }
     },
     {
       "id": "hunyuanvideo15-pytorch",
