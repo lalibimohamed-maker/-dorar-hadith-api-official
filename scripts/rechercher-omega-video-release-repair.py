@@ -146,6 +146,104 @@ def expected_assets(item: dict, chunk_bytes: int) -> list[tuple[str, int]]:
             )
         expected.append((name, length))
     return expected
+def source_expected_assets(chunk_bytes: int) -> list[dict]:
+    """Build the release-part expectation from the pinned source revision."""
+    if not MODEL_ID or not REVISION:
+        raise RuntimeError("MODEL_ID and REVISION are required for source audit")
+    from huggingface_hub import HfApi
+
+    info = HfApi(token=HF_TOKEN or None).model_info(
+        MODEL_ID,
+        revision=REVISION,
+        files_metadata=True,
+    )
+    allowed = {".safetensors", ".bin", ".pt", ".pth", ".onnx"}
+    expected = []
+    for sibling in sorted(info.siblings, key=lambda item: item.rfilename):
+        source_path = str(sibling.rfilename)
+        if Path(source_path).suffix.lower() not in allowed:
+            continue
+        source_size = int(sibling.size or 0)
+        if source_size <= 0:
+            continue
+        safe = "".join(
+            ch if ch.isalnum() or ch in "._-" else "_"
+            for ch in source_path.replace("/", "__")
+        )
+        lengths = expected_part_lengths(source_size, chunk_bytes)
+        if len(lengths) == 1:
+            names = [f"omega__{safe}"]
+        else:
+            names = [f"omega__{safe}.part-{i:04d}" for i in range(len(lengths))]
+        expected.append(
+            {
+                "source_path": source_path,
+                "bytes": source_size,
+                "sha256": (
+                    getattr(getattr(sibling, "lfs", None), "sha256", None)
+                    if getattr(sibling, "lfs", None) is not None
+                    else None
+                ),
+                "assets": list(zip(names, lengths)),
+            }
+        )
+    return expected
+
+
+def audit_source_release(release: dict, assets: dict[str, dict], chunk_bytes: int) -> dict:
+    expected_files = source_expected_assets(chunk_bytes)
+    missing = []
+    wrong_size = []
+    expected_asset_count = 0
+    present_asset_count = 0
+    expected_bytes = 0
+    present_bytes = 0
+
+    for item in expected_files:
+        expected_bytes += int(item["bytes"])
+        for name, length in item["assets"]:
+            expected_asset_count += 1
+            meta = assets.get(name)
+            if not meta:
+                missing.append(
+                    {
+                        "source_path": item["source_path"],
+                        "asset": name,
+                        "expected_bytes": length,
+                        "source_bytes": item["bytes"],
+                        "source_sha256": item["sha256"],
+                    }
+                )
+                continue
+            observed = int(meta["size"])
+            present_asset_count += 1
+            present_bytes += observed
+            if observed != length:
+                wrong_size.append(
+                    {
+                        "source_path": item["source_path"],
+                        "asset": name,
+                        "expected_bytes": length,
+                        "actual_bytes": observed,
+                        "source_bytes": item["bytes"],
+                        "source_sha256": item["sha256"],
+                    }
+                )
+
+    return {
+        "model_id": MODEL_ID,
+        "revision": REVISION,
+        "source_file_count": len(expected_files),
+        "expected_asset_count": expected_asset_count,
+        "present_asset_count": present_asset_count,
+        "expected_source_bytes": expected_bytes,
+        "present_source_asset_bytes": present_bytes,
+        "missing_count": len(missing),
+        "wrong_size_count": len(wrong_size),
+        "missing": missing,
+        "wrong_size": wrong_size,
+        "status": "complete" if not missing and not wrong_size else "incomplete",
+    }
 
 
 def audit(release: dict, manifest: dict, assets: dict[str, dict]):
@@ -246,11 +344,16 @@ def repair(release: dict, manifest: dict, initial_assets: dict[str, dict], audit
         raise RuntimeError("MODEL_ID and REVISION are required for repair mode")
 
     chunk_bytes = int(manifest.get("chunk_bytes", CHUNK_BYTES))
+    source_audit = audit_source_release(release, initial_assets, chunk_bytes)
+    source_wanted = source_audit["missing"] + source_audit["wrong_size"]
+    if not source_wanted:
+        print("[OK] Release matches the pinned source revision; no repair required.")
+        return
     fs = HfFileSystem(token=HF_TOKEN or None, block_size=8 * 1024 * 1024)
     upload_url = release["upload_url"].replace("{?name,label}", "")
     repaired = []
 
-    wanted = audit_result["missing"] + audit_result["wrong_size"]
+    wanted = source_wanted
     for row in wanted:
         item = next(
             x for x in manifest["files"] if str(x["source_path"]) == row["source_path"]
@@ -336,14 +439,16 @@ def main():
     assets = release_assets(release)
     manifest = download_manifest(release)
     result = audit(release, manifest, assets)
+    source_audit = audit_source_release(release, assets, int(manifest.get("chunk_bytes", CHUNK_BYTES)))
+    print(json.dumps({"manifest_audit": result, "source_audit": source_audit}, ensure_ascii=False, indent=2))
     if AUDIT_ONLY:
-        if result["status"] != "complete":
+        if source_audit["status"] != "complete":
             raise SystemExit(1)
         return
-    if result["status"] == "complete":
-        print("[OK] Release is complete; no repair required.")
+    if source_audit["status"] == "complete":
+        print("[OK] Release matches all model files at the pinned source revision.")
         return
-    repair(release, manifest, assets, result)
+    repair(release, manifest, assets, source_audit)
 
 
 if __name__ == "__main__":
