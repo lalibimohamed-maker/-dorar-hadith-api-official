@@ -32,7 +32,7 @@
       "ICLoraPipeline"
     ],
     "linux_cuda_supported": true,
-    "matching_text_encoder_required": true,
+    "matching_text_encoder_required": false,
     "checkpoint_layout_verification_required": true,
     "component_verification_required": [
       "transformer",
@@ -41,7 +41,8 @@
       "audio_vae",
       "vocoder"
     ],
-    "note": "For LTX-2/LTX-2.3 the current upstream documentation requires a matching Gemma text encoder; do not substitute a different encoder."
+    "note": "The pinned LTX-2 checkpoint contains its text_encoder component. Verify that the checkpoint layout and runtime package remain matched; do not silently substitute a different checkpoint family.",
+    "embedded_text_encoder_required": true
   },
   "execution": {
     "local_weight_execution": true,
@@ -64,5 +65,23 @@
     "runtime_component_verification",
     "e2e_smoke_test"
   ],
-  "revision_type": "immutable_hf_commit"
+  "revision_type": "immutable_hf_commit",
+  "checkpoint_proof": {
+    "source": "huggingface",
+    "repository": "Lightricks/LTX-2",
+    "revision": "dfcc2108383fe1aaa0584bdf55d368a4bdadd90c",
+    "verified_reference": "Hugging Face LTX-2 README at the pinned revision",
+    "embedded_components": [
+      "audio_vae",
+      "connectors",
+      "latent_upsampler",
+      "scheduler",
+      "text_encoder",
+      "tokenizer",
+      "transformer",
+      "vae",
+      "vocoder"
+    ],
+    "embedded_text_encoder": true
+  }
 }
