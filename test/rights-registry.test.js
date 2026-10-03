@@ -29,3 +29,16 @@ test("verified licensed resources may pass the redistribution gate", () => {
 test("redistribution gate fails closed", () => {
   assert.throws(() => assertRedistributable(createRightsRecord({ ...verified, status: "unknown" })), (error) => error.code === "REDISTRIBUTION_NOT_VERIFIED");
 });
+
+test("status-only permission objects are insufficient", () => {
+  assert.equal(canRedistribute({ status: "licensed" }), false);
+  assert.throws(() => assertRedistributable({ status: "licensed" }), (error) => error.code === "REDISTRIBUTION_NOT_VERIFIED");
+});
+
+test("all required rights ledger fields are enforced", () => {
+  for (const field of ["resourceId", "status", "basis", "source", "verifiedAt", "verifier"]) {
+    const copy = { ...verified };
+    delete copy[field];
+    assert.throws(() => createRightsRecord(copy), RightsRegistryError);
+  }
+});

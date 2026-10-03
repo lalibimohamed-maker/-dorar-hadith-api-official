@@ -1,3 +1,5 @@
+import { assertRedistributable, assertRightsRecord } from "./rights-registry.js";
+
 const ALLOWED_ACTIONS = new Set([
   "read", "discover", "transform", "write", "publish", "export"
 ]);
@@ -39,8 +41,14 @@ export function validateOperation(operation, policy = DEFAULT_POLICY) {
   }
 
   if ((action === "publish" || action === "export") && policy.requireRightsForPublish) {
-    if (!operation.rights || !["redistributable", "licensed", "public-domain"].includes(operation.rights.status)) {
-      throw new GovernanceBlockedError("RIGHTS_REQUIRED", "Redistribution rights are not verified");
+    if (!operation.rightsRecord) {
+      throw new GovernanceBlockedError("RIGHTS_RECORD_REQUIRED", "A complete rights record is required");
+    }
+    try {
+      const rightsRecord = assertRightsRecord(operation.rightsRecord);
+      assertRedistributable(rightsRecord);
+    } catch (error) {
+      throw new GovernanceBlockedError(error.code === "REDISTRIBUTION_NOT_VERIFIED" ? "RIGHTS_REQUIRED" : "RIGHTS_RECORD_INVALID", error.message);
     }
   }
 

@@ -6,7 +6,14 @@ const baseRequest = {
   resourceId: "book-fixture-1",
   source: "institutional-source",
   provenance: { edition: "verified-edition" },
-  rights: { status: "licensed" },
+  rights: {
+    resourceId: "book-fixture-1",
+    status: "licensed",
+    basis: "explicit-license",
+    source: "https://example.invalid/rights",
+    verifiedAt: "2026-09-28",
+    verifier: "governance-test"
+  },
   validation: "passed"
 };
 
@@ -18,7 +25,10 @@ test("book ingestion requires provenance, rights and validation", () => {
 
 test("unclear or restricted rights fail closed", () => {
   for (const status of ["unknown", "rights-unclear", "restricted"]) {
-    assert.throws(() => validateBookIngestionRequest({ ...baseRequest, rights: { status } }), (error) => error.code === "RIGHTS_NOT_VERIFIED");
+    assert.throws(
+      () => validateBookIngestionRequest({ ...baseRequest, rights: { ...baseRequest.rights, status } }),
+      (error) => error.code === "RIGHTS_NOT_VERIFIED"
+    );
   }
 });
 
@@ -29,4 +39,8 @@ test("verified rights permit an explicit book action", () => {
 
 test("unsupported actions are rejected", () => {
   assert.throws(() => authorizeBookAction(baseRequest, "delete"), (error) => error instanceof BookIngestionGovernanceError && error.code === "ACTION_INVALID");
+});
+
+test("status-only rights do not authorize book ingestion", () => {
+  assert.throws(() => validateBookIngestionRequest({ ...baseRequest, rights: { status: "licensed" } }), (error) => error.code === "RIGHTS_RECORD_INVALID");
 });

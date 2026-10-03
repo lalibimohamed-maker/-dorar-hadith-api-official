@@ -1,4 +1,4 @@
-const PUBLISHABLE_RIGHTS = new Set(["redistributable", "licensed", "public-domain"]);
+import { assertRedistributable, assertRightsRecord } from "./rights-registry.js";
 
 export class BookIngestionGovernanceError extends Error {
   constructor(code, message) {
@@ -29,10 +29,13 @@ export function validateBookIngestionRequest(request) {
     throw new BookIngestionGovernanceError("VALIDATION_REQUIRED", "Book ingestion requires passed validation");
   }
 
-  if (!PUBLISHABLE_RIGHTS.has(request.rights.status)) {
+  try {
+    assertRightsRecord(request.rights);
+    assertRedistributable(request.rights);
+  } catch (error) {
     throw new BookIngestionGovernanceError(
-      "RIGHTS_NOT_VERIFIED",
-      "Book ingestion cannot publish or export without verified redistribution rights"
+      error.code === "REDISTRIBUTION_NOT_VERIFIED" ? "RIGHTS_NOT_VERIFIED" : "RIGHTS_RECORD_INVALID",
+      error.message
     );
   }
 

@@ -1,0 +1,45 @@
+{
+  "version": "2026.28",
+  "id": "rights-ledger-2026",
+  "role": "execution-layer-between-discovery-and-redistribution",
+  "requiredFields": [
+    "resourceId",
+    "status",
+    "basis",
+    "source",
+    "verifiedAt",
+    "verifier"
+  ],
+  "statuses": {
+    "allowedForRedistribution": [
+      "redistributable",
+      "licensed",
+      "public-domain"
+    ],
+    "blocked": [
+      "rights-unclear",
+      "restricted",
+      "unknown"
+    ]
+  },
+  "rules": {
+    "webPresenceDoesNotGrantRedistribution": true,
+    "readabilityDoesNotGrantRedistribution": true,
+    "searchDiscoveryDoesNotGrantRedistribution": true,
+    "publishRequiresCompleteRightsRecord": true,
+    "exportRequiresCompleteRightsRecord": true,
+    "governanceKernelMustValidateRecord": true,
+    "failClosedOnMissingInvalidOrBlockedEvidence": true,
+    "rightsRecordDoesNotModifyCorpus": true
+  },
+  "verification": {
+    "statusIsNotSufficientWithoutRequiredFields": true,
+    "verifierAndVerificationTimestampRequired": true,
+    "basisAndSourceRequired": true
+  },
+  "preservation": {
+    "resourceIdentityPreserved": true,
+    "canonicalTextUnchanged": true,
+    "provenanceSeparateFromCorpusContent": true
+  }
+}
