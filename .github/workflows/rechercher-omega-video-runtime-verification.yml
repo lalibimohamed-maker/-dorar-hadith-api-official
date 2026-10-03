@@ -41,11 +41,16 @@ jobs:
               ;;
             *) exit 2 ;;
           esac
-          gh release view "$TAG" --repo "$REPO" --json isDraft,isPrerelease,assets --jq '.isDraft as $draft | .isPrerelease as $pre | "draft=\($draft) prerelease=\($pre)", (.assets[].name)' > "$RUNNER_TEMP/assets.txt"
-          grep -Fxq "draft=false prerelease=true" "$RUNNER_TEMP/assets.txt"
+          gh release view "$TAG" --repo "$REPO" --json isDraft,isPrerelease --jq '"draft=\(.isDraft) prerelease=\(.isPrerelease)"' > "$RUNNER_TEMP/release-state.txt"
+          grep -Fxq "draft=false prerelease=true" "$RUNNER_TEMP/release-state.txt"
+          release_id="$(gh api "repos/$REPO/releases/tags/$TAG" --jq '.id')"
+          test -n "$release_id"
+          gh api --paginate "repos/$REPO/releases/$release_id/assets?per_page=100" --jq '.[].name' > "$RUNNER_TEMP/assets.txt"
+          test -s "$RUNNER_TEMP/assets.txt"
           for name in $REQUIRED; do
             grep -Fxq "$name" "$RUNNER_TEMP/assets.txt" || { echo "Missing asset: $name"; exit 1; }
           done
+          echo "[OK] paginated Release asset inventory verified"
           echo "[OK] private release assets are present; no model weights were downloaded on the verifier runner."
 
       - name: Audit complete multipart Release integrity
