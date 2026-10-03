@@ -6,7 +6,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { reconstructReleaseParts, validateReleasePartsManifest, verifyReleaseParts } from '../src/local-model-release-parts.js';
 
-test('validates and reconstructs split release assets', () => {
+test('validates and reconstructs split release assets with archive checksum', () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'deen-model-parts-'));
   try {
     const chunks = [Buffer.from('abc'), Buffer.from('defgh')];
@@ -15,12 +15,20 @@ test('validates and reconstructs split release assets', () => {
       fs.writeFileSync(path.join(directory, name), data);
       return { name, bytes: data.length, sha256: crypto.createHash('sha256').update(data).digest('hex') };
     });
-    const manifest = { model: 'Qwen/Qwen3-1.7B', archive: 'qwen3-1.7b.tar.zst', archiveBytes: 8, parts };
+    const archiveData = Buffer.concat(chunks);
+    const manifest = {
+      model: 'Qwen/Qwen3-1.7B',
+      archive: 'qwen3-1.7b.tar.zst',
+      archiveBytes: archiveData.length,
+      archiveSha256: crypto.createHash('sha256').update(archiveData).digest('hex'),
+      parts
+    };
     assert.equal(validateReleasePartsManifest(manifest), true);
     assert.equal(verifyReleaseParts(directory, manifest).ok, true);
     const output = path.join(directory, manifest.archive);
     const result = reconstructReleaseParts(directory, manifest, output);
     assert.equal(result.ok, true);
+    assert.equal(result.archiveSha256, manifest.archiveSha256);
     assert.equal(fs.readFileSync(output, 'utf8'), 'abcdefgh');
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
@@ -33,11 +41,29 @@ test('fails closed when a release part is modified', () => {
     const data = Buffer.from('abc');
     const name = 'part-0';
     fs.writeFileSync(path.join(directory, name), data);
-    const manifest = { model: 'Qwen/Qwen3-1.7B', archive: 'qwen3-1.7b.tar.zst', archiveBytes: 3, parts: [{ name, bytes: 3, sha256: '0'.repeat(64) }] };
+    const manifest = {
+      model: 'Qwen/Qwen3-1.7B',
+      archive: 'qwen3-1.7b.tar.zst',
+      archiveBytes: 3,
+      archiveSha256: '0'.repeat(64),
+      parts: [{ name, bytes: 3, sha256: '0'.repeat(64) }]
+    };
     const result = verifyReleaseParts(directory, manifest);
     assert.equal(result.ok, false);
     assert.equal(result.failures[0].reason, 'checksum-or-size-mismatch');
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
   }
+});
+
+test('rejects an invalid archive checksum in the manifest', () => {
+  assert.throws(
+    () => validateReleasePartsManifest({
+      model: 'Qwen/Qwen3-1.7B',
+      archive: 'qwen3-1.7b.tar.zst',
+      archiveSha256: 'not-a-sha256',
+      parts: [{ name: 'part-0', bytes: 1, sha256: '0'.repeat(64) }]
+    }),
+    /release archive checksum is invalid/
+  );
 });
