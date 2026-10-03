@@ -27,6 +27,9 @@ TAG = os.environ["OMEGA_STORAGE_RELEASE_TAG"]
 OUTPUT_DIR = Path(os.environ.get("OMEGA_MATERIALIZE_DIR", "./.omega-model"))
 PATTERNS = [p.strip() for p in os.environ.get("OMEGA_SOURCE_PATTERNS", "").split(",") if p.strip()]
 EXACT_PATHS = [p.strip() for p in os.environ.get("OMEGA_SOURCE_PATHS", "").split(",") if p.strip()]
+PROFILE_CONFIG = os.environ.get("OMEGA_PROFILE_CONFIG", "config/rechercher-omega-video-engine-profiles-2026.json")
+ENGINE_ID = os.environ.get("OMEGA_VIDEO_ENGINE_ID", "").strip()
+PROFILE_ID = os.environ.get("OMEGA_VIDEO_PROFILE_ID", "").strip()
 CHUNK_BYTES = 8 * 1024 * 1024
 TLS = ssl.create_default_context()
 
@@ -116,12 +119,34 @@ def atomic_state(path: Path, state: dict[str, Any]) -> None:
     os.replace(temp, path)
 
 
-def matches(source_path: str) -> bool:
+def load_profile_prefixes() -> list[str]:
+    if not ENGINE_ID or not PROFILE_ID:
+        return []
+    config = json.loads(Path(PROFILE_CONFIG).read_text(encoding="utf-8"))
+    key = "hunyuanvideo15" if ENGINE_ID == "hunyuanvideo-1.5" else "ltx2" if ENGINE_ID == "ltx-2" else None
+    if not key or key not in config:
+        raise RuntimeError(f"unsupported video profile engine: {ENGINE_ID}")
+    profile = next((p for p in config[key].get("profiles", []) if p.get("id") == PROFILE_ID), None)
+    if not profile:
+        raise RuntimeError(f"unknown video profile: {ENGINE_ID}/{PROFILE_ID}")
+    prefixes = [str(x) for x in profile.get("release_asset_prefixes", []) if str(x)]
+    if not prefixes:
+        raise RuntimeError(f"video profile has no release asset prefixes: {ENGINE_ID}/{PROFILE_ID}")
+    return prefixes
+
+PROFILE_PREFIXES = load_profile_prefixes()
+
+def matches(source_path: str, release_assets: list[str] | None = None) -> bool:
     if EXACT_PATHS and source_path in EXACT_PATHS:
         return True
     if PATTERNS and any(fnmatch.fnmatch(source_path, pat) for pat in PATTERNS):
         return True
-    return not EXACT_PATHS and not PATTERNS
+    if PROFILE_PREFIXES and release_assets:
+        return any(
+            any(str(asset).startswith(prefix) for prefix in PROFILE_PREFIXES)
+            for asset in release_assets
+        )
+    return not EXACT_PATHS and not PATTERNS and not PROFILE_PREFIXES
 
 
 def materialize_source(item: dict[str, Any], assets: dict[str, dict[str, Any]]) -> dict[str, Any]:
@@ -230,12 +255,12 @@ def main() -> int:
     assets = release_assets()
     manifest = fetch_manifest(assets)
     revision = manifest.get("revision")
-    print(f"[OMEGA] release={TAG} revision={revision}")
+    print(f"[OMEGA] release={TAG} revision={revision} engine={ENGINE_ID or '-'} profile={PROFILE_ID or '-'}")
 
     selected = [
         item
         for item in manifest.get("files", [])
-        if matches(str(item.get("source_path", "")))
+        if matches(str(item.get("source_path", "")), item.get("release_assets", []))
     ]
     if not selected:
         raise SystemExit("No manifest source files matched the requested selection")
@@ -252,6 +277,8 @@ def main() -> int:
         "selected_files": results,
         "status": "verified",
         "complete_release_materialized": False,
+        "engine_id": ENGINE_ID or None,
+        "profile_id": PROFILE_ID or None,
     }
     summary_path = OUTPUT_DIR / "omega-materialization-summary.json"
     summary_path.write_text(
