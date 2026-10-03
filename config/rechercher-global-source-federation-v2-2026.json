@@ -1,0 +1,39 @@
+{
+  "schema_version":"1.0",
+  "status":"IMPLEMENTED_FOUNDATION",
+  "purpose":"Permanent lawful federation layer for global source discovery, book-quality acquisition, research reproducibility, and multilingual knowledge routing.",
+  "source_families":[
+    "NATIONAL_LIBRARY","UNIVERSITY_LIBRARY","ARCHIVE","MUSEUM","MANUSCRIPT_REPOSITORY","DIGITAL_HUMANITIES","ISLAMIC_CORPUS","SCHOLARLY_GRAPH","DOI_METADATA","CULTURAL_HERITAGE","OPEN_REPOSITORY","DIGITAL_LIBRARY","IIIF","CATALOG","OPEN_DATA"
+  ],
+  "providers":[
+    {"id":"openalex","engines":["WORK","AUTHOR","SOURCE","INSTITUTION","TOPIC","OA","CITATION","CHANGE_SYNC"]},
+    {"id":"crossref","engines":["DOI","WORK","LICENSE","FULLTEXT","REFERENCE","ORCID_ROR"]},
+    {"id":"iiif","engines":["MANIFEST","CANVAS","ANNOTATION","CONTENT_SEARCH","CHANGE_DISCOVERY","IMAGE_SERVICE"]},
+    {"id":"loc","engines":["CATALOG","API","IIIF"]},
+    {"id":"europeana","engines":["HERITAGE_SEARCH","RECORD","IIIF"]},
+    {"id":"biblissima","engines":["MANUSCRIPT_DISCOVERY","IIIF","CATALOG"]},
+    {"id":"digital_bodleian","engines":["MANUSCRIPT","IIIF"]},
+    {"id":"gallica_bnf","engines":["CATALOG","DIGITAL_OBJECT","IIIF"]},
+    {"id":"openiti","engines":["ISLAMIC_CORPUS","AUTHOR","WORK","TEXT_ALIGNMENT"]},
+    {"id":"open_library","engines":["WORK","EDITION","ISBN","CATALOG"]},
+    {"id":"internet_archive","engines":["DIGITAL_OBJECT","FULLTEXT","OCR","OPEN_ACCESS"]},
+    {"id":"google_books","engines":["BOOK","EDITION","PREVIEW","IDENTITY"]}
+  ],
+  "identity_pipeline":["DISCOVER","NORMALIZE","IDENTIFY_WORK","IDENTIFY_EDITION","IDENTIFY_MANIFESTATION","DEDUPLICATE","RECONCILE","PRESERVE_SOURCE_IDENTITY"],
+  "quality_pipeline":["IDENTITY_MATCH","EDITION_MATCH","COMPLETENESS","PAGE_IMAGE_QUALITY","PDF_INTEGRITY","OCR_HTR_QUALITY","PROVENANCE","RIGHTS_CLARITY","SOURCE_AUTHORITY","DOWNLOADABILITY"],
+  "acquisition_policy":{
+    "source_failure_is_non_blocking":true,
+    "parallel_fallback":true,
+    "retain_valid_alternatives":true,
+    "prefer_original_pdf_when_valid":true,
+    "iiif_images_can_seed_derived_pdf":true,
+    "docx_or_image_or_manuscript_can_seed_derived_pdf":true,
+    "never_replace_original_with_derived":true
+  },
+  "research_outputs":["PDF","DOCX","PPTX","EPUB","HTML","ODT","RTF","TXT","MARKDOWN","TEI"],
+  "multilingual_outputs":true,
+  "evidence_requirements":["SOURCE_IDENTITY","PROVENANCE","RIGHTS_STATE","CONTENT_HASH"],
+  "safety":["NO_AUTH_BYPASS","NO_PAYWALL_BYPASS","NO_RATE_LIMIT_BYPASS","NO_ROBOTS_BYPASS","NO_PROVENANCE_BYPASS","NO_RIGHTS_BYPASS"],
+  "integration":["V5_COGNITIVE","V6_MULTILINGUAL","V7_EVIDENCE_GRAPH","ACQUISITION","PDF_VALIDATION","OCR_HTR","UNIVERSAL_EXPORT"],
+  "completion_gate":["UNIT","INTEGRATION","CI","SECURITY","GOVERNANCE","RIGHTS","ACQUISITION_NON_BLOCKING"]
+}

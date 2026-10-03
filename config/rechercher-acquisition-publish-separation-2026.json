@@ -1,0 +1,10 @@
+{
+  "engine": "rechercher-acquisition-publish-separation",
+  "version": "1.0.0",
+  "principle": "Rights govern publication, not lawful discovery or acquisition.",
+  "pipeline": ["DISCOVER","IDENTIFY","ACQUIRE","VALIDATE","PRESERVE","CATALOG","PUBLISH_IF_ALLOWED"],
+  "acquisition": {"allowed_when": ["source_is_lawful","source_is_reachable","acquisition_method_is_permitted"],"blocked_only_when": ["acquisition_itself_is_unlawful","source_terms_prohibit_the_method","technical_or_safety_constraint_requires_stop"]},
+  "publication": {"requires": ["rights_status","license_evidence","provenance"],"unknown_rights": "NOT_PUBLICLY_DISTRIBUTABLE", "restricted_rights": "NOT_PUBLICLY_DISTRIBUTABLE"},
+  "preservation": {"original_pdf_immutable": true,"checksum_required": true,"preservation_event_required": true,"download_must_not_be_rejected_merely_because_publication_is_unknown": true},
+  "learning_boundary": {"learning_never_blocks_acquisition": true,"knowledge_graph_never_grants_rights": true}
+}

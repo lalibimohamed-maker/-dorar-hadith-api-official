@@ -1,0 +1,31 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
+RUN apt-get update \
+    && apt-get dist-upgrade -y \
+    && apt-get install -y --no-install-recommends \
+    ffmpeg qpdf ghostscript tesseract-ocr libsndfile1 \
+    default-jre-headless curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements/rechercher-ai-engines.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt && pip install --no-cache-dir ocrmypdf
+
+ARG PDFBOX_VERSION=3.0.8
+RUN set -eux; \
+    curl -fsSL -o /opt/pdfbox-app.jar \
+      https://downloads.apache.org/pdfbox/${PDFBOX_VERSION}/pdfbox-app-${PDFBOX_VERSION}.jar; \
+    curl -fsSL -o /opt/pdfbox-app.jar.sha512 \
+      https://downloads.apache.org/pdfbox/${PDFBOX_VERSION}/pdfbox-app-${PDFBOX_VERSION}.jar.sha512; \
+    cd /opt; \
+    PDFBOX_SHA512="$(tr -d '[:space:]' < pdfbox-app.jar.sha512)"; \
+    test "${#PDFBOX_SHA512}" -eq 128; \
+    printf '%s  %s\n' "$PDFBOX_SHA512" pdfbox-app.jar | sha512sum -c -
+
+RUN useradd --create-home --uid 10001 rechercher \
+    && mkdir -p /workspace/input /workspace/output \
+    && chown -R rechercher:rechercher /workspace
+USER rechercher
+WORKDIR /workspace
+
+ENTRYPOINT ["python", "-c"]

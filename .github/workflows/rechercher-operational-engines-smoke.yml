@@ -1,0 +1,50 @@
+name: Rechercher — Operational engines smoke
+on:
+  push:
+    branches:
+      - feat/rechercher-operational-engines-installation-2026
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  python-engines:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install system engines
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg qpdf ghostscript tesseract-ocr libsndfile1
+          ffmpeg -version
+          qpdf --version
+          gs --version
+          tesseract --version
+      - name: Install Python engines
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements/rechercher-ai-engines.txt ocrmypdf
+          python3 - <<'PY'
+          import cv2, librosa, faster_whisper, whisperx
+          import sentence_transformers, transformers, PIL
+          import fitz, pypdfium2, pikepdf
+          print('PYTHON_ENGINE_IMPORTS_OK')
+          PY
+      - name: Verify PDFBox and zero-trust sandbox
+        run: |
+          docker build -f Dockerfile.rechercher-python-sandbox -t rechercher-python-sandbox:ci .
+          docker run --rm --network none --read-only --tmpfs /tmp --cap-drop ALL \
+            rechercher-python-sandbox:ci "import os, subprocess; print('SANDBOX_USER=', os.getuid()); subprocess.run(['java','-jar','/opt/pdfbox-app.jar','--version'], check=True); print('NETWORK_POLICY=external-network-disabled-by-runner')"
+      - name: Verify Montreal Forced Aligner runtime
+        run: |
+          docker build -f Dockerfile.rechercher-mfa-sandbox -t rechercher-mfa-sandbox:ci .
+          docker run --rm --network none --read-only --tmpfs /tmp --cap-drop ALL \
+            rechercher-mfa-sandbox:ci version
+      - name: Boundary smoke
+        run: node --test test/rechercher-operational-scale-guards.test.js
+      - name: V9 multimodal engine tests
+        run: node --test test/rechercher-v9-multimodal-recitation-engine.test.js test/rechercher-v9-multimodal-learning-orchestrator.test.js test/rechercher-v9-runtime-invariants.test.js

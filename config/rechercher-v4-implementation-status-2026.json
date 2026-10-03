@@ -1,0 +1,40 @@
+{
+  "engine": "rechercher-learning-intelligence-v4",
+  "version": "4.0.0",
+  "status_model": ["IMPLEMENTED","PARTIAL","PLANNED"],
+  "capabilities": {
+    "knowledge_gap_diagnosis": "IMPLEMENTED",
+    "prerequisite_similarity_paths": "IMPLEMENTED",
+    "blocked_learning_recovery": "IMPLEMENTED",
+    "explainable_personalized_recommendations": "IMPLEMENTED",
+    "four_knowledge_graph_layers": "IMPLEMENTED",
+    "evidence_provenance_trails": "IMPLEMENTED",
+    "contradiction_aware_research": "IMPLEMENTED",
+    "confidence_calibration": "IMPLEMENTED",
+    "teach_back": "PARTIAL",
+    "socratic_guidance": "PARTIAL",
+    "research_apprenticeship": "PARTIAL",
+    "cognitive_load_controls": "PARTIAL",
+    "transfer_laboratory": "PARTIAL",
+    "continuous_ablation_evaluation": "PARTIAL",
+    "privacy_preserving_learner_model": "PARTIAL",
+    "offline_first_resilience": "PARTIAL",
+    "teacher_scholar_review_channel": "PARTIAL",
+    "translation_alignment_memory": "PARTIAL",
+    "cross_language_terminology_map": "PARTIAL",
+    "accessibility_adaptive_presentation": "PARTIAL"
+  },
+  "safety_contract": {
+    "learning_must_not_stop_pdf_acquisition": true,
+    "learning_must_not_disable_acquisition": true,
+    "learning_must_not_bypass_rights_or_provenance": true,
+    "learning_must_not_modify_original_pdfs": true,
+    "learning_must_not_modify_canonical_quran_arabic": true,
+    "learning_must_not_erase_madhhab_or_scholarly_differences": true,
+    "ai_output_is_not_authoritative_without_human_review": true
+  },
+  "verification": {
+    "required_before_merge": ["unit_tests", "security_gates", "governance_gates", "ci_green"],
+    "current_head": "af0f48a43b5926116f3616fc638c8486899f6292"
+  }
+}

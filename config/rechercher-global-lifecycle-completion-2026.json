@@ -1,0 +1,51 @@
+{
+  "engine": "rechercher-global-lifecycle-completion",
+  "version": "2.0.0",
+  "scope": "V1_TO_V31_PLUS",
+  "principle": "Every Rechercher stage is tracked by the same evidence-backed completion contract; documentation alone never counts.",
+  "stages": [
+    "V1_FOUNDATION", "V2_FEDERATION", "V3_DOMAIN_LEARNING", "V4_LEARNING_INTELLIGENCE", "V5_GLOBAL_RESEARCH",
+    "V6_GLOBAL_SOURCE_INTELLIGENCE", "V7_GLOBAL_RESEARCH_GRAPH", "V8_AUTONOMOUS_ADAPTIVE_LEARNING",
+    "V9", "V10", "V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18", "V19", "V20",
+    "V21", "V22", "V23", "V24", "V25", "V26", "V27", "V28", "V29", "V30", "V31_PLUS"
+  ],
+  "completionStatuses": ["MISSING", "PLANNED", "OPEN_EXTENSION_POINT", "PARTIAL", "IMPLEMENTED_FOUNDATION", "IMPLEMENTED", "COMPLETE"],
+  "hardGates": ["engine", "resources", "contracts", "inputs", "outputs", "handoffs", "tests", "integration", "provenance", "rights", "immutability", "security", "governance", "observability"],
+  "rules": {
+    "completeRequiresAllHardGates": true,
+    "completeRequiresZeroKnownGaps": true,
+    "documentationAloneNeverCounts": true,
+    "unknownRightsNeverBecomePublishable": true,
+    "aiCannotSelfVerify": true,
+    "originalPdfImmutable": true,
+    "canonicalQuranArabicImmutable": true,
+    "acquisitionIndependentFromLearning": true,
+    "futureStagesMustRemainTracked": true,
+    "v31PlusIsOpenEnded": true
+  },
+  "operationalModel": {
+    "discover": true,
+    "identify": true,
+    "deduplicate": true,
+    "verifySource": true,
+    "checkRights": true,
+    "acquireOrReference": true,
+    "validate": true,
+    "extract": true,
+    "align": true,
+    "graph": true,
+    "evidence": true,
+    "scholarReview": true,
+    "publishWhenAllowed": true,
+    "measureGaps": true,
+    "researchAgain": true
+  },
+  "verification": {
+    "unitTests": true,
+    "fullCI": true,
+    "securityGates": true,
+    "governanceGates": true,
+    "integrationTests": true,
+    "mergeToMainRequiredForProductionComplete": true
+  }
+}

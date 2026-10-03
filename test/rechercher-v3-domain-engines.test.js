@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createTakhrijRijalEngine,registerHadith,addTakhrijOccurrence,registerNarrator,addNarratorEvaluation,summarizeTakhrij} from '../src/rechercher-takhrij-rijal-engine.js';
+import {createTafsirSirahArabicEngine,registerItem,addReference,registerConcept,alignArabicTerm,publishableItem} from '../src/rechercher-tafsir-sirah-arabic-engine.js';
+
+test('takhrij preserves source identity and rijal review state',()=>{const e=createTakhrijRijalEngine();registerHadith(e,{hadithId:'h1',text:'نص',canonicalSourceId:'quranless',canonicalSourceHash:'hh'});addTakhrijOccurrence(e,{occurrenceId:'o1',hadithId:'h1',sourceId:'b1',sourceHash:'bh',locator:'vol1:p2'});registerNarrator(e,{narratorId:'n1',name:'راو',sourceIds:['b1']});addNarratorEvaluation(e,{evaluationId:'ev1',narratorId:'n1',scholarId:'s1',status:'SCHOLAR_REVIEWED',sourceIds:['b1']});assert.equal(summarizeTakhrij(e,'h1').occurrences.length,1);assert.equal(e.evaluations.get('ev1').status,'SCHOLAR_REVIEWED');});
+
+test('tafsir sirah Arabic items stay rights-gated and source-linked',()=>{const e=createTafsirSirahArabicEngine();registerItem(e,{itemId:'t1',domain:'TAFSIR',title:'تفسير',sourceId:'b1',sourceHash:'h1',rightsStatus:'UNKNOWN'});addReference(e,{referenceId:'r1',itemId:'t1',locator:'p.4',textRange:'x'});registerConcept(e,{conceptId:'c1',label:'علم',domain:'ARABIC',sourceIds:['b1']});alignArabicTerm(e,{alignmentId:'a1',conceptId:'c1',term:'علم',normalizedTerm:'علم',sourceId:'b1',sourceHash:'h1'});assert.equal(publishableItem(e,'t1'),false);e.items.get('t1').rightsStatus='ALLOWED';assert.equal(publishableItem(e,'t1'),true);});

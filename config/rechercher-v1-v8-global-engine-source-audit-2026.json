@@ -1,0 +1,189 @@
+{
+  "engine": "rechercher-v1-v8-global-engine-source-audit",
+  "version": "1.0.0",
+  "scope": "V1-V8",
+  "status": "AUDITED_ON_PR_BRANCH",
+  "principle": "Every implemented Rechercher stage must have an executable engine, tests, configuration, resource/source coverage and an explicit safety boundary. Partial sub-capabilities remain partial and are never relabeled as complete.",
+  "branch": "feat/rechercher-world-knowledge-engines-v1",
+  "pr": 530,
+  "head_audited": "d20671917badc648303c7970c842c8011a2fab58",
+  "stages": {
+    "V1_FOUNDATION": {
+      "engine_families": [
+        "src/rechercher-world-knowledge-engine.js",
+        "src/rechercher-research-engine.js",
+        "src/rechercher-knowledge-evidence-graph-engine.js",
+        "src/rechercher-learning-roles-engine.js"
+      ],
+      "resources": [
+        "source-registry",
+        "source-coverage",
+        "corpus-provenance",
+        "knowledge-context",
+        "scholar-registry",
+        "evidence/provenance records"
+      ],
+      "tests": ["test/rechercher-world-knowledge-engine.test.js", "test/rechercher-research-engine.test.js"],
+      "state": "IMPLEMENTED_FOUNDATION"
+    },
+    "V2_FEDERATION": {
+      "engine_families": [
+        "src/rechercher-source-federation-engine.js",
+        "src/rechercher-source-identity-engine.js",
+        "src/rechercher-multilingual-concepts-engine.js",
+        "src/rechercher-adaptive-scheduler-engine.js",
+        "src/rechercher-manuscript-manifest-engine.js",
+        "src/rechercher-reproducibility-engine.js",
+        "src/rechercher-review-queue-engine.js"
+      ],
+      "resources": [
+        "global source registry",
+        "provider/query provenance",
+        "multilingual concept/terminology records",
+        "manuscript manifests",
+        "review queue",
+        "source/transformation hashes"
+      ],
+      "tests": ["test/rechercher-v2-engines.test.js"],
+      "state": "IMPLEMENTED_FOUNDATION"
+    },
+    "V3_DOMAIN_LEARNING": {
+      "engine_families": [
+        "src/rechercher-v3-learning-orchestrator.js",
+        "src/rechercher-islamic-sciences-engine.js",
+        "src/rechercher-hadith-evidence-engine.js",
+        "src/rechercher-fiqh-madhhab-engine.js",
+        "src/rechercher-tafsir-sirah-engine.js",
+        "src/rechercher-tafsir-sirah-arabic-engine.js",
+        "src/rechercher-takhrij-rijal-engine.js",
+        "src/rechercher-quran-learning-engine.js"
+      ],
+      "resources": [
+        "Quran source layer",
+        "Hadith source/evidence catalog",
+        "four Sunni madhhab records",
+        "tafsir/sirah source records",
+        "rijal/takhrij provenance",
+        "Islamic-sciences domain resources"
+      ],
+      "tests": ["test/rechercher-v3-continuation.test.js", "test/rechercher-v3-domain-engines.test.js", "test/rechercher-v3-islamic-learning-engines.test.js", "test/rechercher-v3-learning-engines.test.js"],
+      "state": "IMPLEMENTED_FOUNDATION"
+    },
+    "V4_LEARNING_INTELLIGENCE": {
+      "engine_families": [
+        "src/rechercher-learning-intelligence-v4-engine.js",
+        "src/rechercher-learning-memory-engine.js",
+        "src/rechercher-feedback-loop-engine.js",
+        "src/rechercher-transfer-graph-engine.js",
+        "src/rechercher-pedagogy-safety-engine.js",
+        "src/rechercher-teachback-engine.js",
+        "src/rechercher-mastery-engine.js"
+      ],
+      "resources": [
+        "learner state",
+        "session memory",
+        "long-term learner memory",
+        "feedback events",
+        "transfer graph",
+        "mastery/prerequisite records",
+        "pedagogy safety policy"
+      ],
+      "tests": ["test/rechercher-v4-learning-intelligence-contract.test.js", "test/rechercher-v4-learning-intelligence.test.js"],
+      "state": "IMPLEMENTED_FOUNDATION"
+    },
+    "V5_COGNITIVE_GLOBAL_RESEARCH": {
+      "engine_families": [
+        "src/rechercher-v5-cognitive-learning-intelligence-engine.js",
+        "src/rechercher-v5-research-foundation-engine.js",
+        "src/rechercher-v5-v7-global-intelligence-mesh.js",
+        "src/rechercher-cognitive-learning-engine.js",
+        "src/rechercher-citation-reproducibility-engine.js",
+        "src/rechercher-global-knowledge-search-engine.js",
+        "src/rechercher-global-source-discovery-engine.js",
+        "src/rechercher-global-source-federation-v2-engine.js",
+        "src/rechercher-global-work-reconciliation-engine.js"
+      ],
+      "resources": [
+        "global research providers",
+        "world source registry",
+        "work/edition/manuscript identity",
+        "knowledge gaps",
+        "citation/reproducibility traces",
+        "learner retention/session models",
+        "source/rights/provenance graph"
+      ],
+      "tests": ["test/rechercher-v5-cognitive-learning-intelligence-engine.test.js", "test/rechercher-v5-research-foundation.test.js", "test/rechercher-global-knowledge-search-engine.test.js", "test/rechercher-global-source-discovery-engine.test.js", "test/rechercher-global-source-federation-v2-engine.test.js", "test/rechercher-global-work-reconciliation-engine.test.js"],
+      "state": "IMPLEMENTED_FOUNDATION"
+    },
+    "V6_GLOBAL_SOURCE_INTELLIGENCE": {
+      "engine": "src/rechercher-v6-global-source-intelligence-engine.js",
+      "resources": "config/rechercher-v6-v8-resources-2026.json + RESEARCH_RESOURCE_FAMILIES",
+      "capabilities": ["discovery", "classification", "identity", "deduplication", "provenance", "rights", "work-edition-manuscript linking"],
+      "tests": ["test/rechercher-v6-global-source-intelligence-engine.test.js"],
+      "state": "IMPLEMENTED_FOUNDATION"
+    },
+    "V7_EVIDENCE_GRAPH": {
+      "engines": [
+        "src/rechercher-claim-evidence-contradiction-engine.js",
+        "src/rechercher-v7-evidence-graph-engine.js",
+        "src/rechercher-v7-research-evidence-graph-engine.js",
+        "src/rechercher-v7-global-knowledge-evidence-graph-engine.js",
+        "src/rechercher-v7-graph-integration-engine.js"
+      ],
+      "resources": [
+        "claims",
+        "evidence",
+        "contradictions",
+        "attribution graph",
+        "scholar graph",
+        "hadith-chain graph",
+        "fiqh-disagreement graph",
+        "multilingual evidence graph"
+      ],
+      "tests": ["test/rechercher-claim-evidence-contradiction-engine.test.js", "test/rechercher-v7-evidence-graph-engine.test.js", "test/rechercher-v7-graph-integration-engine.test.js"],
+      "state": "IMPLEMENTED_FOUNDATION"
+    },
+    "V8_AUTONOMOUS_ADAPTIVE_LEARNING": {
+      "engines": [
+        "src/rechercher-v8-adaptive-learning-engine.js",
+        "src/rechercher-v8-research-observatory-engine.js",
+        "src/rechercher-v6-v8-resource-integration-engine.js"
+      ],
+      "resources": [
+        "learner state",
+        "skill/prerequisite graph",
+        "misconception observations",
+        "verified source candidates",
+        "rights/provenance evidence",
+        "learning outcomes",
+        "spaced-review schedule",
+        "knowledge-gap observations",
+        "global V6 resource families"
+      ],
+      "tests": ["test/rechercher-v8-adaptive-learning-engine.test.js", "test/rechercher-v8-research-observatory-engine.test.js", "test/rechercher-v6-v8-resource-integration-engine.test.js"],
+      "state": "IMPLEMENTED_FOUNDATION"
+    }
+  },
+  "global_resource_families": [
+    "OPENITI_KITAB", "INTERNET_ARCHIVE", "WIKIMEDIA_COMMONS", "OPEN_LIBRARY", "LIBRARY_OF_CONGRESS", "GOOGLE_BOOKS", "CROSSREF", "NYU_ACO", "SMITHSONIAN", "PRINCETON_PUL", "BRITISH_LIBRARY_EAP", "GALLICA_BNF", "BODLEIAN", "CAMBRIDGE", "VATICAN", "KAIRouAN", "AL_FURQAN", "QATAR_DIGITAL_LIBRARY", "WAQFEYA", "SHAMELA", "ALIFTA", "ISLAMHOUSE", "HADITHENC", "TERMINOLOGY_ENCYCLOPEDIA", "MINHADJ_RU", "ALHADIS_RU", "SUNNAPORTAL_RU", "ISLAMQA_RU", "ISLAMHOUSE_RU", "ALQURAN_ISLAM_GOV_QA"
+  ],
+  "global_safety": {
+    "rights_unknown_publishable": false,
+    "rights_restricted_publishable": false,
+    "explicit_permission_required": true,
+    "original_pdf_immutable": true,
+    "canonical_quran_arabic_immutable": true,
+    "ai_synthesis_authoritative": false,
+    "learning_can_override_religious_authority": false,
+    "acquisition_independent": true,
+    "proxy_rotation": false,
+    "user_agent_rotation": false
+  },
+  "verification": {
+    "required": ["stage_unit_tests", "full_ci", "security_gates", "governance_gates", "integration_tests"],
+    "last_ci_observed": "db71657735324604e65f23977043d752e4905ce6",
+    "last_ci_result": "FAIL_ONE_TEST",
+    "failure": "test/rechercher-v6-v8-resource-integration-engine.test.js expects integrationHealth.publishableSources at top level; fixed in d20671917badc648303c7970c842c8011a2fab58",
+    "promotion": "BLOCKED_UNTIL_CI_GREEN"
+  }
+}

@@ -1,0 +1,22 @@
+FROM condaforge/mambaforge:24.9.2-0
+
+ENV CONDA_NONINTERACTIVE=true \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    MFA_ROOT_DIR=/tmp/mfa
+
+RUN conda install -y -c conda-forge python=3.11 montreal-forced-aligner=3.* \
+    && python -m pip install --no-cache-dir --upgrade \
+       'setuptools>=78.1.1' \
+       'wheel>=0.46.2' \
+       'urllib3>=2.7.0' \
+       'jaraco.context>=6.1.0' \
+    && conda clean -afy \
+    && python -c "import importlib.metadata as md; requirements=(('setuptools','78.1.1'),('wheel','0.46.2'),('urllib3','2.7.0'),('jaraco.context','6.1.0')); print(*[f'{name}=={md.version(name)} (minimum {minimum})' for name, minimum in requirements], sep='\\n')"
+
+RUN useradd --create-home --uid 10002 rechercher-mfa \
+    && mkdir -p /workspace/input /workspace/output /tmp/mfa \
+    && chown -R rechercher-mfa:rechercher-mfa /workspace /tmp/mfa
+USER rechercher-mfa
+WORKDIR /workspace
+ENTRYPOINT ["mfa"]

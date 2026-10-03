@@ -141,7 +141,7 @@ jobs:
       - name: Run Trivy repository shield
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          version: v0.72.0
+          version: v0.74.0
           scan-type: repo
           scan-ref: .
           scanners: vuln,misconfig,secret,license
@@ -149,6 +149,7 @@ jobs:
           ignore-unfixed: false
           exit-code: 1
           format: sarif
+          limit-severities-for-sarif: true
           output: artifacts-security-trivy.sarif
       - name: Preserve Trivy evidence
         if: always()

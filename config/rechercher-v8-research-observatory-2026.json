@@ -1,0 +1,25 @@
+{
+  "stage": "V8_RESEARCH_OBSERVATORY",
+  "version": "8.0.0",
+  "status": "IMPLEMENTED_FOUNDATION",
+  "purpose": "Measure evidence coverage, review readiness, rights coverage, uncertainty and explicit knowledge gaps without treating absence as proof.",
+  "gapTypes": [
+    "MISSING_EVIDENCE",
+    "SOURCE_COVERAGE",
+    "UNRESOLVED_CONTRADICTION",
+    "TERMINOLOGY_ALIGNMENT",
+    "RIGHTS_BLOCKED",
+    "REVIEW_PENDING"
+  ],
+  "outputs": ["RESEARCH_OBSERVATION", "KNOWLEDGE_GAP", "RESEARCH_HEALTH"],
+  "safety": {
+    "absenceIsNotProof": true,
+    "rightsUnknownNotPublishable": true,
+    "humanReviewForAuthoritativeUse": true,
+    "originalPdfImmutable": true,
+    "canonicalQuranArabicImmutable": true,
+    "acquisitionIndependent": true
+  },
+  "handoffs": ["GRAPH_TO_OBSERVATORY", "OBSERVATORY_TO_RESEARCH"],
+  "dependencies": ["V7_GRAPH_INTEGRATION"]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "Rechercher Five-Stage Network",
+  "version": "2026.09",
+  "status": "IMPLEMENTED_EXECUTABLE_FOUNDATION",
+  "stages": [
+    {"id":"V1_FOUNDATION","role":"source-grounded discovery, identity, provenance, evidence"},
+    {"id":"V2_FEDERATION","role":"source federation, multilingual concepts, adaptive scheduling, manifests, reproducibility"},
+    {"id":"V3_DOMAIN_LEARNING","role":"Quran, hadith, fiqh, tafsir, sirah, Arabic, usul, aqidah, recitation and mastery"},
+    {"id":"V4_LEARNING_INTELLIGENCE","role":"cognitive stages, memory, feedback, transfer, active recall, interleaving, teach-back and gap actions"},
+    {"id":"V5_GLOBAL_RESEARCH","role":"global discovery, research foundation, manuscript/edition/OCR/IIIF readiness and evidence-grounded synthesis"}
+  ],
+  "handoff_order": [
+    "DISCOVERY_TO_IDENTITY",
+    "IDENTITY_TO_PROVENANCE",
+    "PROVENANCE_TO_RIGHTS",
+    "RIGHTS_TO_EVIDENCE",
+    "EVIDENCE_TO_LEARNING",
+    "LEARNING_TO_RESEARCH",
+    "RESEARCH_TO_REPLAN"
+  ],
+  "shared_contract": {
+    "source_identity": "stable sourceId + immutable contentHash",
+    "rights": ["ALLOWED","RESTRICTED","UNKNOWN","EXPLICIT_PERMISSION_REQUIRED"],
+    "evidence": "source-grounded before authoritative publication",
+    "learning": "non-authoritative educational guidance remains source-linked",
+    "human_review": "required for scholarly verification where the underlying engine requires it",
+    "original_pdf": "immutable",
+    "canonical_quran_arabic": "immutable",
+    "acquisition": "independent from learning/research orchestration"
+  },
+  "integration_rule": "V1-V5 communicate through explicit handoffs and shared identifiers; future V6-V31+ engines may attach through the same contract without requiring the network core to be rewritten.",
+  "future": {"v6_plus": "OPEN", "v21_plus": "OPEN", "v31_plus": "OPEN", "merge_policy": "keep future stages unmerged until tested and coordinated"}
+}
