@@ -73,7 +73,24 @@
       "license_status": "review_required",
       "weight_status": "review_required",
       "priority": 40,
-      "runtime_status": "queued_until_weight_clearance"
+      "runtime_status": "queued_until_weight_clearance",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "storage_visibility": "private",
+      "storage_release_tag": "rechercher-omega-hunyuanvideo15-v1.0.0",
+      "storage_status": "weights_present",
+      "storage_asset_count": 707,
+      "runtime_artifact_status": "packaged_unverified_execution",
+      "runtime_readiness": "dependency_blocked",
+      "execution_proof": "not_e2e_verified",
+      "execution_modes": [
+        "local-gpu",
+        "kaggle-gpu"
+      ],
+      "quota_required": false,
+      "distribution_status": "private_review_only",
+      "activation_rule": "activate_only_after_license_clearance_and_all_runtime_dependencies_verified",
+      "primary_chat_brain": false,
+      "purpose": "optional_local_video_engine"
     },
     {
       "id": "ltx-2",
@@ -91,7 +108,24 @@
       "license_status": "review_required",
       "weight_status": "review_required",
       "priority": 50,
-      "runtime_status": "queued_until_weight_clearance"
+      "runtime_status": "queued_until_weight_clearance",
+      "storage_repository": "lalibimohamed-maker/rechercher-omega-engine-storage",
+      "storage_visibility": "private",
+      "storage_release_tag": "rechercher-omega-ltx2-v1.0.0",
+      "storage_status": "weights_present",
+      "storage_asset_count": 614,
+      "runtime_artifact_status": "weights_and_components_present_runtime_unverified",
+      "runtime_readiness": "dependency_and_execution_verification_required",
+      "execution_proof": "not_e2e_verified",
+      "execution_modes": [
+        "local-gpu",
+        "kaggle-gpu"
+      ],
+      "quota_required": false,
+      "distribution_status": "private_review_only",
+      "activation_rule": "activate_only_after_license_clearance_and_all_runtime_dependencies_verified",
+      "primary_chat_brain": false,
+      "purpose": "optional_local_audio_video_engine"
     },
     {
       "id": "cogvideox",
