@@ -103,7 +103,7 @@ jobs:
           MODEL_FILE: ${{ matrix.model_file }}
           DATASET_URL: ${{ matrix.dataset_url }}
           EXPECTED_DATASET_LICENSE: ${{ matrix.dataset_license_expected }}
-          OUTPUT: ${{ runner.temp }}/voice-rights.json
+          OUTPUT: ${{ runner.temp }}/voice-rights-${{ matrix.id }}.json
         run: |
           set -euo pipefail
           python - <<'PY'
@@ -163,7 +163,11 @@ jobs:
             "redistribution_gate":"passed",
             "source_type":"Hugging Face Piper voice registry + original dataset source"
           }
-          Path(os.environ["OUTPUT"]).write_text(json.dumps(out,indent=2,ensure_ascii=False)+"\\n")
+          output_path=Path(os.environ["OUTPUT"])
+          output_path.unlink(missing_ok=True)
+          output_path.write_text(json.dumps(out,indent=2,ensure_ascii=False)+"\\n",encoding="utf-8")
+          json.loads(output_path.read_text(encoding="utf-8"))
+          print("rights manifest JSON validated:", output_path)
           print(json.dumps(out,indent=2,ensure_ascii=False))
           PY
 
@@ -208,7 +212,7 @@ jobs:
       - name: Build immutable voice manifest
         env:
           OUT: ${{ runner.temp }}/voice
-          RIGHTS: ${{ runner.temp }}/voice-rights.json
+          RIGHTS: ${{ runner.temp }}/voice-rights-${{ matrix.id }}.json
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
