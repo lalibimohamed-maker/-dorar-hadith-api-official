@@ -452,7 +452,20 @@ def main():
     manifest = download_manifest(release)
     result = audit(release, manifest, assets)
     source_audit = audit_source_release(release, assets, int(manifest.get("chunk_bytes", CHUNK_BYTES)))
-    print(json.dumps({"manifest_audit": result, "source_audit": source_audit}, ensure_ascii=False, indent=2))
+    report = {
+        "manifest_audit": result,
+        "source_audit": source_audit,
+        "release_asset_count": len(assets),
+        "release_tag": TAG,
+        "model_id": MODEL_ID,
+        "revision": REVISION,
+    }
+    report_path = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "omega-video-release-audit.json"
+    report_path.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(json.dumps(report, ensure_ascii=False, indent=2))
     if AUDIT_ONLY:
         if source_audit["status"] != "complete":
             raise SystemExit(1)
