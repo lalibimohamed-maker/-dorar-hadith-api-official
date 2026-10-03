@@ -1,0 +1,1 @@
+V4 is implementation work. V5-V20 are strategic roadmap horizons. V21+ is exploratory only. No future horizon is to be described as implemented before its code, tests, security review, human review where needed, and merge are complete.

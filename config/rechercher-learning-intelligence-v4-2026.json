@@ -1,0 +1,121 @@
+{
+  "schema": "rechercher-learning-intelligence-v4-2026",
+  "status": "frozen-extension-requirements",
+  "extends": "rechercher-learning-intelligence-2026",
+  "new_capabilities": [
+    "mastery-by-cognitive-level",
+    "knowledge-gap-diagnosis",
+    "prerequisite-and-similarity-paths",
+    "explainable-personalized-recommendations",
+    "blocked-learning-recovery",
+    "cross-modal-learning",
+    "multimodal-knowledge-graph",
+    "source-contradiction-aware-research",
+    "evidence-strength-and-provenance-trails",
+    "confidence-calibration",
+    "uncertainty-aware-feedback",
+    "teach-back-assessment",
+    "socratic-guidance",
+    "research-apprenticeship",
+    "cognitive-load-controls",
+    "retrieval-interleaving-controller",
+    "transfer-laboratory",
+    "learning-path-ablation-and-evaluation",
+    "offline-first-learning-resilience",
+    "privacy-preserving-learner-model",
+    "teacher-scholar-review-channel",
+    "translation-alignment-memory",
+    "terminology-cross-language-map",
+    "source-language-preservation",
+    "accessibility-adaptive-presentation"
+  ],
+  "recommendation_policy": {
+    "must_be_explainable": true,
+    "must_expose_source_basis": true,
+    "must_not_optimize_clicks_only": true,
+    "must_allow_manual_override": true,
+    "must_recover_from_blocked_prerequisites": true
+  },
+  "knowledge_graph": {
+    "layers": [
+      "source-graph",
+      "domain-ontology",
+      "learning-resource-graph",
+      "learner-state-graph"
+    ],
+    "relation_types": [
+      "prerequisite",
+      "similar-to",
+      "supports",
+      "contrasts-with",
+      "explains",
+      "cites",
+      "derived-from",
+      "translation-of",
+      "example-of",
+      "applies-to"
+    ],
+    "every_claim_requires_evidence_or_explicit_derived_status": true
+  },
+  "adaptive_learning": {
+    "state_inputs": [
+      "recall-history",
+      "transfer-history",
+      "error-patterns",
+      "confidence-calibration",
+      "prerequisite-mastery",
+      "time-on-task",
+      "modality-response",
+      "language-preference"
+    ],
+    "fallback_when_prerequisite_blocked": [
+      "similar-concept",
+      "worked-example",
+      "source-linked-explanation",
+      "diagnostic-question",
+      "review-card"
+    ]
+  },
+  "multilingual": {
+    "architecture": "language-neutral",
+    "layers": [
+      "interface",
+      "learning",
+      "source"
+    ],
+    "preserve_original_terms": true,
+    "preserve_translation_alignment": true,
+    "world-language-expansion": true
+  },
+  "religious_safety": {
+    "ai_is_assistant_not_authority": true,
+    "source_first": true,
+    "scholarly_disagreement_preserved": true,
+    "madhhab_distinctions_preserved": true,
+    "quran_canonical_text_immutable": true,
+    "original_pdfs_immutable": true,
+    "rights_gate_inherited": true
+  },
+  "evaluation": {
+    "required": [
+      "retention",
+      "transfer",
+      "mastery-time",
+      "error-recovery",
+      "calibration",
+      "source-groundedness",
+      "recommendation-explainability",
+      "translation-alignment",
+      "accessibility"
+    ],
+    "continuous_ablation": true,
+    "no_unvalidated_authoritative_religious_grading": true
+  },
+  "architecture_boundary": {
+    "learning_layer_is_downstream_of_acquisition": true,
+    "learning_layer_must_never_stop_pdf_acquisition": true,
+    "learning_layer_must_never_bypass_rights": true,
+    "learning_layer_must_never_mutate_canonical_source": true,
+    "implementation_policy": "reviewed-increments-only"
+  }
+}
