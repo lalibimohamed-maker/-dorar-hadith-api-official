@@ -83,6 +83,22 @@ jobs:
           print("[OK] profile validated")
           PY
 
+      - name: Validate generation adapter support
+        env:
+          ENGINE: ${{ inputs.engine }}
+          PROFILE: ${{ inputs.profile }}
+        run: |
+          set -euo pipefail
+          case "${ENGINE}/${PROFILE}" in
+            ltx-2/distilled-monolith|hunyuanvideo-1.5/480p-i2v-distilled|hunyuanvideo-1.5/480p-i2v-step-distilled|hunyuanvideo-1.5/480p-t2v-distilled)
+              echo "[OK] executable generation adapter is defined"
+              ;;
+            *)
+              echo "No executable generation adapter is defined for ${ENGINE}/${PROFILE}"
+              exit 1
+              ;;
+          esac
+
       - name: Materialize selected private weight profile
         env:
           GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
@@ -211,6 +227,12 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/HunyuanVideo-1.5"
+          case "${{ inputs.profile }}" in
+            480p-i2v-distilled|480p-i2v-step-distilled)
+              test -n "${IMAGE_PATH:-}" || { echo "IMAGE_PATH is required for Hunyuan I2V profiles"; exit 1; }
+              test -f "$IMAGE_PATH"
+              ;;
+          esac
           resolution=480p
           cfg_distilled=true
           step_distill=false
