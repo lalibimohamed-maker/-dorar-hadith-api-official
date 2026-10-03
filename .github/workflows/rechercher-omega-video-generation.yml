@@ -165,19 +165,19 @@ jobs:
           test -d "$GEMMA_ROOT"
           args=(
             -m ltx_pipelines.distilled
-            --checkpoint-path "$checkpoint"
+            --distilled-checkpoint-path "$checkpoint"
             --gemma-root "$GEMMA_ROOT"
             --spatial-upsampler-path "$spatial"
             --prompt "$PROMPT"
             --output-path "$OUTPUT_PATH"
             --height 512
             --width 768
-            --num-frames 49
+            --duration 2
             --frame-rate 24
           )
           if [ -n "${IMAGE_PATH:-}" ]; then
             test -f "$IMAGE_PATH"
-            args+=(--image "$IMAGE_PATH" 0 1.0)
+            args+=(--image-conditioning-path "$IMAGE_PATH")
           fi
           uv run python "${args[@]}"
 
