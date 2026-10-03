@@ -175,7 +175,7 @@ jobs:
           torchrun --nproc_per_node=1 generate.py             --prompt "$PROMPT"             "${image_args[@]}"             --resolution "$resolution"             --aspect_ratio 16:9             --seed 1             --rewrite false             --cfg_distilled "$cfg_distilled"             --enable_step_distill "$step_distill"             --sparse_attn false --use_sageattn false             --enable_cache false --cache_type deepcache             --overlap_group_offloading false             --sr false --save_pre_sr_video             --output_path "$OUTPUT_PATH"             --model_path "$MODEL_DIR"
 
       - name: Upload generated video as non-scholarly artifact
-        uses: actions/upload-artifact@3d3c42e6b1fd0f9c2e8c6c7d4a3b6c5e4f7d8e9 # v7.0.1 placeholder
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1 placeholder
         with:
           name: omega-video-${{ inputs.engine }}-${{ inputs.profile }}
           path: ${{ runner.temp }}/omega-*-output.mp4
