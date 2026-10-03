@@ -1,0 +1,65 @@
+name: Rechercher — FreeLLM registry health evidence
+
+"on":
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/rechercher-freellm-free-models-2026
+    paths:
+      - .github/workflows/rechercher-freellm-registry-refresh.yml
+      - config/freellm-discovery-registry-2026.json
+      - src/freellm-discovery-registry.js
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-freellm-registry-refresh
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Verify canonical FreeLLM directory
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, urllib.request
+          cfg=json.load(open('config/freellm-discovery-registry-2026.json', encoding='utf-8'))
+          url=cfg['canonicalSource']['modelsUrl']
+          req=urllib.request.Request(url, headers={
+              'User-Agent':'Dinullah-Rechercher/2026',
+              'Accept':'text/html,application/xhtml+xml',
+          })
+          with urllib.request.urlopen(req, timeout=30) as r:
+              body=r.read()
+              status=r.status
+          if status != 200:
+              raise SystemExit(f'FreeLLM returned HTTP {status}')
+          marker=b'Directory of Free LLM APIs'
+          if marker not in body:
+              raise SystemExit('FreeLLM directory marker missing')
+          evidence={
+              'schema':'dinullah.freellm-source-evidence.v1',
+              'sourceUrl':cfg['canonicalSource']['url'],
+              'modelsUrl':url,
+              'httpStatus':status,
+              'retrievedBytes':len(body),
+              'sha256':hashlib.sha256(body).hexdigest(),
+              'markerVerified':True,
+          }
+          json.dump(evidence, open('/tmp/freellm-source-evidence.json','w'), ensure_ascii=False, indent=2)
+          print(json.dumps(evidence, ensure_ascii=False))
+          PY
+      - name: Validate registry contract
+        run: |
+          set -euo pipefail
+          node --test test/freellm-discovery-registry.test.js
