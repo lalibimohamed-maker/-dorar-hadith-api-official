@@ -165,7 +165,7 @@ jobs:
           }
           output_path=Path(os.environ["OUTPUT"])
           output_path.unlink(missing_ok=True)
-          output_path.write_text(json.dumps(out,indent=2,ensure_ascii=False)+"\\n",encoding="utf-8")
+          output_path.write_text(json.dumps(out,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
           json.loads(output_path.read_text(encoding="utf-8"))
           print("rights manifest JSON validated:", output_path)
           print(json.dumps(out,indent=2,ensure_ascii=False))
@@ -249,7 +249,7 @@ jobs:
           REPO: ${{ env.OMEGA_STORAGE_REPOSITORY }}
           RELEASE_TAG: ${{ matrix.release_tag }}
           OUT: ${{ runner.temp }}/voice
-          RIGHTS: ${{ runner.temp }}/voice-rights.json
+          RIGHTS: ${{ runner.temp }}/voice-rights-${{ matrix.id }}.json
           MODEL_FILE: ${{ matrix.model_file }}
         run: |
           set -euo pipefail
