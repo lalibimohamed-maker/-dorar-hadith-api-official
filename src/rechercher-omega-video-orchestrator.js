@@ -189,14 +189,14 @@ export function orchestrateVideoPlan({
 function buildRuntimeJob(runtime, scene, selection = {}) {
   if (["hunyuanvideo-1.5", "ltx-2"].includes(selection.model_id) && ["local", "kaggle-gpu"].includes(runtime)) {
     return buildLocalVideoEngineJob({
-
-    engineId: selection.model_id,
-    modelRevision: selection.model_revision ?? scene.model_revision,
-    runtimeEnvironmentId: selection.runtime_environment_id,
-    task: scene.generation_task,
-    prompt: scene.prompt,
-    sourceAssets: scene.source_assets ?? []
-  });
+      engineId: selection.model_id,
+      modelRevision: selection.model_revision ?? scene.model_revision,
+      runtimeEnvironmentId: selection.runtime_environment_id,
+      task: scene.generation_task,
+      prompt: scene.prompt,
+      sourceAssets: scene.source_assets ?? []
+    });
+  }
   if (runtime === "local-comfyui") return buildComfyUIJob({
     workflow: scene.comfyui_workflow ?? "REQUIRED_RUNTIME_WORKFLOW",
     prompt: scene.prompt
