@@ -31,10 +31,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Reuse or repair an existing Release
+      - name: Reuse existing Release when complete
         id: release_preflight
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
           set -euo pipefail
           TAG='rechercher-free-local-models-2026-10-qwen3-1.7b'
@@ -48,52 +49,20 @@ jobs:
             RELEASE-PARTS.json
             SHA256SUMS.txt
           )
-          complete=true
           asset_names="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || true)"
+          complete=true
           for name in "${required[@]}"; do
             if ! grep -Fxq "$name" <<<"$asset_names"; then
               complete=false
               break
             fi
           done
-
-          if [ "$complete" = true ]; then
-            mkdir -p release-repair
-            gh release download "$TAG" \
-              --pattern RELEASE-PARTS.json \
-              --pattern SHA256SUMS.txt \
-              --dir release-repair \
-              --repo "$GITHUB_REPOSITORY"
-            python3 - <<'PY'
-            import hashlib, json, pathlib
-            root=pathlib.Path('release-repair')
-            manifest=json.loads((root/'RELEASE-PARTS.json').read_text(encoding='utf-8'))
-            manifest['partSizeBytes']=1800*1024*1024
-            (root/'RELEASE-PARTS.json').write_text(
-                json.dumps(manifest, ensure_ascii=False, indent=2) + '\n',
-                encoding='utf-8'
-            )
-            digest=hashlib.sha256((root/'RELEASE-PARTS.json').read_bytes()).hexdigest()
-            lines=(root/'SHA256SUMS.txt').read_text(encoding='utf-8').splitlines()
-            replaced=[]
-            found=False
-            for line in lines:
-                if line.endswith('qwen17-release/RELEASE-PARTS.json'):
-                    replaced.append(f'{digest}  qwen17-release/RELEASE-PARTS.json')
-                    found=True
-                else:
-                    replaced.append(line)
-            if not found:
-                raise SystemExit('RELEASE-PARTS checksum entry missing')
-            (root/'SHA256SUMS.txt').write_text('\n'.join(replaced)+'\n', encoding='utf-8')
-            PY
-            gh release upload "$TAG" \
-              release-repair/RELEASE-PARTS.json \
-              release-repair/SHA256SUMS.txt \
-              --repo "$GITHUB_REPOSITORY" --clobber
-          fi
-
           echo "complete=$complete" >> "$GITHUB_OUTPUT"
+          if [ "$complete" = true ]; then
+            echo "Complete Qwen3-1.7B Release already exists; skipping re-acquisition."
+          else
+            echo "Qwen3-1.7B Release is incomplete; acquisition will run."
+          fi
 
       - name: Install acquisition tools
         if: steps.release_preflight.outputs.complete != 'true'
