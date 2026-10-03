@@ -23,15 +23,15 @@ test('pins and canonicalizes the FreeLLM source, including tracking URLs', () =>
 test('rejects non-canonical source hosts and paths', () => {
   assert.throws(
     () => createFreeLlmDiscoveryRegistry({ sourceUrl: 'https://example.com/' }),
-    (error) => String(error?.message).includes('freellm.net')
+    (error) => error?.message === 'sourceUrl must remain on freellm.net'
   );
   assert.throws(
     () => createFreeLlmDiscoveryRegistry({ modelsUrl: 'https://freellm.net/api/models' }),
-    (error) => String(error?.message).includes('canonical freellm.net path')
+    (error) => error?.message === 'modelsUrl must use the canonical freellm.net path'
   );
   assert.throws(
     () => createFreeLlmDiscoveryRegistry({ agentIndexUrl: 'https://example.com/llms.txt' }),
-    (error) => String(error?.message).includes('freellm.net')
+    (error) => error?.message === 'agentIndexUrl must remain on freellm.net'
   );
 });
 
