@@ -452,9 +452,20 @@ def main():
     manifest = download_manifest(release)
     result = audit(release, manifest, assets)
     source_audit = audit_source_release(release, assets, int(manifest.get("chunk_bytes", CHUNK_BYTES)))
+    source_inventory = [
+        {
+            "source_path": item["source_path"],
+            "bytes": item["bytes"],
+            "asset_count": len(item["assets"]),
+            "first_asset": item["assets"][0][0] if item["assets"] else None,
+            "last_asset": item["assets"][-1][0] if item["assets"] else None,
+        }
+        for item in source_expected_assets(int(manifest.get("chunk_bytes", CHUNK_BYTES)))
+    ]
     report = {
         "manifest_audit": result,
         "source_audit": source_audit,
+        "source_inventory": source_inventory,
         "release_asset_count": len(assets),
         "release_tag": TAG,
         "model_id": MODEL_ID,
