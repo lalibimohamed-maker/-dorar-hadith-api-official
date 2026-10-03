@@ -1,0 +1,64 @@
+name: Rechercher — Native source connectors
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-native-connectors
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Syntax check native connector runtime
+        run: |
+          node --check src/rechercher/native-source-connectors.js
+          node --check src/rechercher/native-federation-engine.js
+          node --check src/rechercher/source-census.js
+          node --check config/rechercher-native-sources.js
+          node --check scripts/rechercher-native-connectors.mjs
+          node --check scripts/rechercher-native-acquisition-bridge.mjs
+      - name: Run native connector tests
+        run: |
+          node --test test/rechercher-native-connectors.test.js
+          node --test test/rechercher-source-census.test.js
+      - name: Emit source census
+        run: node scripts/rechercher-native-connectors.mjs census
+      - name: Emit connector manifest
+        run: node scripts/rechercher-native-connectors.mjs manifest
+
+  live-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Probe enabled native endpoints
+        run: node scripts/rechercher-native-connectors.mjs health

@@ -1,0 +1,41 @@
+name: Rechercher — Historical all-branch source census
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '43 */12 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rechercher-historical-source-census
+  cancel-in-progress: false
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout complete repository history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Use Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Census every branch
+        run: node scripts/rechercher-historical-source-census.mjs
+
+      - name: Upload historical source census
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rechercher-historical-source-census
+          path: artifacts/rechercher-historical-source-census/sources.json
+          if-no-files-found: error
+          retention-days: 30

@@ -1,6 +1,12 @@
-export const NODE_TYPES = Object.freeze(["quran_verse","hadith","hadith_variant","tafsir","asbab_al_nuzul","sirah_event","companion_statement","scholar_statement","scholar","narrator","rijal_entry","fiqh_ruling","aqeedah_statement","fatwa","book","chapter","concept","source"]);
+export const NODE_TYPES = Object.freeze([
+  "quran_verse","hadith","hadith_variant","tafsir","asbab_al_nuzul","sirah_event","companion_statement","scholar_statement","scholar","narrator","rijal_entry","fiqh_ruling","aqeedah_statement","fatwa","book","chapter","concept","source",
+  "knowledge_source","source_service","language","category","subcategory","term","translation","dictionary","reference","source_record"
+]);
 
-export const EDGE_TYPES = Object.freeze(["explains","contextualizes","cause_of_revelation_for","related_to","supports","reports","variant_of","narrated_by","has_narrator","evaluated_by","commented_on","cites","derived_from","applies_to","contradicts","qualifies","same_event_as","same_concept_as","part_of","published_in","source_of"]);
+export const EDGE_TYPES = Object.freeze([
+  "explains","contextualizes","cause_of_revelation_for","related_to","supports","reports","variant_of","narrated_by","has_narrator","evaluated_by","commented_on","cites","derived_from","applies_to","contradicts","qualifies","same_event_as","same_concept_as","part_of","published_in","source_of",
+  "provides","offers_service","supports_language","has_category","has_subcategory","has_term","translated_as","has_dictionary","has_reference","same_source_as","discovered_from","describes","indexed_by"
+]);
 
 const TRUSTED_STATES = new Set(["source_verified","edition_verified","scholar_reviewed"]);
 
@@ -13,6 +19,9 @@ export function validateNode(node = {}) {
   if (!node.id) errors.push("missing:id");
   if (!isNodeType(node.type)) errors.push(`unsupported-node-type:${node.type}`);
   if (!node.provenance || typeof node.provenance !== "object") errors.push("missing:provenance");
+  if (node.metadata?.sourceClassification === "structured-knowledge-source" && node.type !== "knowledge_source") {
+    errors.push("structured-source-must-use-knowledge_source-node");
+  }
   return { valid: errors.length === 0, errors };
 }
 
