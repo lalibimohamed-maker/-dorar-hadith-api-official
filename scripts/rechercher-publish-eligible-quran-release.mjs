@@ -15,7 +15,7 @@ const manifestPath = path.resolve(arg("manifest"));
 const repository = arg("repository", "lalibimohamed-maker/dinullah-matrix-6384-storage-01");
 const releasePrefix = arg("release-prefix", "rechercher-quran");
 if (!manifestPath) throw new Error("manifest argument is required");
-if (!/^\\S+\\/\\S+$/.test(repository)) throw new Error("invalid Release repository");
+if (!/^\S+\/\S+$/.test(repository)) throw new Error("invalid Release repository");
 if (!process.env.GH_TOKEN) throw new Error("GH_TOKEN is required");
 
 const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
@@ -37,7 +37,7 @@ const globalEligible = explicitEligible(manifest);
 const candidates = new Map();
 
 function addCandidate(candidatePath, eligible, provenance) {
-  if (!eligible || typeof candidatePath !== "string" || !/\\.pdf$/i.test(candidatePath)) return;
+  if (!eligible || typeof candidatePath !== "string" || !/\.pdf$/i.test(candidatePath)) return;
   const absolute = path.resolve(root, candidatePath);
   const relative = path.relative(root, absolute);
   if (relative.startsWith("..") || path.isAbsolute(relative)) return;
@@ -48,7 +48,7 @@ function walk(value, inheritedEligible = globalEligible, provenance = manifest) 
   if (!value || typeof value !== "object") return;
   const eligible = inheritedEligible || explicitEligible(value);
 
-  if (typeof value.path === "string" && /\\.pdf$/i.test(value.path)) {
+  if (typeof value.path === "string" && /\.pdf$/i.test(value.path)) {
     addCandidate(value.path, eligible, provenance);
   }
   if (value.acquired && typeof value.acquired === "object" && typeof value.acquired.path === "string") {
@@ -117,7 +117,7 @@ for (const release of inventory) {
 const published = [];
 const skipped = [];
 for (const item of files) {
-  const sha = execFileSync("sha256sum", [item.path], { encoding: "utf8" }).trim().split(/\\s+/)[0];
+  const sha = execFileSync("sha256sum", [item.path], { encoding: "utf8" }).trim().split(/\s+/)[0];
   const digest = `sha256:${sha}`;
   if (existing.has(digest)) {
     skipped.push({ file: item.path, sha256: sha, reason: "existing_release_asset" });
