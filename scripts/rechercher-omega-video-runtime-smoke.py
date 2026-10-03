@@ -31,13 +31,14 @@ result={
     "weights_downloaded_by_runner":False,
     "e2e_generation_invoked":False,
     "status":"environment_ready_generation_command_required",
+
 }
 # A true end-to-end generation remains an explicit model-specific step; we never
 # fake success merely because the weights and CUDA are present.
 if engine=="hunyuanvideo-1.5":
     required = ["config.json","transformer","vae"]
 elif engine=="ltx-2":
-    required = ["diffusion_models","text_encoders","vae"]
+    required = ["text_encoder","transformer","audio_vae","vae","vocoder","scheduler","tokenizer"]
 missing=[item for item in required if not (model_path/item).exists()]
 result["missing_runtime_paths"]=missing
 if missing:
