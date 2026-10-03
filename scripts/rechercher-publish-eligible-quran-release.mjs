@@ -69,11 +69,13 @@ function walk(value, inheritedEligible = globalEligible, provenance = manifest) 
 }
 walk(manifest);
 
+const maxAssetBytes = 2 * 1024 * 1024 * 1024;
 const files = [];
 for (const item of candidates.values()) {
   try {
     const stat = await fs.stat(item.path);
     if (!stat.isFile() || stat.size < 1) continue;
+    if (stat.size >= maxAssetBytes) throw new Error("Release asset exceeds GitHub 2 GiB per-asset limit: " + item.path + " (" + stat.size + " bytes)");
     const fd = await fs.open(item.path, "r");
     const head = Buffer.alloc(5);
     await fd.read(head, 0, 5, 0);
@@ -125,6 +127,10 @@ for (const item of files) {
   }
   const asset = `${sha}_${path.basename(item.path)}`;
   gh(["release", "upload", tag, `${item.path}#${asset}`, "--repo", repository, "--clobber=false"]);
+  const releaseJson = JSON.parse(gh(["api", "-H", "Accept: application/vnd.github+json", `/repos/${repository}/releases/tags/${tag}`]));
+  const uploaded = (releaseJson.assets || []).find((candidate) => candidate.name === asset && candidate.state === "uploaded");
+  if (!uploaded) throw new Error("Release upload verification failed: " + asset);
+  if (String(uploaded.digest || "") !== digest) throw new Error("Release SHA-256 mismatch for " + asset + ": expected " + digest + ", got " + (uploaded.digest || "missing"));
   existing.add(digest);
   published.push({ file: item.path, sha256: sha, release: tag, asset, repository });
 }
@@ -139,7 +145,8 @@ const output = {
   blocked_candidates: candidates.size - files.length,
   encrypted_final_artifacts: false,
   lfs_pdf_persistence: false,
-  corpus_write: false
+  corpus_write: false,
+  release_verified: true
 };
 await fs.writeFile(path.join(path.dirname(manifestPath), "release-persistence.json"), JSON.stringify(output, null, 2) + "\n", "utf8");
 console.log(`QURAN_MATRIX_RELEASE_OK published=${published.length} skipped=${skipped.length} blocked=${output.blocked_candidates}`);
