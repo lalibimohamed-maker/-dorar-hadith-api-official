@@ -311,10 +311,25 @@ jobs:
       - name: Check existing Omega Release assets before streaming
         id: existing_release
         env:
+          GH_TOKEN: ${{ secrets.RECHERCHER_OMEGA_STORAGE_TOKEN }}
+          REPO: ${{ env.RECHERCHER_OMEGA_STORAGE_REPOSITORY }}
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
-          complete="${{ steps.storage_reconciliation.outputs.complete_anywhere }}"
+          release_json="$RUNNER_TEMP/omega-release-${{ matrix.id }}.json"
+          complete="false"
+          if gh api "repos/$REPO/releases/tags/$RELEASE_TAG" > "$release_json" 2>/dev/null; then
+            if python - "$release_json" <<'PY'
+          import json,sys
+          with open(sys.argv[1], encoding="utf-8") as fh:
+              j=json.load(fh)
+          assets={str(x.get("name")) for x in j.get("assets",[])}
+          raise SystemExit(0 if ("release-manifest.json" in assets and any(n.startswith("omega__") for n in assets)) else 1)
+          PY
+            then
+              complete="true"
+            fi
+          fi
           if [ "$complete" = "true" ]; then
             echo "Existing complete Release detected: $RELEASE_TAG"
           else
@@ -585,10 +600,7 @@ jobs:
           RELEASE_TAG: ${{ matrix.release_tag }}
         run: |
           set -euo pipefail
-          release_id="$(gh api "repos/$REPO/releases/tags/$RELEASE_TAG" --jq '.id')"
-          asset_names="$(gh api --paginate "repos/$REPO/releases/$release_id/assets?per_page=100" --jq '.[].name')"
-          printf '%s
-' "$asset_names" | grep -Fxq "release-manifest.json"
+          gh release view "$RELEASE_TAG" --repo "$REPO" --json assets --jq '.assets[].name' | grep -Fxq "release-manifest.json"
           echo "[OK] Weights manifest exists for $RELEASE_TAG"
       - name: Verify Hunyuan runtime completeness
         if: steps.storage_reconciliation.outputs.complete_anywhere != 'true' && false
