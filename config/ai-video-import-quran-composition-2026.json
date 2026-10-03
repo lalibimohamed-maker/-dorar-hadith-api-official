@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "1.2.0",
+  "studioId": "ai-video-import-quran-composition-2026",
+  "status": "benchmark",
+  "scope": "separate_video_studio_only",
+  "purpose": "Import a user-supplied AI-generated video and compose verified Quranic text and rights-cleared recitation without treating the imported video as a search result.",
+  "searchPolicy": {
+    "visibleInEncyclopediaSearch": false,
+    "videoSearchCategory": false
+  },
+  "inputContract": {
+    "required": ["videoFile"],
+    "provenance": [
+      "generatorProvider",
+      "generatorModel",
+      "subscriptionPlanAtGeneration",
+      "generationDate",
+      "termsUrl",
+      "commercialUseStatus",
+      "watermarkStatus"
+    ],
+    "userInputRights": "The user must have the necessary rights to every uploaded input and reference asset."
+  },
+  "composition": {
+    "quranText": "verified_quran_source_required",
+    "quranRecitation": "separate_rights_cleared_recording_required",
+    "synthetic_quran_recitation": false,
+    "narration": "explanatory_voice_only",
+    "captions": "word_or_phrase_sync_when_available",
+    "audioMix": "narration_recitation_and_original_audio_must_be_explicitly_mixed",
+    "visualEdits": ["crop", "scale", "subtitles", "cards", "transitions"]
+  },
+  "rightsRules": {
+    "generatedVideoIsAutomaticallyRightsFree": false,
+    "providerTermsMustBeRecorded": true,
+    "thirdPartyInputMustBeCleared": true,
+    "outputRightsMayContainThirdPartyRights": true,
+    "commercialUseMustMatchProviderTerms": true
+  },
+  "qualityGates": [
+    "video_file_decodable",
+    "video_stream_present",
+    "audio_stream_present_when_audio_required",
+    "quran_text_verified",
+    "recitation_rights_verified_before_embedding",
+    "generator_terms_recorded",
+    "uploaded_inputs_rights_attested",
+    "provenance_complete",
+    "final_output_ffprobe_verified"
+  ],
+  "providerRegistry": [
+    {
+      "provider": "Runway",
+      "rightsMode": "provider-current-policy",
+      "commercialUse": "allowed_on_generations_under_current_policy",
+      "attribution": "not_formally_required",
+      "status": "preferred_candidate",
+      "notes": "Current official help says users retain ownership and rights to uploads and generations and may use generations commercially. Third-party inputs remain the user's responsibility.",
+      "termsUrl": "https://help.runwayml.com/hc/en-us/articles/18927776141715-Usage-rights"
+    },
+    {
+      "provider": "Adobe Firefly",
+      "rightsMode": "product-and-model-dependent",
+      "commercialUse": "non-beta_Firefly_outputs_generally_permitted_under_current_FAQ; verify_exact_model_and_beta_label",
+      "attribution": "record_content_credentials_when_present",
+      "status": "preferred_candidate_with_model_gate",
+      "notes": "Adobe's current FAQ says non-beta Firefly outputs may be used commercially and beta outputs may be used commercially unless the product explicitly says otherwise. Partner models can have different terms.",
+      "termsUrl": "https://helpx.adobe.com/firefly/web/get-started/learn-the-basics/adobe-firefly-faq.html"
+    },
+    {
+      "provider": "Pika",
+      "rightsMode": "plan-or-api-agreement-dependent",
+      "commercialUse": "web_Pro_or_Fancy_currently_allowed;_basic_or_standard_not_allowed; API_outputs_commercially_licensed_under_API_agreement",
+      "attribution": "verify_active_terms",
+      "status": "preferred_candidate_with_plan_gate",
+      "notes": "Pika's current FAQ says Pro/Fancy web subscriptions permit commercial use, while Basic/Standard do not. Pika API states its API outputs are licensed for commercial use under the API agreement.",
+      "termsUrl": "https://pika.art/faq"
+    },
+    {
+      "provider": "Luma Dream Machine",
+      "rightsMode": "plan_dependent",
+      "commercialUse": "paid_qualifying_plans_only",
+      "attribution": "check_current_terms",
+      "status": "candidate_with_plan_gate",
+      "notes": "Official licensing page states Free/Lite generations are personal use and commercial use is available on qualifying paid plans. Rights acquired for specific paid generations are described as vested in those assets.",
+      "termsUrl": "https://lumalabs.ai/learning-hub/licensing"
+    },
+    {
+      "provider": "PixVerse",
+      "rightsMode": "product-and-terms-dependent",
+      "commercialUse": "verify_current_terms_and_authorization",
+      "attribution": "retain_required_source_or_generation_notices_when_applicable",
+      "status": "candidate_with_rights_gate",
+      "notes": "Current terms state users own outputs to the extent permitted by law, but commercial use can be restricted for some service contexts and platform materials. Record the exact service mode and terms.",
+      "termsUrl": "https://pixverse.ai/en/terms-of-service"
+    },
+    {
+      "provider": "Hailuo AI",
+      "rightsMode": "plan_dependent",
+      "commercialUse": "paid_downloaded_generations_supported_under_current_payment_terms",
+      "attribution": "preserve_any_platform_required_notices",
+      "status": "candidate_with_plan_gate",
+      "notes": "Current payment terms say paid subscribers retain IP rights in content generated and downloaded during paid subscription; free downloads carry a watermark. General terms also impose broad conditions and responsibilities.",
+      "termsUrl": "https://hailuoai.video/doc/payment-policy.html"
+    },
+    {
+      "provider": "Vidu",
+      "rightsMode": "API-terms-dependent",
+      "commercialUse": "current_API_terms_do_not_restrict_commercial_purpose",
+      "attribution": "preserve_deep_synthesis_notice_when_required; do_not_remove_output_markers",
+      "status": "candidate_with_provenance_gate",
+      "notes": "Vidu Open Platform terms state the service license does not restrict commercial purposes, while also requiring users to evaluate output and not remove/falsify deep-synthesis distinguishing signs. Confirm the exact product/API terms used for each generation.",
+      "termsUrl": "https://platform.vidu.com/docs/terms-of-use"
+    },
+    {
+      "provider": "Google Flow / Veo",
+      "rightsMode": "product-and-Google-terms-dependent",
+      "commercialUse": "verify_active_product_terms",
+      "attribution": "preserve_content_credentials_or_provenance_metadata_when_present",
+      "status": "candidate_with_terms_snapshot",
+      "notes": "Flow is Google's filmmaking interface for Veo/Imagen/Gemini. Current Flow documentation confirms generated video workflows and data handling; this registry intentionally requires the exact product terms at generation time rather than assuming universal commercial rights.",
+      "termsUrl": "https://labs.google/fx/tools/flow/faq"
+    },
+    {
+      "provider": "InVideo",
+      "rightsMode": "service-terms-dependent",
+      "commercialUse": "outputs_commercially_licensed_under_current_terms_subject_to_third_party_rights_and_terms",
+      "attribution": "verify_templates_and_licensed_content_requirements",
+      "status": "candidate_with_input_and_library_gate",
+      "notes": "Current InVideo terms grant a perpetual worldwide non-exclusive license to use, reproduce, distribute, display and commercialize Outputs generated through the Services, while separately requiring all necessary rights for User Content and Licensed Content.",
+      "termsUrl": "https://invideo.io/terms-and-conditions/"
+    },
+    {
+      "provider": "Haiper",
+      "rightsMode": "terms-dependent",
+      "commercialUse": "verify_current_terms",
+      "attribution": "verify_current_watermark_and_terms",
+      "status": "candidate_requires_live_terms_review",
+      "notes": "Haiper's current FAQ directs ownership and commercial-use questions to its Terms and notes that paid membership can remove the watermark. Do not clear a generation without a terms snapshot.",
+      "termsUrl": "https://book.haiper.ai/haiper-video-generator/faq"
+    },
+    {
+      "provider": "Kling AI",
+      "rightsMode": "terms_snapshot_required",
+      "commercialUse": "verify_current_plan_and_terms",
+      "attribution": "verify_current_terms",
+      "status": "candidate_requires_live_terms_review",
+      "notes": "Provider terms must be captured at generation time before the output is labeled clear for redistribution."
+    },
+    {
+      "provider": "Krea 2",
+      "rightsMode": "model-license-dependent",
+      "commercialUse": "community_license_allowed_only_below_1M_USD_annual_company_revenue;_enterprise_license_above_threshold",
+      "attribution": "license_notice_required_for_model_distribution; output provenance retained",
+      "status": "candidate_with_revenue_gate",
+      "notes": "Krea 2 Community License is for the downloadable Krea 2 model variants and permits commercial use only if the company-wide annual revenue requirement is satisfied. This is a model-license condition, not a universal statement about every hosted Krea product.",
+      "termsUrl": "https://www.krea.ai/krea-2-licensing"
+    }
+  ],
+  "governance": {
+    "policyRefresh": "recheck_provider_terms_before_first_public_release_and_when_provider_plan_or_model_changes",
+    "legalStatus": "metadata_gate_not_legal_advice",
+    "noAssumptionRule": "creator-generated does not equal rights-free; the exact provider terms and all inputs must be evaluated",
+    "sourcePriority": ["official_terms", "official_help", "official_api_agreement", "secondary_summary"]
+  }
+}
