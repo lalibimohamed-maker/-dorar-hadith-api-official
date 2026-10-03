@@ -310,3 +310,140 @@ jobs:
             fi
           done
 
+
+  runtime-verify-existing-release:
+    name: Runtime verify existing voice Release assets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Install inference tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y jq python3 python3-pip tar bzip2 espeak-ng
+          python3 -m pip install --disable-pip-version-check --no-cache-dir qwen-asr onnxruntime numpy scipy soundfile
+
+      - name: Download verified Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          gh release download rechercher-voice-runtime-2026-10 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'Qwen3-ASR-0.6B.tar.bz2' \
+            --pattern 'Qwen3-ASR-1.7B.tar.bz2.part-*' \
+            --pattern 'silero_vad.onnx' \
+            --dir release-assets
+          test -s release-assets/Qwen3-ASR-0.6B.tar.bz2
+          test -s release-assets/silero_vad.onnx
+          ls -lh release-assets
+
+      - name: Reconstruct and unpack Qwen3-ASR models
+        run: |
+          set -euo pipefail
+          mkdir -p models/Qwen3-ASR-0.6B models/Qwen3-ASR-1.7B
+          tar -xjf release-assets/Qwen3-ASR-0.6B.tar.bz2 -C models/Qwen3-ASR-0.6B --strip-components=1
+          parts=(release-assets/Qwen3-ASR-1.7B.tar.bz2.part-*)
+          test "${#parts[@]}" -ge 2
+          cat "${parts[@]}" > /tmp/Qwen3-ASR-1.7B.tar.bz2
+          tar -xjf /tmp/Qwen3-ASR-1.7B.tar.bz2 -C models/Qwen3-ASR-1.7B --strip-components=1
+          test -s models/Qwen3-ASR-0.6B/model.safetensors
+          test -s models/Qwen3-ASR-1.7B/model.safetensors.index.json
+          test -s models/Qwen3-ASR-1.7B/model-00001-of-00002.safetensors
+          test -s models/Qwen3-ASR-1.7B/model-00002-of-00002.safetensors
+
+      - name: Runtime verify Qwen3-ASR 0.6B from Release
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          import torch
+          from qwen_asr import Qwen3ASRModel
+          model=Qwen3ASRModel.from_pretrained(
+              "models/Qwen3-ASR-0.6B",
+              dtype=torch.float32,
+              device_map="cpu",
+              max_inference_batch_size=1,
+              max_new_tokens=128,
+              local_files_only=True
+          )
+          subprocess.run([
+              "espeak-ng","-v","ar","-s","160","-a","140","-w",
+              "/tmp/al-huda-ar-06.wav",
+              "السلام عليكم ورحمة الله وبركاته"
+          ], check=True)
+          result=model.transcribe(
+              audio="/tmp/al-huda-ar-06.wav",
+              language="Arabic",
+              return_time_stamps=False
+          )[0]
+          assert result.language
+          assert result.text.strip()
+          print("Qwen3-ASR-0.6B Release inference OK:", result.language, result.text)
+          PY
+
+      - name: Runtime verify Qwen3-ASR 1.7B from Release
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          import torch
+          from qwen_asr import Qwen3ASRModel
+          model=Qwen3ASRModel.from_pretrained(
+              "models/Qwen3-ASR-1.7B",
+              dtype=torch.float32,
+              device_map="cpu",
+              max_inference_batch_size=1,
+              max_new_tokens=128,
+              local_files_only=True
+          )
+          subprocess.run([
+              "espeak-ng","-v","ar","-s","160","-a","140","-w",
+              "/tmp/al-huda-ar-17.wav",
+              "السلام عليكم ورحمة الله وبركاته"
+          ], check=True)
+          result=model.transcribe(
+              audio="/tmp/al-huda-ar-17.wav",
+              language="Arabic",
+              return_time_stamps=False
+          )[0]
+          assert result.language
+          assert result.text.strip()
+          print("Qwen3-ASR-1.7B Release inference OK:", result.language, result.text)
+          PY
+
+      - name: Runtime verify Silero VAD from Release
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import numpy as np
+          import onnxruntime as ort
+          session=ort.InferenceSession("release-assets/silero_vad.onnx", providers=["CPUExecutionProvider"])
+          names={x.name:x for x in session.get_inputs()}
+          print("Silero inputs:", sorted(names))
+          if {"x","h","c"} <= set(names):
+              out=session.run(None,{
+                  "x":np.zeros((1,512),dtype=np.float32),
+                  "h":np.zeros((2,1,64),dtype=np.float32),
+                  "c":np.zeros((2,1,64),dtype=np.float32),
+              })
+          elif {"input","state","sr"} <= set(names):
+              out=session.run(None,{
+                  "input":np.zeros((1,512),dtype=np.float32),
+                  "state":np.zeros((2,1,128),dtype=np.float32),
+                  "sr":np.array([16000],dtype=np.int64),
+              })
+          else:
+              raise SystemExit("unsupported Silero VAD input contract: "+repr(sorted(names)))
+          assert out
+          print("Silero VAD Release inference OK; outputs:", len(out))
+          PY
+
