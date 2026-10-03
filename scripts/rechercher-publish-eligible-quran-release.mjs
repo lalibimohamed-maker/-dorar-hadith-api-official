@@ -5,9 +5,12 @@ import process from "node:process";
 import { execFileSync } from "node:child_process";
 
 function arg(name, fallback = "") {
-  const prefix = `--${name}=`;
-  const hit = process.argv.find((value) => value.startsWith(prefix));
-  return hit ? hit.slice(prefix.length) : fallback;
+  const prefix = `--${name}`;
+  const index = process.argv.findIndex((value) => value === prefix || value.startsWith(`${prefix}=`));
+  if (index < 0) return fallback;
+  const value = process.argv[index];
+  if (value.startsWith(`${prefix}=`)) return value.slice(prefix.length);
+  return process.argv[index + 1] ?? fallback;
 }
 
 const root = path.resolve(arg("root", "."));
