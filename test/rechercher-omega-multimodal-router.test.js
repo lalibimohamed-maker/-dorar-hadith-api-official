@@ -21,7 +21,10 @@ test("production multimodal execution is fail-closed until weights are cleared",
   const fleet = await loadMultimodalFleet();
   const plan = selectMultimodalModel({fleet,task:"text_to_video",availableRuntimes:["local"]});
   assert.equal(plan.status,"queued");
-  assert.ok(plan.blocked_candidates.every(item => item.next_action === "acquire_and_verify_weight_artifact"));
+  assert.ok(plan.blocked_candidates.every(item =>
+    item.next_action === "acquire_and_verify_weight_artifact" ||
+    item.next_action === "complete_license_dependency_and_e2e_runtime_verification"
+  ));
 });
 
 test("multimodal jobs preserve provenance and Corpus boundaries", async () => {
@@ -40,4 +43,14 @@ test("multimodal fleet distinguishes verified license from uncleared runtime wei
   assert.equal(wan.license_status, "verified_source_license");
   assert.equal(wan.weight_status, "review_required");
   assert.equal(wan.runtime_status, "queued_until_weight_clearance");
+});
+
+test("stored private video weights remain blocked until runtime proof is explicit", async () => {
+  const fleet = await loadMultimodalFleet();
+  for (const id of ["hunyuanvideo-1.5", "ltx-2"]) {
+    const model = fleet.models.find(item => item.id === id);
+    assert.equal(model.storage_status, "weights_present");
+    assert.equal(model.quota_required, false);
+    assert.notEqual(model.execution_proof, "e2e_verified");
+  }
 });
