@@ -1,0 +1,95 @@
+{
+  "schemaVersion":"1.0.0",
+  "purpose":"Local-first mobile GPU/NPU acceleration fabric for Deen Allah Encyclopedia.",
+  "principles":{
+    "localFirst":true,
+    "offlineCapable":true,
+    "hardwareAdaptive":true,
+    "noMandatoryCloudGPU":true,
+    "unifiedMemoryAware":true,
+    "thermalAware":true,
+    "powerAware":true,
+    "memorySafe":true,
+    "qualityOverMarketing":true,
+    "sourceAndProvenancePreserved":true
+  },
+  "deviceModel":{
+    "doNotAssumeDiscreteVRAM":true,
+    "detectCPU":true,
+    "detectMobileGPU":true,
+    "detectNPUOrNeuralAccelerator":true,
+    "detectUnifiedOrSharedMemory":true,
+    "measureAvailableMemoryAtRuntime":true,
+    "neverTreatDeviceGPUAsRTX5090":true
+  },
+  "apple":{
+    "primaryGraphicsCompute":"Metal",
+    "ml":"CoreML",
+    "gpuOptimizedKernels":"Metal Performance Shaders",
+    "metalMLWorkflow":"Metal 4 when supported",
+    "fallback":"CPU/CoreML-compatible path"
+  },
+  "android":{
+    "primaryGraphicsCompute":"Vulkan",
+    "mlCandidates":["NNAPI","Qualcomm QNN when supported","ONNX Runtime XNNPACK"],
+    "fallback":"CPU/XNNPACK"
+  },
+  "crossPlatformRuntime":{
+    "primary":"ONNX Runtime",
+    "selection":"hardware-adaptive execution provider",
+    "mobileProviders":["CoreML","NNAPI","XNNPACK","Qualcomm QNN when supported","WebGPU when supported"],
+    "cloudProvider":"optional_only",
+    "cloudGPURequired":false
+  },
+  "scheduling":{
+    "detectCapabilitiesBeforeModelLoad":true,
+    "lazyLoadModels":true,
+    "unloadIdleModels":true,
+    "tileLargeImagesAndFrames":true,
+    "frameChunking":true,
+    "limitConcurrentHeavyModels":true,
+    "thermalThrottle":true,
+    "batteryAware":true,
+    "backgroundWorkYield":true,
+    "qualityBudgetModes":["mobile","balanced","ultra"],
+    "neverClaimDesktopClassPerformance":true
+  },
+  "memory":{
+    "trackSystemAndSharedGpuMemory":true,
+    "reserveSafetyMargin":true,
+    "avoidFullFrame24KAllocationWhenUnnecessary":true,
+    "useStreamingAndTiles":true,
+    "oomRecovery":"reduce_tile_then_batch_then_model_then_cpu_fallback",
+    "telemetry":["allocated","reserved","peak","available","tileSize","batchSize"]
+  },
+  "video":{
+    "decodeEncode":"FFmpeg_or_platform_hardware_acceleration",
+    "temporalModels":["BasicVSR++","RealBasicVSR"],
+    "arbitraryScaleCandidates":["ST-AVSR","Thera","EQSR","UltraSR"],
+    "restorationCandidates":["Real-ESRGAN","SwinIR","HAT"],
+    "cooperativeRule":"Use multiple models only when the orchestrator's benchmark shows measurable benefit; do not blindly cascade all models.",
+    "targets":["8K","12K","16K","24K"],
+    "targetMeaning":"output resolution target, not proof of native source detail"
+  },
+  "privacy":{
+    "onDevicePreferred":true,
+    "rawMediaCloudUploadOffByDefault":true,
+    "externalProcessingRequiresConsent":true
+  },
+  "observability":{
+    "recordEngine":true,
+    "recordHardwarePath":true,
+    "recordModelVersion":true,
+    "recordRuntime":true,
+    "recordMemory":true,
+    "recordThermalState":true,
+    "recordDuration":true,
+    "attachProvenance":true
+  },
+  "fallbackOrder":["specializedMobileGPUorNPU","crossPlatformGPUProvider","CPUOptimized","CPUStandard"],
+  "truthPolicy":{
+    "enhancedDetailMustNotBePresentedAsOriginal":true,
+    "historicalAndScientificMediaRequireSourceLabel":true,
+    "24KOutputMustCarryOriginalResolutionMetadata":true
+  }
+}

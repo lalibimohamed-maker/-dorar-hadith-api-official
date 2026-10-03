@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Privacy and anti-spy governance for Deen Allah Encyclopedia.",
+  "principles": {
+    "privacyByDefault": true,
+    "dataMinimization": true,
+    "localFirst": true,
+    "explicitConsent": true,
+    "leastPrivilege": true,
+    "noTrackingByDefault": true,
+    "noFingerprinting": true,
+    "noSilentExternalUpload": true,
+    "thirdPartySdkConsentBound": true,
+    "rawAudioRetentionOffByDefault": true,
+    "rawVideoRetentionOffByDefault": true,
+    "reversiblePrivacyControls": true
+  },
+  "sensors": {
+    "microphone": {"permissionRequired": true, "backgroundDefault": false, "indicatorRequired": true},
+    "camera": {"permissionRequired": true, "backgroundDefault": false, "indicatorRequired": true},
+    "location": {"permissionRequired": true, "default": "off"},
+    "bluetooth": {"permissionRequired": true, "default": "feature_scoped"}
+  },
+  "network": {
+    "unknownEndpoints": "deny",
+    "declaredEndpointsOnly": true,
+    "externalAiRequiresConsent": true,
+    "externalVoiceRequiresConsent": true,
+    "telemetryDefault": "off",
+    "advertisingIdentifiers": "deny",
+    "crossSiteTracking": "deny",
+    "certificateValidation": "required"
+  },
+  "thirdParty": {
+    "sdkInventoryRequired": true,
+    "dataFlowDeclared": true,
+    "permissionScopeDocumented": true,
+    "collectionBeforeConsent": "deny",
+    "sensitiveDataSharing": "deny_by_default",
+    "newSdkRequiresReview": true
+  },
+  "data": {
+    "keystrokes": "never_upload_without_explicit_consent",
+    "rawAudio": "ephemeral",
+    "rawVideo": "ephemeral",
+    "searchHistory": "local_and_user_deletable",
+    "analytics": "opt_in",
+    "deviceIdentifiers": "avoid",
+    "export": true,
+    "delete": true
+  },
+  "audit": {
+    "permissionEvents": true,
+    "networkDestinationEvents": true,
+    "sdkInventory": true,
+    "privacyPolicyVersion": true,
+    "userVisibleActivityLog": true,
+    "unexpectedDataFlow": "quarantine_and_alert"
+  },
+  "webSecurity": {
+    "secureContextForSensitiveApis": true,
+    "permissionsPolicyMicrophone": "self",
+    "permissionsPolicyCamera": "self",
+    "contentSecurityPolicy": "required",
+    "subresourceIntegrity": "required_where_applicable"
+  },
+  "productionGate": {
+    "requiresPrivacyReview": true,
+    "requiresDataFlowReview": true,
+    "requiresSdkReview": true,
+    "requiresNetworkEndpointReview": true,
+    "requiresRuntimeTest": true,
+    "failClosedOnUndeclaredCollection": true
+  }
+}

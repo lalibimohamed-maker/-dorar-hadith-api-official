@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Global cooperative image restoration and arbitrary-scale resolution pipeline for Deen Allah Encyclopedia.",
+  "principles": {
+    "qualityFirst": true,
+    "sourcePixelsPreserved": true,
+    "noDetailFabricationClaim": true,
+    "adaptiveRouting": true,
+    "resourceAware": true,
+    "tileProcessingAllowed": true,
+    "modelLicenseRequired": true,
+    "provenanceRequired": true,
+    "deterministicFallback": true
+  },
+  "targets": {
+    "standard": [1080, 1440, 2160],
+    "high": [4320, 5760, 7680],
+    "ultra": [8640, 11520, 12288],
+    "extremeResearchTarget": [16384, 24576],
+    "unit": "long_edge_pixels"
+  },
+  "engines": [
+    {
+      "id": "thera",
+      "role": "arbitrary_scale_primary",
+      "status": "trial",
+      "license": "Apache-2.0",
+      "notes": "Arbitrary-scale SR; use when its model checkpoint and runtime are validated for the requested asset."
+    },
+    {
+      "id": "eqsr",
+      "role": "arbitrary_scale_cross_check",
+      "status": "trial",
+      "license": "Apache-2.0",
+      "notes": "Scale-equivariant arbitrary-scale SR; candidate for independent quality comparison."
+    },
+    {
+      "id": "ultrasr",
+      "role": "arbitrary_scale_secondary",
+      "status": "assess",
+      "license": "verify_project_and_checkpoint_terms",
+      "notes": "Arbitrary-scale implicit-function SR candidate; no production adoption until current model terms are verified."
+    },
+    {
+      "id": "real-esrgan",
+      "role": "real_world_restoration",
+      "status": "adopt",
+      "license": "BSD-3-Clause",
+      "notes": "Restoration and practical SR path; supports tiles and arbitrary output-size parameterization."
+    },
+    {
+      "id": "swinir",
+      "role": "restoration_quality_path",
+      "status": "adopt",
+      "license": "Apache-2.0",
+      "notes": "Restoration/SR path including lightweight and larger models; tile when memory constrained."
+    },
+    {
+      "id": "hat",
+      "role": "high_quality_validation",
+      "status": "trial",
+      "license": "verify_current_project_terms",
+      "notes": "Transformer SR quality candidate; run only when selected by the quality router."
+    }
+  ],
+  "routing": {
+    "analyzeInput": ["dimensions", "blur", "noise", "compression", "text_density", "edges", "faces", "source_provenance", "device_memory", "gpu_available"],
+    "modes": {
+      "fast": {"maxPasses": 1, "prefer": ["native_resize", "real-esrgan"], "maxTargetLongEdge": 4320},
+      "balanced": {"maxPasses": 1, "prefer": ["swinir", "real-esrgan", "thera"], "maxTargetLongEdge": 7680},
+      "ultra": {"maxPasses": 2, "prefer": ["thera", "eqsr", "swinir", "real-esrgan", "hat"], "maxTargetLongEdge": 12288},
+      "archive": {"maxPasses": 3, "prefer": ["thera", "eqsr", "swinir", "hat"], "maxTargetLongEdge": 24576}
+    },
+    "rule": "Do not cascade every engine. Select one primary engine; invoke a second engine only when quality diagnostics show a documented need."
+  },
+  "pipeline": [
+    "ingest",
+    "verify_source_and_rights",
+    "measure_input",
+    "optional_denoise_or_deblock",
+    "select_engine_and_scale",
+    "tile_if_required",
+    "upscale_or_restore",
+    "seam_check",
+    "sharpness_hallucination_check",
+    "text_legibility_check",
+    "optional_secondary_validation",
+    "encode_archival_and_delivery_variants",
+    "attach_provenance_and_hash"
+  ],
+  "qualityGate": {
+    "mustRecord": ["inputDimensions", "outputDimensions", "scale", "engine", "modelVersion", "runtime", "tileSize", "processingPasses", "durationMs", "peakMemory", "qualityMetrics", "provenanceHash"],
+    "rejectOn": ["corruptedOutput", "missingProvenance", "unknownModelLicense", "seamArtifactsAboveThreshold", "unacceptableTextDegradation"],
+    "warningOn": ["veryLargeScale", "detailInferenceHeavy", "extremeComputeCost", "sourceTooSmallForTarget"]
+  },
+  "truthPolicy": {
+    "24KIsOutputTarget": true,
+    "24KDoesNotMeanNative24KDetail": true,
+    "syntheticDetailMustNotBePresentedAsOriginal": true,
+    "originalResolutionAndSourceAreAlwaysDisplayed": true,
+    "scientific_or_archival_claims_require_source_resolution": true
+  },
+  "performance": {
+    "lazyLoadModels": true,
+    "neverRunAllModelsByDefault": true,
+    "useGpuWhenAvailable": true,
+    "cpuFallback": true,
+    "memoryAwareTiling": true,
+    "mobileSafeDefaults": true,
+    "cacheModelArtifacts": true
+  }
+}
