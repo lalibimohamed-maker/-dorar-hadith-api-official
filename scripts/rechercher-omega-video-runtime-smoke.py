@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Profile-aware smoke harness for an authorized GPU runner.
 
-This verifies the selected/default video profile's staged assets and CUDA
-environment. It never downloads model weights and never claims that model
-inference ran; actual generation is performed only by the guarded generation
-workflow.
+Verifies CUDA plus the selected/default profile's staged assets. It never
+downloads model weights and never claims that model inference ran; actual
+generation is performed only by the guarded generation workflow.
 """
 from __future__ import annotations
 
@@ -24,6 +23,12 @@ ENGINE = os.environ.get("ENGINE", "").strip()
 PROFILE = os.environ.get("PROFILE", "").strip()
 MODEL_PATH = Path(os.environ.get("MODEL_PATH", "")).expanduser()
 GEMMA_ROOT = Path(os.environ.get("GEMMA_ROOT", "")).expanduser()
+REQUIRE_EXTERNAL_DEPENDENCIES = (
+    os.environ.get("REQUIRE_EXTERNAL_DEPENDENCIES", "false").strip().lower() == "true"
+)
+REQUIRE_RUNTIME_BUNDLE = (
+    os.environ.get("REQUIRE_RUNTIME_BUNDLE", "false").strip().lower() == "true"
+)
 
 
 def fail(message: str) -> None:
@@ -32,7 +37,7 @@ def fail(message: str) -> None:
 
 if ENGINE not in {"hunyuanvideo-1.5", "ltx-2"}:
     fail("unsupported engine")
-if not MODEL_PATH:
+if not str(MODEL_PATH):
     fail("MODEL_PATH is required")
 if not MODEL_PATH.exists():
     fail(f"MODEL_PATH does not exist: {MODEL_PATH}")
@@ -65,8 +70,10 @@ if profile is None:
 
 missing: list[str] = []
 matched: list[str] = []
+notes: list[str] = []
 
-def find_named_file(name: str) -> Path | None:
+
+def find_file(name: str) -> Path | None:
     direct = MODEL_PATH / name
     if direct.is_file() and direct.stat().st_size > 0:
         return direct
@@ -76,59 +83,87 @@ def find_named_file(name: str) -> Path | None:
     return None
 
 
+def find_path_component(name: str) -> Path | None:
+    direct = MODEL_PATH / name
+    if direct.exists():
+        if direct.is_file() and direct.stat().st_size == 0:
+            return None
+        return direct
+    for candidate in MODEL_PATH.rglob(name):
+        if candidate.exists():
+            if candidate.is_file() and candidate.stat().st_size == 0:
+                continue
+            return candidate
+    return None
+
+
+def require_component(name: str) -> None:
+    found = find_path_component(name)
+    if found:
+        matched.append(str(found.relative_to(MODEL_PATH)))
+    else:
+        missing.append(name)
+
+
 if ENGINE == "ltx-2":
     primary = str(profile.get("model_weight", "")).strip()
-    for required in profile.get("requires", []):
-        required = str(required)
-        if required == "spatial_upscaler":
-            name = "ltx-2-spatial-upscaler-x2-1.0.safetensors"
-            found = find_named_file(name)
-            if found:
-                matched.append(str(found.relative_to(MODEL_PATH)))
-            else:
-                missing.append(name)
-        elif required == "external_gemma_root":
-            if not GEMMA_ROOT.is_dir():
+    if primary and "split transformer/text-encoder component set" not in primary:
+        require_component(primary)
+
+    for requirement in profile.get("requires", []):
+        requirement = str(requirement).strip()
+        if requirement == "spatial_upscaler":
+            require_component("ltx-2-spatial-upscaler-x2-1.0.safetensors")
+        elif requirement == "external_gemma_root":
+            if not GEMMA_ROOT:
+                if REQUIRE_EXTERNAL_DEPENDENCIES:
+                    missing.append("GEMMA_ROOT")
+                else:
+                    notes.append("external Gemma dependency not checked in this smoke mode")
+            elif not GEMMA_ROOT.is_dir():
                 missing.append("GEMMA_ROOT")
             else:
                 files = [
                     p for p in GEMMA_ROOT.rglob("*")
                     if p.is_file() and p.stat().st_size > 0
                 ]
-                if not files:
-                    missing.append("GEMMA_ROOT(no non-empty files)")
-                else:
+                if files:
                     matched.append(f"GEMMA_ROOT:{len(files)} files")
-        elif required:
-            missing.append(required)
+                else:
+                    missing.append("GEMMA_ROOT(no non-empty files)")
+        elif requirement:
+            require_component(requirement)
 
-    if primary and "split transformer/text-encoder component set" not in primary:
-        found = find_named_file(primary)
-        if found:
-            matched.append(str(found.relative_to(MODEL_PATH)))
-        else:
-            missing.append(primary)
+    if PROFILE == "distilled-diffusers-split":
+        split_components = [
+            "audio_vae",
+            "connectors",
+            "latent_upsampler",
+            "text_encoder",
+            "tokenizer",
+            "transformer",
+            "vae",
+            "vocoder",
+            "scheduler",
+        ]
+        for component in split_components:
+            if component not in profile.get("requires", []):
+                require_component(component)
 
-    if not missing and PROFILE == "distilled-monolith":
-        expected = {
-            "ltx-2-19b-distilled.safetensors",
-            "ltx-2-spatial-upscaler-x2-1.0.safetensors",
-        }
-        present = {Path(x).name for x in matched}
-        if not expected.issubset(present):
-            missing.extend(sorted(expected - present))
-
-else:
+elif ENGINE == "hunyuanvideo-1.5":
     transformer = str(profile.get("transformer_asset_prefix", "")).strip()
     transformer_name = Path(transformer).name if transformer else ""
     if transformer_name:
-        found = find_named_file(transformer_name)
-        if found:
-            matched.append(str(found.relative_to(MODEL_PATH)))
-        else:
-            missing.append(transformer_name)
+        require_component(transformer_name)
     else:
         missing.append("transformer_asset_prefix")
+
+    if REQUIRE_RUNTIME_BUNDLE:
+        manifest_name = "hunyuanvideo15-runtime-manifest.json"
+        if find_file(manifest_name):
+            matched.append(manifest_name)
+        else:
+            missing.append(manifest_name)
 
 result = {
     "engine": ENGINE,
@@ -141,9 +176,12 @@ result = {
     ],
     "matched_assets": matched,
     "missing_runtime_paths": missing,
+    "notes": notes,
     "weights_downloaded_by_runner": False,
     "e2e_generation_invoked": False,
-    "status": "runtime_assets_incomplete" if missing else "environment_ready_generation_command_required",
+    "status": "runtime_assets_incomplete"
+    if missing
+    else "environment_ready_generation_command_required",
 }
 
 print(json.dumps(result, ensure_ascii=False, indent=2))
