@@ -75,11 +75,6 @@ jobs:
           fi
           echo "Legacy Qwen3 assets removed successfully."
 
-      - name: Verify active Omega asset set
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
           release_id="$(gh release view rechercher-omega-engines-v0.1.0 --json databaseId --jq '.databaseId')"
           assets="$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --paginate --jq '.[].name')"
           printf '%s\n' "$assets"
