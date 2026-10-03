@@ -354,22 +354,24 @@ def repair(release: dict, manifest: dict, initial_assets: dict[str, dict], audit
     repaired = []
 
     wanted = source_wanted
+    source_files = source_expected_assets(chunk_bytes)
+    source_by_path = {item["source_path"]: item for item in source_files}
     for row in wanted:
-        item = next(
-            x for x in manifest["files"] if str(x["source_path"]) == row["source_path"]
-        )
+        source_item = source_by_path.get(row["source_path"])
+        if source_item is None:
+            raise RuntimeError(f"pinned source file disappeared: {row['source_path']}")
         asset_name = row["asset"]
         expected = int(row["expected_bytes"])
         observed = row.get("actual_bytes")
         if observed is not None:
             delete_asset(asset_name)
 
-        source_path = str(item["source_path"])
-        expected_source_size = int(item["bytes"])
-        source_sha = str(item["sha256"])
+        source_path = str(source_item["source_path"])
+        expected_source_size = int(source_item["bytes"])
+        source_sha = str(source_item["sha256"] or "")
         part_index = next(
             index
-            for index, (name, length) in enumerate(expected_assets(item, chunk_bytes))
+            for index, (name, length) in enumerate(source_item["assets"])
             if name == asset_name
         )
         offset = part_index * chunk_bytes
@@ -415,9 +417,11 @@ def repair(release: dict, manifest: dict, initial_assets: dict[str, dict], audit
         print(f"[REPAIRED] {asset_name} bytes={expected} offset={offset}")
 
     refreshed = release_assets(release)
-    final = audit(release, manifest, refreshed)
-    if final["status"] != "complete":
-        raise RuntimeError("Release remains incomplete after targeted repair")
+    final_source = audit_source_release(release, refreshed, chunk_bytes)
+    if final_source["status"] != "complete":
+        raise RuntimeError(
+            "Release remains incomplete against the pinned source revision after targeted repair"
+        )
 
     record = {
         "schema_version": "1.0.0",
@@ -427,6 +431,7 @@ def repair(release: dict, manifest: dict, initial_assets: dict[str, dict], audit
         "release_tag": TAG,
         "repaired_assets": repaired,
         "post_repair_status": "complete",
+        "source_audit": final_source,
     }
     temp = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "omega-video-release-repair.json"
     temp.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
