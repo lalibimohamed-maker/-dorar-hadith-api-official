@@ -57,3 +57,11 @@ jobs:
           REVISION: ${{ matrix.revision }}
           CHUNK_BYTES: "536870912"
         run: python scripts/rechercher-omega-video-release-repair.py
+
+      - name: Upload exact video Release audit report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: omega-video-release-audit-${{ matrix.id }}
+          path: ${{ runner.temp }}/omega-video-release-audit.json
+          if-no-files-found: error
