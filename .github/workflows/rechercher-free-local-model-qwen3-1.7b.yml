@@ -34,7 +34,7 @@ jobs:
       - name: Reuse or repair an existing Release
         id: release_preflight
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           TAG='rechercher-free-local-models-2026-10-qwen3-1.7b'
@@ -50,7 +50,7 @@ jobs:
           )
           complete=true
           asset_names="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || true)"
-          for name in "\${required[@]}"; do
+          for name in "${required[@]}"; do
             if ! grep -Fxq "$name" <<<"$asset_names"; then
               complete=false
               break
