@@ -17,20 +17,37 @@ TARGETS = [
 ]
 TAG = os.environ["OMEGA_RELEASE_TAG"]
 
-def gh_release(repo: str):
-    p = subprocess.run(
+def gh_release_assets(repo: str):
+    release = subprocess.run(
         ["gh", "api", f"repos/{repo}/releases/tags/{TAG}"],
         text=True, capture_output=True, check=False
     )
-    if p.returncode != 0:
-        return None
-    return json.loads(p.stdout)
+    if release.returncode != 0:
+        return None, set()
+    data = json.loads(release.stdout)
+    release_id = data.get("id")
+    if not release_id:
+        return data, set()
+    assets = subprocess.run(
+        [
+            "gh", "api", "--paginate",
+            f"repos/{repo}/releases/{release_id}/assets?per_page=100",
+            "--jq", ".[].name",
+        ],
+        text=True, capture_output=True, check=False
+    )
+    if assets.returncode != 0:
+        raise RuntimeError(
+            f"Unable to enumerate paginated Release assets for {repo}/{TAG}: "
+            f"{assets.stderr.strip() or 'gh api failed'}"
+        )
+    names = {line.strip() for line in assets.stdout.splitlines() if line.strip()}
+    return data, names
 
 found = {}
 complete_targets = []
 for target_id, repo in TARGETS:
-    data = gh_release(repo)
-    assets = {a.get("name") for a in (data or {}).get("assets", [])}
+    data, assets = gh_release_assets(repo)
     model_assets = sorted(name for name in assets if str(name).startswith("omega__"))
     complete = MANIFEST in assets and bool(model_assets)
     found[target_id] = {
