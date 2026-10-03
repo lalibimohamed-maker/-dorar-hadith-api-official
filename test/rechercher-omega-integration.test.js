@@ -107,6 +107,22 @@ test("expanded engine fleet keeps heavyweight models out of automatic acquisitio
 });
 
 
+test("Qwen3-0.6B is referenced through the shared local-weight Release only", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const weights = JSON.parse(await readFile(
+    new URL("../config/rechercher-omega-model-weights.json", import.meta.url), "utf8"
+  ));
+  const omega = weights.weights.find(weight => weight.model_id === "qwen3");
+  assert.ok(omega, "missing qwen3 Omega weight registry entry");
+  assert.equal(omega.acquisition, "external_release_reference");
+  assert.equal(omega.upstream_release_tag, "rechercher-free-local-models-2026-10");
+  assert.equal(omega.upstream_release_asset, "qwen3-0.6b.tar.zst");
+  assert.equal(omega.release_tag, "rechercher-free-local-models-2026-10");
+  assert.equal(omega.release_assets.includes("qwen3-model.safetensors"), false);
+  assert.equal(omega.release_assets.includes("qwen3-runtime-files.tar.gz"), false);
+  assert.equal(omega.release_assets.includes("qwen3-release-manifest.json"), false);
+});
+
 test("persistent Release manifest keeps binary weights out of Git", async () => {
   const { readFile } = await import("node:fs/promises");
   const release = JSON.parse(await readFile(
