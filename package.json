@@ -45,7 +45,8 @@
     "test:omega-integrity": "node --test test/rechercher-omega-integrity-sharding.test.js",
     "test:omega-claims": "node --test test/rechercher-omega-claim-gate.test.js",
     "test:offline": "node --test test/offline-governed-engine.test.js test/offline-runtime-profile.test.js",
-    "test:omega-engine-identity": "node --test test/rechercher-omega-engine-identity.test.js"
+    "test:omega-engine-identity": "node --test test/rechercher-omega-engine-identity.test.js",
+    "test:omega-video": "node --test test/rechercher-omega-video-engine-readiness.test.js test/rechercher-omega-multimodal-router.test.js test/rechercher-omega-hunyuan-runtime.test.js"
   },
   "engines": {
     "node": ">=20"
