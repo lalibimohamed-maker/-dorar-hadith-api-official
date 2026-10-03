@@ -122,7 +122,7 @@ jobs:
 
           card=Path(hf_hub_download(repo_id=model, filename=f"{model_dir}/MODEL_CARD", revision=info.sha))
           card_text=card.read_text(encoding="utf-8", errors="replace")
-          card_license=re.search(r"(?im)^\s*\\*\s*License:\s*(.+?)\s*$", card_text)
+          card_license=re.search(r"(?im)^\s*\*?\s*License\s*:\s*(.+?)\s*$", card_text)
           training=re.search(r"(?im)^\s*\\*\s*(?:Training|Fine-tuning|Fine-tuned from|Trained from scratch).*?$", card_text)
           if not card_license:
               raise SystemExit("MODEL_CARD has no explicit dataset/model license line")
