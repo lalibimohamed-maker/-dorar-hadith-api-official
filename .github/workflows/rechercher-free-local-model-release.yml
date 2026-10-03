@@ -31,12 +31,46 @@ jobs:
         with:
           persist-credentials: false
 
+
+      - name: Reuse existing Release when complete
+        id: release_preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG='rechercher-free-local-models-2026-10'
+          required=(
+            qwen3-0.6b.tar.zst
+            LICENSE-Qwen3-0.6B
+            README-Qwen3-0.6B.md
+            Qwen3-0.6B-config.json
+            runtime-verification.json
+            SHA256SUMS.txt
+            ARCHIVE-SHA256.txt
+          )
+          asset_names="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null || true)"
+          complete=true
+          for name in "${required[@]}"; do
+            if ! grep -Fxq "$name" <<<"$asset_names"; then
+              complete=false
+              break
+            fi
+          done
+          echo "complete=$complete" >> "$GITHUB_OUTPUT"
+          if [ "$complete" = true ]; then
+            echo "Complete Qwen3-0.6B Release already exists; skipping re-acquisition."
+          else
+            echo "Qwen3-0.6B Release is incomplete; acquisition will run."
+          fi
+
       - name: Install acquisition tools
+        if: steps.release_preflight.outputs.complete != 'true'
         run: |
           set -euo pipefail
           python3 -m pip install --disable-pip-version-check --no-cache-dir huggingface_hub safetensors
 
-      - name: Prepare model payload
+      - placeholder-step-gate-Prepare model payload\n      - name: Prepare model payload
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -55,7 +89,7 @@ jobs:
           cp models-work/Qwen3-0.6B/config.json release-model/Qwen3-0.6B-config.json
           tar --zstd -cf release-model/qwen3-0.6b.tar.zst -C models-work Qwen3-0.6B
 
-      - name: Verify payload integrity and size
+      - placeholder-step-gate-Verify payload integrity and size\n      - name: Verify payload integrity and size
         run: |
           set -euo pipefail
           test -s release-model/qwen3-0.6b.tar.zst
@@ -67,7 +101,7 @@ jobs:
             release-model/README-Qwen3-0.6B.md \
             release-model/Qwen3-0.6B-config.json > release-model/SHA256SUMS.txt
 
-      - name: Runtime smoke test
+      - placeholder-step-gate-Runtime smoke test\n      - name: Runtime smoke test
         env:
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
@@ -101,9 +135,16 @@ jobs:
           json.dump(evidence, open('release-model/runtime-verification.json','w'), ensure_ascii=False, indent=2)
           print(json.dumps(evidence, ensure_ascii=False))
           PY
-          sha256sum release-model/runtime-verification.json >> release-model/SHA256SUMS.txt
+          sha256sum \
+            release-model/qwen3-0.6b.tar.zst \
+            release-model/LICENSE-Qwen3-0.6B \
+            release-model/README-Qwen3-0.6B.md \
+            release-model/Qwen3-0.6B-config.json \
+            release-model/runtime-verification.json \
+            > release-model/SHA256SUMS.txt
+          sha256sum release-model/qwen3-0.6b.tar.zst | awk '{print $1 "  qwen3-0.6b.tar.zst"}' > release-model/ARCHIVE-SHA256.txt
 
-      - name: Publish release
+      - placeholder-step-gate-Publish release\n      - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
