@@ -24,7 +24,7 @@ export function selectMultimodalModel({
   const candidates = taskCandidates
     .filter(m => m.tasks.includes(task))
     .filter(m => runtimes.size === 0 || m.runtime.some(r => runtimes.has(r)))
-    .filter(m => !requireClearedWeights || (m.license_status === "cleared" && m.weight_status === "cleared"))
+    .filter(m => !requireClearedWeights || isProductionRuntimeReady(m))
     .sort((a,b) => a.priority - b.priority);
 
   if (!candidates.length) {
@@ -38,7 +38,9 @@ export function selectMultimodalModel({
         id:m.id,
         license_status:m.license_status ?? "unknown",
         weight_status:m.weight_status ?? "unknown",
-        next_action:"acquire_and_verify_weight_artifact"
+        next_action: m.storage_status === "weights_present"
+          ? "complete_license_dependency_and_e2e_runtime_verification"
+          : "acquire_and_verify_weight_artifact"
       })) : [],
       corpus_write_allowed:false,
       generated_media_is_evidence:false
@@ -62,7 +64,14 @@ export function selectMultimodalModel({
   };
 }
 
-export function buildMultimodalJob({
+export function isProductionRuntimeReady(model) {
+  if (model.license_status !== "cleared" || model.weight_status !== "cleared") return false;
+  if (model.runtime_status && model.runtime_status !== "ready") return false;
+  if (model.execution_proof && model.execution_proof !== "e2e_verified") return false;
+  return true;
+}
+
+function buildMultimodalJob({
   fleet,
   task,
   input,
