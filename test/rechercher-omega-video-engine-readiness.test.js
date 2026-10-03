@@ -9,7 +9,8 @@ import {
 test("review-only storage is visible but never execution-ready",()=>{
   const result=evaluateVideoEngineReadiness({
     engineId:"hunyuanvideo-1.5",
-    licenseCleared:false,
+    localUseCleared:false,
+    publicDistributionCleared:false,
     weightsPresent:true,
     distributionTarget:"private"
   });
@@ -21,7 +22,8 @@ test("review-only storage is visible but never execution-ready",()=>{
 test("execution requires runtime, dependencies, immutable revision, SHA-256 and e2e proof",()=>{
   const blocked=evaluateVideoEngineReadiness({
     engineId:"ltx-2",
-    licenseCleared:true,
+    localUseCleared:true,
+    publicDistributionCleared:false,
     weightsPresent:true,
     revisionVerified:true,
     sha256Verified:true,
