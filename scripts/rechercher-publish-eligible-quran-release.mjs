@@ -15,18 +15,32 @@ function arg(name, fallback = "") {
 const root = path.resolve(arg("root", "."));
 let manifestPath = path.resolve(arg("manifest"));
 if (!arg("manifest")) throw new Error("manifest argument is required");
-try {
-  const manifestStat = await fs.stat(manifestPath);
-  if (manifestStat.isDirectory()) manifestPath = path.join(manifestPath, "manifest.json");
-} catch {
-  throw new Error(`manifest path does not exist: ${manifestPath}`);
+
+async function readJsonManifest(inputPath) {
+  const fd = await fs.open(inputPath, "r");
+  try {
+    const stat = await fd.stat();
+    if (stat.isDirectory()) {
+      const nestedPath = path.join(inputPath, "manifest.json");
+      await fd.close();
+      return readJsonManifest(nestedPath);
+    }
+    return JSON.parse(await fd.readFile("utf8"));
+  } finally {
+    try { await fd.close(); } catch {}
+  }
 }
 const repository = arg("repository", "lalibimohamed-maker/dinullah-matrix-6384-storage-01");
 const releasePrefix = arg("release-prefix", "rechercher-quran");
 if (!/^\S+\/\S+$/.test(repository)) throw new Error("invalid Release repository");
 if (!process.env.GH_TOKEN) throw new Error("GH_TOKEN is required");
 
-const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
+let manifest;
+try {
+  manifest = await readJsonManifest(manifestPath);
+} catch (error) {
+  throw new Error(`unable to read manifest: ${manifestPath}: ${error.message}`);
+}
 
 function explicitEligible(value) {
   return Boolean(
@@ -81,10 +95,16 @@ const maxAssetBytes = 2 * 1024 * 1024 * 1024;
 const files = [];
 for (const item of candidates.values()) {
   try {
-    const stat = await fs.stat(item.path);
-    if (!stat.isFile() || stat.size < 1) continue;
-    if (stat.size >= maxAssetBytes) throw new Error("Release asset exceeds GitHub 2 GiB per-asset limit: " + item.path + " (" + stat.size + " bytes)");
     const fd = await fs.open(item.path, "r");
+    const stat = await fd.stat();
+    if (!stat.isFile() || stat.size < 1) {
+      await fd.close();
+      continue;
+    }
+    if (stat.size >= maxAssetBytes) {
+      await fd.close();
+      throw new Error("Release asset exceeds GitHub 2 GiB per-asset limit: " + item.path + " (" + stat.size + " bytes)");
+    }
     const head = Buffer.alloc(5);
     await fd.read(head, 0, 5, 0);
     await fd.close();
