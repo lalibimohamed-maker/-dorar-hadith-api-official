@@ -5,20 +5,42 @@ import process from "node:process";
 import { execFileSync } from "node:child_process";
 
 function arg(name, fallback = "") {
-  const prefix = `--${name}=`;
-  const hit = process.argv.find((value) => value.startsWith(prefix));
-  return hit ? hit.slice(prefix.length) : fallback;
+  const prefix = `--${name}`;
+  const index = process.argv.findIndex((value) => value === prefix || value.startsWith(`${prefix}=`));
+  if (index < 0) return fallback;
+  const value = process.argv[index];
+  if (value.startsWith(`${prefix}=`)) return value.slice(prefix.length);
+  return process.argv[index + 1] ?? fallback;
 }
-
 const root = path.resolve(arg("root", "."));
-const manifestPath = path.resolve(arg("manifest"));
+let manifestPath = path.resolve(arg("manifest"));
+if (!arg("manifest")) throw new Error("manifest argument is required");
+
+async function readJsonManifest(inputPath) {
+  const fd = await fs.open(inputPath, "r");
+  try {
+    const stat = await fd.stat();
+    if (stat.isDirectory()) {
+      const nestedPath = path.join(inputPath, "manifest.json");
+      await fd.close();
+      return readJsonManifest(nestedPath);
+    }
+    return JSON.parse(await fd.readFile("utf8"));
+  } finally {
+    try { await fd.close(); } catch {}
+  }
+}
 const repository = arg("repository", "lalibimohamed-maker/dinullah-matrix-6384-storage-01");
 const releasePrefix = arg("release-prefix", "rechercher-quran");
-if (!manifestPath) throw new Error("manifest argument is required");
 if (!/^\S+\/\S+$/.test(repository)) throw new Error("invalid Release repository");
 if (!process.env.GH_TOKEN) throw new Error("GH_TOKEN is required");
 
-const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
+let manifest;
+try {
+  manifest = await readJsonManifest(manifestPath);
+} catch (error) {
+  throw new Error(`unable to read manifest: ${manifestPath}: ${error.message}`);
+}
 
 function explicitEligible(value) {
   return Boolean(
@@ -73,10 +95,16 @@ const maxAssetBytes = 2 * 1024 * 1024 * 1024;
 const files = [];
 for (const item of candidates.values()) {
   try {
-    const stat = await fs.stat(item.path);
-    if (!stat.isFile() || stat.size < 1) continue;
-    if (stat.size >= maxAssetBytes) throw new Error("Release asset exceeds GitHub 2 GiB per-asset limit: " + item.path + " (" + stat.size + " bytes)");
     const fd = await fs.open(item.path, "r");
+    const stat = await fd.stat();
+    if (!stat.isFile() || stat.size < 1) {
+      await fd.close();
+      continue;
+    }
+    if (stat.size >= maxAssetBytes) {
+      await fd.close();
+      throw new Error("Release asset exceeds GitHub 2 GiB per-asset limit: " + item.path + " (" + stat.size + " bytes)");
+    }
     const head = Buffer.alloc(5);
     await fd.read(head, 0, 5, 0);
     await fd.close();
